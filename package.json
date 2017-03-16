@@ -1,0 +1,23 @@
+{
+  "name": "react-native-track-player",
+  "version": "0.0.1",
+  "description": "An audio player module for React Native which supports media buttons and chromecast",
+  "keywords": [
+    "react",
+    "react-native",
+    "audio-player",
+    "audio",
+    "player",
+    "music",
+    "controls"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Guichaguri/react-native-track-player.git"
+  },
+  "author": "Guichaguri",
+  "peerDependencies": {
+    "react-native": ">=0.40.0"
+  },
+  "rnpm": {}
+}
