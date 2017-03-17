@@ -42,34 +42,44 @@ public class MediaNotification {
 
     @SuppressWarnings("ResourceAsColor")
     public void updateOptions(ReadableMap data) {
+        // Load the icons
         playIcon = loadIcon(data, "playIcon", "play");
         pauseIcon = loadIcon(data, "pauseIcon", "pause");
         stopIcon = loadIcon(data, "stopIcon", "stop");
         previousIcon = loadIcon(data, "previousIcon", "previous");
         nextIcon = loadIcon(data, "nextIcon", "next");
 
+        // Load the color and the small icon
         int color = data.hasKey("color") ? data.getInt("color") : NotificationCompat.COLOR_DEFAULT;
         int icon = data.hasKey("icon") ? Utils.getLocalResourceId(context, data.getMap("icon")) : 0;
 
+        // Update properties
         nb.setColor(color);
         nb.setLights(color, 250, 250);
         nb.setSmallIcon(icon != 0 ? icon : playIcon);
+
+        // Update the notification
+        update();
     }
 
     public void updateMetadata(MediaMetadataCompat metadata) {
+        // Fill notification info
         nb.setContentTitle(metadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE));
         nb.setContentText(metadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST));
         nb.setContentInfo(metadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM));
         nb.setLargeIcon(metadata.getBitmap(MediaMetadataCompat.METADATA_KEY_ART));
 
+        // Update the notification
         update();
     }
 
     public void updatePlayback(PlaybackStateCompat playback) {
+        // Check and update the state
         int state = playback.getState();
         boolean playing = state == PlaybackStateCompat.STATE_PLAYING || state == PlaybackStateCompat.STATE_BUFFERING;
         nb.setOngoing(playing);
 
+        // Check and update action buttons
         long actions = playback.getActions();
         play = updateAction(play, actions, PlaybackStateCompat.ACTION_PLAY, "Play", playIcon);
         pause = updateAction(pause, actions, PlaybackStateCompat.ACTION_PAUSE, "Pause", pauseIcon);
@@ -77,6 +87,7 @@ public class MediaNotification {
         previous = updateAction(previous, actions, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS, "Previous", previousIcon);
         next = updateAction(next, actions, PlaybackStateCompat.ACTION_SKIP_TO_NEXT, "Next", nextIcon);
 
+        // Add the action buttons
         nb.mActions.clear();
         if(previous != null) nb.mActions.add(0, previous);
         if(play != null && !playing) nb.mActions.add(1, play);
@@ -84,21 +95,25 @@ public class MediaNotification {
         if(stop != null) nb.mActions.add(2, stop);
         if(next != null) nb.mActions.add(3, next);
 
+        // Add the play/pause button to the compact view
         if(nb.mActions.get(1) != null) {
             style.setShowActionsInCompactView(1);
         } else {
             style.setShowActionsInCompactView();
         }
 
+        // Update the notification
         update();
     }
 
     private int loadIcon(ReadableMap data, String key, String iconName) {
         if(data.hasKey(key)) {
+            // Load icon from option value
             int id = Utils.getLocalResourceId(context, data.getMap(key));
             if(id != 0) return id;
         }
 
+        // Load default icon
         Resources r = context.getResources();
         String packageName = context.getPackageName();
         return r.getIdentifier(iconName, "drawable", packageName);
@@ -111,13 +126,16 @@ public class MediaNotification {
         // The action is already created
         if(instance != null) return instance;
 
+        // Create an intent for the service
         Intent intent = new Intent(context, PlayerService.class);
         intent.putExtra(PlayerService.MEDIA_BUTTON, action);
 
+        // Create the action
         return new Action(icon, title, PendingIntent.getService(context, 0, intent, 0));
     }
 
     private void update() {
+        // Update the notification if it's showing
         if(showing) setActive(true);
     }
 

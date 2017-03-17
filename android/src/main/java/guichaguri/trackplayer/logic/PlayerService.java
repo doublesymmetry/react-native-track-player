@@ -1,6 +1,7 @@
 package guichaguri.trackplayer.logic;
 
 import android.content.Intent;
+import android.support.v4.media.session.MediaButtonReceiver;
 import com.facebook.react.HeadlessJsTaskService;
 import com.facebook.react.jstasks.HeadlessJsTaskConfig;
 import javax.annotation.Nullable;
@@ -18,6 +19,8 @@ public class PlayerService extends HeadlessJsTaskService {
 
         if(intent.hasExtra(MEDIA_BUTTON)) {
 
+        } else if(intent.hasExtra(Intent.EXTRA_KEY_EVENT)) {
+            MediaButtonReceiver.handleIntent(null, intent);//TODO
         }
 
         return new HeadlessJsTaskConfig("track-player", null, 0, true);

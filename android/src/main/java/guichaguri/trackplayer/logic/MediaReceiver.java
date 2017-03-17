@@ -12,7 +12,13 @@ public class MediaReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        String action = intent.getAction();
 
+        if(Intent.ACTION_MEDIA_BUTTON.equals(action)) {
+            Intent i = new Intent(context, PlayerService.class);
+            i.putExtra(Intent.EXTRA_KEY_EVENT, intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT));
+            context.startService(i);
+        }
     }
 
 }
