@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * @author Guilherme Chaguri
  */
-public class TrackPlayer implements ReactPackage {
+public class TrackPackage implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext context) {
         List<NativeModule> modules = new ArrayList<>();

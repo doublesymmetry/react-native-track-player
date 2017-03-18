@@ -1,4 +1,4 @@
-package guichaguri.trackplayer.metadata;
+package guichaguri.trackplayer.metadata.components;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -10,6 +10,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
 import guichaguri.trackplayer.logic.Utils;
+import guichaguri.trackplayer.metadata.Metadata;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;

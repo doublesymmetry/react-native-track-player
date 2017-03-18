@@ -1,4 +1,4 @@
-package guichaguri.trackplayer.metadata;
+package guichaguri.trackplayer.metadata.components;
 
 import android.app.PendingIntent;
 import android.content.Context;
@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.support.v4.app.NotificationCompat.Action;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -38,6 +39,9 @@ public class MediaNotification {
 
         nb.setStyle(style);
         nb.setCategory(NotificationCompat.CATEGORY_TRANSPORT);
+        nb.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        nb.setDeleteIntent(createActionIntent(PlaybackStateCompat.ACTION_STOP));
+        nb.setContentIntent(session.getController().getSessionActivity());
     }
 
     @SuppressWarnings("ResourceAsColor")
@@ -63,11 +67,13 @@ public class MediaNotification {
     }
 
     public void updateMetadata(MediaMetadataCompat metadata) {
+        MediaDescriptionCompat description = metadata.getDescription();
+
         // Fill notification info
-        nb.setContentTitle(metadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE));
-        nb.setContentText(metadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST));
-        nb.setContentInfo(metadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM));
-        nb.setLargeIcon(metadata.getBitmap(MediaMetadataCompat.METADATA_KEY_ART));
+        nb.setContentTitle(description.getTitle());
+        nb.setContentText(description.getSubtitle());
+        nb.setSubText(description.getDescription());
+        nb.setLargeIcon(description.getIconBitmap());
 
         // Update the notification
         update();
@@ -75,8 +81,7 @@ public class MediaNotification {
 
     public void updatePlayback(PlaybackStateCompat playback) {
         // Check and update the state
-        int state = playback.getState();
-        boolean playing = state == PlaybackStateCompat.STATE_PLAYING || state == PlaybackStateCompat.STATE_BUFFERING;
+        boolean playing = Utils.isPlaying(playback.getState());
         nb.setOngoing(playing);
 
         // Check and update action buttons
@@ -101,6 +106,7 @@ public class MediaNotification {
         } else {
             style.setShowActionsInCompactView();
         }
+        nb.setStyle(style);
 
         // Update the notification
         update();
@@ -126,12 +132,19 @@ public class MediaNotification {
         // The action is already created
         if(instance != null) return instance;
 
+        // Create the action
+        return new Action(icon, title, createActionIntent(action));
+    }
+
+    /**
+     * Should be replaced by MediaButtonReceiver.buildMediaButtonPendingIntent
+     * when React Native updates to a newer support library version
+     */
+    private PendingIntent createActionIntent(long action) {
         // Create an intent for the service
         Intent intent = new Intent(context, PlayerService.class);
         intent.putExtra(PlayerService.MEDIA_BUTTON, action);
-
-        // Create the action
-        return new Action(icon, title, PendingIntent.getService(context, 0, intent, 0));
+        return PendingIntent.getService(context, 0, intent, 0);
     }
 
     private void update() {

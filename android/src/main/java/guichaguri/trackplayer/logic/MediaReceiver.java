@@ -15,9 +15,12 @@ public class MediaReceiver extends BroadcastReceiver {
         String action = intent.getAction();
 
         if(Intent.ACTION_MEDIA_BUTTON.equals(action)) {
+
+            // Sends media keys to the service
             Intent i = new Intent(context, PlayerService.class);
             i.putExtra(Intent.EXTRA_KEY_EVENT, intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT));
             context.startService(i);
+
         }
     }
 

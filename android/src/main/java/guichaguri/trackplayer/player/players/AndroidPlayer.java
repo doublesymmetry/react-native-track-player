@@ -45,10 +45,13 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
     @Override
     public void load(ReadableMap data, Callback callback) throws IOException {
         Uri url = Utils.getUri(context, data, "url");
+        buffering = true;
         loadCallback = callback;
 
         player.setDataSource(context, url);
         player.prepareAsync();
+
+        updateMetadata();
     }
 
     @Override
@@ -149,6 +152,9 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
             loadCallback.invoke();
             loadCallback = null;
         }
+
+        buffering = false;
+        updateMetadata();
     }
 
     @Override

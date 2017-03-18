@@ -11,6 +11,10 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import com.facebook.react.bridge.ReadableMap;
 import guichaguri.trackplayer.logic.MediaReceiver;
 import guichaguri.trackplayer.logic.Utils;
+import guichaguri.trackplayer.metadata.components.ArtworkLoader;
+import guichaguri.trackplayer.metadata.components.ButtonListener;
+import guichaguri.trackplayer.metadata.components.CustomVolume;
+import guichaguri.trackplayer.metadata.components.MediaNotification;
 import guichaguri.trackplayer.player.Player;
 import guichaguri.trackplayer.player.RemotePlayer;
 
@@ -30,7 +34,7 @@ public class Metadata {
     private PlaybackStateCompat.Builder pb = new PlaybackStateCompat.Builder();
 
     private int ratingType = RatingCompat.RATING_HEART;
-    private int maxArtworkSize = 1000;
+    private int maxArtworkSize = 2000;
     private String artworkUri = null;
 
     public Metadata(Context context) {
@@ -41,7 +45,7 @@ public class Metadata {
 
         session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
                 MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-        session.setCallback(new ButtonListener());
+        session.setCallback(new ButtonListener(context));
 
         notification = new MediaNotification(context, session);
     }
@@ -73,7 +77,7 @@ public class Metadata {
 
         // Load the options
         ratingType = Utils.getInt(data, "ratingType", RatingCompat.RATING_HEART);
-        maxArtworkSize = Utils.getInt(data, "maxArtworkSize", 1000);
+        maxArtworkSize = Utils.getInt(data, "maxArtworkSize", 2000);
 
         // Update the rating type
         session.setRatingType(ratingType);
@@ -88,7 +92,7 @@ public class Metadata {
         md.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, Utils.getString(data, "artist"));
         md.putString(MediaMetadataCompat.METADATA_KEY_GENRE, Utils.getString(data, "genre"));
         md.putString(MediaMetadataCompat.METADATA_KEY_DATE, Utils.getString(data, "date"));
-        md.putRating(MediaMetadataCompat.METADATA_KEY_RATING, Utils.getRating(ratingType, data, "rating"));
+        md.putRating(MediaMetadataCompat.METADATA_KEY_RATING, Utils.getRating("rating", data, ratingType));
         md.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, Utils.getTime(data, "duration", duration));
 
         // Load the artwork
@@ -118,7 +122,7 @@ public class Metadata {
         if(player instanceof RemotePlayer) {
             // Set the volume control to remote
             RemotePlayer remote = (RemotePlayer)player;
-            volume = CustomVolume.updateVolume(volume, remote.canChangeVolume(), (int)(remote.getVolume() * 100), 100);
+            volume = CustomVolume.updateVolume(remote, volume, 100);
             session.setPlaybackToRemote(volume);
         } else {
             // Set the volume control to local
@@ -158,7 +162,7 @@ public class Metadata {
         artwork.start();
     }
 
-    protected void updateArtwork(String uri, Bitmap bitmap, boolean fromLoader) {
+    public void updateArtwork(String uri, Bitmap bitmap, boolean fromLoader) {
         // Interrupt the artwork thread if it's running
         if(!fromLoader && artwork != null) artwork.interrupt();
         artwork = null;

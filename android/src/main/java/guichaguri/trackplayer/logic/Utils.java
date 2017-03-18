@@ -1,10 +1,14 @@
 package guichaguri.trackplayer.logic;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.media.RatingCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
 
 /**
@@ -36,7 +40,11 @@ public class Utils {
         return map.hasKey(key) && map.getType(key) == ReadableType.Number ? (long)(map.getDouble(key) * 1000) : def;
     }
 
-    public static RatingCompat getRating(int ratingType, ReadableMap data, String key) {
+    public static void setTime(WritableMap map, String key, long time) {
+        map.putDouble(key, time / 1000D);
+    }
+
+    public static RatingCompat getRating(String key, ReadableMap data, int ratingType) {
         if(!data.hasKey(key)) {
             return RatingCompat.newUnratedRating(ratingType);
         } else if(ratingType == RatingCompat.RATING_HEART) {
@@ -47,6 +55,21 @@ public class Utils {
             return RatingCompat.newPercentageRating((float)Utils.getDouble(data, key, 0));
         } else {
             return RatingCompat.newStarRating(ratingType, (float)Utils.getDouble(data, key, 0));
+        }
+    }
+
+    public static void setRating(String key, WritableMap data, RatingCompat rating) {
+        if(!rating.isRated()) return;
+        int ratingType = rating.getRatingStyle();
+
+        if(ratingType == RatingCompat.RATING_HEART) {
+            data.putBoolean(key, rating.hasHeart());
+        } else if(ratingType == RatingCompat.RATING_THUMB_UP_DOWN) {
+            data.putBoolean(key, rating.isThumbUp());
+        } else if(ratingType == RatingCompat.RATING_PERCENTAGE) {
+            data.putDouble(key, rating.getPercentRating());
+        } else {
+            data.putDouble(key, rating.getStarRating());
         }
     }
 
@@ -66,6 +89,19 @@ public class Utils {
         } else {
             return Uri.parse(map.getString(key));
         }
+    }
+
+    public static boolean isPlaying(int state) {
+        return state == PlaybackStateCompat.STATE_PLAYING || state == PlaybackStateCompat.STATE_BUFFERING;
+    }
+
+    public static void dispatchEvent(Context context, String event, WritableMap data) {
+        Intent i = new Intent(context, PlayerTask.class);
+
+        if(event != null) i.putExtra(PlayerTask.EVENT_TYPE, event);
+        if(data != null) i.putExtra(PlayerTask.EVENT_DATA, Arguments.toBundle(data));
+
+        context.startService(i);
     }
 
 }
