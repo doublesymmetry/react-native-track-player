@@ -1,22 +1,22 @@
 package guichaguri.trackplayer.player;
 
 import android.content.Context;
-import android.media.AudioManager;
-import android.media.AudioManager.OnAudioFocusChangeListener;
 import guichaguri.trackplayer.logic.Utils;
+import guichaguri.trackplayer.player.components.FocusManager;
 
 /**
  * @author Guilherme Chaguri
  */
-public class PlayerManager implements OnAudioFocusChangeListener {
+public class PlayerManager {
 
     private final Context context;
-    private Player[] players = new Player[0];
+    private final FocusManager focus;
 
-    private boolean hasAudioFocus = false;
+    private Player[] players = new Player[0];//TODO
 
     public PlayerManager(Context context) {
         this.context = context;
+        this.focus = new FocusManager(context);
     }
 
     public boolean isPlaying() {
@@ -26,40 +26,24 @@ public class PlayerManager implements OnAudioFocusChangeListener {
         return false;
     }
 
-    public boolean onPlay(Player player) {
-        if(player instanceof RemotePlayer) return true;
-        if(hasAudioFocus) return true;
-
-        AudioManager manager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
-        int r = manager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-
-        if(r == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            hasAudioFocus = true;
-            return true;
+    public boolean isPlayingLocal() {
+        for(Player p : players) {
+            if(p instanceof RemotePlayer) continue;
+            if(Utils.isPlaying(p.getState())) return true;
         }
         return false;
     }
 
-    public void onStop(Player player) {
-        if(!hasAudioFocus) return;
-
-        AudioManager manager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
-        manager.abandonAudioFocus(this);
-    }
-
-    @Override
-    public void onAudioFocusChange(int focus) {
-        switch(focus) {
-            case AudioManager.AUDIOFOCUS_LOSS:
-            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                // TODO pause everything
-                break;
-            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                // TODO duck everything
-                break;
-            case AudioManager.AUDIOFOCUS_GAIN:
-                // TODO play and "unduck" everything
-                break;
+    public void onPlay(Player p) {
+        if(!(p instanceof RemotePlayer)) {
+            focus.enable();
         }
     }
+
+    public void onStop() {
+        if(!isPlayingLocal()) {
+            focus.disable();
+        }
+    }
+
 }

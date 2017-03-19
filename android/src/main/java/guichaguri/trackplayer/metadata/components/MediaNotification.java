@@ -1,9 +1,11 @@
 package guichaguri.trackplayer.metadata.components;
 
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat.Action;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.media.MediaDescriptionCompat;
@@ -20,6 +22,8 @@ import guichaguri.trackplayer.logic.Utils;
  * @author Guilherme Chaguri
  */
 public class MediaNotification {
+
+    public static final int NOTIFICATION_ID = 6402;
 
     private final Context context;
 
@@ -84,6 +88,19 @@ public class MediaNotification {
         boolean playing = Utils.isPlaying(playback.getState());
         nb.setOngoing(playing);
 
+        // For pre-lollipop devices, service notifications were ongoing even after foreground was disabled
+        // To fix the issue, we'll add a cancel button for them
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            if(playing) {
+                // Remove the cancel button when playing
+                style.setShowCancelButton(false);
+            } else {
+                // Add the cancel button and set its action when not playing
+                style.setCancelButtonIntent(createActionIntent(PlaybackStateCompat.ACTION_STOP));
+                style.setShowCancelButton(true);
+            }
+        }
+
         // Check and update action buttons
         long actions = playback.getActions();
         play = updateAction(play, actions, PlaybackStateCompat.ACTION_PLAY, "Play", playIcon);
@@ -106,9 +123,9 @@ public class MediaNotification {
         } else {
             style.setShowActionsInCompactView();
         }
-        nb.setStyle(style);
 
         // Update the notification
+        nb.setStyle(style);
         update();
     }
 
@@ -143,24 +160,23 @@ public class MediaNotification {
     private PendingIntent createActionIntent(long action) {
         // Create an intent for the service
         Intent intent = new Intent(context, PlayerService.class);
-        intent.putExtra(PlayerService.MEDIA_BUTTON, action);
+        intent.putExtra(Intent.EXTRA_KEY_EVENT, Utils.toKeyCode(action));
         return PendingIntent.getService(context, 0, intent, 0);
     }
 
     private void update() {
         // Update the notification if it's showing
-        if(showing) setActive(true);
+        if(showing) {
+            NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, nb.build());
+        }
     }
 
-    public void setActive(boolean active) {
-        NotificationManagerCompat manager = NotificationManagerCompat.from(context);
+    public Notification build() {
+        return nb.build();
+    }
 
-        if(active) {
-            manager.notify("TrackPlayer", 0, nb.build());
-        } else {
-            manager.cancel("TrackPlayer", 0);
-        }
-        showing = active;
+    public void setShowing(boolean showing) {
+        this.showing = showing;
     }
 
 }

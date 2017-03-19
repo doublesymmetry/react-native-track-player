@@ -2,12 +2,15 @@ package guichaguri.trackplayer.metadata;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
+import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.view.KeyEvent;
 import com.facebook.react.bridge.ReadableMap;
 import guichaguri.trackplayer.logic.MediaReceiver;
 import guichaguri.trackplayer.logic.Utils;
@@ -51,9 +54,8 @@ public class Metadata {
     }
 
     public void setEnabled(boolean enabled) {
-        // Change the MediaSession and the notification visibility
+        // Change the MediaSession visibility
         session.setActive(enabled);
-        notification.setActive(enabled);
     }
 
     public void attachPlayer(Player player) {
@@ -178,6 +180,22 @@ public class Metadata {
         notification.updateMetadata(metadata);
     }
 
+    public void handleIntent(Intent intent) {
+        // A copy of MediaButtonReceiver.handleIntent without action checks
+        if(intent.hasExtra(Intent.EXTRA_KEY_EVENT)) {
+            KeyEvent ke = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+            session.getController().dispatchMediaButtonEvent(ke);
+        }
+    }
+
+    public MediaNotification getNotification() {
+        return notification;
+    }
+
+    public MediaControllerCompat.TransportControls getControls() {
+        return session.getController().getTransportControls();
+    }
+
     public void reset() {
         // Interrupt the artwork thread if it's running
         if(artwork != null) artwork.interrupt();
@@ -205,9 +223,6 @@ public class Metadata {
     public void destroy() {
         // Interrupt the artwork thread if it's running
         if(artwork != null) artwork.interrupt();
-
-        // Remove the notification
-        notification.setActive(false);
 
         // Release the media session
         session.release();
