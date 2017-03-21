@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.support.v4.media.session.PlaybackStateCompat;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableMap;
+import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.player.Player;
 import java.io.IOException;
@@ -32,8 +33,9 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
 
     private float buffered = 0;
 
-    public AndroidPlayer(Context context) {
-        super(context);
+    public AndroidPlayer(Context context, MediaManager manager) {
+        super(context, manager);
+
         player = new MediaPlayer();
         player.setOnInfoListener(this);
         player.setOnCompletionListener(this);
@@ -51,7 +53,7 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
         player.setDataSource(context, url);
         player.prepareAsync();
 
-        updateMetadata();
+        updateState();
     }
 
     @Override
@@ -59,14 +61,14 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
         player.start();
         buffering = false;
         paused = false;
-        updateMetadata();
+        updateState();
     }
 
     @Override
     public void pause() {
         player.pause();
         paused = true;
-        updateMetadata();
+        updateState();
     }
 
     @Override
@@ -74,7 +76,7 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
         player.stop();
         buffering = false;
         paused = false;
-        updateMetadata();
+        updateState();
     }
 
     @Override
@@ -104,7 +106,7 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
     public void seekTo(int ms) {
         buffering = true;
         player.seekTo(ms);
-        updateMetadata();
+        updateState();
     }
 
     @Override
@@ -127,23 +129,23 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
     public boolean onInfo(MediaPlayer mp, int what, int extra) {
         if(what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
             buffering = true;
-            updateMetadata();
+            updateState();
         } else if(what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
             buffering = false;
-            updateMetadata();
+            updateState();
         }
         return true;
     }
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        updateMetadata();
+        updateState();
     }
 
     @Override
     public void onSeekComplete(MediaPlayer mp) {
         buffering = false;
-        updateMetadata();
+        updateState();
     }
 
     @Override
@@ -154,12 +156,16 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
         }
 
         buffering = false;
-        updateMetadata();
+        updateState();
     }
 
     @Override
     public void onBufferingUpdate(MediaPlayer mp, int percent) {
         buffered = percent / 100F;
         updateMetadata();
+    }
+
+    private void updateState() {
+        updateState(getState());
     }
 }

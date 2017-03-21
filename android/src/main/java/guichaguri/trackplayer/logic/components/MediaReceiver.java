@@ -1,8 +1,9 @@
-package guichaguri.trackplayer.logic;
+package guichaguri.trackplayer.logic.components;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import guichaguri.trackplayer.logic.PlayerService;
 
 /**
  * Receives media buttons

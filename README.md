@@ -14,3 +14,4 @@ This is a work-in-progress project not ready for production yet.
 * [ ] *Optional* Chromecast support (Custom Media Receiver)
 * [ ] Video support (maybe)
 * [x] Everything is event-based (nothing happens unless you allow them to)
+* [ ] iOS support

@@ -1,24 +1,26 @@
 package guichaguri.trackplayer;
 
-import android.content.Context;
+import android.app.Service;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 import com.facebook.react.bridge.BaseJavaModule;
+import com.facebook.react.bridge.LifecycleEventListener;
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactMethod;
-import guichaguri.trackplayer.metadata.Metadata;
-import guichaguri.trackplayer.player.Player;
-import guichaguri.trackplayer.player.players.AndroidPlayer;
-import java.util.Arrays;
+import guichaguri.trackplayer.logic.MediaManager;
+import guichaguri.trackplayer.logic.PlayerService;
 
 /**
  * @author Guilherme Chaguri
  */
-public class TrackModule extends BaseJavaModule {
+public class TrackModule extends BaseJavaModule implements ServiceConnection, LifecycleEventListener {
 
-    private final Context context;
+    private final ReactApplicationContext context;
+    private MediaManager manager = null;
 
-    private Player[] players = new Player[0];
-    private Metadata[] metadatas = new Metadata[0];
-
-    public TrackModule(Context context) {
+    public TrackModule(ReactApplicationContext context) {
         this.context = context;
     }
 
@@ -27,58 +29,49 @@ public class TrackModule extends BaseJavaModule {
         return "TrackPlayer";
     }
 
+    @Override
+    public void initialize() {
+        super.initialize();
+
+        context.addLifecycleEventListener(this);
+
+        Intent intent = new Intent(context, PlayerService.class);
+        context.bindService(intent, this, Service.BIND_AUTO_CREATE);
+    }
+
     @ReactMethod
     public int createPlayer() {
-        int id = players.length;
-        players = Arrays.copyOf(players, id + 1);
-        players[id] = new AndroidPlayer(context); // TODO
-        return id;
+        return manager.createPlayer();
     }
 
     @ReactMethod
     public void destroyPlayer(int id) {
-        if(id == -1) {
-            // Destroys all players
-            for(Player p : players) p.destroy();
-            players = new Player[0];
-        } else {
-            Player[] pls = new Player[players.length - 1];
-            for(int o = 0; o < players.length; o++) {
-                if(id == o) {
-                    players[o].destroy();
-                } else {
-                    pls[o > id ? o - 1 : o] = players[o];
-                }
-            }
-            players = pls;
-        }
+        manager.destroyPlayer(id);
     }
 
-    @ReactMethod
-    public int createMetadata() {
-        int id = metadatas.length;
-        metadatas = Arrays.copyOf(metadatas, id + 1);
-        metadatas[id] = new Metadata(context);
-        return id;
+    @Override
+    public void onHostResume() {
+
     }
 
-    @ReactMethod
-    public void destroyMetadata(int id) {
-        if(id == -1) {
-            // Destroys all players
-            for(Metadata p : metadatas) p.destroy();
-            metadatas = new Metadata[0];
-        } else {
-            Metadata[] pls = new Metadata[metadatas.length - 1];
-            for(int o = 0; o < metadatas.length; o++) {
-                if(id == o) {
-                    metadatas[o].destroy();
-                } else {
-                    pls[o > id ? o - 1 : o] = metadatas[o];
-                }
-            }
-            metadatas = pls;
-        }
+    @Override
+    public void onHostPause() {
+
     }
 
+    @Override
+    public void onHostDestroy() {
+        context.removeLifecycleEventListener(this);
+        context.unbindService(this);
+    }
+
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        manager = (MediaManager)service;
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+        manager = null;
+    }
 }

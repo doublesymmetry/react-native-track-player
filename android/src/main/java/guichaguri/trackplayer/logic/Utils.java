@@ -96,6 +96,15 @@ public class Utils {
         return state == PlaybackStateCompat.STATE_PLAYING || state == PlaybackStateCompat.STATE_BUFFERING;
     }
 
+    public static boolean isPaused(int state) {
+        return state == PlaybackStateCompat.STATE_PAUSED;
+    }
+
+    public static boolean isStopped(int state) {
+        return state == PlaybackStateCompat.STATE_NONE || state == PlaybackStateCompat.STATE_STOPPED ||
+                state == PlaybackStateCompat.STATE_ERROR;
+    }
+
     public static void dispatchEvent(Context context, String event, WritableMap data) {
         Intent i = new Intent(context, PlayerTask.class);
 

@@ -45,7 +45,7 @@ public class CustomVolume extends VolumeProviderCompat {
         // Increase/decrease the new volume based on the direction by 10%
         vol += (maxVol / 10) * direction;
 
-        // Clamp the volume
+        // Clamp the volume (0-maxVol)
         vol = Math.max(vol, 0);
         vol = Math.min(vol, maxVol);
 

@@ -4,7 +4,8 @@ import android.content.Context;
 import android.os.SystemClock;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableMap;
-import guichaguri.trackplayer.metadata.Metadata;
+import guichaguri.trackplayer.logic.MediaManager;
+import guichaguri.trackplayer.logic.Utils;
 import java.io.IOException;
 
 /**
@@ -13,10 +14,12 @@ import java.io.IOException;
 public abstract class Player {
 
     protected final Context context;
-    private Metadata metadata;
+    protected final MediaManager manager;
+    private int prevState = 0;
 
-    protected Player(Context context) {
+    protected Player(Context context, MediaManager manager) {
         this.context = context;
+        this.manager = manager;
     }
 
     public abstract void load(ReadableMap data, Callback loadCallback) throws IOException;
@@ -50,12 +53,22 @@ public abstract class Player {
 
     public abstract void destroy();
 
-    public final void bindMetadata(Metadata metadata) {
-        this.metadata = metadata;
+    protected final void updateState(int state) {
+        updateMetadata();
+
+        if(Utils.isPlaying(state) && !Utils.isPlaying(prevState)) {
+            manager.onPlay(this);
+        } else if(Utils.isPaused(state) && !Utils.isPaused(prevState)) {
+            manager.onPause(this);
+        } else if(Utils.isStopped(state) && !Utils.isStopped(prevState)) {
+            manager.onStop(this);
+        }
+
+        prevState = state;
     }
 
     protected final void updateMetadata() {
-        if(metadata != null) metadata.updatePlayback();
+        manager.onUpdate(this);
     }
 
 }

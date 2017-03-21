@@ -1,4 +1,4 @@
-package guichaguri.trackplayer.player.components;
+package guichaguri.trackplayer.logic.components;
 
 import android.content.Context;
 import android.media.AudioManager;
