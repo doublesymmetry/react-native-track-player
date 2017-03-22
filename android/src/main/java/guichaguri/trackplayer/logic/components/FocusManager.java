@@ -3,6 +3,7 @@ package guichaguri.trackplayer.logic.components;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
+import guichaguri.trackplayer.metadata.Metadata;
 
 /**
  * @author Guilherme Chaguri
@@ -10,10 +11,16 @@ import android.media.AudioManager.OnAudioFocusChangeListener;
 public class FocusManager implements OnAudioFocusChangeListener {
 
     private final Context context;
+    private final Metadata metadata;
+
     private boolean hasAudioFocus = false;
 
-    public FocusManager(Context context) {
+    private boolean paused = false;
+    private boolean ducking = false;
+
+    public FocusManager(Context context, Metadata metadata) {
         this.context = context;
+        this.metadata = metadata;
     }
 
     public boolean enable() {
@@ -42,13 +49,23 @@ public class FocusManager implements OnAudioFocusChangeListener {
         switch(focus) {
             case AudioManager.AUDIOFOCUS_LOSS:
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                // TODO pause everything
+                paused = true;
+                metadata.getControls().pause();
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                // TODO duck everything
+                ducking = true;
+                // TODO duck
                 break;
             case AudioManager.AUDIOFOCUS_GAIN:
-                // TODO play and "unduck" everything
+                if(paused) {
+                    paused = false;
+                    metadata.getControls().play();
+                }
+
+                if(ducking) {
+                    ducking = false;
+                    // TODO unduck
+                }
                 break;
         }
     }

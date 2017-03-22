@@ -1,7 +1,7 @@
 package guichaguri.trackplayer.logic;
 
 import android.content.Intent;
-import android.os.Binder;
+import com.facebook.react.bridge.ReadableMap;
 import guichaguri.trackplayer.logic.components.FocusManager;
 import guichaguri.trackplayer.metadata.Metadata;
 import guichaguri.trackplayer.metadata.components.MediaNotification;
@@ -13,7 +13,7 @@ import java.util.Arrays;
 /**
  * @author Guilherme Chaguri
  */
-public class MediaManager extends Binder {
+public class MediaManager {
 
     private final PlayerService service;
     private final FocusManager focus;
@@ -25,29 +25,27 @@ public class MediaManager extends Binder {
 
     public MediaManager(PlayerService service) {
         this.service = service;
-        this.focus = new FocusManager(service);
         this.metadata = new Metadata(service);
+        this.focus = new FocusManager(service, metadata);
     }
 
-    public boolean isPlaying() {
-        for(Player p : players) {
-            if(Utils.isPlaying(p.getState())) return true;
-        }
-        return false;
+    public void updateOptions(ReadableMap data) {
+        metadata.updateOptions(data);
     }
 
-    public boolean isPlayingLocal() {
-        for(Player p : players) {
-            if(p instanceof RemotePlayer) continue;
-            if(Utils.isPlaying(p.getState())) return true;
-        }
-        return false;
+    public void updateMetadata(ReadableMap data) {
+        metadata.updateMetadata(mainPlayer, data);
+    }
+
+    public void resetMetadata() {
+        metadata.reset();
+        mainPlayer = null;
     }
 
     public int createPlayer() {
         int id = players.length;
         players = Arrays.copyOf(players, id + 1);
-        players[id] = new AndroidPlayer(service, this); // TODO
+        players[id] = new AndroidPlayer(service, this); // TODO type
         return id;
     }
 
@@ -67,6 +65,14 @@ public class MediaManager extends Binder {
             }
             players = pls;
         }
+    }
+
+    public Player getPlayer(int id) {
+        return players[id];
+    }
+
+    public Player[] getPlayers() {
+        return players;
     }
 
     public void setMainPlayer(Player player) {
@@ -157,6 +163,14 @@ public class MediaManager extends Binder {
 
         // Deactivate the session
         metadata.setEnabled(false);
+    }
+
+    private boolean isPlayingLocal() {
+        for(Player p : players) {
+            if(p instanceof RemotePlayer) continue;
+            if(Utils.isPlaying(p.getState())) return true;
+        }
+        return false;
     }
 
 }

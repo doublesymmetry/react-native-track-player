@@ -6,6 +6,7 @@ import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableMap;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
+import guichaguri.trackplayer.player.view.PlayerView;
 import java.io.IOException;
 
 /**
@@ -21,6 +22,11 @@ public abstract class Player {
         this.context = context;
         this.manager = manager;
     }
+
+    /**
+     * Custom data
+     */
+    public abstract void update(ReadableMap data, Callback updateCallback);
 
     public abstract void load(ReadableMap data, Callback loadCallback) throws IOException;
 
@@ -45,11 +51,13 @@ public abstract class Player {
 
     public abstract long getDuration();
 
-    public abstract void seekTo(int ms);
+    public abstract void seekTo(long ms);
 
     public abstract float getSpeed();
 
     public abstract void setVolume(float volume);
+
+    public abstract void bindView(PlayerView view);
 
     public abstract void destroy();
 

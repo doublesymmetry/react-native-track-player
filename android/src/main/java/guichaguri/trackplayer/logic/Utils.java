@@ -38,11 +38,11 @@ public class Utils {
     }
 
     public static long getTime(ReadableMap map, String key, long def) {
-        return map.hasKey(key) && map.getType(key) == ReadableType.Number ? (long)(map.getDouble(key) * 1000) : def;
+        return map.hasKey(key) && map.getType(key) == ReadableType.Number ? toMillis(map.getDouble(key)) : def;
     }
 
     public static void setTime(WritableMap map, String key, long time) {
-        map.putDouble(key, time / 1000D);
+        map.putDouble(key, toSeconds(time));
     }
 
     public static RatingCompat getRating(String key, ReadableMap data, int ratingType) {
@@ -72,6 +72,14 @@ public class Utils {
         } else {
             data.putDouble(key, rating.getStarRating());
         }
+    }
+
+    public static long toMillis(double seconds) {
+        return (long)(seconds * 1000);
+    }
+
+    public static double toSeconds(long millis) {
+        return millis / 1000D;
     }
 
     public static String getLocalResource(ReadableMap local) {

@@ -27,6 +27,8 @@ public class TrackPackage implements ReactPackage {
 
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
-        return Collections.emptyList();
+        List<ViewManager> views = new ArrayList<>();
+        //views.add(new VideoManager()); // TODO
+        return views;
     }
 }

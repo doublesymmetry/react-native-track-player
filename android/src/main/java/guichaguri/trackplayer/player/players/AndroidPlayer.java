@@ -14,6 +14,7 @@ import com.facebook.react.bridge.ReadableMap;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.player.Player;
+import guichaguri.trackplayer.player.view.PlayerView;
 import java.io.IOException;
 
 /**
@@ -42,6 +43,11 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
         player.setOnSeekCompleteListener(this);
         player.setOnPreparedListener(this);
         player.setOnBufferingUpdateListener(this);
+    }
+
+    @Override
+    public void update(ReadableMap data, Callback updateCallback) {
+
     }
 
     @Override
@@ -103,9 +109,9 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
     }
 
     @Override
-    public void seekTo(int ms) {
+    public void seekTo(long ms) {
         buffering = true;
-        player.seekTo(ms);
+        player.seekTo((int)ms);
         updateState();
     }
 
@@ -118,6 +124,11 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
     public void setVolume(float volume) {
         player.setVolume(volume, volume);
         updateMetadata();
+    }
+
+    @Override
+    public void bindView(PlayerView view) {
+        player.setDisplay(view != null ? view.getHolder() : null);
     }
 
     @Override

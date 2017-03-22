@@ -15,7 +15,7 @@ public class PlayerService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return manager;
+        return new MediaWrapper(manager);
     }
 
     @Override
