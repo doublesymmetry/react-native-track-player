@@ -1,11 +1,12 @@
-package guichaguri.trackplayer.logic;
+package guichaguri.trackplayer.logic.components;
 
 import android.os.Binder;
 import android.os.SystemClock;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableMap;
+import guichaguri.trackplayer.logic.MediaManager;
+import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.player.Player;
-import guichaguri.trackplayer.player.view.PlayerView;
 import java.io.IOException;
 
 /**
@@ -104,10 +105,6 @@ public class MediaWrapper extends Binder {
         } else {
             for(Player p : manager.getPlayers()) p.setVolume(volume);
         }
-    }
-
-    public void setView(int id, PlayerView view) {
-        manager.getPlayer(id).bindView(view);
     }
 
     public double getDuration(int id) {

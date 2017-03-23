@@ -13,6 +13,7 @@ import java.util.List;
  * @author Guilherme Chaguri
  */
 public class TrackPackage implements ReactPackage {
+
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext context) {
         List<NativeModule> modules = new ArrayList<>();
@@ -26,9 +27,9 @@ public class TrackPackage implements ReactPackage {
     }
 
     @Override
-    public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
+    public List<ViewManager> createViewManagers(ReactApplicationContext context) {
         List<ViewManager> views = new ArrayList<>();
-        //views.add(new VideoManager()); // TODO
+        views.add(new VideoManager(context));
         return views;
     }
 }

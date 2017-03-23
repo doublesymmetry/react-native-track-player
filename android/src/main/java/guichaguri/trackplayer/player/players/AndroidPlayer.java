@@ -1,6 +1,7 @@
 package guichaguri.trackplayer.player.players;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -38,6 +39,8 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
         super(context, manager);
 
         player = new MediaPlayer();
+        player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
         player.setOnInfoListener(this);
         player.setOnCompletionListener(this);
         player.setOnSeekCompleteListener(this);
@@ -47,7 +50,9 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
 
     @Override
     public void update(ReadableMap data, Callback updateCallback) {
+        player.setScreenOnWhilePlaying(Utils.getBoolean(data, "keepScreenActive", false));
 
+        updateCallback.invoke();
     }
 
     @Override

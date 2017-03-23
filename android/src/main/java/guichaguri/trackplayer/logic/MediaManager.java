@@ -68,6 +68,9 @@ public class MediaManager {
     }
 
     public Player getPlayer(int id) {
+        if(id < 0 || id >= players.length) {
+            throw new IllegalArgumentException();
+        }
         return players[id];
     }
 

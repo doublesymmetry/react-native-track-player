@@ -12,8 +12,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import guichaguri.trackplayer.logic.PlayerService;
-import guichaguri.trackplayer.logic.MediaWrapper;
-import guichaguri.trackplayer.player.view.PlayerView;
+import guichaguri.trackplayer.logic.components.MediaWrapper;
 import java.io.IOException;
 
 /**
@@ -41,6 +40,7 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
         context.addLifecycleEventListener(this);
 
         Intent intent = new Intent(context, PlayerService.class);
+        intent.setAction(PlayerService.ACTION_MEDIA);
         context.bindService(intent, this, Service.BIND_AUTO_CREATE);
     }
 
@@ -70,10 +70,6 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     @Override
     public void onServiceDisconnected(ComponentName name) {
         manager = null;
-    }
-
-    public void setView(int id, PlayerView view) {
-        manager.setView(id, view);
     }
 
     /* ****************************** Native Functions ****************************** */

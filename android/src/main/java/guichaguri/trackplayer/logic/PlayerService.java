@@ -4,18 +4,30 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import guichaguri.trackplayer.logic.components.MediaWrapper;
+import guichaguri.trackplayer.logic.components.VideoWrapper;
 
 /**
  * @author Guilherme Chaguri
  */
 public class PlayerService extends Service {
 
+    public static final String ACTION_MEDIA = "track-player-media";
+    public static final String ACTION_VIDEO = "track-player-video";
+
     private MediaManager manager;
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return new MediaWrapper(manager);
+        String action = intent.getAction();
+
+        if(action.equals(ACTION_MEDIA)) {
+            return new MediaWrapper(manager);
+        } else if(action.equals(ACTION_VIDEO)) {
+            return new VideoWrapper(manager);
+        }
+        return null;
     }
 
     @Override
