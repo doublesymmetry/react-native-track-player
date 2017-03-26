@@ -7,6 +7,7 @@ import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.KeyEvent;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableMap;
@@ -43,6 +44,10 @@ public class Utils {
 
     public static void setTime(WritableMap map, String key, long time) {
         map.putDouble(key, toSeconds(time));
+    }
+
+    public static ReadableArray getArray(ReadableMap map, String key, ReadableArray def) {
+        return map.hasKey(key) && map.getType(key) == ReadableType.Array ? map.getArray(key) : def;
     }
 
     public static RatingCompat getRating(String key, ReadableMap data, int ratingType) {

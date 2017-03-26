@@ -30,6 +30,8 @@ public abstract class Player {
 
     public abstract void load(ReadableMap data, Callback loadCallback) throws IOException;
 
+    public abstract void reset();
+
     public abstract void play();
 
     public abstract void pause();

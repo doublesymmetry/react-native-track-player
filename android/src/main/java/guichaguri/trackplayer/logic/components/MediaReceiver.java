@@ -1,6 +1,7 @@
 package guichaguri.trackplayer.logic.components;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import guichaguri.trackplayer.logic.PlayerService;
@@ -18,9 +19,8 @@ public class MediaReceiver extends BroadcastReceiver {
         if(Intent.ACTION_MEDIA_BUTTON.equals(action)) {
 
             // Sends media keys to the service
-            Intent i = new Intent(context, PlayerService.class);
-            i.putExtra(Intent.EXTRA_KEY_EVENT, intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT));
-            context.startService(i);
+            intent.setComponent(new ComponentName(context, PlayerService.class));
+            context.startService(intent);
 
         }
     }

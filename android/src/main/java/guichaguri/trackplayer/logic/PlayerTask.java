@@ -30,7 +30,7 @@ public class PlayerTask extends HeadlessJsTaskService {
         WritableMap map = bundle != null ? Arguments.fromBundle(bundle) : Arguments.createMap();
         if(event != null) map.putString("type", event);
 
-        return new HeadlessJsTaskConfig("track-player", map, 0, true);
+        return new HeadlessJsTaskConfig("TrackPlayer", map, 0, true);
     }
 
 }

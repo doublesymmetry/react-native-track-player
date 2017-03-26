@@ -7,13 +7,15 @@ import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
+import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.view.KeyEvent;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import guichaguri.trackplayer.logic.components.MediaReceiver;
+import com.facebook.react.bridge.ReadableType;
 import guichaguri.trackplayer.logic.Utils;
+import guichaguri.trackplayer.logic.components.MediaReceiver;
 import guichaguri.trackplayer.metadata.components.ArtworkLoader;
 import guichaguri.trackplayer.metadata.components.ButtonListener;
 import guichaguri.trackplayer.metadata.components.CustomVolume;
@@ -37,6 +39,7 @@ public class Metadata {
     private MediaMetadataCompat.Builder md = new MediaMetadataCompat.Builder();
     private PlaybackStateCompat.Builder pb = new PlaybackStateCompat.Builder();
 
+    private long capabilities = 0;
     private int ratingType = RatingCompat.RATING_HEART;
     private int maxArtworkSize = 2000;
     private String artworkUri = null;
@@ -72,6 +75,9 @@ public class Metadata {
 
         // Update the rating type
         session.setRatingType(ratingType);
+
+        // Update the capabilities
+        updateCapabilities(data);
     }
 
     public void updateMetadata(Player player, ReadableMap data) {
@@ -113,6 +119,10 @@ public class Metadata {
         pb.setState(playerState, player.getPosition(), player.getSpeed(), player.getPositionUpdateTime());
         pb.setBufferedPosition(player.getBufferedPosition());
 
+        // Update the capabilities
+        //pb.setActions(capabilities);
+        pb.setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS | PlaybackStateCompat.ACTION_STOP);
+
         if(player instanceof RemotePlayer) {
             // Set the volume control to remote
             RemotePlayer remote = (RemotePlayer)player;
@@ -133,6 +143,19 @@ public class Metadata {
         noisyReceiver.setEnabled(Utils.isPlaying(playerState));
     }
 
+    private void updateCapabilities(ReadableMap data) {
+        capabilities = 0;
+
+        ReadableArray array = Utils.getArray(data, "capabilities", null);
+        if(array == null) return;
+
+        for(int i = 0; i < array.size(); i++) {
+            if(array.getType(i) == ReadableType.Number) {
+                capabilities |= array.getInt(i);
+            }
+        }
+    }
+
     private void loadArtwork(ReadableMap data) {
         if(!data.hasKey("artwork")) {
             // Interrupt the artwork thread if it's running
@@ -142,6 +165,8 @@ public class Metadata {
             // Reset the artwork values
             md.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, null);
             md.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, null);
+
+            return;
         }
 
         // Get more information about the artwork
@@ -176,11 +201,7 @@ public class Metadata {
     }
 
     public void handleIntent(Intent intent) {
-        // A copy of MediaButtonReceiver.handleIntent without action checks
-        if(intent.hasExtra(Intent.EXTRA_KEY_EVENT)) {
-            KeyEvent ke = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-            session.getController().dispatchMediaButtonEvent(ke);
-        }
+        MediaButtonReceiver.handleIntent(session, intent);
     }
 
     public MediaNotification getNotification() {

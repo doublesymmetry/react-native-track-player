@@ -65,6 +65,14 @@ public class MediaWrapper extends Binder {
         }
     }
 
+    public void reset(int id) {
+        if(id != -1) {
+            manager.getPlayer(id).reset();
+        } else {
+            for(Player p : manager.getPlayers()) p.reset();
+        }
+    }
+
     public void play(int id) {
         if(id != -1) {
             manager.getPlayer(id).play();

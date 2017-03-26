@@ -4,7 +4,6 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat.Action;
 import android.support.v4.app.NotificationManagerCompat;
@@ -14,6 +13,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.NotificationCompat;
 import android.support.v7.app.NotificationCompat.MediaStyle;
+import android.view.KeyEvent;
 import com.facebook.react.bridge.ReadableMap;
 import guichaguri.trackplayer.logic.PlayerService;
 import guichaguri.trackplayer.logic.Utils;
@@ -46,6 +46,14 @@ public class MediaNotification {
         nb.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         nb.setDeleteIntent(createActionIntent(PlaybackStateCompat.ACTION_STOP));
         nb.setContentIntent(session.getController().getSessionActivity());
+
+        playIcon = loadIcon("play");
+        pauseIcon = loadIcon("pause");
+        stopIcon = loadIcon("stop");
+        previousIcon = loadIcon("previous");
+        nextIcon = loadIcon("next");
+
+        nb.setSmallIcon(playIcon);
     }
 
     @SuppressWarnings("ResourceAsColor")
@@ -111,15 +119,15 @@ public class MediaNotification {
 
         // Add the action buttons
         nb.mActions.clear();
-        if(previous != null) nb.mActions.add(0, previous);
-        if(play != null && !playing) nb.mActions.add(1, play);
-        if(pause != null && playing) nb.mActions.add(1, pause);
-        if(stop != null) nb.mActions.add(2, stop);
-        if(next != null) nb.mActions.add(3, next);
+        if(previous != null) nb.mActions.add(previous);
+        if(play != null && !playing) nb.mActions.add(play);
+        if(pause != null && playing) nb.mActions.add(pause);
+        if(stop != null) nb.mActions.add(stop);
+        if(next != null) nb.mActions.add(next);
 
         // Add the play/pause button to the compact view
-        if(nb.mActions.get(1) != null) {
-            style.setShowActionsInCompactView(1);
+        if(play != null && pause != null) {
+            style.setShowActionsInCompactView(nb.mActions.indexOf(playing ? pause : play));
         } else {
             style.setShowActionsInCompactView();
         }
@@ -137,9 +145,12 @@ public class MediaNotification {
         }
 
         // Load default icon
-        Resources r = context.getResources();
-        String packageName = context.getPackageName();
-        return r.getIdentifier(iconName, "drawable", packageName);
+        return loadIcon(iconName);
+    }
+
+    private int loadIcon(String iconName) {
+        // Load icon resource from name
+        return context.getResources().getIdentifier(iconName, "drawable", context.getPackageName());
     }
 
     private Action updateAction(Action instance, long mask, long action, String title, int icon) {
@@ -154,14 +165,19 @@ public class MediaNotification {
     }
 
     /**
-     * Should be replaced by MediaButtonReceiver.buildMediaButtonPendingIntent
+     * We should take a look at MediaButtonReceiver.buildMediaButtonPendingIntent
      * when React Native updates to a newer support library version
      */
     private PendingIntent createActionIntent(long action) {
         // Create an intent for the service
+        int keyCode = Utils.toKeyCode(action);
+        KeyEvent event = new KeyEvent(KeyEvent.ACTION_DOWN, keyCode);
+
         Intent intent = new Intent(context, PlayerService.class);
-        intent.putExtra(Intent.EXTRA_KEY_EVENT, Utils.toKeyCode(action));
-        return PendingIntent.getService(context, 0, intent, 0);
+        intent.setAction(Intent.ACTION_MEDIA_BUTTON);
+        intent.putExtra(Intent.EXTRA_KEY_EVENT, event);
+
+        return PendingIntent.getService(context, keyCode, intent, 0);
     }
 
     private void update() {

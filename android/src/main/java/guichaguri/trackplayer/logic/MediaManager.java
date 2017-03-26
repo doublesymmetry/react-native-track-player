@@ -17,9 +17,8 @@ public class MediaManager {
 
     private final PlayerService service;
     private final FocusManager focus;
-
-    private Player[] players = new Player[0];
     private final Metadata metadata;
+    private Player[] players = new Player[0];
 
     private Player mainPlayer;
 
@@ -31,6 +30,7 @@ public class MediaManager {
 
     public void updateOptions(ReadableMap data) {
         metadata.updateOptions(data);
+        metadata.updatePlayback(mainPlayer);
     }
 
     public void updateMetadata(ReadableMap data) {
@@ -114,9 +114,7 @@ public class MediaManager {
     }
 
     public void onCommand(Intent intent) {
-        if(intent.hasExtra(Intent.EXTRA_KEY_EVENT)) {
-            metadata.handleIntent(intent);
-        }
+        metadata.handleIntent(intent);
     }
 
     public void onServiceDestroy() {

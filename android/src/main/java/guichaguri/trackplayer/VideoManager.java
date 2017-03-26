@@ -45,6 +45,12 @@ public class VideoManager extends SimpleViewManager<PlayerView> implements Servi
     }
 
     @Override
+    public void onCatalystInstanceDestroy() {
+        context.removeLifecycleEventListener(this);
+        context.unbindService(this);
+    }
+
+    @Override
     protected PlayerView createViewInstance(ThemedReactContext context) {
         return new PlayerView(context);
     }

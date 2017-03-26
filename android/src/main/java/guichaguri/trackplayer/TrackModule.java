@@ -5,6 +5,8 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.support.v4.media.RatingCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -14,6 +16,9 @@ import com.facebook.react.bridge.ReadableMap;
 import guichaguri.trackplayer.logic.PlayerService;
 import guichaguri.trackplayer.logic.components.MediaWrapper;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import javax.annotation.Nullable;
 
 /**
  * @author Guilherme Chaguri
@@ -21,6 +26,7 @@ import java.io.IOException;
 public class TrackModule extends ReactContextBaseJavaModule implements ServiceConnection, LifecycleEventListener {
 
     private MediaWrapper manager = null;
+    private Callback initCallback = null;
 
     public TrackModule(ReactApplicationContext context) {
         super(context);
@@ -28,7 +34,7 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @Override
     public String getName() {
-        return "TrackPlayer";
+        return "TrackPlayerModule";
     }
 
     @Override
@@ -42,6 +48,14 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
         Intent intent = new Intent(context, PlayerService.class);
         intent.setAction(PlayerService.ACTION_MEDIA);
         context.bindService(intent, this, Service.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    public void onCatalystInstanceDestroy() {
+        ReactApplicationContext context = getReactApplicationContext();
+
+        context.removeLifecycleEventListener(this);
+        context.unbindService(this);
     }
 
     @Override
@@ -65,6 +79,11 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
         manager = (MediaWrapper)service;
+
+        if(initCallback != null) {
+            initCallback.invoke();
+            initCallback = null;
+        }
     }
 
     @Override
@@ -72,7 +91,48 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
         manager = null;
     }
 
+    @Nullable
+    @Override
+    public Map<String, Object> getConstants() {
+        Map<String, Object> constants = new HashMap<>();
+
+        // Capabilities
+        constants.put("CAPABILITY_PLAY", PlaybackStateCompat.ACTION_PLAY);
+        constants.put("CAPABILITY_PAUSE", PlaybackStateCompat.ACTION_PAUSE);
+        constants.put("CAPABILITY_STOP", PlaybackStateCompat.ACTION_STOP);
+        constants.put("CAPABILITY_SEEK_TO", PlaybackStateCompat.ACTION_SEEK_TO);
+        constants.put("CAPABILITY_SKIP_TO_NEXT", PlaybackStateCompat.ACTION_SKIP_TO_NEXT);
+        constants.put("CAPABILITY_SKIP_TO_PREVIOUS", PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
+        constants.put("CAPABILITY_SET_RATING", PlaybackStateCompat.ACTION_SET_RATING);
+
+        // States
+        constants.put("STATE_NONE", PlaybackStateCompat.STATE_NONE);
+        constants.put("STATE_PLAYING", PlaybackStateCompat.STATE_PLAYING);
+        constants.put("STATE_PAUSED", PlaybackStateCompat.STATE_PAUSED);
+        constants.put("STATE_STOPPED", PlaybackStateCompat.STATE_STOPPED);
+        constants.put("STATE_BUFFERING", PlaybackStateCompat.STATE_BUFFERING);
+
+        // Rating Types
+        constants.put("RATING_HEART", RatingCompat.RATING_HEART);
+        constants.put("RATING_THUMBS_UP_DOWN", RatingCompat.RATING_THUMB_UP_DOWN);
+        constants.put("RATING_3_STARS", RatingCompat.RATING_3_STARS);
+        constants.put("RATING_4_STARS", RatingCompat.RATING_4_STARS);
+        constants.put("RATING_5_STARS", RatingCompat.RATING_5_STARS);
+        constants.put("RATING_PERCENTAGE", RatingCompat.RATING_PERCENTAGE);
+
+        return constants;
+    }
+
     /* ****************************** Native Functions ****************************** */
+
+    @ReactMethod
+    public void onReady(Callback callback) {
+        if(manager != null) {
+            callback.invoke();
+        } else {
+            initCallback = callback;
+        }
+    }
 
     @ReactMethod
     public void setOptions(ReadableMap data) {
@@ -90,8 +150,8 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public int createPlayer() {
-        return manager.createPlayer();
+    public void createPlayer(Callback callback) {
+        callback.invoke(manager.createPlayer());
     }
 
     @ReactMethod
@@ -112,6 +172,11 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     @ReactMethod
     public void update(int id, ReadableMap data, Callback callback) {
         manager.update(id, data, callback);
+    }
+
+    @ReactMethod
+    public void reset(int id) {
+        manager.reset(id);
     }
 
     @ReactMethod
@@ -140,22 +205,22 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public double getDuration(int id) {
-        return manager.getDuration(id);
+    public void getDuration(int id, Callback callback) {
+        callback.invoke(manager.getDuration(id));
     }
 
     @ReactMethod
-    public double getBufferedPosition(int id) {
-        return manager.getBufferedPosition(id);
+    public void getBufferedPosition(int id, Callback callback) {
+        callback.invoke(manager.getBufferedPosition(id));
     }
 
     @ReactMethod
-    public double getPosition(int id) {
-        return manager.getPosition(id);
+    public void getPosition(int id, Callback callback) {
+        callback.invoke(manager.getPosition(id));
     }
 
     @ReactMethod
-    public int getState(int id) {
-        return manager.getState(id);
+    public void getState(int id, Callback callback) {
+        callback.invoke(manager.getState(id));
     }
 }

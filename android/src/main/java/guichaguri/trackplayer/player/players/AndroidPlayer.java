@@ -30,6 +30,7 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
 
     private Callback loadCallback;
 
+    private boolean loaded = false;
     private boolean buffering = false;
     private boolean paused = false;
 
@@ -68,6 +69,17 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
     }
 
     @Override
+    public void reset() {
+        player.reset();
+
+        buffering = false;
+        paused = false;
+        loaded = false;
+
+        updateState();
+    }
+
+    @Override
     public void play() {
         player.start();
         buffering = false;
@@ -93,24 +105,25 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
     @Override
     public int getState() {
         if(buffering) return PlaybackStateCompat.STATE_BUFFERING;
+        if(!loaded) return PlaybackStateCompat.STATE_NONE;
         if(paused) return PlaybackStateCompat.STATE_PAUSED;
         if(player.isPlaying()) return PlaybackStateCompat.STATE_PLAYING;
-        return PlaybackStateCompat.STATE_NONE;
+        return PlaybackStateCompat.STATE_STOPPED;
     }
 
     @Override
     public long getPosition() {
-        return player.getCurrentPosition();
+        return loaded ? player.getCurrentPosition() : 0;
     }
 
     @Override
     public long getBufferedPosition() {
-        return (long)(buffered * player.getDuration());
+        return (long)(buffered * getDuration());
     }
 
     @Override
     public long getDuration() {
-        return player.getDuration();
+        return loaded ? player.getDuration() : 0;
     }
 
     @Override
@@ -171,6 +184,7 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
             loadCallback = null;
         }
 
+        loaded = true;
         buffering = false;
         updateState();
     }
