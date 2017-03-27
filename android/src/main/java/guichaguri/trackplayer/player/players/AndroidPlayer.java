@@ -15,7 +15,7 @@ import com.facebook.react.bridge.ReadableMap;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.player.Player;
-import guichaguri.trackplayer.player.view.PlayerView;
+import guichaguri.trackplayer.player.components.PlayerView;
 import java.io.IOException;
 
 /**

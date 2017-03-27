@@ -36,5 +36,8 @@ repositories {
 dependencies {
     //noinspection GradleDynamicVersion
     compile 'com.facebook.react:react-native:+'
-    //compile 'com.google.android.exoplayer:exoplayer:r2.2.0'
+
+    provided 'com.danikula:videocache:2.6.4' // Caching for MediaPlayer
+    provided 'com.google.android.exoplayer:exoplayer:r2.3.1' // ExoPlayer
+    provided 'com.google.android.gms:play-services-cast-framework:10.2.1' // Chromecast
 }

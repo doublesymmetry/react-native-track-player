@@ -11,11 +11,11 @@ This is a work-in-progress project not ready for production yet.
 
 * [x] Multi-player support
 * [x] Android MediaSession support
-* [x] Android MediaBrowser support (required for Android Auto)
+* [ ] Android MediaBrowser support (required for Android Auto)
 * [x] Android MediaStyle Notification support
 * [x] Media buttons fully handled (bluetooth, smartwatches, headphones)
 * [x] Android MediaPlayer support
-* [ ] *Optional* ExoPlayer (DASH streams, etc) support
+* [ ] *Optional* ExoPlayer (DASH, HLS, SmoothStreaming, etc) support
 * [ ] *Optional* Caching for MediaPlayer
 * [ ] *Optional* Caching for ExoPlayer
 * [ ] *Optional* Chromecast support (Default/Styled Media Receiver)

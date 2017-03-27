@@ -8,7 +8,6 @@ import android.os.IBinder;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import com.facebook.react.bridge.Callback;
-import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -16,6 +15,7 @@ import com.facebook.react.bridge.ReadableMap;
 import guichaguri.trackplayer.logic.PlayerService;
 import guichaguri.trackplayer.logic.components.MediaWrapper;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -23,10 +23,10 @@ import javax.annotation.Nullable;
 /**
  * @author Guilherme Chaguri
  */
-public class TrackModule extends ReactContextBaseJavaModule implements ServiceConnection, LifecycleEventListener {
+public class TrackModule extends ReactContextBaseJavaModule implements ServiceConnection {
 
     private MediaWrapper manager = null;
-    private Callback initCallback = null;
+    private Callback[] initCallbacks = null;
 
     public TrackModule(ReactApplicationContext context) {
         super(context);
@@ -43,8 +43,6 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
         ReactApplicationContext context = getReactApplicationContext();
 
-        context.addLifecycleEventListener(this);
-
         Intent intent = new Intent(context, PlayerService.class);
         intent.setAction(PlayerService.ACTION_MEDIA);
         context.bindService(intent, this, Service.BIND_AUTO_CREATE);
@@ -52,37 +50,18 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @Override
     public void onCatalystInstanceDestroy() {
-        ReactApplicationContext context = getReactApplicationContext();
-
-        context.removeLifecycleEventListener(this);
-        context.unbindService(this);
-    }
-
-    @Override
-    public void onHostResume() {
-
-    }
-
-    @Override
-    public void onHostPause() {
-
-    }
-
-    @Override
-    public void onHostDestroy() {
-        ReactApplicationContext context = getReactApplicationContext();
-
-        context.removeLifecycleEventListener(this);
-        context.unbindService(this);
+        getReactApplicationContext().unbindService(this);
     }
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
         manager = (MediaWrapper)service;
 
-        if(initCallback != null) {
-            initCallback.invoke();
-            initCallback = null;
+        if(initCallbacks != null) {
+            for(Callback cb : initCallbacks) {
+                cb.invoke();
+            }
+            initCallbacks = null;
         }
     }
 
@@ -90,6 +69,8 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     public void onServiceDisconnected(ComponentName name) {
         manager = null;
     }
+
+    /* ****************************** API ****************************** */
 
     @Nullable
     @Override
@@ -123,14 +104,19 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
         return constants;
     }
 
-    /* ****************************** Native Functions ****************************** */
-
     @ReactMethod
     public void onReady(Callback callback) {
         if(manager != null) {
             callback.invoke();
+            return;
+        }
+
+        if(initCallbacks == null) {
+            initCallbacks = new Callback[]{callback};
         } else {
-            initCallback = callback;
+            int index = initCallbacks.length;
+            initCallbacks = Arrays.copyOf(initCallbacks, index + 1);
+            initCallbacks[index] = callback;
         }
     }
 

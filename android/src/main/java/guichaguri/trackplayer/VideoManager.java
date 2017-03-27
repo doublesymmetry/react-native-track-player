@@ -5,24 +5,25 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
-import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import guichaguri.trackplayer.logic.PlayerService;
 import guichaguri.trackplayer.logic.components.VideoWrapper;
-import guichaguri.trackplayer.player.view.PlayerView;
+import guichaguri.trackplayer.player.components.PlayerView;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Guilherme Chaguri
  */
-public class VideoManager extends SimpleViewManager<PlayerView> implements ServiceConnection, LifecycleEventListener {
+public class VideoManager extends SimpleViewManager<PlayerView> implements ServiceConnection {
 
     private final ReactApplicationContext context;
 
     private VideoWrapper video;
-    private int boundPlayer = -1;
+    private List<PlayerView> views = new ArrayList<>();
 
     public VideoManager(ReactApplicationContext context) {
         this.context = context;
@@ -30,14 +31,12 @@ public class VideoManager extends SimpleViewManager<PlayerView> implements Servi
 
     @Override
     public String getName() {
-        return "PlayerView";
+        return "TrackPlayerView";
     }
 
     @Override
     public void initialize() {
         super.initialize();
-
-        context.addLifecycleEventListener(this);
 
         Intent intent = new Intent(context, PlayerService.class);
         intent.setAction(PlayerService.ACTION_VIDEO);
@@ -46,57 +45,37 @@ public class VideoManager extends SimpleViewManager<PlayerView> implements Servi
 
     @Override
     public void onCatalystInstanceDestroy() {
-        context.removeLifecycleEventListener(this);
         context.unbindService(this);
     }
 
     @Override
     protected PlayerView createViewInstance(ThemedReactContext context) {
-        return new PlayerView(context);
+        PlayerView view = new PlayerView(context);
+        views.add(view);
+        return view;
     }
 
     @Override
     public void onDropViewInstance(PlayerView view) {
         // Unbind the player
-        if(boundPlayer != -1) {
-            video.setView(boundPlayer, null);
-        }
+        view.bindPlayer(video, -1);
+        views.remove(view);
     }
 
     @ReactProp(name = "player", defaultInt = -1)
     public void setPlayer(PlayerView view, int id) {
-        // Unbind the old player
-        if(boundPlayer != -1) {
-            video.setView(boundPlayer, null);
-        }
-
-        // Bind the new player
-        if(id != -1) {
-            video.setView(id, view);
-        }
-
-        boundPlayer = id;
-    }
-
-    @Override
-    public void onHostResume() {
-
-    }
-
-    @Override
-    public void onHostPause() {
-
-    }
-
-    @Override
-    public void onHostDestroy() {
-        context.removeLifecycleEventListener(this);
-        context.unbindService(this);
+        // Bind the player
+        view.bindPlayer(video, id);
     }
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
         video = (VideoWrapper)service;
+
+        // Update the views
+        for(PlayerView view : views) {
+            view.updatePlayer(video);
+        }
     }
 
     @Override

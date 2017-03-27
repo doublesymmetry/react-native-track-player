@@ -8,7 +8,9 @@ import guichaguri.trackplayer.metadata.components.MediaNotification;
 import guichaguri.trackplayer.player.Player;
 import guichaguri.trackplayer.player.RemotePlayer;
 import guichaguri.trackplayer.player.players.AndroidPlayer;
-import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Guilherme Chaguri
@@ -18,8 +20,9 @@ public class MediaManager {
     private final PlayerService service;
     private final FocusManager focus;
     private final Metadata metadata;
-    private Player[] players = new Player[0];
+    private final Map<Integer, Player> players = new HashMap<>();
 
+    private int lastId = 0;
     private Player mainPlayer;
 
     public MediaManager(PlayerService service) {
@@ -43,39 +46,30 @@ public class MediaManager {
     }
 
     public int createPlayer() {
-        int id = players.length;
-        players = Arrays.copyOf(players, id + 1);
-        players[id] = new AndroidPlayer(service, this); // TODO type
+        int id = lastId++;
+        players.put(id, new AndroidPlayer(service, this)); // TODO type
         return id;
     }
 
     public void destroyPlayer(int id) {
         if(id == -1) {
             // Destroys all players
-            for(Player p : players) p.destroy();
-            players = new Player[0];
+            for(Player p : players.values()) p.destroy();
+            players.clear();
         } else {
-            Player[] pls = new Player[players.length - 1];
-            for(int o = 0; o < players.length; o++) {
-                if(id == o) {
-                    players[o].destroy();
-                } else {
-                    pls[o > id ? o - 1 : o] = players[o];
-                }
-            }
-            players = pls;
+            players.remove(id).destroy();
         }
     }
 
     public Player getPlayer(int id) {
-        if(id < 0 || id >= players.length) {
+        if(id < 0 || !players.containsKey(id)) {
             throw new IllegalArgumentException();
         }
-        return players[id];
+        return players.get(id);
     }
 
-    public Player[] getPlayers() {
-        return players;
+    public Collection<Player> getPlayers() {
+        return players.values();
     }
 
     public void setMainPlayer(Player player) {
@@ -118,7 +112,7 @@ public class MediaManager {
     }
 
     public void onServiceDestroy() {
-        for(Player player : players) {
+        for(Player player : getPlayers()) {
             player.destroy();
         }
         metadata.destroy();
@@ -167,7 +161,7 @@ public class MediaManager {
     }
 
     private boolean isPlayingLocal() {
-        for(Player p : players) {
+        for(Player p : getPlayers()) {
             if(p instanceof RemotePlayer) continue;
             if(Utils.isPlaying(p.getState())) return true;
         }

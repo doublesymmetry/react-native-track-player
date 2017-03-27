@@ -1,0 +1,11 @@
+{
+    "esversion": 6,
+    "node": true,
+    "eqnull": true,
+    "-W041": false,
+    "-W069": false,
+    "globals": {
+        "path": true,
+        "load": true
+    }
+}

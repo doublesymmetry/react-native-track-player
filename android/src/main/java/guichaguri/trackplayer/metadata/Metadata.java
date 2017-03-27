@@ -120,8 +120,7 @@ public class Metadata {
         pb.setBufferedPosition(player.getBufferedPosition());
 
         // Update the capabilities
-        //pb.setActions(capabilities);
-        pb.setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS | PlaybackStateCompat.ACTION_STOP);
+        pb.setActions(capabilities);
 
         if(player instanceof RemotePlayer) {
             // Set the volume control to remote
