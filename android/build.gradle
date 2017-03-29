@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 buildscript {
     repositories {
         jcenter()
@@ -37,7 +39,34 @@ dependencies {
     //noinspection GradleDynamicVersion
     compile 'com.facebook.react:react-native:+'
 
-    provided 'com.danikula:videocache:2.6.4' // Caching for MediaPlayer
-    provided 'com.google.android.exoplayer:exoplayer:r2.3.1' // ExoPlayer
-    provided 'com.google.android.gms:play-services-cast-framework:10.2.1' // Chromecast
+
+    def exoplayer = false, cache = false, chromecast = false;
+    File file = file('../../../track-player.json');
+    if(file.exists()) {
+        def json = new JsonSlurper().parseText(file.text);
+        exoplayer = json.dash || json.hls || json.smoothstreaming;
+        cache = json.cache;
+        chromecast = json.chromecast;
+    }
+
+    if(exoplayer) {
+        compile 'com.google.android.exoplayer:exoplayer:r2.3.1'
+    } else {
+        provided 'com.google.android.exoplayer:exoplayer:r2.3.1'
+    }
+
+    if(cache && !exoplayer) {
+        compile 'com.danikula:videocache:2.6.4'
+    } else {
+        provided 'com.danikula:videocache:2.6.4'
+    }
+
+    if(chromecast) {
+        compile 'com.android.support:mediarouter-v7:23.0.1'
+        compile 'com.google.android.gms:play-services-cast-framework:10.2.1'
+    } else {
+        provided 'com.android.support:mediarouter-v7:23.0.1'
+        provided 'com.google.android.gms:play-services-cast-framework:10.2.1'
+    }
+
 }

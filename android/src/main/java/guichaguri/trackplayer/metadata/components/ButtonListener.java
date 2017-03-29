@@ -5,6 +5,7 @@ import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
+import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 
 /**
@@ -13,48 +14,54 @@ import guichaguri.trackplayer.logic.Utils;
 public class ButtonListener extends MediaSessionCompat.Callback {
 
     private final Context context;
+    private final MediaManager manager;
 
-    public ButtonListener(Context context) {
+    public ButtonListener(Context context, MediaManager manager) {
         this.context = context;
+        this.manager = manager;
+    }
+
+    private void dispatch(String event, WritableMap data) {
+        Utils.dispatchEvent(context, manager.getPlayerId(manager.getMainPlayer()), event, data);
     }
 
     @Override
     public void onPlay() {
-        Utils.dispatchEvent(context, "play", null);
+        dispatch("play", null);
     }
 
     @Override
     public void onPause() {
-        Utils.dispatchEvent(context, "pause", null);
+        dispatch("pause", null);
     }
 
     @Override
     public void onStop() {
-        Utils.dispatchEvent(context, "stop", null);
+        dispatch("stop", null);
     }
 
     @Override
     public void onSkipToNext() {
-        Utils.dispatchEvent(context, "skipNext", null);
+        dispatch("skipNext", null);
     }
 
     @Override
     public void onSkipToPrevious() {
-        Utils.dispatchEvent(context, "skipPrevious", null);
+        dispatch("skipPrevious", null);
     }
 
     @Override
     public void onSeekTo(long pos) {
         WritableMap map = Arguments.createMap();
         Utils.setTime(map, "position", pos);
-        Utils.dispatchEvent(context, "seekTo", map);
+        dispatch("seekTo", map);
     }
 
     @Override
     public void onSetRating(RatingCompat rating) {
         WritableMap map = Arguments.createMap();
         Utils.setRating("rating", map, rating);
-        Utils.dispatchEvent(context, "setRating", map);
+        dispatch("setRating", map);
     }
 
 }

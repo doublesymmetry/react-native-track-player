@@ -14,6 +14,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
+import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.components.MediaReceiver;
 import guichaguri.trackplayer.metadata.components.ArtworkLoader;
@@ -44,7 +45,7 @@ public class Metadata {
     private int maxArtworkSize = 2000;
     private String artworkUri = null;
 
-    public Metadata(Context context) {
+    public Metadata(Context context, MediaManager manager) {
         this.context = context;
 
         ComponentName comp = new ComponentName(context, MediaReceiver.class);
@@ -52,7 +53,7 @@ public class Metadata {
 
         session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
                 MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-        session.setCallback(new ButtonListener(context));
+        session.setCallback(new ButtonListener(context, manager));
 
         notification = new MediaNotification(context, session);
 

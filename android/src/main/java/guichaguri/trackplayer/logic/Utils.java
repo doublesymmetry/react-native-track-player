@@ -51,7 +51,7 @@ public class Utils {
     }
 
     public static RatingCompat getRating(String key, ReadableMap data, int ratingType) {
-        if(!data.hasKey(key)) {
+        if(!data.hasKey(key) || data.getType(key) == ReadableType.Null) {
             return RatingCompat.newUnratedRating(ratingType);
         } else if(ratingType == RatingCompat.RATING_HEART) {
             return RatingCompat.newHeartRating(Utils.getBoolean(data, key, true));
@@ -118,13 +118,23 @@ public class Utils {
                 state == PlaybackStateCompat.STATE_ERROR;
     }
 
-    public static void dispatchEvent(Context context, String event, WritableMap data) {
+    public static void dispatchEvent(Context context, int player, String event, WritableMap data) {
         Intent i = new Intent(context, PlayerTask.class);
 
         if(event != null) i.putExtra(PlayerTask.EVENT_TYPE, event);
         if(data != null) i.putExtra(PlayerTask.EVENT_DATA, Arguments.toBundle(data));
+        if(player != -1) i.putExtra(PlayerTask.EVENT_PLAYER, player);
 
         context.startService(i);
+    }
+
+    public static boolean isAvailable(String className) {
+        try {
+            Class.forName(className);
+        } catch(ClassNotFoundException ex) {
+            return false;
+        }
+        return true;
     }
 
     /**

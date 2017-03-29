@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
  */
 public class PlayerTask extends HeadlessJsTaskService {
 
+    public static final String EVENT_PLAYER = "track-player-event-player";
     public static final String EVENT_TYPE = "track-player-event-type";
     public static final String EVENT_DATA = "track-player-event-data";
 
@@ -21,6 +22,7 @@ public class PlayerTask extends HeadlessJsTaskService {
     protected HeadlessJsTaskConfig getTaskConfig(Intent intent) {
         String event = intent.getStringExtra(EVENT_TYPE);
         Bundle bundle = intent.getBundleExtra(EVENT_DATA);
+        int player = intent.getIntExtra(EVENT_PLAYER, -1);
 
         if(event == null && bundle == null) {
             stopSelf();
@@ -29,6 +31,7 @@ public class PlayerTask extends HeadlessJsTaskService {
 
         WritableMap map = bundle != null ? Arguments.fromBundle(bundle) : Arguments.createMap();
         if(event != null) map.putString("type", event);
+        if(player != -1) map.putInt("player", player);
 
         return new HeadlessJsTaskConfig("TrackPlayer", map, 0, true);
     }

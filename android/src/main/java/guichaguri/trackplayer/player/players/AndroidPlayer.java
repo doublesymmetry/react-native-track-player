@@ -32,7 +32,7 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
 
     private boolean loaded = false;
     private boolean buffering = false;
-    private boolean paused = false;
+    private boolean ended = false;
 
     private float buffered = 0;
 
@@ -71,11 +71,9 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
     @Override
     public void reset() {
         player.reset();
-
         buffering = false;
-        paused = false;
+        ended = false;
         loaded = false;
-
         updateState();
     }
 
@@ -83,32 +81,30 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
     public void play() {
         player.start();
         buffering = false;
-        paused = false;
+        ended = false;
         updateState();
     }
 
     @Override
     public void pause() {
         player.pause();
-        paused = true;
         updateState();
     }
 
     @Override
     public void stop() {
         player.stop();
-        buffering = false;
-        paused = false;
+        ended = true;
         updateState();
     }
 
     @Override
     public int getState() {
+        if(ended) return PlaybackStateCompat.STATE_STOPPED;
         if(buffering) return PlaybackStateCompat.STATE_BUFFERING;
         if(!loaded) return PlaybackStateCompat.STATE_NONE;
-        if(paused) return PlaybackStateCompat.STATE_PAUSED;
-        if(player.isPlaying()) return PlaybackStateCompat.STATE_PLAYING;
-        return PlaybackStateCompat.STATE_STOPPED;
+        if(!player.isPlaying()) return PlaybackStateCompat.STATE_PAUSED;
+        return PlaybackStateCompat.STATE_PLAYING;
     }
 
     @Override
@@ -168,6 +164,7 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
 
     @Override
     public void onCompletion(MediaPlayer mp) {
+        ended = true;
         updateState();
     }
 

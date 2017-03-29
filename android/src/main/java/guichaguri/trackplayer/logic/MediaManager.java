@@ -8,6 +8,7 @@ import guichaguri.trackplayer.metadata.components.MediaNotification;
 import guichaguri.trackplayer.player.Player;
 import guichaguri.trackplayer.player.RemotePlayer;
 import guichaguri.trackplayer.player.players.AndroidPlayer;
+import guichaguri.trackplayer.player.players.ExoPlayer;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +17,8 @@ import java.util.Map;
  * @author Guilherme Chaguri
  */
 public class MediaManager {
+
+    private static final boolean EXOPLAYER_AVAILABLE = Utils.isAvailable("com.google.android.exoplayer2.SimpleExoPlayer");
 
     private final PlayerService service;
     private final FocusManager focus;
@@ -27,7 +30,7 @@ public class MediaManager {
 
     public MediaManager(PlayerService service) {
         this.service = service;
-        this.metadata = new Metadata(service);
+        this.metadata = new Metadata(service, this);
         this.focus = new FocusManager(service, metadata);
     }
 
@@ -46,8 +49,16 @@ public class MediaManager {
     }
 
     public int createPlayer() {
+        Player player;
+
+        if(EXOPLAYER_AVAILABLE) {
+            player = new ExoPlayer(service, this);
+        } else {
+            player = new AndroidPlayer(service, this);
+        }
+
         int id = lastId++;
-        players.put(id, new AndroidPlayer(service, this)); // TODO type
+        players.put(id, player);
         return id;
     }
 
@@ -78,6 +89,17 @@ public class MediaManager {
 
         // Update the playback state
         metadata.updatePlayback(mainPlayer);
+    }
+
+    public Player getMainPlayer() {
+        return mainPlayer;
+    }
+
+    public int getPlayerId(Player player) {
+        for(Integer id : players.keySet()) {
+            if(players.get(id) == player) return id;
+        }
+        return -1;
     }
 
     public void onPlay(Player player) {
@@ -149,6 +171,8 @@ public class MediaManager {
             // When there are no more local players, we'll disable the audio focus
             focus.disable();
         }
+
+        Utils.dispatchEvent(service, getPlayerId(player), "ended", null);
     }
 
     private void onMainPlayerStop() {
