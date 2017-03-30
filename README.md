@@ -16,8 +16,8 @@ This is a work-in-progress project not ready for production yet.
 * [x] Media buttons fully handled (bluetooth, smartwatches, headphones)
 * [x] Android MediaPlayer support
 * [x] *Optional* ExoPlayer (DASH, HLS, SmoothStreaming, etc) support
-* [ ] *Optional* Caching for MediaPlayer
-* [ ] *Optional* Caching for ExoPlayer
+* [x] *Optional* Caching for MediaPlayer
+* [x] *Optional* Caching for ExoPlayer
 * [ ] *Optional* Chromecast support (Default/Styled Media Receiver)
 * [ ] *Optional* Chromecast support (Custom Media Receiver)
 * [x] Video support

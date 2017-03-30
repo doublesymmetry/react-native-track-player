@@ -6,10 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
-import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.metadata.Metadata;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,18 +17,6 @@ import java.net.URLConnection;
  * @author Guilherme Chaguri
  */
 public class ArtworkLoader extends Thread {
-
-    public static boolean isLocal(ReadableMap map, String key) {
-        return map.getType(key) == ReadableType.Map;
-    }
-
-    public static String getUri(ReadableMap map, String key, boolean local) {
-        if(local) {
-            return Utils.getLocalResource(map.getMap(key));
-        } else {
-            return map.getString(key);
-        }
-    }
 
     private final Context context;
     private final Metadata metadata;

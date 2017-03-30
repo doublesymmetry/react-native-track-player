@@ -96,13 +96,30 @@ public class Utils {
         return ResourceDrawableIdHelper.getInstance().getResourceDrawableId(context, uri);
     }
 
-    public static Uri getUri(Context context, ReadableMap map, String key) {
-        if(map.getType(key) == ReadableType.Map) {
-            String uri = getLocalResource(map.getMap(key));
-            return ResourceDrawableIdHelper.getInstance().getResourceDrawableUri(context, uri);
+    public static boolean isUrlLocal(ReadableMap map, String key) {
+        return map.getType(key) == ReadableType.Map;
+    }
+
+    public static String getUrl(ReadableMap map, String key, boolean local) {
+        if(local) {
+            return getLocalResource(map.getMap(key));
         } else {
-            return Uri.parse(map.getString(key));
+            return map.getString(key);
         }
+    }
+
+    public static Uri toUri(Context context, String url, boolean local) {
+        if(local) {
+            return ResourceDrawableIdHelper.getInstance().getResourceDrawableUri(context, url);
+        } else {
+            return Uri.parse(url);
+        }
+    }
+
+    public static Uri getUri(Context context, ReadableMap map, String key) {
+        boolean local = isUrlLocal(map, key);
+        String url = getUrl(map, key, local);
+        return toUri(context, url, local);
     }
 
     public static boolean isPlaying(int state) {

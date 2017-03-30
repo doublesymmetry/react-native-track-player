@@ -170,8 +170,8 @@ public class Metadata {
         }
 
         // Get more information about the artwork
-        boolean local = ArtworkLoader.isLocal(data, "artwork");
-        String uri = ArtworkLoader.getUri(data, "artwork", local);
+        boolean local = Utils.isUrlLocal(data, "artwork");
+        String uri = Utils.getUrl(data, "artwork", local);
 
         // Ignore the same artwork to not download it again
         if(uri == null || uri.equals(artworkUri)) return;

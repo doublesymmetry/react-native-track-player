@@ -8,7 +8,6 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnInfoListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnSeekCompleteListener;
-import android.net.Uri;
 import android.support.v4.media.session.PlaybackStateCompat;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableMap;
@@ -16,6 +15,7 @@ import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.player.Player;
 import guichaguri.trackplayer.player.components.PlayerView;
+import guichaguri.trackplayer.player.components.ProxyCache;
 import java.io.IOException;
 
 /**
@@ -26,7 +26,10 @@ import java.io.IOException;
 public class AndroidPlayer extends Player implements OnInfoListener, OnCompletionListener,
         OnSeekCompleteListener, OnPreparedListener, OnBufferingUpdateListener {
 
+    private static final boolean CACHE_AVAILABLE = Utils.isAvailable("com.danikula.videocache.HttpProxyCacheServer");
+
     private final MediaPlayer player;
+    private ProxyCache cache;
 
     private Callback loadCallback;
 
@@ -58,11 +61,26 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
 
     @Override
     public void load(ReadableMap data, Callback callback) throws IOException {
-        Uri url = Utils.getUri(context, data, "url");
+        boolean local = Utils.isUrlLocal(data, "url");
+        String url = Utils.getUrl(data, "url", local);
+
+        if(CACHE_AVAILABLE && !local) {
+            ReadableMap cacheInfo = data.getMap("cache");
+
+            if(cacheInfo != null) {
+                String id = Utils.getString(cacheInfo, "id");
+                int maxFiles = Utils.getInt(cacheInfo, "maxFiles", 0);
+                long maxSize = (long)(Utils.getDouble(cacheInfo, "maxSize", 0) * 1024);
+
+                cache = new ProxyCache(context, maxFiles, maxSize);
+                url = cache.getURL(url, id);
+            }
+        }
+
         buffering = true;
         loadCallback = callback;
 
-        player.setDataSource(context, url);
+        player.setDataSource(context, Utils.toUri(context, url, local));
         player.prepareAsync();
 
         updateState();
@@ -71,6 +89,12 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
     @Override
     public void reset() {
         player.reset();
+
+        if(cache != null) {
+            cache.destroy();
+            cache = null;
+        }
+
         buffering = false;
         ended = false;
         loaded = false;
@@ -80,6 +104,7 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
     @Override
     public void play() {
         player.start();
+
         buffering = false;
         ended = false;
         updateState();
@@ -88,12 +113,14 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
     @Override
     public void pause() {
         player.pause();
+
         updateState();
     }
 
     @Override
     public void stop() {
         player.stop();
+
         ended = true;
         updateState();
     }
@@ -148,6 +175,11 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
     @Override
     public void destroy() {
         player.release();
+
+        if(cache != null) {
+            cache.destroy();
+            cache = null;
+        }
     }
 
     @Override

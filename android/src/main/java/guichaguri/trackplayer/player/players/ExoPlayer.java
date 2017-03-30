@@ -23,12 +23,18 @@ import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.upstream.cache.Cache;
+import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
+import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor;
+import com.google.android.exoplayer2.upstream.cache.SimpleCache;
 import com.google.android.exoplayer2.util.Util;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.player.Player;
 import guichaguri.trackplayer.player.components.PlayerView;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -51,18 +57,28 @@ public class ExoPlayer extends Player implements EventListener {
 
     @Override
     public void update(ReadableMap data, Callback updateCallback) {
-
         updateCallback.invoke();
     }
 
     @Override
     public void load(ReadableMap data, Callback loadCallback) throws IOException {
+        this.loadCallback = loadCallback;
+
         Uri url = Utils.getUri(context, data, "url");
         String type = Utils.getString(data, "type", "default").toLowerCase();
         String useragent = Utils.getString(data, "useragent", Util.getUserAgent(context, "react-native-track-player"));
 
-        DefaultDataSourceFactory factory = new DefaultDataSourceFactory(context, useragent);
+        DataSource.Factory factory = new DefaultDataSourceFactory(context, useragent);
         MediaSource source;
+
+        ReadableMap cacheInfo = data.getMap("cache");
+        if(cacheInfo != null) {
+            long maxSize = (long)(Utils.getDouble(cacheInfo, "maxSize", 0) * 1024);
+
+            File cacheDir = new File(context.getCacheDir(), "TrackPlayer");
+            Cache cache = new SimpleCache(cacheDir, new LeastRecentlyUsedCacheEvictor(maxSize));
+            factory = new CacheDataSourceFactory(cache, factory, 0, maxSize);
+        }
 
         if(type.equals("dash")) {
             source = new DashMediaSource(url, factory, new DefaultDashChunkSource.Factory(factory), null, null);
@@ -73,8 +89,6 @@ public class ExoPlayer extends Player implements EventListener {
         } else {
             source = new ExtractorMediaSource(url, factory, new DefaultExtractorsFactory(), null, null);
         }
-
-        this.loadCallback = loadCallback;
 
         player.prepare(source);
     }
