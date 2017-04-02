@@ -30,20 +30,20 @@ public abstract class Player {
 
     public abstract void load(ReadableMap data, Callback loadCallback) throws IOException;
 
-    public abstract void reset();
+    public abstract void reset() throws Exception;
 
-    public abstract void play();
+    public abstract void play() throws Exception;
 
-    public abstract void pause();
+    public abstract void pause() throws Exception;
 
-    public abstract void stop();
+    public abstract void stop() throws Exception;
 
     /**
      * State from {@link android.support.v4.media.session.PlaybackStateCompat}
      */
     public abstract int getState();
 
-    public abstract long getPosition();
+    public abstract long getPosition() throws Exception;
 
     public long getPositionUpdateTime() {
         return SystemClock.elapsedRealtime();
@@ -51,17 +51,17 @@ public abstract class Player {
 
     public abstract long getBufferedPosition();
 
-    public abstract long getDuration();
+    public abstract long getDuration() throws Exception;
 
-    public abstract void seekTo(long ms);
+    public abstract void seekTo(long ms) throws Exception;
 
     public abstract float getSpeed();
 
-    public abstract void setVolume(float volume);
+    public abstract void setVolume(float volume) throws Exception;
 
     public abstract void bindView(PlayerView view);
 
-    public abstract void destroy();
+    public abstract void destroy() throws Exception;
 
     protected final void updateState(int state) {
         updateMetadata();

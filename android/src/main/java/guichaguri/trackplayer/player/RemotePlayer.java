@@ -12,7 +12,7 @@ public abstract class RemotePlayer extends Player {
         super(context, manager);
     }
 
-    public abstract float getVolume();
+    public abstract float getVolume() throws Exception;
 
     public abstract boolean canChangeVolume();
 }

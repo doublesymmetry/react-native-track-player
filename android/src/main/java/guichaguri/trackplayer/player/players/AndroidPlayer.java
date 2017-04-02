@@ -11,6 +11,7 @@ import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.support.v4.media.session.PlaybackStateCompat;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableMap;
+import guichaguri.trackplayer.logic.LibHelper;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.player.Player;
@@ -25,8 +26,6 @@ import java.io.IOException;
  */
 public class AndroidPlayer extends Player implements OnInfoListener, OnCompletionListener,
         OnSeekCompleteListener, OnPreparedListener, OnBufferingUpdateListener {
-
-    private static final boolean CACHE_AVAILABLE = Utils.isAvailable("com.danikula.videocache.HttpProxyCacheServer");
 
     private final MediaPlayer player;
     private ProxyCache cache;
@@ -64,8 +63,8 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
         boolean local = Utils.isUrlLocal(data, "url");
         String url = Utils.getUrl(data, "url", local);
 
-        if(CACHE_AVAILABLE && !local) {
-            ReadableMap cacheInfo = data.getMap("cache");
+        if(LibHelper.PROXY_CACHE_AVAILABLE && !local) {
+            ReadableMap cacheInfo = Utils.getMap(data, "cache");
 
             if(cacheInfo != null) {
                 String id = Utils.getString(cacheInfo, "id");
@@ -173,7 +172,7 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
     }
 
     @Override
-    public void destroy() {
+    public void destroy() throws Exception {
         player.release();
 
         if(cache != null) {

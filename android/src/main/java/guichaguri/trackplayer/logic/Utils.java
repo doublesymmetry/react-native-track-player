@@ -38,6 +38,14 @@ public class Utils {
         return map.hasKey(key) && map.getType(key) == ReadableType.Boolean ? map.getBoolean(key) : def;
     }
 
+    public static ReadableMap getMap(ReadableMap map, String key) {
+        return getMap(map, key, null);
+    }
+
+    public static ReadableMap getMap(ReadableMap map, String key, ReadableMap def) {
+        return map.hasKey(key) && map.getType(key) == ReadableType.Map ? map.getMap(key) : def;
+    }
+
     public static long getTime(ReadableMap map, String key, long def) {
         return map.hasKey(key) && map.getType(key) == ReadableType.Number ? toMillis(map.getDouble(key)) : def;
     }
@@ -143,15 +151,6 @@ public class Utils {
         if(player != -1) i.putExtra(PlayerTask.EVENT_PLAYER, player);
 
         context.startService(i);
-    }
-
-    public static boolean isAvailable(String className) {
-        try {
-            Class.forName(className);
-        } catch(ClassNotFoundException ex) {
-            return false;
-        }
-        return true;
     }
 
     /**

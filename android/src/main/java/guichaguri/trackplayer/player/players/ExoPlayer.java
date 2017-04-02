@@ -71,7 +71,7 @@ public class ExoPlayer extends Player implements EventListener {
         DataSource.Factory factory = new DefaultDataSourceFactory(context, useragent);
         MediaSource source;
 
-        ReadableMap cacheInfo = data.getMap("cache");
+        ReadableMap cacheInfo = Utils.getMap(data, "cache");
         if(cacheInfo != null) {
             long maxSize = (long)(Utils.getDouble(cacheInfo, "maxSize", 0) * 1024);
 
@@ -168,7 +168,7 @@ public class ExoPlayer extends Player implements EventListener {
     }
 
     @Override
-    public void destroy() {
+    public void destroy() throws Exception {
         player.release();
     }
 
