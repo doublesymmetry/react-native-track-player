@@ -45,7 +45,10 @@ public class MediaNotification {
         nb.setCategory(NotificationCompat.CATEGORY_TRANSPORT);
         nb.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         nb.setDeleteIntent(createActionIntent(PlaybackStateCompat.ACTION_STOP));
-        nb.setContentIntent(session.getController().getSessionActivity());
+
+        String packageName = context.getPackageName();
+        Intent openApp = context.getPackageManager().getLaunchIntentForPackage(packageName);
+        nb.setContentIntent(PendingIntent.getActivity(context, 0, openApp, 0));
 
         playIcon = loadIcon("play");
         pauseIcon = loadIcon("pause");
