@@ -18,8 +18,6 @@ import java.util.Map;
  */
 public class MediaManager {
 
-    private static final boolean EXOPLAYER_AVAILABLE = Utils.isAvailable("com.google.android.exoplayer2.SimpleExoPlayer");
-
     private final PlayerService service;
     private final FocusManager focus;
     private final Metadata metadata;
@@ -51,7 +49,7 @@ public class MediaManager {
     public int createPlayer() {
         Player player;
 
-        if(EXOPLAYER_AVAILABLE) {
+        if(LibHelper.EXOPLAYER_AVAILABLE) {
             player = new ExoPlayer(service, this);
         } else {
             player = new AndroidPlayer(service, this);
@@ -65,10 +63,19 @@ public class MediaManager {
     public void destroyPlayer(int id) {
         if(id == -1) {
             // Destroys all players
-            for(Player p : players.values()) p.destroy();
+            for(Player p : players.values())
+                try {
+                    p.destroy();
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
             players.clear();
         } else {
-            players.remove(id).destroy();
+            try {
+                players.remove(id).destroy();
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -135,7 +142,11 @@ public class MediaManager {
 
     public void onServiceDestroy() {
         for(Player player : getPlayers()) {
-            player.destroy();
+            try {
+                player.destroy();
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
         }
         metadata.destroy();
     }
@@ -158,7 +169,10 @@ public class MediaManager {
     }
 
     private void onPlayerPause(Player player) {
-
+        if(!isPlayingLocal()) {
+            // When there are no more local players, we'll disable the audio focus
+            focus.disable();
+        }
     }
 
     private void onMainPlayerPause() {
