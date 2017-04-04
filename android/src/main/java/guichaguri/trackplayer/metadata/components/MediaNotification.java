@@ -15,7 +15,7 @@ import android.support.v7.app.NotificationCompat;
 import android.support.v7.app.NotificationCompat.MediaStyle;
 import android.view.KeyEvent;
 import com.facebook.react.bridge.ReadableMap;
-import guichaguri.trackplayer.logic.PlayerService;
+import guichaguri.trackplayer.logic.workers.PlayerService;
 import guichaguri.trackplayer.logic.Utils;
 
 /**

@@ -1,9 +1,10 @@
-package guichaguri.trackplayer.logic;
+package guichaguri.trackplayer.logic.workers;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.components.MediaWrapper;
 import guichaguri.trackplayer.logic.components.VideoWrapper;
 

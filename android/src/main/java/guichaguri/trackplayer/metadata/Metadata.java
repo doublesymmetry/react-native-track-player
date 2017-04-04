@@ -16,7 +16,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
-import guichaguri.trackplayer.logic.components.MediaReceiver;
+import guichaguri.trackplayer.logic.workers.MediaReceiver;
 import guichaguri.trackplayer.metadata.components.ArtworkLoader;
 import guichaguri.trackplayer.metadata.components.ButtonListener;
 import guichaguri.trackplayer.metadata.components.CustomVolume;
@@ -90,7 +90,7 @@ public class Metadata {
         md.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, Utils.getString(data, "artist"));
         md.putString(MediaMetadataCompat.METADATA_KEY_GENRE, Utils.getString(data, "genre"));
         md.putString(MediaMetadataCompat.METADATA_KEY_DATE, Utils.getString(data, "date"));
-        md.putRating(MediaMetadataCompat.METADATA_KEY_RATING, Utils.getRating("rating", data, ratingType));
+        md.putRating(MediaMetadataCompat.METADATA_KEY_RATING, Utils.getRating(data, "rating", ratingType));
         md.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, Utils.getTime(data, "duration", duration));
 
         // Load the artwork
@@ -210,6 +210,10 @@ public class Metadata {
 
     public MediaControllerCompat.TransportControls getControls() {
         return session.getController().getTransportControls();
+    }
+
+    public int getRatingType() {
+        return ratingType;
     }
 
     public void reset() {

@@ -7,11 +7,13 @@ import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.KeyEvent;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
+import guichaguri.trackplayer.logic.workers.PlayerTask;
 
 /**
  * @author Guilherme Chaguri
@@ -58,7 +60,7 @@ public class Utils {
         return map.hasKey(key) && map.getType(key) == ReadableType.Array ? map.getArray(key) : def;
     }
 
-    public static RatingCompat getRating(String key, ReadableMap data, int ratingType) {
+    public static RatingCompat getRating(ReadableMap data, String key, int ratingType) {
         if(!data.hasKey(key) || data.getType(key) == ReadableType.Null) {
             return RatingCompat.newUnratedRating(ratingType);
         } else if(ratingType == RatingCompat.RATING_HEART) {
@@ -72,7 +74,7 @@ public class Utils {
         }
     }
 
-    public static void setRating(String key, WritableMap data, RatingCompat rating) {
+    public static void setRating(WritableMap data, String key, RatingCompat rating) {
         if(!rating.isRated()) return;
         int ratingType = rating.getRatingStyle();
 
@@ -151,6 +153,10 @@ public class Utils {
         if(player != -1) i.putExtra(PlayerTask.EVENT_PLAYER, player);
 
         context.startService(i);
+    }
+
+    public static void triggerCallback(Callback callback, Object ... args) {
+        if(callback != null) callback.invoke(args);
     }
 
     /**

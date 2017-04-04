@@ -62,11 +62,9 @@ dependencies {
     }
 
     if(chromecast) {
-        compile 'com.android.support:mediarouter-v7:23.0.1'
-        compile 'com.google.android.gms:play-services-cast-framework:10.2.1'
+        compile 'com.google.android.libraries.cast.companionlibrary:ccl:2.9.1'
     } else {
-        provided 'com.android.support:mediarouter-v7:23.0.1'
-        provided 'com.google.android.gms:play-services-cast-framework:10.2.1'
+        provided 'com.google.android.libraries.cast.companionlibrary:ccl:2.9.1'
     }
 
 }

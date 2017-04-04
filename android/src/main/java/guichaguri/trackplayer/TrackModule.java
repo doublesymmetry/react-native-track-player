@@ -12,7 +12,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
-import guichaguri.trackplayer.logic.PlayerService;
+import guichaguri.trackplayer.logic.workers.PlayerService;
 import guichaguri.trackplayer.logic.components.MediaWrapper;
 import java.io.IOException;
 import java.util.Arrays;

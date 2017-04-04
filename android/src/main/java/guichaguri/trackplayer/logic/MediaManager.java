@@ -3,6 +3,7 @@ package guichaguri.trackplayer.logic;
 import android.content.Intent;
 import com.facebook.react.bridge.ReadableMap;
 import guichaguri.trackplayer.logic.components.FocusManager;
+import guichaguri.trackplayer.logic.workers.PlayerService;
 import guichaguri.trackplayer.metadata.Metadata;
 import guichaguri.trackplayer.metadata.components.MediaNotification;
 import guichaguri.trackplayer.player.Player;
@@ -88,6 +89,10 @@ public class MediaManager {
 
     public Collection<Player> getPlayers() {
         return players.values();
+    }
+
+    public int getRatingType() {
+        return metadata.getRatingType();
     }
 
     public void setMainPlayer(Player player) {

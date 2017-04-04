@@ -14,6 +14,7 @@ import com.facebook.react.bridge.ReadableMap;
 import guichaguri.trackplayer.logic.LibHelper;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
+import guichaguri.trackplayer.logic.track.Track;
 import guichaguri.trackplayer.player.Player;
 import guichaguri.trackplayer.player.components.PlayerView;
 import guichaguri.trackplayer.player.components.ProxyCache;
@@ -52,6 +53,11 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
     }
 
     @Override
+    protected Track createTrack(ReadableMap data) {
+        return new Track(manager, data);
+    }
+
+    @Override
     public void update(ReadableMap data, Callback updateCallback) {
         player.setScreenOnWhilePlaying(Utils.getBoolean(data, "keepScreenActive", false));
 
@@ -59,21 +65,15 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
     }
 
     @Override
-    public void load(ReadableMap data, Callback callback) throws IOException {
-        boolean local = Utils.isUrlLocal(data, "url");
-        String url = Utils.getUrl(data, "url", local);
+    public void load(Track track, Callback callback) throws IOException {
+        String url = track.url.url;
+        boolean local = track.url.local;
+        int cacheMaxFiles = track.cache.maxFiles;
+        long cacheMaxSize = track.cache.maxSize;
 
-        if(LibHelper.PROXY_CACHE_AVAILABLE && !local) {
-            ReadableMap cacheInfo = Utils.getMap(data, "cache");
-
-            if(cacheInfo != null) {
-                String id = Utils.getString(cacheInfo, "id");
-                int maxFiles = Utils.getInt(cacheInfo, "maxFiles", 0);
-                long maxSize = (long)(Utils.getDouble(cacheInfo, "maxSize", 0) * 1024);
-
-                cache = new ProxyCache(context, maxFiles, maxSize);
-                url = cache.getURL(url, id);
-            }
+        if(LibHelper.PROXY_CACHE_AVAILABLE && !local && (cacheMaxFiles > 0 || cacheMaxSize > 0)) {
+            cache = new ProxyCache(context, cacheMaxFiles, cacheMaxSize);
+            url = cache.getURL(url, track.id);
         }
 
         buffering = true;

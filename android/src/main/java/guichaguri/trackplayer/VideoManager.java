@@ -9,7 +9,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
-import guichaguri.trackplayer.logic.PlayerService;
+import guichaguri.trackplayer.logic.workers.PlayerService;
 import guichaguri.trackplayer.logic.components.VideoWrapper;
 import guichaguri.trackplayer.player.components.PlayerView;
 import java.util.ArrayList;

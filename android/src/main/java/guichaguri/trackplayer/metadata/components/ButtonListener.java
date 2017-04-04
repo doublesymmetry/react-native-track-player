@@ -60,7 +60,7 @@ public class ButtonListener extends MediaSessionCompat.Callback {
     @Override
     public void onSetRating(RatingCompat rating) {
         WritableMap map = Arguments.createMap();
-        Utils.setRating("rating", map, rating);
+        Utils.setRating(map, "rating", rating);
         dispatch("setRating", map);
     }
 
