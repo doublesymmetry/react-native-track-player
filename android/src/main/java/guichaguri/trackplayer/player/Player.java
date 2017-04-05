@@ -7,7 +7,6 @@ import com.facebook.react.bridge.ReadableMap;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.track.Track;
-import guichaguri.trackplayer.player.components.PlayerView;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -30,6 +29,10 @@ public abstract class Player<T extends Track> {
     }
 
     protected abstract T createTrack(ReadableMap data);
+
+    public T getCurrentTrack() {
+        return queue.get(currentTrack);
+    }
 
     public void add(int index, T track) throws Exception {
         if(index < 0) {
@@ -107,13 +110,13 @@ public abstract class Player<T extends Track> {
         load(createTrack(data), loadCallback);
     }
 
-    public abstract void reset() throws Exception;
+    public abstract void reset();
 
-    public abstract void play() throws Exception;
+    public abstract void play();
 
-    public abstract void pause() throws Exception;
+    public abstract void pause();
 
-    public abstract void stop() throws Exception;
+    public abstract void stop();
 
     /**
      * State from {@link android.support.v4.media.session.PlaybackStateCompat}
@@ -130,15 +133,13 @@ public abstract class Player<T extends Track> {
 
     public abstract long getDuration();
 
-    public abstract void seekTo(long ms) throws Exception;
+    public abstract void seekTo(long ms);
 
     public abstract float getSpeed();
 
-    public abstract void setVolume(float volume) throws Exception;
+    public abstract void setVolume(float volume);
 
-    public abstract void bindView(PlayerView view);
-
-    public abstract void destroy() throws Exception;
+    public abstract void destroy();
 
     protected final void updateState(int state) {
         updateMetadata();
@@ -169,5 +170,7 @@ public abstract class Player<T extends Track> {
         } else if(Utils.isPaused(state)) {
             pause();
         }
+
+        updateMetadata();
     }
 }

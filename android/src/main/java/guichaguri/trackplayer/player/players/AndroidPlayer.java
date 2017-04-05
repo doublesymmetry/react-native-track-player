@@ -15,7 +15,7 @@ import guichaguri.trackplayer.logic.LibHelper;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.track.Track;
-import guichaguri.trackplayer.player.Player;
+import guichaguri.trackplayer.player.LocalPlayer;
 import guichaguri.trackplayer.player.components.PlayerView;
 import guichaguri.trackplayer.player.components.ProxyCache;
 import java.io.IOException;
@@ -25,7 +25,7 @@ import java.io.IOException;
  *
  * @author Guilherme Chaguri
  */
-public class AndroidPlayer extends Player implements OnInfoListener, OnCompletionListener,
+public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener, OnCompletionListener,
         OnSeekCompleteListener, OnPreparedListener, OnBufferingUpdateListener {
 
     private final MediaPlayer player;
@@ -172,7 +172,7 @@ public class AndroidPlayer extends Player implements OnInfoListener, OnCompletio
     }
 
     @Override
-    public void destroy() throws Exception {
+    public void destroy() {
         player.release();
 
         if(cache != null) {

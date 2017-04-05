@@ -3,17 +3,17 @@ package guichaguri.trackplayer.player;
 import android.content.Context;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.track.Track;
+import guichaguri.trackplayer.player.components.PlayerView;
 
 /**
  * @author Guilherme Chaguri
  */
-public abstract class RemotePlayer<T extends Track> extends Player<T> {
+public abstract class LocalPlayer<T extends Track> extends Player<T> {
 
-    protected RemotePlayer(Context context, MediaManager manager) {
+    protected LocalPlayer(Context context, MediaManager manager) {
         super(context, manager);
     }
 
-    public abstract float getVolume();
+    public abstract void bindView(PlayerView view);
 
-    public abstract boolean canChangeVolume();
 }

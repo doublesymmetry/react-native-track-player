@@ -13,8 +13,8 @@ import guichaguri.trackplayer.logic.track.TrackType;
  */
 public class ExoTrack extends Track {
 
-    public TrackType type;
-    public String userAgent;
+    public final TrackType type;
+    public final String userAgent;
 
     public ExoTrack(Context context, MediaManager manager, ReadableMap data) {
         super(manager, data);

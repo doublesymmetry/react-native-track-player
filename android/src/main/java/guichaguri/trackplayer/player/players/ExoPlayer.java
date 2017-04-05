@@ -32,7 +32,7 @@ import com.google.android.exoplayer2.upstream.cache.SimpleCache;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.track.TrackType;
-import guichaguri.trackplayer.player.Player;
+import guichaguri.trackplayer.player.LocalPlayer;
 import guichaguri.trackplayer.player.components.PlayerView;
 import guichaguri.trackplayer.player.track.ExoTrack;
 import java.io.File;
@@ -41,7 +41,7 @@ import java.io.IOException;
 /**
  * @author Guilherme Chaguri
  */
-public class ExoPlayer extends Player<ExoTrack> implements EventListener {
+public class ExoPlayer extends LocalPlayer<ExoTrack> implements EventListener {
 
     private final SimpleExoPlayer player;
 
@@ -171,7 +171,7 @@ public class ExoPlayer extends Player<ExoTrack> implements EventListener {
     }
 
     @Override
-    public void destroy() throws Exception {
+    public void destroy() {
         player.release();
     }
 

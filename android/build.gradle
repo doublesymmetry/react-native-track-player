@@ -62,9 +62,9 @@ dependencies {
     }
 
     if(chromecast) {
-        compile 'com.google.android.libraries.cast.companionlibrary:ccl:2.9.1'
+        compile 'com.google.android.gms:play-services-cast:10.2.1'
     } else {
-        provided 'com.google.android.libraries.cast.companionlibrary:ccl:2.9.1'
+        provided 'com.google.android.gms:play-services-cast:10.2.1'
     }
 
 }
