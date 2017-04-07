@@ -9,8 +9,8 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
-import guichaguri.trackplayer.logic.workers.PlayerService;
 import guichaguri.trackplayer.logic.components.VideoWrapper;
+import guichaguri.trackplayer.logic.workers.PlayerService;
 import guichaguri.trackplayer.player.components.PlayerView;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +22,7 @@ public class VideoManager extends SimpleViewManager<PlayerView> implements Servi
 
     private final ReactApplicationContext context;
 
+    private boolean serviceEnabled = false;
     private VideoWrapper video;
     private List<PlayerView> views = new ArrayList<>();
 
@@ -35,21 +36,14 @@ public class VideoManager extends SimpleViewManager<PlayerView> implements Servi
     }
 
     @Override
-    public void initialize() {
-        super.initialize();
-
-        Intent intent = new Intent(context, PlayerService.class);
-        intent.setAction(PlayerService.ACTION_VIDEO);
-        context.bindService(intent, this, Service.BIND_AUTO_CREATE);
-    }
-
-    @Override
     public void onCatalystInstanceDestroy() {
-        context.unbindService(this);
+        setServiceEnabled(false);
     }
 
     @Override
     protected PlayerView createViewInstance(ThemedReactContext context) {
+        setServiceEnabled(true);
+
         PlayerView view = new PlayerView(context);
         views.add(view);
         return view;
@@ -60,12 +54,33 @@ public class VideoManager extends SimpleViewManager<PlayerView> implements Servi
         // Unbind the player
         view.bindPlayer(video, -1);
         views.remove(view);
+
+        if(views.isEmpty()) setServiceEnabled(false);
     }
 
     @ReactProp(name = "player", defaultInt = -1)
     public void setPlayer(PlayerView view, int id) {
         // Bind the player
         view.bindPlayer(video, id);
+    }
+
+    @ReactProp(name = "keepScreenAwake", defaultBoolean = false)
+    public void setKeepScreenAwake(PlayerView view, boolean awake) {
+        // Keep the screen awake
+        view.setKeepScreenOn(awake);
+    }
+
+    private void setServiceEnabled(boolean enabled) {
+        if(serviceEnabled == enabled) return;
+
+        if(enabled) {
+            Intent intent = new Intent(context, PlayerService.class);
+            intent.setAction(PlayerService.ACTION_VIDEO);
+            context.bindService(intent, this, Service.BIND_AUTO_CREATE);
+        } else {
+            context.unbindService(this);
+        }
+        serviceEnabled = enabled;
     }
 
     @Override

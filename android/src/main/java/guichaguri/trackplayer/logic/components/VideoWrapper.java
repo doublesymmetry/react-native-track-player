@@ -2,6 +2,8 @@ package guichaguri.trackplayer.logic.components;
 
 import android.os.Binder;
 import guichaguri.trackplayer.logic.MediaManager;
+import guichaguri.trackplayer.player.LocalPlayer;
+import guichaguri.trackplayer.player.Player;
 import guichaguri.trackplayer.player.components.PlayerView;
 
 /**
@@ -17,7 +19,10 @@ public class VideoWrapper extends Binder {
     }
 
     public void setView(int id, PlayerView view) {
-        manager.getPlayer(id).bindView(view);
+        Player player = manager.getPlayer(id);
+        if(player instanceof LocalPlayer) {
+            ((LocalPlayer)player).bindView(view);
+        }
     }
 
 }
