@@ -18,8 +18,8 @@ This is a work-in-progress project not ready for production yet.
 * [x] *Optional* ExoPlayer (DASH, HLS, SmoothStreaming, etc) support
 * [x] *Optional* Caching for MediaPlayer
 * [x] *Optional* Caching for ExoPlayer
-* [ ] *Optional* Chromecast support (Default/Styled Media Receiver)
-* [ ] *Optional* Chromecast support (Custom Media Receiver)
+* [x] *Optional* Chromecast support (Default Media Receiver)
+* [x] *Optional* Chromecast support (Styled/Custom Media Receiver)
 * [x] Video support
 * [x] Everything is event-based (nothing happens unless you allow them to)
 * [x] Service (background and foreground support)

@@ -7,6 +7,7 @@ import com.facebook.react.bridge.ReadableMap;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.player.Player;
+import guichaguri.trackplayer.player.players.CastPlayer;
 import java.io.IOException;
 
 /**
@@ -46,14 +47,6 @@ public class MediaWrapper extends Binder {
             manager.setMainPlayer(manager.getPlayer(id));
         } else {
             manager.setMainPlayer(null);
-        }
-    }
-
-    public void update(int id, ReadableMap data, Callback callback) {
-        if(id != -1) {
-            manager.getPlayer(id).update(data, callback);
-        } else {
-            for(Player p : manager.getPlayers()) p.update(data, callback);
         }
     }
 
@@ -113,6 +106,19 @@ public class MediaWrapper extends Binder {
         } else {
             for(Player p : manager.getPlayers()) p.setVolume(volume);
         }
+    }
+
+    public void startScan() {
+        manager.getCast().startScan();
+    }
+
+    public void stopScan() {
+        manager.getCast().stopScan();
+    }
+
+    public int connect(String id) {
+        CastPlayer player = manager.getCast().connect(id);
+        return manager.addPlayer(player);
     }
 
     public double getDuration(int id) {

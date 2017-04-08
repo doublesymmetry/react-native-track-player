@@ -62,13 +62,8 @@ public class ExoPlayer extends LocalPlayer<ExoTrack> implements EventListener {
     }
 
     @Override
-    public void update(ReadableMap data, Callback updateCallback) {
-        updateCallback.invoke();
-    }
-
-    @Override
-    public void load(ExoTrack track, Callback loadCallback) throws IOException {
-        this.loadCallback = loadCallback;
+    public void load(ExoTrack track, Callback callback) throws IOException {
+        loadCallback = callback;
 
         boolean local = track.url.local;
         Uri url = Utils.toUri(context, track.url.url, local);

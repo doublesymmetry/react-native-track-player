@@ -156,11 +156,6 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void update(int id, ReadableMap data, Callback callback) {
-        manager.update(id, data, callback);
-    }
-
-    @ReactMethod
     public void reset(int id) {
         manager.reset(id);
     }

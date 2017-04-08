@@ -54,7 +54,7 @@ public class Chromecast extends Callback implements ConnectionCallbacks, OnConne
         this.router = MediaRouter.getInstance(context);
     }
 
-    private void init(ReadableMap cast) {
+    public void updateOptions(ReadableMap cast) {
         destroy();
 
         applicationId = Utils.getString(cast, "id", CastMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID);
@@ -62,6 +62,10 @@ public class Chromecast extends Callback implements ConnectionCallbacks, OnConne
         selector = new MediaRouteSelector.Builder()
                 .addControlCategory(CastMediaControlIntent.categoryForCast(applicationId))
                 .build();
+
+        if(scanning) {
+            router.addCallback(selector, this, MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY);
+        }
     }
 
     public void startScan() {
@@ -100,6 +104,7 @@ public class Chromecast extends Callback implements ConnectionCallbacks, OnConne
             client.disconnect();
             client = null;
         }
+        manager.removePlayer(activePlayer);
         activePlayer = null;
         reconnecting = false;
     }
@@ -158,6 +163,7 @@ public class Chromecast extends Callback implements ConnectionCallbacks, OnConne
             WritableMap data = Arguments.createMap();
             data.putString("id", id);
             data.putString("deviceId", device.getDeviceId());
+            data.putString("model", device.getModelName());
             data.putString("name", device.getFriendlyName());
             data.putString("ip", device.getIpAddress().getHostAddress());
             data.putInt("port", device.getServicePort());
@@ -179,7 +185,7 @@ public class Chromecast extends Callback implements ConnectionCallbacks, OnConne
 
         @Override
         public void onVolumeChanged() {
-            activePlayer.onVolumeChanged();
+            if(activePlayer != null) activePlayer.onVolumeChanged();
         }
     }
 

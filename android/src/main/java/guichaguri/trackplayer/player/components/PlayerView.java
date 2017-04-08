@@ -13,6 +13,7 @@ public class PlayerView extends SurfaceView {
 
     public PlayerView(Context context) {
         super(context);
+        setKeepScreenOn(false);
     }
 
     public void bindPlayer(VideoWrapper video, int player) {

@@ -9,6 +9,7 @@ import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.track.Track;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 
 /**
@@ -34,25 +35,30 @@ public abstract class Player<T extends Track> {
         return queue.get(currentTrack);
     }
 
-    public void add(int index, T track) throws Exception {
+    public List<T> getQueue() {
+        return queue;
+    }
+
+    public void add(int index, T track, Callback callback) throws Exception {
         if(index < 0) {
             queue.add(track);
         } else {
             queue.add(index, track);
         }
+        Utils.triggerCallback(callback);
     }
 
-    public  void add(int index, ReadableMap data) throws Exception {
-        add(index, createTrack(data));
+    public  void add(int index, ReadableMap data, Callback callback) throws Exception {
+        add(index, createTrack(data), callback);
     }
 
-    public void remove(String[] ids) throws Exception {
+    public void remove(String[] ids, Callback callback) throws Exception {
         ListIterator<T> i = queue.listIterator();
         boolean trackChanged = false;
 
         while(i.hasNext()) {
             int index = i.nextIndex();
-            Track track = i.next();
+            T track = i.next();
             for(String id : ids) {
                 if(track.id.equals(id)) {
                     i.remove();
@@ -65,12 +71,16 @@ public abstract class Player<T extends Track> {
             }
         }
 
-        if(trackChanged) updateCurrentTrack(null);
+        if(trackChanged) {
+            updateCurrentTrack(callback);
+        } else {
+            Utils.triggerCallback(callback);
+        }
     }
 
     public void skip(String id, Callback callback) throws Exception {
         for(int i = 0; i < queue.size(); i++) {
-            Track track = queue.get(i);
+            T track = queue.get(i);
             if(track.id.equals(id)) {
                 currentTrack = i;
                 updateCurrentTrack(callback);
@@ -99,15 +109,10 @@ public abstract class Player<T extends Track> {
         }
     }
 
-    /**
-     * Custom data
-     */
-    public abstract void update(ReadableMap data, Callback updateCallback);
+    public abstract void load(T track, Callback callback) throws IOException;
 
-    public abstract void load(T track, Callback loadCallback) throws IOException;
-
-    public void load(ReadableMap data, Callback loadCallback) throws IOException {
-        load(createTrack(data), loadCallback);
+    public void load(ReadableMap data, Callback callback) throws IOException {
+        load(createTrack(data), callback);
     }
 
     public abstract void reset();

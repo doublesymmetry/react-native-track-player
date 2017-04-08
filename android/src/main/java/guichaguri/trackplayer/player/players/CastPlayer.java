@@ -7,26 +7,34 @@ import com.facebook.react.bridge.ReadableMap;
 import com.google.android.gms.cast.Cast;
 import com.google.android.gms.cast.MediaInfo;
 import com.google.android.gms.cast.MediaMetadata;
+import com.google.android.gms.cast.MediaQueueItem;
 import com.google.android.gms.cast.MediaStatus;
 import com.google.android.gms.cast.RemoteMediaPlayer;
+import com.google.android.gms.cast.RemoteMediaPlayer.MediaChannelResult;
+import com.google.android.gms.cast.RemoteMediaPlayer.OnQueueStatusUpdatedListener;
 import com.google.android.gms.cast.RemoteMediaPlayer.OnStatusUpdatedListener;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.images.WebImage;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
-import guichaguri.trackplayer.player.RemotePlayer;
 import guichaguri.trackplayer.player.Chromecast;
+import guichaguri.trackplayer.player.RemotePlayer;
+import guichaguri.trackplayer.player.components.CastCallbackTrigger;
 import guichaguri.trackplayer.player.track.CastTrack;
 import java.io.IOException;
+import java.util.ListIterator;
 
 /**
  * @author Guilherme Chaguri
  */
-public class CastPlayer extends RemotePlayer<CastTrack> implements OnStatusUpdatedListener {
+public class CastPlayer extends RemotePlayer<CastTrack> implements OnStatusUpdatedListener, OnQueueStatusUpdatedListener {
 
     private final Chromecast cast;
     private final GoogleApiClient client;
     private final RemoteMediaPlayer player;
+
+    private boolean playing = false;
 
     public CastPlayer(Context context, Chromecast cast, MediaManager manager, GoogleApiClient client) {
         super(context, manager);
@@ -35,6 +43,7 @@ public class CastPlayer extends RemotePlayer<CastTrack> implements OnStatusUpdat
 
         player = new RemoteMediaPlayer();
         player.setOnStatusUpdatedListener(this);
+        player.setOnQueueStatusUpdatedListener(this);
     }
 
     @Override
@@ -43,12 +52,16 @@ public class CastPlayer extends RemotePlayer<CastTrack> implements OnStatusUpdat
     }
 
     @Override
-    public void update(ReadableMap data, Callback updateCallback) {
-        updateCallback.invoke();
+    protected void updateCurrentTrack(Callback callback) throws Exception {
+        CastTrack track = queue.get(currentTrack);
+        if(track != null) {
+            addCallback(player.queueJumpToItem(client, track.queueId, null), callback);
+        } else {
+            Utils.triggerCallback(callback);
+        }
     }
 
-    @Override
-    public void load(CastTrack track, Callback loadCallback) throws IOException {
+    private MediaInfo createInfo(CastTrack track) {
         MediaMetadata metadata = new MediaMetadata();
         metadata.putString(MediaMetadata.KEY_TITLE, track.title);
         metadata.putString(MediaMetadata.KEY_ARTIST, track.artist);
@@ -56,22 +69,77 @@ public class CastPlayer extends RemotePlayer<CastTrack> implements OnStatusUpdat
         metadata.putDate(MediaMetadata.KEY_RELEASE_DATE, metadata.getDate(track.date));
         metadata.addImage(new WebImage(Utils.toUri(context, track.artwork.url, track.artwork.local)));
 
-        String id = !track.sendUrl || track.url.local ? track.id : track.url.url;
-
-        MediaInfo media = new MediaInfo.Builder(id)
+        return new MediaInfo.Builder(track.mediaId)
                 .setStreamDuration(track.duration)
                 .setContentType(track.contentType)
                 .setStreamType(MediaInfo.STREAM_TYPE_INVALID)
                 .setMetadata(metadata)
                 .setCustomData(track.customData)
                 .build();
+    }
 
-        player.load(client, media);
+    private void addCallback(PendingResult<MediaChannelResult> r, Callback callback, Object ... data) {
+        r.setResultCallback(new CastCallbackTrigger(callback, data));
+    }
+
+    @Override
+    public void add(int index, CastTrack track, Callback callback) throws Exception {
+        super.add(index, track, null);
+
+        MediaQueueItem item = new MediaQueueItem.Builder(createInfo(track))
+                .setAutoplay(false)
+                .build();
+
+        addCallback(player.queueAppendItem(client, item, null), callback);
+    }
+
+    @Override
+    public void remove(String[] ids, Callback callback) throws Exception {
+        ListIterator<CastTrack> i = queue.listIterator();
+        boolean trackChanged = false;
+        int[] trackIds = new int[ids.length];
+        int o = 0;
+
+        while(i.hasNext()) {
+            int index = i.nextIndex();
+            CastTrack track = i.next();
+            for(String id : ids) {
+                if(track.id.equals(id)) {
+
+                    trackIds[o++] = track.queueId;
+                    i.remove();
+                    if(currentTrack == index) {
+                        currentTrack = i.nextIndex();
+                        trackChanged = true;
+                    }
+                    break;
+                }
+            }
+        }
+
+        addCallback(player.queueRemoveItems(client, trackIds, null), callback);
+        if(trackChanged) updateCurrentTrack(null);
+    }
+
+    @Override
+    public void skipToNext(Callback callback) throws Exception {
+        addCallback(player.queueNext(client, null), callback);
+    }
+
+    @Override
+    public void skipToPrevious(Callback callback) throws Exception {
+        addCallback(player.queuePrev(client, null), callback);
+    }
+
+    @Override
+    public void load(CastTrack track, Callback callback) throws IOException {
+        addCallback(player.load(client, createInfo(track)), callback);
     }
 
     @Override
     public void reset() {
         player.stop(client);
+        playing = false;
     }
 
     @Override
@@ -91,10 +159,12 @@ public class CastPlayer extends RemotePlayer<CastTrack> implements OnStatusUpdat
 
     @Override
     public int getState() {
-        switch(player.getMediaStatus().getPlayerState()) {
-            case MediaStatus.PLAYER_STATE_UNKNOWN:
+        MediaStatus status = player.getMediaStatus();
+        int state = status != null ? status.getPlayerState() : MediaStatus.PLAYER_STATE_UNKNOWN;
+
+        switch(state) {
             case MediaStatus.PLAYER_STATE_IDLE:
-                return PlaybackStateCompat.STATE_NONE;
+                return playing ? PlaybackStateCompat.STATE_STOPPED : PlaybackStateCompat.STATE_NONE;
             case MediaStatus.PLAYER_STATE_BUFFERING:
                 return PlaybackStateCompat.STATE_BUFFERING;
             case MediaStatus.PLAYER_STATE_PLAYING:
@@ -127,7 +197,8 @@ public class CastPlayer extends RemotePlayer<CastTrack> implements OnStatusUpdat
 
     @Override
     public float getSpeed() {
-        return 1;
+        MediaStatus status = player.getMediaStatus();
+        return status != null ? (float)status.getPlaybackRate() : 1;
     }
 
     @Override
@@ -157,7 +228,40 @@ public class CastPlayer extends RemotePlayer<CastTrack> implements OnStatusUpdat
 
     @Override
     public void onStatusUpdated() {
-        updateState(getState());
+        int state = getState();
+        updateState(state);
+
+        if(Utils.isPlaying(state) || Utils.isPaused(state)) {
+            playing = true;
+        }
+    }
+
+    @Override
+    public void onQueueStatusUpdated() {
+        MediaStatus status = player.getMediaStatus();
+        if(status == null) return;
+
+        int currentTrackId = status.getCurrentItemId();
+        int oldTrack = currentTrack;
+
+        for(MediaQueueItem item : status.getQueueItems()) {
+            String id = item.getMedia().getContentId();
+
+            for(int i = 0; i < queue.size(); i++) {
+                CastTrack track = queue.get(i);
+
+                if(track.mediaId.equals(id)) {
+                    track.queueId = item.getItemId();
+
+                    if(track.queueId == currentTrackId) {
+                        currentTrack = i;
+                    }
+                    break;
+                }
+            }
+        }
+
+        if(currentTrack != oldTrack) updateMetadata();
     }
 
     public void onVolumeChanged() {

@@ -58,18 +58,14 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
     }
 
     @Override
-    public void update(ReadableMap data, Callback updateCallback) {
-        player.setScreenOnWhilePlaying(Utils.getBoolean(data, "keepScreenActive", false));
-
-        updateCallback.invoke();
-    }
-
-    @Override
     public void load(Track track, Callback callback) throws IOException {
         String url = track.url.url;
         boolean local = track.url.local;
         int cacheMaxFiles = track.cache.maxFiles;
         long cacheMaxSize = track.cache.maxSize;
+
+        player.reset();
+        if(cache != null) cache.destroy();
 
         if(LibHelper.PROXY_CACHE_AVAILABLE && !local && (cacheMaxFiles > 0 || cacheMaxSize > 0)) {
             cache = new ProxyCache(context, cacheMaxFiles, cacheMaxSize);
@@ -77,6 +73,8 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
         }
 
         buffering = true;
+        ended = false;
+        loaded = false;
         loadCallback = callback;
 
         player.setDataSource(context, Utils.toUri(context, url, local));

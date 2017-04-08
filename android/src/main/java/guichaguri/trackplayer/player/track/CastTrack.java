@@ -17,14 +17,18 @@ import org.json.JSONObject;
  */
 public class CastTrack extends Track {
 
-    public final boolean sendUrl;
+    public final String mediaId;
     public final String contentType;
     public final JSONObject customData;
+
+    public int queueId = 0;
 
     public CastTrack(MediaManager manager, ReadableMap data) {
         super(manager, data);
 
-        sendUrl = Utils.getBoolean(data, "sendUrl", true);
+        boolean sendUrl = Utils.getBoolean(data, "sendUrl", true);
+        mediaId = !sendUrl || url.local ? id : url.url;
+
         contentType = Utils.getString(data, "contentType", "audio/mpeg");
 
         ReadableMap custom = Utils.getMap(data, "customData");
@@ -34,7 +38,7 @@ public class CastTrack extends Track {
             try {
                 obj = transferToObject(custom);
             } catch(JSONException e) {
-                Log.w("TrackPlayer", "Couldn't transfer JSON to cast device", e);
+                Log.w("TrackPlayer", "Couldn't transform a Javascript object to JSON", e);
             }
         }
 

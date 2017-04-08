@@ -6,6 +6,7 @@ import guichaguri.trackplayer.logic.components.FocusManager;
 import guichaguri.trackplayer.logic.workers.PlayerService;
 import guichaguri.trackplayer.metadata.Metadata;
 import guichaguri.trackplayer.metadata.components.MediaNotification;
+import guichaguri.trackplayer.player.Chromecast;
 import guichaguri.trackplayer.player.Player;
 import guichaguri.trackplayer.player.RemotePlayer;
 import guichaguri.trackplayer.player.players.AndroidPlayer;
@@ -26,6 +27,7 @@ public class MediaManager {
 
     private int lastId = 0;
     private Player mainPlayer;
+    private Chromecast cast;
 
     public MediaManager(PlayerService service) {
         this.service = service;
@@ -36,6 +38,14 @@ public class MediaManager {
     public void updateOptions(ReadableMap data) {
         metadata.updateOptions(data);
         metadata.updatePlayback(mainPlayer);
+
+        ReadableMap castConfig = Utils.getMap(data, "cast");
+        if(castConfig != null && Utils.getBoolean(castConfig, "enabled", false)) {
+            if(cast == null) cast = new Chromecast(service, this);
+            cast.updateOptions(castConfig);
+        } else {
+            cast = null;
+        }
     }
 
     public void updateMetadata(ReadableMap data) {
@@ -56,9 +66,7 @@ public class MediaManager {
             player = new AndroidPlayer(service, this);
         }
 
-        int id = lastId++;
-        players.put(id, player);
-        return id;
+        return addPlayer(player);
     }
 
     public void destroyPlayer(int id) {
@@ -87,8 +95,22 @@ public class MediaManager {
         return players.get(id);
     }
 
+    public int addPlayer(Player player) {
+        int id = lastId++;
+        players.put(id, player);
+        return id;
+    }
+
+    public void removePlayer(Player player) {
+        players.remove(getPlayerId(player));
+    }
+
     public Collection<Player> getPlayers() {
         return players.values();
+    }
+
+    public Chromecast getCast() {
+        return cast;
     }
 
     public int getRatingType() {
