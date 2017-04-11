@@ -40,7 +40,9 @@ public class MediaManager {
         metadata.updatePlayback(mainPlayer);
 
         ReadableMap castConfig = Utils.getMap(data, "cast");
-        if(castConfig != null && Utils.getBoolean(castConfig, "enabled", false)) {
+        boolean castEnabled = castConfig != null && Utils.getBoolean(castConfig, "enabled", false);
+
+        if(castEnabled && LibHelper.isChromecastAvailable(service)) {
             if(cast == null) cast = new Chromecast(service, this);
             cast.updateOptions(castConfig);
         } else {
@@ -60,7 +62,7 @@ public class MediaManager {
     public int createPlayer() {
         Player player;
 
-        if(LibHelper.EXOPLAYER_AVAILABLE) {
+        if(LibHelper.isExoPlayerAvailable()) {
             player = new ExoPlayer(service, this);
         } else {
             player = new AndroidPlayer(service, this);

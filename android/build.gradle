@@ -11,15 +11,6 @@ buildscript {
 
 apply plugin: 'com.android.library'
 
-def exoplayer = false, cache = false, chromecast = false;
-File file = file('../../../track-player.json');
-if(file.exists()) {
-    def json = new JsonSlurper().parseText(file.text);
-    exoplayer = json.dash || json.hls || json.smoothstreaming;
-    cache = json.cache;
-    chromecast = json.chromecast;
-}
-
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
@@ -49,6 +40,14 @@ dependencies {
     //noinspection GradleDynamicVersion
     compile 'com.facebook.react:react-native:+'
 
+    def exoplayer = false, cache = false;
+    File file = file('../../../track-player.json');
+    if(file.exists()) {
+        def json = new JsonSlurper().parseText(file.text);
+        exoplayer = json.dash || json.hls || json.smoothstreaming;
+        cache = json.cache;
+    }
+
     if(exoplayer) {
         compile 'com.google.android.exoplayer:exoplayer:r2.3.1'
     } else {
@@ -61,7 +60,5 @@ dependencies {
         provided 'com.danikula:videocache:2.6.4'
     }
 
-    // For now, the cast library is included for all builds
-    // I'll figure out a way to partially include it for apps that don't need it
     compile 'com.google.android.gms:play-services-cast:10.2.1'
 }

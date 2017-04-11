@@ -8,6 +8,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.KeyEvent;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
@@ -157,6 +158,18 @@ public class Utils {
 
     public static void triggerCallback(Callback callback, Object ... args) {
         if(callback != null) callback.invoke(args);
+    }
+
+    public static void resolveCallback(Promise promise, Object data) {
+        if(promise != null) promise.resolve(data);
+    }
+
+    public static void rejectCallback(Promise promise, Throwable crash) {
+        if(promise != null) promise.reject(crash);
+    }
+
+    public static void rejectCallback(Promise promise, String code, String error) {
+        if(promise != null) promise.reject(code, error);
     }
 
     /**

@@ -186,6 +186,21 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
+    public void startScan() {
+        manager.startScan();
+    }
+
+    @ReactMethod
+    public void stopScan() {
+        manager.stopScan();
+    }
+
+    @ReactMethod
+    public void connect(String deviceId, Callback callback) {
+        callback.invoke(manager.connect(deviceId));
+    }
+
+    @ReactMethod
     public void getDuration(int id, Callback callback) {
         callback.invoke(manager.getDuration(id));
     }

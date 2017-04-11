@@ -9,6 +9,7 @@ import android.support.v7.media.MediaRouter;
 import android.support.v7.media.MediaRouter.Callback;
 import android.support.v7.media.MediaRouter.RouteInfo;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
@@ -32,7 +33,8 @@ import java.util.Map;
 /**
  * @author Guilherme Chaguri
  */
-public class Chromecast extends Callback implements ConnectionCallbacks, OnConnectionFailedListener, ResultCallback<ApplicationConnectionResult> {
+public class Chromecast extends Callback implements ConnectionCallbacks,
+        OnConnectionFailedListener, ResultCallback<ApplicationConnectionResult> {
 
     private final Context context;
     private final MediaManager manager;
@@ -44,9 +46,11 @@ public class Chromecast extends Callback implements ConnectionCallbacks, OnConne
     private String applicationId;
     private String sessionId;
     private CastPlayer activePlayer;
+    private Promise connectCallback;
 
     private boolean scanning = false;
     private boolean reconnecting = false;
+    private boolean activeScan = false;
 
     public Chromecast(Context context, MediaManager manager) {
         this.context = context;
@@ -55,6 +59,7 @@ public class Chromecast extends Callback implements ConnectionCallbacks, OnConne
     }
 
     public void updateOptions(ReadableMap cast) {
+        boolean wasScaning = scanning;
         destroy();
 
         applicationId = Utils.getString(cast, "id", CastMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID);
@@ -63,14 +68,18 @@ public class Chromecast extends Callback implements ConnectionCallbacks, OnConne
                 .addControlCategory(CastMediaControlIntent.categoryForCast(applicationId))
                 .build();
 
-        if(scanning) {
-            router.addCallback(selector, this, MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY);
-        }
+        if(wasScaning) startScan(activeScan);
     }
 
-    public void startScan() {
+    public void startScan(boolean active) {
         if(scanning) return;
-        router.addCallback(selector, this, MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY);
+
+        int flags = activeScan ?
+                MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN :
+                MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY;
+
+        router.addCallback(selector, this, flags);
+        activeScan = active;
         scanning = true;
     }
 
@@ -80,9 +89,13 @@ public class Chromecast extends Callback implements ConnectionCallbacks, OnConne
         scanning = false;
     }
 
-    public CastPlayer connect(String id) {
+    public void connect(String id, Promise callback) {
+        disconnect();
+
         CastDevice device = devices.get(id);
         CastOptions options = new CastOptions.Builder(device, new CastCallback()).build();
+
+        connectCallback = callback;
 
         client = new GoogleApiClient.Builder(context)
                 .addApi(Cast.API, options)
@@ -90,9 +103,6 @@ public class Chromecast extends Callback implements ConnectionCallbacks, OnConne
                 .addOnConnectionFailedListener(this)
                 .build();
         client.connect();
-
-        activePlayer = new CastPlayer(context, this, manager, client);
-        return activePlayer;
     }
 
     public void disconnect() {
@@ -104,8 +114,10 @@ public class Chromecast extends Callback implements ConnectionCallbacks, OnConne
             client.disconnect();
             client = null;
         }
-        manager.removePlayer(activePlayer);
-        activePlayer = null;
+        if(activePlayer != null) {
+            manager.removePlayer(activePlayer);
+            activePlayer = null;
+        }
         reconnecting = false;
     }
 
@@ -113,6 +125,7 @@ public class Chromecast extends Callback implements ConnectionCallbacks, OnConne
         stopScan();
         disconnect();
         router.selectRoute(router.getDefaultRoute());
+        devices.clear();
     }
 
     @Override
@@ -138,9 +151,15 @@ public class Chromecast extends Callback implements ConnectionCallbacks, OnConne
     public void onResult(@NonNull ApplicationConnectionResult result) {
         if(result.getStatus().isSuccess()) {
             sessionId = result.getSessionId();
+
+            activePlayer = new CastPlayer(context, this, manager, client);
+            Utils.resolveCallback(connectCallback, manager.addPlayer(activePlayer));
         } else {
             disconnect();
+
+            Utils.rejectCallback(connectCallback, "disconnect", "Could not connect to the cast device");
         }
+        connectCallback = null;
     }
 
     @Override
@@ -172,14 +191,14 @@ public class Chromecast extends Callback implements ConnectionCallbacks, OnConne
 
         WritableMap map = Arguments.createMap();
         map.putArray("devices", array);
-        Utils.dispatchEvent(context, manager.getPlayerId(activePlayer), "cast-devices", map);
+        Utils.dispatchEvent(context, manager.getPlayerId(activePlayer), "device-list", map);
     }
 
     private class CastCallback extends Listener {
 
         @Override
         public void onApplicationDisconnected(int status) {
-            Utils.dispatchEvent(context, manager.getPlayerId(activePlayer), "cast-disconnect", null);
+            Utils.dispatchEvent(context, manager.getPlayerId(activePlayer), "device-disconnect", null);
             disconnect();
         }
 
