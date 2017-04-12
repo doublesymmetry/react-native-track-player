@@ -11,7 +11,6 @@ import android.support.v7.media.MediaRouter.RouteInfo;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.google.android.gms.cast.Cast;
 import com.google.android.gms.cast.Cast.ApplicationConnectionResult;
@@ -24,6 +23,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.common.api.ResultCallback;
+import guichaguri.trackplayer.logic.Events;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.player.players.CastPlayer;
@@ -115,6 +115,8 @@ public class Chromecast extends Callback implements ConnectionCallbacks,
             client = null;
         }
         if(activePlayer != null) {
+            Events.dispatchEvent(context, manager.getPlayerId(activePlayer), Events.REMOTE_DISCONNECTED, null);
+
             manager.removePlayer(activePlayer);
             activePlayer = null;
         }
@@ -153,7 +155,9 @@ public class Chromecast extends Callback implements ConnectionCallbacks,
             sessionId = result.getSessionId();
 
             activePlayer = new CastPlayer(context, this, manager, client);
-            Utils.resolveCallback(connectCallback, manager.addPlayer(activePlayer));
+            int id = manager.addPlayer(activePlayer);
+            Utils.resolveCallback(connectCallback, id);
+            Events.dispatchEvent(context, id, Events.REMOTE_CONNECTED, null);
         } else {
             disconnect();
 
@@ -164,41 +168,38 @@ public class Chromecast extends Callback implements ConnectionCallbacks,
 
     @Override
     public void onRouteAdded(MediaRouter router, RouteInfo route) {
-        devices.put(route.getId(), CastDevice.getFromBundle(route.getExtras()));
-        updateRoutes();
+        CastDevice device = CastDevice.getFromBundle(route.getExtras());
+        if(device == null) return;
+
+        devices.put(route.getId(), device);
+
+        WritableMap data = Arguments.createMap();
+        data.putString("id", route.getId());
+        data.putString("deviceId", device.getDeviceId());
+        data.putString("model", device.getModelName());
+        data.putString("version", device.getDeviceVersion());
+        data.putString("name", device.getFriendlyName());
+        data.putString("ip", device.getIpAddress().getHostAddress());
+        data.putInt("port", device.getServicePort());
+        data.putBoolean("audio", device.hasCapability(CastDevice.CAPABILITY_AUDIO_OUT));
+        data.putBoolean("video", device.hasCapability(CastDevice.CAPABILITY_VIDEO_OUT));
+
+        Events.dispatchEvent(context, manager.getPlayerId(activePlayer), Events.REMOTE_ADDED, data);
     }
 
     @Override
     public void onRouteRemoved(MediaRouter router, RouteInfo route) {
         devices.remove(route.getId());
-        updateRoutes();
-    }
 
-    private void updateRoutes() {
-        WritableArray array = Arguments.createArray();
-
-        for(String id : devices.keySet()) {
-            CastDevice device = devices.get(id);
-            WritableMap data = Arguments.createMap();
-            data.putString("id", id);
-            data.putString("deviceId", device.getDeviceId());
-            data.putString("model", device.getModelName());
-            data.putString("name", device.getFriendlyName());
-            data.putString("ip", device.getIpAddress().getHostAddress());
-            data.putInt("port", device.getServicePort());
-            array.pushMap(data);
-        }
-
-        WritableMap map = Arguments.createMap();
-        map.putArray("devices", array);
-        Utils.dispatchEvent(context, manager.getPlayerId(activePlayer), "device-list", map);
+        WritableMap data = Arguments.createMap();
+        data.putString("id", route.getId());
+        Events.dispatchEvent(context, manager.getPlayerId(activePlayer), Events.REMOTE_REMOVED, data);
     }
 
     private class CastCallback extends Listener {
 
         @Override
         public void onApplicationDisconnected(int status) {
-            Utils.dispatchEvent(context, manager.getPlayerId(activePlayer), "device-disconnect", null);
             disconnect();
         }
 

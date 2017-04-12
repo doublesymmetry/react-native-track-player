@@ -1,8 +1,9 @@
 package guichaguri.trackplayer.player.players;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v4.media.session.PlaybackStateCompat;
-import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableMap;
 import com.google.android.gms.cast.Cast;
 import com.google.android.gms.cast.MediaInfo;
@@ -15,17 +16,21 @@ import com.google.android.gms.cast.RemoteMediaPlayer.OnQueueStatusUpdatedListene
 import com.google.android.gms.cast.RemoteMediaPlayer.OnStatusUpdatedListener;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.images.WebImage;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
+import guichaguri.trackplayer.logic.track.Track;
 import guichaguri.trackplayer.player.Chromecast;
 import guichaguri.trackplayer.player.RemotePlayer;
 import guichaguri.trackplayer.player.components.CastCallbackTrigger;
 import guichaguri.trackplayer.player.track.CastTrack;
-import java.io.IOException;
+import java.util.List;
 import java.util.ListIterator;
 
 /**
+ * Remote player using {@link RemoteMediaPlayer}
+ *
  * @author Guilherme Chaguri
  */
 public class CastPlayer extends RemotePlayer<CastTrack> implements OnStatusUpdatedListener, OnQueueStatusUpdatedListener {
@@ -52,12 +57,19 @@ public class CastPlayer extends RemotePlayer<CastTrack> implements OnStatusUpdat
     }
 
     @Override
-    protected void updateCurrentTrack(Callback callback) throws Exception {
+    protected CastTrack createTrack(Track track) {
+        return new CastTrack(track);
+    }
+
+    @Override
+    protected void updateCurrentTrack(Promise callback) {
         CastTrack track = queue.get(currentTrack);
         if(track != null) {
             addCallback(player.queueJumpToItem(client, track.queueId, null), callback);
         } else {
-            Utils.triggerCallback(callback);
+            RuntimeException ex = new RuntimeException("Track not found");
+            Utils.rejectCallback(callback, ex);
+            manager.onError(this, ex);
         }
     }
 
@@ -78,23 +90,32 @@ public class CastPlayer extends RemotePlayer<CastTrack> implements OnStatusUpdat
                 .build();
     }
 
-    private void addCallback(PendingResult<MediaChannelResult> r, Callback callback, Object ... data) {
+    private void addCallback(PendingResult<MediaChannelResult> r, Promise callback, Object ... data) {
         r.setResultCallback(new CastCallbackTrigger(callback, data));
     }
 
     @Override
-    public void add(int index, CastTrack track, Callback callback) throws Exception {
-        super.add(index, track, null);
+    public void add(int index, List<CastTrack> tracks, Promise callback) {
+        super.add(index, tracks, null);
 
-        MediaQueueItem item = new MediaQueueItem.Builder(createInfo(track))
-                .setAutoplay(false)
-                .build();
+        int indexId = MediaQueueItem.INVALID_ITEM_ID;
+        if(index >= 0 && index + 1 < queue.size()) {
+            CastTrack track = queue.get(index + 1);
+            if(track != null) indexId = track.queueId;
+        }
 
-        addCallback(player.queueAppendItem(client, item, null), callback);
+        MediaQueueItem[] items = new MediaQueueItem[tracks.size()];
+
+        for(int i = 0; i < tracks.size(); i++) {
+            items[i] = new MediaQueueItem.Builder(createInfo(tracks.get(i)))
+                    .setAutoplay(false).build();
+        }
+
+        addCallback(player.queueInsertItems(client, items, indexId, null), callback);
     }
 
     @Override
-    public void remove(String[] ids, Callback callback) throws Exception {
+    public void remove(String[] ids, Promise callback) {
         ListIterator<CastTrack> i = queue.listIterator();
         boolean trackChanged = false;
         int[] trackIds = new int[ids.length];
@@ -122,18 +143,26 @@ public class CastPlayer extends RemotePlayer<CastTrack> implements OnStatusUpdat
     }
 
     @Override
-    public void skipToNext(Callback callback) throws Exception {
+    public void skipToNext(Promise callback) {
         addCallback(player.queueNext(client, null), callback);
     }
 
     @Override
-    public void skipToPrevious(Callback callback) throws Exception {
+    public void skipToPrevious(Promise callback) {
         addCallback(player.queuePrev(client, null), callback);
     }
 
     @Override
-    public void load(CastTrack track, Callback callback) throws IOException {
-        addCallback(player.load(client, createInfo(track)), callback);
+    public void load(final CastTrack track, final Promise callback) {
+        PendingResult<MediaChannelResult> result = player.load(client, createInfo(track));
+
+        result.setResultCallback(new ResultCallback<MediaChannelResult>() {
+            @Override
+            public void onResult(@NonNull MediaChannelResult result) {
+                Utils.resolveCallback(callback);
+                manager.onLoad(CastPlayer.this, track);
+            }
+        });
     }
 
     @Override
@@ -233,6 +262,10 @@ public class CastPlayer extends RemotePlayer<CastTrack> implements OnStatusUpdat
 
         if(Utils.isPlaying(state) || Utils.isPaused(state)) {
             playing = true;
+        }
+
+        if(state == PlaybackStateCompat.STATE_STOPPED) {
+            manager.onEnd(this);
         }
     }
 

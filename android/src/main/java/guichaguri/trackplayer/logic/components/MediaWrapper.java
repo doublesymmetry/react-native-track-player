@@ -2,13 +2,13 @@ package guichaguri.trackplayer.logic.components;
 
 import android.os.Binder;
 import android.os.SystemClock;
-import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
+import guichaguri.trackplayer.logic.track.Track;
 import guichaguri.trackplayer.player.Player;
-import guichaguri.trackplayer.player.players.CastPlayer;
-import java.io.IOException;
 
 /**
  * A wrapper of {@link MediaManager} to be used as a lightweight {@link android.os.IBinder}
@@ -50,7 +50,47 @@ public class MediaWrapper extends Binder {
         }
     }
 
-    public void load(int id, ReadableMap data, Callback callback) throws IOException {
+    public void add(int id, int index, ReadableArray data, Promise callback) {
+        if(id != -1) {
+            manager.getPlayer(id).add(index, data, callback);
+        } else {
+            for(Player p : manager.getPlayers()) p.add(index, data, callback);
+        }
+    }
+
+    public void remove(int id, String[] tracks, Promise callback) {
+        if(id != -1) {
+            manager.getPlayer(id).remove(tracks, callback);
+        } else {
+            for(Player p : manager.getPlayers()) p.remove(tracks, callback);
+        }
+    }
+
+    public void skip(int id, String track, Promise callback) {
+        if(id != -1) {
+            manager.getPlayer(id).skip(track, callback);
+        } else {
+            for(Player p : manager.getPlayers()) p.skip(track, callback);
+        }
+    }
+
+    public void skipToNext(int id, Promise callback) {
+        if(id != -1) {
+            manager.getPlayer(id).skipToNext(callback);
+        } else {
+            for(Player p : manager.getPlayers()) p.skipToNext(callback);
+        }
+    }
+
+    public void skipToPrevious(int id, Promise callback) {
+        if(id != -1) {
+            manager.getPlayer(id).skipToPrevious(callback);
+        } else {
+            for(Player p : manager.getPlayers()) p.skipToPrevious(callback);
+        }
+    }
+
+    public void load(int id, ReadableMap data, Promise callback) {
         if(id != -1) {
             manager.getPlayer(id).load(data, callback);
         } else {
@@ -108,17 +148,28 @@ public class MediaWrapper extends Binder {
         }
     }
 
-    public void startScan() {
-        manager.getCast().startScan();
+    public void startScan(boolean active) {
+        manager.getCast().startScan(active);
     }
 
     public void stopScan() {
         manager.getCast().stopScan();
     }
 
-    public int connect(String id) {
-        CastPlayer player = manager.getCast().connect(id);
-        return manager.addPlayer(player);
+    public void connect(String id, Promise callback) {
+        manager.getCast().connect(id, callback);
+    }
+
+    public void copyQueue(int fromId, int toId, int index, Promise promise) {
+        Player fromPlayer = manager.getPlayer(fromId);
+        Player toPlayer = manager.getPlayer(toId);
+
+        fromPlayer.copyQueue(toPlayer, index, promise);
+    }
+
+    public String getCurrentTrack(int id) {
+        Track track = manager.getPlayer(id).getCurrentTrack();
+        return track != null ? track.id : null;
     }
 
     public double getDuration(int id) {

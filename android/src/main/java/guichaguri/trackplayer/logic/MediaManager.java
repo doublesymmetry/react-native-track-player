@@ -1,8 +1,11 @@
 package guichaguri.trackplayer.logic;
 
 import android.content.Intent;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
 import guichaguri.trackplayer.logic.components.FocusManager;
+import guichaguri.trackplayer.logic.track.Track;
 import guichaguri.trackplayer.logic.workers.PlayerService;
 import guichaguri.trackplayer.metadata.Metadata;
 import guichaguri.trackplayer.metadata.components.MediaNotification;
@@ -159,10 +162,29 @@ public class MediaManager {
         onPlayerStop(player);
     }
 
+    public void onLoad(Player player, Track track) {
+        WritableMap data = Arguments.createMap();
+        data.putString("track", track.id);
+        Events.dispatchEvent(service, getPlayerId(player), Events.PLAYER_LOAD, data);
+    }
+
+    public void onEnd(Player player) {
+        Events.dispatchEvent(service, getPlayerId(player), Events.PLAYER_ENDED, null);
+    }
+
     public void onUpdate(Player player) {
         if(mainPlayer == player) {
             metadata.updatePlayback(player);
         }
+
+        WritableMap data = Arguments.createMap();
+        data.putInt("state", player.getState());
+        Events.dispatchEvent(service, getPlayerId(player), Events.PLAYER_STATE, data);
+    }
+
+    public void onError(Player player, Throwable error) {
+
+        Events.dispatchEvent(service, getPlayerId(player), Events.PLAYER_ERROR, null);
     }
 
     public void onCommand(Intent intent) {
@@ -184,6 +206,8 @@ public class MediaManager {
         if(!(player instanceof RemotePlayer)) {
             focus.enable();
         }
+
+        Events.dispatchEvent(service, getPlayerId(player), Events.PLAYER_PLAY, null);
     }
 
     private void onMainPlayerPlay() {
@@ -202,6 +226,8 @@ public class MediaManager {
             // When there are no more local players, we'll disable the audio focus
             focus.disable();
         }
+
+        Events.dispatchEvent(service, getPlayerId(player), Events.PLAYER_PAUSE, null);
     }
 
     private void onMainPlayerPause() {
@@ -215,7 +241,7 @@ public class MediaManager {
             focus.disable();
         }
 
-        Utils.dispatchEvent(service, getPlayerId(player), "ended", null);
+        Events.dispatchEvent(service, getPlayerId(player), Events.PLAYER_STOP, null);
     }
 
     private void onMainPlayerStop() {

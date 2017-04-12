@@ -3,7 +3,7 @@ package guichaguri.trackplayer.player.players;
 import android.content.Context;
 import android.net.Uri;
 import android.support.v4.media.session.PlaybackStateCompat;
-import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableMap;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -31,21 +31,23 @@ import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvicto
 import com.google.android.exoplayer2.upstream.cache.SimpleCache;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
+import guichaguri.trackplayer.logic.track.Track;
 import guichaguri.trackplayer.logic.track.TrackType;
 import guichaguri.trackplayer.player.LocalPlayer;
 import guichaguri.trackplayer.player.components.PlayerView;
 import guichaguri.trackplayer.player.track.ExoTrack;
 import java.io.File;
-import java.io.IOException;
 
 /**
+ * Feature-rich player using {@link SimpleExoPlayer}
+ *
  * @author Guilherme Chaguri
  */
 public class ExoPlayer extends LocalPlayer<ExoTrack> implements EventListener {
 
     private final SimpleExoPlayer player;
 
-    private Callback loadCallback = null;
+    private Promise loadCallback = null;
     private boolean playing = false;
 
     public ExoPlayer(Context context, MediaManager manager) {
@@ -62,7 +64,12 @@ public class ExoPlayer extends LocalPlayer<ExoTrack> implements EventListener {
     }
 
     @Override
-    public void load(ExoTrack track, Callback callback) throws IOException {
+    protected ExoTrack createTrack(Track track) {
+        return new ExoTrack(context, track);
+    }
+
+    @Override
+    public void load(ExoTrack track, Promise callback) {
         loadCallback = callback;
 
         boolean local = track.url.local;
@@ -190,15 +197,26 @@ public class ExoPlayer extends LocalPlayer<ExoTrack> implements EventListener {
         playing = playWhenReady;
         updateState(getState(playbackState));
 
-        if(playbackState == SimpleExoPlayer.STATE_READY && loadCallback != null) {
-            loadCallback.invoke();
+        if(playbackState == SimpleExoPlayer.STATE_READY) {
+
+            Utils.resolveCallback(loadCallback);
             loadCallback = null;
+
+            manager.onLoad(this, getCurrentTrack());
+
+        } else if(playbackState == SimpleExoPlayer.STATE_ENDED) {
+
+            manager.onEnd(this);
+
         }
     }
 
     @Override
     public void onPlayerError(ExoPlaybackException error) {
-        // TODO
+        Utils.rejectCallback(loadCallback, error);
+        loadCallback = null;
+
+        manager.onError(this, error);
     }
 
     @Override

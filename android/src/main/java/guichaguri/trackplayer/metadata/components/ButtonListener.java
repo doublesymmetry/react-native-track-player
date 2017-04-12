@@ -5,6 +5,7 @@ import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
+import guichaguri.trackplayer.logic.Events;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 
@@ -22,46 +23,46 @@ public class ButtonListener extends MediaSessionCompat.Callback {
     }
 
     private void dispatch(String event, WritableMap data) {
-        Utils.dispatchEvent(context, manager.getPlayerId(manager.getMainPlayer()), event, data);
+        Events.dispatchEvent(context, manager.getPlayerId(manager.getMainPlayer()), event, data);
     }
 
     @Override
     public void onPlay() {
-        dispatch("play", null);
+        dispatch(Events.BUTTON_PLAY, null);
     }
 
     @Override
     public void onPause() {
-        dispatch("pause", null);
+        dispatch(Events.BUTTON_PAUSE, null);
     }
 
     @Override
     public void onStop() {
-        dispatch("stop", null);
+        dispatch(Events.BUTTON_STOP, null);
     }
 
     @Override
     public void onSkipToNext() {
-        dispatch("skipNext", null);
+        dispatch(Events.BUTTON_SKIP_NEXT, null);
     }
 
     @Override
     public void onSkipToPrevious() {
-        dispatch("skipPrevious", null);
+        dispatch(Events.BUTTON_SKIP_PREVIOUS, null);
     }
 
     @Override
     public void onSeekTo(long pos) {
         WritableMap map = Arguments.createMap();
         Utils.setTime(map, "position", pos);
-        dispatch("seekTo", map);
+        dispatch(Events.BUTTON_SEEK_TO, map);
     }
 
     @Override
     public void onSetRating(RatingCompat rating) {
         WritableMap map = Arguments.createMap();
         Utils.setRating(map, "rating", rating);
-        dispatch("setRating", map);
+        dispatch(Events.BUTTON_SET_RATING, map);
     }
 
 }

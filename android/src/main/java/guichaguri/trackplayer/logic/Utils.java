@@ -1,12 +1,10 @@
 package guichaguri.trackplayer.logic;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.KeyEvent;
-import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableArray;
@@ -14,7 +12,6 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
-import guichaguri.trackplayer.logic.workers.PlayerTask;
 
 /**
  * @author Guilherme Chaguri
@@ -146,22 +143,12 @@ public class Utils {
                 state == PlaybackStateCompat.STATE_ERROR;
     }
 
-    public static void dispatchEvent(Context context, int player, String event, WritableMap data) {
-        Intent i = new Intent(context, PlayerTask.class);
-
-        if(event != null) i.putExtra(PlayerTask.EVENT_TYPE, event);
-        if(data != null) i.putExtra(PlayerTask.EVENT_DATA, Arguments.toBundle(data));
-        if(player != -1) i.putExtra(PlayerTask.EVENT_PLAYER, player);
-
-        context.startService(i);
-    }
-
     public static void triggerCallback(Callback callback, Object ... args) {
         if(callback != null) callback.invoke(args);
     }
 
-    public static void resolveCallback(Promise promise, Object data) {
-        if(promise != null) promise.resolve(data);
+    public static void resolveCallback(Promise promise, Object ... data) {
+        if(promise != null) promise.resolve(data.length == 1 ? data[0] : data);
     }
 
     public static void rejectCallback(Promise promise, Throwable crash) {

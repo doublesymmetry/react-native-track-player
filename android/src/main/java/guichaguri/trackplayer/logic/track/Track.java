@@ -24,6 +24,20 @@ public class Track {
     public final RatingCompat rating;
     public final TrackURL artwork;
 
+    public Track(Track track) {
+        id = track.id;
+        url = track.url;
+        cache = track.cache;
+        duration = track.duration;
+        title = track.title;
+        artist = track.artist;
+        album = track.album;
+        genre = track.genre;
+        date = track.date;
+        rating = track.rating;
+        artwork = track.artwork;
+    }
+
     public Track(MediaManager manager, ReadableMap data) {
         id = Utils.getString(data, "id");
 

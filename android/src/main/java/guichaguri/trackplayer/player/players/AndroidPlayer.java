@@ -5,11 +5,12 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnInfoListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.support.v4.media.session.PlaybackStateCompat;
-import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableMap;
 import guichaguri.trackplayer.logic.LibHelper;
 import guichaguri.trackplayer.logic.MediaManager;
@@ -26,12 +27,12 @@ import java.io.IOException;
  * @author Guilherme Chaguri
  */
 public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener, OnCompletionListener,
-        OnSeekCompleteListener, OnPreparedListener, OnBufferingUpdateListener {
+        OnSeekCompleteListener, OnPreparedListener, OnBufferingUpdateListener, OnErrorListener {
 
     private final MediaPlayer player;
     private ProxyCache cache;
 
-    private Callback loadCallback;
+    private Promise loadCallback;
 
     private boolean loaded = false;
     private boolean buffering = false;
@@ -50,6 +51,7 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
         player.setOnSeekCompleteListener(this);
         player.setOnPreparedListener(this);
         player.setOnBufferingUpdateListener(this);
+        player.setOnErrorListener(this);
     }
 
     @Override
@@ -58,7 +60,12 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
     }
 
     @Override
-    public void load(Track track, Callback callback) throws IOException {
+    protected Track createTrack(Track track) {
+        return new Track(track);
+    }
+
+    @Override
+    public void load(Track track, Promise callback) {
         String url = track.url.url;
         boolean local = track.url.local;
         int cacheMaxFiles = track.cache.maxFiles;
@@ -77,8 +84,12 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
         loaded = false;
         loadCallback = callback;
 
-        player.setDataSource(context, Utils.toUri(context, url, local));
-        player.prepareAsync();
+        try {
+            player.setDataSource(context, Utils.toUri(context, url, local));
+            player.prepareAsync();
+        } catch(IOException ex) {
+            manager.onError(this, ex);
+        }
 
         updateState();
     }
@@ -195,6 +206,10 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
     public void onCompletion(MediaPlayer mp) {
         ended = true;
         updateState();
+
+        manager.onEnd(this);
+
+        skipToNext(null);
     }
 
     @Override
@@ -205,20 +220,32 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
 
     @Override
     public void onPrepared(MediaPlayer mp) {
-        if(loadCallback != null) {
-            loadCallback.invoke();
-            loadCallback = null;
-        }
+        Utils.resolveCallback(loadCallback);
+        loadCallback = null;
 
         loaded = true;
         buffering = false;
         updateState();
+
+        manager.onLoad(this, getCurrentTrack());
     }
 
     @Override
     public void onBufferingUpdate(MediaPlayer mp, int percent) {
         buffered = percent / 100F;
         updateMetadata();
+    }
+
+    @Override
+    public boolean onError(MediaPlayer mp, int what, int extra) {
+        Exception ex;
+        if(what == MediaPlayer.MEDIA_ERROR_SERVER_DIED) {
+            ex = new IOException("Server died");
+        } else {
+            ex = new RuntimeException("Unknown error");
+        }
+        manager.onError(this, ex);
+        return true;
     }
 
     private void updateState() {

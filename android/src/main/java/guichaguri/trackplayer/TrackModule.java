@@ -8,13 +8,15 @@ import android.os.IBinder;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import guichaguri.trackplayer.logic.workers.PlayerService;
+import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.components.MediaWrapper;
-import java.io.IOException;
+import guichaguri.trackplayer.logic.workers.PlayerService;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -136,8 +138,8 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void createPlayer(Callback callback) {
-        callback.invoke(manager.createPlayer());
+    public void createPlayer(Promise callback) {
+        Utils.resolveCallback(callback, manager.createPlayer());
     }
 
     @ReactMethod
@@ -151,7 +153,32 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void load(int id, ReadableMap data, Callback callback) throws IOException {
+    public void add(int id, int index, ReadableArray data, Promise callback) {
+        manager.add(id, index, data, callback);
+    }
+
+    @ReactMethod
+    public void remove(int id, String[] tracks, Promise callback) {
+        manager.remove(id, tracks, callback);
+    }
+
+    @ReactMethod
+    public void skip(int id, String track, Promise callback) {
+        manager.skip(id, track, callback);
+    }
+
+    @ReactMethod
+    public void skipToNext(int id, Promise callback) {
+        manager.skipToNext(id, callback);
+    }
+
+    @ReactMethod
+    public void skipToPrevious(int id, Promise callback) {
+        manager.skipToPrevious(id, callback);
+    }
+
+    @ReactMethod
+    public void load(int id, ReadableMap data, Promise callback) {
         manager.load(id, data, callback);
     }
 
@@ -186,8 +213,8 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void startScan() {
-        manager.startScan();
+    public void startScan(boolean active) {
+        manager.startScan(active);
     }
 
     @ReactMethod
@@ -196,27 +223,37 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void connect(String deviceId, Callback callback) {
-        callback.invoke(manager.connect(deviceId));
+    public void connect(String deviceId, Promise callback) {
+        manager.connect(deviceId, callback);
+    }
+
+    @ReactMethod
+    public void copyQueue(int fromId, int toId, int index, Promise promise) {
+        manager.copyQueue(fromId, toId, index, promise);
+    }
+
+    @ReactMethod
+    public void getCurrentTrack(int id, Callback callback) {
+        Utils.triggerCallback(callback, manager.getCurrentTrack(id));
     }
 
     @ReactMethod
     public void getDuration(int id, Callback callback) {
-        callback.invoke(manager.getDuration(id));
+        Utils.triggerCallback(callback, manager.getDuration(id));
     }
 
     @ReactMethod
     public void getBufferedPosition(int id, Callback callback) {
-        callback.invoke(manager.getBufferedPosition(id));
+        Utils.triggerCallback(callback, manager.getBufferedPosition(id));
     }
 
     @ReactMethod
     public void getPosition(int id, Callback callback) {
-        callback.invoke(manager.getPosition(id));
+        Utils.triggerCallback(callback, manager.getPosition(id));
     }
 
     @ReactMethod
     public void getState(int id, Callback callback) {
-        callback.invoke(manager.getState(id));
+        Utils.triggerCallback(callback, manager.getState(id));
     }
 }

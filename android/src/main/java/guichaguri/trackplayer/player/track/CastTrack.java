@@ -13,6 +13,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
+ * A track for {@link guichaguri.trackplayer.player.players.CastPlayer}
+ *
  * @author Guilherme Chaguri
  */
 public class CastTrack extends Track {
@@ -22,6 +24,22 @@ public class CastTrack extends Track {
     public final JSONObject customData;
 
     public int queueId = 0;
+
+    public CastTrack(Track track) {
+        super(track);
+
+        if(track instanceof CastTrack) {
+            CastTrack castTrack = (CastTrack)track;
+
+            mediaId = castTrack.mediaId;
+            contentType = castTrack.contentType;
+            customData = castTrack.customData;
+        } else {
+            mediaId = url.local ? id : url.url;
+            contentType = "audio/mpeg";
+            customData = null;
+        }
+    }
 
     public CastTrack(MediaManager manager, ReadableMap data) {
         super(manager, data);
