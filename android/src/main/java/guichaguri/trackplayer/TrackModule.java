@@ -61,7 +61,7 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
         if(initCallbacks != null) {
             for(Callback cb : initCallbacks) {
-                cb.invoke();
+                Utils.triggerCallback(cb);
             }
             initCallbacks = null;
         }
@@ -109,7 +109,7 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     @ReactMethod
     public void onReady(Callback callback) {
         if(manager != null) {
-            callback.invoke();
+            Utils.triggerCallback(callback);
             return;
         }
 
@@ -128,23 +128,8 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void setMetadata(ReadableMap data) {
-        manager.setMetadata(data);
-    }
-
-    @ReactMethod
-    public void resetMetadata() {
-        manager.resetMetadata();
-    }
-
-    @ReactMethod
     public void createPlayer(Promise callback) {
         Utils.resolveCallback(callback, manager.createPlayer());
-    }
-
-    @ReactMethod
-    public void destroy(int id) {
-        manager.destroy(id);
     }
 
     @ReactMethod
@@ -153,8 +138,13 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void add(int id, int index, ReadableArray data, Promise callback) {
-        manager.add(id, index, data, callback);
+    public void destroy(int id) {
+        manager.destroy(id);
+    }
+
+    @ReactMethod
+    public void add(int id, String insertBeforeId, ReadableArray data, Promise callback) {
+        manager.add(id, insertBeforeId, data, callback);
     }
 
     @ReactMethod
@@ -228,8 +218,8 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void copyQueue(int fromId, int toId, int index, Promise promise) {
-        manager.copyQueue(fromId, toId, index, promise);
+    public void copyQueue(int fromId, int toId, String insertBeforeId, Promise promise) {
+        manager.copyQueue(fromId, toId, insertBeforeId, promise);
     }
 
     @ReactMethod

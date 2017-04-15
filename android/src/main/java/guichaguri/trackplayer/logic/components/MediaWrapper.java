@@ -26,14 +26,6 @@ public class MediaWrapper extends Binder {
         manager.updateOptions(data);
     }
 
-    public void setMetadata(ReadableMap data) {
-        manager.updateMetadata(data);
-    }
-
-    public void resetMetadata() {
-        manager.resetMetadata();
-    }
-
     public int createPlayer() {
         return manager.createPlayer();
     }
@@ -50,11 +42,11 @@ public class MediaWrapper extends Binder {
         }
     }
 
-    public void add(int id, int index, ReadableArray data, Promise callback) {
+    public void add(int id, String insertBeforeId, ReadableArray data, Promise callback) {
         if(id != -1) {
-            manager.getPlayer(id).add(index, data, callback);
+            manager.getPlayer(id).add(insertBeforeId, data, callback);
         } else {
-            for(Player p : manager.getPlayers()) p.add(index, data, callback);
+            for(Player p : manager.getPlayers()) p.add(insertBeforeId, data, callback);
         }
     }
 
@@ -160,11 +152,11 @@ public class MediaWrapper extends Binder {
         manager.getCast().connect(id, callback);
     }
 
-    public void copyQueue(int fromId, int toId, int index, Promise promise) {
+    public void copyQueue(int fromId, int toId, String insertBeforeId, Promise promise) {
         Player fromPlayer = manager.getPlayer(fromId);
         Player toPlayer = manager.getPlayer(toId);
 
-        fromPlayer.copyQueue(toPlayer, index, promise);
+        fromPlayer.copyQueue(toPlayer, insertBeforeId, promise);
     }
 
     public String getCurrentTrack(int id) {

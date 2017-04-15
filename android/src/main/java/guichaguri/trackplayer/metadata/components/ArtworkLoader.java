@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
+import guichaguri.trackplayer.logic.track.TrackURL;
 import guichaguri.trackplayer.metadata.Metadata;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,30 +23,28 @@ public class ArtworkLoader extends Thread {
     private final Metadata metadata;
 
     private final int maxSize;
-    private final boolean local;
-    private final String uri;
+    private final TrackURL data;
 
-    public ArtworkLoader(Context context, Metadata metadata, boolean local, String uri, int maxSize) {
+    public ArtworkLoader(Context context, Metadata metadata, TrackURL data, int maxSize) {
         this.context = context;
         this.metadata = metadata;
         this.maxSize = maxSize;
-        this.local = local;
-        this.uri = uri;
+        this.data = data;
     }
 
     @Override
     public void run() {
         Bitmap bitmap;
 
-        if(local) {
+        if(data.local) {
 
             ResourceDrawableIdHelper helper = ResourceDrawableIdHelper.getInstance();
-            bitmap = toBitmap(helper.getResourceDrawable(context, uri));
+            bitmap = toBitmap(helper.getResourceDrawable(context, data.url));
 
         } else {
 
             try {
-                URLConnection con = new URL(uri).openConnection();
+                URLConnection con = new URL(data.url).openConnection();
                 con.connect();
                 InputStream input = con.getInputStream();
                 bitmap = BitmapFactory.decodeStream(input);
@@ -58,7 +57,7 @@ public class ArtworkLoader extends Thread {
 
         if(bitmap != null) bitmap = resize(bitmap, maxSize);
 
-        metadata.updateArtwork(uri, bitmap, true);
+        metadata.updateArtwork(data, bitmap, true);
     }
 
     private Bitmap toBitmap(Drawable drawable) {

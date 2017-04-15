@@ -11,12 +11,12 @@ import guichaguri.trackplayer.logic.workers.PlayerTask;
  */
 public class Events {
 
-    // Media Button Events
+    // Media Control Events
     public static final String BUTTON_PLAY = "play";
     public static final String BUTTON_PAUSE = "pause";
     public static final String BUTTON_STOP = "stop";
-    public static final String BUTTON_SKIP_NEXT = "skipNext";
-    public static final String BUTTON_SKIP_PREVIOUS = "skipPrevious";
+    public static final String BUTTON_SKIP_NEXT = "skipToNext";
+    public static final String BUTTON_SKIP_PREVIOUS = "skipToPrevious";
     public static final String BUTTON_SEEK_TO = "seekTo";
     public static final String BUTTON_SET_RATING = "setRating";
 

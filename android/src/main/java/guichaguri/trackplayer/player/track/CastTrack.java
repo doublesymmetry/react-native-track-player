@@ -5,6 +5,7 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.ReadableType;
+import com.google.android.gms.cast.MediaQueueItem;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.track.Track;
@@ -23,7 +24,7 @@ public class CastTrack extends Track {
     public final String contentType;
     public final JSONObject customData;
 
-    public int queueId = 0;
+    public int queueId = MediaQueueItem.INVALID_ITEM_ID;
 
     public CastTrack(Track track) {
         super(track);

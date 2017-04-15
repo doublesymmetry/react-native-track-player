@@ -100,6 +100,7 @@ public class ExoPlayer extends LocalPlayer<ExoTrack> implements EventListener {
 
     @Override
     public void reset() {
+        super.reset();
         player.stop();
     }
 

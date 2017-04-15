@@ -16,6 +16,8 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
+import guichaguri.trackplayer.logic.track.Track;
+import guichaguri.trackplayer.logic.track.TrackURL;
 import guichaguri.trackplayer.logic.workers.MediaReceiver;
 import guichaguri.trackplayer.metadata.components.ArtworkLoader;
 import guichaguri.trackplayer.metadata.components.ButtonListener;
@@ -43,7 +45,7 @@ public class Metadata {
     private long capabilities = 0;
     private int ratingType = RatingCompat.RATING_HEART;
     private int maxArtworkSize = 2000;
-    private String artworkUri = null;
+    private TrackURL artworkUrl = null;
 
     public Metadata(Context context, MediaManager manager) {
         this.context = context;
@@ -81,20 +83,31 @@ public class Metadata {
         updateCapabilities(data);
     }
 
-    public void updateMetadata(Player player, ReadableMap data) {
-        long duration = player != null ? player.getDuration() : 0;
+    public void updateMetadata(Player player) {
+        // Reset the metadata when there's no player attached
+        if(player == null) {
+            md = new MediaMetadataCompat.Builder();
+            MediaMetadataCompat metadata = md.build();
+            session.setMetadata(metadata);
+            notification.updateMetadata(metadata);
+            return;
+        }
+
+        Track track = player.getCurrentTrack();
+        long duration = player.getDuration();
+        if(duration == 0) duration = track.duration;
 
         // Fill the metadata builder
-        md.putString(MediaMetadataCompat.METADATA_KEY_TITLE, Utils.getString(data, "title"));
-        md.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, Utils.getString(data, "album"));
-        md.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, Utils.getString(data, "artist"));
-        md.putString(MediaMetadataCompat.METADATA_KEY_GENRE, Utils.getString(data, "genre"));
-        md.putString(MediaMetadataCompat.METADATA_KEY_DATE, Utils.getString(data, "date"));
-        md.putRating(MediaMetadataCompat.METADATA_KEY_RATING, Utils.getRating(data, "rating", ratingType));
-        md.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, Utils.getTime(data, "duration", duration));
+        md.putString(MediaMetadataCompat.METADATA_KEY_TITLE, track.title);
+        md.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, track.album);
+        md.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, track.artist);
+        md.putString(MediaMetadataCompat.METADATA_KEY_GENRE, track.genre);
+        md.putString(MediaMetadataCompat.METADATA_KEY_DATE, track.date);
+        md.putRating(MediaMetadataCompat.METADATA_KEY_RATING, track.rating);
+        md.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration);
 
         // Load the artwork
-        loadArtwork(data);
+        loadArtwork(track.artwork);
 
         // Update the metadata to the MediaSession and the notification
         MediaMetadataCompat metadata = md.build();
@@ -156,8 +169,8 @@ public class Metadata {
         }
     }
 
-    private void loadArtwork(ReadableMap data) {
-        if(!data.hasKey("artwork")) {
+    private void loadArtwork(TrackURL data) {
+        if(data == null) {
             // Interrupt the artwork thread if it's running
             if(artwork != null) artwork.interrupt();
             artwork = null;
@@ -169,29 +182,25 @@ public class Metadata {
             return;
         }
 
-        // Get more information about the artwork
-        boolean local = Utils.isUrlLocal(data, "artwork");
-        String uri = Utils.getUrl(data, "artwork", local);
-
         // Ignore the same artwork to not download it again
-        if(uri == null || uri.equals(artworkUri)) return;
+        if(data.url == null || data.equals(artworkUrl)) return;
 
         // Interrupt the artwork thread if it's running
         if(artwork != null) artwork.interrupt();
 
         // Create another thread to load the new artwork
-        artwork = new ArtworkLoader(context, this, local, uri, maxArtworkSize);
+        artwork = new ArtworkLoader(context, this, data, maxArtworkSize);
         artwork.start();
     }
 
-    public void updateArtwork(String uri, Bitmap bitmap, boolean fromLoader) {
+    public void updateArtwork(TrackURL data, Bitmap bitmap, boolean fromLoader) {
         // Interrupt the artwork thread if it's running
         if(!fromLoader && artwork != null) artwork.interrupt();
         artwork = null;
 
         // Fill artwork values
-        artworkUri = uri;
-        md.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, uri);
+        artworkUrl = data;
+        md.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, data.url);
         md.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, bitmap);
 
         // Update the metadata to the MediaSession and the notification

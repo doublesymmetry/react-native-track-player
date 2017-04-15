@@ -95,13 +95,18 @@ public class CastPlayer extends RemotePlayer<CastTrack> implements OnStatusUpdat
     }
 
     @Override
-    public void add(int index, List<CastTrack> tracks, Promise callback) {
-        super.add(index, tracks, null);
+    public void add(String insertBeforeId, List<CastTrack> tracks, Promise callback) {
+        super.add(insertBeforeId, tracks, null);
 
         int indexId = MediaQueueItem.INVALID_ITEM_ID;
-        if(index >= 0 && index + 1 < queue.size()) {
-            CastTrack track = queue.get(index + 1);
-            if(track != null) indexId = track.queueId;
+        if(insertBeforeId != null) {
+            for(int i = 0; i < queue.size(); i++) {
+                CastTrack track = queue.get(i);
+                if(track.id.equals(insertBeforeId)) {
+                    indexId = track.queueId;
+                    break;
+                }
+            }
         }
 
         MediaQueueItem[] items = new MediaQueueItem[tracks.size()];
@@ -168,7 +173,18 @@ public class CastPlayer extends RemotePlayer<CastTrack> implements OnStatusUpdat
     @Override
     public void reset() {
         player.stop(client);
+
+        List<MediaQueueItem> items = player.getMediaStatus().getQueueItems();
+        int[] ids = new int[items.size()];
+        for(int i = 0; i < items.size(); i++) {
+            ids[i] = items.get(i).getItemId();
+        }
+        player.queueRemoveItems(client, ids, null);
+
+        super.reset();
+
         playing = false;
+        updateMetadata();
     }
 
     @Override

@@ -16,4 +16,16 @@ public class TrackURL {
         url = Utils.getUrl(data, key, local);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if(o == null) return false;
+        if(o == this) return true;
+
+        if(o instanceof TrackURL) {
+            TrackURL data = (TrackURL)o;
+            return local == data.local && url.equals(data.url);
+        }
+
+        return false;
+    }
 }

@@ -82,12 +82,14 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
         buffering = true;
         ended = false;
         loaded = false;
-        loadCallback = callback;
 
         try {
+            loadCallback = callback;
             player.setDataSource(context, Utils.toUri(context, url, local));
             player.prepareAsync();
         } catch(IOException ex) {
+            loadCallback = null;
+            Utils.rejectCallback(callback, ex);
             manager.onError(this, ex);
         }
 
@@ -96,6 +98,8 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
 
     @Override
     public void reset() {
+        super.reset();
+
         player.reset();
 
         if(cache != null) {
@@ -244,6 +248,10 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
         } else {
             ex = new RuntimeException("Unknown error");
         }
+
+        Utils.rejectCallback(loadCallback, ex);
+        loadCallback = null;
+
         manager.onError(this, ex);
         return true;
     }

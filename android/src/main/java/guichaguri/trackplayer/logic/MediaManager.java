@@ -53,15 +53,6 @@ public class MediaManager {
         }
     }
 
-    public void updateMetadata(ReadableMap data) {
-        metadata.updateMetadata(mainPlayer, data);
-    }
-
-    public void resetMetadata() {
-        metadata.reset();
-        mainPlayer = null;
-    }
-
     public int createPlayer() {
         Player player;
 
@@ -126,8 +117,9 @@ public class MediaManager {
         // Set the main player
         mainPlayer = player;
 
-        // Update the playback state
+        // Update the metadata
         metadata.updatePlayback(mainPlayer);
+        metadata.updateMetadata(mainPlayer);
     }
 
     public Player getMainPlayer() {
@@ -175,6 +167,7 @@ public class MediaManager {
     public void onUpdate(Player player) {
         if(mainPlayer == player) {
             metadata.updatePlayback(player);
+            metadata.updateMetadata(player);
         }
 
         WritableMap data = Arguments.createMap();
@@ -183,8 +176,9 @@ public class MediaManager {
     }
 
     public void onError(Player player, Throwable error) {
-
-        Events.dispatchEvent(service, getPlayerId(player), Events.PLAYER_ERROR, null);
+        WritableMap data = Arguments.createMap();
+        data.putString("error", error.getMessage());
+        Events.dispatchEvent(service, getPlayerId(player), Events.PLAYER_ERROR, data);
     }
 
     public void onCommand(Intent intent) {

@@ -42,29 +42,34 @@ public abstract class Player<T extends Track> {
         return queue;
     }
 
-    public <F extends Track> void copyQueue(Player<F> to, int index, Promise promise) {
+    public <F extends Track> void copyQueue(Player<F> to, String insertBeforeId, Promise promise) {
         List<F> tracks = new ArrayList<>();
         for(T track : getQueue()) {
             tracks.add(to.createTrack(track));
         }
-        to.add(index, tracks, promise);
+        to.add(insertBeforeId, tracks, promise);
     }
 
-    public void add(int index, List<T> tracks, Promise callback) {
-        if(index < 0) {
+    public void add(String insertBeforeId, List<T> tracks, Promise callback) {
+        if(insertBeforeId == null) {
             queue.addAll(tracks);
         } else {
+            int index = 0;
+            for(int i = 0; i < queue.size(); i++) {
+                if(queue.get(i).id.equals(insertBeforeId)) break;
+                index = i;
+            }
             queue.addAll(index, tracks);
         }
         Utils.resolveCallback(callback);
     }
 
-    public  void add(int index, ReadableArray tracks, Promise callback) {
+    public void add(String insertBeforeId, ReadableArray tracks, Promise callback) {
         List<T> list = new ArrayList<>();
         for(int i = 0; i < tracks.size(); i++) {
             list.add(createTrack(tracks.getMap(i)));
         }
-        add(index, list, callback);
+        add(insertBeforeId, list, callback);
     }
 
     public void remove(String[] ids, Promise callback) {
@@ -130,7 +135,9 @@ public abstract class Player<T extends Track> {
         load(createTrack(data), callback);
     }
 
-    public abstract void reset();
+    public void reset() {
+        queue.clear();
+    }
 
     public abstract void play();
 
