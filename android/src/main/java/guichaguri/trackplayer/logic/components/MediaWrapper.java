@@ -140,16 +140,16 @@ public class MediaWrapper extends Binder {
         }
     }
 
-    public void startScan(boolean active) {
-        manager.getCast().startScan(active);
+    public void startScan(boolean active, Promise callback) {
+        manager.getRemote().startScan(active, callback);
     }
 
     public void stopScan() {
-        manager.getCast().stopScan();
+        manager.getRemote().stopScan();
     }
 
     public void connect(String id, Promise callback) {
-        manager.getCast().connect(id, callback);
+        manager.getRemote().connect(id, callback);
     }
 
     public void copyQueue(int fromId, int toId, String insertBeforeId, Promise promise) {

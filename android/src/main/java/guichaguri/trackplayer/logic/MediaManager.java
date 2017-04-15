@@ -9,11 +9,11 @@ import guichaguri.trackplayer.logic.track.Track;
 import guichaguri.trackplayer.logic.workers.PlayerService;
 import guichaguri.trackplayer.metadata.Metadata;
 import guichaguri.trackplayer.metadata.components.MediaNotification;
-import guichaguri.trackplayer.player.Chromecast;
 import guichaguri.trackplayer.player.Player;
 import guichaguri.trackplayer.player.RemotePlayer;
 import guichaguri.trackplayer.player.players.AndroidPlayer;
 import guichaguri.trackplayer.player.players.ExoPlayer;
+import guichaguri.trackplayer.remote.Remote;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,31 +26,23 @@ public class MediaManager {
     private final PlayerService service;
     private final FocusManager focus;
     private final Metadata metadata;
+    private final Remote remote;
     private final Map<Integer, Player> players = new HashMap<>();
 
     private int lastId = 0;
     private Player mainPlayer;
-    private Chromecast cast;
 
     public MediaManager(PlayerService service) {
         this.service = service;
         this.metadata = new Metadata(service, this);
+        this.remote = new Remote(service, this);
         this.focus = new FocusManager(service, metadata);
     }
 
     public void updateOptions(ReadableMap data) {
+        remote.updateOptions(data);
         metadata.updateOptions(data);
         metadata.updatePlayback(mainPlayer);
-
-        ReadableMap castConfig = Utils.getMap(data, "cast");
-        boolean castEnabled = castConfig != null && Utils.getBoolean(castConfig, "enabled", false);
-
-        if(castEnabled && LibHelper.isChromecastAvailable(service)) {
-            if(cast == null) cast = new Chromecast(service, this);
-            cast.updateOptions(castConfig);
-        } else {
-            cast = null;
-        }
     }
 
     public int createPlayer() {
@@ -105,8 +97,8 @@ public class MediaManager {
         return players.values();
     }
 
-    public Chromecast getCast() {
-        return cast;
+    public Remote getRemote() {
+        return remote;
     }
 
     public int getRatingType() {

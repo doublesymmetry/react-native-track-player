@@ -1,4 +1,4 @@
-package guichaguri.trackplayer.player;
+package guichaguri.trackplayer.remote;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -10,7 +10,6 @@ import android.support.v7.media.MediaRouter.Callback;
 import android.support.v7.media.MediaRouter.RouteInfo;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.google.android.gms.cast.Cast;
 import com.google.android.gms.cast.Cast.ApplicationConnectionResult;
@@ -43,7 +42,7 @@ public class Chromecast extends Callback implements ConnectionCallbacks,
 
     private MediaRouteSelector selector;
     private GoogleApiClient client;
-    private String applicationId;
+    private String applicationId = CastMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID;
     private String sessionId;
     private CastPlayer activePlayer;
     private Promise connectCallback;
@@ -53,16 +52,22 @@ public class Chromecast extends Callback implements ConnectionCallbacks,
     private boolean activeScan = false;
 
     public Chromecast(Context context, MediaManager manager) {
+        this(context, manager, null);
+    }
+
+    public Chromecast(Context context, MediaManager manager, String appId) {
         this.context = context;
         this.manager = manager;
         this.router = MediaRouter.getInstance(context);
+
+        setApplicationId(appId);
     }
 
-    public void updateOptions(ReadableMap cast) {
+    public void setApplicationId(String appId) {
         boolean wasScaning = scanning;
         destroy();
 
-        applicationId = Utils.getString(cast, "id", CastMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID);
+        applicationId = appId != null ? appId : CastMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID;
 
         selector = new MediaRouteSelector.Builder()
                 .addControlCategory(CastMediaControlIntent.categoryForCast(applicationId))

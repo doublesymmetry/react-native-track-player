@@ -77,6 +77,8 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
         if(LibHelper.isProxyCacheAvailable() && !local && (cacheMaxFiles > 0 || cacheMaxSize > 0)) {
             cache = new ProxyCache(context, cacheMaxFiles, cacheMaxSize);
             url = cache.getURL(url, track.id);
+        } else {
+            cache = null;
         }
 
         buffering = true;

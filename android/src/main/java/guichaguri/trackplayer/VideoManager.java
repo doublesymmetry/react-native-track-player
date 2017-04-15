@@ -64,7 +64,7 @@ public class VideoManager extends SimpleViewManager<PlayerView> implements Servi
         view.bindPlayer(video, id);
     }
 
-    @ReactProp(name = "keepScreenAwake", defaultBoolean = false)
+    @ReactProp(name = "keepScreenAwake", defaultBoolean = true)
     public void setKeepScreenAwake(PlayerView view, boolean awake) {
         // Keep the screen awake
         view.setKeepScreenOn(awake);

@@ -21,7 +21,7 @@ import com.google.android.gms.common.images.WebImage;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.track.Track;
-import guichaguri.trackplayer.player.Chromecast;
+import guichaguri.trackplayer.remote.Chromecast;
 import guichaguri.trackplayer.player.RemotePlayer;
 import guichaguri.trackplayer.player.components.CastCallbackTrigger;
 import guichaguri.trackplayer.player.track.CastTrack;

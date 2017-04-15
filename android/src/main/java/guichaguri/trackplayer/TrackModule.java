@@ -203,8 +203,8 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void startScan(boolean active) {
-        manager.startScan(active);
+    public void startScan(boolean active, Promise callback) {
+        manager.startScan(active, callback);
     }
 
     @ReactMethod

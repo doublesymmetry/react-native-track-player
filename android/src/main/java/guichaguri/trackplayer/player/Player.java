@@ -132,7 +132,13 @@ public abstract class Player<T extends Track> {
     public abstract void load(T track, Promise callback);
 
     public void load(ReadableMap data, Promise callback) {
-        load(createTrack(data), callback);
+        T track = createTrack(data);
+
+        // Add it right after the current track
+        currentTrack += 1;
+        queue.add(currentTrack, track);
+
+        load(track, callback);
     }
 
     public void reset() {
@@ -187,14 +193,23 @@ public abstract class Player<T extends Track> {
     }
 
     protected void updateCurrentTrack(Promise callback) {
-        int state = getState();
+        if(queue.isEmpty()) {
+            reset();
+            return;
+        } else if(currentTrack >= queue.size()) {
+            currentTrack = queue.size() - 1;
+        } else if(currentTrack < 0) {
+            currentTrack = 0;
+        }
+
+        int oldState = getState();
         T track = queue.get(currentTrack);
 
         load(track, callback);
 
-        if(Utils.isPlaying(state)) {
+        if(Utils.isPlaying(oldState)) {
             play();
-        } else if(Utils.isPaused(state)) {
+        } else if(Utils.isPaused(oldState)) {
             pause();
         }
 

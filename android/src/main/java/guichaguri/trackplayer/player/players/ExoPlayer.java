@@ -208,6 +208,7 @@ public class ExoPlayer extends LocalPlayer<ExoTrack> implements EventListener {
         } else if(playbackState == SimpleExoPlayer.STATE_ENDED) {
 
             manager.onEnd(this);
+            skipToNext(null);
 
         }
     }
