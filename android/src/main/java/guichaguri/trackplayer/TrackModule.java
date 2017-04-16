@@ -148,7 +148,7 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void remove(int id, String[] tracks, Promise callback) {
+    public void remove(int id, ReadableArray tracks, Promise callback) {
         manager.remove(id, tracks, callback);
     }
 

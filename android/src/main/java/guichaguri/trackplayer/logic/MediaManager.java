@@ -30,7 +30,7 @@ public class MediaManager {
     private final Map<Integer, Player> players = new HashMap<>();
 
     private int lastId = 0;
-    private Player mainPlayer;
+    private Player<? extends Track> mainPlayer;
 
     public MediaManager(PlayerService service) {
         this.service = service;
@@ -114,7 +114,7 @@ public class MediaManager {
         metadata.updateMetadata(mainPlayer);
     }
 
-    public Player getMainPlayer() {
+    public Player<? extends Track> getMainPlayer() {
         return mainPlayer;
     }
 

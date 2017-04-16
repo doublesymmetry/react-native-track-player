@@ -25,6 +25,8 @@ public class Remote {
 
     public void updateOptions(ReadableMap data) {
         castAppId = Utils.getString(data, "castAppId");
+
+        if(cast != null) cast.setApplicationId(castAppId);
     }
 
     public void startScan(boolean active, Promise callback) {

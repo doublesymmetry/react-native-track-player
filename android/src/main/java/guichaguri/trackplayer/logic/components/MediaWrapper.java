@@ -50,7 +50,7 @@ public class MediaWrapper extends Binder {
         }
     }
 
-    public void remove(int id, String[] tracks, Promise callback) {
+    public void remove(int id, ReadableArray tracks, Promise callback) {
         if(id != -1) {
             manager.getPlayer(id).remove(tracks, callback);
         } else {

@@ -98,6 +98,14 @@ public abstract class Player<T extends Track> {
         }
     }
 
+    public void remove(ReadableArray tracks, Promise callback) {
+        String[] ids = new String[tracks.size()];
+        for(int i = 0; i < tracks.size(); i++) {
+            ids[i] = tracks.getString(i);
+        }
+        remove(ids, callback);
+    }
+
     public void skip(String id, Promise callback) {
         for(int i = 0; i < queue.size(); i++) {
             T track = queue.get(i);
@@ -136,6 +144,9 @@ public abstract class Player<T extends Track> {
 
         // Add it right after the current track
         currentTrack += 1;
+        if(currentTrack > queue.size()) {
+            currentTrack = queue.size();
+        }
         queue.add(currentTrack, track);
 
         load(track, callback);
