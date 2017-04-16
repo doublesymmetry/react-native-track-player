@@ -1,6 +1,7 @@
 package guichaguri.trackplayer.metadata.components;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import com.facebook.react.bridge.Arguments;
@@ -24,6 +25,13 @@ public class ButtonListener extends MediaSessionCompat.Callback {
 
     private void dispatch(String event, WritableMap data) {
         Events.dispatchEvent(context, manager.getPlayerId(manager.getMainPlayer()), event, data);
+    }
+
+    @Override
+    public void onPlayFromMediaId(String mediaId, Bundle extras) {
+        WritableMap map = Arguments.createMap();
+        map.putString("id", mediaId);
+        dispatch(Events.BUTTON_SKIP, map); // TODO document this
     }
 
     @Override

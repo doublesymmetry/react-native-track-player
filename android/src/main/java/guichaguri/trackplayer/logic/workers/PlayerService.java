@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import guichaguri.trackplayer.logic.MediaManager;
+import guichaguri.trackplayer.logic.components.BrowserWrapper;
 import guichaguri.trackplayer.logic.components.MediaWrapper;
 import guichaguri.trackplayer.logic.components.VideoWrapper;
 
@@ -15,6 +16,7 @@ public class PlayerService extends Service {
 
     public static final String ACTION_MEDIA = "track-player-media";
     public static final String ACTION_VIDEO = "track-player-video";
+    public static final String ACTION_BROWSER = "track-player-browser";
 
     private MediaManager manager;
 
@@ -27,6 +29,8 @@ public class PlayerService extends Service {
             return new MediaWrapper(manager);
         } else if(action.equals(ACTION_VIDEO)) {
             return new VideoWrapper(manager);
+        } else if(action.equals(ACTION_BROWSER)) {
+            return new BrowserWrapper(this, manager);
         }
         return null;
     }

@@ -12,7 +12,14 @@
         </receiver>
 
         <service android:name=".logic.workers.PlayerService" android:enabled="true"/>
+
         <service android:name=".logic.workers.PlayerTask" android:enabled="true"/>
+
+        <service android:name=".logic.workers.PlayerBrowser">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
 
     </application>
 

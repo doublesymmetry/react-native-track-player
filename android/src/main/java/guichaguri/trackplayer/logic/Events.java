@@ -15,6 +15,7 @@ public class Events {
     public static final String BUTTON_PLAY = "play";
     public static final String BUTTON_PAUSE = "pause";
     public static final String BUTTON_STOP = "stop";
+    public static final String BUTTON_SKIP = "skip";
     public static final String BUTTON_SKIP_NEXT = "skipToNext";
     public static final String BUTTON_SKIP_PREVIOUS = "skipToPrevious";
     public static final String BUTTON_SEEK_TO = "seekTo";
