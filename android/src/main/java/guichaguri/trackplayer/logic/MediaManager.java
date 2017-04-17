@@ -27,7 +27,7 @@ public class MediaManager {
     private final FocusManager focus;
     private final Metadata metadata;
     private final Remote remote;
-    private final Map<Integer, Player> players = new HashMap<>();
+    private final Map<Integer, Player<? extends Track>> players = new HashMap<>();
 
     private int lastId = 0;
     private Player<? extends Track> mainPlayer;
@@ -76,7 +76,7 @@ public class MediaManager {
         }
     }
 
-    public Player getPlayer(int id) {
+    public Player<? extends Track> getPlayer(int id) {
         if(id < 0 || !players.containsKey(id)) {
             throw new IllegalArgumentException();
         }
@@ -93,7 +93,7 @@ public class MediaManager {
         players.remove(getPlayerId(player));
     }
 
-    public Collection<Player> getPlayers() {
+    public Collection<Player<? extends Track>> getPlayers() {
         return players.values();
     }
 
@@ -105,7 +105,7 @@ public class MediaManager {
         return metadata.getRatingType();
     }
 
-    public void setMainPlayer(Player player) {
+    public void setMainPlayer(Player<? extends Track> player) {
         // Set the main player
         mainPlayer = player;
 
@@ -179,12 +179,9 @@ public class MediaManager {
 
     public void onServiceDestroy() {
         for(Player player : getPlayers()) {
-            try {
-                player.destroy();
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
+            player.destroy();
         }
+        focus.disable();
         metadata.destroy();
     }
 

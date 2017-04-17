@@ -21,6 +21,7 @@ public class Track {
     public final String album;
     public final String genre;
     public final String date;
+    public final String description;
     public final RatingCompat rating;
     public final TrackURL artwork;
 
@@ -34,6 +35,7 @@ public class Track {
         album = track.album;
         genre = track.genre;
         date = track.date;
+        description = track.description;
         rating = track.rating;
         artwork = track.artwork;
     }
@@ -50,6 +52,7 @@ public class Track {
         album = Utils.getString(data, "album");
         genre = Utils.getString(data, "genre");
         date = Utils.getString(data, "date");
+        description = Utils.getString(data, "description"); // TODO document this
         rating = Utils.getRating(data, "date", manager.getRatingType());
         artwork = new TrackURL(data, "artwork");
     }

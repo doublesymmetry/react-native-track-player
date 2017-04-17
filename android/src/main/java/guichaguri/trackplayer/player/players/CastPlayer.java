@@ -96,17 +96,23 @@ public class CastPlayer extends RemotePlayer<CastTrack> implements OnStatusUpdat
 
     @Override
     public void add(String insertBeforeId, List<CastTrack> tracks, Promise callback) {
-        super.add(insertBeforeId, tracks, null);
-
         int indexId = MediaQueueItem.INVALID_ITEM_ID;
+
         if(insertBeforeId != null) {
+            int index = queue.size();
+
             for(int i = 0; i < queue.size(); i++) {
                 CastTrack track = queue.get(i);
                 if(track.id.equals(insertBeforeId)) {
+                    index = i;
                     indexId = track.queueId;
                     break;
                 }
             }
+
+            queue.addAll(index, tracks);
+        } else {
+            queue.addAll(tracks);
         }
 
         MediaQueueItem[] items = new MediaQueueItem[tracks.size()];

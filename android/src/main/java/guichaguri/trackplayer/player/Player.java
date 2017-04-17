@@ -52,14 +52,27 @@ public abstract class Player<T extends Track> {
 
     public void add(String insertBeforeId, List<T> tracks, Promise callback) {
         if(insertBeforeId == null) {
+            boolean empty = queue.isEmpty();
             queue.addAll(tracks);
+
+            if(empty) {
+                currentTrack = 0;
+                updateCurrentTrack(callback);
+                return;
+            }
         } else {
-            int index = 0;
+            int index = queue.size();
             for(int i = 0; i < queue.size(); i++) {
                 if(queue.get(i).id.equals(insertBeforeId)) break;
                 index = i;
             }
             queue.addAll(index, tracks);
+
+            if(currentTrack >= index) {
+                currentTrack += tracks.size();
+                updateCurrentTrack(callback);
+                return;
+            }
         }
         Utils.resolveCallback(callback);
     }

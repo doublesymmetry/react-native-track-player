@@ -7,20 +7,15 @@ Designed to be as lightweight as possible.
 ## WIP
 This is a work-in-progress project not ready for production yet.
 
-## Intended Features
+## Features
 
-* [x] Multi-player support
-* [x] Android MediaSession support
-* [ ] Android MediaBrowser support (required for Android Auto)
-* [x] Android MediaStyle Notification support
-* [x] Media buttons fully handled (bluetooth, smartwatches, headphones)
-* [x] Android MediaPlayer support
-* [x] *Optional* ExoPlayer (DASH, HLS, SmoothStreaming, etc) support
-* [x] *Optional* Caching for MediaPlayer
-* [x] *Optional* Caching for ExoPlayer
-* [x] *Optional* Chromecast support (Default Media Receiver)
-* [x] *Optional* Chromecast support (Styled/Custom Media Receiver)
-* [x] Video support
-* [x] Everything is event-based (nothing happens unless you allow them to)
-* [x] Service (background and foreground support)
-* [ ] iOS support
+* **Lightweight** - Highly optimized to use the least amount of storage according to your needs and do the least amount of processing
+* **Multi-player support** - Create how many players you want
+* **Media Controls support** - Control the app from bluetooth, lockscreen, notification, smartwatch or even a car
+* **Local files or Remote streams** - It doesn't matter where the media belongs, we've got you covered
+* **Chromecast support** - Cast media to any Google Cast compatible device, supporting custom media receivers
+* **Adaptive bitrate streaming support** - Optional support for DASH, HLS or SmoothStreaming
+* **Video support** - A simple video component that can be bound to a player
+* **Caching support** - Cache media files to play media without using data quota
+* **Background support** - Keep playing media even when the app is closed
+* **Fully Customizable** - Even the notification icons are customizable
