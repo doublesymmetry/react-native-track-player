@@ -84,8 +84,8 @@ public class Metadata {
     }
 
     public void updateMetadata(Player player) {
-        // Reset the metadata when there's no player attached
-        if(player == null) {
+        // Reset the metadata when there's no player attached or track playing
+        if(player == null || player.getCurrentTrack() == null) {
             md = new MediaMetadataCompat.Builder();
             MediaMetadataCompat metadata = md.build();
             session.setMetadata(metadata);
