@@ -52,7 +52,7 @@ public class Track {
         album = Utils.getString(data, "album");
         genre = Utils.getString(data, "genre");
         date = Utils.getString(data, "date");
-        description = Utils.getString(data, "description"); // TODO document this
+        description = Utils.getString(data, "description");
         rating = Utils.getRating(data, "date", manager.getRatingType());
         artwork = new TrackURL(data, "artwork");
     }

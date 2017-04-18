@@ -39,7 +39,7 @@ public class PlayerService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         manager.onCommand(intent);
 
-        return START_REDELIVER_INTENT;
+        return START_STICKY;
     }
 
     @Override

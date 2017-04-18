@@ -31,11 +31,12 @@ public class MediaManager {
 
     private int lastId = 0;
     private Player<? extends Track> mainPlayer;
+    private boolean serviceStarted = false;
 
     public MediaManager(PlayerService service) {
         this.service = service;
         this.metadata = new Metadata(service, this);
-        this.remote = new Remote(service, this);
+        this.remote = new Remote(service.getApplicationContext(), this);
         this.focus = new FocusManager(service, metadata);
     }
 
@@ -46,7 +47,7 @@ public class MediaManager {
     }
 
     public int createPlayer() {
-        Player player;
+        Player<? extends Track> player;
 
         if(LibHelper.isExoPlayerAvailable()) {
             player = new ExoPlayer(service, this);
@@ -60,19 +61,15 @@ public class MediaManager {
     public void destroyPlayer(int id) {
         if(id == -1) {
             // Destroys all players
-            for(Player p : players.values())
-                try {
-                    p.destroy();
-                } catch(Exception e) {
-                    e.printStackTrace();
-                }
+            for(Player p : players.values()) p.destroy();
             players.clear();
         } else {
-            try {
-                players.remove(id).destroy();
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
+            players.remove(id).destroy();
+        }
+
+        if(players.isEmpty() && !remote.isScanning()) {
+            service.stopSelf();
+            serviceStarted = false;
         }
     }
 
@@ -83,7 +80,7 @@ public class MediaManager {
         return players.get(id);
     }
 
-    public int addPlayer(Player player) {
+    public int addPlayer(Player<? extends Track> player) {
         int id = lastId++;
         players.put(id, player);
         return id;
@@ -190,6 +187,11 @@ public class MediaManager {
     private void onPlayerPlay(Player player) {
         if(!(player instanceof RemotePlayer)) {
             focus.enable();
+        }
+
+        if(!serviceStarted) {
+            service.startService(new Intent(service, PlayerService.class));
+            serviceStarted = true;
         }
 
         Events.dispatchEvent(service, getPlayerId(player), Events.PLAYER_PLAY, null);
