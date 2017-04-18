@@ -211,6 +211,7 @@ public class Metadata {
     }
 
     public void handleIntent(Intent intent) {
+        // Handle the media button
         MediaButtonReceiver.handleIntent(session, intent);
     }
 

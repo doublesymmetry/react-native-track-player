@@ -31,7 +31,7 @@ public class ButtonListener extends MediaSessionCompat.Callback {
     public void onPlayFromMediaId(String mediaId, Bundle extras) {
         WritableMap map = Arguments.createMap();
         map.putString("id", mediaId);
-        dispatch(Events.BUTTON_SKIP, map); // TODO document this
+        dispatch(Events.BUTTON_SKIP, map);
     }
 
     @Override
