@@ -201,6 +201,8 @@ public abstract class Player<T extends Track> {
     protected final void updateState(int state) {
         updateMetadata();
 
+        if(state == prevState) return;
+
         if(Utils.isPlaying(state) && !Utils.isPlaying(prevState)) {
             manager.onPlay(this);
         } else if(Utils.isPaused(state) && !Utils.isPaused(prevState)) {
@@ -209,6 +211,7 @@ public abstract class Player<T extends Track> {
             manager.onStop(this);
         }
 
+        manager.onStateChange(this, state);
         prevState = state;
     }
 

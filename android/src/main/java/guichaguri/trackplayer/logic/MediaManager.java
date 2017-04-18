@@ -156,15 +156,17 @@ public class MediaManager {
         Events.dispatchEvent(service, getPlayerId(player), Events.PLAYER_ENDED, null);
     }
 
+    public void onStateChange(Player player, int state) {
+        WritableMap data = Arguments.createMap();
+        data.putInt("state", state);
+        Events.dispatchEvent(service, getPlayerId(player), Events.PLAYER_STATE, data);
+    }
+
     public void onUpdate(Player player) {
         if(mainPlayer == player) {
             metadata.updatePlayback(player);
             metadata.updateMetadata(player);
         }
-
-        WritableMap data = Arguments.createMap();
-        data.putInt("state", player.getState());
-        Events.dispatchEvent(service, getPlayerId(player), Events.PLAYER_STATE, data);
     }
 
     public void onError(Player player, Throwable error) {

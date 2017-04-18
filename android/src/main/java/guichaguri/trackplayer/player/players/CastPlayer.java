@@ -111,6 +111,7 @@ public class CastPlayer extends RemotePlayer<CastTrack> implements OnStatusUpdat
             }
 
             queue.addAll(index, tracks);
+            if(index <= currentTrack) currentTrack += tracks.size();
         } else {
             queue.addAll(tracks);
         }
