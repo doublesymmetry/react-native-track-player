@@ -20,6 +20,7 @@ public class Events {
     public static final String BUTTON_SKIP_PREVIOUS = "skipToPrevious";
     public static final String BUTTON_SEEK_TO = "seekTo";
     public static final String BUTTON_SET_RATING = "setRating";
+    public static final String BUTTON_DUCK = "duck";
 
     // Player Events
     public static final String PLAYER_STATE = "player-state";
