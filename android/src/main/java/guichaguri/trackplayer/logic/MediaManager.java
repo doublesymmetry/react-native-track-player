@@ -58,36 +58,35 @@ public class MediaManager {
         return addPlayer(player);
     }
 
-    public void destroyPlayer(int id) {
-        if(id == -1) {
-            // Destroys all players
-            for(Player p : players.values()) p.destroy();
-            players.clear();
-        } else {
-            players.remove(id).destroy();
-        }
-
-        if(players.isEmpty() && !remote.isScanning()) {
-            service.stopSelf();
-            serviceStarted = false;
-        }
-    }
-
-    public Player<? extends Track> getPlayer(int id) {
-        if(id < 0 || !players.containsKey(id)) {
-            throw new IllegalArgumentException();
-        }
-        return players.get(id);
-    }
-
     public int addPlayer(Player<? extends Track> player) {
         int id = lastId++;
         players.put(id, player);
         return id;
     }
 
-    public void removePlayer(Player player) {
-        players.remove(getPlayerId(player));
+    public void destroyPlayer(int id) {
+        if(id == -1) {
+            // Destroys all players
+            for(Player p : players.values()) p.destroy();
+            players.clear();
+
+            setMainPlayer(null);
+        } else {
+            Player player = players.remove(id);
+            player.destroy();
+
+            if(player == mainPlayer) setMainPlayer(null);
+        }
+
+        if(serviceStarted && players.isEmpty() && !remote.isScanning()) {
+            Utils.log("Marking the service as stopped, as there are no more players playing");
+            service.stopSelf();
+            serviceStarted = false;
+        }
+    }
+
+    public Player<? extends Track> getPlayer(int id) {
+        return id >= 0 ? players.get(id) : null;
     }
 
     public Collection<Player<? extends Track>> getPlayers() {
@@ -103,6 +102,8 @@ public class MediaManager {
     }
 
     public void setMainPlayer(Player<? extends Track> player) {
+        if(player == mainPlayer) return;
+
         // Set the main player
         mainPlayer = player;
 
@@ -177,11 +178,28 @@ public class MediaManager {
     }
 
     public void onServiceDestroy() {
+        Utils.log("Destroying resources");
         for(Player player : getPlayers()) {
             player.destroy();
         }
         focus.disable();
         metadata.destroy();
+    }
+
+    public void onScanningStart() {
+        if(!serviceStarted) {
+            Utils.log("Marking the service as started, as we are now searching for remote devices");
+            service.startService(new Intent(service, PlayerService.class));
+            serviceStarted = true;
+        }
+    }
+
+    public void onScanningStop() {
+        if(serviceStarted && players.isEmpty() && !remote.isScanning()) {
+            Utils.log("Marking the service as stopped, as we are not searching for remote devices anymore");
+            service.stopSelf();
+            serviceStarted = false;
+        }
     }
 
     private void onPlayerPlay(Player player) {
@@ -190,6 +208,7 @@ public class MediaManager {
         }
 
         if(!serviceStarted) {
+            Utils.log("Marking the service as started, as a player is now playing");
             service.startService(new Intent(service, PlayerService.class));
             serviceStarted = true;
         }

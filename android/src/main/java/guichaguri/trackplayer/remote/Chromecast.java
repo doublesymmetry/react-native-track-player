@@ -34,6 +34,7 @@ import java.util.Map;
  */
 public class Chromecast extends Callback implements ConnectionCallbacks,
         OnConnectionFailedListener, ResultCallback<ApplicationConnectionResult> {
+    // TODO check cast v3 to simplify the code
 
     private final Context context;
     private final MediaManager manager;
@@ -50,10 +51,6 @@ public class Chromecast extends Callback implements ConnectionCallbacks,
     private boolean scanning = false;
     private boolean reconnecting = false;
     private boolean activeScan = false;
-
-    public Chromecast(Context context, MediaManager manager) {
-        this(context, manager, null);
-    }
 
     public Chromecast(Context context, MediaManager manager, String appId) {
         this.context = context;
@@ -76,10 +73,14 @@ public class Chromecast extends Callback implements ConnectionCallbacks,
         if(wasScaning) startScan(activeScan);
     }
 
+    public boolean isScanning() {
+        return scanning;
+    }
+
     public void startScan(boolean active) {
         if(scanning) return;
 
-        int flags = activeScan ?
+        int flags = active ?
                 MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN :
                 MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY;
 
@@ -110,7 +111,7 @@ public class Chromecast extends Callback implements ConnectionCallbacks,
         client.connect();
     }
 
-    public void disconnect() {
+    public void disconnectClient() {
         if(client != null && (client.isConnecting() || client.isConnected())) {
             if(sessionId != null) {
                 Cast.CastApi.stopApplication(client, sessionId);
@@ -119,13 +120,18 @@ public class Chromecast extends Callback implements ConnectionCallbacks,
             client.disconnect();
             client = null;
         }
+        reconnecting = false;
+    }
+
+    public void disconnect() {
         if(activePlayer != null) {
             Events.dispatchEvent(context, manager.getPlayerId(activePlayer), Events.REMOTE_DISCONNECTED, null);
 
-            manager.removePlayer(activePlayer);
+            manager.destroyPlayer(manager.getPlayerId(activePlayer));
             activePlayer = null;
+        } else {
+            disconnectClient();
         }
-        reconnecting = false;
     }
 
     public void destroy() {

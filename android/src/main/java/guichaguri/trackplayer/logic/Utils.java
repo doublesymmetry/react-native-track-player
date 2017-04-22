@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 import android.view.KeyEvent;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
@@ -18,6 +19,10 @@ import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
  * @author Guilherme Chaguri
  */
 public class Utils {
+
+    public static void log(String msg) {
+        Log.i("ReactNativeTrackPlayer", msg);
+    }
 
     public static String getString(ReadableMap map, String key) {
         return getString(map, key, null);

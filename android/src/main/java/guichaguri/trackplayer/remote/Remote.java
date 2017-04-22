@@ -24,32 +24,51 @@ public class Remote {
     }
 
     public void updateOptions(ReadableMap data) {
+        // Updates the Chromecast application id
         castAppId = Utils.getString(data, "castAppId");
 
         if(cast != null) cast.setApplicationId(castAppId);
     }
 
+    public boolean isScanning() {
+        return cast != null && cast.isScanning();
+    }
+
     public void startScan(boolean active, Promise callback) {
         if(cast == null) {
+
+            // Reject when Chromecast support is not available
             if(!LibHelper.isChromecastAvailable(context)) {
-                Utils.rejectCallback(callback, "error", "Google Play Services is not available");
+                Utils.rejectCallback(callback, "GMS", "Google Play Services is not available");
                 return;
             }
+
+            // Create a new Chromecast manager
             cast = new Chromecast(context, manager, castAppId);
         }
+
+        // Start scanning
         cast.startScan(active);
+        manager.onScanningStart();
         Utils.resolveCallback(callback);
     }
 
     public void stopScan() {
-        if(cast != null) cast.stopScan();
+        // Stop scanning if Chromecast is available
+        if(cast != null) {
+            cast.stopScan();
+            manager.onScanningStop();
+        }
     }
 
     public void connect(String deviceId, Promise callback) {
         if(cast == null) {
-            Utils.rejectCallback(callback, "error", "Chromecast is not available");
+            // Reject when Chromecast is not available
+            Utils.rejectCallback(callback, "CAST", "Chromecast is not available");
             return;
         }
+
+        // Connect to the device
         cast.connect(deviceId, callback);
     }
 

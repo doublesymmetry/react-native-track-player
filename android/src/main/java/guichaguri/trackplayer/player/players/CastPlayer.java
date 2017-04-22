@@ -275,7 +275,7 @@ public class CastPlayer extends RemotePlayer<CastTrack> implements OnStatusUpdat
 
     @Override
     public void destroy() {
-        cast.disconnect();
+        cast.disconnectClient();
     }
 
     @Override
