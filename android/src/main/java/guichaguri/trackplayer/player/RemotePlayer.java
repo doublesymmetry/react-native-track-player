@@ -5,6 +5,8 @@ import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.track.Track;
 
 /**
+ * Base player object for remote players
+ *
  * @author Guilherme Chaguri
  */
 public abstract class RemotePlayer<T extends Track> extends Player<T> {

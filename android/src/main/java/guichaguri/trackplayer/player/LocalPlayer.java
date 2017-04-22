@@ -6,6 +6,8 @@ import guichaguri.trackplayer.logic.track.Track;
 import guichaguri.trackplayer.player.components.PlayerView;
 
 /**
+ * Base player object for local players
+ *
  * @author Guilherme Chaguri
  */
 public abstract class LocalPlayer<T extends Track> extends Player<T> {

@@ -38,11 +38,11 @@ public class PlayerBrowser extends MediaBrowserServiceCompat implements ServiceC
         if(enable) {
             Intent intent = new Intent(this, PlayerService.class);
             intent.setAction(PlayerService.ACTION_BROWSER);
-            bindService(intent, this, Service.BIND_AUTO_CREATE);
+            serviceEnabled = bindService(intent, this, Service.BIND_AUTO_CREATE);
         } else {
             unbindService(this);
+            serviceEnabled = false;
         }
-        serviceEnabled = enable;
     }
 
     @Override

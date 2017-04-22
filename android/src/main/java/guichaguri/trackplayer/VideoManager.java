@@ -74,13 +74,15 @@ public class VideoManager extends SimpleViewManager<PlayerView> implements Servi
         if(serviceEnabled == enabled) return;
 
         if(enabled) {
+            // Binds the service to getting a VideoWrapper instance
             Intent intent = new Intent(context, PlayerService.class);
             intent.setAction(PlayerService.ACTION_VIDEO);
-            context.bindService(intent, this, Service.BIND_AUTO_CREATE);
+            serviceEnabled = context.bindService(intent, this, Service.BIND_AUTO_CREATE);
         } else {
+            // Unbinds the service
             context.unbindService(this);
+            serviceEnabled = false;
         }
-        serviceEnabled = enabled;
     }
 
     @Override

@@ -45,6 +45,7 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
         ReactApplicationContext context = getReactApplicationContext();
 
+        // Binds the service to get a MediaWrapper instance
         Intent intent = new Intent(context, PlayerService.class);
         intent.setAction(PlayerService.ACTION_MEDIA);
         context.bindService(intent, this, Service.BIND_AUTO_CREATE);
@@ -52,6 +53,9 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @Override
     public void onCatalystInstanceDestroy() {
+        super.onCatalystInstanceDestroy();
+
+        // Unbinds the service
         getReactApplicationContext().unbindService(this);
     }
 
@@ -60,6 +64,7 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
         manager = (MediaWrapper)service;
 
         if(initCallbacks != null) {
+            // Triggers all callbacks from onReady
             for(Callback cb : initCallbacks) {
                 Utils.triggerCallback(cb);
             }
@@ -109,13 +114,16 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     @ReactMethod
     public void onReady(Callback callback) {
         if(manager != null) {
+            // The manager is already available, we don't need to wait!
             Utils.triggerCallback(callback);
             return;
         }
 
         if(initCallbacks == null) {
+            // Create a new array with our callback
             initCallbacks = new Callback[]{callback};
         } else {
+            // Add to the existing array
             int index = initCallbacks.length;
             initCallbacks = Arrays.copyOf(initCallbacks, index + 1);
             initCallbacks[index] = callback;

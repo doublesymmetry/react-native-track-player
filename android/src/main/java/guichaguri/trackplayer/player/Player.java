@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.ListIterator;
 
 /**
+ * Base player object
+ *
  * @author Guilherme Chaguri
  */
 public abstract class Player<T extends Track> {

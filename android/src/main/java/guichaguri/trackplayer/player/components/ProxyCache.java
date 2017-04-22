@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Proxy Cache using {@link HttpProxyCacheServer}.
+ * Intended for players that do not support internal caching
+ *
  * @author Guilherme Chaguri
  */
 public class ProxyCache implements FileNameGenerator {

@@ -5,6 +5,8 @@ import android.view.SurfaceView;
 import guichaguri.trackplayer.logic.components.VideoWrapper;
 
 /**
+ * A view using {@link SurfaceView} for videos
+ *
  * @author Guilherme Chaguri
  */
 public class PlayerView extends SurfaceView {
