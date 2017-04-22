@@ -37,6 +37,7 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
     private boolean loaded = false;
     private boolean buffering = false;
     private boolean ended = false;
+    private boolean started = false;
 
     private float buffered = 0;
 
@@ -71,9 +72,11 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
         int cacheMaxFiles = track.cache.maxFiles;
         long cacheMaxSize = track.cache.maxSize;
 
+        // Resets the player to update its state to idle
         player.reset();
         if(cache != null) cache.destroy();
 
+        // Prepares the caching
         if(LibHelper.isProxyCacheAvailable() && !local && (cacheMaxFiles > 0 || cacheMaxSize > 0)) {
             cache = new ProxyCache(context, cacheMaxFiles, cacheMaxSize);
             url = cache.getURL(url, track.id);
@@ -81,11 +84,13 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
             cache = null;
         }
 
+        // Updates the state
         buffering = true;
         ended = false;
         loaded = false;
 
         try {
+            // Loads the uri
             loadCallback = callback;
             player.setDataSource(context, Utils.toUri(context, url, local));
             player.prepareAsync();
@@ -102,13 +107,16 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
     public void reset() {
         super.reset();
 
+        // Release the playback resources
         player.reset();
 
+        // Stops the caching server
         if(cache != null) {
             cache.destroy();
             cache = null;
         }
 
+        // Update the state
         buffering = false;
         ended = false;
         loaded = false;
@@ -117,6 +125,10 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
 
     @Override
     public void play() {
+        started = true;
+
+        if(!loaded) return;
+
         player.start();
 
         buffering = false;
@@ -126,6 +138,10 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
 
     @Override
     public void pause() {
+        started = false;
+
+        if(!loaded) return;
+
         player.pause();
 
         updateState();
@@ -133,6 +149,10 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
 
     @Override
     public void stop() {
+        started = false;
+
+        if(!loaded) return;
+
         player.stop();
 
         ended = true;
@@ -226,6 +246,8 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
 
     @Override
     public void onPrepared(MediaPlayer mp) {
+        if(started) player.start();
+
         Utils.resolveCallback(loadCallback);
         loadCallback = null;
 
