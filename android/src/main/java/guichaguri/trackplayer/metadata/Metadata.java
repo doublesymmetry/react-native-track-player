@@ -86,10 +86,12 @@ public class Metadata {
     public void updateMetadata(Player player) {
         // Reset the metadata when there's no player attached or track playing
         if(player == null || player.getCurrentTrack() == null) {
+            if(artwork != null) artwork.interrupt();
             md = new MediaMetadataCompat.Builder();
             MediaMetadataCompat metadata = md.build();
             session.setMetadata(metadata);
             notification.updateMetadata(metadata);
+            artwork = null;
             return;
         }
 
@@ -122,9 +124,11 @@ public class Metadata {
         if(player == null) {
             pb = new PlaybackStateCompat.Builder();
             PlaybackStateCompat state = pb.build();
+            session.setPlaybackToLocal(AudioManager.STREAM_MUSIC);
             session.setPlaybackState(state);
             notification.updatePlayback(state);
             noisyReceiver.setEnabled(false);
+            volume = null;
             return;
         }
 
@@ -225,30 +229,6 @@ public class Metadata {
 
     public int getRatingType() {
         return ratingType;
-    }
-
-    public void reset() {
-        // Interrupt the artwork thread if it's running
-        if(artwork != null) artwork.interrupt();
-
-        // Reset properties
-        md = new MediaMetadataCompat.Builder();
-        pb = new PlaybackStateCompat.Builder();
-        volume = null;
-        artwork = null;
-
-        // Recreate the metadata and playback state
-        MediaMetadataCompat metadata = md.build();
-        PlaybackStateCompat state = pb.build();
-
-        // Update the metadata and the state to the MediaSession and the notification
-        session.setMetadata(metadata);
-        session.setPlaybackState(state);
-        notification.updateMetadata(metadata);
-        notification.updatePlayback(state);
-
-        // Reset volume control
-        session.setPlaybackToLocal(AudioManager.STREAM_MUSIC);
     }
 
     public void destroy() {

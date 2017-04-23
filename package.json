@@ -1,7 +1,8 @@
 {
   "name": "react-native-track-player",
-  "version": "0.0.1",
-  "description": "An audio player module for React Native which supports media buttons and chromecast",
+  "version": "0.0.2",
+  "description": "An audio player module for React Native which supports media buttons and Chromecast",
+  "author": "Guichaguri",
   "keywords": [
     "react",
     "react-native",
@@ -12,13 +13,15 @@
     "controls",
     "chromecast"
   ],
+  "license": "GPL-3.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Guichaguri/react-native-track-player.git"
+    "url": "https://github.com/Guichaguri/react-native-track-player.git"
   },
-  "author": "Guichaguri",
+  "bugs": {
+    "url" : "https://github.com/Guichaguri/react-native-track-player/issues"
+  },
   "peerDependencies": {
     "react-native": "^0.40.0"
-  },
-  "rnpm": {}
+  }
 }
