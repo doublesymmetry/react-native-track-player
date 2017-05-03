@@ -6,6 +6,7 @@ import com.facebook.react.HeadlessJsTaskService;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.jstasks.HeadlessJsTaskConfig;
+import guichaguri.trackplayer.logic.Utils;
 import javax.annotation.Nullable;
 
 /**
@@ -28,6 +29,8 @@ public class PlayerTask extends HeadlessJsTaskService {
             stopSelf();
             return null;
         }
+
+        Utils.log("Sending event %s...", event);
 
         WritableMap map = bundle != null ? Arguments.fromBundle(bundle) : Arguments.createMap();
         if(event != null) map.putString("type", event);

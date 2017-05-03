@@ -50,8 +50,10 @@ public class MediaManager {
         Player<? extends Track> player;
 
         if(LibHelper.isExoPlayerAvailable()) {
+            Utils.log("Creating an ExoPlayer instance...");
             player = new ExoPlayer(service, this);
         } else {
+            Utils.log("Creating a MediaPlayer instance...");
             player = new AndroidPlayer(service, this);
         }
 
@@ -66,12 +68,16 @@ public class MediaManager {
 
     public void destroyPlayer(int id) {
         if(id == -1) {
+            Utils.log("Destroying all players...");
+
             // Destroys all players
             for(Player p : players.values()) p.destroy();
             players.clear();
 
             setMainPlayer(null);
         } else {
+            Utils.log("Destroying player %d...", id);
+
             Player player = players.remove(id);
             player.destroy();
 

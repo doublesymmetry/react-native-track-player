@@ -231,6 +231,8 @@ public abstract class Player<T extends Track> {
             currentTrack = 0;
         }
 
+        Utils.log("Updating current track...");
+
         int oldState = getState();
         T track = queue.get(currentTrack);
 

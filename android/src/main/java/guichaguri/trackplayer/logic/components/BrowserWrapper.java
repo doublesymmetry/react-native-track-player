@@ -43,6 +43,8 @@ public class BrowserWrapper extends Binder {
 
         if(mainPlayer == null) return Collections.emptyList();
 
+        Utils.log("Sending queue items to the MediaBrowser...");
+
         List<MediaItem> items = new ArrayList<>();
 
         for(Track track : mainPlayer.getQueue()) {

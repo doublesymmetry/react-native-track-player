@@ -14,14 +14,17 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
+import guichaguri.trackplayer.BuildConfig;
 
 /**
  * @author Guilherme Chaguri
  */
 public class Utils {
 
-    public static void log(String msg) {
-        Log.i("ReactNativeTrackPlayer", msg);
+    public static void log(String msg, Object ... args) {
+        if(BuildConfig.DEBUG) {
+            Log.i("ReactNativeTrackPlayer", String.format(msg, args));
+        }
     }
 
     public static String getString(ReadableMap map, String key) {
