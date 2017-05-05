@@ -135,11 +135,11 @@ public class MediaNotification {
 
         // Check and update action buttons
         long mask = playback.getActions();
-        play = addAction(play, mask, PlaybackStateCompat.ACTION_PLAY, "Play", playIcon, actions, compact);
-        pause = addAction(pause, mask, PlaybackStateCompat.ACTION_PAUSE, "Pause", pauseIcon, actions, compact);
-        stop = addAction(stop, mask, PlaybackStateCompat.ACTION_STOP, "Stop", stopIcon, actions, compact);
-        previous = addAction(previous, mask, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS, "Previous", previousIcon, actions, compact);
-        next = addAction(next, mask, PlaybackStateCompat.ACTION_SKIP_TO_NEXT, "Next", nextIcon, actions, compact);
+        play = addAction(play, mask, PlaybackStateCompat.ACTION_PLAY, "Play", playIcon, actions, compact, playing);
+        pause = addAction(pause, mask, PlaybackStateCompat.ACTION_PAUSE, "Pause", pauseIcon, actions, compact, playing);
+        stop = addAction(stop, mask, PlaybackStateCompat.ACTION_STOP, "Stop", stopIcon, actions, compact, playing);
+        previous = addAction(previous, mask, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS, "Previous", previousIcon, actions, compact, playing);
+        next = addAction(next, mask, PlaybackStateCompat.ACTION_SKIP_TO_NEXT, "Next", nextIcon, actions, compact, playing);
 
         // Add the action buttons
         nb.mActions.clear();
@@ -173,12 +173,16 @@ public class MediaNotification {
         return context.getResources().getIdentifier(iconName, "drawable", context.getPackageName());
     }
 
-    private Action addAction(Action instance, long mask, long action, String title, int icon, List<Action> list, List<Action> compactView) {
+    private Action addAction(Action instance, long mask, long action, String title, int icon,
+                             List<Action> list, List<Action> compactView, boolean playing) {
         // Update the action
         instance = updateAction(instance, mask, action, title, icon);
 
         // Check if it's disabled
         if(instance == null) return null;
+
+        if(action == PlaybackStateCompat.ACTION_PLAY && !playing) return instance;
+        if(action == PlaybackStateCompat.ACTION_PAUSE && playing) return instance;
 
         // Add it to the compact view if it's allowed to
         if((compactCapabilities & action) == 0) {
