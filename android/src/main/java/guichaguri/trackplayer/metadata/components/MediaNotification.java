@@ -14,9 +14,13 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.NotificationCompat;
 import android.support.v7.app.NotificationCompat.MediaStyle;
 import android.view.KeyEvent;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import guichaguri.trackplayer.logic.workers.PlayerService;
+import com.facebook.react.bridge.ReadableType;
 import guichaguri.trackplayer.logic.Utils;
+import guichaguri.trackplayer.logic.workers.PlayerService;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Guilherme Chaguri
@@ -32,6 +36,8 @@ public class MediaNotification {
 
     private int playIcon, pauseIcon, stopIcon, previousIcon, nextIcon;
     private Action play, pause, stop, previous, next;
+
+    private int compactCapabilities = 0;
 
     private boolean showing = false;
 
@@ -77,6 +83,18 @@ public class MediaNotification {
         nb.setLights(color, 250, 250);
         nb.setSmallIcon(icon != 0 ? icon : playIcon);
 
+        // Update compact capabilities
+        compactCapabilities = 0;
+
+        ReadableArray array = Utils.getArray(data, "compactCapabilities", null);
+        if(array == null) return;
+
+        for(int i = 0; i < array.size(); i++) {
+            if(array.getType(i) == ReadableType.Number) {
+                compactCapabilities |= array.getInt(i);
+            }
+        }
+
         // Update the notification
         update();
     }
@@ -112,28 +130,27 @@ public class MediaNotification {
             }
         }
 
+        List<Action> actions = new ArrayList<>();
+        List<Action> compact = new ArrayList<>();
+
         // Check and update action buttons
-        long actions = playback.getActions();
-        play = updateAction(play, actions, PlaybackStateCompat.ACTION_PLAY, "Play", playIcon);
-        pause = updateAction(pause, actions, PlaybackStateCompat.ACTION_PAUSE, "Pause", pauseIcon);
-        stop = updateAction(stop, actions, PlaybackStateCompat.ACTION_STOP, "Stop", stopIcon);
-        previous = updateAction(previous, actions, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS, "Previous", previousIcon);
-        next = updateAction(next, actions, PlaybackStateCompat.ACTION_SKIP_TO_NEXT, "Next", nextIcon);
+        long mask = playback.getActions();
+        play = addAction(play, mask, PlaybackStateCompat.ACTION_PLAY, "Play", playIcon, actions, compact);
+        pause = addAction(pause, mask, PlaybackStateCompat.ACTION_PAUSE, "Pause", pauseIcon, actions, compact);
+        stop = addAction(stop, mask, PlaybackStateCompat.ACTION_STOP, "Stop", stopIcon, actions, compact);
+        previous = addAction(previous, mask, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS, "Previous", previousIcon, actions, compact);
+        next = addAction(next, mask, PlaybackStateCompat.ACTION_SKIP_TO_NEXT, "Next", nextIcon, actions, compact);
 
         // Add the action buttons
         nb.mActions.clear();
-        if(previous != null) nb.mActions.add(previous);
-        if(play != null && !playing) nb.mActions.add(play);
-        if(pause != null && playing) nb.mActions.add(pause);
-        if(stop != null) nb.mActions.add(stop);
-        if(next != null) nb.mActions.add(next);
+        nb.mActions.addAll(actions);
 
-        // Add the play/pause button to the compact view
-        if(play != null && pause != null) {
-            style.setShowActionsInCompactView(nb.mActions.indexOf(playing ? pause : play));
-        } else {
-            style.setShowActionsInCompactView();
+        // Add the compact actions
+        int[] compactIndexes = new int[compact.size()];
+        for(int i = 0; i < compact.size(); i++) {
+            compactIndexes[i] = actions.indexOf(compact.get(i));
         }
+        style.setShowActionsInCompactView(compactIndexes);
 
         // Update the notification
         nb.setStyle(style);
@@ -154,6 +171,24 @@ public class MediaNotification {
     private int loadIcon(String iconName) {
         // Load icon resource from name
         return context.getResources().getIdentifier(iconName, "drawable", context.getPackageName());
+    }
+
+    private Action addAction(Action instance, long mask, long action, String title, int icon, List<Action> list, List<Action> compactView) {
+        // Update the action
+        instance = updateAction(instance, mask, action, title, icon);
+
+        // Check if it's disabled
+        if(instance == null) return null;
+
+        // Add it to the compact view if it's allowed to
+        if((compactCapabilities & action) == 0) {
+            compactView.add(instance);
+        }
+
+        // Add to the action list
+        list.add(instance);
+
+        return instance;
     }
 
     private Action updateAction(Action instance, long mask, long action, String title, int icon) {
