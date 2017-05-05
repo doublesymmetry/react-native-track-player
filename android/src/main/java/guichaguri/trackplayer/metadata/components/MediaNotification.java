@@ -181,8 +181,8 @@ public class MediaNotification {
         // Check if it's disabled
         if(instance == null) return null;
 
-        if(action == PlaybackStateCompat.ACTION_PLAY && !playing) return instance;
-        if(action == PlaybackStateCompat.ACTION_PAUSE && playing) return instance;
+        if(action == PlaybackStateCompat.ACTION_PLAY && playing) return instance;
+        if(action == PlaybackStateCompat.ACTION_PAUSE && !playing) return instance;
 
         // Add it to the compact view if it's allowed to
         if((compactCapabilities & action) == 0) {
