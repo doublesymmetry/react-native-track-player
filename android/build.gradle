@@ -44,7 +44,7 @@ dependencies {
     File file = file('../../../track-player.json');
     if(file.exists()) {
         def json = new JsonSlurper().parseText(file.text);
-        exoplayer = json.dash || json.hls || json.smoothstreaming;
+        exoplayer = json.exoplayer || json.dash || json.hls || json.smoothstreaming;
         cache = json.cache;
     }
 
