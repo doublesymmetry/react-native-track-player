@@ -21,6 +21,8 @@ public class PlayerTask extends HeadlessJsTaskService {
     @Nullable
     @Override
     protected HeadlessJsTaskConfig getTaskConfig(Intent intent) {
+        if(intent == null) return null;
+
         String event = intent.getStringExtra(EVENT_TYPE);
         Bundle bundle = intent.getBundleExtra(EVENT_DATA);
         int player = intent.getIntExtra(EVENT_PLAYER, -1);

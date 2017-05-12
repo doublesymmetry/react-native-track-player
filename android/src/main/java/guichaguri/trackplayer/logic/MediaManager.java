@@ -1,6 +1,11 @@
 package guichaguri.trackplayer.logic;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiManager.WifiLock;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
@@ -29,6 +34,9 @@ public class MediaManager {
     private final Remote remote;
     private final Map<Integer, Player<? extends Track>> players = new HashMap<>();
 
+    private final WakeLock wakeLock;
+    private final WifiLock wifiLock;
+
     private int lastId = 0;
     private Player<? extends Track> mainPlayer;
     private boolean serviceStarted = false;
@@ -38,6 +46,12 @@ public class MediaManager {
         this.metadata = new Metadata(service, this);
         this.remote = new Remote(service.getApplicationContext(), this);
         this.focus = new FocusManager(service, metadata);
+
+        PowerManager powerManager = (PowerManager)service.getSystemService(Context.POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "track-player-wake-lock");
+
+        WifiManager wifiManager = (WifiManager)service.getSystemService(Context.WIFI_SERVICE);
+        wifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, "track-player-wifi-lock");
     }
 
     public void updateOptions(ReadableMap data) {
@@ -70,18 +84,23 @@ public class MediaManager {
         if(id == -1) {
             Utils.log("Destroying all players...");
 
-            // Destroys all players
-            for(Player p : players.values()) p.destroy();
-            players.clear();
-
             setMainPlayer(null);
+
+            for(Player p : players.values()) {
+                p.destroy();
+                if(!Utils.isStopped(p.getState())) onStop(p);
+            }
+
+            players.clear();
         } else {
             Utils.log("Destroying player %d...", id);
 
             Player player = players.remove(id);
-            player.destroy();
 
             if(player == mainPlayer) setMainPlayer(null);
+
+            player.destroy();
+            if(!Utils.isStopped(player.getState())) onStop(player);
         }
 
         if(serviceStarted && players.isEmpty() && !remote.isScanning()) {
@@ -185,11 +204,29 @@ public class MediaManager {
 
     public void onServiceDestroy() {
         Utils.log("Destroying resources");
+
+        // Destroy each player
         for(Player player : getPlayers()) {
             player.destroy();
         }
+
+        // Remove the audio focus
         focus.disable();
+
+        // Destroy the metadata resources
         metadata.destroy();
+
+        // Release the wifi lock
+        if(wifiLock.isHeld()) {
+            wifiLock.setReferenceCounted(false);
+            wifiLock.release();
+        }
+
+        // Release the wake lock
+        if(wakeLock.isHeld()) {
+            wakeLock.setReferenceCounted(false);
+            wakeLock.release();
+        }
     }
 
     public void onScanningStart() {
@@ -211,6 +248,12 @@ public class MediaManager {
     private void onPlayerPlay(Player player) {
         if(!(player instanceof RemotePlayer)) {
             focus.enable();
+            wakeLock.acquire();
+
+            if(player.getCurrentTrack().needsNetwork()) {
+                // Acquire wifi lock when the track needs network
+                wifiLock.acquire();
+            }
         }
 
         if(!serviceStarted) {
@@ -234,9 +277,18 @@ public class MediaManager {
     }
 
     private void onPlayerPause(Player player) {
-        if(!isPlayingLocal()) {
-            // When there are no more local players, we'll disable the audio focus
-            focus.disable();
+        if(!(player instanceof RemotePlayer)) {
+            wakeLock.release();
+
+            if(player.getCurrentTrack().needsNetwork()) {
+                // Release wifi lock when the track needs network
+                wifiLock.release();
+            }
+
+            if(!isPlayingLocal()) {
+                // When there are no more local players, we'll disable the audio focus
+                focus.disable();
+            }
         }
 
         Events.dispatchEvent(service, getPlayerId(player), Events.PLAYER_PAUSE, null);
@@ -248,9 +300,18 @@ public class MediaManager {
     }
 
     private void onPlayerStop(Player player) {
-        if(!isPlayingLocal()) {
-            // When there are no more local players, we'll disable the audio focus
-            focus.disable();
+        if(!(player instanceof RemotePlayer)) {
+            wakeLock.release();
+
+            if(player.getCurrentTrack().needsNetwork()) {
+                // Release wifi lock when the track needs network
+                wifiLock.release();
+            }
+
+            if(!isPlayingLocal()) {
+                // When there are no more local players, we'll disable the audio focus
+                focus.disable();
+            }
         }
 
         Events.dispatchEvent(service, getPlayerId(player), Events.PLAYER_STOP, null);

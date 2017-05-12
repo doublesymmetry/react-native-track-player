@@ -57,4 +57,8 @@ public class Track {
         artwork = new TrackURL(data, "artwork");
     }
 
+    public boolean needsNetwork() {
+        return !url.local || !artwork.local;
+    }
+
 }
