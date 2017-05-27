@@ -2,6 +2,7 @@ package guichaguri.trackplayer.logic;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
@@ -21,8 +22,10 @@ import guichaguri.trackplayer.BuildConfig;
  */
 public class Utils {
 
+    private static final boolean LOG = BuildConfig.DEBUG || Build.PRODUCT.contains("sdk") || Boolean.getBoolean("guichaguri.trackplayer.log");
+
     public static void log(String msg, Object ... args) {
-        if(BuildConfig.DEBUG) {
+        if(LOG) {
             Log.i("ReactNativeTrackPlayer", String.format(msg, args));
         }
     }
