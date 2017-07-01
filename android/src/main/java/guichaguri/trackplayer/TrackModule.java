@@ -56,6 +56,7 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
         super.onCatalystInstanceDestroy();
 
         // Unbinds the service
+        manager.destroy(-1);
         getReactApplicationContext().unbindService(this);
     }
 
