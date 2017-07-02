@@ -1,0 +1,374 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 48;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		9B0E282E1F07D76F00B71D2A /* RNTrackPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E282D1F07D76F00B71D2A /* RNTrackPlayer.m */; };
+		9B0E282F1F07D76F00B71D2A /* RNTrackPlayer.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B0E282C1F07D76F00B71D2A /* RNTrackPlayer.h */; };
+		9B0E287D1F0831AE00B71D2A /* Track.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E287C1F0831AE00B71D2A /* Track.m */; };
+		9B0E28801F0835BB00B71D2A /* TrackURL.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E287F1F0835BB00B71D2A /* TrackURL.m */; };
+		9B0E28831F08E9DC00B71D2A /* Player.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E28821F08E9DC00B71D2A /* Player.m */; };
+		9B0E28841F094D7E00B71D2A /* NSMutableArray+STKAudioPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E28711F07E0FE00B71D2A /* NSMutableArray+STKAudioPlayer.m */; };
+		9B0E28851F094D8000B71D2A /* STKAudioPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E28701F07E0FE00B71D2A /* STKAudioPlayer.m */; };
+		9B0E28861F094D8800B71D2A /* STKAutoRecoveringHTTPDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E28681F07E0FE00B71D2A /* STKAutoRecoveringHTTPDataSource.m */; };
+		9B0E28871F094D8800B71D2A /* STKCoreFoundationDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E28751F07E0FE00B71D2A /* STKCoreFoundationDataSource.m */; };
+		9B0E28881F094D8800B71D2A /* STKDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E28651F07E0FE00B71D2A /* STKDataSource.m */; };
+		9B0E28891F094D8800B71D2A /* STKDataSourceWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E286C1F07E0FE00B71D2A /* STKDataSourceWrapper.m */; };
+		9B0E288A1F094D8800B71D2A /* STKHTTPDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E28721F07E0FE00B71D2A /* STKHTTPDataSource.m */; };
+		9B0E288B1F094D8800B71D2A /* STKLocalFileDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E286A1F07E0FE00B71D2A /* STKLocalFileDataSource.m */; };
+		9B0E288C1F094D8800B71D2A /* STKQueueEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E286E1F07E0FE00B71D2A /* STKQueueEntry.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9B0E28271F07D76F00B71D2A /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+				9B0E282F1F07D76F00B71D2A /* RNTrackPlayer.h in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		9B0E28291F07D76F00B71D2A /* libRNTrackPlayer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNTrackPlayer.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B0E282C1F07D76F00B71D2A /* RNTrackPlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNTrackPlayer.h; sourceTree = "<group>"; };
+		9B0E282D1F07D76F00B71D2A /* RNTrackPlayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNTrackPlayer.m; sourceTree = "<group>"; };
+		9B0E28641F07E0FE00B71D2A /* STKCoreFoundationDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STKCoreFoundationDataSource.h; sourceTree = "<group>"; };
+		9B0E28651F07E0FE00B71D2A /* STKDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STKDataSource.m; sourceTree = "<group>"; };
+		9B0E28661F07E0FE00B71D2A /* STKDataSourceWrapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STKDataSourceWrapper.h; sourceTree = "<group>"; };
+		9B0E28671F07E0FE00B71D2A /* STKAudioPlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STKAudioPlayer.h; sourceTree = "<group>"; };
+		9B0E28681F07E0FE00B71D2A /* STKAutoRecoveringHTTPDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STKAutoRecoveringHTTPDataSource.m; sourceTree = "<group>"; };
+		9B0E28691F07E0FE00B71D2A /* STKAutoRecoveringHTTPDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STKAutoRecoveringHTTPDataSource.h; sourceTree = "<group>"; };
+		9B0E286A1F07E0FE00B71D2A /* STKLocalFileDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STKLocalFileDataSource.m; sourceTree = "<group>"; };
+		9B0E286B1F07E0FE00B71D2A /* STKLocalFileDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STKLocalFileDataSource.h; sourceTree = "<group>"; };
+		9B0E286C1F07E0FE00B71D2A /* STKDataSourceWrapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STKDataSourceWrapper.m; sourceTree = "<group>"; };
+		9B0E286D1F07E0FE00B71D2A /* STKHTTPDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STKHTTPDataSource.h; sourceTree = "<group>"; };
+		9B0E286E1F07E0FE00B71D2A /* STKQueueEntry.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STKQueueEntry.m; sourceTree = "<group>"; };
+		9B0E286F1F07E0FE00B71D2A /* STKQueueEntry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STKQueueEntry.h; sourceTree = "<group>"; };
+		9B0E28701F07E0FE00B71D2A /* STKAudioPlayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STKAudioPlayer.m; sourceTree = "<group>"; };
+		9B0E28711F07E0FE00B71D2A /* NSMutableArray+STKAudioPlayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSMutableArray+STKAudioPlayer.m"; sourceTree = "<group>"; };
+		9B0E28721F07E0FE00B71D2A /* STKHTTPDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STKHTTPDataSource.m; sourceTree = "<group>"; };
+		9B0E28731F07E0FE00B71D2A /* STKDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STKDataSource.h; sourceTree = "<group>"; };
+		9B0E28741F07E0FE00B71D2A /* NSMutableArray+STKAudioPlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSMutableArray+STKAudioPlayer.h"; sourceTree = "<group>"; };
+		9B0E28751F07E0FE00B71D2A /* STKCoreFoundationDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STKCoreFoundationDataSource.m; sourceTree = "<group>"; };
+		9B0E287B1F0831AE00B71D2A /* Track.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Track.h; sourceTree = "<group>"; };
+		9B0E287C1F0831AE00B71D2A /* Track.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Track.m; sourceTree = "<group>"; };
+		9B0E287E1F0835BB00B71D2A /* TrackURL.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TrackURL.h; sourceTree = "<group>"; };
+		9B0E287F1F0835BB00B71D2A /* TrackURL.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TrackURL.m; sourceTree = "<group>"; };
+		9B0E28811F08E9DC00B71D2A /* Player.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Player.h; sourceTree = "<group>"; };
+		9B0E28821F08E9DC00B71D2A /* Player.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Player.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9B0E28261F07D76F00B71D2A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		9B0E28201F07D76E00B71D2A = {
+			isa = PBXGroup;
+			children = (
+				9B0E282B1F07D76F00B71D2A /* RNTrackPlayer */,
+				9B0E282A1F07D76F00B71D2A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		9B0E282A1F07D76F00B71D2A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9B0E28291F07D76F00B71D2A /* libRNTrackPlayer.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9B0E282B1F07D76F00B71D2A /* RNTrackPlayer */ = {
+			isa = PBXGroup;
+			children = (
+				9B0E287A1F0831A400B71D2A /* Models */,
+				9B0E28621F07DF6200B71D2A /* Vendor */,
+				9B0E282C1F07D76F00B71D2A /* RNTrackPlayer.h */,
+				9B0E282D1F07D76F00B71D2A /* RNTrackPlayer.m */,
+			);
+			path = RNTrackPlayer;
+			sourceTree = "<group>";
+		};
+		9B0E28621F07DF6200B71D2A /* Vendor */ = {
+			isa = PBXGroup;
+			children = (
+				9B0E28631F07DF6D00B71D2A /* StreamingKit */,
+			);
+			path = Vendor;
+			sourceTree = "<group>";
+		};
+		9B0E28631F07DF6D00B71D2A /* StreamingKit */ = {
+			isa = PBXGroup;
+			children = (
+				9B0E28741F07E0FE00B71D2A /* NSMutableArray+STKAudioPlayer.h */,
+				9B0E28711F07E0FE00B71D2A /* NSMutableArray+STKAudioPlayer.m */,
+				9B0E28671F07E0FE00B71D2A /* STKAudioPlayer.h */,
+				9B0E28701F07E0FE00B71D2A /* STKAudioPlayer.m */,
+				9B0E28691F07E0FE00B71D2A /* STKAutoRecoveringHTTPDataSource.h */,
+				9B0E28681F07E0FE00B71D2A /* STKAutoRecoveringHTTPDataSource.m */,
+				9B0E28641F07E0FE00B71D2A /* STKCoreFoundationDataSource.h */,
+				9B0E28751F07E0FE00B71D2A /* STKCoreFoundationDataSource.m */,
+				9B0E28731F07E0FE00B71D2A /* STKDataSource.h */,
+				9B0E28651F07E0FE00B71D2A /* STKDataSource.m */,
+				9B0E28661F07E0FE00B71D2A /* STKDataSourceWrapper.h */,
+				9B0E286C1F07E0FE00B71D2A /* STKDataSourceWrapper.m */,
+				9B0E286D1F07E0FE00B71D2A /* STKHTTPDataSource.h */,
+				9B0E28721F07E0FE00B71D2A /* STKHTTPDataSource.m */,
+				9B0E286B1F07E0FE00B71D2A /* STKLocalFileDataSource.h */,
+				9B0E286A1F07E0FE00B71D2A /* STKLocalFileDataSource.m */,
+				9B0E286F1F07E0FE00B71D2A /* STKQueueEntry.h */,
+				9B0E286E1F07E0FE00B71D2A /* STKQueueEntry.m */,
+			);
+			path = StreamingKit;
+			sourceTree = "<group>";
+		};
+		9B0E287A1F0831A400B71D2A /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				9B0E287B1F0831AE00B71D2A /* Track.h */,
+				9B0E287C1F0831AE00B71D2A /* Track.m */,
+				9B0E287E1F0835BB00B71D2A /* TrackURL.h */,
+				9B0E287F1F0835BB00B71D2A /* TrackURL.m */,
+				9B0E28811F08E9DC00B71D2A /* Player.h */,
+				9B0E28821F08E9DC00B71D2A /* Player.m */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		9B0E28281F07D76F00B71D2A /* RNTrackPlayer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9B0E28321F07D76F00B71D2A /* Build configuration list for PBXNativeTarget "RNTrackPlayer" */;
+			buildPhases = (
+				9B0E28251F07D76F00B71D2A /* Sources */,
+				9B0E28261F07D76F00B71D2A /* Frameworks */,
+				9B0E28271F07D76F00B71D2A /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RNTrackPlayer;
+			productName = RNTrackPlayer;
+			productReference = 9B0E28291F07D76F00B71D2A /* libRNTrackPlayer.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9B0E28211F07D76E00B71D2A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0900;
+				ORGANIZATIONNAME = "David Chavez";
+				TargetAttributes = {
+					9B0E28281F07D76F00B71D2A = {
+						CreatedOnToolsVersion = 9.0;
+					};
+				};
+			};
+			buildConfigurationList = 9B0E28241F07D76E00B71D2A /* Build configuration list for PBXProject "RNTrackPlayer" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 9B0E28201F07D76E00B71D2A;
+			productRefGroup = 9B0E282A1F07D76F00B71D2A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9B0E28281F07D76F00B71D2A /* RNTrackPlayer */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9B0E28251F07D76F00B71D2A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B0E28831F08E9DC00B71D2A /* Player.m in Sources */,
+				9B0E282E1F07D76F00B71D2A /* RNTrackPlayer.m in Sources */,
+				9B0E28801F0835BB00B71D2A /* TrackURL.m in Sources */,
+				9B0E287D1F0831AE00B71D2A /* Track.m in Sources */,
+				9B0E28851F094D8000B71D2A /* STKAudioPlayer.m in Sources */,
+				9B0E28891F094D8800B71D2A /* STKDataSourceWrapper.m in Sources */,
+				9B0E28871F094D8800B71D2A /* STKCoreFoundationDataSource.m in Sources */,
+				9B0E288A1F094D8800B71D2A /* STKHTTPDataSource.m in Sources */,
+				9B0E28861F094D8800B71D2A /* STKAutoRecoveringHTTPDataSource.m in Sources */,
+				9B0E288C1F094D8800B71D2A /* STKQueueEntry.m in Sources */,
+				9B0E28881F094D8800B71D2A /* STKDataSource.m in Sources */,
+				9B0E28841F094D7E00B71D2A /* NSMutableArray+STKAudioPlayer.m in Sources */,
+				9B0E288B1F094D8800B71D2A /* STKLocalFileDataSource.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		9B0E28301F07D76F00B71D2A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		9B0E28311F07D76F00B71D2A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		9B0E28331F07D76F00B71D2A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEVELOPMENT_TEAM = B82TF96752;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9B0E28341F07D76F00B71D2A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEVELOPMENT_TEAM = B82TF96752;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9B0E28241F07D76E00B71D2A /* Build configuration list for PBXProject "RNTrackPlayer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9B0E28301F07D76F00B71D2A /* Debug */,
+				9B0E28311F07D76F00B71D2A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9B0E28321F07D76F00B71D2A /* Build configuration list for PBXNativeTarget "RNTrackPlayer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9B0E28331F07D76F00B71D2A /* Debug */,
+				9B0E28341F07D76F00B71D2A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 9B0E28211F07D76E00B71D2A /* Project object */;
+}
