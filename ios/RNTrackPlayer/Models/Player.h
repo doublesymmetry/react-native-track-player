@@ -11,7 +11,13 @@
 #import "Track.h"
 
 @interface Player: NSObject
-- (void)load:(Track *)track;
+- (BOOL)queueContainsTrack:(NSString *)trackId;
+- (void)addTracks:(NSArray *)tracks before:(NSString *)trackId;
+- (void)removeTrackIds:(NSArray *)trackIds;
+- (void)skipToTrack:(NSString *)trackId;
+- (BOOL)playNext;
+- (BOOL)playPrevious;
+- (void)loadTrack:(Track *)track;
 - (void)reset;
 - (void)play;
 - (void)pause;
