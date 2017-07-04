@@ -40,25 +40,53 @@ dependencies {
     //noinspection GradleDynamicVersion
     compile 'com.facebook.react:react-native:+'
 
-    def exoplayer = false, cache = false;
-    File file = file('../../../track-player.json');
+    def exoplayer = false, cache = false, dash = false, hls = false, smoothstreaming = false
+
+    File file = file('../../../track-player.json')
     if(file.exists()) {
-        def json = new JsonSlurper().parseText(file.text);
-        exoplayer = json.exoplayer || json.dash || json.hls || json.smoothstreaming;
-        cache = json.cache;
+        def json = new JsonSlurper().parseText(file.text)
+        exoplayer = json.exoplayer || json.dash || json.hls || json.smoothstreaming
+        cache = json.cache
+        dash = json.dash
+        hls = json.hls
+        smoothstreaming = json.smoothstreaming
     }
 
+    // ExoPlayer Core
     if(exoplayer) {
-        compile 'com.google.android.exoplayer:exoplayer:r2.3.1'
+        compile 'com.google.android.exoplayer:exoplayer-core:r2.4.3'
     } else {
-        provided 'com.google.android.exoplayer:exoplayer:r2.3.1'
+        provided 'com.google.android.exoplayer:exoplayer-core:r2.4.3'
     }
 
+    // ExoPlayer DASH
+    if(dash) {
+        compile 'com.google.android.exoplayer:exoplayer-dash:r2.4.3'
+    } else {
+        provided 'com.google.android.exoplayer:exoplayer-dash:r2.4.3'
+    }
+
+    // ExoPlayer HLS
+    if(hls) {
+        compile 'com.google.android.exoplayer:exoplayer-hls:r2.4.3'
+    } else {
+        provided 'com.google.android.exoplayer:exoplayer-hls:r2.4.3'
+    }
+
+    // ExoPlayer SmoothStreaming
+    if(smoothstreaming) {
+        compile 'com.google.android.exoplayer:exoplayer-smoothstreaming:r2.4.3'
+    } else {
+        provided 'com.google.android.exoplayer:exoplayer-smoothstreaming:r2.4.3'
+    }
+
+    // Caching (for the default Android player)
     if(cache && !exoplayer) {
-        compile 'com.danikula:videocache:2.6.4'
+        compile 'com.danikula:videocache:2.7.0'
     } else {
-        provided 'com.danikula:videocache:2.6.4'
+        provided 'com.danikula:videocache:2.7.0'
     }
 
-    compile 'com.google.android.gms:play-services-cast:10.2.1'
+    // Google Cast
+    compile 'com.google.android.gms:play-services-cast-framework:11.0.2'
 }
