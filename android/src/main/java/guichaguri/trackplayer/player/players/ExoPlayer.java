@@ -5,13 +5,8 @@ import android.net.Uri;
 import android.support.v4.media.session.PlaybackStateCompat;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableMap;
-import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.DefaultLoadControl;
-import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.*;
 import com.google.android.exoplayer2.ExoPlayer.EventListener;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -24,6 +19,7 @@ import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.cache.Cache;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
@@ -38,6 +34,8 @@ import guichaguri.trackplayer.player.components.PlayerView;
 import guichaguri.trackplayer.player.track.ExoTrack;
 import java.io.File;
 
+import static com.google.android.exoplayer2.DefaultLoadControl.*;
+
 /**
  * Feature-rich player using {@link SimpleExoPlayer}
  *
@@ -50,10 +48,15 @@ public class ExoPlayer extends LocalPlayer<ExoTrack> implements EventListener {
     private Promise loadCallback = null;
     private boolean playing = false;
 
-    public ExoPlayer(Context context, MediaManager manager) {
+    public ExoPlayer(Context context, MediaManager manager, ReadableMap options) {
         super(context, manager);
 
-        player = ExoPlayerFactory.newSimpleInstance(context, new DefaultTrackSelector(), new DefaultLoadControl());
+        long bufferMs = Utils.toMillis(Utils.getDouble(options, "secondsRequiredToStartPlaying", DEFAULT_BUFFER_FOR_PLAYBACK_MS));
+
+        DefaultAllocator allocator = new DefaultAllocator(true, 0x10000);
+        LoadControl control = new DefaultLoadControl(allocator, DEFAULT_MIN_BUFFER_MS, DEFAULT_MAX_BUFFER_MS, bufferMs, bufferMs * 2);
+
+        player = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(context), new DefaultTrackSelector(), control);
         player.setAudioStreamType(C.STREAM_TYPE_MUSIC);
         player.addListener(this);
     }
@@ -223,6 +226,11 @@ public class ExoPlayer extends LocalPlayer<ExoTrack> implements EventListener {
 
     @Override
     public void onPositionDiscontinuity() {
+
+    }
+
+    @Override
+    public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
 
     }
 
