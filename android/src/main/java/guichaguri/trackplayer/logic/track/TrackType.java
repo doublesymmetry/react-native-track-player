@@ -13,7 +13,7 @@ public enum TrackType {
     HLS("hls"),
     SMOOTH_STREAMING("smoothstreaming");
 
-    private final String name;
+    public final String name;
 
     TrackType(String name) {
         this.name = name;

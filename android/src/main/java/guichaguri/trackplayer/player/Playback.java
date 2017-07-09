@@ -4,12 +4,12 @@ import android.content.Context;
 import android.os.SystemClock;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.bridge.ReadableMap;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.track.Track;
+import guichaguri.trackplayer.player.components.PlayerView;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -18,41 +18,36 @@ import java.util.ListIterator;
  *
  * @author Guilherme Chaguri
  */
-public abstract class Player<T extends Track> {
+public abstract class Playback {
 
     protected final Context context;
     protected final MediaManager manager;
-    protected LinkedList<T> queue = new LinkedList<>();
+    protected List<Track> queue = Collections.synchronizedList(new ArrayList<Track>());
     protected int currentTrack = 0;
 
     private int prevState = 0;
 
-    protected Player(Context context, MediaManager manager) {
+    protected Playback(Context context, MediaManager manager) {
         this.context = context;
         this.manager = manager;
     }
 
-    protected abstract T createTrack(ReadableMap data);
-
-    protected abstract T createTrack(Track track);
-
-    public T getCurrentTrack() {
-        return currentTrack < queue.size() && currentTrack >= 0 ? queue.get(currentTrack) : null;
-    }
-
-    public List<T> getQueue() {
+    public List<Track> getQueue() {
         return queue;
     }
 
-    public <F extends Track> void copyQueue(Player<F> to, String insertBeforeId, Promise promise) {
-        List<F> tracks = new ArrayList<>();
-        for(T track : getQueue()) {
-            tracks.add(to.createTrack(track));
-        }
-        to.add(insertBeforeId, tracks, promise);
+    public Track getCurrentTrack() {
+        return currentTrack < queue.size() && currentTrack >= 0 ? queue.get(currentTrack) : null;
     }
 
-    public void add(String insertBeforeId, List<T> tracks, Promise callback) {
+    public Track getTrackById(long id) {
+        for(Track track : queue) {
+            if(track.queueId == id) return track;
+        }
+        return null;
+    }
+
+    public void add(String insertBeforeId, List<Track> tracks, Promise callback) {
         if(insertBeforeId == null) {
             boolean empty = queue.isEmpty();
             queue.addAll(tracks);
@@ -80,20 +75,20 @@ public abstract class Player<T extends Track> {
     }
 
     public void add(String insertBeforeId, ReadableArray tracks, Promise callback) {
-        List<T> list = new ArrayList<>();
+        List<Track> list = new ArrayList<>();
         for(int i = 0; i < tracks.size(); i++) {
-            list.add(createTrack(tracks.getMap(i)));
+            list.add(new Track(context, manager, tracks.getMap(i)));
         }
         add(insertBeforeId, list, callback);
     }
 
     public void remove(String[] ids, Promise callback) {
-        ListIterator<T> i = queue.listIterator();
+        ListIterator<Track> i = queue.listIterator();
         boolean trackChanged = false;
 
         while(i.hasNext()) {
             int index = i.nextIndex();
-            T track = i.next();
+            Track track = i.next();
             for(String id : ids) {
                 if(track.id.equals(id)) {
                     i.remove();
@@ -123,7 +118,7 @@ public abstract class Player<T extends Track> {
 
     public void skip(String id, Promise callback) {
         for(int i = 0; i < queue.size(); i++) {
-            T track = queue.get(i);
+            Track track = queue.get(i);
             if(track.id.equals(id)) {
                 currentTrack = i;
                 updateCurrentTrack(callback);
@@ -152,20 +147,7 @@ public abstract class Player<T extends Track> {
         }
     }
 
-    public abstract void load(T track, Promise callback);
-
-    public void load(ReadableMap data, Promise callback) {
-        T track = createTrack(data);
-
-        // Add it right after the current track
-        currentTrack += 1;
-        if(currentTrack > queue.size()) {
-            currentTrack = queue.size();
-        }
-        queue.add(currentTrack, track);
-
-        load(track, callback);
-    }
+    public abstract void load(Track track, Promise callback);
 
     public void reset() {
         queue.clear();
@@ -196,7 +178,13 @@ public abstract class Player<T extends Track> {
 
     public abstract float getSpeed();
 
+    public abstract float getVolume();
+
     public abstract void setVolume(float volume);
+
+    public abstract boolean isRemote();
+
+    public abstract void bindView(PlayerView view); // TODO Check if video should be kept
 
     public abstract void destroy();
 
@@ -234,7 +222,7 @@ public abstract class Player<T extends Track> {
         Utils.log("Updating current track...");
 
         int oldState = getState();
-        T track = queue.get(currentTrack);
+        Track track = queue.get(currentTrack);
 
         load(track, callback);
 
