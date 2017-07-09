@@ -1,11 +1,10 @@
 package guichaguri.trackplayer.player.components;
 
 import android.content.Context;
+import android.net.Uri;
 import com.danikula.videocache.HttpProxyCacheServer;
 import com.danikula.videocache.file.FileNameGenerator;
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Proxy Cache using {@link HttpProxyCacheServer}.
@@ -16,7 +15,7 @@ import java.util.Map;
 public class ProxyCache implements FileNameGenerator {
 
     private final HttpProxyCacheServer server;
-    private final Map<String, String> urlIds = new HashMap<>();
+    private String lastUrl, lastId;
 
     public ProxyCache(Context context, int maxFiles, long maxSize) {
         HttpProxyCacheServer.Builder builder = new HttpProxyCacheServer.Builder(context);
@@ -33,9 +32,13 @@ public class ProxyCache implements FileNameGenerator {
         server = builder.build();
     }
 
-    public String getURL(String url, String id) {
-        if(id != null) urlIds.put(url, id);
-        return server.getProxyUrl(url);
+    public Uri getURL(Uri uri, String id) {
+        String url = uri.toString();
+
+        lastUrl = url;
+        lastId = id;
+
+        return Uri.parse(server.getProxyUrl(url));
     }
 
     public void destroy() {
@@ -44,7 +47,7 @@ public class ProxyCache implements FileNameGenerator {
 
     @Override
     public String generate(String url) {
-        String id = urlIds.get(url);
-        return id == null ? url : id;
+        if(lastUrl.equals(url)) return lastId;
+        return url;
     }
 }

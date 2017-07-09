@@ -9,6 +9,9 @@ import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnInfoListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnSeekCompleteListener;
+import android.net.Uri;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
 import android.support.v4.media.session.PlaybackStateCompat;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableMap;
@@ -16,8 +19,7 @@ import guichaguri.trackplayer.logic.LibHelper;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.track.Track;
-import guichaguri.trackplayer.player.LocalPlayer;
-import guichaguri.trackplayer.player.components.PlayerView;
+import guichaguri.trackplayer.player.Playback;
 import guichaguri.trackplayer.player.components.ProxyCache;
 import java.io.IOException;
 
@@ -26,11 +28,11 @@ import java.io.IOException;
  *
  * @author Guilherme Chaguri
  */
-public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener, OnCompletionListener,
+public class AndroidPlayback extends Playback implements OnInfoListener, OnCompletionListener,
         OnSeekCompleteListener, OnPreparedListener, OnBufferingUpdateListener, OnErrorListener {
 
     private final MediaPlayer player;
-    private ProxyCache cache;
+    private final ProxyCache cache;
 
     private Promise loadCallback;
 
@@ -40,8 +42,9 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
     private boolean started = false;
 
     private float buffered = 0;
+    private float volume = 1;
 
-    public AndroidPlayer(Context context, MediaManager manager) {
+    public AndroidPlayback(Context context, MediaManager manager, ReadableMap map) {
         super(context, manager);
 
         player = new MediaPlayer();
@@ -53,35 +56,29 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
         player.setOnPreparedListener(this);
         player.setOnBufferingUpdateListener(this);
         player.setOnErrorListener(this);
-    }
 
-    @Override
-    protected Track createTrack(ReadableMap data) {
-        return new Track(manager, data);
-    }
+        ReadableMap cacheMap = Utils.getMap(map, "cache");
 
-    @Override
-    protected Track createTrack(Track track) {
-        return new Track(track);
+        if(LibHelper.isProxyCacheAvailable() && cacheMap != null) {
+            int maxFiles = Utils.getInt(cacheMap, "maxFiles", 0);
+            long maxSize = (long)(Utils.getDouble(cacheMap, "maxSize", 0) * 1024);
+
+            cache = new ProxyCache(context, maxFiles, maxSize);
+        } else {
+            cache = null;
+        }
     }
 
     @Override
     public void load(Track track, Promise callback) {
-        String url = track.url.url;
-        boolean local = track.url.local;
-        int cacheMaxFiles = track.cache.maxFiles;
-        long cacheMaxSize = track.cache.maxSize;
+        Uri url = track.url;
 
         // Resets the player to update its state to idle
         player.reset();
-        if(cache != null) cache.destroy();
 
         // Prepares the caching
-        if(LibHelper.isProxyCacheAvailable() && !local && (cacheMaxFiles > 0 || cacheMaxSize > 0)) {
-            cache = new ProxyCache(context, cacheMaxFiles, cacheMaxSize);
+        if(cache != null && !track.urlLocal) {
             url = cache.getURL(url, track.id);
-        } else {
-            cache = null;
         }
 
         // Updates the state
@@ -92,7 +89,7 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
         try {
             // Loads the uri
             loadCallback = callback;
-            player.setDataSource(context, Utils.toUri(context, url, local));
+            player.setDataSource(context, url);
             player.prepareAsync();
         } catch(IOException ex) {
             loadCallback = null;
@@ -109,12 +106,6 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
 
         // Release the playback resources
         player.reset();
-
-        // Stops the caching server
-        if(cache != null) {
-            cache.destroy();
-            cache = null;
-        }
 
         // Update the state
         buffering = false;
@@ -192,18 +183,28 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
 
     @Override
     public float getSpeed() {
-        return 1; // player.getPlaybackParams().getSpeed();
+        if(VERSION.SDK_INT >= VERSION_CODES.M) {
+            return player.getPlaybackParams().getSpeed();
+        } else {
+            return 1;
+        }
     }
 
     @Override
-    public void setVolume(float volume) {
-        player.setVolume(volume, volume);
+    public float getVolume() {
+        return volume;
+    }
+
+    @Override
+    public void setVolume(float vol) {
+        volume = vol;
+        player.setVolume(vol, vol);
         updateMetadata();
     }
 
     @Override
-    public void bindView(PlayerView view) {
-        player.setDisplay(view != null ? view.getHolder() : null);
+    public boolean isRemote() {
+        return false;
     }
 
     @Override
@@ -212,7 +213,6 @@ public class AndroidPlayer extends LocalPlayer<Track> implements OnInfoListener,
 
         if(cache != null) {
             cache.destroy();
-            cache = null;
         }
     }
 

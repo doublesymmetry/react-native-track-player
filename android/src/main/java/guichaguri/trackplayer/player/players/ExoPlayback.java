@@ -25,13 +25,12 @@ import com.google.android.exoplayer2.upstream.cache.Cache;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor;
 import com.google.android.exoplayer2.upstream.cache.SimpleCache;
+import com.google.android.exoplayer2.util.Util;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.track.Track;
 import guichaguri.trackplayer.logic.track.TrackType;
-import guichaguri.trackplayer.player.LocalPlayer;
-import guichaguri.trackplayer.player.components.PlayerView;
-import guichaguri.trackplayer.player.track.ExoTrack;
+import guichaguri.trackplayer.player.Playback;
 import java.io.File;
 
 import static com.google.android.exoplayer2.DefaultLoadControl.*;
@@ -41,14 +40,15 @@ import static com.google.android.exoplayer2.DefaultLoadControl.*;
  *
  * @author Guilherme Chaguri
  */
-public class ExoPlayer extends LocalPlayer<ExoTrack> implements EventListener {
+public class ExoPlayback extends Playback implements EventListener {
 
     private final SimpleExoPlayer player;
 
     private Promise loadCallback = null;
     private boolean playing = false;
+    private long cacheMaxSize = 0;
 
-    public ExoPlayer(Context context, MediaManager manager, ReadableMap options) {
+    public ExoPlayback(Context context, MediaManager manager, ReadableMap options) {
         super(context, manager);
 
         long bufferMs = Utils.toMillis(Utils.getDouble(options, "secondsRequiredToStartPlaying", DEFAULT_BUFFER_FOR_PLAYBACK_MS));
@@ -59,30 +59,25 @@ public class ExoPlayer extends LocalPlayer<ExoTrack> implements EventListener {
         player = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(context), new DefaultTrackSelector(), control);
         player.setAudioStreamType(C.STREAM_TYPE_MUSIC);
         player.addListener(this);
+
+        ReadableMap cacheMap = Utils.getMap(options, "cache");
+
+        if(cacheMap != null) {
+            cacheMaxSize = (long)(Utils.getDouble(cacheMap, "maxSize", 0) * 1024);
+        }
     }
 
     @Override
-    protected ExoTrack createTrack(ReadableMap data) {
-        return new ExoTrack(context, manager, data);
-    }
-
-    @Override
-    protected ExoTrack createTrack(Track track) {
-        return new ExoTrack(context, track);
-    }
-
-    @Override
-    public void load(ExoTrack track, Promise callback) {
+    public void load(Track track, Promise callback) {
         loadCallback = callback;
 
-        boolean local = track.url.local;
-        Uri url = Utils.toUri(context, track.url.url, local);
-        long cacheMaxSize = track.cache.maxSize;
+        Uri url = track.url;
 
-        DataSource.Factory factory = new DefaultDataSourceFactory(context, track.userAgent);
+        String userAgent = Util.getUserAgent(context, "react-native-track-player");
+        DataSource.Factory factory = new DefaultDataSourceFactory(context, userAgent);
         MediaSource source;
 
-        if(cacheMaxSize > 0 && !local) {
+        if(cacheMaxSize > 0 && !track.urlLocal) {
             File cacheDir = new File(context.getCacheDir(), "TrackPlayer");
             Cache cache = new SimpleCache(cacheDir, new LeastRecentlyUsedCacheEvictor(cacheMaxSize));
             factory = new CacheDataSourceFactory(cache, factory, 0, cacheMaxSize);
@@ -163,7 +158,12 @@ public class ExoPlayer extends LocalPlayer<ExoTrack> implements EventListener {
 
     @Override
     public float getSpeed() {
-        return 1;
+        return player.getPlaybackParameters().speed;
+    }
+
+    @Override
+    public float getVolume() {
+        return player.getVolume();
     }
 
     @Override
@@ -172,8 +172,8 @@ public class ExoPlayer extends LocalPlayer<ExoTrack> implements EventListener {
     }
 
     @Override
-    public void bindView(PlayerView view) {
-        player.setVideoSurfaceHolder(view != null ? view.getHolder() : null);
+    public boolean isRemote() {
+        return false;
     }
 
     @Override

@@ -7,7 +7,6 @@ import com.facebook.react.bridge.ReadableArray;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.track.Track;
-import guichaguri.trackplayer.player.components.PlayerView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -183,8 +182,6 @@ public abstract class Playback {
     public abstract void setVolume(float volume);
 
     public abstract boolean isRemote();
-
-    public abstract void bindView(PlayerView view); // TODO Check if video should be kept
 
     public abstract void destroy();
 
