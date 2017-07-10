@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="guichaguri.trackplayer">
 
@@ -5,21 +6,22 @@
 
     <application>
 
-        <receiver android:name=".logic.workers.MediaReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-            </intent-filter>
-        </receiver>
-
-        <service android:name=".logic.workers.PlayerService" android:enabled="true"/>
-
-        <service android:name=".logic.workers.PlayerTask" android:enabled="true"/>
-
-        <service android:name=".logic.workers.PlayerBrowser">
+        <!-- The main service, handles playback, playlists, media buttons and chromecast -->
+        <service android:name=".logic.workers.PlayerService" android:enabled="true" android:exported="true">
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
         </service>
+
+        <!-- The service for the headless tasks in which events can be received by the JS side -->
+        <service android:name=".logic.workers.PlayerTask" android:enabled="true"/>
+
+        <!-- A receiver that will receive media buttons. Required on pre-lollipop devices -->
+        <receiver android:name="android.support.v4.media.session.MediaButtonReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
 
         <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
         <meta-data android:name="com.google.android.gms.car.application" android:resource="@xml/automotive_app_desc"/>

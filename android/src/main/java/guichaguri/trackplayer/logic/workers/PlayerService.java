@@ -1,41 +1,34 @@
 package guichaguri.trackplayer.logic.workers;
 
-import android.app.Service;
 import android.content.Intent;
-import android.os.IBinder;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.media.MediaBrowserCompat.MediaItem;
+import android.support.v4.media.MediaBrowserServiceCompat;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
-import guichaguri.trackplayer.logic.components.BrowserWrapper;
-import guichaguri.trackplayer.logic.components.MediaWrapper;
-import guichaguri.trackplayer.logic.components.VideoWrapper;
+import java.util.Collections;
+import java.util.List;
 
 /**
+ * The main service!
  * @author Guilherme Chaguri
  */
-public class PlayerService extends Service {
-
-    public static final String ACTION_MEDIA = "track-player-media";
-    public static final String ACTION_VIDEO = "track-player-video";
-    public static final String ACTION_BROWSER = "track-player-browser";
+public class PlayerService extends MediaBrowserServiceCompat {
 
     private MediaManager manager;
 
     @Nullable
     @Override
-    public IBinder onBind(Intent intent) {
-        String action = intent.getAction();
+    public BrowserRoot onGetRoot(@NonNull String clientPackageName, int clientUid, @Nullable Bundle rootHints) {
+        return new BrowserRoot("browser-" + getPackageName(), null);
+    }
 
-        Utils.log("Service bound (%s)", action);
-
-        if(action.equals(ACTION_MEDIA)) {
-            return new MediaWrapper(manager);
-        } else if(action.equals(ACTION_VIDEO)) {
-            return new VideoWrapper(manager);
-        } else if(action.equals(ACTION_BROWSER)) {
-            return new BrowserWrapper(this, manager);
-        }
-        return null;
+    @Override
+    public void onLoadChildren(@NonNull String parentId, @NonNull Result<List<MediaItem>> result) {
+        //TODO
+        result.sendResult(Collections.<MediaItem>emptyList());
     }
 
     @Override
