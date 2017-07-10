@@ -2,9 +2,9 @@ package guichaguri.trackplayer.player.players;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v4.media.session.PlaybackStateCompat;
 import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.ReadableMap;
 import com.google.android.exoplayer2.*;
 import com.google.android.exoplayer2.ExoPlayer.EventListener;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
@@ -43,15 +43,15 @@ import static com.google.android.exoplayer2.DefaultLoadControl.*;
 public class ExoPlayback extends Playback implements EventListener {
 
     private final SimpleExoPlayer player;
+    private final long cacheMaxSize;
 
     private Promise loadCallback = null;
     private boolean playing = false;
-    private long cacheMaxSize = 0;
 
-    public ExoPlayback(Context context, MediaManager manager, ReadableMap options) {
+    public ExoPlayback(Context context, MediaManager manager, Bundle options) {
         super(context, manager);
 
-        long bufferMs = Utils.toMillis(Utils.getDouble(options, "secondsRequiredToStartPlaying", DEFAULT_BUFFER_FOR_PLAYBACK_MS));
+        long bufferMs = Utils.toMillis(options.getDouble("secondsRequiredToStartPlaying", DEFAULT_BUFFER_FOR_PLAYBACK_MS));
 
         DefaultAllocator allocator = new DefaultAllocator(true, 0x10000);
         LoadControl control = new DefaultLoadControl(allocator, DEFAULT_MIN_BUFFER_MS, DEFAULT_MAX_BUFFER_MS, bufferMs, bufferMs * 2);
@@ -60,10 +60,12 @@ public class ExoPlayback extends Playback implements EventListener {
         player.setAudioStreamType(C.STREAM_TYPE_MUSIC);
         player.addListener(this);
 
-        ReadableMap cacheMap = Utils.getMap(options, "cache");
+        Bundle cacheBundle = options.getBundle("cache");
 
-        if(cacheMap != null) {
-            cacheMaxSize = (long)(Utils.getDouble(cacheMap, "maxSize", 0) * 1024);
+        if(cacheBundle != null) {
+            cacheMaxSize = (long)(cacheBundle.getDouble("maxSize", 0) * 1024);
+        } else {
+            cacheMaxSize = 0;
         }
     }
 

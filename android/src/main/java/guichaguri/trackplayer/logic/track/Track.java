@@ -13,8 +13,13 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableMap;
+import com.google.android.gms.cast.MediaInfo;
+import com.google.android.gms.cast.MediaMetadata;
+import com.google.android.gms.cast.MediaQueueItem;
+import com.google.android.gms.common.images.WebImage;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
+import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,6 +35,8 @@ public class Track {
     public final long queueId;
 
     public final Uri url;
+    public final boolean urlLocal;
+
     public final long duration;
     /** ExoPlayer track type */
     public final TrackType type;
@@ -43,18 +50,26 @@ public class Track {
     public final String date;
     public final String description;
     public final RatingCompat rating;
+
     public final Uri artwork;
+    public final boolean artworkLocal;
 
     /** Cast Media ID */
     public final String mediaId;
     /** Cast Custom Data */
     public final JSONObject customData;
 
+    public int castId = MediaQueueItem.INVALID_ITEM_ID;
+    public QueueItem queueItem;
+    public MediaQueueItem castQueueItem;
+
     public Track(Context context, MediaManager manager, ReadableMap data) {
         id = Utils.getString(data, "id");
         queueId = queueIds++;
 
         url = Utils.getUri(context, data, "url", null);
+        urlLocal = isLocal(url);
+
         duration = Utils.getTime(data, "duration", 0);
         type = TrackType.fromMap(data, "type");
         contentType = Utils.getString(data, "contentType", "audio/mpeg");
@@ -66,7 +81,9 @@ public class Track {
         date = Utils.getString(data, "date");
         description = Utils.getString(data, "description");
         rating = Utils.getRating(data, "date", manager.getRatingType());
+
         artwork = Utils.getUri(context, data, "artwork", null);
+        artworkLocal = isLocal(artwork);
 
         boolean sendUrl = Utils.getBoolean(data, "sendUrl", true);
         mediaId = sendUrl ? url.toString() : id;
@@ -83,6 +100,41 @@ public class Track {
         }
 
         customData = obj;
+    }
+
+    @SuppressWarnings("WrongConstant")
+    public Track(MediaManager manager, MediaQueueItem item) {
+        MediaInfo info = item.getMedia();
+        JSONObject data = info.getCustomData();
+        MediaMetadata metadata = info.getMetadata();
+        List<WebImage> images = metadata.getImages();
+
+        id = Utils.getString(data, "id", info.getContentId());
+        queueId = queueIds++;
+
+        url = Uri.parse(Utils.getString(data, "url", info.getContentId()));
+        urlLocal = false;
+
+        duration = info.getStreamDuration();
+        type = TrackType.fromString(Utils.getString(data, "type", TrackType.DEFAULT.name));
+        contentType = info.getContentType();
+
+        title = metadata.getString(MediaMetadata.KEY_TITLE);
+        artist = metadata.getString(MediaMetadata.KEY_ARTIST);
+        album = metadata.getString(MediaMetadata.KEY_ALBUM_TITLE);
+        genre = Utils.getString(data, "genre", null);
+        date = metadata.getDateAsString(MediaMetadata.KEY_RELEASE_DATE);
+        description = Utils.getString(data, "description", null);
+        rating = RatingCompat.newUnratedRating(manager.getRatingType());
+
+        artwork = !images.isEmpty() ? images.get(0).getUrl() : null;
+        artworkLocal = false;
+
+        mediaId = info.getContentId();
+        customData = item.getCustomData();
+
+        castId = item.getItemId();
+        castQueueItem = item;
     }
 
     private JSONObject transferToObject(ReadableMap map) throws JSONException {
@@ -133,16 +185,13 @@ public class Track {
         return array;
     }
 
-    public boolean needsNetwork() {
-        return !isLocal(url) || !isLocal(artwork);
-    }
-
     private boolean isLocal(Uri uri) {
         String scheme = uri.getScheme();
 
         return scheme.equals(ContentResolver.SCHEME_FILE) ||
                 scheme.equals(ContentResolver.SCHEME_ANDROID_RESOURCE) ||
-                scheme.equals(ContentResolver.SCHEME_CONTENT);
+                scheme.equals(ContentResolver.SCHEME_CONTENT) ||
+                scheme.equals("res");
     }
 
     public WritableMap toJavascriptMap() {
@@ -165,7 +214,9 @@ public class Track {
         return map;
     }
 
-    public QueueItem toQueueItem(long queueId) {
+    public QueueItem toQueueItem() {
+        if(queueItem != null) return queueItem;
+
         MediaDescriptionCompat desc = new MediaDescriptionCompat.Builder()
                 .setMediaId(id)
                 .setMediaUri(url)
@@ -175,7 +226,38 @@ public class Track {
                 .setIconUri(artwork)
                 .build();
 
-        return new QueueItem(desc, queueId);
+        queueItem = new QueueItem(desc, queueId);
+        return queueItem;
+    }
+
+    public MediaQueueItem toCastQueueItem() {
+        if(castQueueItem != null) return castQueueItem;
+
+        MediaMetadata metadata = new MediaMetadata();
+        metadata.putString(MediaMetadata.KEY_TITLE, title);
+        metadata.putString(MediaMetadata.KEY_ARTIST, artist);
+        metadata.putString(MediaMetadata.KEY_ALBUM_TITLE, album);
+        metadata.putDate(MediaMetadata.KEY_RELEASE_DATE, metadata.getDate(date));
+        metadata.addImage(new WebImage(artwork));
+
+        JSONObject obj = new JSONObject();
+        Utils.setString(obj, "id", id);
+        Utils.setString(obj, "url", url.toString());
+        Utils.setString(obj, "type", type.name);
+        Utils.setString(obj, "genre", genre);
+        Utils.setString(obj, "description", description);
+
+        MediaInfo info = new MediaInfo.Builder(mediaId)
+                .setMetadata(metadata)
+                .setStreamDuration(duration)
+                .setStreamType(MediaInfo.STREAM_TYPE_INVALID)
+                .setContentType(contentType)
+                .build();
+
+        castQueueItem = new MediaQueueItem.Builder(info)
+                .setCustomData(customData)
+                .build();
+        return castQueueItem;
     }
 
 }

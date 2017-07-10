@@ -12,9 +12,9 @@ import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.net.Uri;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
+import android.os.Bundle;
 import android.support.v4.media.session.PlaybackStateCompat;
 import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.ReadableMap;
 import guichaguri.trackplayer.logic.LibHelper;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
@@ -41,10 +41,11 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
     private boolean ended = false;
     private boolean started = false;
 
+    private int startPos = 0;
     private float buffered = 0;
     private float volume = 1;
 
-    public AndroidPlayback(Context context, MediaManager manager, ReadableMap map) {
+    public AndroidPlayback(Context context, MediaManager manager, Bundle options) {
         super(context, manager);
 
         player = new MediaPlayer();
@@ -57,11 +58,11 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
         player.setOnBufferingUpdateListener(this);
         player.setOnErrorListener(this);
 
-        ReadableMap cacheMap = Utils.getMap(map, "cache");
+        Bundle cacheBundle = options.getBundle("cache");
 
-        if(LibHelper.isProxyCacheAvailable() && cacheMap != null) {
-            int maxFiles = Utils.getInt(cacheMap, "maxFiles", 0);
-            long maxSize = (long)(Utils.getDouble(cacheMap, "maxSize", 0) * 1024);
+        if(LibHelper.isProxyCacheAvailable() && cacheBundle != null) {
+            int maxFiles = cacheBundle.getInt("maxFiles", 0);
+            long maxSize = (long)(cacheBundle.getDouble("maxSize", 0) * 1024);
 
             cache = new ProxyCache(context, maxFiles, maxSize);
         } else {
@@ -85,6 +86,7 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
         buffering = true;
         ended = false;
         loaded = false;
+        startPos = 0;
 
         try {
             // Loads the uri
@@ -176,9 +178,13 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
 
     @Override
     public void seekTo(long ms) {
-        buffering = true;
-        player.seekTo((int)ms);
-        updateState();
+        if(!loaded) {
+            startPos = (int)ms;
+        } else {
+            buffering = true;
+            player.seekTo((int)ms);
+            updateState();
+        }
     }
 
     @Override
@@ -246,13 +252,19 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
 
     @Override
     public void onPrepared(MediaPlayer mp) {
+        if(startPos > 0) {
+            buffering = true;
+            player.seekTo(startPos);
+        } else {
+            buffering = false;
+        }
+
         if(started) player.start();
 
         Utils.resolveCallback(loadCallback);
         loadCallback = null;
 
         loaded = true;
-        buffering = false;
         updateState();
 
         manager.onLoad(getCurrentTrack());

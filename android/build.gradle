@@ -11,6 +11,20 @@ buildscript {
 
 apply plugin: 'com.android.library'
 
+def exoplayer = false, cache = false, dash = false, hls = false, smoothstreaming = false
+def castAppId = 'null'
+
+File file = file('../../../track-player.json')
+if(file.exists()) {
+    def json = new JsonSlurper().parseText(file.text)
+    exoplayer = json.exoplayer || json.dash || json.hls || json.smoothstreaming
+    cache = json.cache
+    dash = json.dash
+    hls = json.hls
+    smoothstreaming = json.smoothstreaming
+    castAppId = json.castApplicationId
+}
+
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
@@ -25,6 +39,11 @@ android {
         }
     }
 
+    buildTypes {
+        buildTypes.each {
+            it.buildConfigField 'String', 'CAST_APPLICATION_ID', castAppId
+        }
+    }
 }
 
 repositories {
@@ -39,18 +58,6 @@ repositories {
 dependencies {
     //noinspection GradleDynamicVersion
     compile 'com.facebook.react:react-native:+'
-
-    def exoplayer = false, cache = false, dash = false, hls = false, smoothstreaming = false
-
-    File file = file('../../../track-player.json')
-    if(file.exists()) {
-        def json = new JsonSlurper().parseText(file.text)
-        exoplayer = json.exoplayer || json.dash || json.hls || json.smoothstreaming
-        cache = json.cache
-        dash = json.dash
-        hls = json.hls
-        smoothstreaming = json.smoothstreaming
-    }
 
     // ExoPlayer Core
     if(exoplayer) {

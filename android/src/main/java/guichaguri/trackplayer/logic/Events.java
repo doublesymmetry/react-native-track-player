@@ -14,6 +14,8 @@ public class Events {
     // Media Control Events
     public static final String BUTTON_LOAD = "load";
     public static final String BUTTON_PLAY = "play";
+    public static final String BUTTON_PLAY_FROM_ID = "playFromId";
+    public static final String BUTTON_PLAY_FROM_SEARCH = "playFromSearch";
     public static final String BUTTON_PAUSE = "pause";
     public static final String BUTTON_STOP = "stop";
     public static final String BUTTON_SKIP = "skip";
@@ -33,10 +35,12 @@ public class Events {
     public static final String PLAYBACK_ERROR = "playback-error";
 
     // Remote Events
-    public static final String REMOTE_ADDED = "device-added";
-    public static final String REMOTE_REMOVED = "device-removed";
-    public static final String REMOTE_CONNECTED = "device-connected";
-    public static final String REMOTE_DISCONNECTED = "device-disconnected";
+    public static final String CAST_STATE = "cast-state";
+    public static final String CAST_CONNECTING = "cast-connecting";
+    public static final String CAST_CONNECTED = "cast-connected";
+    public static final String CAST_CONNECTION_FAILED = "cast-connection-failed";
+    public static final String CAST_DISCONNECTING = "cast-disconnecting";
+    public static final String CAST_DISCONNECTED = "cast-disconnected";
 
     public static void dispatchEvent(Context context, String event, WritableMap data) {
         Intent i = new Intent(context, PlayerTask.class);

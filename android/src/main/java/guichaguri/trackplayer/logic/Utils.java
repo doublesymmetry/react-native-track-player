@@ -16,6 +16,8 @@ import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
 import guichaguri.trackplayer.BuildConfig;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * @author Guilherme Chaguri
@@ -27,6 +29,22 @@ public class Utils {
     public static void log(String msg, Object ... args) {
         if(LOG) {
             Log.i("ReactNativeTrackPlayer", String.format(msg, args));
+        }
+    }
+
+    public static String getString(JSONObject object, String key, String def) {
+        try {
+            return object != null ? object.getString(key) : def;
+        } catch(JSONException ex) {
+            return def;
+        }
+    }
+
+    public static void setString(JSONObject object, String key, String value) {
+        try {
+            if(object != null) object.put(key, value);
+        } catch(JSONException ex) {
+            // Ignored
         }
     }
 

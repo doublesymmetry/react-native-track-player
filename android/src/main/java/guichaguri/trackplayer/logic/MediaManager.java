@@ -4,11 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
+import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
+import guichaguri.trackplayer.cast.GoogleCast;
 import guichaguri.trackplayer.logic.components.FocusManager;
 import guichaguri.trackplayer.logic.track.Track;
 import guichaguri.trackplayer.logic.workers.PlayerService;
@@ -17,7 +19,6 @@ import guichaguri.trackplayer.metadata.components.MediaNotification;
 import guichaguri.trackplayer.player.Playback;
 import guichaguri.trackplayer.player.players.AndroidPlayback;
 import guichaguri.trackplayer.player.players.ExoPlayback;
-import guichaguri.trackplayer.remote.Remote;
 
 /**
  * @author Guilherme Chaguri
@@ -27,18 +28,19 @@ public class MediaManager {
     private final PlayerService service;
     private final FocusManager focus;
     private final Metadata metadata;
-    private final Remote remote;
+    private final GoogleCast cast;
 
     private final WakeLock wakeLock;
     private final WifiLock wifiLock;
 
     private Playback playback;
+    private Bundle playbackOptions;
     private boolean serviceStarted = false;
 
     public MediaManager(PlayerService service) {
         this.service = service;
         this.metadata = new Metadata(service, this);
-        this.remote = new Remote(service.getApplicationContext(), this);
+        this.cast = new GoogleCast(service.getApplicationContext(), this);
         this.focus = new FocusManager(service, metadata);
 
         PowerManager powerManager = (PowerManager)service.getSystemService(Context.POWER_SERVICE);
@@ -51,34 +53,38 @@ public class MediaManager {
     }
 
     public void updateOptions(ReadableMap data) {
-        remote.updateOptions(data);
         metadata.updateOptions(data);
         metadata.updatePlayback(playback);
     }
 
-    public void setupPlayer(ReadableMap options) {
+    public Playback createLocalPlayback() {
         if(LibHelper.isExoPlayerAvailable()) {
             Utils.log("Creating an ExoPlayer instance...");
-            playback = new ExoPlayback(service, this, options);
+            return new ExoPlayback(service, this, playbackOptions);
         } else {
             Utils.log("Creating a MediaPlayer instance...");
-            playback = new AndroidPlayback(service, this, options);
+            return new AndroidPlayback(service, this, playbackOptions);
         }
+    }
+
+    public void setupPlayer(Bundle options) {
+        playbackOptions = options;
+        playback = createLocalPlayback();
     }
 
     public void destroyPlayer() {
         playback.destroy();
         if(!Utils.isStopped(playback.getState())) onStop();
 
-        if(serviceStarted && !remote.isScanning()) {
+        if(serviceStarted) {
             Utils.log("Marking the service as stopped, as there's nothing playing");
             service.stopSelf();
             serviceStarted = false;
         }
     }
 
-    public Remote getRemote() {
-        return remote;
+    public GoogleCast getCast() {
+        return cast;
     }
 
     public int getRatingType() {
@@ -88,6 +94,10 @@ public class MediaManager {
     public void switchPlayback(Playback pb) {
         // Same playback?
         if(pb == playback) return;
+
+        // Copy everything to the new playback
+        pb.copyPlayback(playback);
+        playback.destroy();
 
         // Set the new playback
         playback = pb;
@@ -218,6 +228,9 @@ public class MediaManager {
         // Destroy the metadata resources
         metadata.destroy();
 
+        // Destroy the cast resources
+        cast.disconnect(false);
+
         // Release the wifi lock
         if(wifiLock.isHeld()) {
             wifiLock.release();
@@ -226,22 +239,6 @@ public class MediaManager {
         // Release the wake lock
         if(wakeLock.isHeld()) {
             wakeLock.release();
-        }
-    }
-
-    public void onScanningStart() {
-        if(!serviceStarted) {
-            Utils.log("Marking the service as started, as we are now searching for remote devices");
-            service.startService(new Intent(service, PlayerService.class));
-            serviceStarted = true;
-        }
-    }
-
-    public void onScanningStop() {
-        if(serviceStarted && playback == null && !remote.isScanning()) {
-            Utils.log("Marking the service as stopped, as we are not searching for remote devices anymore");
-            service.stopSelf();
-            serviceStarted = false;
         }
     }
 

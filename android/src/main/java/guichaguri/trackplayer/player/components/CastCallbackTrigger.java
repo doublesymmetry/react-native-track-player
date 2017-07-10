@@ -2,8 +2,9 @@ package guichaguri.trackplayer.player.components;
 
 import android.support.annotation.NonNull;
 import com.facebook.react.bridge.Promise;
-import com.google.android.gms.cast.RemoteMediaPlayer.MediaChannelResult;
+import com.google.android.gms.cast.framework.media.RemoteMediaClient.MediaChannelResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import guichaguri.trackplayer.logic.Utils;
 
 /**
@@ -21,7 +22,12 @@ public class CastCallbackTrigger implements ResultCallback<MediaChannelResult> {
 
     @Override
     public void onResult(@NonNull MediaChannelResult result) {
-        Utils.resolveCallback(callback, data);
+        Status status = result.getStatus();
+        if(status.isSuccess()) {
+            Utils.resolveCallback(callback, data);
+        } else {
+            Utils.rejectCallback(callback, Integer.toString(status.getStatusCode()), status.getStatusMessage());
+        }
     }
 
 }

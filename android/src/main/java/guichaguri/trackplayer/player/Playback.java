@@ -1,7 +1,6 @@
 package guichaguri.trackplayer.player;
 
 import android.content.Context;
-import android.os.SystemClock;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableArray;
 import guichaguri.trackplayer.logic.MediaManager;
@@ -24,7 +23,7 @@ public abstract class Playback {
     protected List<Track> queue = Collections.synchronizedList(new ArrayList<Track>());
     protected int currentTrack = 0;
 
-    private int prevState = 0;
+    protected int prevState = 0;
 
     protected Playback(Context context, MediaManager manager) {
         this.context = context;
@@ -165,10 +164,6 @@ public abstract class Playback {
 
     public abstract long getPosition();
 
-    public long getPositionUpdateTime() {
-        return SystemClock.elapsedRealtime();
-    }
-
     public abstract long getBufferedPosition();
 
     public abstract long getDuration();
@@ -182,6 +177,25 @@ public abstract class Playback {
     public abstract void setVolume(float volume);
 
     public abstract boolean isRemote();
+
+    public void updateData() {
+        // NOOP
+    }
+
+    public void copyPlayback(Playback playback) {
+        // Copy everything to the new playback
+        queue = playback.getQueue();
+        currentTrack = playback.currentTrack;
+        load(getCurrentTrack(), null);
+        seekTo(playback.getPosition());
+
+        int state = playback.getState();
+        if(Utils.isPlaying(state)) {
+            play();
+        } else if(Utils.isPaused(state)) {
+            pause();
+        }
+    }
 
     public abstract void destroy();
 
