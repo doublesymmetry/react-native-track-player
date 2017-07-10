@@ -206,11 +206,11 @@ public class ExoPlayback extends Playback implements EventListener {
             Utils.resolveCallback(loadCallback);
             loadCallback = null;
 
-            manager.onLoad(this, getCurrentTrack());
+            manager.onLoad(getCurrentTrack());
 
         } else if(playbackState == SimpleExoPlayer.STATE_ENDED) {
 
-            manager.onEnd(this);
+            manager.onEnd();
             skipToNext(null);
 
         }
@@ -221,7 +221,7 @@ public class ExoPlayback extends Playback implements EventListener {
         Utils.rejectCallback(loadCallback, error);
         loadCallback = null;
 
-        manager.onError(this, error);
+        manager.onError(error);
     }
 
     @Override

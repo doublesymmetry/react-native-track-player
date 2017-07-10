@@ -186,24 +186,20 @@ public abstract class Playback {
     public abstract void destroy();
 
     protected final void updateState(int state) {
-        updateMetadata();
+        manager.onPlaybackUpdate();
 
         if(state == prevState) return;
 
         if(Utils.isPlaying(state) && !Utils.isPlaying(prevState)) {
-            manager.onPlay(this);
+            manager.onPlay();
         } else if(Utils.isPaused(state) && !Utils.isPaused(prevState)) {
-            manager.onPause(this);
+            manager.onPause();
         } else if(Utils.isStopped(state) && !Utils.isStopped(prevState)) {
-            manager.onStop(this);
+            manager.onStop();
         }
 
-        manager.onStateChange(this, state);
+        manager.onStateChange(state);
         prevState = state;
-    }
-
-    protected final void updateMetadata() {
-        manager.onUpdate(this);
     }
 
     protected void updateCurrentTrack(Promise callback) {
@@ -229,6 +225,6 @@ public abstract class Playback {
             pause();
         }
 
-        updateMetadata();
+        manager.onTrackUpdate();
     }
 }

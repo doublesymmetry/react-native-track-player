@@ -94,7 +94,7 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
         } catch(IOException ex) {
             loadCallback = null;
             Utils.rejectCallback(callback, ex);
-            manager.onError(this, ex);
+            manager.onError(ex);
         }
 
         updateState();
@@ -199,7 +199,7 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
     public void setVolume(float vol) {
         volume = vol;
         player.setVolume(vol, vol);
-        updateMetadata();
+        manager.onPlaybackUpdate();
     }
 
     @Override
@@ -233,7 +233,7 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
         ended = true;
         updateState();
 
-        manager.onEnd(this);
+        manager.onEnd();
 
         skipToNext(null);
     }
@@ -255,13 +255,13 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
         buffering = false;
         updateState();
 
-        manager.onLoad(this, getCurrentTrack());
+        manager.onLoad(getCurrentTrack());
     }
 
     @Override
     public void onBufferingUpdate(MediaPlayer mp, int percent) {
         buffered = percent / 100F;
-        updateMetadata();
+        manager.onPlaybackUpdate();
     }
 
     @Override
@@ -276,7 +276,7 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
         Utils.rejectCallback(loadCallback, ex);
         loadCallback = null;
 
-        manager.onError(this, ex);
+        manager.onError(ex);
         return true;
     }
 
