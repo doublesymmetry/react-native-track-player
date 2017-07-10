@@ -1,7 +1,6 @@
 package guichaguri.trackplayer.metadata.components;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import com.facebook.react.bridge.Arguments;
@@ -9,6 +8,7 @@ import com.facebook.react.bridge.WritableMap;
 import guichaguri.trackplayer.logic.Events;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
+import guichaguri.trackplayer.logic.track.Track;
 
 /**
  * @author Guilherme Chaguri
@@ -24,14 +24,12 @@ public class ButtonListener extends MediaSessionCompat.Callback {
     }
 
     private void dispatch(String event, WritableMap data) {
-        Events.dispatchEvent(context, manager.getPlayerId(manager.getMainPlayer()), event, data);
+        Events.dispatchEvent(context, event, data);
     }
 
     @Override
-    public void onPlayFromMediaId(String mediaId, Bundle extras) {
-        WritableMap map = Arguments.createMap();
-        map.putString("id", mediaId);
-        dispatch(Events.BUTTON_SKIP, map);
+    public void onPrepare() {
+        dispatch(Events.BUTTON_LOAD, null);
     }
 
     @Override
@@ -57,6 +55,16 @@ public class ButtonListener extends MediaSessionCompat.Callback {
     @Override
     public void onSkipToPrevious() {
         dispatch(Events.BUTTON_SKIP_PREVIOUS, null);
+    }
+
+    @Override
+    public void onSkipToQueueItem(long id) {
+        Track track = manager.getPlayback().getTrackById(id);
+        if(track != null) {
+            WritableMap map = Arguments.createMap();
+            map.putString("id", track.id);
+            dispatch(Events.BUTTON_SKIP, map);
+        }
     }
 
     @Override
