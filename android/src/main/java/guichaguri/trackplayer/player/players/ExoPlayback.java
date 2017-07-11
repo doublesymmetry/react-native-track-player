@@ -51,22 +51,19 @@ public class ExoPlayback extends Playback implements EventListener {
     public ExoPlayback(Context context, MediaManager manager, Bundle options) {
         super(context, manager);
 
-        long bufferMs = Utils.toMillis(options.getDouble("secondsRequiredToStartPlaying", DEFAULT_BUFFER_FOR_PLAYBACK_MS));
+        int minBuffer = (int)Utils.toMillis(options.getDouble("minBuffer", Utils.toSeconds(DEFAULT_MIN_BUFFER_MS)));
+        int maxBuffer = (int)Utils.toMillis(options.getDouble("maxBuffer", Utils.toSeconds(DEFAULT_MAX_BUFFER_MS)));
+        long playBuffer = Utils.toMillis(options.getDouble("playBuffer", Utils.toSeconds(DEFAULT_BUFFER_FOR_PLAYBACK_MS)));
+        int multiplier = DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS / DEFAULT_BUFFER_FOR_PLAYBACK_MS;
 
         DefaultAllocator allocator = new DefaultAllocator(true, 0x10000);
-        LoadControl control = new DefaultLoadControl(allocator, DEFAULT_MIN_BUFFER_MS, DEFAULT_MAX_BUFFER_MS, bufferMs, bufferMs * 2);
+        LoadControl control = new DefaultLoadControl(allocator, minBuffer, maxBuffer, playBuffer, playBuffer * multiplier);
 
         player = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(context), new DefaultTrackSelector(), control);
         player.setAudioStreamType(C.STREAM_TYPE_MUSIC);
         player.addListener(this);
 
-        Bundle cacheBundle = options.getBundle("cache");
-
-        if(cacheBundle != null) {
-            cacheMaxSize = (long)(cacheBundle.getDouble("maxSize", 0) * 1024);
-        } else {
-            cacheMaxSize = 0;
-        }
+        cacheMaxSize = (long)(options.getDouble("maxCacheSize", 0) * 1024);
     }
 
     @Override

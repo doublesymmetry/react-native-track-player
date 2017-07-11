@@ -58,12 +58,10 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
         player.setOnBufferingUpdateListener(this);
         player.setOnErrorListener(this);
 
-        Bundle cacheBundle = options.getBundle("cache");
+        int maxFiles = options.getInt("maxCacheFiles", 0);
+        long maxSize = (long)(options.getDouble("maxCacheSize", 0) * 1024);
 
-        if(LibHelper.isProxyCacheAvailable() && cacheBundle != null) {
-            int maxFiles = cacheBundle.getInt("maxFiles", 0);
-            long maxSize = (long)(cacheBundle.getDouble("maxSize", 0) * 1024);
-
+        if(LibHelper.isProxyCacheAvailable() && (maxFiles > 0 || maxSize > 0)) {
             cache = new ProxyCache(context, maxFiles, maxSize);
         } else {
             cache = null;

@@ -149,6 +149,8 @@ public abstract class Playback {
 
     public void reset() {
         queue.clear();
+        currentTrack = -1;
+        manager.onTrackUpdate();
     }
 
     public abstract void play();
@@ -186,7 +188,11 @@ public abstract class Playback {
         // Copy everything to the new playback
         queue = playback.getQueue();
         currentTrack = playback.currentTrack;
-        load(getCurrentTrack(), null);
+
+        Track track = getCurrentTrack();
+        if(track == null) return;
+
+        load(track, null);
         seekTo(playback.getPosition());
 
         int state = playback.getState();

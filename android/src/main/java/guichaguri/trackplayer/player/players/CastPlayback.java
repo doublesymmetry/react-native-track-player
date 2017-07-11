@@ -283,6 +283,8 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
     public void copyPlayback(Playback playback) {
         // Copy everything to the new playback
         List<Track> oldQueue = playback.getQueue();
+        if(oldQueue.isEmpty()) return;
+
         final Track currTrack = playback.getCurrentTrack();
         final long pos = playback.getPosition();
 
@@ -297,7 +299,9 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
                 .setResultCallback(new ResultCallback<MediaChannelResult>() {
             @Override
             public void onResult(@NonNull MediaChannelResult mediaChannelResult) {
-                player.queueJumpToItem(currTrack.castId, pos, null);
+                if(currTrack != null) {
+                    player.queueJumpToItem(currTrack.castId, pos, null);
+                }
             }
         });
     }
