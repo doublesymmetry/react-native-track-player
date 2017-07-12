@@ -12,7 +12,7 @@ buildscript {
 apply plugin: 'com.android.library'
 
 def exoplayer = false, cache = false, dash = false, hls = false, smoothstreaming = false
-def castAppId = 'null'
+def castAppId = 'null', auto = false
 
 File file = file('../../../track-player.json')
 if(file.exists()) {
@@ -23,6 +23,7 @@ if(file.exists()) {
     hls = json.hls
     smoothstreaming = json.smoothstreaming
     castAppId = json.castApplicationId
+    auto = json.auto
 }
 
 android {
@@ -42,6 +43,7 @@ android {
     buildTypes {
         buildTypes.each {
             it.buildConfigField 'String', 'CAST_APPLICATION_ID', castAppId
+            it.manifestPlaceholders = [autoRemove: auto ? 'merge' : 'remove']
         }
     }
 }

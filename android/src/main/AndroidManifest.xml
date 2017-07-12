@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="guichaguri.trackplayer">
+          package="guichaguri.trackplayer"
+          xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application>
 
         <!-- The main service, handles playback, playlists, media buttons and chromecast -->
-        <service android:name=".logic.workers.PlayerService" android:enabled="true" android:exported="true">
+        <service android:name=".logic.services.PlayerService" android:enabled="true" android:exported="true">
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
         </service>
 
         <!-- The service for the headless tasks in which events can be received by the JS side -->
-        <service android:name=".logic.workers.PlayerTask" android:enabled="true" />
+        <service android:name=".logic.services.PlayerTask" android:enabled="true" />
 
         <!-- A receiver that will receive media buttons. Required on pre-lollipop devices -->
         <receiver android:name="android.support.v4.media.session.MediaButtonReceiver">
@@ -23,8 +24,15 @@
             </intent-filter>
         </receiver>
 
+        <!-- Google Play Services version, required for Google Cast support -->
         <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
-        <meta-data android:name="com.google.android.gms.car.application" android:resource="@xml/automotive_app_desc" />
+
+        <!-- Android Auto support, removed if not allowed in track-player.json -->
+        <meta-data android:name="com.google.android.gms.car.application"
+                   android:resource="@xml/automotive_app_desc"
+                   tools:remove="${autoRemove}" />
+
+        <!-- Google Cast support -->
         <meta-data android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
                    android:value="guichaguri.trackplayer.cast.CastOptionProvider" />
 
