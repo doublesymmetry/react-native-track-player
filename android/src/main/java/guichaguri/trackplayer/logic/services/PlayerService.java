@@ -1,4 +1,4 @@
-package guichaguri.trackplayer.logic.workers;
+package guichaguri.trackplayer.logic.services;
 
 import android.content.Intent;
 import android.os.Bundle;
