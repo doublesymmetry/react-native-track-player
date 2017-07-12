@@ -13,7 +13,6 @@
 - (id)initWithObject:(id)object {
     self = [super init];
     if (self) {
-        // Check if local url
         _isLocal = [object isKindOfClass:[NSDictionary class]];
         
         if (_isLocal) {

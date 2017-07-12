@@ -6,6 +6,8 @@
 //  Copyright © 2017 David Chavez. All rights reserved.
 //
 
+@import MediaPlayer;
+
 #import "Player.h"
 #import "STKAudioPlayer.h"
 
@@ -97,7 +99,7 @@
             _currentIndex = index;
             [self play];
         }
-    }];    
+    }];
 }
 
 - (BOOL)playNext {
@@ -105,9 +107,10 @@
         _currentIndex++;
         [self play];
         return YES;
+    } else {
+        [self stop];
+        return NO;
     }
-    
-    return NO;
 }
 
 - (BOOL)playPrevious {
@@ -145,11 +148,22 @@
         return;
     }
     
-    Track *nextTrack = [_queue objectAtIndex:_currentIndex];
+    Track *track = [_queue objectAtIndex:_currentIndex];
     
-    // TODO: - Update system music metadata
+    // TODO: Handle artwork (part of supporting local files)
+    NSDictionary *ccMetadata = @{
+                                 MPMediaItemPropertyMediaType: @(MPMediaTypeMusic),
+                                 MPMediaItemPropertyTitle: track.title ? track.title : @"",
+                                 MPMediaItemPropertyAlbumTitle: track.album ? track.album : @"",
+                                 MPMediaItemPropertyArtist: track.artist ? track.artist : @"",
+                                 MPMediaItemPropertyGenre: track.genre ? track.genre : @"",
+                                 MPMediaItemPropertyPlaybackDuration: track.duration ? track.duration : @(0),
+                                 MPMediaItemPropertyReleaseDate: track.date ? track.date : @"",
+                                 MPNowPlayingInfoPropertyElapsedPlaybackTime: @(_player.progress),
+                                 };
+    [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:ccMetadata];
     
-    [_player playURL:nextTrack.url.value];
+    [_player playURL:track.url.value];
 }
 
 - (void)pause {
@@ -158,10 +172,21 @@
 
 - (void)stop {
     [_player stop];
+    [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:nil];
 }
 
 - (void)seekToTime:(NSInteger)time {
-    [_player seekToTime:time];
+    [_player mute];
+    if (_player.state != STKAudioPlayerStatePlaying) {
+        [self play];
+    }
+    
+    double delayInSeconds = 0.001;
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+    dispatch_after(popTime, dispatch_get_main_queue(), ^() {
+        [_player seekToTime:time];
+        [_player unmute];
+    });
 }
 
 - (void)setVolume:(NSInteger)volume {

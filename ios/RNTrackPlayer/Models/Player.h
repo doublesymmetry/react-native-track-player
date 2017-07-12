@@ -6,7 +6,7 @@
 //  Copyright © 2017 David Chavez. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+@import Foundation;
 
 #import "Track.h"
 
