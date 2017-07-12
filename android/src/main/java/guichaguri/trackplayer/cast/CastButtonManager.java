@@ -1,6 +1,5 @@
 package guichaguri.trackplayer.cast;
 
-import android.support.v7.app.MediaRouteButton;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
@@ -12,7 +11,7 @@ import javax.annotation.Nullable;
 /**
  * @author Guilherme Chaguri
  */
-public class CastButtonManager extends SimpleViewManager<MediaRouteButton> {
+public class CastButtonManager extends SimpleViewManager<CastButton> {
 
     private final int SHOW_DIALOG = 1;
 
@@ -22,14 +21,14 @@ public class CastButtonManager extends SimpleViewManager<MediaRouteButton> {
     }
 
     @Override
-    protected MediaRouteButton createViewInstance(ThemedReactContext reactContext) {
-        MediaRouteButton button = new MediaRouteButton(reactContext);
-        CastButtonFactory.setUpMediaRouteButton(reactContext, button);
+    protected CastButton createViewInstance(ThemedReactContext reactContext) {
+        CastButton button = new CastButton(reactContext);
+        CastButtonFactory.setUpMediaRouteButton(reactContext.getApplicationContext(), button);
         return button;
     }
 
     @Override
-    public void receiveCommand(MediaRouteButton root, int commandId, @Nullable ReadableArray args) {
+    public void receiveCommand(CastButton root, int commandId, @Nullable ReadableArray args) {
         if(commandId == SHOW_DIALOG) {
             root.showDialog();
         }
