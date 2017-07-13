@@ -43,7 +43,8 @@ android {
     buildTypes {
         buildTypes.each {
             it.buildConfigField 'String', 'CAST_APPLICATION_ID', castAppId
-            it.manifestPlaceholders = [autoRemove: auto ? 'merge' : 'remove']
+            def autoMd = auto ? 'com.google.android.gms.car.application' : 'disabled.car.application'
+            it.manifestPlaceholders = [autoMetadata: autoMd]
         }
     }
 }
