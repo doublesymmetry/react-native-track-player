@@ -1,8 +1,9 @@
 package guichaguri.trackplayer.cast;
 
 import android.content.Context;
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.WritableMap;
+import android.os.Bundle;
+import com.google.android.gms.cast.CastDevice;
+import com.google.android.gms.cast.CastStatusCodes;
 import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.cast.framework.CastSession;
 import com.google.android.gms.cast.framework.CastStateListener;
@@ -37,16 +38,32 @@ public class GoogleCast implements CastStateListener, SessionManagerListener<Cas
         cast.getSessionManager().endCurrentSession(stopReceiver);
     }
 
+    public void destroy() {
+        disconnect(false);
+        cast.removeCastStateListener(this);
+        cast.getSessionManager().removeSessionManagerListener(this, CastSession.class);
+    }
+
     @Override
     public void onCastStateChanged(int state) {
-        WritableMap map = Arguments.createMap();
-        map.putInt("state", state);
-        Events.dispatchEvent(context, Events.CAST_STATE, map);
+        Bundle bundle = new Bundle();
+        bundle.putInt("state", state);
+        Events.dispatchEvent(context, Events.CAST_STATE, bundle);
     }
 
     @Override
     public void onSessionStarting(CastSession session) {
-        Events.dispatchEvent(context, Events.CAST_CONNECTING, null);
+        Bundle bundle = new Bundle();
+        CastDevice device = session.getCastDevice();
+
+        bundle.putString("id", device.getDeviceId());
+        bundle.putString("version", device.getDeviceVersion());
+        bundle.putString("name", device.getFriendlyName());
+        bundle.putString("model", device.getModelName());
+        bundle.putString("ip", device.getIpAddress().getHostAddress());
+        bundle.putInt("port", device.getServicePort());
+
+        Events.dispatchEvent(context, Events.CAST_CONNECTING, bundle);
     }
 
     @Override
@@ -57,7 +74,10 @@ public class GoogleCast implements CastStateListener, SessionManagerListener<Cas
 
     @Override
     public void onSessionStartFailed(CastSession session, int error) {
-        Events.dispatchEvent(context, Events.CAST_CONNECTION_FAILED, null);
+        Bundle bundle = new Bundle();
+        bundle.putInt("code", error);
+        bundle.putString("reason", CastStatusCodes.getStatusCodeString(error));
+        Events.dispatchEvent(context, Events.CAST_CONNECTION_FAILED, bundle);
     }
 
     @Override

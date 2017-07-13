@@ -2,9 +2,8 @@ package guichaguri.trackplayer.logic;
 
 import android.content.Context;
 import android.content.Intent;
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.WritableMap;
-import guichaguri.trackplayer.logic.workers.PlayerTask;
+import android.os.Bundle;
+import guichaguri.trackplayer.logic.services.PlayerTask;
 
 /**
  * @author Guilherme Chaguri
@@ -42,11 +41,11 @@ public class Events {
     public static final String CAST_DISCONNECTING = "cast-disconnecting";
     public static final String CAST_DISCONNECTED = "cast-disconnected";
 
-    public static void dispatchEvent(Context context, String event, WritableMap data) {
+    public static void dispatchEvent(Context context, String event, Bundle data) {
         Intent i = new Intent(context, PlayerTask.class);
 
         if(event != null) i.putExtra(PlayerTask.EVENT_TYPE, event);
-        if(data != null) i.putExtra(PlayerTask.EVENT_DATA, Arguments.toBundle(data));
+        if(data != null) i.putExtra(PlayerTask.EVENT_DATA, data);
 
         context.startService(i);
     }

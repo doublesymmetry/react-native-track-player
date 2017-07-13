@@ -1,10 +1,11 @@
 package guichaguri.trackplayer.metadata.components;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat;
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.WritableMap;
 import guichaguri.trackplayer.logic.Events;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
@@ -23,62 +24,103 @@ public class ButtonListener extends MediaSessionCompat.Callback {
         this.manager = manager;
     }
 
-    private void dispatch(String event, WritableMap data) {
-        Events.dispatchEvent(context, event, data);
-    }
-
     @Override
     public void onPrepare() {
-        dispatch(Events.BUTTON_LOAD, null);
+        Events.dispatchEvent(context, Events.BUTTON_LOAD, null);
     }
 
     @Override
     public void onPlay() {
-        dispatch(Events.BUTTON_PLAY, null);
+        Events.dispatchEvent(context, Events.BUTTON_PLAY, null);
     }
 
     @Override
     public void onPause() {
-        dispatch(Events.BUTTON_PAUSE, null);
+        Events.dispatchEvent(context, Events.BUTTON_PAUSE, null);
     }
 
     @Override
     public void onStop() {
-        dispatch(Events.BUTTON_STOP, null);
+        Events.dispatchEvent(context, Events.BUTTON_STOP, null);
     }
 
     @Override
     public void onSkipToNext() {
-        dispatch(Events.BUTTON_SKIP_NEXT, null);
+        Events.dispatchEvent(context, Events.BUTTON_SKIP_NEXT, null);
     }
 
     @Override
     public void onSkipToPrevious() {
-        dispatch(Events.BUTTON_SKIP_PREVIOUS, null);
+        Events.dispatchEvent(context, Events.BUTTON_SKIP_PREVIOUS, null);
     }
 
     @Override
     public void onSkipToQueueItem(long id) {
         Track track = manager.getPlayback().getTrackById(id);
         if(track != null) {
-            WritableMap map = Arguments.createMap();
-            map.putString("id", track.id);
-            dispatch(Events.BUTTON_SKIP, map);
+            Bundle bundle = new Bundle();
+            bundle.putString("id", track.id);
+            Events.dispatchEvent(context, Events.BUTTON_SKIP, bundle);
         }
     }
 
     @Override
+    public void onPlayFromMediaId(String mediaId, Bundle extras) {
+        // Required for Android Auto
+        Bundle bundle = new Bundle();
+        bundle.putString("id", mediaId);
+        Events.dispatchEvent(context, Events.BUTTON_PLAY_FROM_ID, bundle);
+    }
+
+    @SuppressLint("InlinedApi")
+    @Override
+    public void onPlayFromSearch(String query, Bundle extras) {
+        // Required for Android Auto
+        Bundle bundle = new Bundle();
+        bundle.putString("query", query);
+
+        if(extras.containsKey(MediaStore.EXTRA_MEDIA_FOCUS)) {
+            String focus = extras.getString(MediaStore.EXTRA_MEDIA_FOCUS);
+            if(MediaStore.Audio.Artists.ENTRY_CONTENT_TYPE.equals(focus)) {
+                focus = "artist";
+            } else if(MediaStore.Audio.Albums.ENTRY_CONTENT_TYPE.equals(focus)) {
+                focus = "album";
+            } else if(MediaStore.Audio.Playlists.ENTRY_CONTENT_TYPE.equals(focus)) {
+                focus = "playlist";
+            } else if(MediaStore.Audio.Genres.ENTRY_CONTENT_TYPE.equals(focus)) {
+                focus = "genre";
+            } else if(MediaStore.Audio.Media.ENTRY_CONTENT_TYPE.equals(focus)) {
+                focus = "title";
+            }
+            bundle.putString("focus", focus);
+        }
+
+        if(extras.containsKey(MediaStore.EXTRA_MEDIA_TITLE))
+            bundle.putString("title", extras.getString(MediaStore.EXTRA_MEDIA_TITLE));
+        if(extras.containsKey(MediaStore.EXTRA_MEDIA_ARTIST))
+            bundle.putString("artist", extras.getString(MediaStore.EXTRA_MEDIA_ARTIST));
+        if(extras.containsKey(MediaStore.EXTRA_MEDIA_ALBUM))
+            bundle.putString("album", extras.getString(MediaStore.EXTRA_MEDIA_ALBUM));
+        if(extras.containsKey(MediaStore.EXTRA_MEDIA_GENRE))
+            bundle.putString("genre", extras.getString(MediaStore.EXTRA_MEDIA_GENRE));
+        if(extras.containsKey(MediaStore.EXTRA_MEDIA_PLAYLIST))
+            bundle.putString("playlist", extras.getString(MediaStore.EXTRA_MEDIA_PLAYLIST));
+
+        Events.dispatchEvent(context, Events.BUTTON_PLAY_FROM_SEARCH, bundle);
+    }
+
+    @Override
     public void onSeekTo(long pos) {
-        WritableMap map = Arguments.createMap();
-        Utils.setTime(map, "position", pos);
-        dispatch(Events.BUTTON_SEEK_TO, map);
+        Bundle bundle = new Bundle();
+        Utils.setTime(bundle, "position", pos);
+        Events.dispatchEvent(context, Events.BUTTON_SEEK_TO, bundle);
     }
 
     @Override
     public void onSetRating(RatingCompat rating) {
-        WritableMap map = Arguments.createMap();
-        Utils.setRating(map, "rating", rating);
-        dispatch(Events.BUTTON_SET_RATING, map);
+        Bundle bundle = new Bundle();
+        Utils.setRating(bundle, "rating", rating);
+        Events.dispatchEvent(context, Events.BUTTON_SET_RATING, bundle);
     }
 
 }
