@@ -3,16 +3,11 @@ package guichaguri.trackplayer.logic.track;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat.QueueItem;
 import android.util.Log;
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.ReadableMapKeySetIterator;
-import com.facebook.react.bridge.ReadableType;
-import com.facebook.react.bridge.WritableMap;
 import com.google.android.gms.cast.MediaInfo;
 import com.google.android.gms.cast.MediaMetadata;
 import com.google.android.gms.cast.MediaQueueItem;
@@ -63,32 +58,32 @@ public class Track {
     public QueueItem queueItem;
     public MediaQueueItem castQueueItem;
 
-    public Track(Context context, MediaManager manager, ReadableMap data) {
-        id = Utils.getString(data, "id");
+    public Track(Context context, MediaManager manager, Bundle data) {
+        id = data.getString("id");
         queueId = queueIds++;
 
         url = Utils.getUri(context, data, "url", null);
         urlLocal = isLocal(url);
 
         duration = Utils.getTime(data, "duration", 0);
-        type = TrackType.fromMap(data, "type");
-        contentType = Utils.getString(data, "contentType", "audio/mpeg");
+        type = TrackType.fromBundle(data, "type");
+        contentType = data.getString("contentType", "audio/mpeg");
 
-        title = Utils.getString(data, "title");
-        artist = Utils.getString(data, "artist");
-        album = Utils.getString(data, "album");
-        genre = Utils.getString(data, "genre");
-        date = Utils.getString(data, "date");
-        description = Utils.getString(data, "description");
+        title = data.getString("title");
+        artist = data.getString("artist");
+        album = data.getString("album");
+        genre = data.getString("genre");
+        date = data.getString("date");
+        description = data.getString("description");
         rating = Utils.getRating(data, "date", manager.getRatingType());
 
         artwork = Utils.getUri(context, data, "artwork", null);
         artworkLocal = isLocal(artwork);
 
-        boolean sendUrl = Utils.getBoolean(data, "sendUrl", true);
+        boolean sendUrl = data.getBoolean("sendUrl", true);
         mediaId = sendUrl ? url.toString() : id;
 
-        ReadableMap custom = Utils.getMap(data, "customData");
+        Bundle custom = data.getBundle("customData");
         JSONObject obj = null;
 
         if(custom != null) {
@@ -137,49 +132,37 @@ public class Track {
         castQueueItem = item;
     }
 
-    private JSONObject transferToObject(ReadableMap map) throws JSONException {
-        JSONObject obj = new JSONObject();
-        ReadableMapKeySetIterator i = map.keySetIterator();
+    private JSONObject transferToObject(Bundle bundle) throws JSONException {
+        JSONObject json = new JSONObject();
 
-        while(i.hasNextKey()) {
-            String key = i.nextKey();
-            ReadableType type = map.getType(key);
+        for(String key : bundle.keySet()) {
+            Object obj = bundle.get(key);
 
-            if(type == ReadableType.String) {
-                obj.put(key, map.getString(key));
-            } else if(type == ReadableType.Number) {
-                obj.put(key, map.getDouble(key));
-            } else if(type == ReadableType.Boolean) {
-                obj.put(key, map.getBoolean(key));
-            } else if(type == ReadableType.Null) {
-                obj.put(key, null);
-            } else if(type == ReadableType.Array) {
-                obj.put(key, transferToArray(map.getArray(key)));
-            } else if(type == ReadableType.Map) {
-                obj.put(key, transferToObject(map.getMap(key)));
+            if(obj == null) {
+                json.put(key, null);
+            } else if(obj instanceof List) {
+                json.put(key, transferToArray((List)obj));
+            } else if(obj instanceof Bundle) {
+                json.put(key, transferToObject((Bundle)obj));
+            } else {
+                json.put(key, obj);
             }
         }
-        return obj;
+        return json;
     }
 
-    private JSONArray transferToArray(ReadableArray arr) throws JSONException {
+    private JSONArray transferToArray(List list) throws JSONException {
         JSONArray array = new JSONArray();
 
-        for(int i = 0; i < arr.size(); i++) {
-            ReadableType type = arr.getType(i);
-
-            if(type == ReadableType.String) {
-                array.put(arr.getString(i));
-            } else if(type == ReadableType.Number) {
-                array.put(arr.getDouble(i));
-            } else if(type == ReadableType.Boolean) {
-                array.put(arr.getBoolean(i));
-            } else if(type == ReadableType.Null) {
+        for(Object obj : list) {
+            if(obj == null) {
                 array.put(null);
-            } else if(type == ReadableType.Array) {
-                array.put(transferToArray(arr.getArray(i)));
-            } else if(type == ReadableType.Map) {
-                array.put(transferToObject(arr.getMap(i)));
+            } else if(obj instanceof List) {
+                array.put(transferToArray((List)obj));
+            } else if(obj instanceof Bundle) {
+                array.put(transferToObject((Bundle)obj));
+            } else {
+                array.put(obj);
             }
         }
         return array;
@@ -194,24 +177,24 @@ public class Track {
                 scheme.equals("res");
     }
 
-    public WritableMap toJavascriptMap() {
-        WritableMap map = Arguments.createMap();
+    public Bundle toBundle() {
+        Bundle bundle = new Bundle();
 
-        map.putString("id", id);
-        map.putString("url", url.toString());
-        map.putDouble("duration", Utils.toSeconds(duration));
-        map.putString("type", type.name);
-        map.putString("contentType", contentType);
-        map.putString("title", title);
-        map.putString("artist", artist);
-        map.putString("album", album);
-        map.putString("genre", genre);
-        map.putString("date", date);
-        map.putString("description", description);
-        Utils.setRating(map, "rating", rating);
-        map.putString("artwork", artwork.toString());
+        bundle.putString("id", id);
+        bundle.putString("url", url.toString());
+        bundle.putDouble("duration", Utils.toSeconds(duration));
+        bundle.putString("type", type.name);
+        bundle.putString("contentType", contentType);
+        bundle.putString("title", title);
+        bundle.putString("artist", artist);
+        bundle.putString("album", album);
+        bundle.putString("genre", genre);
+        bundle.putString("date", date);
+        bundle.putString("description", description);
+        Utils.setRating(bundle, "rating", rating);
+        bundle.putString("artwork", artwork.toString());
 
-        return map;
+        return bundle;
     }
 
     public QueueItem toQueueItem() {

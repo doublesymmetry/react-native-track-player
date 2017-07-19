@@ -1,7 +1,6 @@
 package guichaguri.trackplayer.logic.track;
 
-import com.facebook.react.bridge.ReadableMap;
-import guichaguri.trackplayer.logic.Utils;
+import android.os.Bundle;
 
 /**
  * @author Guilherme Chaguri
@@ -26,8 +25,8 @@ public enum TrackType {
         return TrackType.DEFAULT;
     }
 
-    public static TrackType fromMap(ReadableMap data, String key) {
-        return fromString(Utils.getString(data, key, "default").toLowerCase());
+    public static TrackType fromBundle(Bundle data, String key) {
+        return fromString(data.getString(key, "default").toLowerCase());
     }
 
 }
