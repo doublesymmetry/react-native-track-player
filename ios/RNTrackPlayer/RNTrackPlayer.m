@@ -31,42 +31,40 @@
 RCT_EXPORT_MODULE(TrackPlayerModule)
 
 RCT_EXPORT_METHOD(onReady:(RCTResponseSenderBlock)callback) {
+    callback(@[[NSNull null]]);
+}
+
+RCT_EXPORT_METHOD(setupPlayer:(NSDictionary *)data
+                  promise:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
     // Setup audio session
     NSError *error;
     
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
     [[AVAudioSession sharedInstance] setActive:YES error:&error];
     
-    // TODO: - Handle possible setup error (promise rejection?)
     if (error) {
-        NSLog(@"Audio session error!");
+        reject(@"failed_setup_audio_session", @"Failed to setup audio session", error);
     }
     
-    callback(@[[NSNull null]]);
+    // TODO: Setup player with custom properties
+}
+
+RCT_EXPORT_METHOD(destroy) {
+    NSLog(@"Destroying player");
+    _player = nil;
 }
 
 RCT_EXPORT_METHOD(setOptions:(NSDictionary *)options) {
     // TODO: - Implement
 }
 
-RCT_EXPORT_METHOD(createPlayer:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    resolve(@(0));
-}
-
-RCT_EXPORT_METHOD(setMain:(NSInteger)identifier) {
-    // TODO: - Remove when Android project gets rid of multiple players
-}
-
-RCT_EXPORT_METHOD(destroy:(NSInteger)identifier) {
-    // TODO: - Remove identifier parameter when Android project gets rid of multiple players
-    NSLog(@"Destroying player");
-    _player = nil;
-}
-
-RCT_EXPORT_METHOD(add:(NSInteger)identifier before:(NSString *)trackId tracks:(NSArray *)trackDicts resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    // TODO: - Remove identifier parameter when Android project gets rid of multiple players
-    
-    if (![_player queueContainsTrack:trackId]) {
+// TODO: Change signature to addTracks beforeTrackId
+RCT_EXPORT_METHOD(add:(NSString *)beforeTrackId
+                  tracks:(NSArray *)trackDicts
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    if (![_player queueContainsTrack:beforeTrackId]) {
         reject(@"track_not_in_queue", @"Given track ID was not found in queue", nil);
         return;
     }
@@ -78,23 +76,23 @@ RCT_EXPORT_METHOD(add:(NSInteger)identifier before:(NSString *)trackId tracks:(N
     }
     
     NSLog(@"Adding tracks: %@", tracks);
-    [_player addTracks:tracks before:trackId];
+    [_player addTracks:tracks before:beforeTrackId];
     
     resolve([NSNull null]);
 }
 
-RCT_EXPORT_METHOD(remove:(NSInteger)identifier trackIds:(NSArray *)trackIds resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    // TODO: - Remove identifier parameter when Android project gets rid of multiple players
-    
+RCT_EXPORT_METHOD(remove:(NSArray *)trackIds
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
     NSLog(@"Removing tracks: %@", trackIds);
     [_player removeTrackIds:trackIds];
     
     resolve([NSNull null]);
 }
 
-RCT_EXPORT_METHOD(skip:(NSInteger)identifier trackId:(NSString *)trackId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    // TODO: - Remove identifier parameter when Android project gets rid of multiple players
-    
+RCT_EXPORT_METHOD(skip:(NSString *)trackId
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
     if (![_player queueContainsTrack:trackId]) {
         reject(@"track_not_in_queue", @"Given track ID was not found in queue", nil);
         return;
@@ -106,9 +104,8 @@ RCT_EXPORT_METHOD(skip:(NSInteger)identifier trackId:(NSString *)trackId resolve
     resolve([NSNull null]);
 }
 
-RCT_EXPORT_METHOD(skipToNext:(NSInteger)identifier resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    // TODO: - Remove identifier parameter when Android project gets rid of multiple players
-    
+RCT_EXPORT_METHOD(skipToNext:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
     NSLog(@"Skipping to next track");
     if ([_player playNext]) {
         resolve([NSNull null]);
@@ -117,9 +114,8 @@ RCT_EXPORT_METHOD(skipToNext:(NSInteger)identifier resolver:(RCTPromiseResolveBl
     }
 }
 
-RCT_EXPORT_METHOD(skipToPrevious:(NSInteger)identifier resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    // TODO: - Remove identifier parameter when Android project gets rid of multiple players
-    
+RCT_EXPORT_METHOD(skipToPrevious:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
     NSLog(@"Skipping to previous track");
     if ([_player playPrevious]) {
         resolve([NSNull null]);
@@ -128,8 +124,10 @@ RCT_EXPORT_METHOD(skipToPrevious:(NSInteger)identifier resolver:(RCTPromiseResol
     }
 }
 
-RCT_EXPORT_METHOD(load:(NSUInteger)identifier track:(NSDictionary *)trackDict resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    // TODO: - Remove identifier parameter when Android project gets rid of multiple players
+RCT_EXPORT_METHOD(load:(NSDictionary *)trackDict
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    // TODO: - Resolve what this method will do with Android API revamp
     
     Track *track = [[Track alloc] initWithDictionary:trackDict];
     
@@ -139,63 +137,47 @@ RCT_EXPORT_METHOD(load:(NSUInteger)identifier track:(NSDictionary *)trackDict re
     resolve([NSNull null]);
 }
 
-RCT_EXPORT_METHOD(reset:(NSInteger)identifier) {
-    // TODO: - Remove identifier parameter when Android project gets rid of multiple players
-    
+RCT_EXPORT_METHOD(reset) {
     NSLog(@"Resetting player.");
     [_player reset];
 }
 
-RCT_EXPORT_METHOD(play:(NSInteger)identifier) {
-    // TODO: - Remove identifier parameter when Android project gets rid of multiple players
-    
+RCT_EXPORT_METHOD(play) {
     NSLog(@"Starting/Resuming playback");
     [_player play];
 }
 
-RCT_EXPORT_METHOD(pause:(NSInteger)identifier) {
-    // TODO: - Remove identifier parameter when Android project gets rid of multiple players
-    
+RCT_EXPORT_METHOD(pause) {
     NSLog(@"Pausing playback");
     [_player pause];
 }
 
-RCT_EXPORT_METHOD(stop:(NSInteger)identifier) {
-    // TODO: - Remove identifier parameter when Android project gets rid of multiple players
-    
+RCT_EXPORT_METHOD(stop) {
     NSLog(@"Stopping playback");
     [_player stop];
 }
 
-RCT_EXPORT_METHOD(seekTo:(NSInteger)identifier time:(NSInteger)time) {
-    // TODO: - Remove identifier parameter when Android project gets rid of multiple players
-    
+RCT_EXPORT_METHOD(seekTo:(NSInteger)time) {
     NSLog(@"Seeking to %ld seconds", time);
     [_player seekToTime:time];
 }
 
-RCT_EXPORT_METHOD(setVolume:(NSInteger)identifier volume:(NSInteger)volume) {
-    // TODO: - Remove identifier parameter when Android project gets rid of multiple players
-    
+RCT_EXPORT_METHOD(setVolume:(NSInteger)volume) {
     NSLog(@"Setting volume to %ld", volume);
     [_player setVolume:volume];
 }
 
-RCT_EXPORT_METHOD(startScan:(BOOL)active callback:(RCTResponseSenderBlock)callback) {
-    // TODO: - Implement
-}
-
-RCT_EXPORT_METHOD(stopScan) {
-    // TODO: - Implement
-}
-
-RCT_EXPORT_METHOD(connect:(NSInteger)deviceId callback:(RCTResponseSenderBlock)callback) {
-    // TODO: - Implement
-}
-
-RCT_EXPORT_METHOD(copyQueue:(NSInteger)fromId toId:(NSInteger)toId beforeId:(NSString *)beforeId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    // TODO: - Remove when Android project gets rid of multiple players
-}
+//RCT_EXPORT_METHOD(startScan:(BOOL)active callback:(RCTResponseSenderBlock)callback) {
+//    // TODO: - Implement
+//}
+//
+//RCT_EXPORT_METHOD(stopScan) {
+//    // TODO: - Implement
+//}
+//
+//RCT_EXPORT_METHOD(connect:(NSInteger)deviceId callback:(RCTResponseSenderBlock)callback) {
+//    // TODO: - Implement
+//}
 
 RCT_EXPORT_METHOD(getCurrentTrack:(NSInteger)identifier callback:(RCTResponseSenderBlock)callback) {
     // TODO: - Remove identifier parameter when Android project gets rid of multiple players
@@ -204,26 +186,21 @@ RCT_EXPORT_METHOD(getCurrentTrack:(NSInteger)identifier callback:(RCTResponseSen
     callback(@[[NSNull null], [track identifier]]);
 }
 
-RCT_EXPORT_METHOD(getDuration:(NSInteger)identifier callback:(RCTResponseSenderBlock)callback) {
-    // TODO: - Remove identifier parameter when Android project gets rid of multiple players
-    
+RCT_EXPORT_METHOD(getDuration:(RCTResponseSenderBlock)callback) {
     callback(@[[NSNull null], @([_player duration])]);
 }
 
-RCT_EXPORT_METHOD(getBufferedPosition:(NSInteger)identifier callback:(RCTResponseSenderBlock)callback) {
+RCT_EXPORT_METHOD(getBufferedPosition:(RCTResponseSenderBlock)callback) {
     // TODO: - Implement
 }
 
-RCT_EXPORT_METHOD(getPosition:(NSInteger)identifier callback:(RCTResponseSenderBlock)callback) {
-    // TODO: - Remove identifier parameter when Android project gets rid of multiple players
-    
-    callback(@[[NSNull null], @([_player duration])]);
+RCT_EXPORT_METHOD(getPosition:(RCTResponseSenderBlock)callback) {
+    callback(@[[NSNull null], @([_player position])]);
 }
 
 RCT_EXPORT_METHOD(getState:(NSInteger)identifier callback:(RCTResponseSenderBlock)callback) {
-    // TODO: - Remove identifier parameter when Android project gets rid of multiple players
-    
-    callback(@[[NSNull null], @([_player duration])]);
+    callback(@[[NSNull null], @([_player state])]);
 }
 
 @end
+
