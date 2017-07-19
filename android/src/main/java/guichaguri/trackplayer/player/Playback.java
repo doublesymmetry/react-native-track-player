@@ -1,8 +1,8 @@
 package guichaguri.trackplayer.player;
 
 import android.content.Context;
+import android.util.Log;
 import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.ReadableArray;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.track.Track;
@@ -38,14 +38,7 @@ public abstract class Playback {
         return currentTrack < queue.size() && currentTrack >= 0 ? queue.get(currentTrack) : null;
     }
 
-    public Track getTrackById(long id) {
-        for(Track track : queue) {
-            if(track.queueId == id) return track;
-        }
-        return null;
-    }
-
-    public void add(String insertBeforeId, List<Track> tracks, Promise callback) {
+    public void add(List<Track> tracks, String insertBeforeId, Promise callback) {
         if(insertBeforeId == null) {
             boolean empty = queue.isEmpty();
             queue.addAll(tracks);
@@ -72,15 +65,7 @@ public abstract class Playback {
         Utils.resolveCallback(callback);
     }
 
-    public void add(String insertBeforeId, ReadableArray tracks, Promise callback) {
-        List<Track> list = new ArrayList<>();
-        for(int i = 0; i < tracks.size(); i++) {
-            list.add(new Track(context, manager, tracks.getMap(i)));
-        }
-        add(insertBeforeId, list, callback);
-    }
-
-    public void remove(String[] ids, Promise callback) {
+    public void remove(List<String> ids, Promise callback) {
         ListIterator<Track> i = queue.listIterator();
         boolean trackChanged = false;
 
@@ -104,14 +89,6 @@ public abstract class Playback {
         } else {
             Utils.resolveCallback(callback);
         }
-    }
-
-    public void remove(ReadableArray tracks, Promise callback) {
-        String[] ids = new String[tracks.size()];
-        for(int i = 0; i < tracks.size(); i++) {
-            ids[i] = tracks.getString(i);
-        }
-        remove(ids, callback);
     }
 
     public void skip(String id, Promise callback) {
@@ -232,7 +209,7 @@ public abstract class Playback {
             currentTrack = 0;
         }
 
-        Utils.log("Updating current track...");
+        Log.d(Utils.TAG, "Updating current track...");
 
         int oldState = getState();
         Track track = queue.get(currentTrack);

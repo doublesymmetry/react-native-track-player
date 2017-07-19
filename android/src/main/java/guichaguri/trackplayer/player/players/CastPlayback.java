@@ -80,7 +80,7 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
     }
 
     @Override
-    public void add(String insertBeforeId, List<Track> tracks, Promise callback) {
+    public void add(List<Track> tracks, String insertBeforeId, Promise callback) {
         int indexId = MediaQueueItem.INVALID_ITEM_ID;
 
         if(insertBeforeId != null) {
@@ -111,11 +111,11 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
     }
 
     @Override
-    public void remove(String[] ids, final Promise callback) {
+    public void remove(List<String> ids, final Promise callback) {
         final Track currentTrack = getCurrentTrack();
 
         ListIterator<Track> i = queue.listIterator();
-        int[] trackIds = new int[ids.length];
+        int[] trackIds = new int[ids.size()];
         int o = 0;
 
         while(i.hasNext()) {
