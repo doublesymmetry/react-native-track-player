@@ -16,6 +16,8 @@ import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
 import guichaguri.trackplayer.BuildConfig;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * @author Guilherme Chaguri
@@ -27,6 +29,22 @@ public class Utils {
     public static void log(String msg, Object ... args) {
         if(LOG) {
             Log.i("ReactNativeTrackPlayer", String.format(msg, args));
+        }
+    }
+
+    public static String getString(JSONObject object, String key, String def) {
+        try {
+            return object != null ? object.getString(key) : def;
+        } catch(JSONException ex) {
+            return def;
+        }
+    }
+
+    public static void setString(JSONObject object, String key, String value) {
+        try {
+            if(object != null) object.put(key, value);
+        } catch(JSONException ex) {
+            // Ignored
         }
     }
 
@@ -99,47 +117,30 @@ public class Utils {
         }
     }
 
+    public static Uri getUri(Context context, ReadableMap map, String key, Uri def) {
+        if(!map.hasKey(key)) return def;
+
+        ReadableType type = map.getType(key);
+        if(type == ReadableType.String) {
+            return Uri.parse(map.getString(key));
+        } else if(type == ReadableType.Map) {
+            String uri = map.getMap(key).getString("uri");
+            return ResourceDrawableIdHelper.getInstance().getResourceDrawableUri(context, uri);
+        }
+        return def;
+    }
+
+    public static int getResourceId(Context context, ReadableMap map) {
+        ResourceDrawableIdHelper helper = ResourceDrawableIdHelper.getInstance();
+        return helper.getResourceDrawableId(context, map.getString("uri"));
+    }
+
     public static long toMillis(double seconds) {
         return (long)(seconds * 1000);
     }
 
     public static double toSeconds(long millis) {
         return millis / 1000D;
-    }
-
-    public static String getLocalResource(ReadableMap local) {
-        return local.hasKey("uri") ? local.getString("uri") : null;
-    }
-
-    public static int getLocalResourceId(Context context, ReadableMap map) {
-        String uri = getLocalResource(map);
-        return ResourceDrawableIdHelper.getInstance().getResourceDrawableId(context, uri);
-    }
-
-    public static boolean isUrlLocal(ReadableMap map, String key) {
-        return map.getType(key) == ReadableType.Map;
-    }
-
-    public static String getUrl(ReadableMap map, String key, boolean local) {
-        if(local) {
-            return getLocalResource(map.getMap(key));
-        } else {
-            return map.getString(key);
-        }
-    }
-
-    public static Uri toUri(Context context, String url, boolean local) {
-        if(local) {
-            return ResourceDrawableIdHelper.getInstance().getResourceDrawableUri(context, url);
-        } else {
-            return Uri.parse(url);
-        }
-    }
-
-    public static Uri getUri(Context context, ReadableMap map, String key) {
-        boolean local = isUrlLocal(map, key);
-        String url = getUrl(map, key, local);
-        return toUri(context, url, local);
     }
 
     public static boolean isPlaying(int state) {

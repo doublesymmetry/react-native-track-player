@@ -3,16 +3,10 @@ package guichaguri.trackplayer.metadata.components;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
-import guichaguri.trackplayer.logic.track.TrackURL;
+import android.net.Uri;
 import guichaguri.trackplayer.metadata.Metadata;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 
 /**
  * @author Guilherme Chaguri
@@ -23,65 +17,36 @@ public class ArtworkLoader extends Thread {
     private final Metadata metadata;
 
     private final int maxSize;
-    private final TrackURL data;
+    private final Uri uri;
 
-    public ArtworkLoader(Context context, Metadata metadata, TrackURL data, int maxSize) {
+    public ArtworkLoader(Context context, Metadata metadata, Uri uri, int maxSize) {
         this.context = context;
         this.metadata = metadata;
         this.maxSize = maxSize;
-        this.data = data;
+        this.uri = uri;
     }
 
     @Override
     public void run() {
-        Bitmap bitmap;
+        Bitmap bitmap = null;
+        InputStream input = null;
 
-        if(data.local) {
-
-            // Retrieve the bitmap from a local resource
-            ResourceDrawableIdHelper helper = ResourceDrawableIdHelper.getInstance();
-            bitmap = toBitmap(helper.getResourceDrawable(context, data.url));
-
-        } else {
-
+        try {
+            input = context.getContentResolver().openInputStream(uri);
+            bitmap = BitmapFactory.decodeStream(input);
+        } catch(IOException ex) {
+            ex.printStackTrace();
+        } finally {
             try {
-                // Open connection to a remote resource, download and decode it into a bitmap
-                URLConnection con = new URL(data.url).openConnection();
-                con.connect();
-                InputStream input = con.getInputStream();
-                bitmap = BitmapFactory.decodeStream(input);
-                input.close();
-            } catch(IOException ex) {
-                bitmap = null;
-            }
-
+                if(input != null) input.close();
+            } catch(Exception ignored) {}
         }
 
         // Resize the bitmap if it's too big. Let's save a bit of memory :)
         if(bitmap != null) bitmap = resize(bitmap, maxSize);
 
         // Update the metadata with the new artwork
-        metadata.updateArtwork(data, bitmap, true);
-    }
-
-    private Bitmap toBitmap(Drawable drawable) {
-        if(drawable instanceof BitmapDrawable) {
-            // When the drawable is from a bitmap, we can just retrieve the bitmap!
-            return ((BitmapDrawable)drawable).getBitmap();
-        }
-
-        int width = Math.max(drawable.getIntrinsicWidth(), 0);
-        int height = Math.max(drawable.getIntrinsicHeight(), 0);
-
-        // Create a bitmap
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-
-        // Draw the drawable into a bitmap
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-
-        return bitmap;
+        metadata.updateArtwork(uri, bitmap);
     }
 
     private Bitmap resize(Bitmap bitmap, int maxSize) {

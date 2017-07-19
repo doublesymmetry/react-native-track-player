@@ -3,8 +3,7 @@ package guichaguri.trackplayer.logic.components;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.WritableMap;
+import android.os.Bundle;
 import guichaguri.trackplayer.logic.Events;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.metadata.Metadata;
@@ -83,8 +82,8 @@ public class FocusManager implements OnAudioFocusChangeListener {
     }
 
     private void onDuck() {
-        WritableMap map = Arguments.createMap();
-        map.putBoolean("ducking", ducking);
-        Events.dispatchEvent(context, -1, Events.BUTTON_DUCK, map);
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("ducking", ducking);
+        Events.dispatchEvent(context, Events.BUTTON_DUCK, bundle);
     }
 }

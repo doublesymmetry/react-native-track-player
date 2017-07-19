@@ -2,9 +2,8 @@ package guichaguri.trackplayer.logic;
 
 import android.content.Context;
 import android.content.Intent;
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.WritableMap;
-import guichaguri.trackplayer.logic.workers.PlayerTask;
+import android.os.Bundle;
+import guichaguri.trackplayer.logic.services.PlayerTask;
 
 /**
  * @author Guilherme Chaguri
@@ -12,7 +11,10 @@ import guichaguri.trackplayer.logic.workers.PlayerTask;
 public class Events {
 
     // Media Control Events
+    public static final String BUTTON_LOAD = "load";
     public static final String BUTTON_PLAY = "play";
+    public static final String BUTTON_PLAY_FROM_ID = "playFromId";
+    public static final String BUTTON_PLAY_FROM_SEARCH = "playFromSearch";
     public static final String BUTTON_PAUSE = "pause";
     public static final String BUTTON_STOP = "stop";
     public static final String BUTTON_SKIP = "skip";
@@ -22,27 +24,28 @@ public class Events {
     public static final String BUTTON_SET_RATING = "setRating";
     public static final String BUTTON_DUCK = "duck";
 
-    // Player Events
-    public static final String PLAYER_STATE = "player-state";
-    public static final String PLAYER_LOAD = "player-loaded";
-    public static final String PLAYER_PLAY = "player-playing";
-    public static final String PLAYER_PAUSE = "player-pause";
-    public static final String PLAYER_STOP = "player-stopped";
-    public static final String PLAYER_ENDED = "player-ended";
-    public static final String PLAYER_ERROR = "player-error";
+    // Playback Events
+    public static final String PLAYBACK_STATE = "playback-state";
+    public static final String PLAYBACK_LOAD = "playback-loaded";
+    public static final String PLAYBACK_PLAY = "playback-started";
+    public static final String PLAYBACK_PAUSE = "playback-paused";
+    public static final String PLAYBACK_STOP = "playback-stopped";
+    public static final String PLAYBACK_ENDED = "playback-ended";
+    public static final String PLAYBACK_ERROR = "playback-error";
 
     // Remote Events
-    public static final String REMOTE_ADDED = "device-added";
-    public static final String REMOTE_REMOVED = "device-removed";
-    public static final String REMOTE_CONNECTED = "device-connected";
-    public static final String REMOTE_DISCONNECTED = "device-disconnected";
+    public static final String CAST_STATE = "cast-state";
+    public static final String CAST_CONNECTING = "cast-connecting";
+    public static final String CAST_CONNECTED = "cast-connected";
+    public static final String CAST_CONNECTION_FAILED = "cast-connection-failed";
+    public static final String CAST_DISCONNECTING = "cast-disconnecting";
+    public static final String CAST_DISCONNECTED = "cast-disconnected";
 
-    public static void dispatchEvent(Context context, int player, String event, WritableMap data) {
+    public static void dispatchEvent(Context context, String event, Bundle data) {
         Intent i = new Intent(context, PlayerTask.class);
 
         if(event != null) i.putExtra(PlayerTask.EVENT_TYPE, event);
-        if(data != null) i.putExtra(PlayerTask.EVENT_DATA, Arguments.toBundle(data));
-        if(player != -1) i.putExtra(PlayerTask.EVENT_PLAYER, player);
+        if(data != null) i.putExtra(PlayerTask.EVENT_DATA, data);
 
         context.startService(i);
     }

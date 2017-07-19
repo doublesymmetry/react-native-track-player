@@ -76,7 +76,7 @@ public class MediaNotification {
 
         // Load the color and the small icon
         int color = data.hasKey("color") ? data.getInt("color") : NotificationCompat.COLOR_DEFAULT;
-        int icon = data.hasKey("icon") ? Utils.getLocalResourceId(context, data.getMap("icon")) : 0;
+        int icon = data.hasKey("icon") ? Utils.getResourceId(context, data.getMap("icon")) : 0;
 
         // Update properties
         nb.setColor(color);
@@ -160,7 +160,7 @@ public class MediaNotification {
     private int loadIcon(ReadableMap data, String key, String iconName) {
         if(data.hasKey(key)) {
             // Load icon from option value
-            int id = Utils.getLocalResourceId(context, data.getMap(key));
+            int id = Utils.getResourceId(context, data.getMap(key));
             if(id != 0) return id;
         }
 

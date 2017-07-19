@@ -1,10 +1,10 @@
 package guichaguri.trackplayer.metadata;
 
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
@@ -17,15 +17,12 @@ import com.facebook.react.bridge.ReadableType;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.track.Track;
-import guichaguri.trackplayer.logic.track.TrackURL;
-import guichaguri.trackplayer.logic.workers.MediaReceiver;
 import guichaguri.trackplayer.metadata.components.ArtworkLoader;
 import guichaguri.trackplayer.metadata.components.ButtonListener;
 import guichaguri.trackplayer.metadata.components.CustomVolume;
 import guichaguri.trackplayer.metadata.components.MediaNotification;
 import guichaguri.trackplayer.metadata.components.NoisyReceiver;
-import guichaguri.trackplayer.player.Player;
-import guichaguri.trackplayer.player.RemotePlayer;
+import guichaguri.trackplayer.player.Playback;
 
 /**
  * @author Guilherme Chaguri
@@ -45,13 +42,12 @@ public class Metadata {
     private long capabilities = 0;
     private int ratingType = RatingCompat.RATING_HEART;
     private int maxArtworkSize = 2000;
-    private TrackURL artworkUrl = null;
+    private Uri artworkUrl = null;
 
     public Metadata(Context context, MediaManager manager) {
         this.context = context;
 
-        ComponentName comp = new ComponentName(context, MediaReceiver.class);
-        session = new MediaSessionCompat(context, "TrackPlayer", comp, null);
+        session = new MediaSessionCompat(context, "TrackPlayer");
 
         session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
                 MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
@@ -83,9 +79,9 @@ public class Metadata {
         updateCapabilities(data);
     }
 
-    public void updateMetadata(Player player) {
-        // Reset the metadata when there's no player attached or track playing
-        if(player == null || player.getCurrentTrack() == null) {
+    public void updateMetadata(Playback playback) {
+        // Reset the metadata when there's no playback attached or track playing
+        if(playback == null || playback.getCurrentTrack() == null) {
             if(artwork != null) artwork.interrupt();
             md = new MediaMetadataCompat.Builder();
             MediaMetadataCompat metadata = md.build();
@@ -95,8 +91,8 @@ public class Metadata {
             return;
         }
 
-        Track track = player.getCurrentTrack();
-        long duration = player.getDuration();
+        Track track = playback.getCurrentTrack();
+        long duration = playback.getDuration();
         if(duration == 0) duration = track.duration;
 
         // Fill the metadata builder
@@ -119,9 +115,9 @@ public class Metadata {
     }
 
     @SuppressWarnings("WrongConstant")
-    public void updatePlayback(Player player) {
-        // Reset the playback state when there's no player attached
-        if(player == null) {
+    public void updatePlayback(Playback playback) {
+        // Reset the playback state when there's no playback attached
+        if(playback == null) {
             pb = new PlaybackStateCompat.Builder();
             PlaybackStateCompat state = pb.build();
             session.setPlaybackToLocal(AudioManager.STREAM_MUSIC);
@@ -132,19 +128,22 @@ public class Metadata {
             return;
         }
 
-        int playerState = player.getState();
+        int playerState = playback.getState();
 
         // Update the state, position, speed and buffered position
-        pb.setState(playerState, player.getPosition(), player.getSpeed(), player.getPositionUpdateTime());
-        pb.setBufferedPosition(player.getBufferedPosition());
+        pb.setState(playerState, playback.getPosition(), playback.getSpeed(), playback.getPositionUpdateTime());
+        pb.setBufferedPosition(playback.getBufferedPosition());
 
         // Update the capabilities
         pb.setActions(capabilities);
 
-        if(player instanceof RemotePlayer) {
+        if(playback.isRemote()) {
             // Set the volume control to remote
-            RemotePlayer remote = (RemotePlayer)player;
-            volume = CustomVolume.updateVolume(remote, volume, 100);
+            if(volume == null) {
+                volume = new CustomVolume(playback, playback.getVolume(), 100, true);
+            } else {
+                volume.setVolume(playback.getVolume());
+            }
             session.setPlaybackToRemote(volume);
         } else {
             // Set the volume control to local
@@ -174,8 +173,8 @@ public class Metadata {
         }
     }
 
-    private void loadArtwork(TrackURL data) {
-        if(data == null) {
+    private void loadArtwork(Uri url) {
+        if(url == null) {
             // Interrupt the artwork thread if it's running
             if(artwork != null) artwork.interrupt();
             artwork = null;
@@ -188,24 +187,22 @@ public class Metadata {
         }
 
         // Ignore the same artwork to not download it again
-        if(data.url == null || data.equals(artworkUrl)) return;
+        if(url.equals(artworkUrl)) return;
 
         // Interrupt the artwork thread if it's running
         if(artwork != null) artwork.interrupt();
 
         // Create another thread to load the new artwork
-        artwork = new ArtworkLoader(context, this, data, maxArtworkSize);
+        artwork = new ArtworkLoader(context, this, url, maxArtworkSize);
         artwork.start();
     }
 
-    public void updateArtwork(TrackURL data, Bitmap bitmap, boolean fromLoader) {
-        // Interrupt the artwork thread if it's running
-        if(!fromLoader && artwork != null) artwork.interrupt();
+    public void updateArtwork(Uri uri, Bitmap bitmap) {
         artwork = null;
 
         // Fill artwork values
-        artworkUrl = data;
-        md.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, data.url);
+        artworkUrl = uri;
+        md.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, uri.toString());
         md.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, bitmap);
 
         // Update the metadata to the MediaSession and the notification
