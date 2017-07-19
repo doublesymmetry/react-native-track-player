@@ -10,7 +10,7 @@
 		9B0E282E1F07D76F00B71D2A /* RNTrackPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E282D1F07D76F00B71D2A /* RNTrackPlayer.m */; };
 		9B0E282F1F07D76F00B71D2A /* RNTrackPlayer.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B0E282C1F07D76F00B71D2A /* RNTrackPlayer.h */; };
 		9B0E287D1F0831AE00B71D2A /* Track.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E287C1F0831AE00B71D2A /* Track.m */; };
-		9B0E28801F0835BB00B71D2A /* TrackURL.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E287F1F0835BB00B71D2A /* TrackURL.m */; };
+		9B0E28801F0835BB00B71D2A /* MediaURL.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E287F1F0835BB00B71D2A /* MediaURL.m */; };
 		9B0E28831F08E9DC00B71D2A /* Player.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E28821F08E9DC00B71D2A /* Player.m */; };
 		9B0E28841F094D7E00B71D2A /* NSMutableArray+STKAudioPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E28711F07E0FE00B71D2A /* NSMutableArray+STKAudioPlayer.m */; };
 		9B0E28851F094D8000B71D2A /* STKAudioPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E28701F07E0FE00B71D2A /* STKAudioPlayer.m */; };
@@ -60,8 +60,8 @@
 		9B0E28751F07E0FE00B71D2A /* STKCoreFoundationDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STKCoreFoundationDataSource.m; sourceTree = "<group>"; };
 		9B0E287B1F0831AE00B71D2A /* Track.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Track.h; sourceTree = "<group>"; };
 		9B0E287C1F0831AE00B71D2A /* Track.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Track.m; sourceTree = "<group>"; };
-		9B0E287E1F0835BB00B71D2A /* TrackURL.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TrackURL.h; sourceTree = "<group>"; };
-		9B0E287F1F0835BB00B71D2A /* TrackURL.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TrackURL.m; sourceTree = "<group>"; };
+		9B0E287E1F0835BB00B71D2A /* MediaURL.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MediaURL.h; sourceTree = "<group>"; };
+		9B0E287F1F0835BB00B71D2A /* MediaURL.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MediaURL.m; sourceTree = "<group>"; };
 		9B0E28811F08E9DC00B71D2A /* Player.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Player.h; sourceTree = "<group>"; };
 		9B0E28821F08E9DC00B71D2A /* Player.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Player.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -142,8 +142,8 @@
 			children = (
 				9B0E287B1F0831AE00B71D2A /* Track.h */,
 				9B0E287C1F0831AE00B71D2A /* Track.m */,
-				9B0E287E1F0835BB00B71D2A /* TrackURL.h */,
-				9B0E287F1F0835BB00B71D2A /* TrackURL.m */,
+				9B0E287E1F0835BB00B71D2A /* MediaURL.h */,
+				9B0E287F1F0835BB00B71D2A /* MediaURL.m */,
 				9B0E28811F08E9DC00B71D2A /* Player.h */,
 				9B0E28821F08E9DC00B71D2A /* Player.m */,
 			);
@@ -208,7 +208,7 @@
 			files = (
 				9B0E28831F08E9DC00B71D2A /* Player.m in Sources */,
 				9B0E282E1F07D76F00B71D2A /* RNTrackPlayer.m in Sources */,
-				9B0E28801F0835BB00B71D2A /* TrackURL.m in Sources */,
+				9B0E28801F0835BB00B71D2A /* MediaURL.m in Sources */,
 				9B0E287D1F0831AE00B71D2A /* Track.m in Sources */,
 				9B0E28851F094D8000B71D2A /* STKAudioPlayer.m in Sources */,
 				9B0E28891F094D8800B71D2A /* STKDataSourceWrapper.m in Sources */,

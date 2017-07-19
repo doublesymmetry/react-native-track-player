@@ -15,7 +15,7 @@
     if (self) {
         _identifier = [dict objectForKey:@"id"];
         
-        _url = [[TrackURL alloc] initWithObject:[dict objectForKey:@"url"]];
+        _url = [[MediaURL alloc] initWithObject:[dict objectForKey:@"url"]];
         _duration = [dict objectForKey:@"duration"] != nil ? [dict objectForKey:@"duration"] : @(0);
         
         _title = [dict objectForKey:@"title"];
@@ -24,7 +24,7 @@
         _genre = [dict objectForKey:@"genre"];
         _date = [dict objectForKey:@"date"];
         _desc = [dict objectForKey:@"description"];
-        _artwork = [[TrackURL alloc] initWithObject:[dict objectForKey:@"artwork"]];
+        _artwork = [[MediaURL alloc] initWithObject:[dict objectForKey:@"artwork"]];
     }
     
     return self;

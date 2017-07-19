@@ -1,5 +1,5 @@
 //
-//  TrackURL.h
+//  MediaURL.h
 //  RNTrackPlayer
 //
 //  Created by David Chavez on 7/1/17.
@@ -8,7 +8,7 @@
 
 @import Foundation;
 
-@interface TrackURL : NSObject
+@interface MediaURL : NSObject
 @property(strong, nonatomic) NSURL *value;
 @property(assign, nonatomic) bool isLocal;
 

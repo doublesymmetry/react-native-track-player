@@ -8,12 +8,12 @@
 
 @import Foundation;
 
-#import "TrackURL.h"
+#import "MediaURL.h"
 
 @interface Track: NSObject
 @property(strong, nonatomic) NSString *identifier;
 
-@property(strong, nonatomic) TrackURL *url;
+@property(strong, nonatomic) MediaURL *url;
 @property(strong, nonatomic) NSNumber *duration;
 
 @property(strong, nonatomic) NSString *title;
@@ -22,7 +22,7 @@
 @property(strong, nonatomic) NSString *genre;
 @property(strong, nonatomic) NSString *date;
 @property(strong, nonatomic) NSString *desc;
-@property(strong, nonatomic) TrackURL *artwork;
+@property(strong, nonatomic) MediaURL *artwork;
 
 - (id)initWithDictionary:(NSDictionary *)dict;
 - (BOOL)needsNetwork;
