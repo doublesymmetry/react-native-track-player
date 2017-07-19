@@ -4,27 +4,21 @@ import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.media.AudioManager;
-import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Parcelable;
-import android.os.RemoteException;
-import android.support.v4.media.MediaBrowserCompat;
-import android.support.v4.media.MediaBrowserCompat.ConnectionCallback;
-import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
-import android.support.v4.media.session.MediaControllerCompat;
-import android.support.v4.media.session.MediaControllerCompat.TransportControls;
-import android.support.v4.media.session.MediaSessionCompat.QueueItem;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.util.Log;
-import com.facebook.react.bridge.*;
-import com.google.android.gms.cast.framework.CastContext;
-import com.google.android.gms.cast.framework.CastSession;
-import guichaguri.trackplayer.logic.Constants;
+import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
+import com.google.android.gms.cast.framework.CastState;
+import guichaguri.trackplayer.logic.Temp;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.components.MediaWrapper;
-import guichaguri.trackplayer.logic.workers.PlayerService;
+import guichaguri.trackplayer.logic.services.PlayerService;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,12 +27,10 @@ import javax.annotation.Nullable;
 /**
  * @author Guilherme Chaguri
  */
-public class TrackModule extends ReactContextBaseJavaModule {
+public class TrackModule extends ReactContextBaseJavaModule implements ServiceConnection {
 
-    private MediaBrowserCompat browser;
-    private MediaControllerCompat controller;
-    private TransportControls controls;
-
+    private MediaWrapper binder;
+    private boolean connecting = false;
     private Callback[] initCallbacks = null;
 
     public TrackModule(ReactApplicationContext context) {
@@ -54,11 +46,30 @@ public class TrackModule extends ReactContextBaseJavaModule {
     public void onCatalystInstanceDestroy() {
         super.onCatalystInstanceDestroy();
 
-        // Disconnects the media browser
-        if(browser != null) {
-            browser.disconnect();
-            browser = null;
+        // Unbinds the service
+        if(binder != null || connecting) {
+            getReactApplicationContext().unbindService(this);
         }
+    }
+
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        binder = (MediaWrapper)service;
+        connecting = false;
+
+        if(initCallbacks != null) {
+            // Triggers all callbacks from onReady
+            for(Callback cb : initCallbacks) {
+                Utils.triggerCallback(cb);
+            }
+            initCallbacks = null;
+        }
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+        binder = null;
+        connecting = false;
     }
 
     /* ****************************** API ****************************** */
@@ -70,9 +81,12 @@ public class TrackModule extends ReactContextBaseJavaModule {
 
         // Capabilities
         constants.put("CAPABILITY_PLAY", PlaybackStateCompat.ACTION_PLAY);
+        constants.put("CAPABILITY_PLAY_FROM_ID", PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID);
+        constants.put("CAPABILITY_PLAY_FROM_SEARCH", PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH);
         constants.put("CAPABILITY_PAUSE", PlaybackStateCompat.ACTION_PAUSE);
         constants.put("CAPABILITY_STOP", PlaybackStateCompat.ACTION_STOP);
         constants.put("CAPABILITY_SEEK_TO", PlaybackStateCompat.ACTION_SEEK_TO);
+        constants.put("CAPABILITY_SKIP", PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM);
         constants.put("CAPABILITY_SKIP_TO_NEXT", PlaybackStateCompat.ACTION_SKIP_TO_NEXT);
         constants.put("CAPABILITY_SKIP_TO_PREVIOUS", PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
         constants.put("CAPABILITY_SET_RATING", PlaybackStateCompat.ACTION_SET_RATING);
@@ -92,12 +106,18 @@ public class TrackModule extends ReactContextBaseJavaModule {
         constants.put("RATING_5_STARS", RatingCompat.RATING_5_STARS);
         constants.put("RATING_PERCENTAGE", RatingCompat.RATING_PERCENTAGE);
 
+        // Cast States
+        constants.put("CAST_NO_DEVICES_AVAILABLE", CastState.NO_DEVICES_AVAILABLE);
+        constants.put("CAST_NOT_CONNECTED", CastState.NOT_CONNECTED);
+        constants.put("CAST_CONNECTING", CastState.CONNECTING);
+        constants.put("CAST_CONNECTED", CastState.CONNECTED);
+
         return constants;
     }
 
     @ReactMethod
     public void onReady(Callback callback) {
-        if(browser != null && browser.isConnected()) {
+        if(binder != null) {
             // The module is already connected to the service
             Utils.triggerCallback(callback);
             return;
@@ -113,217 +133,126 @@ public class TrackModule extends ReactContextBaseJavaModule {
             initCallbacks[index] = callback;
         }
 
-        // The browser is already connecting
-        if(browser != null) return;
+        if(connecting) return;
 
         ReactApplicationContext context = getReactApplicationContext();
 
-        // Creates the media browser just to get the token
-        ComponentName comp = new ComponentName(context, PlayerService.class);
-        browser = new MediaBrowserCompat(context, comp, new MediaConnectionHandler(), null);
-        browser.connect();
+        // Binds the service to get a MediaWrapper instance
+        Intent intent = new Intent(context, PlayerService.class);
+        intent.setAction(PlayerService.ACTION_MEDIA_WRAPPER);
+        context.bindService(intent, this, Service.BIND_AUTO_CREATE);
+
+        connecting = true;
     }
 
     @ReactMethod
     public void setupPlayer(ReadableMap data, Promise promise) {
-        if(Utils.isPlaying(controller.getPlaybackState().getState())) {
-            // The player is already initialized
-            Utils.rejectCallback(promise, "setup", "Couldn't setup the player, it is already initialized!");
-            return;
-        }
-        //TODO
+        binder.setupPlayer(Temp.toBundle(data)); // TODO callback
     }
 
     @ReactMethod
     public void destroy() {
-        browser.disconnect();
+        binder.destroy();
+        //getReactApplicationContext().unbindService(this);
     }
 
     @ReactMethod
     public void setOptions(ReadableMap data) {
-        //manager.setOptions(data);//TODO
+        binder.updateOptions(Temp.toBundle(data));
     }
 
     @ReactMethod
-    public void add(String insertBeforeId, ReadableArray tracks, Promise callback) {
-        Bundle bundle = new Bundle();
-        bundle.putString("insertBeforeId", insertBeforeId);
-
-        Parcelable[] array = new Parcelable[tracks.size()];
-        for(int i = 0; i < tracks.size(); i++) {
-            array[i] = Arguments.toBundle(tracks.getMap(i));
-        }
-        bundle.putParcelableArray("tracks", array);
-
-        controls.sendCustomAction(Constants.ADD, bundle);//TODO
+    public void add(ReadableArray tracks, String insertBeforeId, Promise callback) {
+        binder.add(Temp.toList(tracks), insertBeforeId);//TODO callback
     }
 
     @ReactMethod
     public void remove(ReadableArray tracks, Promise callback) {
-        Bundle bundle = new Bundle();
-
-        String[] array = new String[tracks.size()];
-        for(int i = 0; i < tracks.size(); i++) {
-            array[i] = tracks.getString(i);
-        }
-        bundle.putStringArray("tracks", array);
-
-        controls.sendCustomAction(Constants.REMOVE, bundle);//TODO
+        binder.remove(Temp.toList(tracks));//TODO callback
     }
 
     @ReactMethod
     public void skip(String track, Promise callback) {
-        //TODO check if it will work for backwards queue
-        for(QueueItem item : controller.getQueue()) {
-            if(track.equals(item.getDescription().getMediaId())) {
-                controls.skipToQueueItem(item.getQueueId());
-                Utils.resolveCallback(callback);
-                return;
-            }
-        }
-        Utils.rejectCallback(callback, "skip", "The track was not found");
+        binder.skip(track);// TODO keep callback?
     }
 
     @ReactMethod
     public void skipToNext(Promise callback) {
-        controls.skipToNext();//TODO keep callback?
+        binder.skipToNext();//TODO keep callback?
     }
 
     @ReactMethod
     public void skipToPrevious(Promise callback) {
-        controls.skipToPrevious();//TODO keep callback?
-    }
-
-    @ReactMethod
-    public void load(ReadableMap data, Promise callback) {
-        controls.playFromMediaId();//TODO
+        binder.skipToPrevious();//TODO keep callback?
     }
 
     @ReactMethod
     public void reset() {
-        controls.sendCustomAction(Constants.RESET, null);
+        binder.reset();
     }
 
     @ReactMethod
     public void play() {
-        controls.play();
+        binder.play();
     }
 
     @ReactMethod
     public void pause() {
-        controls.pause();
+        binder.pause();
     }
 
     @ReactMethod
     public void stop() {
-        controls.stop();
+        binder.stop();
     }
 
     @ReactMethod
     public void seekTo(double seconds) {
-        controls.seekTo(Utils.toMillis(seconds));
+        binder.seekTo(Utils.toMillis(seconds));
     }
 
     @ReactMethod
     public void setVolume(float volume) {
-        int vol = (int)(volume * controller.getPlaybackInfo().getMaxVolume());
-        controller.setVolumeTo(vol, 0);
-    }
-
-    /*@ReactMethod
-    public void startScan(boolean active, Promise callback) {
-        //controls.sendCustomAction();//TODO
-        //manager.startScan(active, callback);
+        binder.setVolume(volume);
     }
 
     @ReactMethod
-    public void stopScan() {
-        //controls.sendCustomAction();//TODO
-        //manager.stopScan();
+    public void getVolume(Callback callback) {
+        Utils.triggerCallback(callback, binder.getVolume());
     }
 
     @ReactMethod
-    public void connect(String deviceId, Promise callback) {
-        //manager.connect(deviceId, callback);
-    }*/
+    public void getTrack(String id, Callback callback) {
+        Utils.triggerCallback(callback, Temp.fromBundle(binder.getTrack(id)));
+    }
 
     @ReactMethod
     public void getCurrentTrack(Callback callback) {
-        long id = controller.getPlaybackState().getActiveQueueItemId();
-        for(QueueItem item : controller.getQueue()) {
-            if(item.getQueueId() == id) {
-                Utils.triggerCallback(callback, item.getDescription().getMediaId());
-                return;
-            }
-        }
-
-        // Nothing is playing?
-        Utils.triggerCallback(callback);
+        Utils.triggerCallback(callback, binder.getCurrentTrack());
     }
 
     @ReactMethod
     public void getDuration(Callback callback) {
-        long duration = controller.getMetadata().getLong(MediaMetadataCompat.METADATA_KEY_DURATION);
-        Utils.triggerCallback(callback, Utils.toSeconds(duration));
+        Utils.triggerCallback(callback, Utils.toSeconds(binder.getDuration()));
     }
 
     @ReactMethod
     public void getBufferedPosition(Callback callback) {
-        Utils.triggerCallback(callback, Utils.toSeconds(controller.getPlaybackState().getBufferedPosition()));
+        Utils.triggerCallback(callback, Utils.toSeconds(binder.getBufferedPosition()));
     }
 
     @ReactMethod
     public void getPosition(Callback callback) {
-        Utils.triggerCallback(callback, Utils.toSeconds(controller.getPlaybackState().getPosition()));
+        Utils.triggerCallback(callback, Utils.toSeconds(binder.getPosition()));
     }
 
     @ReactMethod
     public void getState(Callback callback) {
-        Utils.triggerCallback(callback, controller.getPlaybackState().getState());
+        Utils.triggerCallback(callback, binder.getState());
     }
 
-    /*@ReactMethod
-    public void isRemote(Callback callback) {
-        CastContext cast = CastContext.getSharedInstance(getReactApplicationContext());
-        CastSession session = cast.getSessionManager().getCurrentCastSession();
-
-        Utils.triggerCallback(callback, session != null && session.isConnected());//TODO
-    }*/
-
-
-    private class MediaConnectionHandler extends ConnectionCallback {
-        @Override
-        public void onConnected() {
-            try {
-                controller = new MediaControllerCompat(getReactApplicationContext(), browser.getSessionToken());
-                controls = controller.getTransportControls();
-            } catch(RemoteException ex) {
-                Log.e("ReactNativeTrackPlayer", "An error occurred while creating the media controller.", ex);
-            }
-
-            if(initCallbacks != null) {
-                // Triggers all callbacks from onReady
-                for(Callback cb : initCallbacks) {
-                    Utils.triggerCallback(cb);
-                }
-                initCallbacks = null;
-            }
-        }
-
-        @Override
-        public void onConnectionSuspended() {
-            Log.d("ReactNativeTrackPlayer", "The connection to the media browser was suspended");
-            browser = null;
-            controller = null;
-            controls = null;
-        }
-
-        @Override
-        public void onConnectionFailed() {
-            Log.e("ReactNativeTrackPlayer", "Couldn't connect to the media browser. Something went wrong");
-            browser = null;
-            controller = null;
-            controls = null;
-        }
+    @ReactMethod
+    public void getCastState(Callback callback) {
+        Utils.triggerCallback(callback, binder.getCastState());
     }
 }
