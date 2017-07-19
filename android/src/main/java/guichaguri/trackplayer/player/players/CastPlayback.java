@@ -101,6 +101,8 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
             queue.addAll(tracks);
         }
 
+        manager.onQueueUpdate();
+
         MediaQueueItem[] items = new MediaQueueItem[tracks.size()];
 
         for(int i = 0; i < tracks.size(); i++) {
@@ -128,6 +130,8 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
                 }
             }
         }
+
+        manager.onQueueUpdate();
 
         PendingResult<MediaChannelResult> result = player.queueRemoveItems(trackIds, null);
 
@@ -360,7 +364,7 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
 
         if(queueChanged) {
             queue = newQueue;
-            manager.onTrackUpdate();
+            manager.onQueueUpdate();
         }
 
         updateCurrentTrackClient(status.getCurrentItemId());

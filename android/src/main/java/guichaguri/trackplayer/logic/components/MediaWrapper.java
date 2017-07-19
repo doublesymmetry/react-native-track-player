@@ -3,6 +3,7 @@ package guichaguri.trackplayer.logic.components;
 import android.content.Context;
 import android.os.Binder;
 import android.os.Bundle;
+import com.facebook.react.bridge.Promise;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.track.Track;
 import java.util.ArrayList;
@@ -21,40 +22,36 @@ public class MediaWrapper extends Binder {
         this.manager = manager;
     }
 
-    public void setupPlayer(Bundle options) {
-        manager.setupPlayer(options);
+    public void setupPlayer(Bundle options, Promise promise) {
+        manager.setupPlayer(options, promise);
     }
 
     public void updateOptions(Bundle bundle) {
         manager.updateOptions(bundle);
     }
 
-    public void add(List<Bundle> tracks, String insertBeforeId) {
+    public void add(List<Bundle> tracks, String insertBeforeId, Promise promise) {
         List<Track> list = new ArrayList<>();
         for(int i = 0; i < tracks.size(); i++) {
             list.add(new Track(context, manager, tracks.get(i)));
         }
-        manager.getPlayback().add(list, insertBeforeId);
+        manager.getPlayback().add(list, insertBeforeId, promise);
     }
 
-    public void remove(List<String> ids) {
-        manager.getPlayback().remove(ids);
+    public void remove(List<String> ids, Promise promise) {
+        manager.getPlayback().remove(ids, promise);
     }
 
-    public void skip(String id) {
-        manager.getPlayback().skip(id);
+    public void skip(String id, Promise promise) {
+        manager.getPlayback().skip(id, promise);
     }
 
-    public void skipToNext() {
-        manager.getPlayback().skipToNext();
+    public void skipToNext(Promise promise) {
+        manager.getPlayback().skipToNext(promise);
     }
 
-    public void skipToPrevious() {
-        manager.getPlayback().skipToPrevious();
-    }
-
-    public void load() {
-        manager.getPlayback().load();
+    public void skipToPrevious(Promise promise) {
+        manager.getPlayback().skipToPrevious(promise);
     }
 
     public void reset() {

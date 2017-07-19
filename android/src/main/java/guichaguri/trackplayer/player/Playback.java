@@ -89,6 +89,8 @@ public abstract class Playback {
         } else {
             Utils.resolveCallback(callback);
         }
+
+        manager.onQueueUpdate();
     }
 
     public void skip(String id, Promise callback) {
@@ -126,6 +128,8 @@ public abstract class Playback {
 
     public void reset() {
         queue.clear();
+        manager.onQueueUpdate();
+
         currentTrack = -1;
         manager.onTrackUpdate();
     }

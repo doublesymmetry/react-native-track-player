@@ -7,13 +7,12 @@ import android.net.wifi.WifiManager.WifiLock;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableMap;
+import android.util.Log;
+import com.facebook.react.bridge.Promise;
 import guichaguri.trackplayer.cast.GoogleCast;
 import guichaguri.trackplayer.logic.components.FocusManager;
+import guichaguri.trackplayer.logic.services.PlayerService;
 import guichaguri.trackplayer.logic.track.Track;
-import guichaguri.trackplayer.logic.workers.PlayerService;
 import guichaguri.trackplayer.metadata.Metadata;
 import guichaguri.trackplayer.metadata.components.MediaNotification;
 import guichaguri.trackplayer.player.Playback;
@@ -40,8 +39,16 @@ public class MediaManager {
     public MediaManager(PlayerService service) {
         this.service = service;
         this.metadata = new Metadata(service, this);
-        this.cast = new GoogleCast(service.getApplicationContext(), this);
+
+        if(LibHelper.isChromecastAvailable(service)) {
+            this.cast = new GoogleCast(service.getApplicationContext(), this);
+        } else {
+            this.cast = null;
+        }
+
         this.focus = new FocusManager(service, metadata);
+
+        service.setSessionToken(metadata.getToken());
 
         PowerManager powerManager = (PowerManager)service.getSystemService(Context.POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "track-playback-wake-lock");
@@ -52,39 +59,43 @@ public class MediaManager {
         wifiLock.setReferenceCounted(false);
     }
 
-    public void updateOptions(ReadableMap data) {
+    public void updateOptions(Bundle data) {
         metadata.updateOptions(data);
         metadata.updatePlayback(playback);
     }
 
     public Playback createLocalPlayback() {
         if(LibHelper.isExoPlayerAvailable()) {
-            Utils.log("Creating an ExoPlayer instance...");
+            Log.i(Utils.TAG, "Creating an ExoPlayer instance...");
             return new ExoPlayback(service, this, playbackOptions);
         } else {
-            Utils.log("Creating a MediaPlayer instance...");
+            Log.i(Utils.TAG, "Creating a MediaPlayer instance...");
             return new AndroidPlayback(service, this, playbackOptions);
         }
     }
 
-    public void setupPlayer(Bundle options) {
+    public void setupPlayer(Bundle options, Promise promise) {
+        if(playback != null) {
+            Utils.rejectCallback(promise, "setupPlayer", "The playback is already initialized");
+            return;
+        }
+
         playbackOptions = options;
         playback = createLocalPlayback();
+
+        Utils.resolveCallback(promise);
     }
 
     public void destroyPlayer() {
         playback.destroy();
         if(!Utils.isStopped(playback.getState())) onStop();
+        playback = null;
 
         if(serviceStarted) {
-            Utils.log("Marking the service as stopped, as there's nothing playing");
+            Log.i(Utils.TAG, "Marking the service as stopped, as we don't need it anymore");
             service.stopSelf();
             serviceStarted = false;
         }
-    }
-
-    public GoogleCast getCast() {
-        return cast;
     }
 
     public int getRatingType() {
@@ -103,8 +114,9 @@ public class MediaManager {
         playback = pb;
 
         // Update the metadata
-        metadata.updatePlayback(playback);
+        metadata.updateQueue(playback);
         metadata.updateMetadata(playback);
+        metadata.updatePlayback(playback);
     }
 
     public Playback getPlayback() {
@@ -122,7 +134,10 @@ public class MediaManager {
         metadata.setEnabled(true);
 
         if(!playback.isRemote()) {
+            // Enable the audio focus so the device knows we are playing music
             focus.enable();
+
+            // Acquire the wake lock so the device doesn't sleeps stopping the music
             if(!wakeLock.isHeld()) wakeLock.acquire();
 
             if(!playback.getCurrentTrack().urlLocal) {
@@ -132,7 +147,7 @@ public class MediaManager {
         }
 
         if(!serviceStarted) {
-            Utils.log("Marking the service as started, as there is now playback");
+            Log.i(Utils.TAG, "Marking the service as started, as there is now playback");
             service.startService(new Intent(service, PlayerService.class));
             serviceStarted = true;
         }
@@ -145,6 +160,7 @@ public class MediaManager {
         service.stopForeground(false);
 
         if(!playback.isRemote()) {
+            // Release the wake lock
             if(wakeLock.isHeld()) wakeLock.release();
 
             if(wifiLock.isHeld()) {
@@ -168,6 +184,7 @@ public class MediaManager {
         metadata.setEnabled(false);
 
         if(!playback.isRemote()) {
+            // Release the wake lock
             if(wakeLock.isHeld()) wakeLock.release();
 
             if(wifiLock.isHeld()) {
@@ -183,9 +200,9 @@ public class MediaManager {
     }
 
     public void onLoad(Track track) {
-        WritableMap data = Arguments.createMap();
-        data.putString("track", track.id);
-        Events.dispatchEvent(service, Events.PLAYBACK_LOAD, data);
+        Bundle bundle = new Bundle();
+        bundle.putString("track", track.id);
+        Events.dispatchEvent(service, Events.PLAYBACK_LOAD, bundle);
     }
 
     public void onEnd() {
@@ -193,9 +210,9 @@ public class MediaManager {
     }
 
     public void onStateChange(int state) {
-        WritableMap data = Arguments.createMap();
-        data.putInt("state", state);
-        Events.dispatchEvent(service, Events.PLAYBACK_STATE, data);
+        Bundle bundle = new Bundle();
+        bundle.putInt("state", state);
+        Events.dispatchEvent(service, Events.PLAYBACK_STATE, bundle);
     }
 
     public void onTrackUpdate() {
@@ -206,10 +223,14 @@ public class MediaManager {
         metadata.updatePlayback(playback);
     }
 
+    public void onQueueUpdate() {
+        metadata.updateQueue(playback);
+    }
+
     public void onError(Throwable error) {
-        WritableMap data = Arguments.createMap();
-        data.putString("error", error.getMessage());
-        Events.dispatchEvent(service, Events.PLAYBACK_ERROR, data);
+        Bundle bundle = new Bundle();
+        bundle.putString("error", error.getMessage());
+        Events.dispatchEvent(service, Events.PLAYBACK_ERROR, bundle);
     }
 
     public void onCommand(Intent intent) {
@@ -217,10 +238,10 @@ public class MediaManager {
     }
 
     public void onServiceDestroy() {
-        Utils.log("Destroying resources");
+        Log.i(Utils.TAG, "Destroying resources");
 
         // Destroy the playback
-        playback.destroy();
+        if(playback != null) playback.destroy();
 
         // Remove the audio focus
         focus.disable();
@@ -229,7 +250,7 @@ public class MediaManager {
         metadata.destroy();
 
         // Destroy the cast resources
-        cast.disconnect(false);
+        if(cast != null) cast.destroy();
 
         // Release the wifi lock
         if(wifiLock.isHeld()) {

@@ -154,7 +154,7 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @ReactMethod
     public void setupPlayer(ReadableMap data, Promise promise) {
-        binder.setupPlayer(Temp.toBundle(data)); // TODO callback
+        binder.setupPlayer(Temp.toBundle(data), promise); //TODO check if callback works properly
     }
 
     @ReactMethod
@@ -164,33 +164,33 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void setOptions(ReadableMap data) {
+    public void updateOptions(ReadableMap data) {
         binder.updateOptions(Temp.toBundle(data));
     }
 
     @ReactMethod
     public void add(ReadableArray tracks, String insertBeforeId, Promise callback) {
-        binder.add(Temp.toList(tracks), insertBeforeId);//TODO callback
+        binder.add(Temp.toList(tracks), insertBeforeId, callback);//TODO check if callback works properly
     }
 
     @ReactMethod
     public void remove(ReadableArray tracks, Promise callback) {
-        binder.remove(Temp.toList(tracks));//TODO callback
+        binder.remove(Temp.toList(tracks), callback);//TODO check if callback works properly
     }
 
     @ReactMethod
     public void skip(String track, Promise callback) {
-        binder.skip(track);// TODO keep callback?
+        binder.skip(track, callback);//TODO check if callback works properly
     }
 
     @ReactMethod
     public void skipToNext(Promise callback) {
-        binder.skipToNext();//TODO keep callback?
+        binder.skipToNext(callback);//TODO check if callback works properly
     }
 
     @ReactMethod
     public void skipToPrevious(Promise callback) {
-        binder.skipToPrevious();//TODO keep callback?
+        binder.skipToPrevious(callback);//TODO check if callback works properly
     }
 
     @ReactMethod
