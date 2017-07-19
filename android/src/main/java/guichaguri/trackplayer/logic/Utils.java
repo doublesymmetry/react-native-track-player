@@ -2,20 +2,14 @@ package guichaguri.trackplayer.logic;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.Build;
+import android.os.Bundle;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.util.Log;
 import android.view.KeyEvent;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.ReadableType;
-import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
-import guichaguri.trackplayer.BuildConfig;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,13 +18,7 @@ import org.json.JSONObject;
  */
 public class Utils {
 
-    private static final boolean LOG = BuildConfig.DEBUG || Build.PRODUCT.contains("sdk") || Boolean.getBoolean("guichaguri.trackplayer.log");
-
-    public static void log(String msg, Object ... args) {
-        if(LOG) {
-            Log.i("ReactNativeTrackPlayer", String.format(msg, args));
-        }
-    }
+    public static final String TAG = "ReactNativeTrackPlayer";
 
     public static String getString(JSONObject object, String key, String def) {
         try {
@@ -48,61 +36,32 @@ public class Utils {
         }
     }
 
-    public static String getString(ReadableMap map, String key) {
-        return getString(map, key, null);
+    public static long getTime(Bundle map, String key, long def) {
+        if(!map.containsKey(key)) return def;
+        Object obj = map.get(key);
+        if(!(obj instanceof Number)) return def;
+        return toMillis(((Number)obj).doubleValue());
     }
 
-    public static String getString(ReadableMap map, String key, String def) {
-        return map.hasKey(key) && map.getType(key) == ReadableType.String ? map.getString(key) : def;
+    public static void setTime(Bundle bundle, String key, long time) {
+        bundle.putDouble(key, toSeconds(time));
     }
 
-    public static int getInt(ReadableMap map, String key, int def) {
-        return map.hasKey(key) && map.getType(key) == ReadableType.Number ? map.getInt(key) : def;
-    }
-
-    public static double getDouble(ReadableMap map, String key, double def) {
-        return map.hasKey(key) && map.getType(key) == ReadableType.Number ? map.getDouble(key) : def;
-    }
-
-    public static boolean getBoolean(ReadableMap map, String key, boolean def) {
-        return map.hasKey(key) && map.getType(key) == ReadableType.Boolean ? map.getBoolean(key) : def;
-    }
-
-    public static ReadableMap getMap(ReadableMap map, String key) {
-        return getMap(map, key, null);
-    }
-
-    public static ReadableMap getMap(ReadableMap map, String key, ReadableMap def) {
-        return map.hasKey(key) && map.getType(key) == ReadableType.Map ? map.getMap(key) : def;
-    }
-
-    public static long getTime(ReadableMap map, String key, long def) {
-        return map.hasKey(key) && map.getType(key) == ReadableType.Number ? toMillis(map.getDouble(key)) : def;
-    }
-
-    public static void setTime(WritableMap map, String key, long time) {
-        map.putDouble(key, toSeconds(time));
-    }
-
-    public static ReadableArray getArray(ReadableMap map, String key, ReadableArray def) {
-        return map.hasKey(key) && map.getType(key) == ReadableType.Array ? map.getArray(key) : def;
-    }
-
-    public static RatingCompat getRating(ReadableMap data, String key, int ratingType) {
-        if(!data.hasKey(key) || data.getType(key) == ReadableType.Null) {
+    public static RatingCompat getRating(Bundle data, String key, int ratingType) {
+        if(!data.containsKey(key)) {
             return RatingCompat.newUnratedRating(ratingType);
         } else if(ratingType == RatingCompat.RATING_HEART) {
-            return RatingCompat.newHeartRating(Utils.getBoolean(data, key, true));
+            return RatingCompat.newHeartRating(data.getBoolean(key, true));
         } else if(ratingType == RatingCompat.RATING_THUMB_UP_DOWN) {
-            return RatingCompat.newThumbRating(Utils.getBoolean(data, key, true));
+            return RatingCompat.newThumbRating(data.getBoolean(key, true));
         } else if(ratingType == RatingCompat.RATING_PERCENTAGE) {
-            return RatingCompat.newPercentageRating((float)Utils.getDouble(data, key, 0));
+            return RatingCompat.newPercentageRating(data.getFloat(key, 0));
         } else {
-            return RatingCompat.newStarRating(ratingType, (float)Utils.getDouble(data, key, 0));
+            return RatingCompat.newStarRating(ratingType, data.getFloat(key, 0));
         }
     }
 
-    public static void setRating(WritableMap data, String key, RatingCompat rating) {
+    public static void setRating(Bundle data, String key, RatingCompat rating) {
         if(!rating.isRated()) return;
         int ratingType = rating.getRatingStyle();
 
@@ -117,22 +76,22 @@ public class Utils {
         }
     }
 
-    public static Uri getUri(Context context, ReadableMap map, String key, Uri def) {
-        if(!map.hasKey(key)) return def;
+    public static Uri getUri(Context context, Bundle data, String key, Uri def) {
+        if(!data.containsKey(key)) return def;
 
-        ReadableType type = map.getType(key);
-        if(type == ReadableType.String) {
-            return Uri.parse(map.getString(key));
-        } else if(type == ReadableType.Map) {
-            String uri = map.getMap(key).getString("uri");
+        Object obj = data.get(key);
+        if(obj instanceof String) {
+            return Uri.parse((String)obj);
+        } else if(obj instanceof Bundle) {
+            String uri = ((Bundle)obj).getString("uri");
             return ResourceDrawableIdHelper.getInstance().getResourceDrawableUri(context, uri);
         }
         return def;
     }
 
-    public static int getResourceId(Context context, ReadableMap map) {
+    public static int getResourceId(Context context, Bundle bundle) {
         ResourceDrawableIdHelper helper = ResourceDrawableIdHelper.getInstance();
-        return helper.getResourceDrawableId(context, map.getString("uri"));
+        return helper.getResourceDrawableId(context, bundle.getString("uri"));
     }
 
     public static long toMillis(double seconds) {
