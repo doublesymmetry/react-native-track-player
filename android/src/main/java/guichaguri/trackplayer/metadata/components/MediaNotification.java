@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.v4.app.NotificationCompat.Action;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.media.MediaDescriptionCompat;
@@ -14,11 +15,8 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.NotificationCompat;
 import android.support.v7.app.NotificationCompat.MediaStyle;
 import android.view.KeyEvent;
-import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.ReadableType;
 import guichaguri.trackplayer.logic.Utils;
-import guichaguri.trackplayer.logic.workers.PlayerService;
+import guichaguri.trackplayer.logic.services.PlayerService;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +32,8 @@ public class MediaNotification {
     private NotificationCompat.Builder nb;
     private MediaStyle style;
 
-    private int playIcon, pauseIcon, stopIcon, previousIcon, nextIcon;
+    private int color = NotificationCompat.COLOR_DEFAULT;
+    private int smallIcon, playIcon, pauseIcon, stopIcon, previousIcon, nextIcon;
     private Action play, pause, stop, previous, next;
 
     private int compactCapabilities = 0;
@@ -56,6 +55,7 @@ public class MediaNotification {
         Intent openApp = context.getPackageManager().getLaunchIntentForPackage(packageName);
         nb.setContentIntent(PendingIntent.getActivity(context, 0, openApp, 0));
 
+        smallIcon = 0;
         playIcon = loadIcon("play");
         pauseIcon = loadIcon("pause");
         stopIcon = loadIcon("stop");
@@ -66,32 +66,30 @@ public class MediaNotification {
     }
 
     @SuppressWarnings("ResourceAsColor")
-    public void updateOptions(ReadableMap data) {
+    public void updateOptions(Bundle data) {
         // Load the icons
-        playIcon = loadIcon(data, "playIcon", "play");
-        pauseIcon = loadIcon(data, "pauseIcon", "pause");
-        stopIcon = loadIcon(data, "stopIcon", "stop");
-        previousIcon = loadIcon(data, "previousIcon", "previous");
-        nextIcon = loadIcon(data, "nextIcon", "next");
+        playIcon = loadIcon(data, "playIcon", playIcon);
+        pauseIcon = loadIcon(data, "pauseIcon", pauseIcon);
+        stopIcon = loadIcon(data, "stopIcon", stopIcon);
+        previousIcon = loadIcon(data, "previousIcon", previousIcon);
+        nextIcon = loadIcon(data, "nextIcon", nextIcon);
 
         // Load the color and the small icon
-        int color = data.hasKey("color") ? data.getInt("color") : NotificationCompat.COLOR_DEFAULT;
-        int icon = data.hasKey("icon") ? Utils.getResourceId(context, data.getMap("icon")) : 0;
+        color = data.getInt("color", color);
+        smallIcon = data.containsKey("icon") ? Utils.getResourceId(context, data.getBundle("icon")) : smallIcon;
 
         // Update properties
         nb.setColor(color);
         nb.setLights(color, 250, 250);
-        nb.setSmallIcon(icon != 0 ? icon : playIcon);
+        nb.setSmallIcon(smallIcon != 0 ? smallIcon : playIcon);
 
         // Update compact capabilities
-        compactCapabilities = 0;
+        int[] array = data.getIntArray("compactCapabilities");
 
-        ReadableArray array = Utils.getArray(data, "compactCapabilities", null);
-        if(array == null) return;
-
-        for(int i = 0; i < array.size(); i++) {
-            if(array.getType(i) == ReadableType.Number) {
-                compactCapabilities |= array.getInt(i);
+        if(array != null) {
+            compactCapabilities = 0;
+            for(int i = 0; i < array.length; i++) {
+                compactCapabilities |= array[i];
             }
         }
 
@@ -157,15 +155,13 @@ public class MediaNotification {
         update();
     }
 
-    private int loadIcon(ReadableMap data, String key, String iconName) {
-        if(data.hasKey(key)) {
+    private int loadIcon(Bundle data, String key, int icon) {
+        if(data.containsKey(key)) {
             // Load icon from option value
-            int id = Utils.getResourceId(context, data.getMap(key));
+            int id = Utils.getResourceId(context, data.getBundle(key));
             if(id != 0) return id;
         }
-
-        // Load default icon
-        return loadIcon(iconName);
+        return icon;
     }
 
     private int loadIcon(String iconName) {

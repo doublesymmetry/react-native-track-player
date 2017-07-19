@@ -5,15 +5,15 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.MediaSessionCompat.QueueItem;
+import android.support.v4.media.session.MediaSessionCompat.Token;
 import android.support.v4.media.session.PlaybackStateCompat;
-import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.ReadableType;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.track.Track;
@@ -23,6 +23,8 @@ import guichaguri.trackplayer.metadata.components.CustomVolume;
 import guichaguri.trackplayer.metadata.components.MediaNotification;
 import guichaguri.trackplayer.metadata.components.NoisyReceiver;
 import guichaguri.trackplayer.player.Playback;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Guilherme Chaguri
@@ -63,20 +65,31 @@ public class Metadata {
         session.setActive(enabled);
     }
 
+    public Token getToken() {
+        return session.getSessionToken();
+    }
+
     @SuppressWarnings("WrongConstant")
-    public void updateOptions(ReadableMap data) {
+    public void updateOptions(Bundle data) {
         // Update notification options
         notification.updateOptions(data);
 
         // Load the options
-        ratingType = Utils.getInt(data, "ratingType", RatingCompat.RATING_HEART);
-        maxArtworkSize = Utils.getInt(data, "maxArtworkSize", 2000);
+        ratingType = data.getInt("ratingType", ratingType);
+        maxArtworkSize = data.getInt("maxArtworkSize", maxArtworkSize);
 
         // Update the rating type
         session.setRatingType(ratingType);
 
         // Update the capabilities
-        updateCapabilities(data);
+        int[] array = data.getIntArray("capabilities");
+
+        if(array != null) {
+            capabilities = 0;
+            for(int i = 0; i < array.length; i++) {
+                capabilities |= array[i];
+            }
+        }
     }
 
     public void updateMetadata(Playback playback) {
@@ -93,7 +106,7 @@ public class Metadata {
 
         Track track = playback.getCurrentTrack();
         long duration = playback.getDuration();
-        if(duration == 0) duration = track.duration;
+        if(duration <= 0) duration = track.duration;
 
         // Fill the metadata builder
         md.putString(MediaMetadataCompat.METADATA_KEY_TITLE, track.title);
@@ -104,6 +117,9 @@ public class Metadata {
         md.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION, track.description);
         md.putRating(MediaMetadataCompat.METADATA_KEY_RATING, track.rating);
         md.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration);
+
+        // Update the queue item
+        pb.setActiveQueueItemId(track.queueId);
 
         // Load the artwork
         loadArtwork(track.artwork);
@@ -131,7 +147,7 @@ public class Metadata {
         int playerState = playback.getState();
 
         // Update the state, position, speed and buffered position
-        pb.setState(playerState, playback.getPosition(), playback.getSpeed(), playback.getPositionUpdateTime());
+        pb.setState(playerState, playback.getPosition(), playback.getSpeed());
         pb.setBufferedPosition(playback.getBufferedPosition());
 
         // Update the capabilities
@@ -160,17 +176,12 @@ public class Metadata {
         noisyReceiver.setEnabled(Utils.isPlaying(playerState));
     }
 
-    private void updateCapabilities(ReadableMap data) {
-        capabilities = 0;
-
-        ReadableArray array = Utils.getArray(data, "capabilities", null);
-        if(array == null) return;
-
-        for(int i = 0; i < array.size(); i++) {
-            if(array.getType(i) == ReadableType.Number) {
-                capabilities |= array.getInt(i);
-            }
+    public void updateQueue(Playback playback) {
+        List<QueueItem> items = new ArrayList<>();
+        for(Track track : playback.getQueue()) {
+            items.add(track.toQueueItem());
         }
+        session.setQueue(items);
     }
 
     private void loadArtwork(Uri url) {
