@@ -1,4 +1,4 @@
-const ReactNative = require('react-native');
-const TrackPlayer = ReactNative.NativeModules.TrackPlayerModule;
+// For documentation, check our wiki
+// https://github.com/Guichaguri/react-native-track-player/wiki
 
-module.exports = TrackPlayer;
+module.exports = require('./lib/index.js');
