@@ -126,17 +126,6 @@
     return NO;
 }
 
-- (void)loadTrack:(Track *)track {
-    [_player stop];
-    
-    if (_queue.count > 0) {
-        _currentIndex++;
-    }
-    
-    // TODO: - Implement preloading (this would be the perfect time)
-    [_queue insertObject:track atIndex:_currentIndex];
-}
-
 - (void)reset {
     [_queue removeAllObjects];
     [_player stop];

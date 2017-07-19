@@ -17,7 +17,6 @@
 - (void)skipToTrack:(NSString *)trackId;
 - (BOOL)playNext;
 - (BOOL)playPrevious;
-- (void)loadTrack:(Track *)track;
 - (void)reset;
 - (void)play;
 - (void)pause;

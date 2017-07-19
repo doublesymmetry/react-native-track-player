@@ -135,19 +135,6 @@ RCT_EXPORT_METHOD(skipToPrevious:(RCTPromiseResolveBlock)resolve
     }
 }
 
-RCT_EXPORT_METHOD(load:(NSDictionary *)trackDict
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-    // TODO: - Resolve what this method will do with Android API revamp
-    
-    Track *track = [[Track alloc] initWithDictionary:trackDict];
-    
-    NSLog(@"Loading track: %@", trackDict);
-    [_player loadTrack:track];
-    
-    resolve([NSNull null]);
-}
-
 RCT_EXPORT_METHOD(reset) {
     NSLog(@"Resetting player.");
     [_player reset];
