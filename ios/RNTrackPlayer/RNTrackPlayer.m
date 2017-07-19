@@ -75,7 +75,7 @@ RCT_EXPORT_METHOD(add:(NSString *)beforeTrackId
                   tracks:(NSArray *)trackDicts
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
-    if (![_player queueContainsTrack:beforeTrackId]) {
+    if (![_player queueContainsTrack:beforeTrackId] && beforeTrackId != nil) {
         reject(@"track_not_in_queue", @"Given track ID was not found in queue", nil);
         return;
     }
