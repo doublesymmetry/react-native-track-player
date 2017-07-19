@@ -70,12 +70,11 @@ RCT_EXPORT_METHOD(setOptions:(NSDictionary *)options) {
     // TODO: - Implement
 }
 
-// TODO: Change signature to addTracks beforeTrackId
-RCT_EXPORT_METHOD(add:(NSString *)beforeTrackId
-                  tracks:(NSArray *)trackDicts
+RCT_EXPORT_METHOD(add:(NSArray *)trackDicts
+                  before:(NSString *)trackId
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
-    if (![_player queueContainsTrack:beforeTrackId] && beforeTrackId != nil) {
+    if (![_player queueContainsTrack:trackId] && trackId != nil) {
         reject(@"track_not_in_queue", @"Given track ID was not found in queue", nil);
         return;
     }
@@ -87,7 +86,7 @@ RCT_EXPORT_METHOD(add:(NSString *)beforeTrackId
     }
     
     NSLog(@"Adding tracks: %@", tracks);
-    [_player addTracks:tracks before:beforeTrackId];
+    [_player addTracks:tracks before:trackId];
     
     resolve([NSNull null]);
 }
