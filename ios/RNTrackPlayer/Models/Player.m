@@ -59,7 +59,8 @@
     }];
     
     if (indexFound) {
-        NSIndexSet *indexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(indexToInsertAt, tracks.count)];
+        NSRange range = NSMakeRange(indexToInsertAt, tracks.count);
+        NSIndexSet *indexes = [NSIndexSet indexSetWithIndexesInRange:range];
         [_queue insertObjects:tracks atIndexes:indexes];
     } else {
         [_queue addObjectsFromArray:tracks];
@@ -68,7 +69,9 @@
 
 - (void)removeTrackIds:(NSArray *)trackIds {
     __block BOOL removedCurrentTrack = NO;
-    __block NSMutableArray *tracksToKeep = [NSMutableArray arrayWithCapacity:_queue.count - trackIds.count];
+    
+    NSUInteger numberOfTracksToKeep = _queue.count - trackIds.count;
+    __block NSMutableArray *tracksToKeep = [NSMutableArray arrayWithCapacity:numberOfTracksToKeep];
     
     [_queue enumerateObjectsUsingBlock:^(id track, NSUInteger queueIndex, BOOL *stop) {
         for (id identifier in trackIds) {
@@ -174,16 +177,11 @@
 }
 
 - (void)seekToTime:(NSInteger)time {
-    [_player mute];
-    if (_player.state != STKAudioPlayerStatePlaying) {
-        [self play];
-    }
-    
     double delayInSeconds = 0.1;
-    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+    int64_t delay = (int64_t)(delayInSeconds * NSEC_PER_SEC);
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delay);
     dispatch_after(popTime, dispatch_get_main_queue(), ^() {
         [_player seekToTime:time];
-        [_player unmute];
     });
 }
 
@@ -223,19 +221,28 @@
 
 // MARK: - STKAudioPlayerDelegate
 
-- (void)audioPlayer:(STKAudioPlayer *)audioPlayer didFinishBufferingSourceWithQueueItemId:(NSObject *)queueItemId {}
+- (void)audioPlayer:(STKAudioPlayer *)audioPlayer
+didFinishBufferingSourceWithQueueItemId:(NSObject *)queueItemId {}
 
-- (void)audioPlayer:(STKAudioPlayer *)audioPlayer didFinishPlayingQueueItemId:(NSObject *)queueItemId withReason:(STKAudioPlayerStopReason)stopReason andProgress:(double)progress andDuration:(double)duration {
+- (void)audioPlayer:(STKAudioPlayer *)audioPlayer
+didFinishPlayingQueueItemId:(NSObject *)queueItemId
+         withReason:(STKAudioPlayerStopReason)stopReason
+        andProgress:(double)progress
+        andDuration:(double)duration {
     // Play the next song in the queue when song ends
     if (stopReason == STKAudioPlayerStopReasonEof) {
         [self playNext];
     }
 }
 
-- (void)audioPlayer:(STKAudioPlayer *)audioPlayer didStartPlayingQueueItemId:(NSObject *)queueItemId {}
+- (void)audioPlayer:(STKAudioPlayer *)audioPlayer
+didStartPlayingQueueItemId:(NSObject *)queueItemId {}
 
-- (void)audioPlayer:(STKAudioPlayer *)audioPlayer stateChanged:(STKAudioPlayerState)state previousState:(STKAudioPlayerState)previousState {}
+- (void)audioPlayer:(STKAudioPlayer *)audioPlayer
+       stateChanged:(STKAudioPlayerState)state
+      previousState:(STKAudioPlayerState)previousState {}
 
-- (void)audioPlayer:(STKAudioPlayer *)audioPlayer unexpectedError:(STKAudioPlayerErrorCode)errorCode {}
+- (void)audioPlayer:(STKAudioPlayer *)audioPlayer
+    unexpectedError:(STKAudioPlayerErrorCode)errorCode {}
 
 @end
