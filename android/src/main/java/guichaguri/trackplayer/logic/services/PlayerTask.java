@@ -2,6 +2,7 @@ package guichaguri.trackplayer.logic.services;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import com.facebook.react.HeadlessJsTaskService;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
@@ -30,7 +31,7 @@ public class PlayerTask extends HeadlessJsTaskService {
             return null;
         }
 
-        Utils.log("Sending event %s...", event);
+        Log.d(Utils.TAG, "Sending event " + event + "...");
 
         WritableMap map = bundle != null ? Arguments.fromBundle(bundle) : Arguments.createMap();
         if(event != null) map.putString("type", event);

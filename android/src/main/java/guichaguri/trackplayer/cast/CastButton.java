@@ -14,6 +14,7 @@ import android.support.v7.app.MediaRouteControllerDialogFragment;
 import android.support.v7.media.MediaRouteSelector;
 import android.support.v7.media.MediaRouter;
 import android.util.Log;
+import guichaguri.trackplayer.logic.Utils;
 
 /**
  * A copy of {@link MediaRouteButton}, but works without a {@link android.support.v4.app.FragmentActivity}
@@ -22,7 +23,6 @@ import android.util.Log;
  */
 public class CastButton extends MediaRouteButton {
 
-    private final String TAG = "CastButtonView";
     private final String CHOOSER_FRAGMENT_TAG = "trackplayer.cast.chooser";
     private final String CONTROLLER_FRAGMENT_TAG = "trackplayer.cast.controller";
 
@@ -58,7 +58,7 @@ public class CastButton extends MediaRouteButton {
 
         if (route.isDefaultOrBluetooth() || !route.matchesSelector(selector)) {
             if (fm.findFragmentByTag(CHOOSER_FRAGMENT_TAG) != null) {
-                Log.w(TAG, "showDialog(): Route chooser dialog already showing!");
+                Log.w(Utils.TAG, "showDialog(): Route chooser dialog already showing!");
                 return false;
             }
             MediaRouteChooserDialogFragment f = getDialogFactory().onCreateChooserDialogFragment();
@@ -66,7 +66,7 @@ public class CastButton extends MediaRouteButton {
             showDialogFragment(f, fm, CHOOSER_FRAGMENT_TAG);
         } else {
             if (fm.findFragmentByTag(CONTROLLER_FRAGMENT_TAG) != null) {
-                Log.w(TAG, "showDialog(): Route controller dialog already showing!");
+                Log.w(Utils.TAG, "showDialog(): Route controller dialog already showing!");
                 return false;
             }
             MediaRouteControllerDialogFragment f = getDialogFactory().onCreateControllerDialogFragment();
