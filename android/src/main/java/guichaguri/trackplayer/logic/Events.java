@@ -11,7 +11,6 @@ import guichaguri.trackplayer.logic.services.PlayerTask;
 public class Events {
 
     // Media Control Events
-    public static final String BUTTON_LOAD = "load";
     public static final String BUTTON_PLAY = "play";
     public static final String BUTTON_PLAY_FROM_ID = "playFromId";
     public static final String BUTTON_PLAY_FROM_SEARCH = "playFromSearch";

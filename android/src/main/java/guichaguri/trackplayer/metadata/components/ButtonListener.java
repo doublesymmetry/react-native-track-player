@@ -25,11 +25,6 @@ public class ButtonListener extends MediaSessionCompat.Callback {
     }
 
     @Override
-    public void onPrepare() {
-        Events.dispatchEvent(context, Events.BUTTON_LOAD, null);
-    }
-
-    @Override
     public void onPlay() {
         Events.dispatchEvent(context, Events.BUTTON_PLAY, null);
     }
@@ -56,11 +51,13 @@ public class ButtonListener extends MediaSessionCompat.Callback {
 
     @Override
     public void onSkipToQueueItem(long id) {
-        Track track = manager.getPlayback().getTrackById(id);
-        if(track != null) {
-            Bundle bundle = new Bundle();
-            bundle.putString("id", track.id);
-            Events.dispatchEvent(context, Events.BUTTON_SKIP, bundle);
+        for(Track track : manager.getPlayback().getQueue()) {
+            if(track.queueId == id) {
+                Bundle bundle = new Bundle();
+                bundle.putString("id", track.id);
+                Events.dispatchEvent(context, Events.BUTTON_SKIP, bundle);
+                break;
+            }
         }
     }
 
