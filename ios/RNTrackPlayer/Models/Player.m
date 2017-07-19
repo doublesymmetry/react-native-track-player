@@ -140,8 +140,6 @@
 }
 
 - (void)play {
-    if (_queue.count < 1) { return; }
-    
     // Resume playback if it was paused
     if (_player.state == STKAudioPlayerStatePaused) {
         [_player resume];
@@ -181,7 +179,7 @@
         [self play];
     }
     
-    double delayInSeconds = 0.001;
+    double delayInSeconds = 0.1;
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
     dispatch_after(popTime, dispatch_get_main_queue(), ^() {
         [_player seekToTime:time];
@@ -205,20 +203,20 @@
     return _player.progress;
 }
 
-- (NSInteger)state {
+- (NSString *)state {
     // Mapping to values used by Android project
     // TODO: - Unify into a shared enum
     switch (_player.state) {
-        case STKAudioPlayerStateReady:
-            return 3;
-        case STKAudioPlayerStateBuffering:
-            return 6;
+        case STKAudioPlayerStatePlaying:
+            return @"STATE_PLAYING";
         case STKAudioPlayerStatePaused:
-            return 2;
+            return @"STATE_PAUSED";
         case STKAudioPlayerStateStopped:
-            return 1;
+            return @"STATE_STOPPED";
+        case STKAudioPlayerStateBuffering:
+            return @"STATE_BUFFERING";
         default:
-            return 0;
+            return @"STATE_NONE";
     }
 }
 

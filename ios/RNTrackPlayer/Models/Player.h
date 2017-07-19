@@ -27,5 +27,5 @@
 - (Track *)currentTrack;
 - (NSInteger)duration;
 - (NSInteger)position;
-- (NSInteger)state;
+- (NSString *)state;
 @end

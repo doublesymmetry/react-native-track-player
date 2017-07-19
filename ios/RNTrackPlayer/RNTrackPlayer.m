@@ -30,6 +30,16 @@
 
 RCT_EXPORT_MODULE(TrackPlayerModule)
 
+- (NSDictionary *)constantsToExport {
+    return @{
+             @"STATE_NONE": @(STKAudioPlayerStateDisposed),
+             @"STATE_PLAYING": @(STKAudioPlayerStatePlaying),
+             @"STATE_PAUSED": @(STKAudioPlayerStatePaused),
+             @"STATE_STOPPED": @(STKAudioPlayerStateStopped),
+             @"STATE_BUFFERING": @(STKAudioPlayerStateBuffering)
+             };
+}
+
 RCT_EXPORT_METHOD(onReady:(RCTResponseSenderBlock)callback) {
     callback(@[[NSNull null]]);
 }
@@ -48,6 +58,7 @@ RCT_EXPORT_METHOD(setupPlayer:(NSDictionary *)data
     }
     
     // TODO: Setup player with custom properties
+    resolve([NSNull null]);
 }
 
 RCT_EXPORT_METHOD(destroy) {
@@ -199,8 +210,7 @@ RCT_EXPORT_METHOD(getPosition:(RCTResponseSenderBlock)callback) {
 }
 
 RCT_EXPORT_METHOD(getState:(NSInteger)identifier callback:(RCTResponseSenderBlock)callback) {
-    callback(@[[NSNull null], @([_player state])]);
+    callback(@[[NSNull null], [_player state]]);
 }
 
 @end
-
