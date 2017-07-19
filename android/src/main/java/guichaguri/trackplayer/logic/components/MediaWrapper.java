@@ -112,10 +112,6 @@ public class MediaWrapper extends Binder {
         return manager.getPlayback().getState();
     }
 
-    public int getCastState() {
-        return manager.getCast().getState();
-    }
-
     public void destroy() {
         manager.destroyPlayer();
     }

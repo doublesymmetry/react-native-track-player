@@ -6,6 +6,7 @@ import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
 import guichaguri.trackplayer.cast.CastButtonManager;
+import guichaguri.trackplayer.logic.LibHelper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +31,9 @@ public class TrackPlayer implements ReactPackage {
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext context) {
         List<ViewManager> views = new ArrayList<>();
-        views.add(new CastButtonManager());
+        if(LibHelper.isChromecastAvailable(context)) {
+            views.add(new CastButtonManager());
+        }
         return views;
     }
 }

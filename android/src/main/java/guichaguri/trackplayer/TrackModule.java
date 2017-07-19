@@ -2,6 +2,7 @@ package guichaguri.trackplayer;
 
 import android.app.Service;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
@@ -14,7 +15,9 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.cast.framework.CastState;
+import guichaguri.trackplayer.logic.LibHelper;
 import guichaguri.trackplayer.logic.Temp;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.components.MediaWrapper;
@@ -111,6 +114,10 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
         constants.put("CAST_NOT_CONNECTED", CastState.NOT_CONNECTED);
         constants.put("CAST_CONNECTING", CastState.CONNECTING);
         constants.put("CAST_CONNECTED", CastState.CONNECTED);
+
+        // Not actual an API constant
+        // Only used internally
+        constants.put("CAST_SUPPORT_AVAILABLE", LibHelper.isChromecastAvailable(getReactApplicationContext()));
 
         return constants;
     }
@@ -253,6 +260,14 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @ReactMethod
     public void getCastState(Callback callback) {
-        Utils.triggerCallback(callback, binder.getCastState());
+        Context context = getReactApplicationContext().getApplicationContext();
+
+        if(!LibHelper.isChromecastAvailable(context)) {
+            Utils.triggerCallback(callback, CastState.NO_DEVICES_AVAILABLE);
+            return;
+        }
+
+        CastContext cast = CastContext.getSharedInstance(context);
+        Utils.triggerCallback(callback, cast.getCastState());
     }
 }
