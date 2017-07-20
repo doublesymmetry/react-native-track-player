@@ -15,6 +15,7 @@
 @property(strong, nonatomic) NSMutableArray *queue;
 @property(strong, nonatomic) STKAudioPlayer *player;
 @property(assign, nonatomic) NSInteger currentIndex;
+@property(strong, nonatomic) NSURLSessionDataTask *imageDownloader;
 @end
 
 @implementation Player
@@ -25,6 +26,8 @@
         _currentIndex = 0;
         _queue = [[NSMutableArray alloc] init];
         _player = [[STKAudioPlayer alloc] init];
+        
+        [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
     }
     
     return self;
@@ -139,19 +142,33 @@
     }
     
     Track *track = [_queue objectAtIndex:_currentIndex];
+    [_imageDownloader cancel];
     
     // TODO: Handle artwork (part of supporting local files)
-    NSDictionary *ccMetadata = @{
-                                 MPMediaItemPropertyMediaType: @(MPMediaTypeMusic),
-                                 MPMediaItemPropertyTitle: track.title ? track.title : @"",
-                                 MPMediaItemPropertyAlbumTitle: track.album ? track.album : @"",
-                                 MPMediaItemPropertyArtist: track.artist ? track.artist : @"",
-                                 MPMediaItemPropertyGenre: track.genre ? track.genre : @"",
-                                 MPMediaItemPropertyPlaybackDuration: track.duration ? track.duration : @(0),
-                                 MPMediaItemPropertyReleaseDate: track.date ? track.date : @"",
-                                 MPNowPlayingInfoPropertyElapsedPlaybackTime: @(_player.progress),
-                                 };
-    [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:ccMetadata];
+    NSDictionary *metadata = @{
+                               MPMediaItemPropertyMediaType: @(MPMediaTypeMusic),
+                               MPMediaItemPropertyTitle: track.title ? track.title : @"",
+                               MPMediaItemPropertyAlbumTitle: track.album ? track.album : @"",
+                               MPMediaItemPropertyArtist: track.artist ? track.artist : @"",
+                               MPMediaItemPropertyGenre: track.genre ? track.genre : @"",
+                               MPMediaItemPropertyPlaybackDuration: track.duration ? track.duration : @(0),
+                               MPMediaItemPropertyReleaseDate: track.date ? track.date : @"",
+                               MPNowPlayingInfoPropertyElapsedPlaybackTime: @(_player.progress),
+                               };
+    
+    [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:metadata];
+    
+    _imageDownloader = [[NSURLSession sharedSession]
+                        dataTaskWithURL:track.artwork.value
+                        completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                            if (!error) {
+                               NSMutableDictionary *dict = [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo.mutableCopy;
+                               UIImage *artwork = [UIImage imageWithData:data];
+                               dict[MPMediaItemPropertyArtwork] = [[MPMediaItemArtwork alloc] initWithImage:artwork];
+                               [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:dict];
+                           }
+                        }];
+    [_imageDownloader resume];
     
     [_player playURL:track.url.value];
 }
@@ -221,6 +238,8 @@ didFinishPlayingQueueItemId:(NSObject *)queueItemId
     // Play the next song in the queue when song ends
     if (stopReason == STKAudioPlayerStopReasonEof) {
         [self playNext];
+        [_imageDownloader cancel];
+        [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:@{}];
     }
 }
 
