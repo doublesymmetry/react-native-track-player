@@ -66,7 +66,7 @@ RCT_EXPORT_METHOD(destroy) {
     _player = nil;
 }
 
-RCT_EXPORT_METHOD(setOptions:(NSDictionary *)options) {
+RCT_EXPORT_METHOD(updateOptions:(NSDictionary *)options) {
     // TODO: - Implement
 }
 
