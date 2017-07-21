@@ -1,5 +1,5 @@
 //
-//  Player.h
+//  MediaWrapper.h
 //  RNTrackPlayer
 //
 //  Created by David Chavez on 7/2/17.
@@ -10,7 +10,7 @@
 
 #import "Track.h"
 
-@interface Player: NSObject
+@interface MediaWrapper: NSObject
 - (BOOL)queueContainsTrack:(NSString *)trackId;
 - (void)addTracks:(NSArray *)tracks before:(NSString *)trackId;
 - (void)removeTrackIds:(NSArray *)trackIds;

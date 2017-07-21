@@ -1,5 +1,5 @@
 //
-//  Player.m
+//  MediaWrapper.m
 //  RNTrackPlayer
 //
 //  Created by David Chavez on 7/2/17.
@@ -8,17 +8,17 @@
 
 @import MediaPlayer;
 
-#import "Player.h"
+#import "MediaWrapper.h"
 #import "STKAudioPlayer.h"
 
-@interface Player() <STKAudioPlayerDelegate>
+@interface MediaWrapper() <STKAudioPlayerDelegate>
 @property(strong, nonatomic) NSMutableArray *queue;
 @property(strong, nonatomic) STKAudioPlayer *player;
 @property(assign, nonatomic) NSInteger currentIndex;
 @property(strong, nonatomic) NSURLSessionDataTask *imageDownloader;
 @end
 
-@implementation Player
+@implementation MediaWrapper
 
 - (id)init {
     self = [super init];
@@ -162,11 +162,11 @@
                         dataTaskWithURL:track.artwork.value
                         completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
                             if (!error) {
-                               NSMutableDictionary *dict = [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo.mutableCopy;
-                               UIImage *artwork = [UIImage imageWithData:data];
-                               dict[MPMediaItemPropertyArtwork] = [[MPMediaItemArtwork alloc] initWithImage:artwork];
-                               [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:dict];
-                           }
+                                NSMutableDictionary *dict = [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo.mutableCopy;
+                                UIImage *artwork = [UIImage imageWithData:data];
+                                dict[MPMediaItemPropertyArtwork] = [[MPMediaItemArtwork alloc] initWithImage:artwork];
+                                [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:dict];
+                            }
                         }];
     [_imageDownloader resume];
     

@@ -9,12 +9,12 @@
 #import <AVFoundation/AVFoundation.h>
 
 #import "Track.h"
-#import "Player.h"
+#import "MediaWrapper.h"
 #import "RNTrackPlayer.h"
 #import "STKAudioPlayer.h"
 
 @interface RNTrackPlayer()
-@property(strong, nonatomic) Player *player;
+@property(strong, nonatomic) MediaWrapper *mediaWrapper;
 @end
 
 @implementation RNTrackPlayer
@@ -22,7 +22,7 @@
 -(id)init {
     self = [super init];
     if (self)  {
-        _player = [[Player alloc] init];
+        _mediaWrapper = [[MediaWrapper alloc] init];
     }
     
     return self;
@@ -63,7 +63,7 @@ RCT_EXPORT_METHOD(setupPlayer:(NSDictionary *)data
 
 RCT_EXPORT_METHOD(destroy) {
     NSLog(@"Destroying player");
-    _player = nil;
+    _mediaWrapper = nil;
 }
 
 RCT_EXPORT_METHOD(updateOptions:(NSDictionary *)options) {
@@ -74,7 +74,7 @@ RCT_EXPORT_METHOD(add:(id)object
                   before:(NSString *)trackId
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
-    if (![_player queueContainsTrack:trackId] && trackId != nil) {
+    if (![_mediaWrapper queueContainsTrack:trackId] && trackId != nil) {
         reject(@"track_not_in_queue", @"Given track ID was not found in queue", nil);
         return;
     }
@@ -93,7 +93,7 @@ RCT_EXPORT_METHOD(add:(id)object
     }
     
     NSLog(@"Adding tracks: %@", tracks);
-    [_player addTracks:tracks before:trackId];
+    [_mediaWrapper addTracks:tracks before:trackId];
     
     resolve([NSNull null]);
 }
@@ -103,10 +103,10 @@ RCT_EXPORT_METHOD(remove:(id)object
                   rejecter:(RCTPromiseRejectBlock)reject) {
     if ([object isKindOfClass:[NSArray class]]) {
         NSLog(@"Removing tracks: %@", object);
-        [_player removeTrackIds:object];
+        [_mediaWrapper removeTrackIds:object];
     } else if ([object isKindOfClass:[NSString class]]) {
         NSLog(@"Removing track: %@", object);
-        [_player removeTrackIds:@[object]];
+        [_mediaWrapper removeTrackIds:@[object]];
     } else {
         reject(@"invalid_object", @"You must remove a single track id or an array of ID's", nil);
         return;
@@ -118,13 +118,13 @@ RCT_EXPORT_METHOD(remove:(id)object
 RCT_EXPORT_METHOD(skip:(NSString *)trackId
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
-    if (![_player queueContainsTrack:trackId]) {
+    if (![_mediaWrapper queueContainsTrack:trackId]) {
         reject(@"track_not_in_queue", @"Given track ID was not found in queue", nil);
         return;
     }
     
     NSLog(@"Skipping to track %@", trackId);
-    [_player skipToTrack:trackId];
+    [_mediaWrapper skipToTrack:trackId];
     
     resolve([NSNull null]);
 }
@@ -132,7 +132,7 @@ RCT_EXPORT_METHOD(skip:(NSString *)trackId
 RCT_EXPORT_METHOD(skipToNext:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
     NSLog(@"Skipping to next track");
-    if ([_player playNext]) {
+    if ([_mediaWrapper playNext]) {
         resolve([NSNull null]);
     } else {
         reject(@"queue_exhausted", @"There is no tracks left to play", nil);
@@ -142,7 +142,7 @@ RCT_EXPORT_METHOD(skipToNext:(RCTPromiseResolveBlock)resolve
 RCT_EXPORT_METHOD(skipToPrevious:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
     NSLog(@"Skipping to previous track");
-    if ([_player playPrevious]) {
+    if ([_mediaWrapper playPrevious]) {
         resolve([NSNull null]);
     } else {
         reject(@"no_previous_track", @"There is no previous track", nil);
@@ -151,32 +151,32 @@ RCT_EXPORT_METHOD(skipToPrevious:(RCTPromiseResolveBlock)resolve
 
 RCT_EXPORT_METHOD(reset) {
     NSLog(@"Resetting player.");
-    [_player reset];
+    [_mediaWrapper reset];
 }
 
 RCT_EXPORT_METHOD(play) {
     NSLog(@"Starting/Resuming playback");
-    [_player play];
+    [_mediaWrapper play];
 }
 
 RCT_EXPORT_METHOD(pause) {
     NSLog(@"Pausing playback");
-    [_player pause];
+    [_mediaWrapper pause];
 }
 
 RCT_EXPORT_METHOD(stop) {
     NSLog(@"Stopping playback");
-    [_player stop];
+    [_mediaWrapper stop];
 }
 
 RCT_EXPORT_METHOD(seekTo:(NSInteger)time) {
     NSLog(@"Seeking to %ld seconds", time);
-    [_player seekToTime:time];
+    [_mediaWrapper seekToTime:time];
 }
 
 RCT_EXPORT_METHOD(setVolume:(NSInteger)volume) {
     NSLog(@"Setting volume to %ld", volume);
-    [_player setVolume:volume];
+    [_mediaWrapper setVolume:volume];
 }
 
 //RCT_EXPORT_METHOD(startScan:(BOOL)active callback:(RCTResponseSenderBlock)callback) {
@@ -194,12 +194,12 @@ RCT_EXPORT_METHOD(setVolume:(NSInteger)volume) {
 RCT_EXPORT_METHOD(getCurrentTrack:(NSInteger)identifier callback:(RCTResponseSenderBlock)callback) {
     // TODO: - Remove identifier parameter when Android project gets rid of multiple players
     
-    Track *track = [_player currentTrack];
+    Track *track = [_mediaWrapper currentTrack];
     callback(@[[NSNull null], [track identifier]]);
 }
 
 RCT_EXPORT_METHOD(getDuration:(RCTResponseSenderBlock)callback) {
-    callback(@[[NSNull null], @([_player duration])]);
+    callback(@[[NSNull null], @([_mediaWrapper duration])]);
 }
 
 RCT_EXPORT_METHOD(getBufferedPosition:(RCTResponseSenderBlock)callback) {
@@ -207,11 +207,11 @@ RCT_EXPORT_METHOD(getBufferedPosition:(RCTResponseSenderBlock)callback) {
 }
 
 RCT_EXPORT_METHOD(getPosition:(RCTResponseSenderBlock)callback) {
-    callback(@[[NSNull null], @([_player position])]);
+    callback(@[[NSNull null], @([_mediaWrapper position])]);
 }
 
 RCT_EXPORT_METHOD(getState:(NSInteger)identifier callback:(RCTResponseSenderBlock)callback) {
-    callback(@[[NSNull null], [_player state]]);
+    callback(@[[NSNull null], [_mediaWrapper state]]);
 }
 
 @end
