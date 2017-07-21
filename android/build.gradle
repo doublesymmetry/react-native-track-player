@@ -11,8 +11,9 @@ buildscript {
 
 apply plugin: 'com.android.library'
 
-def exoplayer = false, cache = false, dash = false, hls = false, smoothstreaming = false
-def castAppId = 'null', auto = false
+String castAppId = 'null';
+boolean exoplayer = false, cache = false, auto = false;
+boolean dash = false, hls = false, smoothstreaming = false;
 
 File file = file('../../../track-player.json')
 if(file.exists()) {
@@ -21,7 +22,7 @@ if(file.exists()) {
     dash = json.dash ?: dash
     hls = json.hls ?: hls
     smoothstreaming = json.smoothstreaming ?: smoothstreaming
-    castAppId = json.castApplicationId ?: 'null'
+    castAppId = String.valueOf(json.castApplicationId) ?: 'null'
     auto = json.auto ?: auto
 
     exoplayer = json.exoplayer || dash || hls || smoothstreaming
