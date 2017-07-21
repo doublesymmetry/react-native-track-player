@@ -70,7 +70,7 @@ RCT_EXPORT_METHOD(updateOptions:(NSDictionary *)options) {
     // TODO: - Implement
 }
 
-RCT_EXPORT_METHOD(add:(NSArray *)trackDicts
+RCT_EXPORT_METHOD(add:(id)object
                   before:(NSString *)trackId
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
@@ -80,9 +80,16 @@ RCT_EXPORT_METHOD(add:(NSArray *)trackDicts
     }
     
     NSMutableArray *tracks = [[NSMutableArray alloc] init];
-    for (id trackDict in trackDicts) {
-        Track *track = [[Track alloc] initWithDictionary:trackDict];
-        [tracks addObject:track];
+    if ([object isKindOfClass:[NSArray class]]) {
+        for (id trackDict in object) {
+            Track *track = [[Track alloc] initWithDictionary:trackDict];
+            [tracks addObject:track];
+        }
+    } else if ([object isKindOfClass:[NSDictionary class]]) {
+        [tracks addObject:object];
+    } else {
+        reject(@"invalid_object", @"You must either add a track or an array of tracks", nil);
+        return;
     }
     
     NSLog(@"Adding tracks: %@", tracks);
