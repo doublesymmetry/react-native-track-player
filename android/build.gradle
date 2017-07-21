@@ -11,7 +11,7 @@ buildscript {
 
 apply plugin: 'com.android.library'
 
-String castAppId = 'null';
+String castAppId = null;
 boolean exoplayer = false, cache = false, auto = false;
 boolean dash = false, hls = false, smoothstreaming = false;
 
@@ -22,7 +22,7 @@ if(file.exists()) {
     dash = json.dash ?: dash
     hls = json.hls ?: hls
     smoothstreaming = json.smoothstreaming ?: smoothstreaming
-    castAppId = String.valueOf(json.castApplicationId) ?: 'null'
+    castAppId = json.castApplicationId ?: castAppId
     auto = json.auto ?: auto
 
     exoplayer = json.exoplayer || dash || hls || smoothstreaming
@@ -44,7 +44,9 @@ android {
 
     buildTypes {
         buildTypes.each {
-            it.buildConfigField 'String', 'CAST_APPLICATION_ID', castAppId
+            def appId = castAppId != null ? '"' + castAppId + '"' : 'null';
+            it.buildConfigField 'String', 'CAST_APPLICATION_ID', appId
+
             def autoMd = auto ? 'com.google.android.gms.car.application' : 'disabled.car.application'
             it.manifestPlaceholders = [autoMetadata: autoMd]
         }
