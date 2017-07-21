@@ -17,13 +17,14 @@ def castAppId = 'null', auto = false
 File file = file('../../../track-player.json')
 if(file.exists()) {
     def json = new JsonSlurper().parseText(file.text)
-    exoplayer = json.exoplayer || json.dash || json.hls || json.smoothstreaming
-    cache = json.cache
-    dash = json.dash
-    hls = json.hls
-    smoothstreaming = json.smoothstreaming
-    castAppId = json.castApplicationId
-    auto = json.auto
+    cache = json.cache ?: cache
+    dash = json.dash ?: dash
+    hls = json.hls ?: hls
+    smoothstreaming = json.smoothstreaming ?: smoothstreaming
+    castAppId = json.castApplicationId ?: 'null'
+    auto = json.auto ?: auto
+
+    exoplayer = json.exoplayer || dash || hls || smoothstreaming
 }
 
 android {
