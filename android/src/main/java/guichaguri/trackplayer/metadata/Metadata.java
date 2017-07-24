@@ -122,7 +122,7 @@ public class Metadata {
         pb.setActiveQueueItemId(track.queueId);
 
         // Load the artwork
-        loadArtwork(track.artwork);
+        loadArtwork(track.artwork, track.artworkLocal);
 
         // Update the metadata to the MediaSession and the notification
         MediaMetadataCompat metadata = md.build();
@@ -184,7 +184,7 @@ public class Metadata {
         session.setQueue(items);
     }
 
-    private void loadArtwork(Uri url) {
+    private void loadArtwork(Uri url, boolean local) {
         if(url == null) {
             // Interrupt the artwork thread if it's running
             if(artwork != null) artwork.interrupt();
@@ -204,7 +204,7 @@ public class Metadata {
         if(artwork != null) artwork.interrupt();
 
         // Create another thread to load the new artwork
-        artwork = new ArtworkLoader(context, this, url, maxArtworkSize);
+        artwork = new ArtworkLoader(context, this, url, local, maxArtworkSize);
         artwork.start();
     }
 

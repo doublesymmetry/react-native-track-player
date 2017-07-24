@@ -4,9 +4,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import com.facebook.react.modules.network.OkHttpClientProvider;
 import guichaguri.trackplayer.metadata.Metadata;
 import java.io.IOException;
 import java.io.InputStream;
+import okhttp3.Call;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 
 /**
  * @author Guilherme Chaguri
@@ -18,10 +22,12 @@ public class ArtworkLoader extends Thread {
 
     private final int maxSize;
     private final Uri uri;
+    private final boolean local;
 
-    public ArtworkLoader(Context context, Metadata metadata, Uri uri, int maxSize) {
+    public ArtworkLoader(Context context, Metadata metadata, Uri uri, boolean local, int maxSize) {
         this.context = context;
         this.metadata = metadata;
+        this.local = local;
         this.maxSize = maxSize;
         this.uri = uri;
     }
@@ -32,7 +38,14 @@ public class ArtworkLoader extends Thread {
         InputStream input = null;
 
         try {
-            input = context.getContentResolver().openInputStream(uri);
+            if(local) {
+                input = context.getContentResolver().openInputStream(uri);
+            } else {
+                // Use the OkHttp client from the provider in case the user has it configured
+                OkHttpClient client = OkHttpClientProvider.getOkHttpClient();
+                Call call = client.newCall(new Request.Builder().url(uri.toString()).build());
+                input = call.execute().body().byteStream();
+            }
             bitmap = BitmapFactory.decodeStream(input);
         } catch(IOException ex) {
             ex.printStackTrace();

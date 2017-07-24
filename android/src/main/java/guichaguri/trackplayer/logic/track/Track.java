@@ -169,6 +169,8 @@ public class Track {
     }
 
     private boolean isLocal(Uri uri) {
+        if(uri == null) return false;
+
         String scheme = uri.getScheme();
 
         return scheme == null ||

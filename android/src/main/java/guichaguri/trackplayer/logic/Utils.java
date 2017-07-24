@@ -1,6 +1,8 @@
 package guichaguri.trackplayer.logic;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.media.RatingCompat;
@@ -76,6 +78,15 @@ public class Utils {
         }
     }
 
+    public static Uri getResourceUri(Resources res, int id) {
+        return new Uri.Builder()
+                .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+                .authority(res.getResourcePackageName(id))
+                .appendPath(res.getResourceTypeName(id))
+                .appendPath(res.getResourceEntryName(id))
+                .build();
+    }
+
     public static Uri getUri(Context context, Bundle data, String key, Uri def) {
         if(!data.containsKey(key)) return def;
 
@@ -84,7 +95,16 @@ public class Utils {
             return Uri.parse((String)obj);
         } else if(obj instanceof Bundle) {
             String uri = ((Bundle)obj).getString("uri");
-            return ResourceDrawableIdHelper.getInstance().getResourceDrawableUri(context, uri);
+
+            ResourceDrawableIdHelper helper = ResourceDrawableIdHelper.getInstance();
+            int id = helper.getResourceDrawableId(context, uri);
+
+            if(id > 0) {
+                return getResourceUri(context.getResources(), id);
+            } else {
+                // During development, the resources might come directly from the packager server
+                return Uri.parse(uri);
+            }
         }
         return def;
     }
