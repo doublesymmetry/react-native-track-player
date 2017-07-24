@@ -75,7 +75,7 @@ public class MediaNotification {
         nextIcon = loadIcon(data, "nextIcon", nextIcon);
 
         // Load the color and the small icon
-        color = data.getInt("color", color);
+        color = (int)data.getDouble("color", color);
         smallIcon = data.containsKey("icon") ? Utils.getResourceId(context, data.getBundle("icon")) : smallIcon;
 
         // Update properties
@@ -84,12 +84,12 @@ public class MediaNotification {
         nb.setSmallIcon(smallIcon != 0 ? smallIcon : playIcon);
 
         // Update compact capabilities
-        int[] array = data.getIntArray("compactCapabilities");
+        List<Integer> array = data.getIntegerArrayList("compactCapabilities");
 
         if(array != null) {
             compactCapabilities = 0;
-            for(int i = 0; i < array.length; i++) {
-                compactCapabilities |= array[i];
+            for(int cap : array) {
+                compactCapabilities |= cap;
             }
         }
 

@@ -82,12 +82,12 @@ public class Metadata {
         session.setRatingType(ratingType);
 
         // Update the capabilities
-        int[] array = data.getIntArray("capabilities");
+        List<Integer> array = data.getIntegerArrayList("capabilities");
 
         if(array != null) {
             capabilities = 0;
-            for(int i = 0; i < array.length; i++) {
-                capabilities |= array[i];
+            for(int cap : array) {
+                capabilities |= cap;
             }
         }
     }

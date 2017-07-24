@@ -58,6 +58,8 @@ public class PlayerService extends MediaBrowserServiceCompat {
     public void onCreate() {
         Log.d(Utils.TAG, "Service init");
 
+        super.onCreate();
+
         manager = new MediaManager(this);
     }
 

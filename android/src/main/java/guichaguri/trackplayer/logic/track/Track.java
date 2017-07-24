@@ -171,7 +171,8 @@ public class Track {
     private boolean isLocal(Uri uri) {
         String scheme = uri.getScheme();
 
-        return scheme.equals(ContentResolver.SCHEME_FILE) ||
+        return scheme == null ||
+                scheme.equals(ContentResolver.SCHEME_FILE) ||
                 scheme.equals(ContentResolver.SCHEME_ANDROID_RESOURCE) ||
                 scheme.equals(ContentResolver.SCHEME_CONTENT) ||
                 scheme.equals("res");
