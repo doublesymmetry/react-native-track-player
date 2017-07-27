@@ -9,6 +9,6 @@
 #import <Foundation/Foundation.h>
 #import <React/RCTBridgeModule.h>
 
-@interface RNTrackPlayer : NSObject <RCTBridgeModule>
+@interface RNTrackPlayer: NSObject <RCTBridgeModule>
 
 @end

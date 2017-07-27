@@ -8,7 +8,7 @@
 
 @import Foundation;
 
-@interface MediaURL : NSObject
+@interface MediaURL: NSObject
 @property(strong, nonatomic) NSURL *value;
 @property(assign, nonatomic) bool isLocal;
 

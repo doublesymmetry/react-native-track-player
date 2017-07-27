@@ -70,7 +70,7 @@ RCT_EXPORT_METHOD(updateOptions:(NSDictionary *)options) {
     // TODO: - Implement
 }
 
-RCT_EXPORT_METHOD(add:(id)object
+RCT_EXPORT_METHOD(add:(NSArray *)objects
                   before:(NSString *)trackId
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
@@ -80,16 +80,9 @@ RCT_EXPORT_METHOD(add:(id)object
     }
     
     NSMutableArray *tracks = [[NSMutableArray alloc] init];
-    if ([object isKindOfClass:[NSArray class]]) {
-        for (id trackDict in object) {
-            Track *track = [[Track alloc] initWithDictionary:trackDict];
-            [tracks addObject:track];
-        }
-    } else if ([object isKindOfClass:[NSDictionary class]]) {
-        [tracks addObject:object];
-    } else {
-        reject(@"invalid_object", @"You must add a single track object or an array of tracks", nil);
-        return;
+    for (id dict in objects) {
+        Track *track = [[Track alloc] initWithDictionary:dict];
+        [tracks addObject:track];
     }
     
     NSLog(@"Adding tracks: %@", tracks);
@@ -98,19 +91,11 @@ RCT_EXPORT_METHOD(add:(id)object
     resolve([NSNull null]);
 }
 
-RCT_EXPORT_METHOD(remove:(id)object
+RCT_EXPORT_METHOD(remove:(NSArray *)objects
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
-    if ([object isKindOfClass:[NSArray class]]) {
-        NSLog(@"Removing tracks: %@", object);
-        [_mediaWrapper removeTrackIds:object];
-    } else if ([object isKindOfClass:[NSString class]]) {
-        NSLog(@"Removing track: %@", object);
-        [_mediaWrapper removeTrackIds:@[object]];
-    } else {
-        reject(@"invalid_object", @"You must remove a single track id or an array of ID's", nil);
-        return;
-    }
+    NSLog(@"Removing tracks: %@", objects);
+    [_mediaWrapper removeTrackIds:objects];
     
     resolve([NSNull null]);
 }
