@@ -15,7 +15,6 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.cast.framework.CastState;
 import guichaguri.trackplayer.logic.LibHelper;
 import guichaguri.trackplayer.logic.Temp;
@@ -225,37 +224,37 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @ReactMethod
     public void getVolume(Callback callback) {
-        Utils.triggerCallback(callback, binder.getVolume());
+        binder.getVolume(callback);
     }
 
     @ReactMethod
     public void getTrack(String id, Callback callback) {
-        Utils.triggerCallback(callback, Temp.fromBundle(binder.getTrack(id)));
+        binder.getTrack(id, callback);
     }
 
     @ReactMethod
     public void getCurrentTrack(Callback callback) {
-        Utils.triggerCallback(callback, binder.getCurrentTrack());
+        binder.getCurrentTrack(callback);
     }
 
     @ReactMethod
     public void getDuration(Callback callback) {
-        Utils.triggerCallback(callback, Utils.toSeconds(binder.getDuration()));
+        binder.getDuration(callback);
     }
 
     @ReactMethod
     public void getBufferedPosition(Callback callback) {
-        Utils.triggerCallback(callback, Utils.toSeconds(binder.getBufferedPosition()));
+        binder.getBufferedPosition(callback);
     }
 
     @ReactMethod
     public void getPosition(Callback callback) {
-        Utils.triggerCallback(callback, Utils.toSeconds(binder.getPosition()));
+        binder.getPosition(callback);
     }
 
     @ReactMethod
     public void getState(Callback callback) {
-        Utils.triggerCallback(callback, binder.getState());
+        binder.getState(callback);
     }
 
     @ReactMethod
@@ -267,7 +266,11 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
             return;
         }
 
-        CastContext cast = CastContext.getSharedInstance(context);
-        Utils.triggerCallback(callback, cast.getCastState());
+        binder.getCastState(callback);
+
+        // Use the code below when React Native updates the support library
+        // and we'll be able to update the Cast SDK too
+        /*CastContext cast = CastContext.getSharedInstance(context);
+        Utils.triggerCallback(callback, cast.getCastState());*/
     }
 }
