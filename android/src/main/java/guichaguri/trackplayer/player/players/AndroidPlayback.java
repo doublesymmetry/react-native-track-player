@@ -10,8 +10,6 @@ import android.media.MediaPlayer.OnInfoListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.net.Uri;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.v4.media.session.PlaybackStateCompat;
 import com.facebook.react.bridge.Promise;
@@ -89,6 +87,8 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
         try {
             // Loads the uri
             loadCallback = callback;
+            if(player.isPlaying()) player.stop();
+            player.reset();
             player.setDataSource(context, url);
             player.prepareAsync();
         } catch(IOException ex) {
@@ -105,6 +105,7 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
         super.reset();
 
         // Release the playback resources
+        if(player.isPlaying()) player.stop();
         player.reset();
 
         // Update the state
@@ -187,11 +188,10 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
 
     @Override
     public float getSpeed() {
-        if(VERSION.SDK_INT >= VERSION_CODES.M) {
+        /*if(VERSION.SDK_INT >= VERSION_CODES.M) {
             return player.getPlaybackParams().getSpeed();
-        } else {
-            return 1;
-        }
+        }*/
+        return 1;
     }
 
     @Override
@@ -253,6 +253,7 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
         if(startPos > 0) {
             buffering = true;
             player.seekTo(startPos);
+            startPos = 0;
         } else {
             buffering = false;
         }
