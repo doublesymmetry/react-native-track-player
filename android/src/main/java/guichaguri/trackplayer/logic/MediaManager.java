@@ -123,6 +123,10 @@ public class MediaManager {
         return playback;
     }
 
+    public int getCastState() {
+        return cast.getState();
+    }
+
     public void onPlay() {
         MediaNotification notification = metadata.getNotification();
 

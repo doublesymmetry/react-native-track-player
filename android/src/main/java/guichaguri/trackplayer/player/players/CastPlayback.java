@@ -379,9 +379,4 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
     public void onSendingRemoteMediaRequest() {
 
     }
-
-    @Override
-    public void onAdBreakStatusUpdated() {
-
-    }
 }

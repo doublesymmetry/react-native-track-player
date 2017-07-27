@@ -29,12 +29,12 @@ if(file.exists()) {
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.3"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         minSdkVersion 16 // RN's minimum version
-        targetSdkVersion 25
+        targetSdkVersion 23
         versionCode 1
         versionName "1.0"
         ndk {
@@ -101,6 +101,9 @@ dependencies {
         provided 'com.danikula:videocache:2.7.0'
     }
 
-    // Google Cast
-    compile 'com.google.android.gms:play-services-cast-framework:11.0.2'
+    // Google Cast (Update this when RN updates the support library to 25+)
+    compile 'com.google.android.gms:play-services-cast-framework:9.4.0'
+
+    // Make sure we're using at least the support library 23.2.0, not 23.0.1
+    compile 'com.android.support:appcompat-v7:23.2.0'
 }

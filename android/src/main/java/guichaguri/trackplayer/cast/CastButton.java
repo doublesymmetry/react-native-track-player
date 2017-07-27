@@ -56,8 +56,8 @@ public class CastButton extends MediaRouteButton {
         MediaRouteSelector selector = getRouteSelector();
         MediaRouter.RouteInfo route = MediaRouter.getInstance(getContext()).getSelectedRoute();
 
-        if (route.isDefaultOrBluetooth() || !route.matchesSelector(selector)) {
-            if (fm.findFragmentByTag(CHOOSER_FRAGMENT_TAG) != null) {
+        if(route.isDefault() || !route.matchesSelector(selector)) {
+            if(fm.findFragmentByTag(CHOOSER_FRAGMENT_TAG) != null) {
                 Log.w(Utils.TAG, "showDialog(): Route chooser dialog already showing!");
                 return false;
             }
@@ -65,7 +65,7 @@ public class CastButton extends MediaRouteButton {
             f.setRouteSelector(selector);
             showDialogFragment(f, fm, CHOOSER_FRAGMENT_TAG);
         } else {
-            if (fm.findFragmentByTag(CONTROLLER_FRAGMENT_TAG) != null) {
+            if(fm.findFragmentByTag(CONTROLLER_FRAGMENT_TAG) != null) {
                 Log.w(Utils.TAG, "showDialog(): Route controller dialog already showing!");
                 return false;
             }

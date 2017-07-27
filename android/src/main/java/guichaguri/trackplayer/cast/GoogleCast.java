@@ -6,6 +6,7 @@ import com.google.android.gms.cast.CastDevice;
 import com.google.android.gms.cast.CastStatusCodes;
 import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.cast.framework.CastSession;
+import com.google.android.gms.cast.framework.CastState;
 import com.google.android.gms.cast.framework.CastStateListener;
 import com.google.android.gms.cast.framework.SessionManagerListener;
 import guichaguri.trackplayer.logic.Events;
@@ -21,6 +22,10 @@ public class GoogleCast implements CastStateListener, SessionManagerListener<Cas
     private final MediaManager manager;
     private final CastContext cast;
 
+    // Remove this when React Native updates the support lib
+    // and we'll be able to update the Cast SDK which has CastContext#getCastState
+    private int state = CastState.NO_DEVICES_AVAILABLE;
+
     public GoogleCast(Context context, MediaManager manager) {
         this.context = context;
         this.manager = manager;
@@ -28,6 +33,10 @@ public class GoogleCast implements CastStateListener, SessionManagerListener<Cas
 
         cast.addCastStateListener(this);
         cast.getSessionManager().addSessionManagerListener(this, CastSession.class);
+    }
+
+    public int getState() {
+        return state;
     }
 
     public boolean isCurrentSession(CastSession session) {
@@ -46,6 +55,8 @@ public class GoogleCast implements CastStateListener, SessionManagerListener<Cas
 
     @Override
     public void onCastStateChanged(int state) {
+        this.state = state;
+
         Bundle bundle = new Bundle();
         bundle.putInt("state", state);
         Events.dispatchEvent(context, Events.CAST_STATE, bundle);
