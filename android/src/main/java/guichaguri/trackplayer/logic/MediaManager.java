@@ -54,7 +54,7 @@ public class MediaManager {
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "track-playback-wake-lock");
         wakeLock.setReferenceCounted(false);
 
-        // Android 7: Use the application context here to prevent any problems
+        // Android 7: Use the application context here to prevent any memory leaks
         WifiManager wifiManager = (WifiManager)service.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         wifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, "track-playback-wifi-lock");
         wifiLock.setReferenceCounted(false);
@@ -76,6 +76,8 @@ public class MediaManager {
     }
 
     public void setupPlayer(Bundle options, Promise promise) {
+        Log.d(Utils.TAG, "Setting up the player");
+
         if(playback != null) {
             Utils.rejectCallback(promise, "setupPlayer", "The playback is already initialized");
             return;
@@ -88,6 +90,8 @@ public class MediaManager {
     }
 
     public void destroyPlayer() {
+        Log.d(Utils.TAG, "Destroying the player");
+
         playback.destroy();
         if(!Utils.isStopped(playback.getState())) onStop();
         playback = null;
@@ -104,6 +108,8 @@ public class MediaManager {
     }
 
     public void switchPlayback(Playback pb) {
+        Log.d(Utils.TAG, "Switching playback");
+
         // Same playback?
         if(pb == playback) return;
 
@@ -129,6 +135,8 @@ public class MediaManager {
     }
 
     public void onPlay() {
+        Log.d(Utils.TAG, "onPlay: The service is now on foreground, audio focus, wake and wifi locks have been acquired");
+
         MediaNotification notification = metadata.getNotification();
 
         // Set the service as foreground, updating and showing the notification
@@ -152,7 +160,7 @@ public class MediaManager {
         }
 
         if(!serviceStarted) {
-            Log.i(Utils.TAG, "Marking the service as started, as there is now playback");
+            Log.d(Utils.TAG, "Marking the service as started, as there is now playback");
             service.startService(new Intent(service, PlayerService.class));
             serviceStarted = true;
         }
@@ -161,6 +169,8 @@ public class MediaManager {
     }
 
     public void onPause() {
+        Log.d(Utils.TAG, "onPause: The service is now in background again, audio focus, wake and wifi locks have been released");
+
         // Set the service as background, keeping the notification
         service.stopForeground(false);
 
@@ -181,6 +191,8 @@ public class MediaManager {
     }
 
     public void onStop() {
+        Log.d(Utils.TAG, "onStop: The service is now in background, audio focus, wake and wifi locks have been released");
+
         // Set the service as background, removing the notification
         metadata.getNotification().setShowing(false);
         service.stopForeground(true);
@@ -205,34 +217,48 @@ public class MediaManager {
     }
 
     public void onLoad(Track track) {
+        Log.d(Utils.TAG, "onLoad");
+
         Bundle bundle = new Bundle();
         bundle.putString("track", track.id);
         Events.dispatchEvent(service, Events.PLAYBACK_LOAD, bundle);
     }
 
     public void onEnd() {
+        Log.d(Utils.TAG, "onEnd");
+
         Events.dispatchEvent(service, Events.PLAYBACK_ENDED, null);
     }
 
     public void onStateChange(int state) {
+        Log.d(Utils.TAG, "onStateChange");
+
         Bundle bundle = new Bundle();
         bundle.putInt("state", state);
         Events.dispatchEvent(service, Events.PLAYBACK_STATE, bundle);
     }
 
     public void onTrackUpdate() {
+        Log.d(Utils.TAG, "onTrackUpdate");
+
         metadata.updateMetadata(playback);
     }
 
     public void onPlaybackUpdate() {
+        Log.d(Utils.TAG, "onPlaybackUpdate");
+
         metadata.updatePlayback(playback);
     }
 
     public void onQueueUpdate() {
+        Log.d(Utils.TAG, "onQueueUpdate");
+
         metadata.updateQueue(playback);
     }
 
     public void onError(Throwable error) {
+        Log.d(Utils.TAG, "onError: " + error.getMessage());
+
         Bundle bundle = new Bundle();
         bundle.putString("error", error.getMessage());
         Events.dispatchEvent(service, Events.PLAYBACK_ERROR, bundle);
@@ -244,8 +270,7 @@ public class MediaManager {
 
             // Fail-safely
             if(playback != null) {
-                playback.destroy();
-                playback = null;
+                destroyPlayer();
             }
         } else {
             metadata.handleIntent(intent);
