@@ -49,7 +49,7 @@ public class FocusManager implements OnAudioFocusChangeListener {
 
         AudioManager manager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
         int r = manager.abandonAudioFocus(this);
-        hasAudioFocus = r == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+        hasAudioFocus = r != AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
     }
 
     @Override
