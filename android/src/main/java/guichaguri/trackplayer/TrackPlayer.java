@@ -23,7 +23,8 @@ public class TrackPlayer implements ReactPackage {
         return modules;
     }
 
-    @Override
+    // Removed override to not crash with newer RN builds
+    // Older ones should still work as the method is still present.
     public List<Class<? extends JavaScriptModule>> createJSModules() {
         return Collections.emptyList();
     }

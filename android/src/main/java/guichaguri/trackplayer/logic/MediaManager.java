@@ -54,7 +54,8 @@ public class MediaManager {
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "track-playback-wake-lock");
         wakeLock.setReferenceCounted(false);
 
-        WifiManager wifiManager = (WifiManager)service.getSystemService(Context.WIFI_SERVICE);
+        // Android 7: Use the application context here to prevent any problems
+        WifiManager wifiManager = (WifiManager)service.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         wifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, "track-playback-wifi-lock");
         wifiLock.setReferenceCounted(false);
     }
@@ -238,14 +239,27 @@ public class MediaManager {
     }
 
     public void onCommand(Intent intent) {
-        metadata.handleIntent(intent);
+        if(intent == null) {
+            Log.d(Utils.TAG, "The service is probably restarting. The player is being safely destroyed");
+
+            // Fail-safely
+            if(playback != null) {
+                playback.destroy();
+                playback = null;
+            }
+        } else {
+            metadata.handleIntent(intent);
+        }
     }
 
     public void onServiceDestroy() {
         Log.i(Utils.TAG, "Destroying resources");
 
         // Destroy the playback
-        if(playback != null) playback.destroy();
+        if(playback != null) {
+            playback.destroy();
+            playback = null;
+        }
 
         // Remove the audio focus
         focus.disable();
