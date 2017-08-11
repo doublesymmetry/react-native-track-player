@@ -196,7 +196,7 @@
 }
 
 - (Track *)currentTrack {
-    return _queue.firstObject;
+    return _queue[_currentIndex];
 }
 
 - (NSInteger)duration {
