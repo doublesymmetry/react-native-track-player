@@ -130,6 +130,7 @@
 }
 
 - (void)reset {
+    _currentIndex = 0;
     [_queue removeAllObjects];
     [_player stop];
 }
