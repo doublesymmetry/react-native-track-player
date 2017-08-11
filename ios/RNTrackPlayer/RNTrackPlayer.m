@@ -176,9 +176,7 @@ RCT_EXPORT_METHOD(setVolume:(NSInteger)volume) {
 //    // TODO: - Implement
 //}
 
-RCT_EXPORT_METHOD(getCurrentTrack:(NSInteger)identifier callback:(RCTResponseSenderBlock)callback) {
-    // TODO: - Remove identifier parameter when Android project gets rid of multiple players
-    
+RCT_EXPORT_METHOD(getCurrentTrack:(RCTResponseSenderBlock)callback) {
     Track *track = [_mediaWrapper currentTrack];
     callback(@[[NSNull null], [track identifier]]);
 }
@@ -195,7 +193,7 @@ RCT_EXPORT_METHOD(getPosition:(RCTResponseSenderBlock)callback) {
     callback(@[[NSNull null], @([_mediaWrapper position])]);
 }
 
-RCT_EXPORT_METHOD(getState:(NSInteger)identifier callback:(RCTResponseSenderBlock)callback) {
+RCT_EXPORT_METHOD(getState:(RCTResponseSenderBlock)callback) {
     callback(@[[NSNull null], [_mediaWrapper state]]);
 }
 
