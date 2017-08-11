@@ -19,20 +19,6 @@
             _value = [[NSURL alloc] initWithString:object[@"uri"]];
         } else {
             _value = [[NSURL alloc] initWithString:object];;
-            
-            NSMutableURLRequest *newRequest = [[NSMutableURLRequest alloc] initWithURL:_value];
-            NSURLResponse *response = nil;
-            NSError *error = nil;
-            
-            [newRequest setValue:@"HEAD" forKey:@"HTTPMethod"];
-            [NSURLConnection
-             sendSynchronousRequest:newRequest
-             returningResponse:&response
-             error:&error];
-            
-            if (response && !error) {
-                _value = [response URL];
-            }
         }
     }
     

@@ -170,6 +170,23 @@
                         }];
     [_imageDownloader resume];
     
+    // fetch possible redirected url
+    if (!track.url.isLocal) {
+        NSMutableURLRequest *newRequest = [[NSMutableURLRequest alloc] initWithURL:track.url.value];
+        NSURLResponse *response = nil;
+        NSError *error = nil;
+        
+        [newRequest setValue:@"HEAD" forKey:@"HTTPMethod"];
+        [NSURLConnection
+         sendSynchronousRequest:newRequest
+         returningResponse:&response
+         error:&error];
+        
+        if (response && !error) {
+            [track.url setValue:[response URL]];
+        }
+    }
+    
     [_player playURL:track.url.value];
 }
 
