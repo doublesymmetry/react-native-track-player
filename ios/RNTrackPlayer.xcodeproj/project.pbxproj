@@ -9,9 +9,6 @@
 /* Begin PBXBuildFile section */
 		9B0E282E1F07D76F00B71D2A /* RNTrackPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E282D1F07D76F00B71D2A /* RNTrackPlayer.m */; };
 		9B0E282F1F07D76F00B71D2A /* RNTrackPlayer.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B0E282C1F07D76F00B71D2A /* RNTrackPlayer.h */; };
-		9B0E287D1F0831AE00B71D2A /* Track.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E287C1F0831AE00B71D2A /* Track.m */; };
-		9B0E28801F0835BB00B71D2A /* MediaURL.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E287F1F0835BB00B71D2A /* MediaURL.m */; };
-		9B0E28831F08E9DC00B71D2A /* MediaWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E28821F08E9DC00B71D2A /* MediaWrapper.m */; };
 		9B0E28841F094D7E00B71D2A /* NSMutableArray+STKAudioPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E28711F07E0FE00B71D2A /* NSMutableArray+STKAudioPlayer.m */; };
 		9B0E28851F094D8000B71D2A /* STKAudioPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E28701F07E0FE00B71D2A /* STKAudioPlayer.m */; };
 		9B0E28861F094D8800B71D2A /* STKAutoRecoveringHTTPDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E28681F07E0FE00B71D2A /* STKAutoRecoveringHTTPDataSource.m */; };
@@ -21,6 +18,9 @@
 		9B0E288A1F094D8800B71D2A /* STKHTTPDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E28721F07E0FE00B71D2A /* STKHTTPDataSource.m */; };
 		9B0E288B1F094D8800B71D2A /* STKLocalFileDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E286A1F07E0FE00B71D2A /* STKLocalFileDataSource.m */; };
 		9B0E288C1F094D8800B71D2A /* STKQueueEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E286E1F07E0FE00B71D2A /* STKQueueEntry.m */; };
+		9B78A2461F3F12BC002B5E3C /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B78A2451F3F12BC002B5E3C /* Track.swift */; };
+		9B78A2481F3F12C9002B5E3C /* MediaURL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B78A2471F3F12C9002B5E3C /* MediaURL.swift */; };
+		9BFBA4D21F3DFA3F00453D3A /* MediaWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BFBA4D11F3DFA3F00453D3A /* MediaWrapper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -58,12 +58,10 @@
 		9B0E28731F07E0FE00B71D2A /* STKDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STKDataSource.h; sourceTree = "<group>"; };
 		9B0E28741F07E0FE00B71D2A /* NSMutableArray+STKAudioPlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSMutableArray+STKAudioPlayer.h"; sourceTree = "<group>"; };
 		9B0E28751F07E0FE00B71D2A /* STKCoreFoundationDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STKCoreFoundationDataSource.m; sourceTree = "<group>"; };
-		9B0E287B1F0831AE00B71D2A /* Track.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Track.h; sourceTree = "<group>"; };
-		9B0E287C1F0831AE00B71D2A /* Track.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Track.m; sourceTree = "<group>"; };
-		9B0E287E1F0835BB00B71D2A /* MediaURL.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MediaURL.h; sourceTree = "<group>"; };
-		9B0E287F1F0835BB00B71D2A /* MediaURL.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MediaURL.m; sourceTree = "<group>"; };
-		9B0E28811F08E9DC00B71D2A /* MediaWrapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MediaWrapper.h; sourceTree = "<group>"; };
-		9B0E28821F08E9DC00B71D2A /* MediaWrapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MediaWrapper.m; sourceTree = "<group>"; };
+		9B78A2451F3F12BC002B5E3C /* Track.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
+		9B78A2471F3F12C9002B5E3C /* MediaURL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaURL.swift; sourceTree = "<group>"; };
+		9BFBA4D01F3DFA3F00453D3A /* RNTrackPlayer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNTrackPlayer-Bridging-Header.h"; sourceTree = "<group>"; };
+		9BFBA4D11F3DFA3F00453D3A /* MediaWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaWrapper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,8 +78,7 @@
 		9B0AF8E71F22304200C50DC1 /* Logic */ = {
 			isa = PBXGroup;
 			children = (
-				9B0E28811F08E9DC00B71D2A /* MediaWrapper.h */,
-				9B0E28821F08E9DC00B71D2A /* MediaWrapper.m */,
+				9BFBA4D11F3DFA3F00453D3A /* MediaWrapper.swift */,
 			);
 			path = Logic;
 			sourceTree = "<group>";
@@ -105,6 +102,7 @@
 		9B0E282B1F07D76F00B71D2A /* RNTrackPlayer */ = {
 			isa = PBXGroup;
 			children = (
+				9BFBA4D31F3DFA4B00453D3A /* Support */,
 				9B0AF8E71F22304200C50DC1 /* Logic */,
 				9B0E287A1F0831A400B71D2A /* Models */,
 				9B0E28621F07DF6200B71D2A /* Vendor */,
@@ -150,12 +148,18 @@
 		9B0E287A1F0831A400B71D2A /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				9B0E287B1F0831AE00B71D2A /* Track.h */,
-				9B0E287C1F0831AE00B71D2A /* Track.m */,
-				9B0E287E1F0835BB00B71D2A /* MediaURL.h */,
-				9B0E287F1F0835BB00B71D2A /* MediaURL.m */,
+				9B78A2451F3F12BC002B5E3C /* Track.swift */,
+				9B78A2471F3F12C9002B5E3C /* MediaURL.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		9BFBA4D31F3DFA4B00453D3A /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				9BFBA4D01F3DFA3F00453D3A /* RNTrackPlayer-Bridging-Header.h */,
+			);
+			path = Support;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -189,6 +193,7 @@
 				TargetAttributes = {
 					9B0E28281F07D76F00B71D2A = {
 						CreatedOnToolsVersion = 9.0;
+						LastSwiftMigration = 0900;
 					};
 				};
 			};
@@ -214,12 +219,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9B0E28831F08E9DC00B71D2A /* MediaWrapper.m in Sources */,
 				9B0E282E1F07D76F00B71D2A /* RNTrackPlayer.m in Sources */,
-				9B0E28801F0835BB00B71D2A /* MediaURL.m in Sources */,
-				9B0E287D1F0831AE00B71D2A /* Track.m in Sources */,
+				9B78A2481F3F12C9002B5E3C /* MediaURL.swift in Sources */,
 				9B0E28851F094D8000B71D2A /* STKAudioPlayer.m in Sources */,
 				9B0E28891F094D8800B71D2A /* STKDataSourceWrapper.m in Sources */,
+				9BFBA4D21F3DFA3F00453D3A /* MediaWrapper.swift in Sources */,
 				9B0E28871F094D8800B71D2A /* STKCoreFoundationDataSource.m in Sources */,
 				9B0E288A1F094D8800B71D2A /* STKHTTPDataSource.m in Sources */,
 				9B0E28861F094D8800B71D2A /* STKAutoRecoveringHTTPDataSource.m in Sources */,
@@ -227,6 +231,7 @@
 				9B0E28881F094D8800B71D2A /* STKDataSource.m in Sources */,
 				9B0E28841F094D7E00B71D2A /* NSMutableArray+STKAudioPlayer.m in Sources */,
 				9B0E288B1F094D8800B71D2A /* STKLocalFileDataSource.m in Sources */,
+				9B78A2461F3F12BC002B5E3C /* Track.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -336,10 +341,16 @@
 		9B0E28331F07D76F00B71D2A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = B82TF96752;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RNTrackPlayer/Support/RNTrackPlayer-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -347,10 +358,15 @@
 		9B0E28341F07D76F00B71D2A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = B82TF96752;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RNTrackPlayer/Support/RNTrackPlayer-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

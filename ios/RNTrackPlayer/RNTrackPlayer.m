@@ -7,9 +7,8 @@
 //
 
 #import <AVFoundation/AVFoundation.h>
+#import "RNTrackPlayer-Swift.h"
 
-#import "Track.h"
-#import "MediaWrapper.h"
 #import "RNTrackPlayer.h"
 #import "STKAudioPlayer.h"
 
@@ -74,7 +73,7 @@ RCT_EXPORT_METHOD(add:(NSArray *)objects
                   before:(NSString *)trackId
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
-    if (![_mediaWrapper queueContainsTrack:trackId] && trackId != nil) {
+    if (![_mediaWrapper queueContainsTrackWithTrackId:trackId] && trackId != nil) {
         reject(@"track_not_in_queue", @"Given track ID was not found in queue", nil);
         return;
     }
@@ -82,6 +81,11 @@ RCT_EXPORT_METHOD(add:(NSArray *)objects
     NSMutableArray *tracks = [[NSMutableArray alloc] init];
     for (id dict in objects) {
         Track *track = [[Track alloc] initWithDictionary:dict];
+        if (track == nil) {
+            reject(@"invalid_track_object", @"Track is missing a required key", nil);
+            return;
+        }
+        
         [tracks addObject:track];
     }
     
@@ -95,7 +99,7 @@ RCT_EXPORT_METHOD(remove:(NSArray *)objects
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
     NSLog(@"Removing tracks: %@", objects);
-    [_mediaWrapper removeTrackIds:objects];
+    [_mediaWrapper removeTracksWithIds:objects];
     
     resolve([NSNull null]);
 }
@@ -103,13 +107,13 @@ RCT_EXPORT_METHOD(remove:(NSArray *)objects
 RCT_EXPORT_METHOD(skip:(NSString *)trackId
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
-    if (![_mediaWrapper queueContainsTrack:trackId]) {
+    if (![_mediaWrapper queueContainsTrackWithTrackId:trackId]) {
         reject(@"track_not_in_queue", @"Given track ID was not found in queue", nil);
         return;
     }
     
     NSLog(@"Skipping to track %@", trackId);
-    [_mediaWrapper skipToTrack:trackId];
+    [_mediaWrapper skipToTrackWithId:trackId];
     
     resolve([NSNull null]);
 }
@@ -154,13 +158,13 @@ RCT_EXPORT_METHOD(stop) {
     [_mediaWrapper stop];
 }
 
-RCT_EXPORT_METHOD(seekTo:(NSInteger)time) {
-    NSLog(@"Seeking to %ld seconds", time);
-    [_mediaWrapper seekToTime:time];
+RCT_EXPORT_METHOD(seekTo:(double)time) {
+    NSLog(@"Seeking to %f seconds", time);
+    [_mediaWrapper seekTo:time];
 }
 
-RCT_EXPORT_METHOD(setVolume:(NSInteger)volume) {
-    NSLog(@"Setting volume to %ld", volume);
+RCT_EXPORT_METHOD(setVolume:(float)volume) {
+    NSLog(@"Setting volume to %f", volume);
     [_mediaWrapper setVolume:volume];
 }
 
@@ -178,7 +182,7 @@ RCT_EXPORT_METHOD(setVolume:(NSInteger)volume) {
 
 RCT_EXPORT_METHOD(getCurrentTrack:(RCTResponseSenderBlock)callback) {
     Track *track = [_mediaWrapper currentTrack];
-    callback(@[[NSNull null], [track identifier]]);
+    callback(@[[NSNull null], [track id]]);
 }
 
 RCT_EXPORT_METHOD(getDuration:(RCTResponseSenderBlock)callback) {
