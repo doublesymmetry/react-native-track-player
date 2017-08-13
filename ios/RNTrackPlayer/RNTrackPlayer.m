@@ -10,7 +10,6 @@
 #import "RNTrackPlayer-Swift.h"
 
 #import "RNTrackPlayer.h"
-#import "STKAudioPlayer.h"
 
 @interface RNTrackPlayer()
 @property(strong, nonatomic) MediaWrapper *mediaWrapper;
@@ -30,13 +29,7 @@
 RCT_EXPORT_MODULE(TrackPlayerModule)
 
 - (NSDictionary *)constantsToExport {
-    return @{
-             @"STATE_NONE": @(STKAudioPlayerStateDisposed),
-             @"STATE_PLAYING": @(STKAudioPlayerStatePlaying),
-             @"STATE_PAUSED": @(STKAudioPlayerStatePaused),
-             @"STATE_STOPPED": @(STKAudioPlayerStateStopped),
-             @"STATE_BUFFERING": @(STKAudioPlayerStateBuffering)
-             };
+    return @{};
 }
 
 RCT_EXPORT_METHOD(onReady:(RCTResponseSenderBlock)callback) {

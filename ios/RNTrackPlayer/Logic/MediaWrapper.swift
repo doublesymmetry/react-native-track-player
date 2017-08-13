@@ -10,11 +10,10 @@ import Foundation
 import MediaPlayer
 
 @objc(MediaWrapper)
-class MediaWrapper: NSObject {
+class MediaWrapper: NSObject, AudioPlayerDelegate {
     private var queue: [Track]
     private var currentIndex: Int
-    private let player: STKAudioPlayer
-    private var trackURLTask: URLSessionDataTask?
+    private let player: AudioPlayer
     private var trackImageTask: URLSessionDataTask?
     
     
@@ -23,12 +22,12 @@ class MediaWrapper: NSObject {
     override init() {
         self.queue = []
         self.currentIndex = 0
-        self.player = STKAudioPlayer()
+        self.player = AudioPlayer()
+        super.init()
         
+        self.player.delegate = self
         UIApplication.shared.beginReceivingRemoteControlEvents()
     }
-    
-    deinit { player.dispose() }
     
     
     // MARK: - Public API
@@ -111,53 +110,28 @@ class MediaWrapper: NSObject {
         
         let track = queue[currentIndex]
         
-        // cancel any previous tasks
-        trackURLTask?.cancel()
+        // go to next track if item cannot be played
+        guard let audioItem = AudioItem(mediumQualitySoundURL: track.url.value) else {
+            _ = playNext()
+            return
+        }
+        
+        audioItem.title = track.title
+        audioItem.artist = track.artist
+        audioItem.album = track.album
+        player.play(item: audioItem)
+        
+        // fetch artwork and cancel any previous requests
         trackImageTask?.cancel()
-        
-        // setup now playing info center data and download album artwork
-        var infoCenterMetadata: [String: Any] = [
-            MPMediaItemPropertyTitle: track.title,
-            MPMediaItemPropertyArtist: track.artist,
-            MPMediaItemPropertyGenre: track.genre ?? "",
-            MPMediaItemPropertyAlbumTitle: track.album ?? "",
-            MPMediaItemPropertyReleaseDate: track.date ?? "",
-            MPMediaItemPropertyMediaType: MPMediaType.music.rawValue,
-            MPMediaItemPropertyPlaybackDuration: track.duration ?? 0.0,
-            MPNowPlayingInfoPropertyElapsedPlaybackTime: player.progress,
-            ]
-        
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = infoCenterMetadata
-        
         if let artworkURL = track.artwork?.value {
             trackImageTask = URLSession.shared.dataTask(with: artworkURL, completionHandler: { (data, _, error) in
                 if let data = data, let artwork = UIImage(data: data), error == nil {
-                    infoCenterMetadata[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(image: artwork)
-                    MPNowPlayingInfoCenter.default().nowPlayingInfo = infoCenterMetadata
+                    audioItem.artwork = MPMediaItemArtwork(image: artwork)
                 }
             })
-            
-            trackImageTask?.resume()
         }
         
-        
-        // fetch possible 302 redirection
-        if (!track.url.isLocal) {
-            var request = URLRequest(url: track.url.value, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 5)
-            request.setValue("HEAD", forHTTPHeaderField: "HTTPMethod")
-            
-            trackURLTask = URLSession.shared.dataTask(with: request, completionHandler: { [unowned self] (_, response, error) in
-                if let response = response, error == nil {
-                    // TODO: Add way to remember we've already fetched the 302 redirect
-                    track.url.value = response.url!
-                    self.player.play(track.url.value)
-                }
-            })
-            
-            trackURLTask?.resume()
-        } else {
-            player.play(track.url.value)
-        }
+        trackImageTask?.resume()
     }
     
     @objc func pause() {
@@ -170,7 +144,7 @@ class MediaWrapper: NSObject {
     }
     
     @objc func seek(to time: Double) {
-        self.player.seek(toTime: time)
+        self.player.seek(to: time)
     }
     
     @objc func setVolume(_ level: Float) {
@@ -182,11 +156,11 @@ class MediaWrapper: NSObject {
     }
     
     @objc func duration() -> Double {
-        return player.duration
+        return player.currentItemDuration ?? 0
     }
     
     @objc func position() -> Double {
-        return player.progress
+        return player.currentItemProgression ?? 0
     }
     
     @objc func state() -> String {
@@ -202,5 +176,12 @@ class MediaWrapper: NSObject {
         default:
             return "STATE_NONE"
         }
+    }
+    
+    
+    // MARK: - AudioPlayerDelegate
+    
+    func audioPlayer(_ audioPlayer: AudioPlayer, didChangeStateFrom from: AudioPlayerState, to state: AudioPlayerState) {
+        if from == .playing && state == .stopped { _ = playNext() }
     }
 }
