@@ -8,7 +8,6 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -33,7 +32,7 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
     private MediaWrapper binder;
     private boolean connecting = false;
-    private Callback[] initCallbacks = null;
+    private Promise[] initCallbacks = null;
 
     public TrackModule(ReactApplicationContext context) {
         super(context);
@@ -61,8 +60,8 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
         if(initCallbacks != null) {
             // Triggers all callbacks from onReady
-            for(Callback cb : initCallbacks) {
-                Utils.triggerCallback(cb);
+            for(Promise cb : initCallbacks) {
+                Utils.resolveCallback(cb);
             }
             initCallbacks = null;
         }
@@ -122,21 +121,21 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void onReady(Callback callback) {
+    public void setupPlayer(ReadableMap data, Promise promise) {
         if(binder != null) {
             // The module is already connected to the service
-            Utils.triggerCallback(callback);
+            Utils.resolveCallback(promise);
             return;
         }
 
         if(initCallbacks == null) {
             // Create a new array with our callback
-            initCallbacks = new Callback[]{callback};
+            initCallbacks = new Promise[]{promise};
         } else {
             // Add to the existing array
             int index = initCallbacks.length;
             initCallbacks = Arrays.copyOf(initCallbacks, index + 1);
-            initCallbacks[index] = callback;
+            initCallbacks[index] = promise;
         }
 
         if(connecting) return;
@@ -146,20 +145,16 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
         // Binds the service to get a MediaWrapper instance
         Intent intent = new Intent(context, PlayerService.class);
         intent.setAction(PlayerService.ACTION_MEDIA_WRAPPER);
+        intent.putExtra("data", Temp.toBundle(data));
         context.bindService(intent, this, Service.BIND_AUTO_CREATE);
 
         connecting = true;
     }
 
     @ReactMethod
-    public void setupPlayer(ReadableMap data, Promise promise) {
-        binder.setupPlayer(Temp.toBundle(data), promise); //TODO check if callback works properly
-    }
-
-    @ReactMethod
     public void destroy() {
-        binder.destroy();
-        //getReactApplicationContext().unbindService(this);
+        if(binder != null) binder.destroy();
+        getReactApplicationContext().unbindService(this);
     }
 
     @ReactMethod
@@ -169,27 +164,27 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @ReactMethod
     public void add(ReadableArray tracks, String insertBeforeId, Promise callback) {
-        binder.add(Temp.toList(tracks), insertBeforeId, callback);//TODO check if callback works properly
+        binder.add(Temp.toList(tracks), insertBeforeId, callback);
     }
 
     @ReactMethod
     public void remove(ReadableArray tracks, Promise callback) {
-        binder.remove(Temp.toList(tracks), callback);//TODO check if callback works properly
+        binder.remove(Temp.toList(tracks), callback);
     }
 
     @ReactMethod
     public void skip(String track, Promise callback) {
-        binder.skip(track, callback);//TODO check if callback works properly
+        binder.skip(track, callback);
     }
 
     @ReactMethod
     public void skipToNext(Promise callback) {
-        binder.skipToNext(callback);//TODO check if callback works properly
+        binder.skipToNext(callback);
     }
 
     @ReactMethod
     public void skipToPrevious(Promise callback) {
-        binder.skipToPrevious(callback);//TODO check if callback works properly
+        binder.skipToPrevious(callback);
     }
 
     @ReactMethod
@@ -223,46 +218,46 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void getVolume(Callback callback) {
+    public void getVolume(Promise callback) {
         binder.getVolume(callback);
     }
 
     @ReactMethod
-    public void getTrack(String id, Callback callback) {
+    public void getTrack(String id, Promise callback) {
         binder.getTrack(id, callback);
     }
 
     @ReactMethod
-    public void getCurrentTrack(Callback callback) {
+    public void getCurrentTrack(Promise callback) {
         binder.getCurrentTrack(callback);
     }
 
     @ReactMethod
-    public void getDuration(Callback callback) {
+    public void getDuration(Promise callback) {
         binder.getDuration(callback);
     }
 
     @ReactMethod
-    public void getBufferedPosition(Callback callback) {
+    public void getBufferedPosition(Promise callback) {
         binder.getBufferedPosition(callback);
     }
 
     @ReactMethod
-    public void getPosition(Callback callback) {
+    public void getPosition(Promise callback) {
         binder.getPosition(callback);
     }
 
     @ReactMethod
-    public void getState(Callback callback) {
+    public void getState(Promise callback) {
         binder.getState(callback);
     }
 
     @ReactMethod
-    public void getCastState(Callback callback) {
+    public void getCastState(Promise callback) {
         Context context = getReactApplicationContext().getApplicationContext();
 
-        if(!LibHelper.isChromecastAvailable(context)) {
-            Utils.triggerCallback(callback, CastState.NO_DEVICES_AVAILABLE);
+        if(!LibHelper.isChromecastAvailable(context) || binder == null) {
+            Utils.resolveCallback(callback, CastState.NO_DEVICES_AVAILABLE);
             return;
         }
 

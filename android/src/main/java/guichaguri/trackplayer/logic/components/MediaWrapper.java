@@ -4,12 +4,12 @@ import android.content.Context;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
-import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Temp;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.track.Track;
+import guichaguri.trackplayer.player.Playback;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,15 +28,6 @@ public class MediaWrapper extends Binder {
         this.handler = new Handler();
     }
 
-    public void setupPlayer(final Bundle options, final Promise promise) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                manager.setupPlayer(options, promise);
-            }
-        });
-    }
-
     public void updateOptions(final Bundle bundle) {
         handler.post(new Runnable() {
             @Override
@@ -50,11 +41,15 @@ public class MediaWrapper extends Binder {
         handler.post(new Runnable() {
             @Override
             public void run() {
+                Playback pb = manager.getPlayback();
+                if(pb == null) return;
+
                 List<Track> list = new ArrayList<>();
                 for(int i = 0; i < tracks.size(); i++) {
                     list.add(new Track(context, manager, tracks.get(i)));
                 }
-                manager.getPlayback().add(list, insertBeforeId, promise);
+
+                pb.add(list, insertBeforeId, promise);
             }
         });
     }
@@ -63,7 +58,9 @@ public class MediaWrapper extends Binder {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                manager.getPlayback().remove(ids, promise);
+                Playback pb = manager.getPlayback();
+                if(pb == null) return;
+                pb.remove(ids, promise);
             }
         });
     }
@@ -72,7 +69,9 @@ public class MediaWrapper extends Binder {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                manager.getPlayback().skip(id, promise);
+                Playback pb = manager.getPlayback();
+                if(pb == null) return;
+                pb.skip(id, promise);
             }
         });
     }
@@ -81,7 +80,9 @@ public class MediaWrapper extends Binder {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                manager.getPlayback().skipToNext(promise);
+                Playback pb = manager.getPlayback();
+                if(pb == null) return;
+                pb.skipToNext(promise);
             }
         });
     }
@@ -90,7 +91,9 @@ public class MediaWrapper extends Binder {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                manager.getPlayback().skipToPrevious(promise);
+                Playback pb = manager.getPlayback();
+                if(pb == null) return;
+                pb.skipToPrevious(promise);
             }
         });
     }
@@ -99,7 +102,9 @@ public class MediaWrapper extends Binder {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                manager.getPlayback().reset();
+                Playback pb = manager.getPlayback();
+                if(pb == null) return;
+                pb.reset();
             }
         });
     }
@@ -108,7 +113,9 @@ public class MediaWrapper extends Binder {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                manager.getPlayback().play();
+                Playback pb = manager.getPlayback();
+                if(pb == null) return;
+                pb.play();
             }
         });
     }
@@ -117,7 +124,9 @@ public class MediaWrapper extends Binder {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                manager.getPlayback().pause();
+                Playback pb = manager.getPlayback();
+                if(pb == null) return;
+                pb.pause();
             }
         });
     }
@@ -126,7 +135,9 @@ public class MediaWrapper extends Binder {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                manager.getPlayback().stop();
+                Playback pb = manager.getPlayback();
+                if(pb == null) return;
+                pb.stop();
             }
         });
     }
@@ -135,7 +146,9 @@ public class MediaWrapper extends Binder {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                manager.getPlayback().seekTo(ms);
+                Playback pb = manager.getPlayback();
+                if(pb == null) return;
+                pb.seekTo(ms);
             }
         });
     }
@@ -144,83 +157,110 @@ public class MediaWrapper extends Binder {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                manager.getPlayback().setVolume(volume);
+                Playback pb = manager.getPlayback();
+                if(pb == null) return;
+                pb.setVolume(volume);
             }
         });
     }
 
-    public void getVolume(final Callback callback) {
+    public void getVolume(final Promise callback) {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                Utils.triggerCallback(callback, manager.getPlayback().getVolume());
+                Playback pb = manager.getPlayback();
+                if(checkPlayback(pb, callback)) return;
+                Utils.resolveCallback(callback, pb.getVolume());
             }
         });
     }
 
-    public void getTrack(final String id, final Callback callback) {
+    public void getTrack(final String id, final Promise callback) {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                for(Track track : manager.getPlayback().getQueue()) {
+                Playback pb = manager.getPlayback();
+                if(checkPlayback(pb, callback)) return;
+
+                for(Track track : pb.getQueue()) {
                     if(track.id.equals(id)) {
-                        Utils.triggerCallback(callback, Temp.fromBundle(track.toBundle()));
+                        Utils.resolveCallback(callback, Temp.fromBundle(track.toBundle()));
                         return;
                     }
                 }
-                Utils.triggerCallback(callback);
+                Utils.rejectCallback(callback, "track", "No track found");
             }
         });
     }
 
-    public void getCurrentTrack(final Callback callback) {
+    public void getCurrentTrack(final Promise callback) {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                Track track = manager.getPlayback().getCurrentTrack();
-                Utils.triggerCallback(callback, track != null ? track.id : null);
+                Playback pb = manager.getPlayback();
+                if(checkPlayback(pb, callback)) return;
+
+                Track track = pb.getCurrentTrack();
+
+                if(track == null) {
+                    Utils.rejectCallback(callback, "track", "No track playing");
+                } else {
+                    Utils.resolveCallback(callback, track.id);
+                }
             }
         });
     }
 
-    public void getDuration(final Callback callback) {
+    public void getDuration(final Promise callback) {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                Utils.triggerCallback(callback, Utils.toSeconds(manager.getPlayback().getDuration()));
+                Playback pb = manager.getPlayback();
+                if(checkPlayback(pb, callback)) return;
+
+                Utils.resolveCallback(callback, Utils.toSeconds(pb.getDuration()));
             }
         });
     }
 
-    public void getPosition(final Callback callback) {
+    public void getPosition(final Promise callback) {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                Utils.triggerCallback(callback, Utils.toSeconds(manager.getPlayback().getPosition()));
+                Playback pb = manager.getPlayback();
+                if(checkPlayback(pb, callback)) return;
+
+                Utils.resolveCallback(callback, Utils.toSeconds(pb.getPosition()));
             }
         });
     }
 
-    public void getBufferedPosition(final Callback callback) {
+    public void getBufferedPosition(final Promise callback) {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                Utils.triggerCallback(callback, Utils.toSeconds(manager.getPlayback().getBufferedPosition()));
+                Playback pb = manager.getPlayback();
+                if(checkPlayback(pb, callback)) return;
+
+                Utils.resolveCallback(callback, Utils.toSeconds(pb.getBufferedPosition()));
             }
         });
     }
 
-    public void getState(final Callback callback) {
+    public void getState(final Promise callback) {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                Utils.triggerCallback(callback, manager.getPlayback().getState());
+                Playback pb = manager.getPlayback();
+                if(checkPlayback(pb, callback)) return;
+
+                Utils.resolveCallback(callback, pb.getState());
             }
         });
     }
 
-    public void getCastState(Callback callback) {
-        Utils.triggerCallback(callback, manager.getCastState());
+    public void getCastState(Promise callback) {
+        Utils.resolveCallback(callback, manager.getCastState());
     }
 
     public void destroy() {
@@ -230,5 +270,13 @@ public class MediaWrapper extends Binder {
                 manager.destroyPlayer();
             }
         });
+    }
+
+    private boolean checkPlayback(Playback pb, Promise callback) {
+        if(pb == null) {
+            Utils.rejectCallback(callback, "playback", "The playback is not initialized");
+            return true;
+        }
+        return false;
     }
 }

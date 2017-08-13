@@ -28,6 +28,13 @@ public class PlayerService extends MediaBrowserServiceCompat {
     public IBinder onBind(Intent intent) {
         if(intent.getAction().equals(ACTION_MEDIA_WRAPPER)) {
             Log.d(Utils.TAG, "Module Bound");
+
+            if(intent.hasExtra("data")) {
+                manager.setupPlayer(intent.getBundleExtra("data"));
+            } else {
+                manager.setupPlayer(null);
+            }
+
             return new MediaWrapper(this, manager);
         }
         return super.onBind(intent);

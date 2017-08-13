@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
-import com.facebook.react.bridge.Promise;
+import com.google.android.gms.cast.framework.CastState;
 import guichaguri.trackplayer.cast.GoogleCast;
 import guichaguri.trackplayer.logic.components.FocusManager;
 import guichaguri.trackplayer.logic.services.PlayerService;
@@ -75,18 +75,13 @@ public class MediaManager {
         }
     }
 
-    public void setupPlayer(Bundle options, Promise promise) {
+    public void setupPlayer(Bundle options) {
+        if(playback != null) return;
+
         Log.d(Utils.TAG, "Setting up the player");
 
-        if(playback != null) {
-            Utils.rejectCallback(promise, "setupPlayer", "The playback is already initialized");
-            return;
-        }
-
-        playbackOptions = options;
+        playbackOptions = options == null ? new Bundle() : options;
         playback = createLocalPlayback();
-
-        Utils.resolveCallback(promise);
     }
 
     public void destroyPlayer() {
@@ -131,7 +126,7 @@ public class MediaManager {
     }
 
     public int getCastState() {
-        return cast.getState();
+        return cast != null ? cast.getState() : CastState.NO_DEVICES_AVAILABLE;
     }
 
     public void onPlay() {
@@ -164,8 +159,6 @@ public class MediaManager {
             service.startService(new Intent(service, PlayerService.class));
             serviceStarted = true;
         }
-
-        Events.dispatchEvent(service, Events.PLAYBACK_PLAY, null);
     }
 
     public void onPause() {
@@ -186,8 +179,6 @@ public class MediaManager {
             // We'll disable the audio focus as we don't need it anymore
             focus.disable();
         }
-
-        Events.dispatchEvent(service, Events.PLAYBACK_PAUSE, null);
     }
 
     public void onStop() {
@@ -212,8 +203,6 @@ public class MediaManager {
             // We'll disable the audio focus as we don't need it anymore
             focus.disable();
         }
-
-        Events.dispatchEvent(service, Events.PLAYBACK_STOP, null);
     }
 
     public void onLoad(Track track) {

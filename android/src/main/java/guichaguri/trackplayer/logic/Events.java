@@ -26,9 +26,6 @@ public class Events {
     // Playback Events
     public static final String PLAYBACK_STATE = "playback-state";
     public static final String PLAYBACK_LOAD = "playback-loaded";
-    public static final String PLAYBACK_PLAY = "playback-started";
-    public static final String PLAYBACK_PAUSE = "playback-paused";
-    public static final String PLAYBACK_STOP = "playback-stopped";
     public static final String PLAYBACK_ENDED = "playback-ended";
     public static final String PLAYBACK_ERROR = "playback-error";
 

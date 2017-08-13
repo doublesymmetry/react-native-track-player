@@ -13,18 +13,16 @@ import guichaguri.trackplayer.logic.Utils;
 public class CastCallbackTrigger implements ResultCallback<MediaChannelResult> {
 
     private final Promise callback;
-    private final Object[] data;
 
-    public CastCallbackTrigger(Promise callback, Object ... data) {
+    public CastCallbackTrigger(Promise callback) {
         this.callback = callback;
-        this.data = data;
     }
 
     @Override
     public void onResult(@NonNull MediaChannelResult result) {
         Status status = result.getStatus();
         if(status.isSuccess()) {
-            Utils.resolveCallback(callback, data);
+            Utils.resolveCallback(callback, result.getCustomData());
         } else {
             Utils.rejectCallback(callback, Integer.toString(status.getStatusCode()), status.getStatusMessage());
         }

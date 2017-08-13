@@ -8,8 +8,6 @@ import android.os.Bundle;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.KeyEvent;
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
 import org.json.JSONException;
@@ -135,20 +133,12 @@ public class Utils {
                 state == PlaybackStateCompat.STATE_ERROR;
     }
 
-    public static void triggerCallback(Callback callback, Object ... args) {
-        if(callback != null) callback.invoke(args);
+    public static void resolveCallback(Promise promise) {
+        if(promise != null) promise.resolve(null);
     }
 
-    public static void resolveCallback(Promise promise, Object ... data) {
-        if(promise != null) {
-            Object value = null;
-            if(data.length == 1) {
-                value = data[0];
-            } else if(data.length > 1) {
-                value = Arguments.fromJavaArgs(data);
-            }
-            promise.resolve(value);
-        }
+    public static void resolveCallback(Promise promise, Object data) {
+        if(promise != null) promise.resolve(data);
     }
 
     public static void rejectCallback(Promise promise, Throwable crash) {

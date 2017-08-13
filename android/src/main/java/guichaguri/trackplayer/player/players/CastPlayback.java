@@ -50,8 +50,8 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
         return cast.isCurrentSession(session);
     }
 
-    private void addCallback(PendingResult<MediaChannelResult> r, Promise callback, Object ... data) {
-        r.setResultCallback(new CastCallbackTrigger(callback, data));
+    private void addCallback(PendingResult<MediaChannelResult> r, Promise callback) {
+        r.setResultCallback(new CastCallbackTrigger(callback));
     }
 
     private void updateCurrentTrackClient(int castId) {
