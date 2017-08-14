@@ -21,6 +21,8 @@ struct Track {
     let duration: Double?
     let artwork: MediaURL?
     
+    private let originalObject: [String: Any]
+    
     init?(dictionary: [String: Any]) {
         guard let id = dictionary["id"] as? String,
             let title = dictionary["title"] as? String,
@@ -39,5 +41,14 @@ struct Track {
         self.desc = dictionary["description"] as? String
         self.duration = dictionary["duration"] as? Double
         self.artwork = MediaURL(object: dictionary["artwork"])
+        
+        self.originalObject = dictionary
+    }
+    
+    
+    // MARK: - Public Interface
+    
+    func toObject() -> [String: Any] {
+        return originalObject
     }
 }

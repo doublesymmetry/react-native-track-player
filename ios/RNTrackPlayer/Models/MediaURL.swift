@@ -9,10 +9,12 @@
 import Foundation
 
 struct MediaURL {
-    var value: URL
+    let value: URL
+    private let originalObject: Any
     
     init?(object: Any?) {
         guard let object = object else { return nil }
+        originalObject = object
         
         if let localObject = object as? [String: Any] {
             value = URL(string: localObject["uri"] as! String)!

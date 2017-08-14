@@ -149,6 +149,16 @@ class RNTrackPlayer: NSObject {
         mediaWrapper.volume = level
     }
     
+    @objc(getTrack:resolver:rejecter:)
+    func getTrack(id: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        if !mediaWrapper.queueContainsTrack(trackId: id) {
+            reject("track_not_in_queue", "Given track ID was not found in queue", nil)
+            return
+        }
+        
+        resolve(mediaWrapper.currentTrack.toObject())
+    }
+    
     @objc(getCurrentTrack:rejecter:)
     func getCurrentTrack(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         resolve(mediaWrapper.currentTrack.id)
