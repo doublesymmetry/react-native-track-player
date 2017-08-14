@@ -9,21 +9,55 @@
 import Foundation
 import MediaPlayer
 
-@objc(MediaWrapper)
-class MediaWrapper: NSObject, AudioPlayerDelegate {
+class MediaWrapper: AudioPlayerDelegate {
     private var queue: [Track]
     private var currentIndex: Int
     private let player: AudioPlayer
     private var trackImageTask: URLSessionDataTask?
     
+    var volume: Float {
+        get {
+            return player.volume
+        }
+        set {
+            player.volume = newValue
+        }
+    }
+    
+    var currentTrack: Track {
+        return queue[currentIndex]
+    }
+    
+    var currentTrackDuration: Double {
+        return player.currentItemDuration ?? 0
+    }
+    
+    var currentTrackProgression: Double {
+        return player.currentItemProgression ?? 0
+    }
+    
+    var state: String {
+        switch player.state {
+        case .playing:
+            return "STATE_PLAYING"
+        case .paused:
+            return "STATE_PAUSED"
+        case .stopped:
+            return "STATE_STOPPED"
+        case .buffering:
+            return "STATE_BUFFERING"
+        default:
+            return "STATE_NONE"
+        }
+    }
+    
     
     // MARK: - Init/Deinit
     
-    override init() {
+    init() {
         self.queue = []
         self.currentIndex = 0
         self.player = AudioPlayer()
-        super.init()
         
         self.player.delegate = self
         UIApplication.shared.beginReceivingRemoteControlEvents()
@@ -32,19 +66,23 @@ class MediaWrapper: NSObject, AudioPlayerDelegate {
     
     // MARK: - Public API
     
-    @objc func queueContainsTrack(trackId: String) -> Bool {
+    func queueContainsTrack(trackId: String) -> Bool {
         return queue.contains(where: { $0.id == trackId })
     }
     
-    @objc func addTracks(_ tracks: [Track], before trackId: String) {
+    func addTracks(_ tracks: [Track]) {
+        queue.append(contentsOf: tracks)
+    }
+    
+    func addTracks(_ tracks: [Track], before trackId: String?) {
         if let trackIndex = queue.index(where: { $0.id == trackId }) {
             queue.insert(contentsOf: tracks, at: trackIndex)
         } else {
-            queue.append(contentsOf: tracks)
+            addTracks(tracks)
         }
     }
     
-    @objc func removeTracks(ids: [String]) {
+    func removeTracks(ids: [String]) {
         var removedCurrentTrack = false
         
         for (index, track) in queue.enumerated() {
@@ -66,14 +104,14 @@ class MediaWrapper: NSObject, AudioPlayerDelegate {
         queue = queue.filter { ids.contains($0.id) }
     }
     
-    @objc func skipToTrack(id: String) {
+    func skipToTrack(id: String) {
         if let trackIndex = queue.index(where: { $0.id == id }) {
             currentIndex = trackIndex
             play()
         }
     }
     
-    @objc func playNext() -> Bool {
+    func playNext() -> Bool {
         if queue.indices.contains(currentIndex + 1) {
             currentIndex = currentIndex + 1
             play()
@@ -84,7 +122,7 @@ class MediaWrapper: NSObject, AudioPlayerDelegate {
         return false
     }
     
-    @objc func playPrevious() -> Bool {
+    func playPrevious() -> Bool {
         if queue.indices.contains(currentIndex - 1) {
             currentIndex = currentIndex - 1
             play()
@@ -95,13 +133,13 @@ class MediaWrapper: NSObject, AudioPlayerDelegate {
         return false
     }
     
-    @objc func reset() {
+    func reset() {
         currentIndex = 0
         queue.removeAll()
         stop()
     }
     
-    @objc func play() {
+    func play() {
         // resume playback if it was paused
         if player.state == .paused {
             player.resume()
@@ -134,48 +172,17 @@ class MediaWrapper: NSObject, AudioPlayerDelegate {
         trackImageTask?.resume()
     }
     
-    @objc func pause() {
+    func pause() {
         player.pause()
     }
     
-    @objc func stop() {
+    func stop() {
         player.stop()
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
     }
     
-    @objc func seek(to time: Double) {
+    func seek(to time: Double) {
         self.player.seek(to: time)
-    }
-    
-    @objc func setVolume(_ level: Float) {
-        player.volume = level
-    }
-    
-    @objc func currentTrack() -> Track {
-        return queue[currentIndex];
-    }
-    
-    @objc func duration() -> Double {
-        return player.currentItemDuration ?? 0
-    }
-    
-    @objc func position() -> Double {
-        return player.currentItemProgression ?? 0
-    }
-    
-    @objc func state() -> String {
-        switch player.state {
-        case .playing:
-            return "STATE_PLAYING"
-        case .paused:
-            return "STATE_PAUSED"
-        case .stopped:
-            return "STATE_STOPPED"
-        case .buffering:
-            return "STATE_BUFFERING"
-        default:
-            return "STATE_NONE"
-        }
     }
     
     

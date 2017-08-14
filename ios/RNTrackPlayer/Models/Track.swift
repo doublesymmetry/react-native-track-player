@@ -8,8 +8,7 @@
 
 import Foundation
 
-@objc(Track)
-class Track: NSObject {
+struct Track {
     let id: String
     let url: MediaURL
     let title: String

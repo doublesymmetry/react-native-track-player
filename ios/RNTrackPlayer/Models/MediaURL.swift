@@ -8,8 +8,7 @@
 
 import Foundation
 
-@objc(MediaURL)
-class MediaURL: NSObject {
+struct MediaURL {
     var value: URL
     
     init?(object: Any?) {
@@ -20,7 +19,5 @@ class MediaURL: NSObject {
         } else {
             value = URL(string: object as! String)!
         }
-        
-        super.init()
     }
 }
