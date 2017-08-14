@@ -32,7 +32,6 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
     private final CastSession session;
     private final RemoteMediaClient player;
 
-    private boolean loading = false;
     private int lastKnownState = MediaStatus.PLAYER_STATE_UNKNOWN;
     private int lastKnownIdleReason = MediaStatus.IDLE_REASON_NONE;
     private long lastKnownPosition = 0;
@@ -57,10 +56,11 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
     private void updateCurrentTrackClient(int castId) {
         // Updates the current track client-side (or "sender-side")
         for(int i = 0; i < queue.size(); i++) {
-            if(queue.get(i).castId == castId) {
+            Track track = queue.get(i);
+            if(track.castId == castId) {
                 if(i == currentTrack) return;
                 currentTrack = i;
-                manager.onTrackUpdate();
+                manager.onTrackUpdate(track, true);
                 break;
             }
         }
@@ -194,7 +194,6 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
 
     @Override
     public void play() {
-        loading = true;
         player.play();
     }
 
@@ -218,7 +217,7 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
 
         switch(lastKnownState) {
             case MediaStatus.PLAYER_STATE_IDLE:
-                if(lastKnownIdleReason == MediaStatus.IDLE_REASON_FINISHED) {
+                if(lastKnownIdleReason != MediaStatus.IDLE_REASON_NONE) {
                     return PlaybackStateCompat.STATE_STOPPED;
                 } else {
                     return PlaybackStateCompat.STATE_NONE;
@@ -323,16 +322,15 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
         updateState(state);
 
         if(state == PlaybackStateCompat.STATE_STOPPED) {
-            manager.onEnd();
-        } else if(prevState == PlaybackStateCompat.STATE_BUFFERING && state != PlaybackStateCompat.STATE_BUFFERING) {
-            if(loading) manager.onLoad(getCurrentTrack());
-            loading = false;
+            if(lastKnownIdleReason == MediaStatus.IDLE_REASON_FINISHED) {
+                manager.onEnd();
+            }
         }
     }
 
     @Override
     public void onMetadataUpdated() {
-        manager.onTrackUpdate();
+        manager.onTrackUpdate(getCurrentTrack(), false);
     }
 
     @Override

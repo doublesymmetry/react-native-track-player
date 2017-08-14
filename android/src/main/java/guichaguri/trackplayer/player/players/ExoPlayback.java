@@ -205,12 +205,13 @@ public class ExoPlayback extends Playback implements EventListener {
             Utils.resolveCallback(loadCallback);
             loadCallback = null;
 
-            manager.onLoad(getCurrentTrack());
-
         } else if(playbackState == SimpleExoPlayer.STATE_ENDED) {
 
-            manager.onEnd();
-            skipToNext(null);
+            if(nextTrack()) {
+                updateCurrentTrack(null);
+            } else {
+                manager.onEnd();
+            }
 
         }
     }

@@ -92,7 +92,7 @@ public class Metadata {
         }
     }
 
-    public void updateMetadata(Playback playback) {
+    public void updateMetadata(Playback playback, Track track) {
         // Reset the metadata when there's no playback attached or track playing
         if(playback == null || playback.getCurrentTrack() == null) {
             if(artwork != null) artwork.interrupt();
@@ -104,7 +104,6 @@ public class Metadata {
             return;
         }
 
-        Track track = playback.getCurrentTrack();
         long duration = playback.getDuration();
         if(duration <= 0) duration = track.duration;
 

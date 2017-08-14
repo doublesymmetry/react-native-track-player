@@ -43,12 +43,12 @@ public class PlayerService extends MediaBrowserServiceCompat {
     @Nullable
     @Override
     public BrowserRoot onGetRoot(@NonNull String clientPackageName, int clientUid, @Nullable Bundle rootHints) {
-        return new BrowserRoot("browser-" + getPackageName(), null);
+        return new BrowserRoot("root", null);
     }
 
     @Override
     public void onLoadChildren(@NonNull String parentId, @NonNull Result<List<MediaItem>> result) {
-        // TODO
+        //TODO
         result.sendResult(Collections.<MediaItem>emptyList());
     }
 
@@ -78,4 +78,12 @@ public class PlayerService extends MediaBrowserServiceCompat {
         manager = null;
     }
 
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        Log.d(Utils.TAG, "Task removed");
+
+        if(manager.shouldStopWithApp()) {
+            stopSelf();
+        }
+    }
 }

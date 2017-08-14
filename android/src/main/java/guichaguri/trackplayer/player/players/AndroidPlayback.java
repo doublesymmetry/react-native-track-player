@@ -237,9 +237,11 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
         ended = true;
         updateState();
 
-        manager.onEnd();
-
-        skipToNext(null);
+        if(nextTrack()) {
+            updateCurrentTrack(null);
+        } else {
+            manager.onEnd();
+        }
     }
 
     @Override
@@ -265,8 +267,6 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
 
         loaded = true;
         updateState();
-
-        manager.onLoad(getCurrentTrack());
     }
 
     @Override

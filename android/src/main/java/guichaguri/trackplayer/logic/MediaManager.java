@@ -35,6 +35,7 @@ public class MediaManager {
     private Playback playback;
     private Bundle playbackOptions;
     private boolean serviceStarted = false;
+    private boolean stopWithApp = false;
 
     public MediaManager(PlayerService service) {
         this.service = service;
@@ -61,6 +62,8 @@ public class MediaManager {
     }
 
     public void updateOptions(Bundle data) {
+        stopWithApp = data.getBoolean("stopWithApp", stopWithApp);
+
         metadata.updateOptions(data);
         metadata.updatePlayback(playback);
     }
@@ -102,6 +105,10 @@ public class MediaManager {
         return metadata.getRatingType();
     }
 
+    public boolean shouldStopWithApp() {
+        return stopWithApp;
+    }
+
     public void switchPlayback(Playback pb) {
         Log.d(Utils.TAG, "Switching playback");
 
@@ -117,7 +124,7 @@ public class MediaManager {
 
         // Update the metadata
         metadata.updateQueue(playback);
-        metadata.updateMetadata(playback);
+        metadata.updateMetadata(playback, playback.getCurrentTrack());
         metadata.updatePlayback(playback);
     }
 
@@ -162,9 +169,9 @@ public class MediaManager {
     }
 
     public void onPause() {
-        Log.d(Utils.TAG, "onPause: The service is now in background again, audio focus, wake and wifi locks have been released");
+        Log.d(Utils.TAG, "onPause: The service is now in stopWithApp again, audio focus, wake and wifi locks have been released");
 
-        // Set the service as background, keeping the notification
+        // Set the service as stopWithApp, keeping the notification
         service.stopForeground(false);
 
         if(!playback.isRemote()) {
@@ -182,9 +189,9 @@ public class MediaManager {
     }
 
     public void onStop() {
-        Log.d(Utils.TAG, "onStop: The service is now in background, audio focus, wake and wifi locks have been released");
+        Log.d(Utils.TAG, "onStop: The service is now in stopWithApp, audio focus, wake and wifi locks have been released");
 
-        // Set the service as background, removing the notification
+        // Set the service as stopWithApp, removing the notification
         metadata.getNotification().setShowing(false);
         service.stopForeground(true);
 
@@ -205,14 +212,6 @@ public class MediaManager {
         }
     }
 
-    public void onLoad(Track track) {
-        Log.d(Utils.TAG, "onLoad");
-
-        Bundle bundle = new Bundle();
-        bundle.putString("track", track.id);
-        Events.dispatchEvent(service, Events.PLAYBACK_LOAD, bundle);
-    }
-
     public void onEnd() {
         Log.d(Utils.TAG, "onEnd");
 
@@ -227,10 +226,16 @@ public class MediaManager {
         Events.dispatchEvent(service, Events.PLAYBACK_STATE, bundle);
     }
 
-    public void onTrackUpdate() {
+    public void onTrackUpdate(Track track, boolean changed) {
         Log.d(Utils.TAG, "onTrackUpdate");
 
-        metadata.updateMetadata(playback);
+        metadata.updateMetadata(playback, track);
+
+        if(changed && track != null) {
+            Bundle bundle = new Bundle();
+            bundle.putString("track", track.id);
+            Events.dispatchEvent(service, Events.PLAYBACK_TRACK_CHANGED, bundle);
+        }
     }
 
     public void onPlaybackUpdate() {

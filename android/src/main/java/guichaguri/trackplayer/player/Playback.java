@@ -106,9 +106,16 @@ public abstract class Playback {
         Utils.rejectCallback(callback, "skip", "The track was not found");
     }
 
-    public void skipToNext(Promise callback) {
+    protected boolean nextTrack() {
         if(currentTrack < queue.size() - 1) {
             currentTrack++;
+            return true;
+        }
+        return false;
+    }
+
+    public void skipToNext(Promise callback) {
+        if(nextTrack()) {
             updateCurrentTrack(callback);
         } else {
             Utils.rejectCallback(callback, "skip", "There is no next tracks");
@@ -131,7 +138,7 @@ public abstract class Playback {
         manager.onQueueUpdate();
 
         currentTrack = -1;
-        manager.onTrackUpdate();
+        manager.onTrackUpdate(null, true);
     }
 
     public abstract void play();
@@ -226,6 +233,6 @@ public abstract class Playback {
             pause();
         }
 
-        manager.onTrackUpdate();
+        manager.onTrackUpdate(track, true);
     }
 }
