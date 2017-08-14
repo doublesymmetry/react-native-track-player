@@ -29,7 +29,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     }
     
     func playerExhaustedQueue() {
-        sendEvent(withName: "playback-stopped", body: nil)
+        sendEvent(withName: "playback-ended", body: nil)
     }
     
     func playbackFailed(error: Error) {
