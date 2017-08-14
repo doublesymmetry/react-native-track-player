@@ -169,9 +169,9 @@ public class MediaManager {
     }
 
     public void onPause() {
-        Log.d(Utils.TAG, "onPause: The service is now in stopWithApp again, audio focus, wake and wifi locks have been released");
+        Log.d(Utils.TAG, "onPause: The service is now in background again, audio focus, wake and wifi locks have been released");
 
-        // Set the service as stopWithApp, keeping the notification
+        // Set the service as background, keeping the notification
         service.stopForeground(false);
 
         if(!playback.isRemote()) {
@@ -189,9 +189,9 @@ public class MediaManager {
     }
 
     public void onStop() {
-        Log.d(Utils.TAG, "onStop: The service is now in stopWithApp, audio focus, wake and wifi locks have been released");
+        Log.d(Utils.TAG, "onStop: The service is now in background, audio focus, wake and wifi locks have been released");
 
-        // Set the service as stopWithApp, removing the notification
+        // Set the service as background, removing the notification
         metadata.getNotification().setShowing(false);
         service.stopForeground(true);
 
