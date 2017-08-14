@@ -56,7 +56,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     @objc(supportedEvents)
     override func supportedEvents() -> [String] {
-        return ["playback-state", "playback-loaded", "playback-error", "playback-progress", "playback-ended"]
+        return ["playback-state", "playback-track-changed", "playback-error", "playback-progress", "playback-ended"]
     }
     
     
