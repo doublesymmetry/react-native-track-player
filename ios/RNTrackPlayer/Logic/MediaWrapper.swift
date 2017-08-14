@@ -9,10 +9,6 @@
 import Foundation
 import MediaPlayer
 
-fileprivate struct Constants {
-    static let defaultBuffer = 0.5
-}
-
 class MediaWrapper: AudioPlayerDelegate {
     private var queue: [Track]
     private var currentIndex: Int
@@ -64,8 +60,7 @@ class MediaWrapper: AudioPlayerDelegate {
         self.player = AudioPlayer()
         
         self.player.delegate = self
-        self.player.bufferingStrategy = .playWhenPreferredBufferDurationFull
-        self.player.preferredBufferDurationBeforePlayback = Constants.defaultBuffer
+        self.player.bufferingStrategy = .playWhenBufferNotEmpty
         UIApplication.shared.beginReceivingRemoteControlEvents()
     }
     
