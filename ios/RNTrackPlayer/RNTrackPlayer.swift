@@ -10,13 +10,41 @@ import Foundation
 import AVFoundation
 
 @objc(RNTrackPlayer)
-class RNTrackPlayer: NSObject {
-    private let mediaWrapper = MediaWrapper()
+class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
+    private lazy var mediaWrapper: MediaWrapper = {
+        let wrapper = MediaWrapper()
+        wrapper.delegate = self
+        
+        return wrapper
+    }()
+    
+    // MARK: - MediaWrapperDelegate Methods
+    
+    func playerUpdatedState() {
+        sendEvent(withName: "playback-state", body: mediaWrapper.state)
+    }
+    
+    func playerSwitchedTracks() {
+        sendEvent(withName: "playback-track-changed", body: nil)
+    }
+    
+    func playerExhaustedQueue() {
+        sendEvent(withName: "playback-stopped", body: nil)
+    }
+    
+    func playbackFailed(error: Error) {
+        sendEvent(withName: "playback-error", body: error.localizedDescription)
+    }
+    
+    func playbackUpdatedProgress(to time: TimeInterval) {
+        sendEvent(withName: "playback-progress", body: mediaWrapper.currentTrackProgression)
+    }
+    
     
     // MARK: - Required Methods
     
     @objc(constantsToExport)
-    func constantsToExport() -> [String: Any] {
+    override func constantsToExport() -> [String: Any] {
         return [
             "STATE_NONE": AudioPlayerState.stopped,
             "STATE_PLAYING": AudioPlayerState.playing,
@@ -24,6 +52,11 @@ class RNTrackPlayer: NSObject {
             "STATE_STOPPED": AudioPlayerState.stopped,
             "STATE_BUFFERING": AudioPlayerState.buffering
         ]
+    }
+    
+    @objc(supportedEvents)
+    override func supportedEvents() -> [String] {
+        return ["playback-state", "playback-loaded", "playback-error", "playback-progress", "playback-ended"]
     }
     
     
@@ -171,8 +204,7 @@ class RNTrackPlayer: NSObject {
     
     @objc(getBufferedPosition:rejecter:)
     func getBufferedPosition(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        // TODO: Implement
-        resolve(0)
+        resolve(mediaWrapper.bufferedPosition)
     }
     
     @objc(getPosition:rejecter:)

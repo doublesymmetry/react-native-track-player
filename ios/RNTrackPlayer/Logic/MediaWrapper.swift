@@ -15,6 +15,8 @@ class MediaWrapper: AudioPlayerDelegate {
     private let player: AudioPlayer
     private var trackImageTask: URLSessionDataTask?
     
+    weak var delegate: MediaWrapperDelegate?
+    
     var volume: Float {
         get {
             return player.volume
@@ -26,6 +28,10 @@ class MediaWrapper: AudioPlayerDelegate {
     
     var currentTrack: Track {
         return queue[currentIndex]
+    }
+    
+    var bufferedPosition: Double {
+        return player.currentItemLoadedRange?.latest ?? 0
     }
     
     var currentTrackDuration: Double {
@@ -61,7 +67,10 @@ class MediaWrapper: AudioPlayerDelegate {
         
         self.player.delegate = self
         self.player.bufferingStrategy = .playWhenBufferNotEmpty
-        UIApplication.shared.beginReceivingRemoteControlEvents()
+        
+        DispatchQueue.main.async {
+            UIApplication.shared.beginReceivingRemoteControlEvents()
+        }
     }
     
     
@@ -179,7 +188,6 @@ class MediaWrapper: AudioPlayerDelegate {
     
     func stop() {
         player.stop()
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
     }
     
     func seek(to time: Double) {
@@ -189,7 +197,26 @@ class MediaWrapper: AudioPlayerDelegate {
     
     // MARK: - AudioPlayerDelegate
     
-    func audioPlayer(_ audioPlayer: AudioPlayer, didChangeStateFrom from: AudioPlayerState, to state: AudioPlayerState) {
-        if from == .playing && state == .stopped { _ = playNext() }
+    func audioPlayer(_ audioPlayer: AudioPlayer, willStartPlaying item: AudioItem) {
+        delegate?.playerSwitchedTracks()
     }
+    
+    func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: AudioItem) {
+        if (!playNext()) {
+            delegate?.playerExhaustedQueue()
+        }
+    }
+    
+    func audioPlayer(_ audioPlayer: AudioPlayer, didChangeStateFrom from: AudioPlayerState, to state: AudioPlayerState) {
+        switch state {
+        case .failed(let error):
+            delegate?.playbackFailed(error: error)
+        default:
+            delegate?.playerUpdatedState()
+        }
+    }
+    
+    func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateProgressionTo time: TimeInterval, percentageRead: Float) {
+        delegate?.playbackUpdatedProgress(to: time)
+    }    
 }

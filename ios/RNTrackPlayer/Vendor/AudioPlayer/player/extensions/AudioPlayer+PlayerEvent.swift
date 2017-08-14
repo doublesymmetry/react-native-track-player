@@ -18,6 +18,10 @@ extension AudioPlayer {
             if let error = error {
                 state = .failed(.foundationError(error))
             } else {
+                if let currentItem = currentItem {
+                    delegate?.audioPlayer(self, didFinishPlaying: currentItem)
+                }
+                
                 nextOrStop()
             }
 

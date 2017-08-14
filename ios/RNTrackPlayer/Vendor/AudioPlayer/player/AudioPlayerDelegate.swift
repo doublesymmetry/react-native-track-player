@@ -29,6 +29,13 @@ public protocol AudioPlayerDelegate: class {
     ///   - audioPlayer: The audio player.
     ///   - item: The item that is about to start being played.
     func audioPlayer(_ audioPlayer: AudioPlayer, willStartPlaying item: AudioItem)
+    
+    /// This method is called when the audio player finishes playing an item.
+    ///
+    /// - Parameters:
+    ///   - audioPlayer: The audio player.
+    ///   - item: The item that it just finished playing.
+    func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: AudioItem)
 
     /// This method is called a regular time interval while playing. It notifies the delegate that the current playing
     /// progression changed.
@@ -71,6 +78,8 @@ public extension AudioPlayerDelegate {
                      to state: AudioPlayerState) {}
 
     func audioPlayer(_ audioPlayer: AudioPlayer, willStartPlaying item: AudioItem) {}
+    
+    func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: AudioItem) {}
 
     func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateProgressionTo time: TimeInterval, percentageRead: Float) {}
 
