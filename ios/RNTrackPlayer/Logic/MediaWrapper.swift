@@ -26,8 +26,8 @@ class MediaWrapper: AudioPlayerDelegate {
         }
     }
     
-    var currentTrack: Track {
-        return queue[currentIndex]
+    var currentTrack: Track? {
+        return queue.indices.contains(0) ? queue[currentIndex] : nil
     }
     
     var bufferedPosition: Double {
