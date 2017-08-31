@@ -10,7 +10,8 @@ import Foundation
 
 protocol MediaWrapperDelegate: class {
     func playerUpdatedState()
-    func playerSwitchedTracks()
+    func playerSwitchedTracks(trackId: String?)
+    func playerTrackEnded(trackId: String?)
     func playerExhaustedQueue()
     func playbackFailed(error: Error)
     func playbackUpdatedProgress(to time: TimeInterval)

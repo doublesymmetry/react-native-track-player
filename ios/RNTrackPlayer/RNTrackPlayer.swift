@@ -24,8 +24,12 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         sendEvent(withName: "playback-state", body: mediaWrapper.state)
     }
     
-    func playerSwitchedTracks() {
-        sendEvent(withName: "playback-track-changed", body: mediaWrapper.currentTrack?.id)
+    func playerSwitchedTracks(trackId: String?) {
+        sendEvent(withName: "playback-track-changed", body: trackId)
+    }
+    
+    func playerTrackEnded(trackId: String?) {
+        sendEvent(withName: "playback-track-ended", body: trackId)
     }
     
     func playerExhaustedQueue() {
@@ -56,7 +60,14 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     @objc(supportedEvents)
     override func supportedEvents() -> [String] {
-        return ["playback-state", "playback-track-changed", "playback-error", "playback-progress", "playback-ended"]
+        return [
+            "playback-ended",
+            "playback-state",
+            "playback-error",
+            "playback-progress",
+            "playback-track-ended",
+            "playback-track-changed"
+        ]
     }
     
     

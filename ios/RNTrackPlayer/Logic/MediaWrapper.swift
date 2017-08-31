@@ -198,10 +198,12 @@ class MediaWrapper: AudioPlayerDelegate {
     // MARK: - AudioPlayerDelegate
     
     func audioPlayer(_ audioPlayer: AudioPlayer, willStartPlaying item: AudioItem) {
-        delegate?.playerSwitchedTracks()
+        delegate?.playerSwitchedTracks(trackId: currentTrack?.id)
     }
     
     func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: AudioItem) {
+        delegate?.playerTrackEnded(trackId: currentTrack?.id)
+        
         if (!playNext()) {
             delegate?.playerExhaustedQueue()
         }
