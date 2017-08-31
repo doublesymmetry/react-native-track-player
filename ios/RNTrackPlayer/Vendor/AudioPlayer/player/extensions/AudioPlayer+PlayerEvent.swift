@@ -22,7 +22,7 @@ extension AudioPlayer {
                     delegate?.audioPlayer(self, didFinishPlaying: currentItem)
                 }
                 
-                nextOrStop()
+//                nextOrStop() -- disabled until we use AudioPlayer queue
             }
 
         case .interruptionBegan where state.isPlaying || state.isBuffering:
