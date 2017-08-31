@@ -25,7 +25,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     }
     
     func playerSwitchedTracks() {
-        sendEvent(withName: "playback-track-changed", body: nil)
+        sendEvent(withName: "playback-track-changed", body: mediaWrapper.currentTrack?.id)
     }
     
     func playerExhaustedQueue() {
