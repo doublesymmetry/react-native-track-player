@@ -128,7 +128,7 @@ class MediaWrapper: AudioPlayerDelegate {
             return true
         }
         
-        stop()
+        pause()
         return false
     }
     
@@ -139,7 +139,7 @@ class MediaWrapper: AudioPlayerDelegate {
             return true
         }
         
-        stop()
+        pause()
         return false
     }
     
