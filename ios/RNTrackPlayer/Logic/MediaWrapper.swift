@@ -194,7 +194,7 @@ class MediaWrapper: AudioPlayerDelegate {
     func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: Track) {
         guard fabs(currentTrackProgression.distance(to: currentTrackDuration)) <= 1e-1 else { return }
         
-        delegate?.playerTrackEnded(trackId: currentTrack?.id)
+        delegate?.playerTrackEnded(trackId: currentTrack?.id, time: currentTrackProgression)
         
         if (!playNext()) {
             delegate?.playerExhaustedQueue()
