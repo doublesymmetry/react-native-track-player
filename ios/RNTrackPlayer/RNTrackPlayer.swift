@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import MediaPlayer
 import AVFoundation
 
 @objc(RNTrackPlayer)
@@ -55,7 +56,13 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
             "STATE_PLAYING": AudioPlayerState.playing,
             "STATE_PAUSED": AudioPlayerState.paused,
             "STATE_STOPPED": AudioPlayerState.stopped,
-            "STATE_BUFFERING": AudioPlayerState.buffering
+            "STATE_BUFFERING": AudioPlayerState.buffering,
+            
+            "CAPABILITY_PLAY": Capability.play,
+            "CAPABILITY_PAUSE": Capability.pause,
+            "CAPABILITY_STOP": Capability.stop,
+            "CAPABILITY_SKIP_TO_NEXT": Capability.next,
+            "CAPABILITY_SKIP_TO_PREVIOUS": Capability.previous
         ]
     }
     
@@ -67,7 +74,13 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
             "playback-error",
             "playback-progress",
             "playback-track-ended",
-            "playback-track-changed"
+            "playback-track-changed",
+            
+            "remote-stop",
+            "remote-pause",
+            "remote-play",
+            "remote-next",
+            "remote-previous"
         ]
     }
     
@@ -93,7 +106,20 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     @objc(updateOptions:)
     func update(options: [String: Any]) {
-        // TODO: - Implement
+        guard let capabilities = options["capabilities"] as? [Capability] else { return }
+        let remoteCenter = MPRemoteCommandCenter.shared()
+        
+        let enableStop = capabilities.contains(.stop)
+        let enablePause = capabilities.contains(.pause)
+        let enablePlay = capabilities.contains(.play)
+        let enablePlayNext = capabilities.contains(.next)
+        let enablePlayPrevious = capabilities.contains(.previous)
+        
+        toggleRemoteHandler(command: remoteCenter.stopCommand, selector: #selector(remoteSentStop), enabled: enableStop)
+        toggleRemoteHandler(command: remoteCenter.pauseCommand, selector: #selector(remoteSentPause), enabled: enablePause)
+        toggleRemoteHandler(command: remoteCenter.playCommand, selector: #selector(remoteSentPlay), enabled: enablePlay)
+        toggleRemoteHandler(command: remoteCenter.nextTrackCommand, selector: #selector(remoteSentNext), enabled: enablePlayNext)
+        toggleRemoteHandler(command: remoteCenter.previousTrackCommand, selector: #selector(remoteSentPrevious), enabled: enablePlayPrevious)
     }
     
     @objc(add:before:resolver:rejecter:)
@@ -227,5 +253,37 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     @objc(getState:rejecter:)
     func getState(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         resolve(mediaWrapper.state)
+    }
+    
+    
+    // MARK: - Private Helpers
+    
+    private func toggleRemoteHandler(command: MPRemoteCommand, selector: Selector, enabled: Bool) {
+        command.removeTarget(self, action: selector)
+        if enabled { command.addTarget(self, action: selector) }
+        command.isEnabled = enabled
+    }
+    
+    
+    // MARK: - Remote Dynamic Methods
+    
+    func remoteSentStop() {
+        sendEvent(withName: "remote-stop", body: nil)
+    }
+    
+    func remoteSentPause() {
+        sendEvent(withName: "remote-pause", body: nil)
+    }
+    
+    func remoteSentPlay() {
+        sendEvent(withName: "remote-play", body: nil)
+    }
+    
+    func remoteSentNext() {
+        sendEvent(withName: "remote-next", body: nil)
+    }
+    
+    func remoteSentPrevious() {
+        sendEvent(withName: "remote-previous", body: nil)
     }
 }

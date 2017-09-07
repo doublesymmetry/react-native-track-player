@@ -9,6 +9,15 @@
 import Foundation
 import MediaPlayer
 
+protocol MediaWrapperDelegate: class {
+    func playerUpdatedState()
+    func playerSwitchedTracks(trackId: String?)
+    func playerTrackEnded(trackId: String?, time: TimeInterval?)
+    func playerExhaustedQueue()
+    func playbackFailed(error: Error)
+    func playbackUpdatedProgress(to time: TimeInterval)    
+}
+
 class MediaWrapper: AudioPlayerDelegate {
     private var queue: [Track]
     private var currentIndex: Int
@@ -143,12 +152,6 @@ class MediaWrapper: AudioPlayerDelegate {
         return false
     }
     
-    func reset() {
-        currentIndex = 0
-        queue.removeAll()
-        stop()
-    }
-    
     func play() {
         // resume playback if it was paused
         if player.state == .paused {
@@ -156,7 +159,7 @@ class MediaWrapper: AudioPlayerDelegate {
             return
         }
         
-        var track = queue[currentIndex]
+        let track = queue[currentIndex]
         player.play(track: track)
         
         // fetch artwork and cancel any previous requests
@@ -182,6 +185,12 @@ class MediaWrapper: AudioPlayerDelegate {
     
     func seek(to time: Double) {
         self.player.seek(to: time)
+    }
+    
+    func reset() {
+        currentIndex = 0
+        queue.removeAll()
+        stop()
     }
     
     

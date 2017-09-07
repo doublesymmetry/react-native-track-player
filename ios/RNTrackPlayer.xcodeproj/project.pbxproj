@@ -10,7 +10,6 @@
 		9B0E282E1F07D76F00B71D2A /* RNTrackPlayerBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E282D1F07D76F00B71D2A /* RNTrackPlayerBridge.m */; };
 		9B0E282F1F07D76F00B71D2A /* RNTrackPlayerBridge.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B0E282C1F07D76F00B71D2A /* RNTrackPlayerBridge.h */; };
 		9B58DF3B1F40C0F000C2105E /* RNTrackPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B58DF3A1F40C0F000C2105E /* RNTrackPlayer.swift */; };
-		9B58DF651F41E56000C2105E /* MediaWrapperDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B58DF641F41E56000C2105E /* MediaWrapperDelegate.swift */; };
 		9B78A2461F3F12BC002B5E3C /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B78A2451F3F12BC002B5E3C /* Track.swift */; };
 		9B78A2481F3F12C9002B5E3C /* MediaURL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B78A2471F3F12C9002B5E3C /* MediaURL.swift */; };
 		9B8D9F771F40AF7B003A0C0B /* BackgroundHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8D9F571F40AEC3003A0C0B /* BackgroundHandler.swift */; };
@@ -36,6 +35,7 @@
 		9BFBA4D21F3DFA3F00453D3A /* MediaWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BFBA4D11F3DFA3F00453D3A /* MediaWrapper.swift */; };
 		9BFC1F7B1F619A09008795BF /* TrackEventProducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC1F7A1F619A09008795BF /* TrackEventProducer.swift */; };
 		9BFC1F7D1F619C0B008795BF /* AudioPlayer+TrackEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC1F7C1F619C0B008795BF /* AudioPlayer+TrackEvent.swift */; };
+		9BFC1FDD1F61A8E8008795BF /* Capabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC1FDC1F61A8E8008795BF /* Capabilities.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -56,7 +56,6 @@
 		9B0E282C1F07D76F00B71D2A /* RNTrackPlayerBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNTrackPlayerBridge.h; sourceTree = "<group>"; };
 		9B0E282D1F07D76F00B71D2A /* RNTrackPlayerBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNTrackPlayerBridge.m; sourceTree = "<group>"; };
 		9B58DF3A1F40C0F000C2105E /* RNTrackPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNTrackPlayer.swift; sourceTree = "<group>"; };
-		9B58DF641F41E56000C2105E /* MediaWrapperDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaWrapperDelegate.swift; sourceTree = "<group>"; };
 		9B78A2451F3F12BC002B5E3C /* Track.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
 		9B78A2471F3F12C9002B5E3C /* MediaURL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaURL.swift; sourceTree = "<group>"; };
 		9B8D9F571F40AEC3003A0C0B /* BackgroundHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundHandler.swift; sourceTree = "<group>"; };
@@ -83,6 +82,7 @@
 		9BFBA4D11F3DFA3F00453D3A /* MediaWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaWrapper.swift; sourceTree = "<group>"; };
 		9BFC1F7A1F619A09008795BF /* TrackEventProducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackEventProducer.swift; sourceTree = "<group>"; };
 		9BFC1F7C1F619C0B008795BF /* AudioPlayer+TrackEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AudioPlayer+TrackEvent.swift"; sourceTree = "<group>"; };
+		9BFC1FDC1F61A8E8008795BF /* Capabilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Capabilities.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,7 +100,6 @@
 			isa = PBXGroup;
 			children = (
 				9BFBA4D11F3DFA3F00453D3A /* MediaWrapper.swift */,
-				9B58DF641F41E56000C2105E /* MediaWrapperDelegate.swift */,
 			);
 			path = Logic;
 			sourceTree = "<group>";
@@ -148,6 +147,7 @@
 			children = (
 				9B78A2451F3F12BC002B5E3C /* Track.swift */,
 				9B78A2471F3F12C9002B5E3C /* MediaURL.swift */,
+				9BFC1FDC1F61A8E8008795BF /* Capabilities.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -292,6 +292,7 @@
 				9B8D9F8C1F40AF8F003A0C0B /* AudioPlayer+NetworkEvent.swift in Sources */,
 				9B8D9F7A1F40AF7B003A0C0B /* CMTime+TimeIntervalValue.swift in Sources */,
 				9BFC1F7D1F619C0B008795BF /* AudioPlayer+TrackEvent.swift in Sources */,
+				9BFC1FDD1F61A8E8008795BF /* Capabilities.swift in Sources */,
 				9B8D9F861F40AF8A003A0C0B /* AudioPlayerBufferingStrategy.swift in Sources */,
 				9B8D9F7B1F40AF7E003A0C0B /* Reachability.swift in Sources */,
 				9B8D9F921F40AF93003A0C0B /* AudioPlayerState.swift in Sources */,
@@ -305,7 +306,6 @@
 				9B58DF3B1F40C0F000C2105E /* RNTrackPlayer.swift in Sources */,
 				9B8D9F791F40AF7B003A0C0B /* MPNowPlayingInfoCenter+AudioItem.swift in Sources */,
 				9B8D9F821F40AF85003A0C0B /* RetryEventProducer.swift in Sources */,
-				9B58DF651F41E56000C2105E /* MediaWrapperDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
