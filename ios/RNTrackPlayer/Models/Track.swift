@@ -7,8 +7,10 @@
 //
 
 import Foundation
+import MediaPlayer
+import AVFoundation
 
-struct Track {
+class Track: NSObject {
     let id: String
     let url: MediaURL
     let title: String
@@ -19,7 +21,8 @@ struct Track {
     let album: String?
     let genre: String?
     let duration: Double?
-    let artwork: MediaURL?
+    let artworkURL: MediaURL?
+    var artwork: MPMediaItemArtwork?
     
     private let originalObject: [String: Any]
     
@@ -40,7 +43,7 @@ struct Track {
         self.genre = dictionary["genre"] as? String
         self.desc = dictionary["description"] as? String
         self.duration = dictionary["duration"] as? Double
-        self.artwork = MediaURL(object: dictionary["artwork"])
+        self.artworkURL = MediaURL(object: dictionary["artwork"])
         
         self.originalObject = dictionary
     }

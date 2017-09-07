@@ -12,7 +12,7 @@ extension AudioPlayer {
     /// - Parameters:
     ///   - producer: The event producer that generated the audio item event.
     ///   - event: The audio item event.
-    func handleAudioItemEvent(from producer: EventProducer, with event: AudioItemEventProducer.AudioItemEvent) {
+    func handleTrackEvent(from producer: EventProducer, with event: TrackEventProducer.TrackEvent) {
         updateNowPlayingInfoCenter()
     }
 }

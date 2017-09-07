@@ -10,6 +10,7 @@ import Foundation
 
 struct MediaURL {
     let value: URL
+    let isLocal: Bool
     private let originalObject: Any
     
     init?(object: Any?) {
@@ -17,8 +18,10 @@ struct MediaURL {
         originalObject = object
         
         if let localObject = object as? [String: Any] {
+            isLocal = true
             value = URL(string: localObject["uri"] as! String)!
         } else {
+            isLocal = false
             value = URL(string: object as! String)!
         }
     }

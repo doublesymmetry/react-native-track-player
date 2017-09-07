@@ -53,31 +53,6 @@ extension AudioPlayer {
         }
     }
 
-    /// Plays previous item in the queue or rewind current item.
-    public func previous() {
-        if hasPrevious {
-            currentItem = queue?.previousItem()
-        } else {
-            seek(to: 0)
-        }
-    }
-
-    /// Plays next item in the queue.
-    public func next() {
-        if hasNext {
-            currentItem = queue?.nextItem()
-        }
-    }
-
-    /// Plays the next item in the queue and if there isn't, the player will stop.
-    public func nextOrStop() {
-        if hasNext {
-            next()
-        } else {
-            stop()
-        }
-    }
-
     /// Stops the player and clear the queue.
     public func stop() {
         retryEventProducer.stopProducingEvents()
@@ -88,9 +63,6 @@ extension AudioPlayer {
         }
         if let _ = currentItem {
             currentItem = nil
-        }
-        if let _ = queue {
-            queue = nil
         }
 
         setAudioSession(active: false)
@@ -161,43 +133,6 @@ extension AudioPlayer {
         let position = max(range.earliest, range.latest - padding)
         seekSafely(to: position, completionHandler: completionHandler)
     }
-
-    #if os(iOS) || os(tvOS)
-    //swiftlint:disable cyclomatic_complexity
-    /// Handle events received from Control Center/Lock screen/Other in UIApplicationDelegate.
-    ///
-    /// - Parameter event: The event received.
-    public func remoteControlReceived(with event: UIEvent) {
-        guard event.type == .remoteControl else {
-            return
-        }
-
-        switch event.subtype {
-        case .remoteControlBeginSeekingBackward:
-            seekingBehavior.handleSeekingStart(player: self, forward: false)
-        case .remoteControlBeginSeekingForward:
-            seekingBehavior.handleSeekingStart(player: self, forward: true)
-        case .remoteControlEndSeekingBackward:
-            seekingBehavior.handleSeekingEnd(player: self, forward: false)
-        case .remoteControlEndSeekingForward:
-            seekingBehavior.handleSeekingEnd(player: self, forward: true)
-        case .remoteControlNextTrack:
-            next()
-        case .remoteControlPause,
-             .remoteControlTogglePlayPause where state.isPlaying:
-            pause()
-        case .remoteControlPlay,
-             .remoteControlTogglePlayPause where state.isPaused:
-            resume()
-        case .remoteControlPreviousTrack:
-            previous()
-        case .remoteControlStop:
-            stop()
-        default:
-            break
-        }
-    }
-    #endif
 }
 
 extension AudioPlayer {

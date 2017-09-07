@@ -21,8 +21,6 @@ extension AudioPlayer {
                 if let currentItem = currentItem {
                     delegate?.audioPlayer(self, didFinishPlaying: currentItem)
                 }
-                
-//                nextOrStop() -- disabled until we use AudioPlayer queue
             }
 
         case .interruptionBegan where state.isPlaying || state.isBuffering:
@@ -46,7 +44,6 @@ extension AudioPlayer {
 
         case .loadedMetadata(let metadata):
             if let currentItem = currentItem, !metadata.isEmpty {
-                currentItem.parseMetadata(metadata)
                 delegate?.audioPlayer(self, didUpdateEmptyMetadataOn: currentItem, withData: metadata)
             }
 
@@ -125,7 +122,7 @@ extension AudioPlayer {
             }
 
             stateBeforeBuffering = state
-            if reachability.isReachable() || (currentItem?.soundURLs[currentQuality]?.ap_isOfflineURL ?? false) {
+            if reachability.isReachable() || (currentItem?.url.isLocal ?? false) {
                 state = .buffering
             } else {
                 state = .waitingForConnection

@@ -21,7 +21,7 @@ extension AudioPlayer {
             }
 
             //In case we're not playing offline file
-            if !(currentItem.soundURLs[currentQuality]?.ap_isOfflineURL ?? false) {
+            if !(currentItem.url.isLocal ?? false) {
                 stateWhenConnectionLost = state
 
                 if let currentItem = player?.currentItem, currentItem.isPlaybackBufferEmpty {

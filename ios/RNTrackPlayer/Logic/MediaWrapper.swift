@@ -156,29 +156,19 @@ class MediaWrapper: AudioPlayerDelegate {
             return
         }
         
-        let track = queue[currentIndex]
-        
-        // go to next track if item cannot be played
-        guard let audioItem = AudioItem(mediumQualitySoundURL: track.url.value) else {
-            _ = playNext()
-            return
-        }
-        
-        audioItem.title = track.title
-        audioItem.artist = track.artist
-        audioItem.album = track.album
-        player.play(item: audioItem)
+        var track = queue[currentIndex]
+        player.play(track: track)
         
         // fetch artwork and cancel any previous requests
         trackImageTask?.cancel()
-        if let artworkURL = track.artwork?.value {
+        if let artworkURL = track.artworkURL?.value {
             trackImageTask = URLSession.shared.dataTask(with: artworkURL, completionHandler: { (data, _, error) in
                 if let data = data, let artwork = UIImage(data: data), error == nil {
-                    audioItem.artwork = MPMediaItemArtwork(image: artwork)
+                    track.artwork = MPMediaItemArtwork(image: artwork)
                 }
             })
         }
-        
+
         trackImageTask?.resume()
     }
     
@@ -197,11 +187,11 @@ class MediaWrapper: AudioPlayerDelegate {
     
     // MARK: - AudioPlayerDelegate
     
-    func audioPlayer(_ audioPlayer: AudioPlayer, willStartPlaying item: AudioItem) {
+    func audioPlayer(_ audioPlayer: AudioPlayer, willStartPlaying item: Track) {
         delegate?.playerSwitchedTracks(trackId: currentTrack?.id)
     }
     
-    func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: AudioItem) {
+    func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: Track) {
         guard fabs(currentTrackProgression.distance(to: currentTrackDuration)) <= 1e-1 else { return }
         
         delegate?.playerTrackEnded(trackId: currentTrack?.id)

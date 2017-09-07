@@ -9,11 +9,11 @@
 import AVFoundation
 
 /// This typealias only serves the purpose of saving user to `import AVFoundation`.
-public typealias Metadata = [AVMetadataItem]
+typealias Metadata = [AVMetadataItem]
 
 /// This protocol contains helpful methods to alert you of specific events. If you want to be notified about those
 /// events, you will have to set a delegate to your `audioPlayer` instance.
-public protocol AudioPlayerDelegate: class {
+protocol AudioPlayerDelegate: class {
     /// This method is called when the audio player changes its state. A fresh created audioPlayer starts in `.stopped`
     /// mode.
     ///
@@ -28,14 +28,14 @@ public protocol AudioPlayerDelegate: class {
     /// - Parameters:
     ///   - audioPlayer: The audio player.
     ///   - item: The item that is about to start being played.
-    func audioPlayer(_ audioPlayer: AudioPlayer, willStartPlaying item: AudioItem)
+    func audioPlayer(_ audioPlayer: AudioPlayer, willStartPlaying item: Track)
     
     /// This method is called when the audio player finishes playing an item.
     ///
     /// - Parameters:
     ///   - audioPlayer: The audio player.
     ///   - item: The item that it just finished playing.
-    func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: AudioItem)
+    func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: Track)
 
     /// This method is called a regular time interval while playing. It notifies the delegate that the current playing
     /// progression changed.
@@ -53,7 +53,7 @@ public protocol AudioPlayerDelegate: class {
     ///   - audioPlayer: The audio player.
     ///   - duration: Current item's duration.
     ///   - item: Current item.
-    func audioPlayer(_ audioPlayer: AudioPlayer, didFindDuration duration: TimeInterval, for item: AudioItem)
+    func audioPlayer(_ audioPlayer: AudioPlayer, didFindDuration duration: TimeInterval, for item: Track)
 
     /// This methods gets called before duration gets updated with discovered metadata.
     ///
@@ -61,7 +61,7 @@ public protocol AudioPlayerDelegate: class {
     ///   - audioPlayer: The audio player.
     ///   - item: Current item.
     ///   - data: Found metadata.
-    func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateEmptyMetadataOn item: AudioItem, withData data: Metadata)
+    func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateEmptyMetadataOn item: Track, withData data: Metadata)
 
     /// This method gets called while the audio player is loading the file (over the network or locally). It lets the
     /// delegate know what time range has already been loaded.
@@ -70,22 +70,22 @@ public protocol AudioPlayerDelegate: class {
     ///   - audioPlayer: The audio player.
     ///   - range: The time range that the audio player loaded.
     ///   - item: Current item.
-    func audioPlayer(_ audioPlayer: AudioPlayer, didLoad range: TimeRange, for item: AudioItem)
+    func audioPlayer(_ audioPlayer: AudioPlayer, didLoad range: TimeRange, for item: Track)
 }
 
-public extension AudioPlayerDelegate {
+extension AudioPlayerDelegate {
     func audioPlayer(_ audioPlayer: AudioPlayer, didChangeStateFrom from: AudioPlayerState,
                      to state: AudioPlayerState) {}
 
-    func audioPlayer(_ audioPlayer: AudioPlayer, willStartPlaying item: AudioItem) {}
+    func audioPlayer(_ audioPlayer: AudioPlayer, willStartPlaying item: Track) {}
     
-    func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: AudioItem) {}
+    func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: Track) {}
 
     func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateProgressionTo time: TimeInterval, percentageRead: Float) {}
 
-    func audioPlayer(_ audioPlayer: AudioPlayer, didFindDuration duration: TimeInterval, for item: AudioItem) {}
+    func audioPlayer(_ audioPlayer: AudioPlayer, didFindDuration duration: TimeInterval, for item: Track) {}
 
-    func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateEmptyMetadataOn item: AudioItem, withData data: Metadata) {}
+    func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateEmptyMetadataOn item: Track, withData data: Metadata) {}
 
-    func audioPlayer(_ audioPlayer: AudioPlayer, didLoad range: TimeRange, for item: AudioItem) {}
+    func audioPlayer(_ audioPlayer: AudioPlayer, didLoad range: TimeRange, for item: Track) {}
 }
