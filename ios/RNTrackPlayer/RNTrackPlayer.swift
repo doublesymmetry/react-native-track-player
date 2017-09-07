@@ -232,7 +232,12 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     @objc(getCurrentTrack:rejecter:)
     func getCurrentTrack(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        resolve(mediaWrapper.currentTrack?.id)
+        guard let currentTrack = mediaWrapper.currentTrack else {
+            reject("no_track_playing", "There is no track playing", nil)
+            return
+        }
+        
+        resolve(currentTrack.id)
     }
     
     @objc(getDuration:rejecter:)
