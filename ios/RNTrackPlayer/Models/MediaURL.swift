@@ -19,10 +19,14 @@ struct MediaURL {
         
         if let localObject = object as? [String: Any] {
             isLocal = true
-            value = URL(string: localObject["uri"] as! String)!
+            let uri = localObject["uri"] as! String
+            let encodedURI = uri.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+            value = URL(string: encodedURI)!
         } else {
             isLocal = false
-            value = URL(string: object as! String)!
+            let url = object as! String
+            let encodedURI = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+            value = URL(string: encodedURI)!
         }
     }
 }
