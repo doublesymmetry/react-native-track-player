@@ -118,6 +118,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         toggleRemoteHandler(command: remoteCenter.stopCommand, selector: #selector(remoteSentStop), enabled: enableStop)
         toggleRemoteHandler(command: remoteCenter.pauseCommand, selector: #selector(remoteSentPause), enabled: enablePause)
         toggleRemoteHandler(command: remoteCenter.playCommand, selector: #selector(remoteSentPlay), enabled: enablePlay)
+        toggleRemoteHandler(command: remoteCenter.togglePlayPauseCommand, selector: #selector(remoteSentPlayPause), enabled: enablePause && enablePlay)
         toggleRemoteHandler(command: remoteCenter.nextTrackCommand, selector: #selector(remoteSentNext), enabled: enablePlayNext)
         toggleRemoteHandler(command: remoteCenter.previousTrackCommand, selector: #selector(remoteSentPrevious), enabled: enablePlayPrevious)
     }
@@ -290,5 +291,13 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     func remoteSentPrevious() {
         sendEvent(withName: "remote-previous", body: nil)
+    }
+    
+    func remoteSentPlayPause() {
+        if mediaWrapper.state == "STATE_PAUSED" {
+            sendEvent(withName: "remote-play", body: nil)
+        }
+        
+        sendEvent(withName: "remote-pause", body: nil)
     }
 }
