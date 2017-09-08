@@ -24,9 +24,9 @@ extension MPNowPlayingInfoCenter {
         if let album = item.album {
             info[MPMediaItemPropertyAlbumTitle] = album
         }
-//        if let artwork = item.artwork {
-//            info[MPMediaItemPropertyArtwork] = artwork
-//        }
+        if let artwork = item.artwork {
+            info[MPMediaItemPropertyArtwork] = artwork
+        }
         if let duration = duration {
             info[MPMediaItemPropertyPlaybackDuration] = duration
         }

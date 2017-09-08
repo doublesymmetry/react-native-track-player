@@ -13,16 +13,16 @@ import AVFoundation
 class Track: NSObject {
     let id: String
     let url: MediaURL
-    let title: String
-    let artist: String
+    dynamic let title: String
+    dynamic let artist: String
     
     let date: String?
     let desc: String?
-    let album: String?
     let genre: String?
     let duration: Double?
     let artworkURL: MediaURL?
-    var artwork: MPMediaItemArtwork?
+    dynamic let album: String?
+    dynamic var artwork: MPMediaItemArtwork?
     
     private let originalObject: [String: Any]
     
