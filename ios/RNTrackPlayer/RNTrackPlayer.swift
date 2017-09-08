@@ -106,8 +106,8 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     @objc(updateOptions:)
     func update(options: [String: Any]) {
-        guard let capabilities = options["capabilities"] as? [Capability] else { return }
         let remoteCenter = MPRemoteCommandCenter.shared()
+        let capabilities = options["capabilities"] as? [Capability] ?? []
         
         let enableStop = capabilities.contains(.stop)
         let enablePause = capabilities.contains(.pause)
@@ -266,7 +266,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     private func toggleRemoteHandler(command: MPRemoteCommand, selector: Selector, enabled: Bool) {
         command.removeTarget(self, action: selector)
-        if enabled { command.addTarget(self, action: selector) }
+        command.addTarget(self, action: selector)
         command.isEnabled = enabled
     }
     
