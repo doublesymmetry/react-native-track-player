@@ -296,6 +296,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     func remoteSentPlayPause() {
         if mediaWrapper.state == "STATE_PAUSED" {
             sendEvent(withName: "remote-play", body: nil)
+            return
         }
         
         sendEvent(withName: "remote-pause", body: nil)
