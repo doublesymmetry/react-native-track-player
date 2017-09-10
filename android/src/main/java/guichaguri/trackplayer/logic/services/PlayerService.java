@@ -58,7 +58,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
         manager.onCommand(intent);
 
-        return START_STICKY;
+        return intent == null ? START_NOT_STICKY : START_STICKY;
     }
 
     @Override

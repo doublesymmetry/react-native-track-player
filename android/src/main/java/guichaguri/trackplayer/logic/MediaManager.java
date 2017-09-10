@@ -266,6 +266,8 @@ public class MediaManager {
             if(playback != null) {
                 destroyPlayer();
             }
+
+            service.stopForeground(true);
         } else {
             metadata.handleIntent(intent);
         }
