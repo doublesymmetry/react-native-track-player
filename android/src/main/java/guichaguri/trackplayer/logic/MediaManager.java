@@ -215,7 +215,7 @@ public class MediaManager {
     public void onEnd() {
         Log.d(Utils.TAG, "onEnd");
 
-        Events.dispatchEvent(service, Events.PLAYBACK_ENDED, null);
+        Events.dispatchEvent(service, Events.PLAYBACK_QUEUE_ENDED, null);
     }
 
     public void onStateChange(int state) {
@@ -226,15 +226,17 @@ public class MediaManager {
         Events.dispatchEvent(service, Events.PLAYBACK_STATE, bundle);
     }
 
-    public void onTrackUpdate(Track track, boolean changed) {
+    public void onTrackUpdate(Track previous, long prevPos, Track next, boolean changed) {
         Log.d(Utils.TAG, "onTrackUpdate");
 
-        metadata.updateMetadata(playback, track);
+        metadata.updateMetadata(playback, next);
 
-        if(changed && track != null) {
+        if(changed) {
             Bundle bundle = new Bundle();
-            bundle.putString("track", track.id);
-            Events.dispatchEvent(service, Events.PLAYBACK_TRACK_CHANGED, bundle);
+            bundle.putString("track", previous != null ? previous.id : null);
+            bundle.putDouble("position", Utils.toSeconds(prevPos));
+            bundle.putString("nextTrack", next != null ? next.id : null);
+            Events.dispatchEvent(service, Events.PLAYBACK_TRACK_ENDED, bundle);
         }
     }
 

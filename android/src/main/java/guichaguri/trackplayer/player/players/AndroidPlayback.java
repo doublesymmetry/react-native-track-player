@@ -237,8 +237,8 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
         ended = true;
         updateState();
 
-        if(nextTrack()) {
-            updateCurrentTrack(null);
+        if(hasNext()) {
+            updateCurrentTrack(currentTrack + 1, null);
         } else {
             manager.onEnd();
         }
