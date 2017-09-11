@@ -265,6 +265,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     // MARK: - Private Helpers
     
     private func toggleRemoteHandler(command: MPRemoteCommand, selector: Selector, enabled: Bool) {
+        if( !enabled ) { return }
         command.removeTarget(self, action: selector)
         command.addTarget(self, action: selector)
         command.isEnabled = enabled
