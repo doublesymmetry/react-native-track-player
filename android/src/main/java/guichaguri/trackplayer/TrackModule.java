@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -20,7 +21,8 @@ import guichaguri.trackplayer.logic.Temp;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.components.MediaWrapper;
 import guichaguri.trackplayer.logic.services.PlayerService;
-import java.util.Arrays;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -32,7 +34,7 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
     private MediaWrapper binder;
     private boolean connecting = false;
-    private Promise[] initCallbacks = null;
+    private ArrayDeque<Runnable> initCallbacks = null;
 
     public TrackModule(ReactApplicationContext context) {
         super(context);
@@ -58,12 +60,9 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
         binder = (MediaWrapper)service;
         connecting = false;
 
-        if(initCallbacks != null) {
-            // Triggers all callbacks from onReady
-            for(Promise cb : initCallbacks) {
-                Utils.resolveCallback(cb);
-            }
-            initCallbacks = null;
+        // Triggers all callbacks
+        while(!initCallbacks.isEmpty()) {
+            initCallbacks.remove().run();
         }
     }
 
@@ -71,6 +70,27 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     public void onServiceDisconnected(ComponentName name) {
         binder = null;
         connecting = false;
+    }
+
+    private void waitForConnection(Runnable r) {
+        // TODO find a "fancier" way to do this, removing the amount of boilerplate code for the runnable classes
+
+        if(binder != null) {
+            r.run();
+        } else {
+            initCallbacks.add(r);
+        }
+
+        if(connecting) return;
+
+        ReactApplicationContext context = getReactApplicationContext();
+
+        // Binds the service to get a MediaWrapper instance
+        Intent intent = new Intent(context, PlayerService.class);
+        intent.setAction(PlayerService.ACTION_CONNECT);
+        context.bindService(intent, this, Service.BIND_AUTO_CREATE);
+
+        connecting = true;
     }
 
     /* ****************************** API ****************************** */
@@ -121,22 +141,19 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void setupPlayer(ReadableMap data, Promise promise) {
+    public void setupPlayer(ReadableMap data, final Promise promise) {
         if(binder != null) {
             // The module is already connected to the service
             Utils.resolveCallback(promise);
             return;
         }
 
-        if(initCallbacks == null) {
-            // Create a new array with our callback
-            initCallbacks = new Promise[]{promise};
-        } else {
-            // Add to the existing array
-            int index = initCallbacks.length;
-            initCallbacks = Arrays.copyOf(initCallbacks, index + 1);
-            initCallbacks[index] = promise;
-        }
+        initCallbacks.add(new Runnable() {
+            @Override
+            public void run() {
+                Utils.resolveCallback(promise);
+            }
+        });
 
         if(connecting) return;
 
@@ -144,7 +161,7 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
         // Binds the service to get a MediaWrapper instance
         Intent intent = new Intent(context, PlayerService.class);
-        intent.setAction(PlayerService.ACTION_MEDIA_WRAPPER);
+        intent.setAction(PlayerService.ACTION_SETUP_PLAYER);
         intent.putExtra("data", Temp.toBundle(data));
         context.bindService(intent, this, Service.BIND_AUTO_CREATE);
 
@@ -159,97 +176,198 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @ReactMethod
     public void updateOptions(ReadableMap data) {
-        binder.updateOptions(Temp.toBundle(data));
+        final Bundle options = Temp.toBundle(data);
+
+        waitForConnection(new Runnable() {
+            @Override
+            public void run() {
+                binder.updateOptions(options);
+            }
+        });
     }
 
     @ReactMethod
-    public void add(ReadableArray tracks, String insertBeforeId, Promise callback) {
-        binder.add(Temp.toList(tracks), insertBeforeId, callback);
+    public void add(ReadableArray tracks, final String insertBeforeId, final Promise callback) {
+        final ArrayList trackList = Temp.toList(tracks);
+
+        waitForConnection(new Runnable() {
+            @Override
+            public void run() {
+                binder.add(trackList, insertBeforeId, callback);
+            }
+        });
     }
 
     @ReactMethod
-    public void remove(ReadableArray tracks, Promise callback) {
-        binder.remove(Temp.toList(tracks), callback);
+    public void remove(ReadableArray tracks, final Promise callback) {
+        final ArrayList trackList = Temp.toList(tracks);
+
+        waitForConnection(new Runnable() {
+            @Override
+            public void run() {
+                binder.remove(trackList, callback);
+            }
+        });
     }
 
     @ReactMethod
-    public void skip(String track, Promise callback) {
-        binder.skip(track, callback);
+    public void skip(final String track, final Promise callback) {
+        waitForConnection(new Runnable() {
+            @Override
+            public void run() {
+                binder.skip(track, callback);
+            }
+        });
     }
 
     @ReactMethod
-    public void skipToNext(Promise callback) {
-        binder.skipToNext(callback);
+    public void skipToNext(final Promise callback) {
+        waitForConnection(new Runnable() {
+            @Override
+            public void run() {
+                binder.skipToNext(callback);
+            }
+        });
     }
 
     @ReactMethod
-    public void skipToPrevious(Promise callback) {
-        binder.skipToPrevious(callback);
+    public void skipToPrevious(final Promise callback) {
+        waitForConnection(new Runnable() {
+            @Override
+            public void run() {
+                binder.skipToPrevious(callback);
+            }
+        });
     }
 
     @ReactMethod
     public void reset() {
-        binder.reset();
+        waitForConnection(new Runnable() {
+            @Override
+            public void run() {
+                binder.reset();
+            }
+        });
     }
 
     @ReactMethod
     public void play() {
-        binder.play();
+        waitForConnection(new Runnable() {
+            @Override
+            public void run() {
+                binder.play();
+            }
+        });
     }
 
     @ReactMethod
     public void pause() {
-        binder.pause();
+        waitForConnection(new Runnable() {
+            @Override
+            public void run() {
+                binder.pause();
+            }
+        });
     }
 
     @ReactMethod
     public void stop() {
-        binder.stop();
+        waitForConnection(new Runnable() {
+            @Override
+            public void run() {
+                binder.stop();
+            }
+        });
     }
 
     @ReactMethod
-    public void seekTo(double seconds) {
-        binder.seekTo(Utils.toMillis(seconds));
+    public void seekTo(final double seconds) {
+        waitForConnection(new Runnable() {
+            @Override
+            public void run() {
+                binder.seekTo(Utils.toMillis(seconds));
+            }
+        });
     }
 
     @ReactMethod
-    public void setVolume(float volume) {
-        binder.setVolume(volume);
+    public void setVolume(final float volume) {
+        waitForConnection(new Runnable() {
+            @Override
+            public void run() {
+                binder.setVolume(volume);
+            }
+        });
     }
 
     @ReactMethod
-    public void getVolume(Promise callback) {
-        binder.getVolume(callback);
+    public void getVolume(final Promise callback) {
+        waitForConnection(new Runnable() {
+            @Override
+            public void run() {
+                binder.getVolume(callback);
+            }
+        });
     }
 
     @ReactMethod
-    public void getTrack(String id, Promise callback) {
-        binder.getTrack(id, callback);
+    public void getTrack(final String id, final Promise callback) {
+        waitForConnection(new Runnable() {
+            @Override
+            public void run() {
+                binder.getTrack(id, callback);
+            }
+        });
     }
 
     @ReactMethod
-    public void getCurrentTrack(Promise callback) {
-        binder.getCurrentTrack(callback);
+    public void getCurrentTrack(final Promise callback) {
+        waitForConnection(new Runnable() {
+            @Override
+            public void run() {
+                binder.getCurrentTrack(callback);
+            }
+        });
     }
 
     @ReactMethod
-    public void getDuration(Promise callback) {
-        binder.getDuration(callback);
+    public void getDuration(final Promise callback) {
+        waitForConnection(new Runnable() {
+            @Override
+            public void run() {
+                binder.getDuration(callback);
+            }
+        });
     }
 
     @ReactMethod
-    public void getBufferedPosition(Promise callback) {
-        binder.getBufferedPosition(callback);
+    public void getBufferedPosition(final Promise callback) {
+        waitForConnection(new Runnable() {
+            @Override
+            public void run() {
+                binder.getBufferedPosition(callback);
+            }
+        });
     }
 
     @ReactMethod
-    public void getPosition(Promise callback) {
-        binder.getPosition(callback);
+    public void getPosition(final Promise callback) {
+        waitForConnection(new Runnable() {
+            @Override
+            public void run() {
+                binder.getPosition(callback);
+            }
+        });
     }
 
     @ReactMethod
-    public void getState(Promise callback) {
-        binder.getState(callback);
+    public void getState(final Promise callback) {
+        waitForConnection(new Runnable() {
+            @Override
+            public void run() {
+                binder.getState(callback);
+            }
+        });
     }
 
     @ReactMethod
