@@ -34,7 +34,7 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
     private MediaWrapper binder;
     private boolean connecting = false;
-    private ArrayDeque<Runnable> initCallbacks = null;
+    private ArrayDeque<Runnable> initCallbacks = new ArrayDeque<>();
 
     public TrackModule(ReactApplicationContext context) {
         super(context);
