@@ -23,8 +23,8 @@ struct MediaURL {
             let encodedURI = uri.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
             value = URL(string: encodedURI)!
         } else {
-            isLocal = false
             let url = object as! String
+            isLocal = url.lowercased().range(of:"file://") != nil ? true : false
             let encodedURI = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
             value = URL(string: encodedURI)!
         }
