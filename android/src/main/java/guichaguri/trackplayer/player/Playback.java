@@ -44,8 +44,7 @@ public abstract class Playback {
             queue.addAll(tracks);
 
             if(empty) {
-                currentTrack = 0;
-                updateCurrentTrack(callback);
+                updateCurrentTrack(0, callback);
                 return;
             }
         } else {
@@ -58,7 +57,6 @@ public abstract class Playback {
 
             if(currentTrack >= index) {
                 currentTrack += tracks.size();
-                updateCurrentTrack(callback);
                 return;
             }
         }
@@ -67,7 +65,7 @@ public abstract class Playback {
 
     public void remove(List<String> ids, Promise callback) {
         ListIterator<Track> i = queue.listIterator();
-        boolean trackChanged = false;
+        int currTrack = currentTrack;
 
         while(i.hasNext()) {
             int index = i.nextIndex();
@@ -75,17 +73,16 @@ public abstract class Playback {
             for(String id : ids) {
                 if(track.id.equals(id)) {
                     i.remove();
-                    if(currentTrack == index) {
-                        currentTrack = i.nextIndex();
-                        trackChanged = true;
+                    if(currTrack == index) {
+                        currTrack = i.nextIndex();
                     }
                     break;
                 }
             }
         }
 
-        if(trackChanged) {
-            updateCurrentTrack(callback);
+        if(currTrack != currentTrack) {
+            updateCurrentTrack(currTrack, callback);
         } else {
             Utils.resolveCallback(callback);
         }
@@ -97,8 +94,7 @@ public abstract class Playback {
         for(int i = 0; i < queue.size(); i++) {
             Track track = queue.get(i);
             if(track.id.equals(id)) {
-                currentTrack = i;
-                updateCurrentTrack(callback);
+                updateCurrentTrack(i, callback);
                 return;
             }
         }
@@ -106,17 +102,13 @@ public abstract class Playback {
         Utils.rejectCallback(callback, "skip", "The track was not found");
     }
 
-    protected boolean nextTrack() {
-        if(currentTrack < queue.size() - 1) {
-            currentTrack++;
-            return true;
-        }
-        return false;
+    protected boolean hasNext() {
+        return currentTrack < queue.size() - 1;
     }
 
     public void skipToNext(Promise callback) {
-        if(nextTrack()) {
-            updateCurrentTrack(callback);
+        if(hasNext()) {
+            updateCurrentTrack(currentTrack + 1, callback);
         } else {
             Utils.rejectCallback(callback, "skip", "There is no next tracks");
         }
@@ -124,8 +116,7 @@ public abstract class Playback {
 
     public void skipToPrevious(Promise callback) {
         if(currentTrack > 0) {
-            currentTrack--;
-            updateCurrentTrack(callback);
+            updateCurrentTrack(currentTrack - 1, callback);
         } else {
             Utils.rejectCallback(callback, "skip", "There is no previous tracks");
         }
@@ -134,11 +125,14 @@ public abstract class Playback {
     public abstract void load(Track track, Promise callback);
 
     public void reset() {
+        Track prev = getCurrentTrack();
+        long pos = getPosition();
+
         queue.clear();
         manager.onQueueUpdate();
 
         currentTrack = -1;
-        manager.onTrackUpdate(null, true);
+        manager.onTrackUpdate(prev, pos, null, true);
     }
 
     public abstract void play();
@@ -210,22 +204,26 @@ public abstract class Playback {
         prevState = state;
     }
 
-    protected void updateCurrentTrack(Promise callback) {
+    protected void updateCurrentTrack(int track, Promise callback) {
         if(queue.isEmpty()) {
             reset();
             return;
-        } else if(currentTrack >= queue.size()) {
-            currentTrack = queue.size() - 1;
-        } else if(currentTrack < 0) {
-            currentTrack = 0;
+        } else if(track >= queue.size()) {
+            track = queue.size() - 1;
+        } else if(track < 0) {
+            track = 0;
         }
+
+        Track previous = getCurrentTrack();
+        long position = getPosition();
+        int oldState = getState();
 
         Log.d(Utils.TAG, "Updating current track...");
 
-        int oldState = getState();
-        Track track = queue.get(currentTrack);
+        Track next = queue.get(track);
+        currentTrack = track;
 
-        load(track, callback);
+        load(next, callback);
 
         if(Utils.isPlaying(oldState)) {
             play();
@@ -233,6 +231,6 @@ public abstract class Playback {
             pause();
         }
 
-        manager.onTrackUpdate(track, true);
+        manager.onTrackUpdate(previous, position, next, true);
     }
 }

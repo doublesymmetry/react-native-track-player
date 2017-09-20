@@ -81,7 +81,7 @@ public class Track {
         artworkLocal = isLocal(artwork);
 
         boolean sendUrl = data.getBoolean("sendUrl", true);
-        mediaId = sendUrl ? url.toString() : id;
+        mediaId = sendUrl && url != null ? url.toString() : id;
 
         Bundle custom = data.getBundle("customData");
         JSONObject obj = null;

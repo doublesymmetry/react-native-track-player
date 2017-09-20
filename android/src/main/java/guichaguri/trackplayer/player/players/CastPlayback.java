@@ -58,20 +58,26 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
         for(int i = 0; i < queue.size(); i++) {
             Track track = queue.get(i);
             if(track.castId == castId) {
-                if(i == currentTrack) return;
+                if(i == currentTrack) break;
+
+                Track previous = getCurrentTrack();
+                long position = getPosition();
+
                 currentTrack = i;
-                manager.onTrackUpdate(track, true);
+                manager.onTrackUpdate(previous, position, track, true);
                 break;
             }
         }
     }
 
     @Override
-    protected void updateCurrentTrack(Promise callback) {
+    protected void updateCurrentTrack(int track, Promise callback) {
         // Updates the current track server-side (or "receiver-side")
-        Track track = queue.get(currentTrack);
-        if(track != null) {
-            addCallback(player.queueJumpToItem(track.castId, null), callback);
+        Track next = queue.get(track);
+
+        if(next != null) {
+            // The track that we're going to jump is going to be updated in #onQueueStatusUpdated
+            addCallback(player.queueJumpToItem(next.castId, null), callback);
         } else {
             RuntimeException ex = new RuntimeException("Track not found");
             Utils.rejectCallback(callback, ex);
@@ -330,7 +336,8 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
 
     @Override
     public void onMetadataUpdated() {
-        manager.onTrackUpdate(getCurrentTrack(), false);
+        // Force the metadata to update
+        manager.onTrackUpdate(null, 0, getCurrentTrack(), false);
     }
 
     @Override

@@ -207,8 +207,8 @@ public class ExoPlayback extends Playback implements EventListener {
 
         } else if(playbackState == SimpleExoPlayer.STATE_ENDED) {
 
-            if(nextTrack()) {
-                updateCurrentTrack(null);
+            if(hasNext()) {
+                updateCurrentTrack(currentTrack + 1, null);
             } else {
                 manager.onEnd();
             }

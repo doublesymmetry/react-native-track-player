@@ -24,7 +24,7 @@ struct MediaURL {
             value = URL(string: encodedURI)!
         } else {
             let url = object as! String
-            isLocal = url.hasPrefix("file://")
+            isLocal = url.lowercased().hasPrefix("file://")
             let encodedURI = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
             value = URL(string: encodedURI)!
         }

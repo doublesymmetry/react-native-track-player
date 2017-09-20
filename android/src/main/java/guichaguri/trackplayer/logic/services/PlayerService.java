@@ -20,24 +20,30 @@ import java.util.List;
  */
 public class PlayerService extends MediaBrowserServiceCompat {
 
-    public static final String ACTION_MEDIA_WRAPPER = "trackplayer.media.wrapper";
+    public static final String ACTION_SETUP_PLAYER = "trackplayer.setup";
+    public static final String ACTION_CONNECT = "trackplayer.connect";
 
     private MediaManager manager;
 
     @Override
     public IBinder onBind(Intent intent) {
-        if(intent.getAction().equals(ACTION_MEDIA_WRAPPER)) {
-            Log.d(Utils.TAG, "Module Bound");
+        String action = intent.getAction();
+
+        if(ACTION_SETUP_PLAYER.equals(action)) {
+            Log.d(Utils.TAG, "onBind: Setup Player");
 
             if(intent.hasExtra("data")) {
                 manager.setupPlayer(intent.getBundleExtra("data"));
             } else {
                 manager.setupPlayer(null);
             }
-
-            return new MediaWrapper(this, manager);
+        } else if(ACTION_CONNECT.equals(action)) {
+            Log.d(Utils.TAG, "onBind: Connect");
+        } else {
+            return super.onBind(intent);
         }
-        return super.onBind(intent);
+
+        return new MediaWrapper(this, manager);
     }
 
     @Nullable
