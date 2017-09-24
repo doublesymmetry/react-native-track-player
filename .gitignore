@@ -1,14 +1,29 @@
-.DS_Store
+# General
 
+.DS_Store
 node_modules/
+build/
+DerivedData/
+
+# Android
 
 android/.gradle/
 android/.idea/
 android/build/
 android/gradle/
+android/captures/
+android/local.properties
+gradle.properties
 
-build/
-DerivedData/
+# Windows
+
+windows/.vs/
+windows/ARM/
+windows/RNTrackPlayer/bin/
+windows/RNTrackPlayer/obj/
+windows/RNTrackPlayer/project.lock.json
+
+# iOS
 
 ## Various settings
 *.pbxuser
