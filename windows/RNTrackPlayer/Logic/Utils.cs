@@ -30,5 +30,20 @@ namespace TrackPlayer.Logic {
             return state == MediaPlayerState.Paused;
         }
 
+        public static Uri GetUri(JObject obj, string key, Uri def) {
+            JToken val;
+            if(!obj.TryGetValue(key, val)) return def;
+
+            if(val.Type == JTokenType.Object) {
+                return new Uri(((JObject)val).Value<string>("uri"));
+            } else if(val.Type == JTokenType.String) {
+                return new Uri((string)val);
+            } else if(val.Type == JTokenType.Uri) {
+                return (Uri)val;
+            }
+
+            return def;
+        }
+
     }
 }

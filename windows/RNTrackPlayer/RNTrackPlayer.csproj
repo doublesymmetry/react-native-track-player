@@ -53,6 +53,7 @@
     <PlatformTarget>ARM</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>0</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM'">
     <PlatformTarget>ARM</PlatformTarget>
@@ -128,8 +129,9 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Logic\Events.cs" />
     <Compile Include="Logic\Track.cs" />
-    <Compile Include="Logic\MediaMetadata.cs" />
+    <Compile Include="Logic\Metadata.cs" />
     <Compile Include="Logic\MediaManager.cs" />
     <Compile Include="Logic\Utils.cs" />
     <Compile Include="Players\CastPlayback.cs" />

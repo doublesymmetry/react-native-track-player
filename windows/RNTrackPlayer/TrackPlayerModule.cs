@@ -195,14 +195,7 @@ namespace TrackPlayer {
 
         [ReactMethod]
         public async int getState() {
-            MediaPlayerState state = manager.GetPlayer().GetState();
-
-            if(state == MediaPlayerState.Opening) {
-                // Closed = "STATE_NONE"
-                state = MediaPlayerState.Closed;
-            }
-
-            return state;
+            return manager.GetPlayer().GetState();
         }
 
         [ReactMethod]

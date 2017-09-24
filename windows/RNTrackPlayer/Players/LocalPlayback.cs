@@ -68,7 +68,9 @@ namespace TrackPlayer.Players {
         }
 
         public override double GetDuration() {
-            return player.NaturalDuration.TotalSeconds;
+            double duration = player.NaturalDuration.TotalSeconds;
+
+            return duration <= 0 ? GetCurrentTrack().duration : duration;
         }
 
         public override MediaPlayerState GetState() {
