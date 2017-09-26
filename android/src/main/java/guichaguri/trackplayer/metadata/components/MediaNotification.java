@@ -128,8 +128,8 @@ public class MediaNotification {
             }
         }
 
-        List<Action> actions = new ArrayList<>();
-        List<Action> compact = new ArrayList<>();
+        ArrayList<Action> actions = new ArrayList<>();
+        ArrayList<Action> compact = new ArrayList<>();
 
         // Check and update action buttons
         long mask = playback.getActions();
@@ -139,15 +139,14 @@ public class MediaNotification {
         stop = addAction(stop, mask, PlaybackStateCompat.ACTION_STOP, "Stop", stopIcon, actions, compact, playing);
         next = addAction(next, mask, PlaybackStateCompat.ACTION_SKIP_TO_NEXT, "Next", nextIcon, actions, compact, playing);
 
-        // Add the action buttons
-        nb.mActions.clear();
-        nb.mActions.addAll(actions);
-
-        // Add the compact actions
+        // Create the compact indexes array
         int[] compactIndexes = new int[compact.size()];
         for(int i = 0; i < compact.size(); i++) {
             compactIndexes[i] = actions.indexOf(compact.get(i));
         }
+
+        // Update the action buttons list and the compact indexes
+        nb.mActions = actions;
         style.setShowActionsInCompactView(compactIndexes);
 
         // Update the notification
