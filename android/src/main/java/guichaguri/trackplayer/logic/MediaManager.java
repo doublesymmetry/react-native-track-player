@@ -42,7 +42,7 @@ public class MediaManager {
         this.metadata = new Metadata(service, this);
 
         if(LibHelper.isChromecastAvailable(service)) {
-            this.cast = new GoogleCast(service.getApplicationContext(), this);
+            this.cast = GoogleCast.initialize(service, this);
         } else {
             this.cast = null;
         }

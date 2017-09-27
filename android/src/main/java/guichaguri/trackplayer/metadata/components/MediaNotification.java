@@ -14,6 +14,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.NotificationCompat;
 import android.support.v7.app.NotificationCompat.MediaStyle;
+import android.util.Log;
 import android.view.KeyEvent;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.services.PlayerService;
@@ -219,13 +220,23 @@ public class MediaNotification {
 
     private void update() {
         // Update the notification if it's showing
-        if(showing) {
-            NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, nb.build());
-        }
+        if(!showing) return;
+
+        // Create the notification
+        Notification notification = build();
+        if(notification == null) return;
+
+        // Update it
+        NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, notification);
     }
 
     public Notification build() {
-        return nb.build();
+        try {
+            return nb.build();
+        } catch(Exception ex) {
+            Log.w(Utils.TAG, "Couldn't build the notification", ex);
+            return null;
+        }
     }
 
     public void setShowing(boolean showing) {
