@@ -236,7 +236,7 @@ public class MediaManager {
             bundle.putString("track", previous != null ? previous.id : null);
             bundle.putDouble("position", Utils.toSeconds(prevPos));
             bundle.putString("nextTrack", next != null ? next.id : null);
-            Events.dispatchEvent(service, Events.PLAYBACK_TRACK_ENDED, bundle);
+            Events.dispatchEvent(service, Events.PLAYBACK_TRACK_CHANGED, bundle);
         }
     }
 
