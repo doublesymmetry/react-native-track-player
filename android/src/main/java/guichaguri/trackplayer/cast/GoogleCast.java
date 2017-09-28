@@ -2,6 +2,7 @@ package guichaguri.trackplayer.cast;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import com.google.android.gms.cast.CastDevice;
 import com.google.android.gms.cast.CastStatusCodes;
 import com.google.android.gms.cast.framework.CastContext;
@@ -11,12 +12,23 @@ import com.google.android.gms.cast.framework.CastStateListener;
 import com.google.android.gms.cast.framework.SessionManagerListener;
 import guichaguri.trackplayer.logic.Events;
 import guichaguri.trackplayer.logic.MediaManager;
+import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.player.players.CastPlayback;
 
 /**
  * @author Guilherme Chaguri
  */
 public class GoogleCast implements CastStateListener, SessionManagerListener<CastSession> {
+
+    public static GoogleCast initialize(Context context, MediaManager manager) {
+        try {
+            CastContext cast = CastContext.getSharedInstance(context.getApplicationContext());
+            return new GoogleCast(context, manager, cast);
+        } catch(Exception ex) {
+            Log.w(Utils.TAG, "The Cast SDK couldn't be initialized", ex);
+            return null;
+        }
+    }
 
     private final Context context;
     private final MediaManager manager;
@@ -26,10 +38,10 @@ public class GoogleCast implements CastStateListener, SessionManagerListener<Cas
     // and we'll be able to update the Cast SDK which has CastContext#getCastState
     private int state = CastState.NO_DEVICES_AVAILABLE;
 
-    public GoogleCast(Context context, MediaManager manager) {
+    public GoogleCast(Context context, MediaManager manager, CastContext cast) {
         this.context = context;
         this.manager = manager;
-        this.cast = CastContext.getSharedInstance(context);
+        this.cast = cast;
 
         cast.addCastStateListener(this);
         cast.getSessionManager().addSessionManagerListener(this, CastSession.class);

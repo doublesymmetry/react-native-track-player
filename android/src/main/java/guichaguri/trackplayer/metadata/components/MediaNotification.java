@@ -14,6 +14,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.NotificationCompat;
 import android.support.v7.app.NotificationCompat.MediaStyle;
+import android.util.Log;
 import android.view.KeyEvent;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.services.PlayerService;
@@ -128,8 +129,8 @@ public class MediaNotification {
             }
         }
 
-        List<Action> actions = new ArrayList<>();
-        List<Action> compact = new ArrayList<>();
+        ArrayList<Action> actions = new ArrayList<>();
+        ArrayList<Action> compact = new ArrayList<>();
 
         // Check and update action buttons
         long mask = playback.getActions();
@@ -139,15 +140,14 @@ public class MediaNotification {
         stop = addAction(stop, mask, PlaybackStateCompat.ACTION_STOP, "Stop", stopIcon, actions, compact, playing);
         next = addAction(next, mask, PlaybackStateCompat.ACTION_SKIP_TO_NEXT, "Next", nextIcon, actions, compact, playing);
 
-        // Add the action buttons
-        nb.mActions.clear();
-        nb.mActions.addAll(actions);
-
-        // Add the compact actions
+        // Create the compact indexes array
         int[] compactIndexes = new int[compact.size()];
         for(int i = 0; i < compact.size(); i++) {
             compactIndexes[i] = actions.indexOf(compact.get(i));
         }
+
+        // Update the action buttons list and the compact indexes
+        nb.mActions = actions;
         style.setShowActionsInCompactView(compactIndexes);
 
         // Update the notification
@@ -220,13 +220,23 @@ public class MediaNotification {
 
     private void update() {
         // Update the notification if it's showing
-        if(showing) {
-            NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, nb.build());
-        }
+        if(!showing) return;
+
+        // Create the notification
+        Notification notification = build();
+        if(notification == null) return;
+
+        // Update it
+        NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, notification);
     }
 
     public Notification build() {
-        return nb.build();
+        try {
+            return nb.build();
+        } catch(Exception ex) {
+            Log.w(Utils.TAG, "Couldn't build the notification", ex);
+            return null;
+        }
     }
 
     public void setShowing(boolean showing) {
