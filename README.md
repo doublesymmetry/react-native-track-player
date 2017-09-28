@@ -1,106 +1,77 @@
-# react-native-track-player
+﻿# react-native-track-player [![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player) [![Chat](https://badges.gitter.im/react-native-track-player/gitter.png)](https://gitter.im/react-native-track-player/Support)
 
-An all-in-one module, supporting multiple audio and video players, media metadata, media controls, chromecast, files streams, DASH/HLS/SmoothStreaming, and more!
+An all-in-one module that provides audio playback, external media controls, chromecast support and background mode.
 
-Designed to be as lightweight as possible.
+---
 
-## WIP
-This is a work-in-progress project not ready for production yet.
+* [[Installation|installation]]
+* [[Getting Started|api]]
+* [[Documentation|documentation]]
+* [[Platform Support|platform-support]]
+* [[Cast Integration|cast-integration]]
+* [[Car Integration|car-integration]]
+* [[Background Mode|background-mode]]
+* [[Build Preferences|build-preferences]]
 
 ## Features
 
-* **Lightweight** - Highly optimized to use the least amount of storage according to your needs and do the least amount of processing
-* **Multi-player support** - Create how many players you want
-* **Media Controls support** - Control the app from bluetooth, lockscreen, notification, smartwatch or even a car
-* **Local files or Remote streams** - It doesn't matter where the media belongs, we've got you covered
-* **Chromecast support** - Cast media to any Google Cast compatible device, supporting custom media receivers
+* **Lightweight** - Optimized to use the least amount of resources according to your needs
+* **Media Controls support** - Control the app from a bluetooth device, the lockscreen, a notification, a smartwatch or even a car
+* **Local or network, files or streams** - It doesn't matter where the media belongs, we've got you covered
+* **Chromecast support** - Seamlessly switch to any Google Cast compatible device, supporting custom media receivers
 * **Adaptive bitrate streaming support** - Optional support for DASH, HLS or SmoothStreaming
-* **Video support** - A simple video component that can be bound to a player
-* **Caching support** - Cache media files to play media without using data quota
-* **Background support** - Keep playing media even when the app is closed
-* **Fully Customizable** - Even the notification icons are customizable
+* **Caching support** - Cache media files to play them again without an internet connection
+* **Background support** - Keep playing audio even after the app is closed
+* **Fully Customizable** - Even the notification icons are customizable!
+
+## Platform Support
+
+| Feature | Android | iOS | Windows |
+| ------- | ------- | --- | ------- |
+| Load from the app bundle | ✓ | ✓ | ✓ |
+| Load from the network | ✓ | ✓ | ✓ |
+| Load from the file system | ✗ | ✗ | ✗ |
+| Adaptive Bitrate Streaming | ✓ | ✗ | ✓ |
+| Play/Pause/Stop/Reset | ✓ | ✓ | ✓ |
+| Seeking/Volume | ✓ | ✓ | ✓ |
+| Remote Media Controls | ✓ | ✓ | ✓ |
+| Caching | ✓ | ✗ | ✗ |
+| Events | ✓ | ✓ | ✓ |
+| Background Mode | ✓ | ✓ | ✓ |
+| Google Cast | ✓ | ✗ | ✗ |
+
+Check [[Platform Support|platform-support]] for more information.
+
+## Why another music module?
+After trying to team up modules like `react-native-sound`, `react-native-music-controls` and `react-native-google-cast`, I've noticed that their structure and the way should be tied together can cause a lot problems (mainly on Android). Those can heavily affect the app stability and user experience.
+
+All audio modules (like `react-native-sound`) don't play in a separated service on Android, which should **only** be used for simple audio tracks in foreground (such as sound effects, voice messages, etc)
+
+`react-native-music-controls` is meant for apps using those audio modules, although it has a few problems due to how the audio is not directly tied to the controls, it can be pretty useful for casting (such as Chromecast)
+
+`react-native-google-cast` works pretty well and also supports custom receivers, but it has fewer player controls, it's harder to integrate and still uses the Cast SDK v2
 
 ## Example
 
-If you want to get started with this module, check the [API](https://github.com/Guichaguri/react-native-track-player/wiki/API) page.
-If you want detailed information about the API, check the [Documentation](https://github.com/Guichaguri/react-native-track-player/wiki/Documentation).
+If you want to get started with this module, check the [[API|api]] page.
+If you want detailed information about the API, check the [[Documentation|documentation]].
 ```javascript
 import TrackPlayer from 'react-native-track-player';
 
-// Waits for the module to get ready
-TrackPlayer.onReady(async () => {
-    
-    // Creates a local player
-    let id = await TrackPlayer.createPlayer();
-    
-    // Sets the player as the main one
-    TrackPlayer.setMain(id);
-    
-    // Loads a local track
-    await TrackPlayer.load(id, {
+// Creates the player
+TrackPlayer.setupPlayer().then(() => {
+
+    // Adds a track to the queue
+    await TrackPlayer.add({
         id: 'trackId',
         url: require('track.mp3'),
         title: 'Track Title',
         artist: 'Track Artist',
         artwork: require('track.png')
     });
-    
+
     // Starts playing it
-    TrackPlayer.play(id);
-    
+    TrackPlayer.play();
+
 });
-```
-
-## Installation
-First of all, install the module from NPM with the following command:
-```
-npm install react-native-track-player --save
-```
-
-### Automatic
-
-Link the module with the following command:
-```
-react-native link
-```
-
-### Manual
-#### Android
-
-**android/app/build.gradle**
-```diff
-dependencies {
-    ...
-    compile "com.facebook.react:react-native:+"  // From node_modules
-+   compile project(':react-native-track-player')
-}
-```
-
-**android/settings.gradle**
-```diff
-...
-include ':app'
-+include ':react-native-track-player'
-+project(':react-native-track-player').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-track-player/android')
-```
-
-**MainApplication.java**
-```diff
-// ...
-
-+import guichaguri.trackplayer.TrackPlayer;
-
-public class MainApplication extends Application implements ReactApplication {
-    // ...
-
-    @Override
-    protected List<ReactPackage> getPackages() {
-        return Arrays.<ReactPackage>asList(
-+           new TrackPlayer(),
-            new MainReactPackage()
-        );
-    }
-
-    // ...
-  }
 ```
