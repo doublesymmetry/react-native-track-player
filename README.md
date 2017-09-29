@@ -4,14 +4,14 @@ An all-in-one module that provides audio playback, external media controls, chro
 
 ---
 
-* [[Installation|installation]]
-* [[Getting Started|api]]
-* [[Documentation|documentation]]
-* [[Platform Support|platform-support]]
-* [[Cast Integration|cast-integration]]
-* [[Car Integration|car-integration]]
-* [[Background Mode|background-mode]]
-* [[Build Preferences|build-preferences]]
+* [Installation](https://github.com/Guichaguri/react-native-track-player/wiki/Installation)
+* [Getting Started](https://github.com/Guichaguri/react-native-track-player/wiki/API)
+* [Documentation](https://github.com/Guichaguri/react-native-track-player/wiki/Documentation)
+* [Platform Support](https://github.com/Guichaguri/react-native-track-player/wiki/Platform-Support)
+* [Cast Integration](https://github.com/Guichaguri/react-native-track-player/wiki/Cast-Integration)
+* [Car Integration](https://github.com/Guichaguri/react-native-track-player/wiki/Car-Integration)
+* [Background Mode](https://github.com/Guichaguri/react-native-track-player/wiki/Background-Mode)
+* [Build Preferences](https://github.com/Guichaguri/react-native-track-player/wiki/Build-Preferences)
 
 ## Features
 
@@ -40,7 +40,7 @@ An all-in-one module that provides audio playback, external media controls, chro
 | Background Mode | ✓ | ✓ | ✓ |
 | Google Cast | ✓ | ✗ | ✗ |
 
-Check [[Platform Support|platform-support]] for more information.
+Check [Platform Support](https://github.com/Guichaguri/react-native-track-player/wiki/Platform-Support) for more information.
 
 ## Why another music module?
 After trying to team up modules like `react-native-sound`, `react-native-music-controls` and `react-native-google-cast`, I've noticed that their structure and the way should be tied together can cause a lot problems (mainly on Android). Those can heavily affect the app stability and user experience.
@@ -53,8 +53,8 @@ All audio modules (like `react-native-sound`) don't play in a separated service 
 
 ## Example
 
-If you want to get started with this module, check the [[API|api]] page.
-If you want detailed information about the API, check the [[Documentation|documentation]].
+If you want to get started with this module, check the [API](https://github.com/Guichaguri/react-native-track-player/wiki/API) page.
+If you want detailed information about the API, check the [Documentation](https://github.com/Guichaguri/react-native-track-player/wiki/Documentation).
 ```javascript
 import TrackPlayer from 'react-native-track-player';
 
