@@ -119,7 +119,7 @@ public class AudioPlayer: NSObject {
 
                 // Calls delegate
                 if oldValue != currentItem {
-                    delegate?.audioPlayer(self, willChangeTrackFrom: oldProgression, at: previousProgression, to: currentItem)
+                    delegate?.audioPlayer(self, willChangeTrackFrom: oldValue, at: oldProgression, to: currentItem)
                 }
                 player?.rate = rate
             } else {
