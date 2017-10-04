@@ -41,10 +41,6 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         sendEvent(withName: "playback-error", body: ["error": error.localizedDescription])
     }
     
-    func playbackUpdatedProgress(to time: TimeInterval) {
-        sendEvent(withName: "playback-progress", body: ["progress": mediaWrapper.currentTrackProgression])
-    }
-    
     
     // MARK: - Required Methods
     
@@ -71,7 +67,6 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
             "playback-queue-ended",
             "playback-state",
             "playback-error",
-            "playback-progress",
             "playback-track-changed",
             
             "remote-stop",

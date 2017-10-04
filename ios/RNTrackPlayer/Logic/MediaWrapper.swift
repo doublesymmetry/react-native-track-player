@@ -14,7 +14,6 @@ protocol MediaWrapperDelegate: class {
     func playerSwitchedTracks(trackId: String?, time: TimeInterval?, nextTrackId: String?)
     func playerExhaustedQueue()
     func playbackFailed(error: Error)
-    func playbackUpdatedProgress(to time: TimeInterval)    
 }
 
 class MediaWrapper: AudioPlayerDelegate {
@@ -213,8 +212,4 @@ class MediaWrapper: AudioPlayerDelegate {
             delegate?.playerUpdatedState()
         }
     }
-    
-    func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateProgressionTo time: TimeInterval, percentageRead: Float) {
-        delegate?.playbackUpdatedProgress(to: time)
-    }    
 }
