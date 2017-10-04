@@ -22,7 +22,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     // MARK: - MediaWrapperDelegate Methods
     
     func playerUpdatedState() {
-        sendEvent(withName: "playback-state", body: mediaWrapper.state)
+        sendEvent(withName: "playback-state", body: ["state": mediaWrapper.state])
     }
     
     func playerSwitchedTracks(trackId: String?, time: TimeInterval?, nextTrackId: String?) {
@@ -38,11 +38,11 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     }
     
     func playbackFailed(error: Error) {
-        sendEvent(withName: "playback-error", body: error.localizedDescription)
+        sendEvent(withName: "playback-error", body: ["error": error.localizedDescription])
     }
     
     func playbackUpdatedProgress(to time: TimeInterval) {
-        sendEvent(withName: "playback-progress", body: mediaWrapper.currentTrackProgression)
+        sendEvent(withName: "playback-progress", body: ["progress": mediaWrapper.currentTrackProgression])
     }
     
     
