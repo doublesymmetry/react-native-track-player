@@ -80,14 +80,17 @@ public class AudioPlayer: NSObject {
     internal(set) var currentItem: Track? {
         didSet {
             if let currentItem = currentItem {
-                //Stops the current player
+                // Save previous item's progression
+                let oldProgression = currentItemProgression
+                
+                // Stops the current player
                 player?.rate = 0
                 player = nil
 
-                //Ensures the audio session got started
+                // Ensures the audio session got started
                 setAudioSession(active: true)
 
-                //Sets new state
+                // Sets new state
                 if reachability.isReachable() || currentItem.url.isLocal {
                     state = .buffering
                     backgroundHandler.beginBackgroundTask()
@@ -98,25 +101,25 @@ public class AudioPlayer: NSObject {
                     return
                 }
                 
-                //Reset special state flags
+                // Reset special state flags
                 pausedForInterruption = false
                 
-                //Create new AVPlayerItem
+                // Create new AVPlayerItem
                 let playerItem = AVPlayerItem(url: currentItem.url.value)
                 
                 if #available(iOS 10.0, tvOS 10.0, OSX 10.12, *) {
                     playerItem.preferredForwardBufferDuration = self.preferredForwardBufferDuration
                 }
 
-                //Creates new player
+                // Creates new player
                 player = AVPlayer(playerItem: playerItem)
                 
-                //Updates information on the lock screen
+                // Updates information on the lock screen
                 updateNowPlayingInfoCenter()
 
-                //Calls delegate
+                // Calls delegate
                 if oldValue != currentItem {
-                    delegate?.audioPlayer(self, willStartPlaying: currentItem)
+                    delegate?.audioPlayer(self, willChangeTrackFrom: oldProgression, at: previousProgression, to: currentItem)
                 }
                 player?.rate = rate
             } else {

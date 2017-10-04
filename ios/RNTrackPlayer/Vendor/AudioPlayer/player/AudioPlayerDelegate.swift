@@ -27,15 +27,12 @@ protocol AudioPlayerDelegate: class {
     ///
     /// - Parameters:
     ///   - audioPlayer: The audio player.
-    ///   - item: The item that is about to start being played.
-    func audioPlayer(_ audioPlayer: AudioPlayer, willStartPlaying item: Track)
+    ///   - from: The item that is about to be replaced.
+    ///   - position: The position item that is going to be replaced was at.
+    ///   - track: The item that is about to start being played.
+    func audioPlayer(_ audioPlayer: AudioPlayer, willChangeTrackFrom from: Track?, at position: TimeInterval?, to track: Track)
     
     /// This method is called when the audio player finishes playing an item.
-    ///
-    /// - Parameters:
-    ///   - audioPlayer: The audio player.
-    ///   - item: The item that it just finished playing.
-    func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: Track)
 
     /// This method is called a regular time interval while playing. It notifies the delegate that the current playing
     /// progression changed.
@@ -77,10 +74,8 @@ extension AudioPlayerDelegate {
     func audioPlayer(_ audioPlayer: AudioPlayer, didChangeStateFrom from: AudioPlayerState,
                      to state: AudioPlayerState) {}
 
-    func audioPlayer(_ audioPlayer: AudioPlayer, willStartPlaying item: Track) {}
+    func audioPlayer(_ audioPlayer: AudioPlayer, willChangeTrackFrom from: Track?, at position: TimeInterval?, to track: Track)
     
-    func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: Track) {}
-
     func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateProgressionTo time: TimeInterval, percentageRead: Float) {}
 
     func audioPlayer(_ audioPlayer: AudioPlayer, didFindDuration duration: TimeInterval, for item: Track) {}
