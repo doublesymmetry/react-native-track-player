@@ -203,6 +203,7 @@ public class MediaNotification {
     }
 
     /**
+     * TODO
      * We should take a look at MediaButtonReceiver.buildMediaButtonPendingIntent
      * when React Native updates to a newer support library version
      */
@@ -222,21 +223,16 @@ public class MediaNotification {
         // Update the notification if it's showing
         if(!showing) return;
 
-        // Create the notification
-        Notification notification = build();
-        if(notification == null) return;
-
-        // Update it
-        NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, notification);
+        // Updates the notification it
+        try {
+            NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, nb.build());
+        } catch(Exception ex) {
+            Log.w(Utils.TAG, "Something went wrong while updating the notification", ex);
+        }
     }
 
     public Notification build() {
-        try {
-            return nb.build();
-        } catch(Exception ex) {
-            Log.w(Utils.TAG, "Couldn't build the notification", ex);
-            return null;
-        }
+        return nb.build();
     }
 
     public void setShowing(boolean showing) {
