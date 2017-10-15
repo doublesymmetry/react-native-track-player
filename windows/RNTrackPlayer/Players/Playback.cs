@@ -16,13 +16,13 @@ namespace TrackPlayer.Players {
 
         protected List<Track> queue;
         protected int currentTrack = -1;
-        protected MediaPlayerState prevState = MediaPlayerState.Closed;
+        protected MediaPlaybackState prevState = MediaPlaybackState.None;
 
         public Playback(MediaManager manager) {
             this.manager = manager;
         }
 
-        protected void UpdateState(MediaPlayerState state) {
+        protected void UpdateState(MediaPlaybackState state) {
             if(prevState == state) return;
 
             manager.OnStateChange(state);
@@ -40,9 +40,9 @@ namespace TrackPlayer.Players {
                 index = queue.Count - 1;
             }
 
-            Track previous = getCurrentTrack();
-            double position = getPosition();
-            MediaPlayerState oldState = getState();
+            Track previous = GetCurrentTrack();
+            double position = GetPosition();
+            MediaPlaybackState oldState = GetState();
 
             Debug.WriteLine("Updating current track...");
 
@@ -76,7 +76,7 @@ namespace TrackPlayer.Players {
                 // Tracks were added, we'll update the current track accordingly
                 if(empty) UpdateCurrentTrack(0, null);
             } else {
-                int index = queue.FindIndex(track => track.id == id);
+                int index = queue.FindIndex(track => track.id == insertBeforeId);
                 if(index == -1) index = queue.Count;
 
                 queue.InsertRange(index, tracks);
@@ -115,10 +115,15 @@ namespace TrackPlayer.Players {
         public abstract void Stop();
 
         public void Reset() {
+            Track prev = GetCurrentTrack();
+            double pos = GetPosition();
+
             Stop();
 
             currentTrack = -1;
             queue.Clear();
+
+            manager.OnTrackUpdate(prev, pos, null, true);
         }
 
         public void Skip(string id, IPromise promise) {
@@ -163,7 +168,7 @@ namespace TrackPlayer.Players {
 
         public abstract double GetDuration();
 
-        public abstract MediaPlayerState GetState();
+        public abstract MediaPlaybackState GetState();
 
         public abstract void Dispose();
 

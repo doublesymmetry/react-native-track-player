@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace TrackPlayer.Logic {
-    public struct Track {
+    public class Track {
 
         public string id;
         public Uri url;
@@ -15,18 +15,16 @@ namespace TrackPlayer.Logic {
         public string title;
         public string artist;
         public string album;
-        public string[] genre;
         public Uri artwork;
 
         public Track(JObject data) {
-            this.id = data.GetValue<string>("id");
-            this.url = Utils.GetUri("url", null);
-            this.duration = Utils.GetValue<double>("duration", 0);
-            this.title = Utils.GetValue<string>("title", null);
-            this.artist = Utils.GetValue<string>("artist", null);
-            this.album = Utils.GetValue<string>("album", null);
-            this.genre = Utils.GetValue<string>("genre", null).Split(",");
-            this.artwork = Utils.GetUri("artwork", null);
+            this.id = (string)data.GetValue("id");
+            this.url = Utils.GetUri(data, "url", null);
+            this.duration = Utils.GetValue<double>(data, "duration", 0);
+            this.title = Utils.GetValue<string>(data, "title", null);
+            this.artist = Utils.GetValue<string>(data, "artist", null);
+            this.album = Utils.GetValue<string>(data, "album", null);
+            this.artwork = Utils.GetUri(data, "artwork", null);
         }
 
         public JObject ToObject() {

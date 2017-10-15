@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TrackPlayer.Players {
 
-    class CastPlayback : Playback {
+    class CastPlayback {
 
         // TODO
         // https://github.com/Tapanila/SharpCaster

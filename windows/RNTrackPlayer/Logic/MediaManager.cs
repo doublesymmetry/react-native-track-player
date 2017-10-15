@@ -13,7 +13,7 @@ using Windows.Media.Core;
 using TrackPlayer.Players;
 
 namespace TrackPlayer.Logic {
-    class MediaManager {
+    public class MediaManager {
 
         private ReactContext context;
         private Metadata metadata;
@@ -22,10 +22,11 @@ namespace TrackPlayer.Logic {
         private Playback player;
 
         public MediaManager(ReactContext context, JObject options) {
+            this.context = context;
             this.options = options;
 
-            this.player = new LocalPlayback(options);
-            this.metadata = new Metadata();
+            this.player = new LocalPlayback(this, options);
+            this.metadata = new Metadata(this);
         }
 
         public void SendEvent(string eventName, object data) {
@@ -46,7 +47,7 @@ namespace TrackPlayer.Logic {
             SendEvent(Events.PlaybackQueueEnded, null);
         }
 
-        public void OnStateChange(MediaPlayerState state) {
+        public void OnStateChange(MediaPlaybackState state) {
             Debug.WriteLine("OnStateChange");
 
             JObject obj = new JObject();

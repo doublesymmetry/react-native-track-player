@@ -36,13 +36,13 @@ namespace TrackPlayer.Logic {
         }
 
         public void UpdateOptions(JObject data) {
-            JArray capabilities = data.GetValue("capabilities");
+            JArray capabilities = (JArray)data.GetValue("capabilities");
 
-            controls.IsPlayEnabled = capabilities.Contains(Capability.Play);
-            controls.IsPauseEnabled = capabilities.Contains(Capability.Pause);
-            controls.IsStopEnabled = capabilities.Contains(Capability.Stop);
-            controls.IsPreviousEnabled = capabilities.Contains(Capability.Previous);
-            controls.IsNextEnabled = capabilities.Contains(Capability.Next);
+            controls.IsPlayEnabled = Utils.ContainsInt(capabilities, (int)Capability.Play);
+            controls.IsPauseEnabled = Utils.ContainsInt(capabilities, (int)Capability.Pause);
+            controls.IsStopEnabled = Utils.ContainsInt(capabilities, (int)Capability.Stop);
+            controls.IsPreviousEnabled = Utils.ContainsInt(capabilities, (int)Capability.Previous);
+            controls.IsNextEnabled = Utils.ContainsInt(capabilities, (int)Capability.Next);
 
             // Unsupported for now
             controls.IsChannelDownEnabled = false;
@@ -61,7 +61,6 @@ namespace TrackPlayer.Logic {
 
             properties.Title = track.title;
             properties.Artist = track.artist;
-            properties.Genres = track.genre;
             properties.AlbumTitle = track.album;
         }
 
@@ -77,8 +76,8 @@ namespace TrackPlayer.Logic {
             manager.SendEvent(Events.ButtonSeekTo, obj);
         }
 
-        async void OnButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args) {
-            Events eventType = null;
+        private void OnButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args) {
+            string eventType = null;
 
             switch(args.Button) {
                 case SystemMediaTransportControlsButton.Play:

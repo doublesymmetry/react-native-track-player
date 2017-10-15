@@ -4,13 +4,14 @@ using ReactNative.UIManager;
 using System;
 using System.Collections.Generic;
 
-namespace TrackPlayer {
+namespace TrackPlayer
+{ // <- Put the bracket in a new line here to prevent linking errors
 
     public class TrackPlayerPackage : IReactPackage {
 
         public IReadOnlyList<INativeModule> CreateNativeModules(ReactContext reactContext) {
             return new List<INativeModule> {
-                new TrackPlayerModule()
+                new TrackPlayerModule(reactContext)
             };
         }
         

@@ -16,9 +16,11 @@ namespace TrackPlayer.Players {
 
         private MediaPlayer player;
 
+        private bool stopped = false;
+
         private IPromise loadCallback;
 
-        public LocalPlayback(JObject options) {
+        public LocalPlayback(MediaManager manager, JObject options) : base(manager) {
             player = new MediaPlayer();
             player.AutoPlay = false;
             player.AudioCategory = MediaPlayerAudioCategory.Media;
@@ -31,20 +33,26 @@ namespace TrackPlayer.Players {
         }
 
         protected override void Load(Track track, IPromise promise) {
+            stopped = false;
             loadCallback = promise;
-            player.SetUriSource(track.url);
+            player.Source = MediaSource.CreateFromUri(track.url);
+            // TODO: check whether adaptive streaming works without "CreateFromAdaptiveMediaSource"
         }
 
         public override void Play() {
+            stopped = false;
             player.Play();
         }
 
         public override void Pause() {
+            stopped = false;
             player.Pause();
         }
 
         public override void Stop() {
-            player.Stop();
+            stopped = true;
+            player.Pause();
+            player.PlaybackSession.Position = TimeSpan.FromSeconds(0);
         }
 
         public override void SetVolume(double volume) {
@@ -56,29 +64,35 @@ namespace TrackPlayer.Players {
         }
 
         public override void SeekTo(double seconds) {
-            player.Position = TimeSpan.FromSeconds(seconds);
+            player.PlaybackSession.Position = TimeSpan.FromSeconds(seconds);
         }
 
         public override double GetPosition() {
-            return player.Position.TotalSeconds;
+            return player.PlaybackSession.Position.TotalSeconds;
         }
 
         public override double GetBufferedPosition() {
-            return player.BufferingProgress * GetDuration();
+            return player.PlaybackSession.BufferingProgress * GetDuration();
         }
 
         public override double GetDuration() {
-            double duration = player.NaturalDuration.TotalSeconds;
+            double duration = player.PlaybackSession.NaturalDuration.TotalSeconds;
 
             return duration <= 0 ? GetCurrentTrack().duration : duration;
         }
 
-        public override MediaPlayerState GetState() {
-            return Utils.GetState(player.CurrentState);
+        public override MediaPlaybackState GetState() {
+            MediaPlaybackState state = player.PlaybackSession.PlaybackState;
+
+            if(stopped && Utils.IsPaused(state)) {
+                state = MediaPlaybackState.None;
+            }
+
+            return Utils.GetState(state);
         }
 
         public override void Dispose() {
-            Player.Dispose();
+            player.Dispose();
         }
 
         private void OnStateChange(MediaPlayer sender, object args) {
