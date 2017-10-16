@@ -95,6 +95,7 @@ namespace TrackPlayer
 
         [ReactMethod]
         public void updateOptions(JObject options) {
+            // TODO remove the necessity of setupPlayer
             manager?.UpdateOptions(options);
         }
 

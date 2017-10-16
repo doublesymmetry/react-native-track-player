@@ -1,6 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ namespace TrackPlayer.Logic {
 
         public void SetTransportControls(SystemMediaTransportControls transportControls) {
             if(controls != null) {
+                controls.IsEnabled = false;
                 controls.PlaybackPositionChangeRequested -= OnSeekTo;
                 controls.ButtonPressed -= OnButtonPressed;
             }
@@ -28,6 +30,7 @@ namespace TrackPlayer.Logic {
             controls = transportControls;
 
             if(controls != null) {
+                controls.IsEnabled = true;
                 controls.DisplayUpdater.Type = MediaPlaybackType.Music;
 
                 controls.PlaybackPositionChangeRequested += OnSeekTo;
@@ -36,6 +39,7 @@ namespace TrackPlayer.Logic {
         }
 
         public void UpdateOptions(JObject data) {
+            Debug.WriteLine("Updating options...");
             JArray capabilities = (JArray)data.GetValue("capabilities");
 
             controls.IsPlayEnabled = Utils.ContainsInt(capabilities, (int)Capability.Play);
@@ -65,6 +69,7 @@ namespace TrackPlayer.Logic {
         }
 
         public void Dispose() {
+            controls.IsEnabled = false;
             controls.PlaybackPositionChangeRequested -= OnSeekTo;
             controls.ButtonPressed -= OnButtonPressed;
             controls = null;

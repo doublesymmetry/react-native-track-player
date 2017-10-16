@@ -1,10 +1,11 @@
-﻿using ReactNative.Bridge;
+using ReactNative.Bridge;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Media;
 using Windows.Media.Playback;
 using TrackPlayer.Logic;
 
@@ -14,7 +15,7 @@ namespace TrackPlayer.Players {
 
         protected MediaManager manager;
 
-        protected List<Track> queue;
+        protected List<Track> queue = new List<Track>();
         protected int currentTrack = -1;
         protected MediaPlaybackState prevState = MediaPlaybackState.None;
 
@@ -105,6 +106,8 @@ namespace TrackPlayer.Players {
 
             promise?.Resolve(null);
         }
+
+        public abstract SystemMediaTransportControls GetTransportControls();
 
         protected abstract void Load(Track track, IPromise promise);
 

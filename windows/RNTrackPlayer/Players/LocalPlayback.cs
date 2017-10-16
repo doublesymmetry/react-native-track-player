@@ -1,6 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using ReactNative.Bridge;
 using System.Text;
@@ -16,9 +17,11 @@ namespace TrackPlayer.Players {
 
         private MediaPlayer player;
 
-        private bool stopped = false;
-
         private IPromise loadCallback;
+
+        private bool started = false;
+        private bool ended = false;
+        private double startPos = 0;
 
         public LocalPlayback(MediaManager manager, JObject options) : base(manager) {
             player = new MediaPlayer();
@@ -32,25 +35,34 @@ namespace TrackPlayer.Players {
             player.CurrentStateChanged += OnStateChange;
         }
 
+        public override SystemMediaTransportControls GetTransportControls() {
+            return player.SystemMediaTransportControls;
+        }
+
         protected override void Load(Track track, IPromise promise) {
-            stopped = false;
+            started = false;
+            ended = false;
+            startPos = 0;
             loadCallback = promise;
+
             player.Source = MediaSource.CreateFromUri(track.url);
             // TODO: check whether adaptive streaming works without "CreateFromAdaptiveMediaSource"
         }
 
         public override void Play() {
-            stopped = false;
+            started = true;
+            ended = false;
             player.Play();
         }
 
         public override void Pause() {
-            stopped = false;
+            started = false;
             player.Pause();
         }
 
         public override void Stop() {
-            stopped = true;
+            started = false;
+            ended = true;
             player.Pause();
             player.PlaybackSession.Position = TimeSpan.FromSeconds(0);
         }
@@ -64,6 +76,7 @@ namespace TrackPlayer.Players {
         }
 
         public override void SeekTo(double seconds) {
+            startPos = seconds;
             player.PlaybackSession.Position = TimeSpan.FromSeconds(seconds);
         }
 
@@ -72,19 +85,30 @@ namespace TrackPlayer.Players {
         }
 
         public override double GetBufferedPosition() {
-            return player.PlaybackSession.BufferingProgress * GetDuration();
+#pragma warning disable CS0168 // Unused exception variable
+            try {
+                return player.PlaybackSession.BufferingProgress * GetDuration();
+            } catch(Exception ex) {
+                return 0;
+            }
+#pragma warning restore CS0168
         }
 
         public override double GetDuration() {
             double duration = player.PlaybackSession.NaturalDuration.TotalSeconds;
 
-            return duration <= 0 ? GetCurrentTrack().duration : duration;
+            if(duration <= 0) {
+                Track track = GetCurrentTrack();
+                duration = track != null && track.duration > 0 ? track.duration : 0;
+            }
+
+            return duration;
         }
 
         public override MediaPlaybackState GetState() {
             MediaPlaybackState state = player.PlaybackSession.PlaybackState;
 
-            if(stopped && Utils.IsPaused(state)) {
+            if(ended && Utils.IsPaused(state)) {
                 state = MediaPlaybackState.None;
             }
 
@@ -102,6 +126,7 @@ namespace TrackPlayer.Players {
         private void OnEnd(MediaPlayer sender, object args) {
             if(HasNext()) {
                 UpdateCurrentTrack(currentTrack + 1, null);
+                Play();
             } else {
                 manager.OnEnd();
             }
@@ -111,10 +136,23 @@ namespace TrackPlayer.Players {
             loadCallback?.Reject("load", args.ErrorMessage);
             loadCallback = null;
 
+            Debug.WriteLine(args.Error);
+            Debug.WriteLine(args.ErrorMessage);
+            Debug.WriteLine(args.ExtendedErrorCode);
+
             manager.OnError(args.ErrorMessage);
         }
 
         private void OnLoad(MediaPlayer sender, object args) {
+            Debug.WriteLine("OnLoad");
+
+            if(startPos > 0) {
+                player.PlaybackSession.Position = TimeSpan.FromSeconds(startPos);
+                startPos = 0;
+            }
+
+            if(started) Play();
+
             loadCallback?.Resolve(null);
             loadCallback = null;
         }

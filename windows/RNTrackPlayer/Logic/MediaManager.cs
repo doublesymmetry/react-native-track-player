@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using ReactNative.Bridge;
 using ReactNative.Modules.Core;
 using System;
@@ -27,6 +27,7 @@ namespace TrackPlayer.Logic {
 
             this.player = new LocalPlayback(this, options);
             this.metadata = new Metadata(this);
+            this.metadata.SetTransportControls(this.player.GetTransportControls());
         }
 
         public void SendEvent(string eventName, object data) {
