@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -17,7 +19,6 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.google.android.gms.cast.framework.CastState;
 import guichaguri.trackplayer.logic.LibHelper;
-import guichaguri.trackplayer.logic.Temp;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.components.MediaWrapper;
 import guichaguri.trackplayer.logic.services.PlayerService;
@@ -142,7 +143,7 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @ReactMethod
     public void setupPlayer(ReadableMap data, final Promise promise) {
-        final Bundle options = Temp.toBundle(data);
+        final Bundle options = Arguments.toBundle(data);
 
         waitForConnection(new Runnable() {
             @Override
@@ -160,7 +161,7 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @ReactMethod
     public void updateOptions(ReadableMap data) {
-        final Bundle options = Temp.toBundle(data);
+        final Bundle options = Arguments.toBundle(data);
 
         waitForConnection(new Runnable() {
             @Override
@@ -172,7 +173,7 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @ReactMethod
     public void add(ReadableArray tracks, final String insertBeforeId, final Promise callback) {
-        final ArrayList trackList = Temp.toList(tracks);
+        final ArrayList trackList = Arguments.toList(tracks);
 
         waitForConnection(new Runnable() {
             @Override
@@ -184,7 +185,7 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @ReactMethod
     public void remove(ReadableArray tracks, final Promise callback) {
-        final ArrayList trackList = Temp.toList(tracks);
+        final ArrayList trackList = Arguments.toList(tracks);
 
         waitForConnection(new Runnable() {
             @Override

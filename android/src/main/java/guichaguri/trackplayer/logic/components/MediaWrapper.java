@@ -4,9 +4,10 @@ import android.content.Context;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
+
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import guichaguri.trackplayer.logic.MediaManager;
-import guichaguri.trackplayer.logic.Temp;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.track.Track;
 import guichaguri.trackplayer.player.Playback;
@@ -194,7 +195,7 @@ public class MediaWrapper extends Binder {
 
                 for(Track track : pb.getQueue()) {
                     if(track.id.equals(id)) {
-                        Utils.resolveCallback(callback, Temp.fromBundle(track.toBundle()));
+                        Utils.resolveCallback(callback, Arguments.fromBundle(track.toBundle()));
                         return;
                     }
                 }
