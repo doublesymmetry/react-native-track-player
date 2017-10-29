@@ -138,14 +138,8 @@ public class Temp {
                     bundle.putBoolean(key, readableMap.getBoolean(key));
                     break;
                 case Number:
-                    double number = readableMap.getDouble(key);
-                    if (number == Math.rint(number)) {
-                        // Add as an integer
-                        bundle.putInt(key, readableMap.getInt(key));
-                    } else {
-                        // Add as a double
-                        bundle.putDouble(key, readableMap.getDouble(key));
-                    }
+                    // Can be int or double.
+                    bundle.putDouble(key, readableMap.getDouble(key));
                     break;
                 case String:
                     bundle.putString(key, readableMap.getString(key));
