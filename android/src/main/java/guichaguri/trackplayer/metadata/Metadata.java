@@ -75,8 +75,8 @@ public class Metadata {
         notification.updateOptions(data);
 
         // Load the options
-        ratingType = data.getInt("ratingType", ratingType);
-        maxArtworkSize = data.getInt("maxArtworkSize", maxArtworkSize);
+        ratingType = (int)data.getDouble("ratingType", ratingType);
+        maxArtworkSize = (int)data.getDouble("maxArtworkSize", maxArtworkSize);
 
         // Update the rating type
         session.setRatingType(ratingType);
