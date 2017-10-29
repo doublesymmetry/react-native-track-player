@@ -171,11 +171,6 @@ public class MediaNotification {
 
     private Action addAction(Action instance, long mask, long action, String title, int icon,
                              List<Action> list, List<Action> compactView, boolean playing) {
-        // Add it to the compact view if it's allowed to
-        if((compactCapabilities & action) == action) {
-            compactView.add(instance);
-        }
-
         // Update the action
         instance = updateAction(instance, mask, action, title, icon);
 
@@ -184,6 +179,11 @@ public class MediaNotification {
 
         if(action == PlaybackStateCompat.ACTION_PLAY && playing) return instance;
         if(action == PlaybackStateCompat.ACTION_PAUSE && !playing) return instance;
+
+        // Add it to the compact view if it's allowed to
+        if((compactCapabilities & action) == action) {
+            compactView.add(instance);
+        }
 
         // Add to the action list
         list.add(instance);
