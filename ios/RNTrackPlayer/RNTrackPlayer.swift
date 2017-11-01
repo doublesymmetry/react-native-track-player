@@ -45,7 +45,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     // MARK: - Required Methods
     
     @objc(constantsToExport)
-    override func constantsToExport() -> [AnyHashable: Any] {
+    override func constantsToExport() -> [String: Any] {
         return [
             "STATE_NONE": AudioPlayerState.stopped,
             "STATE_PLAYING": AudioPlayerState.playing,
