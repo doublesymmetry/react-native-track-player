@@ -1,6 +1,6 @@
 {
   "name": "react-native-track-player",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A fully fledged audio module created for music apps",
   "author": "Guichaguri",
   "keywords": [
@@ -11,7 +11,10 @@
     "player",
     "music",
     "controls",
-    "chromecast"
+    "chromecast",
+    "android",
+    "ios",
+    "windows"
   ],
   "license": "GPL-3.0",
   "repository": {
@@ -22,7 +25,6 @@
     "url": "https://github.com/react-native-kit/react-native-track-player/issues"
   },
   "peerDependencies": {
-    "react-native-windows": ">=0.48.0",
     "react-native": ">=0.48.0",
     "react": ">=15.0.2"
   }
