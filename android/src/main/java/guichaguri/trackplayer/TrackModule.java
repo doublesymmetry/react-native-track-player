@@ -142,30 +142,14 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @ReactMethod
     public void setupPlayer(ReadableMap data, final Promise promise) {
-        if(binder != null) {
-            // The module is already connected to the service
-            Utils.resolveCallback(promise);
-            return;
-        }
+        final Bundle options = Temp.toBundle(data);
 
-        initCallbacks.add(new Runnable() {
+        waitForConnection(new Runnable() {
             @Override
             public void run() {
-                Utils.resolveCallback(promise);
+                binder.setupPlayer(options, promise);
             }
         });
-
-        if(connecting) return;
-
-        ReactApplicationContext context = getReactApplicationContext();
-
-        // Binds the service to get a MediaWrapper instance
-        Intent intent = new Intent(context, PlayerService.class);
-        intent.setAction(PlayerService.ACTION_SETUP_PLAYER);
-        intent.putExtra("data", Temp.toBundle(data));
-        context.bindService(intent, this, Service.BIND_AUTO_CREATE);
-
-        connecting = true;
     }
 
     @ReactMethod

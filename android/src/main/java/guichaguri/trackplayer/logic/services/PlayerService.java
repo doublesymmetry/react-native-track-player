@@ -20,7 +20,6 @@ import java.util.List;
  */
 public class PlayerService extends MediaBrowserServiceCompat {
 
-    public static final String ACTION_SETUP_PLAYER = "trackplayer.setup";
     public static final String ACTION_CONNECT = "trackplayer.connect";
 
     private MediaManager manager;
@@ -29,21 +28,12 @@ public class PlayerService extends MediaBrowserServiceCompat {
     public IBinder onBind(Intent intent) {
         String action = intent.getAction();
 
-        if(ACTION_SETUP_PLAYER.equals(action)) {
-            Log.d(Utils.TAG, "onBind: Setup Player");
-
-            if(intent.hasExtra("data")) {
-                manager.setupPlayer(intent.getBundleExtra("data"));
-            } else {
-                manager.setupPlayer(null);
-            }
-        } else if(ACTION_CONNECT.equals(action)) {
-            Log.d(Utils.TAG, "onBind: Connect");
+        if(ACTION_CONNECT.equals(action)) {
+            Log.d(Utils.TAG, "onBind");
+            return new MediaWrapper(this, manager);
         } else {
             return super.onBind(intent);
         }
-
-        return new MediaWrapper(this, manager);
     }
 
     @Nullable

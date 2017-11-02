@@ -17,10 +17,6 @@ extension AudioPlayer {
         case .endedPlaying(let error):
             if let error = error {
                 state = .failed(.foundationError(error))
-            } else {
-                if let currentItem = currentItem {
-                    delegate?.audioPlayer(self, didFinishPlaying: currentItem)
-                }
             }
 
         case .interruptionBegan where state.isPlaying || state.isBuffering:

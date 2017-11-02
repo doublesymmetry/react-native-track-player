@@ -22,35 +22,30 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     // MARK: - MediaWrapperDelegate Methods
     
     func playerUpdatedState() {
-        sendEvent(withName: "playback-state", body: mediaWrapper.state)
+        sendEvent(withName: "playback-state", body: ["state": mediaWrapper.state])
     }
     
-    func playerSwitchedTracks(trackId: String?) {
-        sendEvent(withName: "playback-track-changed", body: trackId)
-    }
-    
-    func playerTrackEnded(trackId: String?, time: TimeInterval?) {
-        guard let trackId = trackId, let time = time else { return }
-        sendEvent(withName: "playback-track-ended", body: ["trackId": trackId, "position": time])
+    func playerSwitchedTracks(trackId: String?, time: TimeInterval?, nextTrackId: String?) {
+        sendEvent(withName: "playback-track-changed", body: [
+            "track": trackId,
+            "position": time,
+            "nextTrack": nextTrackId
+        ])
     }
     
     func playerExhaustedQueue() {
-        sendEvent(withName: "playback-ended", body: nil)
+        sendEvent(withName: "playback-queue-ended", body: nil)
     }
     
     func playbackFailed(error: Error) {
-        sendEvent(withName: "playback-error", body: error.localizedDescription)
-    }
-    
-    func playbackUpdatedProgress(to time: TimeInterval) {
-        sendEvent(withName: "playback-progress", body: mediaWrapper.currentTrackProgression)
+        sendEvent(withName: "playback-error", body: ["error": error.localizedDescription])
     }
     
     
     // MARK: - Required Methods
     
     @objc(constantsToExport)
-    override func constantsToExport() -> [String: Any] {
+    override func constantsToExport() -> [AnyHashable: Any] {
         return [
             "STATE_NONE": AudioPlayerState.stopped,
             "STATE_PLAYING": AudioPlayerState.playing,
@@ -69,11 +64,9 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     @objc(supportedEvents)
     override func supportedEvents() -> [String] {
         return [
-            "playback-ended",
+            "playback-queue-ended",
             "playback-state",
             "playback-error",
-            "playback-progress",
-            "playback-track-ended",
             "playback-track-changed",
             
             "remote-stop",

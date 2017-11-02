@@ -42,7 +42,7 @@ public class MediaManager {
         this.metadata = new Metadata(service, this);
 
         if(LibHelper.isChromecastAvailable(service)) {
-            this.cast = new GoogleCast(service.getApplicationContext(), this);
+            this.cast = GoogleCast.initialize(service, this);
         } else {
             this.cast = null;
         }
@@ -236,7 +236,7 @@ public class MediaManager {
             bundle.putString("track", previous != null ? previous.id : null);
             bundle.putDouble("position", Utils.toSeconds(prevPos));
             bundle.putString("nextTrack", next != null ? next.id : null);
-            Events.dispatchEvent(service, Events.PLAYBACK_TRACK_ENDED, bundle);
+            Events.dispatchEvent(service, Events.PLAYBACK_TRACK_CHANGED, bundle);
         }
     }
 

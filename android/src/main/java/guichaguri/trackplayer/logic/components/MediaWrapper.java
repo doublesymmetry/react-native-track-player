@@ -28,6 +28,16 @@ public class MediaWrapper extends Binder {
         this.handler = new Handler();
     }
 
+    public void setupPlayer(final Bundle options, final Promise promise) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                manager.setupPlayer(options);
+                Utils.resolveCallback(promise);
+            }
+        });
+    }
+
     public void updateOptions(final Bundle bundle) {
         handler.post(new Runnable() {
             @Override

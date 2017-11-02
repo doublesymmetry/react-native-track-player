@@ -1,6 +1,7 @@
 package guichaguri.trackplayer.player;
 
 import android.content.Context;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import com.facebook.react.bridge.Promise;
 import guichaguri.trackplayer.logic.MediaManager;
@@ -21,9 +22,9 @@ public abstract class Playback {
     protected final Context context;
     protected final MediaManager manager;
     protected List<Track> queue = Collections.synchronizedList(new ArrayList<Track>());
-    protected int currentTrack = 0;
+    protected int currentTrack = -1;
 
-    protected int prevState = 0;
+    protected int prevState = PlaybackStateCompat.STATE_NONE;
 
     protected Playback(Context context, MediaManager manager) {
         this.context = context;
@@ -43,10 +44,7 @@ public abstract class Playback {
             boolean empty = queue.isEmpty();
             queue.addAll(tracks);
 
-            if(empty) {
-                updateCurrentTrack(0, callback);
-                return;
-            }
+            if(empty) updateCurrentTrack(0, null);
         } else {
             int index = queue.size();
             for(int i = 0; i < queue.size(); i++) {
@@ -57,9 +55,9 @@ public abstract class Playback {
 
             if(currentTrack >= index) {
                 currentTrack += tracks.size();
-                return;
             }
         }
+
         Utils.resolveCallback(callback);
     }
 
@@ -82,11 +80,10 @@ public abstract class Playback {
         }
 
         if(currTrack != currentTrack) {
-            updateCurrentTrack(currTrack, callback);
-        } else {
-            Utils.resolveCallback(callback);
+            updateCurrentTrack(currTrack, null);
         }
 
+        Utils.resolveCallback(callback);
         manager.onQueueUpdate();
     }
 
@@ -207,6 +204,7 @@ public abstract class Playback {
     protected void updateCurrentTrack(int track, Promise callback) {
         if(queue.isEmpty()) {
             reset();
+            Utils.rejectCallback(callback, "queue", "The queue is empty");
             return;
         } else if(track >= queue.size()) {
             track = queue.size() - 1;

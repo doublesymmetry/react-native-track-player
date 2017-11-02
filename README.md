@@ -1,6 +1,7 @@
-﻿# react-native-track-player [![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player) [![Chat](https://badges.gitter.im/react-native-track-player/gitter.png)](https://gitter.im/react-native-track-player/Support)
+﻿[![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player) [![Chat](https://badges.gitter.im/react-native-track-player/gitter.png)](https://gitter.im/react-native-track-player/Support)
+# react-native-track-player
 
-An all-in-one module that provides audio playback, external media controls, chromecast support and background mode.
+A fully fledged audio module created for music apps. Provides audio playback, external media controls, chromecast support, background mode and more!
 
 ---
 
@@ -16,21 +17,23 @@ An all-in-one module that provides audio playback, external media controls, chro
 ## Features
 
 * **Lightweight** - Optimized to use the least amount of resources according to your needs
-* **Media Controls support** - Control the app from a bluetooth device, the lockscreen, a notification, a smartwatch or even a car
+* **Feels native** - As everything is built together, it follows the same design principles as real music apps do
+* **Multi-platform** - Supports Android, iOS and Windows
+* **Media Controls support** - Provides events for controlling the app from a bluetooth device, the lockscreen, a notification, a smartwatch or even a car
 * **Local or network, files or streams** - It doesn't matter where the media belongs, we've got you covered
 * **Chromecast support** - Seamlessly switch to any Google Cast compatible device, supporting custom media receivers
-* **Adaptive bitrate streaming support** - Optional support for DASH, HLS or SmoothStreaming
+* **Adaptive bitrate streaming support** - Support for DASH, HLS or SmoothStreaming
 * **Caching support** - Cache media files to play them again without an internet connection
-* **Background support** - Keep playing audio even after the app is closed
+* **Background support** - Keep playing audio even after the app is in background
 * **Fully Customizable** - Even the notification icons are customizable!
 
 ## Platform Support
 
 | Feature | Android | iOS | Windows |
-| ------- | ------- | --- | ------- |
+| ------- | :-----: | :-: | :-----: |
 | Load from the app bundle | ✓ | ✓ | ✓ |
 | Load from the network | ✓ | ✓ | ✓ |
-| Load from the file system | ✗ | ✗ | ✗ |
+| Load from the file system | ✓ | ✓ | ✓ |
 | Adaptive Bitrate Streaming | ✓ | ✗ | ✓ |
 | Play/Pause/Stop/Reset | ✓ | ✓ | ✓ |
 | Seeking/Volume | ✓ | ✓ | ✓ |
@@ -38,7 +41,7 @@ An all-in-one module that provides audio playback, external media controls, chro
 | Caching | ✓ | ✗ | ✗ |
 | Events | ✓ | ✓ | ✓ |
 | Background Mode | ✓ | ✓ | ✓ |
-| Google Cast | ✓ | ✗ | ✗ |
+| Casting | ✓ | ✗ | ✗ |
 
 Check [Platform Support](https://github.com/Guichaguri/react-native-track-player/wiki/Platform-Support) for more information.
 
@@ -75,3 +78,8 @@ TrackPlayer.setupPlayer().then(() => {
 
 });
 ```
+
+## Maintainers
+* Android: [Guilherme Chaguri](https://github.com/Guichaguri)
+* iOS: [David Chavez](https://github.com/dcvz)
+* Windows: [Guilherme Chaguri](https://github.com/Guichaguri)

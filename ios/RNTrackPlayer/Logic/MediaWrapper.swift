@@ -11,11 +11,9 @@ import MediaPlayer
 
 protocol MediaWrapperDelegate: class {
     func playerUpdatedState()
-    func playerSwitchedTracks(trackId: String?)
-    func playerTrackEnded(trackId: String?, time: TimeInterval?)
+    func playerSwitchedTracks(trackId: String?, time: TimeInterval?, nextTrackId: String?)
     func playerExhaustedQueue()
     func playbackFailed(error: Error)
-    func playbackUpdatedProgress(to time: TimeInterval)    
 }
 
 class MediaWrapper: AudioPlayerDelegate {
@@ -196,15 +194,11 @@ class MediaWrapper: AudioPlayerDelegate {
     
     // MARK: - AudioPlayerDelegate
     
-    func audioPlayer(_ audioPlayer: AudioPlayer, willStartPlaying item: Track) {
-        delegate?.playerSwitchedTracks(trackId: currentTrack?.id)
+    func audioPlayer(_ audioPlayer: AudioPlayer, willChangeTrackFrom from: Track?, at position: TimeInterval?, to track: Track) {
+        delegate?.playerSwitchedTracks(trackId: from?.id, time: position, nextTrackId: track.id)
     }
     
     func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: Track) {
-        guard fabs(currentTrackProgression.distance(to: currentTrackDuration)) <= 1e-1 else { return }
-        
-        delegate?.playerTrackEnded(trackId: currentTrack?.id, time: currentTrackProgression)
-        
         if (!playNext()) {
             delegate?.playerExhaustedQueue()
         }
@@ -218,8 +212,4 @@ class MediaWrapper: AudioPlayerDelegate {
             delegate?.playerUpdatedState()
         }
     }
-    
-    func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateProgressionTo time: TimeInterval, percentageRead: Float) {
-        delegate?.playbackUpdatedProgress(to: time)
-    }    
 }
