@@ -129,8 +129,7 @@ public class Utils {
     }
 
     public static boolean isStopped(int state) {
-        return state == PlaybackStateCompat.STATE_NONE || state == PlaybackStateCompat.STATE_STOPPED ||
-                state == PlaybackStateCompat.STATE_ERROR;
+        return state == PlaybackStateCompat.STATE_NONE || state == PlaybackStateCompat.STATE_STOPPED;
     }
 
     public static void resolveCallback(Promise promise) {

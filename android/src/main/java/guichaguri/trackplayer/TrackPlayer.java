@@ -1,14 +1,12 @@
 package guichaguri.trackplayer;
 
 import com.facebook.react.ReactPackage;
-import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
 import guichaguri.trackplayer.cast.CastButtonManager;
 import guichaguri.trackplayer.logic.LibHelper;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -21,12 +19,6 @@ public class TrackPlayer implements ReactPackage {
         List<NativeModule> modules = new ArrayList<>();
         modules.add(new TrackModule(context));
         return modules;
-    }
-
-    // Removed override to not crash with newer RN builds
-    // Older ones should still work as the method is still present.
-    public List<Class<? extends JavaScriptModule>> createJSModules() {
-        return Collections.emptyList();
     }
 
     @Override
