@@ -54,7 +54,7 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
     }
 
     private void updateCurrentTrackClient(int castId) {
-        // Updates the current track client-side (or "sender-side")
+        // Updates the current track in the app (or "sender-side")
         for(int i = 0; i < queue.size(); i++) {
             Track track = queue.get(i);
             if(track.castId == castId) {
@@ -72,7 +72,17 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
 
     @Override
     protected void updateCurrentTrack(int track, Promise callback) {
-        // Updates the current track server-side (or "receiver-side")
+        // Updates the current track in the cast device (or "receiver-side")
+        if(queue.isEmpty()) {
+            reset();
+            Utils.rejectCallback(callback, "queue", "The queue is empty");
+            return;
+        } else if(track >= queue.size()) {
+            track = queue.size() - 1;
+        } else if(track < 0) {
+            track = 0;
+        }
+
         Track next = queue.get(track);
 
         if(next != null) {
