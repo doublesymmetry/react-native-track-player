@@ -33,6 +33,11 @@ protocol AudioPlayerDelegate: class {
     func audioPlayer(_ audioPlayer: AudioPlayer, willChangeTrackFrom from: Track?, at position: TimeInterval?, to track: Track)
     
     /// This method is called when the audio player finishes playing an item.
+    ///
+    /// - Parameters:
+    ///   - audioPlayer: The audio player.
+    ///   - item: The item that it just finished playing.
+    func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: Track)
 
     /// This method is called a regular time interval while playing. It notifies the delegate that the current playing
     /// progression changed.
