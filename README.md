@@ -1,18 +1,18 @@
-﻿[![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player) [![Chat](https://badges.gitter.im/react-native-track-player/gitter.png)](https://gitter.im/react-native-track-player/Support)
+﻿[![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player) [![Chat](https://badges.gitter.im/react-native-track-player/gitter.png)](https://gitter.im/react-native-track-player/Lobby)
 # react-native-track-player
 
 A fully fledged audio module created for music apps. Provides audio playback, external media controls, chromecast support, background mode and more!
 
 ---
 
-* [Installation](https://github.com/Guichaguri/react-native-track-player/wiki/Installation)
-* [Getting Started](https://github.com/Guichaguri/react-native-track-player/wiki/API)
-* [Documentation](https://github.com/Guichaguri/react-native-track-player/wiki/Documentation)
-* [Platform Support](https://github.com/Guichaguri/react-native-track-player/wiki/Platform-Support)
-* [Cast Integration](https://github.com/Guichaguri/react-native-track-player/wiki/Cast-Integration)
-* [Car Integration](https://github.com/Guichaguri/react-native-track-player/wiki/Car-Integration)
-* [Background Mode](https://github.com/Guichaguri/react-native-track-player/wiki/Background-Mode)
-* [Build Preferences](https://github.com/Guichaguri/react-native-track-player/wiki/Build-Preferences)
+* [Installation](https://github.com/react-native-kit/react-native-track-player/wiki/Installation)
+* [Getting Started](https://github.com/react-native-kit/react-native-track-player/wiki/API)
+* [Documentation](https://github.com/react-native-kit/react-native-track-player/wiki/Documentation)
+* [Platform Support](https://github.com/react-native-kit/react-native-track-player/wiki/Platform-Support)
+* [Cast Integration](https://github.com/react-native-kit/react-native-track-player/wiki/Cast-Integration)
+* [Car Integration](https://github.com/react-native-kit/react-native-track-player/wiki/Car-Integration)
+* [Background Mode](https://github.com/react-native-kit/react-native-track-player/wiki/Background-Mode)
+* [Build Preferences](https://github.com/react-native-kit/react-native-track-player/wiki/Build-Preferences)
 
 ## Features
 
@@ -43,7 +43,7 @@ A fully fledged audio module created for music apps. Provides audio playback, ex
 | Background Mode | ✓ | ✓ | ✓ |
 | Casting | ✓ | ✗ | ✗ |
 
-Check [Platform Support](https://github.com/Guichaguri/react-native-track-player/wiki/Platform-Support) for more information.
+Check [Platform Support](https://github.com/react-native-kit/react-native-track-player/wiki/Platform-Support) for more information.
 
 ## Why another music module?
 After trying to team up modules like `react-native-sound`, `react-native-music-controls` and `react-native-google-cast`, I've noticed that their structure and the way should be tied together can cause a lot problems (mainly on Android). Those can heavily affect the app stability and user experience.
@@ -56,8 +56,8 @@ All audio modules (like `react-native-sound`) don't play in a separated service 
 
 ## Example
 
-If you want to get started with this module, check the [API](https://github.com/Guichaguri/react-native-track-player/wiki/API) page.
-If you want detailed information about the API, check the [Documentation](https://github.com/Guichaguri/react-native-track-player/wiki/Documentation).
+If you want to get started with this module, check the [API](https://github.com/react-native-kit/react-native-track-player/wiki/API) page.
+If you want detailed information about the API, check the [Documentation](https://github.com/react-native-kit/react-native-track-player/wiki/Documentation).
 ```javascript
 import TrackPlayer from 'react-native-track-player';
 

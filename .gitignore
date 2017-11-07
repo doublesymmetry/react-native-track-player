@@ -4,6 +4,7 @@
 node_modules/
 build/
 DerivedData/
+package-lock.json
 
 # Android
 
@@ -14,6 +15,7 @@ android/gradle/
 android/captures/
 android/local.properties
 gradle.properties
+android/*.iml
 
 # Windows
 
