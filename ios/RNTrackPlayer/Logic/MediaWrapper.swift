@@ -12,7 +12,7 @@ import MediaPlayer
 protocol MediaWrapperDelegate: class {
     func playerUpdatedState()
     func playerSwitchedTracks(trackId: String?, time: TimeInterval?, nextTrackId: String?)
-    func playerExhaustedQueue()
+    func playerExhaustedQueue(trackId: String?, time: TimeInterval?)
     func playbackFailed(error: Error)
 }
 
@@ -198,9 +198,9 @@ class MediaWrapper: AudioPlayerDelegate {
         delegate?.playerSwitchedTracks(trackId: from?.id, time: position, nextTrackId: track.id)
     }
     
-    func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: Track) {
+    func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: Track, at position: TimeInterval?) {
         if (!playNext()) {
-            delegate?.playerExhaustedQueue()
+            delegate?.playerExhaustedQueue(trackId: item.id, time: position)
         }
     }
     

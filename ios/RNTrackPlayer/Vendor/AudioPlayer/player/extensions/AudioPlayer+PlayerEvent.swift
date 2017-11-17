@@ -19,7 +19,7 @@ extension AudioPlayer {
                 state = .failed(.foundationError(error))
             } else {
                 if let currentItem = currentItem {
-                    delegate?.audioPlayer(self, didFinishPlaying: currentItem)
+                    delegate?.audioPlayer(self, didFinishPlaying: currentItem, at: currentItemProgression)
                 }
             }
 

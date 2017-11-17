@@ -33,8 +33,11 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         ])
     }
     
-    func playerExhaustedQueue() {
-        sendEvent(withName: "playback-queue-ended", body: nil)
+    func playerExhaustedQueue(trackId: String?, time: TimeInterval?) {
+      sendEvent(withName: "playback-queue-ended", body: [
+          "track": trackId,
+          "position": time,
+      ])
     }
     
     func playbackFailed(error: Error) {
