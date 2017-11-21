@@ -123,7 +123,7 @@ public class AudioPlayer: NSObject {
                 }
                 player?.rate = rate
             } else {
-                stop()
+                pause()
             }
         }
     }

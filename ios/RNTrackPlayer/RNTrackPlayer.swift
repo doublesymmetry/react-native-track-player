@@ -100,7 +100,8 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     @objc(updateOptions:)
     func update(options: [String: Any]) {
         let remoteCenter = MPRemoteCommandCenter.shared()
-        let capabilities = (options["capabilities"] as? [String])?.flatMap { Capability(rawValue: $0) } ?? []
+        let castedCapabilities = (options["capabilities"] as? [String])
+        let capabilities = castedCapabilities?.flatMap { Capability(rawValue: $0) } ?? []
         
         let enableStop = capabilities.contains(.stop)
         let enablePause = capabilities.contains(.pause)
