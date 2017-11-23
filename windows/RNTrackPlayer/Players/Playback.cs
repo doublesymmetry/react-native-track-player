@@ -61,6 +61,13 @@ namespace TrackPlayer.Players {
             manager.OnTrackUpdate(previous, position, track, true);
         }
 
+        protected void HandleOnEnd() {
+            Track previous = GetCurrentTrack();
+            double position = GetPosition();
+
+            manager.OnEnd(previous, position);
+        }
+
         public Track GetCurrentTrack() {
             return currentTrack >= 0 && currentTrack < queue.Count ? queue[currentTrack] : null;
         }

@@ -42,10 +42,13 @@ namespace TrackPlayer.Logic {
             return player;
         }
 
-        public void OnEnd() {
+        public void OnEnd(Track previous, double prevPos) {
             Debug.WriteLine("OnEnd");
 
-            SendEvent(Events.PlaybackQueueEnded, null);
+            JObject obj = new JObject();
+            obj.Add("track", previous?.id);
+            obj.Add("position", prevPos);
+            SendEvent(Events.PlaybackQueueEnded, obj);
         }
 
         public void OnStateChange(MediaPlaybackState state) {
