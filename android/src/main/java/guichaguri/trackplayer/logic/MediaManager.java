@@ -212,10 +212,13 @@ public class MediaManager {
         }
     }
 
-    public void onEnd() {
+    public void onEnd(Track previous, long prevPos) {
         Log.d(Utils.TAG, "onEnd");
 
-        Events.dispatchEvent(service, Events.PLAYBACK_QUEUE_ENDED, null);
+        Bundle bundle = new Bundle();
+        bundle.putString("track", previous != null ? previous.id : null);
+        bundle.putDouble("position", Utils.toSeconds(prevPos));
+        Events.dispatchEvent(service, Events.PLAYBACK_QUEUE_ENDED, bundle);
     }
 
     public void onStateChange(int state) {

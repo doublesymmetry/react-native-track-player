@@ -240,7 +240,7 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
         if(hasNext()) {
             updateCurrentTrack(currentTrack + 1, null);
         } else {
-            manager.onEnd();
+            onEnd();
         }
     }
 

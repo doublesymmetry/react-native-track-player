@@ -231,4 +231,11 @@ public abstract class Playback {
 
         manager.onTrackUpdate(previous, position, next, true);
     }
+
+    protected void onEnd() {
+      Track previous = getCurrentTrack();
+      long position = getPosition();
+
+      manager.onEnd(previous, position);
+    }
 }

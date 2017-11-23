@@ -128,7 +128,7 @@ namespace TrackPlayer.Players {
                 UpdateCurrentTrack(currentTrack + 1, null);
                 Play();
             } else {
-                manager.OnEnd();
+                HandleOnEnd();
             }
         }
 
