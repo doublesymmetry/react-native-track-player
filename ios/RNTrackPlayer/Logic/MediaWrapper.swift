@@ -135,7 +135,7 @@ class MediaWrapper: AudioPlayerDelegate {
             return true
         }
         
-        stop()
+        pause()
         return false
     }
     
