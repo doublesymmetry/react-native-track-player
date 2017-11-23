@@ -339,7 +339,7 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
 
         if(state == PlaybackStateCompat.STATE_STOPPED) {
             if(lastKnownIdleReason == MediaStatus.IDLE_REASON_FINISHED) {
-                manager.onEnd();
+                onEnd();
             }
         }
     }

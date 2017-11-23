@@ -210,7 +210,7 @@ public class ExoPlayback extends Playback implements EventListener {
             if(hasNext()) {
                 updateCurrentTrack(currentTrack + 1, null);
             } else {
-                manager.onEnd();
+                onEnd();
             }
 
         }
