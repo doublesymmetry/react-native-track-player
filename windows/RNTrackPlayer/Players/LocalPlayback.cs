@@ -75,6 +75,26 @@ namespace TrackPlayer.Players {
             return player.Volume;
         }
 
+        public override void SetSpeed(double speed) {
+            // Unfortunatelly, UWP does not support setting speed and pitch individually
+            // We'll have to change both of them for now :/
+            player.PlaybackSession.PlaybackRate = speed;
+        }
+
+        public override double GetSpeed() {
+            return player.PlaybackSession.PlaybackRate;
+        }
+
+        public override void SetPitch(double pitch) {
+            // Unfortunatelly, UWP does not support setting speed and pitch individually
+            // We'll have to change both of them for now :/
+            player.PlaybackSession.PlaybackRate = pitch;
+        }
+
+        public override double GetPitch() {
+            return player.PlaybackSession.PlaybackRate;
+        }
+
         public override void SeekTo(double seconds) {
             startPos = seconds;
             player.PlaybackSession.Position = TimeSpan.FromSeconds(seconds);
