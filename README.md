@@ -62,7 +62,7 @@ If you want detailed information about the API, check the [Documentation](https:
 import TrackPlayer from 'react-native-track-player';
 
 // Creates the player
-TrackPlayer.setupPlayer().then(() => {
+TrackPlayer.setupPlayer().then(async () => {
 
     // Adds a track to the queue
     await TrackPlayer.add({
