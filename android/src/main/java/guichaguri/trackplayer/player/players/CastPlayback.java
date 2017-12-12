@@ -278,6 +278,22 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
     }
 
     @Override
+    public void setSpeed(float speed) {
+        // NOOP for now
+    }
+
+    @Override
+    public float getPitch() {
+        MediaStatus status = player.getMediaStatus();
+        return status != null ? (float)status.getPlaybackRate() : 1;
+    }
+
+    @Override
+    public void setPitch(float pitch) {
+        // NOOP for now
+    }
+
+    @Override
     public void setVolume(float volume) {
         player.setStreamVolume(volume);
     }
@@ -339,7 +355,7 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
 
         if(state == PlaybackStateCompat.STATE_STOPPED) {
             if(lastKnownIdleReason == MediaStatus.IDLE_REASON_FINISHED) {
-                onEnd();
+                manager.onEnd(getCurrentTrack(), getPosition());
             }
         }
     }

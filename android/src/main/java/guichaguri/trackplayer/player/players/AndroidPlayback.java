@@ -10,6 +10,8 @@ import android.media.MediaPlayer.OnInfoListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.net.Uri;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.v4.media.session.PlaybackStateCompat;
 import com.facebook.react.bridge.Promise;
@@ -188,10 +190,32 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
 
     @Override
     public float getSpeed() {
-        /*if(VERSION.SDK_INT >= VERSION_CODES.M) {
+        if(VERSION.SDK_INT >= VERSION_CODES.M) {
             return player.getPlaybackParams().getSpeed();
-        }*/
+        }
         return 1;
+    }
+
+    @Override
+    public void setSpeed(float speed) {
+        if(VERSION.SDK_INT >= VERSION_CODES.M) {
+            player.getPlaybackParams().setSpeed(speed);
+        }
+    }
+
+    @Override
+    public float getPitch() {
+        if(VERSION.SDK_INT >= VERSION_CODES.M) {
+            return player.getPlaybackParams().getPitch();
+        }
+        return 1;
+    }
+
+    @Override
+    public void setPitch(float pitch) {
+        if(VERSION.SDK_INT >= VERSION_CODES.M) {
+            player.getPlaybackParams().setPitch(pitch);
+        }
     }
 
     @Override
@@ -240,7 +264,7 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
         if(hasNext()) {
             updateCurrentTrack(currentTrack + 1, null);
         } else {
-            onEnd();
+            manager.onEnd(getCurrentTrack(), getPosition());
         }
     }
 

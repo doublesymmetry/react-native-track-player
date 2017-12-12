@@ -153,6 +153,12 @@ public abstract class Playback {
 
     public abstract float getSpeed();
 
+    public abstract void setSpeed(float speed);
+
+    public abstract float getPitch();
+
+    public abstract void setPitch(float pitch);
+
     public abstract float getVolume();
 
     public abstract void setVolume(float volume);
@@ -230,12 +236,5 @@ public abstract class Playback {
         }
 
         manager.onTrackUpdate(previous, position, next, true);
-    }
-
-    protected void onEnd() {
-      Track previous = getCurrentTrack();
-      long position = getPosition();
-
-      manager.onEnd(previous, position);
     }
 }

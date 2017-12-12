@@ -170,6 +170,14 @@ namespace TrackPlayer.Players {
 
         public abstract double GetVolume();
 
+        public abstract void SetSpeed(double speed);
+
+        public abstract double GetSpeed();
+
+        public abstract void SetPitch(double pitch);
+
+        public abstract double GetPitch();
+
         public abstract void SeekTo(double seconds);
 
         public abstract double GetPosition();

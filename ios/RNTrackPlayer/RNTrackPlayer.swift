@@ -218,6 +218,18 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         mediaWrapper.volume = level
     }
     
+    @objc(setSpeed:)
+    func setSpeed(newSpeed: Float) {
+        print("Setting speed to \(next)")
+        /* TODO */
+    }
+    
+    @objc(getSpeed:)
+    func getSpeed() {
+        print("Getting current speed")
+        /* TODO */
+    }
+    
     @objc(getTrack:resolver:rejecter:)
     func getTrack(id: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !mediaWrapper.queueContainsTrack(trackId: id) {

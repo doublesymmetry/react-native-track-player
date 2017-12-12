@@ -198,6 +198,32 @@ namespace TrackPlayer
         }
 
         [ReactMethod]
+        public void getSpeed(IPromise promise) {
+            Playback player = manager?.GetPlayer();
+            if(Utils.CheckPlayback(player, promise)) return;
+
+            promise.Resolve(player.GetSpeed());
+        }
+
+        [ReactMethod]
+        public void setSpeed(double speed) {
+            manager?.GetPlayer()?.SetSpeed(speed);
+        }
+
+        [ReactMethod]
+        public void getPitch(IPromise promise) {
+            Playback player = manager?.GetPlayer();
+            if(Utils.CheckPlayback(player, promise)) return;
+
+            promise.Resolve(player.GetPitch());
+        }
+
+        [ReactMethod]
+        public void setPitch(double pitch) {
+            manager?.GetPlayer()?.SetPitch(pitch);
+        }
+
+        [ReactMethod]
         public void seekTo(double seconds) {
             manager?.GetPlayer()?.SeekTo(seconds);
         }
