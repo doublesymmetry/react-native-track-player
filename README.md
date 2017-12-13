@@ -1,4 +1,4 @@
-﻿[![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player) [![Chat](https://badges.gitter.im/react-native-track-player/gitter.png)](https://gitter.im/react-native-track-player/Lobby)
+﻿[![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player) [![Chat](https://badges.gitter.im/react-native-track-player/gitter.png)](https://gitter.im/react-native-track-player/Support)
 # react-native-track-player
 
 A fully fledged audio module created for music apps. Provides audio playback, external media controls, chromecast support, background mode and more!
@@ -9,7 +9,6 @@ A fully fledged audio module created for music apps. Provides audio playback, ex
 * [Getting Started](https://github.com/react-native-kit/react-native-track-player/wiki/API)
 * [Documentation](https://github.com/react-native-kit/react-native-track-player/wiki/Documentation)
 * [Platform Support](https://github.com/react-native-kit/react-native-track-player/wiki/Platform-Support)
-* [Cast Integration](https://github.com/react-native-kit/react-native-track-player/wiki/Cast-Integration)
 * [Car Integration](https://github.com/react-native-kit/react-native-track-player/wiki/Car-Integration)
 * [Background Mode](https://github.com/react-native-kit/react-native-track-player/wiki/Background-Mode)
 * [Build Preferences](https://github.com/react-native-kit/react-native-track-player/wiki/Build-Preferences)
@@ -21,7 +20,7 @@ A fully fledged audio module created for music apps. Provides audio playback, ex
 * **Multi-platform** - Supports Android, iOS and Windows
 * **Media Controls support** - Provides events for controlling the app from a bluetooth device, the lockscreen, a notification, a smartwatch or even a car
 * **Local or network, files or streams** - It doesn't matter where the media belongs, we've got you covered
-* **Chromecast support** - Seamlessly switch to any Google Cast compatible device, supporting custom media receivers
+* **[Casting support](https://github.com/react-native-kit/react-native-track-casting)** - Seamlessly switch to any Google Cast compatible device, supporting custom media receivers
 * **Adaptive bitrate streaming support** - Support for DASH, HLS or SmoothStreaming
 * **Caching support** - Cache media files to play them again without an internet connection
 * **Background support** - Keep playing audio even after the app is in background
@@ -41,7 +40,7 @@ A fully fledged audio module created for music apps. Provides audio playback, ex
 | Caching | ✓ | ✗ | ✗ |
 | Events | ✓ | ✓ | ✓ |
 | Background Mode | ✓ | ✓ | ✓ |
-| Casting | ✓ | ✗ | ✗ |
+| [Casting](https://github.com/react-native-kit/react-native-track-casting) | ✓ | ✗ | ✗ |
 
 Check [Platform Support](https://github.com/react-native-kit/react-native-track-player/wiki/Platform-Support) for more information.
 

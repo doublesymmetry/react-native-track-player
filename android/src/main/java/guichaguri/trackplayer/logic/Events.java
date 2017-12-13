@@ -29,14 +29,6 @@ public class Events {
     public static final String PLAYBACK_QUEUE_ENDED = "playback-queue-ended";
     public static final String PLAYBACK_ERROR = "playback-error";
 
-    // Remote Events
-    public static final String CAST_STATE = "cast-state";
-    public static final String CAST_CONNECTING = "cast-connecting";
-    public static final String CAST_CONNECTED = "cast-connected";
-    public static final String CAST_CONNECTION_FAILED = "cast-connection-failed";
-    public static final String CAST_DISCONNECTING = "cast-disconnecting";
-    public static final String CAST_DISCONNECTED = "cast-disconnected";
-
     public static void dispatchEvent(Context context, String event, Bundle data) {
         Intent i = new Intent(context, PlayerTask.class);
 

@@ -173,10 +173,6 @@ public class MediaWrapper extends Binder {
         Utils.resolveCallback(callback, pb.getState());
     }
 
-    public void getCastState(Promise callback) {
-        Utils.resolveCallback(callback, manager.getCastState());
-    }
-
     public void destroy() {
         manager.destroyPlayer();
     }

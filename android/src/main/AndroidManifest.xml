@@ -23,16 +23,9 @@
             </intent-filter>
         </receiver>
 
-        <!-- Google Play Services version, required for Google Cast support -->
-        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
-
         <!-- Android Auto support, removed if not allowed in track-player.json -->
         <meta-data android:name="${autoMetadata}"
                    android:resource="@xml/automotive_app_desc" />
-
-        <!-- Google Cast support -->
-        <meta-data android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
-                   android:value="guichaguri.trackplayer.cast.CastOptionProvider" />
 
     </application>
 
