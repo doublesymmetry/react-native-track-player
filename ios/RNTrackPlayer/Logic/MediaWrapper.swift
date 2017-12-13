@@ -19,6 +19,7 @@ protocol MediaWrapperDelegate: class {
 class MediaWrapper: AudioPlayerDelegate {
     private var queue: [Track]
     private var currentIndex: Int
+    private var _rate: Float
     private let player: AudioPlayer
     private var trackImageTask: URLSessionDataTask?
     
@@ -30,6 +31,15 @@ class MediaWrapper: AudioPlayerDelegate {
         }
         set {
             player.volume = newValue
+        }
+    }
+    var rate: Float {
+        get {
+            return _rate
+        }
+        set {
+            _rate = newValue
+            player.rate = newValue
         }
     }
     
@@ -71,6 +81,7 @@ class MediaWrapper: AudioPlayerDelegate {
         self.queue = []
         self.currentIndex = 0
         self.player = AudioPlayer()
+        self._rate = 1
         
         self.player.delegate = self
         self.player.bufferingStrategy = .playWhenBufferNotEmpty
@@ -160,6 +171,8 @@ class MediaWrapper: AudioPlayerDelegate {
         let track = queue[currentIndex]
         player.play(track: track)
         
+        setPitchAlgorithm(for: track)
+        
         // fetch artwork and cancel any previous requests
         trackImageTask?.cancel()
         if let artworkURL = track.artworkURL?.value {
@@ -171,6 +184,21 @@ class MediaWrapper: AudioPlayerDelegate {
         }
 
         trackImageTask?.resume()
+    }
+    
+    func setPitchAlgorithm(for track: Track) {
+        if let pitchAlgorithm = track.pitchAlgorithm {
+            switch pitchAlgorithm {
+            case "voice":
+                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmTimeDomain
+            case "music":
+                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmSpectral
+            case "linear":
+                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmVarispeed
+            default:
+                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmLowQualityZeroLatency
+            }
+        }
     }
     
     func pause() {
@@ -187,10 +215,10 @@ class MediaWrapper: AudioPlayerDelegate {
     
     func reset() {
         currentIndex = 0
+        rate = 1
         queue.removeAll()
         stop()
     }
-    
     
     // MARK: - AudioPlayerDelegate
     

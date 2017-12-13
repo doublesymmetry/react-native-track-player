@@ -218,15 +218,15 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         mediaWrapper.volume = level
     }
     
-    @objc(setSpeed:)
-    func setSpeed(newSpeed: Float) {
-        print("Setting speed to \(next)")
+    @objc(setRate:)
+    func setRate(rate: Float) {
         /* TODO */
+        mediaWrapper.rate = rate
     }
     
-    @objc(getSpeed:)
-    func getSpeed() {
-        print("Getting current speed")
+    @objc(getRate)
+    func getRate() {
+        print("Getting current rate")
         /* TODO */
     }
     
