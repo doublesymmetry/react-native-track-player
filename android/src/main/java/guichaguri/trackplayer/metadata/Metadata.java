@@ -43,6 +43,7 @@ public class Metadata {
 
     private long capabilities = 0;
     private int ratingType = RatingCompat.RATING_HEART;
+    private int jumpInterval = 15;
     private int maxArtworkSize = 2000;
     private Uri artworkUrl = null;
 
@@ -77,6 +78,7 @@ public class Metadata {
         // Load the options
         ratingType = (int)data.getDouble("ratingType", ratingType);
         maxArtworkSize = (int)data.getDouble("maxArtworkSize", maxArtworkSize);
+        jumpInterval = (int)data.getDouble("jumpInterval", jumpInterval);
 
         // Update the rating type
         session.setRatingType(ratingType);
@@ -236,6 +238,10 @@ public class Metadata {
 
     public int getRatingType() {
         return ratingType;
+    }
+
+    public int getJumpInterval() {
+        return jumpInterval;
     }
 
     public void destroy() {
