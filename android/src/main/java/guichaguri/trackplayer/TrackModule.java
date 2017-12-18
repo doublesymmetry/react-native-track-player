@@ -280,38 +280,22 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
         });
     }
 
-    public void setSpeed(final float speed) {
+    @ReactMethod
+    public void setRate(final float rate) {
         waitForConnection(new Runnable() {
             @Override
             public void run() {
-                binder.setSpeed(speed);
+                binder.setRate(rate);
             }
         });
     }
 
-    public void getSpeed(final Promise callback) {
+    @ReactMethod
+    public void getRate(final Promise callback) {
         waitForConnection(new Runnable() {
             @Override
             public void run() {
-                binder.getSpeed(callback);
-            }
-        });
-    }
-
-    public void setPitch(final float pitch) {
-        waitForConnection(new Runnable() {
-            @Override
-            public void run() {
-                binder.setPitch(pitch);
-            }
-        });
-    }
-
-    public void getPitch(final Promise callback) {
-        waitForConnection(new Runnable() {
-            @Override
-            public void run() {
-                binder.getPitch(callback);
+                binder.getRate(callback);
             }
         });
     }

@@ -156,25 +156,14 @@ public class ExoPlayback extends Playback implements EventListener {
     }
 
     @Override
-    public float getSpeed() {
+    public float getRate() {
         return player.getPlaybackParameters().speed;
     }
 
     @Override
-    public void setSpeed(float speed) {
+    public void setRate(float rate) {
         PlaybackParameters params = player.getPlaybackParameters();
-        player.setPlaybackParameters(new PlaybackParameters(speed, params.pitch));
-    }
-
-    @Override
-    public float getPitch() {
-        return player.getPlaybackParameters().pitch;
-    }
-
-    @Override
-    public void setPitch(float pitch) {
-        PlaybackParameters params = player.getPlaybackParameters();
-        player.setPlaybackParameters(new PlaybackParameters(params.speed, pitch));
+        player.setPlaybackParameters(new PlaybackParameters(rate, params.pitch));
     }
 
     @Override

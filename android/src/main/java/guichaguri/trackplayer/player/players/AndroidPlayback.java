@@ -188,33 +188,16 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
         }
     }
 
-    @Override
-    public float getSpeed() {
+    public float getRate() {
         if(VERSION.SDK_INT >= VERSION_CODES.M) {
             return player.getPlaybackParams().getSpeed();
         }
         return 1;
     }
 
-    @Override
-    public void setSpeed(float speed) {
+    public void setRate(float rate) {
         if(VERSION.SDK_INT >= VERSION_CODES.M) {
-            player.getPlaybackParams().setSpeed(speed);
-        }
-    }
-
-    @Override
-    public float getPitch() {
-        if(VERSION.SDK_INT >= VERSION_CODES.M) {
-            return player.getPlaybackParams().getPitch();
-        }
-        return 1;
-    }
-
-    @Override
-    public void setPitch(float pitch) {
-        if(VERSION.SDK_INT >= VERSION_CODES.M) {
-            player.getPlaybackParams().setPitch(pitch);
+            player.getPlaybackParams().setSpeed(rate);
         }
     }
 

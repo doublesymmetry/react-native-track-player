@@ -146,7 +146,7 @@ public class Metadata {
         int playerState = playback.getState();
 
         // Update the state, position, speed and buffered position
-        pb.setState(playerState, playback.getPosition(), playback.getSpeed());
+        pb.setState(playerState, playback.getPosition(), playback.getRate());
         pb.setBufferedPosition(playback.getBufferedPosition());
 
         // Update the capabilities
