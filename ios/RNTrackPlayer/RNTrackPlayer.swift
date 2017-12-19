@@ -56,11 +56,11 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
             "STATE_STOPPED": AudioPlayerState.stopped,
             "STATE_BUFFERING": AudioPlayerState.buffering,
             
-            "CAPABILITY_PLAY": Capability.play,
-            "CAPABILITY_PAUSE": Capability.pause,
-            "CAPABILITY_STOP": Capability.stop,
-            "CAPABILITY_SKIP_TO_NEXT": Capability.next,
-            "CAPABILITY_SKIP_TO_PREVIOUS": Capability.previous
+            "CAPABILITY_PLAY": Capability.play.rawValue,
+            "CAPABILITY_PAUSE": Capability.pause.rawValue,
+            "CAPABILITY_STOP": Capability.stop.rawValue,
+            "CAPABILITY_SKIP_TO_NEXT": Capability.next.rawValue,
+            "CAPABILITY_SKIP_TO_PREVIOUS": Capability.previous.rawValue
         ]
     }
     
