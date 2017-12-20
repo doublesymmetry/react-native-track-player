@@ -61,13 +61,6 @@ namespace TrackPlayer.Players {
             manager.OnTrackUpdate(previous, position, track, true);
         }
 
-        protected void HandleOnEnd() {
-            Track previous = GetCurrentTrack();
-            double position = GetPosition();
-
-            manager.OnEnd(previous, position);
-        }
-
         public Track GetCurrentTrack() {
             return currentTrack >= 0 && currentTrack < queue.Count ? queue[currentTrack] : null;
         }
@@ -170,13 +163,9 @@ namespace TrackPlayer.Players {
 
         public abstract double GetVolume();
 
-        public abstract void SetSpeed(double speed);
+        public abstract void SetRate(double rate);
 
-        public abstract double GetSpeed();
-
-        public abstract void SetPitch(double pitch);
-
-        public abstract double GetPitch();
+        public abstract double GetRate();
 
         public abstract void SeekTo(double seconds);
 
