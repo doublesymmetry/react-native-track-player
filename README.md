@@ -1,6 +1,10 @@
 ﻿[![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player) [![Chat](https://badges.gitter.im/react-native-track-player/gitter.png)](https://gitter.im/react-native-track-player/Lobby)
 # react-native-track-player
 
+## Added Support for Earpiece Speaker (For Android Only)
+
+`TrackPlayer.playWithEarPiece()`
+
 A fully fledged audio module created for music apps. Provides audio playback, external media controls, chromecast support, background mode and more!
 
 ---
