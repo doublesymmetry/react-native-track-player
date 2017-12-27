@@ -67,7 +67,7 @@ public class ExoPlayback extends Playback implements EventListener {
     }
 
     @Override
-    public void load(Track track, Promise callback) {
+    public void load(Track track, Promise callback, String s) {
         loadCallback = callback;
 
         Uri url = track.url;

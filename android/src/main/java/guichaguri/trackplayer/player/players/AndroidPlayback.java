@@ -71,7 +71,7 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
     }
 
     @Override
-    public void load(Track track, Promise callback) {
+    public void load(Track track, Promise callback, String s) {
         Uri url = track.url;
 
         // Resets the player to update its state to idle

@@ -187,7 +187,7 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
     }
 
     @Override
-    public void load(Track track, Promise callback) {
+    public void load(Track track, Promise callback, String s) {
         // NOOP
         Utils.resolveCallback(callback);
     }
