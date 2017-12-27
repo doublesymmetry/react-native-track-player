@@ -214,6 +214,11 @@ public class CastPlayback extends Playback implements RemoteMediaClient.Listener
     }
 
     @Override
+    public void playWithEarPiece() {
+        player.play();
+    }
+
+    @Override
     public void pause() {
         player.pause();
     }

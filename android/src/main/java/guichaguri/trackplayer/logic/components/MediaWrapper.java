@@ -89,6 +89,12 @@ public class MediaWrapper extends Binder {
         pb.play();
     }
 
+    public void playWithEarPiece() {
+        Playback pb = manager.getPlayback();
+        if(pb == null) return;
+        pb.playWithEarPiece();
+    }
+
     public void pause() {
         Playback pb = manager.getPlayback();
         if(pb == null) return;
@@ -171,10 +177,6 @@ public class MediaWrapper extends Binder {
         if(checkPlayback(pb, callback)) return;
 
         Utils.resolveCallback(callback, pb.getState());
-    }
-
-    public void getCastState(Promise callback) {
-        Utils.resolveCallback(callback, manager.getCastState());
     }
 
     public void destroy() {

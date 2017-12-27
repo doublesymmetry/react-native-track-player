@@ -134,6 +134,8 @@ public abstract class Playback {
 
     public abstract void play();
 
+    public abstract void playWithEarPiece();
+
     public abstract void pause();
 
     public abstract void stop();

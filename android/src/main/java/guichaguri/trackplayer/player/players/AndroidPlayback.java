@@ -29,7 +29,7 @@ import java.io.IOException;
 public class AndroidPlayback extends Playback implements OnInfoListener, OnCompletionListener,
         OnSeekCompleteListener, OnPreparedListener, OnBufferingUpdateListener, OnErrorListener {
 
-    private final MediaPlayer player;
+    private MediaPlayer player;
     private final ProxyCache cache;
 
     private Promise loadCallback;
@@ -38,6 +38,10 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
     private boolean buffering = false;
     private boolean ended = false;
     private boolean started = false;
+
+    private String SPEAKER = "SPEAKER";
+    private String AUDIO_TYPE = "SPEAKER";
+    private String VOICE_CALL = "VOICE_CALL";
 
     private int startPos = 0;
     private float buffered = 0;
@@ -90,6 +94,11 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
             if(player.isPlaying()) player.stop();
             player.reset();
             player.setDataSource(context, url);
+            if (s != null) {
+                player.setAudioStreamType(AudioManager.STREAM_VOICE_CALL);
+            } else {
+                player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            }
             player.prepareAsync();
         } catch(IOException ex) {
             loadCallback = null;
@@ -118,8 +127,35 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
     @Override
     public void play() {
         started = true;
+        Track track;
+        track = super.getCurrentTrack();
+
+        if (AUDIO_TYPE.equals("VOICE_CALL")) {
+            AUDIO_TYPE = "SPEAKER";
+            load(track, null, null);
+        }
 
         if(!loaded) return;
+
+        player.start();
+
+        buffering = false;
+        ended = false;
+        updateState();
+    }
+
+    @Override
+    public void playWithEarPiece() {
+        started = true;
+        Track track;
+        track = super.getCurrentTrack();
+
+        if (AUDIO_TYPE.equals("SPEAKER")) {
+            AUDIO_TYPE = "VOICE_CALL";
+            load(track, null, "Ankit");
+        }
+
+        if (!loaded) return;
 
         player.start();
 
