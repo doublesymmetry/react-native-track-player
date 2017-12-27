@@ -40,8 +40,8 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
     private boolean started = false;
 
     private String SPEAKER = "SPEAKER";
-    private String AUDIO_TYPE = "SPEAKER";
     private String VOICE_CALL = "VOICE_CALL";
+    private String AUDIO_TYPE = SPEAKER;
 
     private int startPos = 0;
     private float buffered = 0;
@@ -130,8 +130,8 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
         Track track;
         track = super.getCurrentTrack();
 
-        if (AUDIO_TYPE.equals("VOICE_CALL")) {
-            AUDIO_TYPE = "SPEAKER";
+        if (AUDIO_TYPE.equals(VOICE_CALL)) {
+            AUDIO_TYPE = SPEAKER;
             load(track, null, null);
         }
 
@@ -150,9 +150,9 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
         Track track;
         track = super.getCurrentTrack();
 
-        if (AUDIO_TYPE.equals("SPEAKER")) {
-            AUDIO_TYPE = "VOICE_CALL";
-            load(track, null, "Ankit");
+        if (AUDIO_TYPE.equals(SPEAKER)) {
+            AUDIO_TYPE = VOICE_CALL;
+            load(track, null, AUDIO_TYPE);
         }
 
         if (!loaded) return;
