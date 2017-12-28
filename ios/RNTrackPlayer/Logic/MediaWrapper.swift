@@ -172,6 +172,30 @@ class MediaWrapper: AudioPlayerDelegate {
 
         trackImageTask?.resume()
     }
+
+    func playWithEarPiece() {
+        
+        if player.state == .paused {
+            player.resumeForEarPiece()
+            return
+        }
+        
+        let track = queue[currentIndex]
+        player.play(track: track)
+        
+        // fetch artwork and cancel any previous requests
+        trackImageTask?.cancel()
+        if let artworkURL = track.artworkURL?.value {
+            trackImageTask = URLSession.shared.dataTask(with: artworkURL, completionHandler: { (data, _, error) in
+                if let data = data, let artwork = UIImage(data: data), error == nil {
+                    track.artwork = MPMediaItemArtwork(image: artwork)
+                }
+            })
+        }
+
+        trackImageTask?.resume()
+    }
+    
     
     func pause() {
         player.pause()

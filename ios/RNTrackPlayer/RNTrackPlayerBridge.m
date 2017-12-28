@@ -42,6 +42,8 @@ RCT_EXTERN_METHOD(reset);
 
 RCT_EXTERN_METHOD(play);
 
+RCT_EXTERN_METHOD(playWithEarPiece);
+
 RCT_EXTERN_METHOD(pause);
 
 RCT_EXTERN_METHOD(stop);

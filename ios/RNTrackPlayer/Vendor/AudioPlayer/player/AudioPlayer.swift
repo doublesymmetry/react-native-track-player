@@ -88,7 +88,7 @@ public class AudioPlayer: NSObject {
                 player = nil
 
                 // Ensures the audio session got started
-                setAudioSession(active: true)
+                setAudioSession(active: true, earPiece: false)
 
                 // Sets new state
                 if reachability.isReachable() || currentItem.url.isLocal {
@@ -347,10 +347,16 @@ public class AudioPlayer: NSObject {
     /// Enables or disables the `AVAudioSession` and sets the right category.
     ///
     /// - Parameter active: A boolean value indicating whether the audio session should be set to active or not.
-    func setAudioSession(active: Bool) {
+    func setAudioSession(active: Bool, earPiece: Bool) {
         #if os(iOS) || os(tvOS)
-            _ = try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
-            _ = try? AVAudioSession.sharedInstance().setActive(active)
+            if earPiece {
+                _ = try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayAndRecord)
+                _ = try? AVAudioSession.sharedInstance().setMode(AVAudioSessionModeVoiceChat)
+                _ = try? AVAudioSession.sharedInstance().setActive(active)    
+            } else {
+                _ = try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+                _ = try? AVAudioSession.sharedInstance().setActive(active)
+            }
         #endif
     }
 
