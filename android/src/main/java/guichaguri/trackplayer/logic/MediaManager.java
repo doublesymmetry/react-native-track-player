@@ -265,6 +265,11 @@ public class MediaManager {
         }
     }
 
+    public void onServiceUnbounded() {
+        Bundle bundle = new Bundle();
+        Events.dispatchEvent(service, Events.PLAYBACK_UNBIND, bundle);
+    }
+    
     public void onServiceDestroy() {
         Log.i(Utils.TAG, "Destroying resources");
 
