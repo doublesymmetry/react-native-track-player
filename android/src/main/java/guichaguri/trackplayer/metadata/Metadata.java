@@ -241,7 +241,8 @@ public class Metadata {
     }
 
     public int getJumpInterval() {
-        return jumpInterval;
+        // In milliseconds
+        return jumpInterval * 1000;
     }
 
     public void destroy() {

@@ -10,6 +10,7 @@ import guichaguri.trackplayer.logic.Events;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.track.Track;
+import guichaguri.trackplayer.player.Playback;
 
 /**
  * @author Guilherme Chaguri
@@ -26,37 +27,52 @@ public class ButtonListener extends MediaSessionCompat.Callback {
 
     @Override
     public void onPlay() {
-        Events.dispatchEvent(context, Events.BUTTON_PLAY, null);
+        Playback pb = manager.getPlayback();
+        if(pb == null) return;
+
+        pb.play();
     }
 
     @Override
     public void onPause() {
-        Events.dispatchEvent(context, Events.BUTTON_PAUSE, null);
+        Playback pb = manager.getPlayback();
+        if(pb == null) return;
+
+        pb.pause();
     }
 
     @Override
     public void onStop() {
-        Events.dispatchEvent(context, Events.BUTTON_STOP, null);
+        Playback pb = manager.getPlayback();
+        if(pb == null) return;
+
+        pb.stop();
     }
 
     @Override
     public void onSkipToNext() {
-        Events.dispatchEvent(context, Events.BUTTON_SKIP_NEXT, null);
+        Playback pb = manager.getPlayback();
+        if(pb == null) return;
+
+        pb.skipToNext(null);
     }
 
     @Override
     public void onSkipToPrevious() {
-        Events.dispatchEvent(context, Events.BUTTON_SKIP_PREVIOUS, null);
+        Playback pb = manager.getPlayback();
+        if(pb == null) return;
+
+        pb.skipToPrevious(null);
     }
 
     @Override
     public void onSkipToQueueItem(long id) {
+        Playback pb = manager.getPlayback();
+        if(pb == null) return;
+
         for(Track track : manager.getPlayback().getQueue()) {
             if(track.queueId == id) {
-                Bundle bundle = new Bundle();
-                bundle.putString("id", track.id);
-                Events.dispatchEvent(context, Events.BUTTON_SKIP, bundle);
-                break;
+                pb.skip(track.id, null);
             }
         }
     }
@@ -108,9 +124,10 @@ public class ButtonListener extends MediaSessionCompat.Callback {
 
     @Override
     public void onSeekTo(long pos) {
-        Bundle bundle = new Bundle();
-        Utils.setTime(bundle, "position", pos);
-        Events.dispatchEvent(context, Events.BUTTON_SEEK_TO, bundle);
+        Playback pb = manager.getPlayback();
+        if(pb == null) return;
+
+        pb.seekTo(pos);
     }
 
     @Override
@@ -122,15 +139,23 @@ public class ButtonListener extends MediaSessionCompat.Callback {
 
     @Override
     public void onFastForward() {
-        Bundle bundle = new Bundle();
-        bundle.putInt("interval", manager.getMetadata().getJumpInterval());
-        Events.dispatchEvent(context, Events.BUTTON_JUMP_FORWARD, bundle);
+        Playback pb = manager.getPlayback();
+        if(pb == null) return;
+
+        long pos = pb.getPosition() + manager.getMetadata().getJumpInterval();
+        if(pos > pb.getDuration()) pos = pb.getDuration();
+
+        pb.seekTo(pos);
     }
 
     @Override
     public void onRewind() {
-        Bundle bundle = new Bundle();
-        bundle.putInt("interval", manager.getMetadata().getJumpInterval());
-        Events.dispatchEvent(context, Events.BUTTON_JUMP_BACKWARD, bundle);
+        Playback pb = manager.getPlayback();
+        if(pb == null) return;
+
+        long pos = pb.getPosition() - manager.getMetadata().getJumpInterval();
+        if(pos < 0) pos = 0;
+
+        pb.seekTo(pos);
     }
 }

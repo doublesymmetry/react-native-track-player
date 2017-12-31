@@ -3,11 +3,10 @@ package guichaguri.trackplayer.logic.components;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
-import android.os.Bundle;
 import android.util.Log;
-import guichaguri.trackplayer.logic.Events;
+import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
-import guichaguri.trackplayer.metadata.Metadata;
+import guichaguri.trackplayer.player.Playback;
 
 /**
  * @author Guilherme Chaguri
@@ -15,16 +14,17 @@ import guichaguri.trackplayer.metadata.Metadata;
 public class FocusManager implements OnAudioFocusChangeListener {
 
     private final Context context;
-    private final Metadata metadata;
+    private final MediaManager manager;
 
     private boolean hasAudioFocus = false;
 
     private boolean paused = false;
     private boolean ducking = false;
+    private float originalVolume = 1;
 
-    public FocusManager(Context context, Metadata metadata) {
+    public FocusManager(Context context, MediaManager manager) {
         this.context = context;
-        this.metadata = metadata;
+        this.manager = manager;
     }
 
     public boolean enable() {
@@ -54,37 +54,35 @@ public class FocusManager implements OnAudioFocusChangeListener {
 
     @Override
     public void onAudioFocusChange(int focus) {
+        Playback pb = manager.getPlayback();
+        if(pb == null) return;
+
         switch(focus) {
             case AudioManager.AUDIOFOCUS_LOSS:
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                 Log.d(Utils.TAG, "Audio focus loss, triggering pause");
                 paused = true;
-                metadata.getControls().pause();
+                pb.pause();
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
                 Log.d(Utils.TAG, "Audio focus loss, triggering duck");
                 ducking = true;
-                onDuck();
+                originalVolume = pb.getVolume();
+                pb.setVolume(originalVolume / 2);
                 break;
             case AudioManager.AUDIOFOCUS_GAIN:
                 if(paused) {
                     Log.d(Utils.TAG, "Audio focus gain, triggering play");
                     paused = false;
-                    metadata.getControls().play();
+                    pb.play();
                 }
 
                 if(ducking) {
                     Log.d(Utils.TAG, "Audio focus gain, triggering duck");
                     ducking = false;
-                    onDuck();
+                    pb.setVolume(originalVolume);
                 }
                 break;
         }
-    }
-
-    private void onDuck() {
-        Bundle bundle = new Bundle();
-        bundle.putBoolean("ducking", ducking);
-        Events.dispatchEvent(context, Events.BUTTON_DUCK, bundle);
     }
 }
