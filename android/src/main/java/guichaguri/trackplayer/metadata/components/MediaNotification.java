@@ -37,6 +37,7 @@ public class MediaNotification {
     private int smallIcon, playIcon, pauseIcon, stopIcon, previousIcon, nextIcon, rewindIcon, forwardIcon;
     private Action play, pause, stop, previous, next, rewind, forward;
 
+    private int notificationCapabilities = -1;
     private int compactCapabilities = 0;
 
     private boolean showing = false;
@@ -88,12 +89,24 @@ public class MediaNotification {
         nb.setLights(color, 250, 250);
         nb.setSmallIcon(smallIcon != 0 ? smallIcon : playIcon);
 
-        // Update compact capabilities
-        List<Integer> array = data.getIntegerArrayList("compactCapabilities");
+        // Update notification capabilities
+        List<Integer> notification = data.getIntegerArrayList("notificationCapabilities");
 
-        if(array != null) {
+        if(notification != null) {
+            notificationCapabilities = 0;
+            for(int cap : notification) {
+                notificationCapabilities |= cap;
+            }
+        } else {
+            notificationCapabilities = -1;
+        }
+
+        // Update compact capabilities
+        List<Integer> compact = data.getIntegerArrayList("compactCapabilities");
+
+        if(compact != null) {
             compactCapabilities = 0;
-            for(int cap : array) {
+            for(int cap : compact) {
                 compactCapabilities |= cap;
             }
         }
@@ -187,7 +200,7 @@ public class MediaNotification {
         if(action == PlaybackStateCompat.ACTION_PAUSE && !playing) return instance;
 
         // Add it to the compact view if it's allowed to
-        if((compactCapabilities & action) == action) {
+        if((compactCapabilities & action) != 0) {
             compactView.add(instance);
         }
 
@@ -200,6 +213,7 @@ public class MediaNotification {
     private Action updateAction(Action instance, long mask, long action, String title, int icon) {
         // The action is disabled, we'll not create it
         if((mask & action) == 0) return null;
+        if(notificationCapabilities != -1 && (notificationCapabilities & action) == 0) return null;
 
         // The action is already created
         if(instance != null) return instance;
