@@ -34,8 +34,8 @@ public class MediaNotification {
     private MediaStyle style;
 
     private int color = NotificationCompat.COLOR_DEFAULT;
-    private int smallIcon, playIcon, pauseIcon, stopIcon, previousIcon, nextIcon;
-    private Action play, pause, stop, previous, next;
+    private int smallIcon, playIcon, pauseIcon, stopIcon, previousIcon, nextIcon, rewindIcon, forwardIcon;
+    private Action play, pause, stop, previous, next, rewind, forward;
 
     private int compactCapabilities = 0;
 
@@ -62,6 +62,8 @@ public class MediaNotification {
         stopIcon = loadIcon("stop");
         previousIcon = loadIcon("previous");
         nextIcon = loadIcon("next");
+        rewindIcon = loadIcon("rewind");
+        forwardIcon = loadIcon("forward");
 
         nb.setSmallIcon(playIcon);
     }
@@ -74,6 +76,8 @@ public class MediaNotification {
         stopIcon = loadIcon(data, "stopIcon", stopIcon);
         previousIcon = loadIcon(data, "previousIcon", previousIcon);
         nextIcon = loadIcon(data, "nextIcon", nextIcon);
+        rewindIcon = loadIcon(data, "rewindIcon", rewindIcon);
+        forwardIcon = loadIcon(data, "forwardIcon", forwardIcon);
 
         // Load the color and the small icon
         color = (int)data.getDouble("color", color);
@@ -134,11 +138,13 @@ public class MediaNotification {
 
         // Check and update action buttons
         long mask = playback.getActions();
+        rewind = addAction(rewind, mask, PlaybackStateCompat.ACTION_REWIND, "Rewind", rewindIcon, actions, compact, playing);
         previous = addAction(previous, mask, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS, "Previous", previousIcon, actions, compact, playing);
         play = addAction(play, mask, PlaybackStateCompat.ACTION_PLAY, "Play", playIcon, actions, compact, playing);
         pause = addAction(pause, mask, PlaybackStateCompat.ACTION_PAUSE, "Pause", pauseIcon, actions, compact, playing);
         stop = addAction(stop, mask, PlaybackStateCompat.ACTION_STOP, "Stop", stopIcon, actions, compact, playing);
         next = addAction(next, mask, PlaybackStateCompat.ACTION_SKIP_TO_NEXT, "Next", nextIcon, actions, compact, playing);
+        forward = addAction(forward, mask, PlaybackStateCompat.ACTION_FAST_FORWARD, "Forward", forwardIcon, actions, compact, playing);
 
         // Create the compact indexes array
         int[] compactIndexes = new int[compact.size()];
