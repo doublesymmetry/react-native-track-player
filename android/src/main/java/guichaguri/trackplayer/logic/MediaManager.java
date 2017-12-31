@@ -92,8 +92,8 @@ public class MediaManager {
         }
     }
 
-    public int getRatingType() {
-        return metadata.getRatingType();
+    public Metadata getMetadata() {
+        return metadata;
     }
 
     public boolean shouldStopWithApp() {

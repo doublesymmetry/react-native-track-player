@@ -9,5 +9,5 @@
 import Foundation
 
 enum Capability: String {
-    case play, pause, stop, next, previous
+    case play, pause, stop, next, previous, jumpForward, jumpBackward
 }
