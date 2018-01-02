@@ -37,6 +37,10 @@ public class Events {
     public static final String CAST_DISCONNECTING = "cast-disconnecting";
     public static final String CAST_DISCONNECTED = "cast-disconnected";
 
+    // Headset Events
+    public static final String HEADSET_PLUGGED_IN = "headset-plugged-in";
+    public static final String HEADSET_PLUGGED_OUT = "headset-plugged-out";
+
     public static void dispatchEvent(Context context, String event, Bundle data) {
         Intent i = new Intent(context, PlayerTask.class);
 
