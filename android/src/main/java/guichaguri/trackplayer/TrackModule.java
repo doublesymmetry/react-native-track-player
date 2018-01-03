@@ -3,6 +3,7 @@ package guichaguri.trackplayer;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.Context;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -15,6 +16,8 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.google.android.gms.cast.framework.CastState;
+import guichaguri.trackplayer.logic.LibHelper;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.components.MediaWrapper;
 import guichaguri.trackplayer.logic.services.PlayerService;
@@ -122,6 +125,16 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
         constants.put("RATING_4_STARS", RatingCompat.RATING_4_STARS);
         constants.put("RATING_5_STARS", RatingCompat.RATING_5_STARS);
         constants.put("RATING_PERCENTAGE", RatingCompat.RATING_PERCENTAGE);
+
+        // Cast States
+        constants.put("CAST_NO_DEVICES_AVAILABLE", CastState.NO_DEVICES_AVAILABLE);
+        constants.put("CAST_NOT_CONNECTED", CastState.NOT_CONNECTED);
+        constants.put("CAST_CONNECTING", CastState.CONNECTING);
+        constants.put("CAST_CONNECTED", CastState.CONNECTED);
+
+        // Not an actual API constant
+        // Only used internally
+        constants.put("CAST_SUPPORT_AVAILABLE", LibHelper.isChromecastAvailable(getReactApplicationContext()));
 
         return constants;
     }
@@ -338,6 +351,23 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
                 binder.getPosition(callback);
             }
         });
+    }
+
+    @ReactMethod
+    public void getCastState(Promise callback) {
+        Context context = getReactApplicationContext().getApplicationContext();
+
+        if(!LibHelper.isChromecastAvailable(context) || binder == null) {
+            Utils.resolveCallback(callback, CastState.NO_DEVICES_AVAILABLE);
+            return;
+        }
+
+        binder.getCastState(callback);
+
+        // Use the code below when React Native updates the support library
+        // and we'll be able to update the Cast SDK too
+        /*CastContext cast = CastContext.getSharedInstance(context);
+        Utils.triggerCallback(callback, cast.getCastState());*/
     }
 
     @ReactMethod
