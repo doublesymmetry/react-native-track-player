@@ -49,6 +49,8 @@ protocol AudioPlayerDelegate: class {
     ///         you can easily update an `UISlider` for example.
     func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateProgressionTo time: TimeInterval, percentageRead: Float)
 
+    func audioPlayer(_ audioPlayer: AudioPlayer, didHeadphonePluggedIn isHeadPhone: Bool, previousState: Bool)
+
     /// This method gets called when the current item duration has been found.
     ///
     /// - Parameters:
