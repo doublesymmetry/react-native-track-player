@@ -104,6 +104,13 @@ extension AudioPlayer {
                 state = .paused
             }
 
+        case .headphonePluggedIn:
+            delegate?.audioPlayer(self, didHeadphonePluggedIn: true, previousState: false)
+
+        case .headphonePulledOut:
+            delegate?.audioPlayer(self, didHeadphonePluggedIn: false, previousState: true)
+   
+
         case .sessionMessedUp:
             #if os(iOS) || os(tvOS)
                 //We reenable the audio session directly in case we're in background

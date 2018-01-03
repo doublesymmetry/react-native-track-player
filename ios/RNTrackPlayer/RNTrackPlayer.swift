@@ -24,6 +24,14 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     func playerUpdatedState() {
         sendEvent(withName: "playback-state", body: ["state": mediaWrapper.state])
     }
+
+    func headphonePluggedIn() {
+        sendEvent(withName: "headset-plugged-in", body: ["state": mediaWrapper.state])
+    }
+
+    func headphonePulledOut() {
+        sendEvent(withName: "headset-plugged-out", body: ["state": mediaWrapper.state])
+    }
     
     func playerSwitchedTracks(trackId: String?, time: TimeInterval?, nextTrackId: String?) {
         sendEvent(withName: "playback-track-changed", body: [
@@ -77,6 +85,9 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
             "remote-play",
             "remote-next",
             "remote-previous"
+
+            "headset-plugged-in",
+            "headset-plugged-out",
         ]
     }
     
