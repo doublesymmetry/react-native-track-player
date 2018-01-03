@@ -84,7 +84,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
             "remote-pause",
             "remote-play",
             "remote-next",
-            "remote-previous"
+            "remote-previous",
 
             "headset-plugged-in",
             "headset-plugged-out",
