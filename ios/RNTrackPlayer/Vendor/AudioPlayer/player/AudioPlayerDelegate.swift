@@ -85,6 +85,8 @@ extension AudioPlayerDelegate {
     
     func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateProgressionTo time: TimeInterval, percentageRead: Float) {}
 
+    func audioPlayer(_ audioPlayer: AudioPlayer, didHeadphonePluggedIn isHeadPhone: Bool, previousState: Bool) {}
+
     func audioPlayer(_ audioPlayer: AudioPlayer, didFindDuration duration: TimeInterval, for item: Track) {}
 
     func audioPlayer(_ audioPlayer: AudioPlayer, didUpdateEmptyMetadataOn item: Track, withData data: Metadata) {}

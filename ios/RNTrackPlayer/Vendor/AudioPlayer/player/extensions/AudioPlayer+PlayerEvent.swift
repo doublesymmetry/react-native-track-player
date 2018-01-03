@@ -103,13 +103,22 @@ extension AudioPlayer {
             if let player = player, player.rate == 0 {
                 state = .paused
             }
-
+            
         case .headphonePluggedIn:
+            //In some route changes, the player pause automatically
+            //TODO: there should be a check if state == playing
+            // if let player = player, player.rate == 0 {
+            //     state = .paused
+            // }
             delegate?.audioPlayer(self, didHeadphonePluggedIn: true, previousState: false)
 
         case .headphonePulledOut:
+            //In some route changes, the player pause automatically
+            //TODO: there should be a check if state == playing
+            // if let player = player, player.rate == 0 {
+            //     state = .paused
+            // }
             delegate?.audioPlayer(self, didHeadphonePluggedIn: false, previousState: true)
-   
 
         case .sessionMessedUp:
             #if os(iOS) || os(tvOS)

@@ -73,6 +73,8 @@ class PlayerEventProducer: NSObject, EventProducer {
         case interruptionBegan
         case interruptionEnded(shouldResume: Bool)
         case routeChanged
+        case headphonePluggedIn
+        case headphonePulledOut
         case sessionMessedUp
     }
 
