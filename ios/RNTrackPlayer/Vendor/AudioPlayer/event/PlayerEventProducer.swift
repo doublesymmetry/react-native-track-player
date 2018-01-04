@@ -107,6 +107,16 @@ class PlayerEventProducer: NSObject, EventProducer {
             return
         }
 
+        //Checking Whether Headphone is already plugged in or not
+
+        let outputs = AVAudioSession.sharedInstance().currentRoute.outputs
+
+        for output in outputs{
+        if output.portType == AVAudioSessionPortHeadphones {
+                eventListener?.onEvent(PlayerEvent.headphonePluggedIn, generetedBy: self)
+            }
+        }
+
         //Observing notifications sent through `NSNotificationCenter`
         let center = NotificationCenter.default
         #if os(iOS) || os(tvOS)
