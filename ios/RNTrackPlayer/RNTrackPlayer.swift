@@ -47,6 +47,11 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     // MARK: - Required Methods
     
+    @objc(requiresMainQueueSetup)
+    override func requiresMainQueueSetup() -> Bool {
+        return true;
+    }
+    
     @objc(constantsToExport)
     override func constantsToExport() -> [AnyHashable: Any] {
         return [
