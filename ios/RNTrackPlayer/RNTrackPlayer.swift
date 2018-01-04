@@ -50,19 +50,19 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     @objc(constantsToExport)
     override func constantsToExport() -> [AnyHashable: Any] {
         return [
-            "STATE_NONE": AudioPlayerState.stopped,
-            "STATE_PLAYING": AudioPlayerState.playing,
-            "STATE_PAUSED": AudioPlayerState.paused,
-            "STATE_STOPPED": AudioPlayerState.stopped,
-            "STATE_BUFFERING": AudioPlayerState.buffering,
+            "STATE_NONE": "STATE_NONE",
+            "STATE_PLAYING": "STATE_PLAYING",
+            "STATE_PAUSED": "STATE_PAUSED",
+            "STATE_STOPPED": "STATE_STOPPED",
+            "STATE_BUFFERING": "STATE_BUFFERING",
             
-            "CAPABILITY_PLAY": Capability.play,
-            "CAPABILITY_PAUSE": Capability.pause,
-            "CAPABILITY_STOP": Capability.stop,
-            "CAPABILITY_SKIP_TO_NEXT": Capability.next,
-            "CAPABILITY_SKIP_TO_PREVIOUS": Capability.previous,
-            "CAPABILITY_JUMP_FORWARD": Capability.jumpForward,
-            "CAPABILITY_JUMP_BACKWARD": Capability.jumpBackward
+            "CAPABILITY_PLAY": Capability.play.rawValue,
+            "CAPABILITY_PAUSE": Capability.pause.rawValue,
+            "CAPABILITY_STOP": Capability.stop.rawValue,
+            "CAPABILITY_SKIP_TO_NEXT": Capability.next.rawValue,
+            "CAPABILITY_SKIP_TO_PREVIOUS": Capability.previous.rawValue,
+            "CAPABILITY_JUMP_FORWARD": Capability.jumpForward.rawValue,
+            "CAPABILITY_JUMP_BACKWARD": Capability.jumpBackward.rawValue
         ]
     }
     
