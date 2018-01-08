@@ -83,8 +83,9 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
         // Binds the service to get a MediaWrapper instance
         Intent intent = new Intent(context, PlayerService.class);
+        context.startService(intent);
         intent.setAction(PlayerService.ACTION_CONNECT);
-        context.bindService(intent, this, Service.BIND_AUTO_CREATE);
+        context.bindService(intent, this, 0);
 
         connecting = true;
     }
