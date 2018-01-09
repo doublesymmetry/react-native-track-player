@@ -5,6 +5,7 @@ node_modules/
 build/
 DerivedData/
 package-lock.json
+yarn.lock
 
 # Android
 
