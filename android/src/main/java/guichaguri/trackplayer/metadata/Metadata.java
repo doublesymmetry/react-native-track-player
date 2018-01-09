@@ -21,7 +21,6 @@ import guichaguri.trackplayer.metadata.components.ArtworkLoader;
 import guichaguri.trackplayer.metadata.components.ButtonListener;
 import guichaguri.trackplayer.metadata.components.CustomVolume;
 import guichaguri.trackplayer.metadata.components.MediaNotification;
-import guichaguri.trackplayer.metadata.components.MusicIntentReceiver;
 import guichaguri.trackplayer.metadata.components.NoisyReceiver;
 import guichaguri.trackplayer.player.Playback;
 import java.util.ArrayList;
@@ -36,7 +35,6 @@ public class Metadata {
     private final MediaSessionCompat session;
     private final MediaNotification notification;
     private final NoisyReceiver noisyReceiver;
-    private final MusicIntentReceiver musicIntentReceiver;
 
     private ArtworkLoader artwork = null;
     private CustomVolume volume = null;
@@ -45,6 +43,7 @@ public class Metadata {
 
     private long capabilities = 0;
     private int ratingType = RatingCompat.RATING_HEART;
+    private int jumpInterval = 15;
     private int maxArtworkSize = 2000;
     private Uri artworkUrl = null;
 
@@ -60,8 +59,6 @@ public class Metadata {
         notification = new MediaNotification(context, session);
 
         noisyReceiver = new NoisyReceiver(context, session);
-
-        musicIntentReceiver = new MusicIntentReceiver(context, session);
     }
 
     public void setEnabled(boolean enabled) {
@@ -81,6 +78,7 @@ public class Metadata {
         // Load the options
         ratingType = (int)data.getDouble("ratingType", ratingType);
         maxArtworkSize = (int)data.getDouble("maxArtworkSize", maxArtworkSize);
+        jumpInterval = (int)data.getDouble("jumpInterval", jumpInterval);
 
         // Update the rating type
         session.setRatingType(ratingType);
@@ -175,9 +173,6 @@ public class Metadata {
         session.setPlaybackState(state);
         notification.updatePlayback(state);
 
-        // Update the headset connection listener to start receiving when it's playing
-        musicIntentReceiver.setEnabled(true);
-
         // Update the noisy listener to start receiving when it's playing
         noisyReceiver.setEnabled(Utils.isPlaying(playerState));
     }
@@ -243,6 +238,10 @@ public class Metadata {
 
     public int getRatingType() {
         return ratingType;
+    }
+
+    public int getJumpInterval() {
+        return jumpInterval;
     }
 
     public void destroy() {

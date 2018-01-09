@@ -119,7 +119,7 @@ public abstract class Playback {
         }
     }
 
-    public abstract void load(Track track, Promise callback, String s);
+    public abstract void load(Track track, Promise callback);
 
     public void reset() {
         Track prev = getCurrentTrack();
@@ -133,8 +133,6 @@ public abstract class Playback {
     }
 
     public abstract void play();
-
-    public abstract void playWithEarPiece();
 
     public abstract void pause();
 
@@ -173,7 +171,7 @@ public abstract class Playback {
         Track track = getCurrentTrack();
         if(track == null) return;
 
-        load(track, null, null);
+        load(track, null);
         seekTo(playback.getPosition());
 
         int state = playback.getState();
@@ -223,7 +221,7 @@ public abstract class Playback {
         Track next = queue.get(track);
         currentTrack = track;
 
-        load(next, callback, null);
+        load(next, callback);
 
         if(Utils.isPlaying(oldState)) {
             play();

@@ -15,29 +15,6 @@ extension AudioPlayer {
     /// Resumes the player.
     public func resume() {
         //Ensure pause flag is no longer set
-
-        setAudioSession(active: false, earPiece: false)
-
-        pausedForInterruption = false
-        
-        player?.rate = rate
-
-        //We don't wan't to change the state to Playing in case it's Buffering. That
-        //would be a lie.
-        if !state.isPlaying && !state.isBuffering {
-            state = .playing
-        }
-
-        retryEventProducer.startProducingEvents()
-    }
-
-    public func resumeForEarPiece() {
-
-        //Setting Audio Session
-        
-        setAudioSession(active: false, earPiece: true)
-
-        //Ensure pause flag is no longer set
         pausedForInterruption = false
         
         player?.rate = rate
@@ -88,7 +65,7 @@ extension AudioPlayer {
             currentItem = nil
         }
 
-        setAudioSession(active: false, earPiece: false)
+        setAudioSession(active: false)
         state = .stopped
     }
 

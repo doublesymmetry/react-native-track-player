@@ -120,4 +120,17 @@ public class ButtonListener extends MediaSessionCompat.Callback {
         Events.dispatchEvent(context, Events.BUTTON_SET_RATING, bundle);
     }
 
+    @Override
+    public void onFastForward() {
+        Bundle bundle = new Bundle();
+        bundle.putInt("interval", manager.getMetadata().getJumpInterval());
+        Events.dispatchEvent(context, Events.BUTTON_JUMP_FORWARD, bundle);
+    }
+
+    @Override
+    public void onRewind() {
+        Bundle bundle = new Bundle();
+        bundle.putInt("interval", manager.getMetadata().getJumpInterval());
+        Events.dispatchEvent(context, Events.BUTTON_JUMP_BACKWARD, bundle);
+    }
 }

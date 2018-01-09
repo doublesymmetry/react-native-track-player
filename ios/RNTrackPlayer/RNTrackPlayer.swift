@@ -24,14 +24,6 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     func playerUpdatedState() {
         sendEvent(withName: "playback-state", body: ["state": mediaWrapper.state])
     }
-
-    func headphonePluggedIn() {
-        sendEvent(withName: "headset-plugged-in", body: ["state": mediaWrapper.state])
-    }
-
-    func headphonePulledOut() {
-        sendEvent(withName: "headset-plugged-out", body: ["state": mediaWrapper.state])
-    }
     
     func playerSwitchedTracks(trackId: String?, time: TimeInterval?, nextTrackId: String?) {
         sendEvent(withName: "playback-track-changed", body: [
@@ -55,20 +47,23 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     // MARK: - Required Methods
     
+    
     @objc(constantsToExport)
     override func constantsToExport() -> [AnyHashable: Any] {
         return [
-            "STATE_NONE": AudioPlayerState.stopped,
-            "STATE_PLAYING": AudioPlayerState.playing,
-            "STATE_PAUSED": AudioPlayerState.paused,
-            "STATE_STOPPED": AudioPlayerState.stopped,
-            "STATE_BUFFERING": AudioPlayerState.buffering,
+            "STATE_NONE": "STATE_NONE",
+            "STATE_PLAYING": "STATE_PLAYING",
+            "STATE_PAUSED": "STATE_PAUSED",
+            "STATE_STOPPED": "STATE_STOPPED",
+            "STATE_BUFFERING": "STATE_BUFFERING",
             
-            "CAPABILITY_PLAY": Capability.play,
-            "CAPABILITY_PAUSE": Capability.pause,
-            "CAPABILITY_STOP": Capability.stop,
-            "CAPABILITY_SKIP_TO_NEXT": Capability.next,
-            "CAPABILITY_SKIP_TO_PREVIOUS": Capability.previous
+            "CAPABILITY_PLAY": Capability.play.rawValue,
+            "CAPABILITY_PAUSE": Capability.pause.rawValue,
+            "CAPABILITY_STOP": Capability.stop.rawValue,
+            "CAPABILITY_SKIP_TO_NEXT": Capability.next.rawValue,
+            "CAPABILITY_SKIP_TO_PREVIOUS": Capability.previous.rawValue,
+            "CAPABILITY_JUMP_FORWARD": Capability.jumpForward.rawValue,
+            "CAPABILITY_JUMP_BACKWARD": Capability.jumpBackward.rawValue
         ]
     }
     
@@ -85,9 +80,8 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
             "remote-play",
             "remote-next",
             "remote-previous",
-
-            "headset-plugged-in",
-            "headset-plugged-out",
+            "remote-jump-foward",
+            "remote-jump-backward",
         ]
     }
     
@@ -129,6 +123,10 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         toggleRemoteHandler(command: remoteCenter.togglePlayPauseCommand, selector: #selector(remoteSentPlayPause), enabled: enablePause && enablePlay)
         toggleRemoteHandler(command: remoteCenter.nextTrackCommand, selector: #selector(remoteSentNext), enabled: enablePlayNext)
         toggleRemoteHandler(command: remoteCenter.previousTrackCommand, selector: #selector(remoteSentPrevious), enabled: enablePlayPrevious)
+        
+        
+        remoteCenter.skipForwardCommand.preferredIntervals = [options["jumpInterval"] as? NSNumber ?? 15]
+        remoteCenter.skipBackwardCommand.preferredIntervals = [options["jumpInterval"] as? NSNumber ?? 15]
     }
     
     @objc(add:before:resolver:rejecter:)
@@ -203,12 +201,6 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     func play() {
         print("Starting/Resuming playback")
         mediaWrapper.play()
-    }
-
-    @objc(playWithEarPiece)
-    func playWithEarPiece() {
-        print("Starting/Resuming With EarPiece")
-        mediaWrapper.playWithEarPiece()
     }
     
     @objc(pause)
@@ -305,6 +297,14 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     func remoteSentPrevious() {
         sendEvent(withName: "remote-previous", body: nil)
+    }
+    
+    func remoteSendSkipForward(event: MPSkipIntervalCommandEvent) {
+        sendEvent(withName: "remote-jump-foward", body: ["interval": event.interval])
+    }
+    
+    func remoteSendSkipBackward(event: MPSkipIntervalCommandEvent) {
+        sendEvent(withName: "remote-jump-backward", body: ["interval": event.interval])
     }
     
     func remoteSentPlayPause() {

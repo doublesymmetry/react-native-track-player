@@ -8,8 +8,6 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
-import com.google.android.gms.cast.framework.CastState;
-import guichaguri.trackplayer.cast.GoogleCast;
 import guichaguri.trackplayer.logic.components.FocusManager;
 import guichaguri.trackplayer.logic.services.PlayerService;
 import guichaguri.trackplayer.logic.track.Track;
@@ -27,7 +25,6 @@ public class MediaManager {
     private final PlayerService service;
     private final FocusManager focus;
     private final Metadata metadata;
-    private final GoogleCast cast;
 
     private final WakeLock wakeLock;
     private final WifiLock wifiLock;
@@ -40,12 +37,6 @@ public class MediaManager {
     public MediaManager(PlayerService service) {
         this.service = service;
         this.metadata = new Metadata(service, this);
-
-        if(LibHelper.isChromecastAvailable(service)) {
-            this.cast = GoogleCast.initialize(service, this);
-        } else {
-            this.cast = null;
-        }
 
         this.focus = new FocusManager(service, metadata);
 
@@ -101,8 +92,8 @@ public class MediaManager {
         }
     }
 
-    public int getRatingType() {
-        return metadata.getRatingType();
+    public Metadata getMetadata() {
+        return metadata;
     }
 
     public boolean shouldStopWithApp() {
@@ -130,10 +121,6 @@ public class MediaManager {
 
     public Playback getPlayback() {
         return playback;
-    }
-
-    public int getCastState() {
-        return cast != null ? cast.getState() : CastState.NO_DEVICES_AVAILABLE;
     }
 
     public void onPlay() {
@@ -278,6 +265,11 @@ public class MediaManager {
         }
     }
 
+    public void onServiceUnbounded() {
+        Bundle bundle = new Bundle();
+        Events.dispatchEvent(service, Events.PLAYBACK_UNBIND, bundle);
+    }
+    
     public void onServiceDestroy() {
         Log.i(Utils.TAG, "Destroying resources");
 
@@ -292,9 +284,6 @@ public class MediaManager {
 
         // Destroy the metadata resources
         metadata.destroy();
-
-        // Destroy the cast resources
-        if(cast != null) cast.destroy();
 
         // Release the wifi lock
         if(wifiLock.isHeld()) {

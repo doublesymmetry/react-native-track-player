@@ -36,6 +36,14 @@ public class PlayerService extends MediaBrowserServiceCompat {
         }
     }
 
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Log.d(Utils.TAG, "onUnbind");
+        super.onUnbind(intent);
+        manager.onServiceUnbounded();
+        return true;
+    }
+
     @Nullable
     @Override
     public BrowserRoot onGetRoot(@NonNull String clientPackageName, int clientUid, @Nullable Bundle rootHints) {

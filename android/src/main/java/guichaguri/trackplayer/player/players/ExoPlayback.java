@@ -67,7 +67,7 @@ public class ExoPlayback extends Playback implements EventListener {
     }
 
     @Override
-    public void load(Track track, Promise callback, String s) {
+    public void load(Track track, Promise callback) {
         loadCallback = callback;
 
         Uri url = track.url;
@@ -103,11 +103,6 @@ public class ExoPlayback extends Playback implements EventListener {
 
     @Override
     public void play() {
-        player.setPlayWhenReady(true);
-    }
-
-    @Override
-    public void playWithEarPiece() {
         player.setPlayWhenReady(true);
     }
 
