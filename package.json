@@ -1,8 +1,70 @@
 {
-  "name": "react-native-track-player",
-  "version": "0.2.2",
+  "_args": [
+    [
+      {
+        "raw": "react-native-track-player@git+https://github.com/react-native-kit/react-native-track-player.git#dev",
+        "scope": null,
+        "escapedName": "react-native-track-player",
+        "name": "react-native-track-player",
+        "rawSpec": "git+https://github.com/react-native-kit/react-native-track-player.git#dev",
+        "spec": "git+https://github.com/react-native-kit/react-native-track-player.git#dev",
+        "type": "hosted",
+        "hosted": {
+          "type": "github",
+          "ssh": "git@github.com:react-native-kit/react-native-track-player.git#dev",
+          "sshUrl": "git+ssh://git@github.com/react-native-kit/react-native-track-player.git#dev",
+          "httpsUrl": "git+https://github.com/react-native-kit/react-native-track-player.git#dev",
+          "gitUrl": "git://github.com/react-native-kit/react-native-track-player.git#dev",
+          "shortcut": "github:react-native-kit/react-native-track-player#dev",
+          "directUrl": "https://raw.githubusercontent.com/react-native-kit/react-native-track-player/dev/package.json"
+        }
+      },
+      "/Users/neeraj/Sites/projects/newTrack"
+    ]
+  ],
+  "_from": "git+https://github.com/react-native-kit/react-native-track-player.git#dev",
+  "_id": "react-native-track-player@0.2.2",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/react-native-track-player",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "react-native-track-player@git+https://github.com/react-native-kit/react-native-track-player.git#dev",
+    "scope": null,
+    "escapedName": "react-native-track-player",
+    "name": "react-native-track-player",
+    "rawSpec": "git+https://github.com/react-native-kit/react-native-track-player.git#dev",
+    "spec": "git+https://github.com/react-native-kit/react-native-track-player.git#dev",
+    "type": "hosted",
+    "hosted": {
+      "type": "github",
+      "ssh": "git@github.com:react-native-kit/react-native-track-player.git#dev",
+      "sshUrl": "git+ssh://git@github.com/react-native-kit/react-native-track-player.git#dev",
+      "httpsUrl": "git+https://github.com/react-native-kit/react-native-track-player.git#dev",
+      "gitUrl": "git://github.com/react-native-kit/react-native-track-player.git#dev",
+      "shortcut": "github:react-native-kit/react-native-track-player#dev",
+      "directUrl": "https://raw.githubusercontent.com/react-native-kit/react-native-track-player/dev/package.json"
+    }
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "git+https://github.com/react-native-kit/react-native-track-player.git#d580cd0b480cc4c0362a3f8ba43e97fd8361053e",
+  "_shasum": "73efe4b8078212f047c28f62356b93fb882f2d70",
+  "_shrinkwrap": null,
+  "_spec": "react-native-track-player@git+https://github.com/react-native-kit/react-native-track-player.git#dev",
+  "_where": "/Users/neeraj/Sites/projects/newTrack",
+  "author": {
+    "name": "Guichaguri"
+  },
+  "bugs": {
+    "url": "https://github.com/react-native-kit/react-native-track-player/issues"
+  },
+  "dependencies": {},
   "description": "A fully fledged audio module created for music apps",
-  "author": "Guichaguri",
+  "devDependencies": {},
+  "gitHead": "d580cd0b480cc4c0362a3f8ba43e97fd8361053e",
+  "homepage": "https://github.com/react-native-kit/react-native-track-player#readme",
   "keywords": [
     "react",
     "react-native",
@@ -17,15 +79,17 @@
     "windows"
   ],
   "license": "GPL-3.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/react-native-kit/react-native-track-player.git"
-  },
-  "bugs": {
-    "url": "https://github.com/react-native-kit/react-native-track-player/issues"
-  },
+  "name": "react-native-track-player",
+  "optionalDependencies": {},
   "peerDependencies": {
     "react-native": ">=0.49.0",
     "react": ">=16.0.0"
-  }
+  },
+  "readme": "﻿[![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player) [![Chat](https://badges.gitter.im/react-native-track-player/gitter.png)](https://gitter.im/react-native-track-player/Support)\n# react-native-track-player\n\nA fully fledged audio module created for music apps. Provides audio playback, external media controls, chromecast support, background mode and more!\n\n---\n\n* [Installation](https://github.com/react-native-kit/react-native-track-player/wiki/Installation)\n* [Getting Started](https://github.com/react-native-kit/react-native-track-player/wiki/API)\n* [Documentation](https://github.com/react-native-kit/react-native-track-player/wiki/Documentation)\n* [Platform Support](https://github.com/react-native-kit/react-native-track-player/wiki/Platform-Support)\n* [Car Integration](https://github.com/react-native-kit/react-native-track-player/wiki/Car-Integration)\n* [Background Mode](https://github.com/react-native-kit/react-native-track-player/wiki/Background-Mode)\n* [Build Preferences](https://github.com/react-native-kit/react-native-track-player/wiki/Build-Preferences)\n\n## Features\n\n* **Lightweight** - Optimized to use the least amount of resources according to your needs\n* **Feels native** - As everything is built together, it follows the same design principles as real music apps do\n* **Multi-platform** - Supports Android, iOS and Windows\n* **Media Controls support** - Provides events for controlling the app from a bluetooth device, the lockscreen, a notification, a smartwatch or even a car\n* **Local or network, files or streams** - It doesn't matter where the media belongs, we've got you covered\n* **[Casting support](https://github.com/react-native-kit/react-native-track-casting)** - Seamlessly switch to any Google Cast compatible device, supporting custom media receivers\n* **Adaptive bitrate streaming support** - Support for DASH, HLS or SmoothStreaming\n* **Caching support** - Cache media files to play them again without an internet connection\n* **Background support** - Keep playing audio even after the app is in background\n* **Fully Customizable** - Even the notification icons are customizable!\n\n## Platform Support\n\n| Feature | Android | iOS | Windows |\n| ------- | :-----: | :-: | :-----: |\n| Load from the app bundle | ✓ | ✓ | ✓ |\n| Load from the network | ✓ | ✓ | ✓ |\n| Load from the file system | ✓ | ✓ | ✓ |\n| Adaptive Bitrate Streaming | ✓ | ✗ | ✓ |\n| Play/Pause/Stop/Reset | ✓ | ✓ | ✓ |\n| Seeking/Volume | ✓ | ✓ | ✓ |\n| Remote Media Controls | ✓ | ✓ | ✓ |\n| Caching | ✓ | ✗ | ✗ |\n| Events | ✓ | ✓ | ✓ |\n| Background Mode | ✓ | ✓ | ✓ |\n| [Casting](https://github.com/react-native-kit/react-native-track-casting) | ✓ | ✗ | ✗ |\n\nCheck [Platform Support](https://github.com/react-native-kit/react-native-track-player/wiki/Platform-Support) for more information.\n\n## Why another music module?\nAfter trying to team up modules like `react-native-sound`, `react-native-music-controls` and `react-native-google-cast`, I've noticed that their structure and the way should be tied together can cause a lot problems (mainly on Android). Those can heavily affect the app stability and user experience.\n\nAll audio modules (like `react-native-sound`) don't play in a separated service on Android, which should **only** be used for simple audio tracks in foreground (such as sound effects, voice messages, etc)\n\n`react-native-music-controls` is meant for apps using those audio modules, although it has a few problems due to how the audio is not directly tied to the controls, it can be pretty useful for casting (such as Chromecast)\n\n`react-native-google-cast` works pretty well and also supports custom receivers, but it has fewer player controls, it's harder to integrate and still uses the Cast SDK v2\n\n## Example\n\nIf you want to get started with this module, check the [API](https://github.com/react-native-kit/react-native-track-player/wiki/API) page.\nIf you want detailed information about the API, check the [Documentation](https://github.com/react-native-kit/react-native-track-player/wiki/Documentation).\n```javascript\nimport TrackPlayer from 'react-native-track-player';\n\n// Creates the player\nTrackPlayer.setupPlayer().then(async () => {\n\n    // Adds a track to the queue\n    await TrackPlayer.add({\n        id: 'trackId',\n        url: require('track.mp3'),\n        title: 'Track Title',\n        artist: 'Track Artist',\n        artwork: require('track.png')\n    });\n\n    // Starts playing it\n    TrackPlayer.play();\n\n});\n```\n\n## Maintainers\n* Android: [Guilherme Chaguri](https://github.com/Guichaguri)\n* iOS: [David Chavez](https://github.com/dcvz)\n* Windows: [Guilherme Chaguri](https://github.com/Guichaguri)\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/react-native-kit/react-native-track-player.git"
+  },
+  "version": "0.2.2"
 }

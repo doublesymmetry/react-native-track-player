@@ -47,11 +47,6 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     // MARK: - Required Methods
     
-    @objc(requiresMainQueueSetup)
-    override func requiresMainQueueSetup() -> Bool {
-        return true;
-    }
-    
     @objc(constantsToExport)
     override func constantsToExport() -> [AnyHashable: Any] {
         return [
@@ -133,8 +128,6 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         
         remoteCenter.skipForwardCommand.preferredIntervals = [options["jumpInterval"] as? NSNumber ?? 15]
         remoteCenter.skipBackwardCommand.preferredIntervals = [options["jumpInterval"] as? NSNumber ?? 15]
-        toggleRemoteHandler(command: remoteCenter.skipForwardCommand, selector: #selector(remoteSendSkipForward), enabled: enableSkipForward)
-        toggleRemoteHandler(command: remoteCenter.skipBackwardCommand, selector: #selector(remoteSendSkipBackward), enabled: enableSkipBackward)
     }
     
     @objc(add:before:resolver:rejecter:)
