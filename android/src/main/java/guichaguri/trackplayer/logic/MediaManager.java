@@ -142,7 +142,8 @@ public class MediaManager {
             // Acquire the wake lock so the device doesn't sleeps stopping the music
             if(!wakeLock.isHeld()) wakeLock.acquire();
 
-            if(!playback.getCurrentTrack().urlLocal) {
+            Track currentTrack = playback.getCurrentTrack();
+            if(currentTrack != null && !currentTrack.urlLocal) {
                 // Acquire wifi lock when the track needs network
                 if(!wifiLock.isHeld()) wifiLock.acquire();
             }
