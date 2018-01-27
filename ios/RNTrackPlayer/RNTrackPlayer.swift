@@ -47,8 +47,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     // MARK: - Required Methods
     
-    @objc(requiresMainQueueSetup)
-    override func requiresMainQueueSetup() -> Bool {
+    override open static func requiresMainQueueSetup() -> Bool {
         return true;
     }
     
