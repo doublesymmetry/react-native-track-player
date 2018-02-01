@@ -47,8 +47,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     // MARK: - Required Methods
     
-    @objc(requiresMainQueueSetup)
-    override func requiresMainQueueSetup() -> Bool {
+    override open static func requiresMainQueueSetup() -> Bool {
         return true;
     }
     
@@ -84,7 +83,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
             "remote-play",
             "remote-next",
             "remote-previous",
-            "remote-jump-foward",
+            "remote-jump-forward",
             "remote-jump-backward",
         ]
     }
@@ -120,8 +119,8 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         let enablePlay = capabilities.contains(.play)
         let enablePlayNext = capabilities.contains(.next)
         let enablePlayPrevious = capabilities.contains(.previous)
-        let enableSkipForward = capabilities.contains(.skipForward)
-        let enableSkipBackward = capabilities.contains(.skipBackward)
+        let enableSkipForward = capabilities.contains(.jumpForward)
+        let enableSkipBackward = capabilities.contains(.jumpBackward)
         
         toggleRemoteHandler(command: remoteCenter.stopCommand, selector: #selector(remoteSentStop), enabled: enableStop)
         toggleRemoteHandler(command: remoteCenter.pauseCommand, selector: #selector(remoteSentPause), enabled: enablePause)
