@@ -232,6 +232,16 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
             }
         });
     }
+    
+    @ReactMethod
+    public void playWithEarPiece() {
+        waitForConnection(new Runnable() {
+            @Override
+            public void run() {
+                binder.playWithEarPiece();
+            }
+        });
+    }
 
     @ReactMethod
     public void pause() {

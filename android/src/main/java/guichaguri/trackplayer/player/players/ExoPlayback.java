@@ -105,6 +105,10 @@ public class ExoPlayback extends Playback implements EventListener {
     public void play() {
         player.setPlayWhenReady(true);
     }
+    @Override
+    public void playWithEarPiece() {
+        player.setPlayWhenReady(true);
+    }
 
     @Override
     public void pause() {

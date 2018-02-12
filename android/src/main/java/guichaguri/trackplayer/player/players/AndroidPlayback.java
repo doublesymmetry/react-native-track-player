@@ -38,6 +38,7 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
     private boolean buffering = false;
     private boolean ended = false;
     private boolean started = false;
+    private boolean earpiece = false;
 
     private int startPos = 0;
     private float buffered = 0;
@@ -90,6 +91,13 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
             if(player.isPlaying()) player.stop();
             player.reset();
             player.setDataSource(context, url);
+
+            if (earpiece == true) {
+                player.setAudioStreamType(AudioManager.STREAM_VOICE_CALL);
+            } else {
+                player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            }
+
             player.prepareAsync();
         } catch(IOException ex) {
             loadCallback = null;
@@ -119,7 +127,37 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
     public void play() {
         started = true;
 
+        if (earpiece == true) {
+            earpiece = false;
+
+            Track track;
+            track = super.getCurrentTrack();
+
+            load(track, null);
+        }
+
         if(!loaded) return;
+
+        player.start();
+
+        buffering = false;
+        ended = false;
+        updateState();
+    }
+    @Override
+    public void playWithEarPiece() {
+        started = true;
+
+        if (earpiece == false) {
+            earpiece = true;
+
+            Track track;
+            track = super.getCurrentTrack();
+
+            load(track, null);
+        }
+
+        if (!loaded) return;
 
         player.start();
 
