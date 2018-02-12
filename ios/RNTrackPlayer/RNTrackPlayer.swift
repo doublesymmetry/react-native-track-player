@@ -210,6 +210,12 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         mediaWrapper.play()
     }
     
+    @objc(playWithEarPiece)
+    func playWithEarPiece() {
+        print("Starting/Resuming With EarPiece")
+        mediaWrapper.playWithEarPiece()
+    }
+
     @objc(pause)
     func pause() {
         print("Pausing playback")
