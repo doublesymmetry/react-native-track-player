@@ -7,6 +7,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import com.facebook.react.bridge.Promise;
 import com.google.android.exoplayer2.*;
 import com.google.android.exoplayer2.ExoPlayer.EventListener;
+import com.google.android.exoplayer2.audio.AudioAttributes;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -47,6 +48,7 @@ public class ExoPlayback extends Playback implements EventListener {
 
     private Promise loadCallback = null;
     private boolean playing = false;
+    private boolean earpiece = false;
 
     public ExoPlayback(Context context, MediaManager manager, Bundle options) {
         super(context, manager);
@@ -60,7 +62,6 @@ public class ExoPlayback extends Playback implements EventListener {
         LoadControl control = new DefaultLoadControl(allocator, minBuffer, maxBuffer, playBuffer, playBuffer * multiplier);
 
         player = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(context), new DefaultTrackSelector(), control);
-        player.setAudioStreamType(C.STREAM_TYPE_MUSIC);
         player.addListener(this);
 
         cacheMaxSize = (long)(options.getDouble("maxCacheSize", 0) * 1024);
@@ -103,10 +104,31 @@ public class ExoPlayback extends Playback implements EventListener {
 
     @Override
     public void play() {
+        if (earpiece == true) {
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                .setContentType(C.CONTENT_TYPE_MUSIC)
+                .build();
+
+            player.setAudioAttributes(audioAttributes);
+
+            earpiece = false;
+        }
+
         player.setPlayWhenReady(true);
     }
     @Override
     public void playWithEarPiece() {
+        if (earpiece == false) {
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                .setContentType(C.CONTENT_TYPE_SPEECH)
+                .setUsage(C.USAGE_VOICE_COMMUNICATION)
+                .build();
+
+            player.setAudioAttributes(audioAttributes);
+
+            earpiece = true;
+        }
+
         player.setPlayWhenReady(true);
     }
 
@@ -191,6 +213,11 @@ public class ExoPlayback extends Playback implements EventListener {
 
     @Override
     public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+
+    }
+
+    @Override
+    public void onRepeatModeChanged(int repeatMode) {
 
     }
 

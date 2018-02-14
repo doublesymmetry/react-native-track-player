@@ -65,30 +65,30 @@ dependencies {
 
     // ExoPlayer Core
     if(exoplayer) {
-        compile 'com.google.android.exoplayer:exoplayer-core:r2.4.3'
+        compile 'com.google.android.exoplayer:exoplayer-core:r2.5.0'
     } else {
-        provided 'com.google.android.exoplayer:exoplayer-core:r2.4.3'
+        provided 'com.google.android.exoplayer:exoplayer-core:r2.5.0'
     }
 
     // ExoPlayer DASH
     if(dash) {
-        compile 'com.google.android.exoplayer:exoplayer-dash:r2.4.3'
+        compile 'com.google.android.exoplayer:exoplayer-dash:r2.5.0'
     } else {
-        provided 'com.google.android.exoplayer:exoplayer-dash:r2.4.3'
+        provided 'com.google.android.exoplayer:exoplayer-dash:r2.5.0'
     }
 
     // ExoPlayer HLS
     if(hls) {
-        compile 'com.google.android.exoplayer:exoplayer-hls:r2.4.3'
+        compile 'com.google.android.exoplayer:exoplayer-hls:r2.5.0'
     } else {
-        provided 'com.google.android.exoplayer:exoplayer-hls:r2.4.3'
+        provided 'com.google.android.exoplayer:exoplayer-hls:r2.5.0'
     }
 
     // ExoPlayer SmoothStreaming
     if(smoothstreaming) {
-        compile 'com.google.android.exoplayer:exoplayer-smoothstreaming:r2.4.3'
+        compile 'com.google.android.exoplayer:exoplayer-smoothstreaming:r2.5.0'
     } else {
-        provided 'com.google.android.exoplayer:exoplayer-smoothstreaming:r2.4.3'
+        provided 'com.google.android.exoplayer:exoplayer-smoothstreaming:r2.5.0'
     }
 
     // Caching (for the default Android player)
