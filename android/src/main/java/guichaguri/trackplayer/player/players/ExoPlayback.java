@@ -104,29 +104,27 @@ public class ExoPlayback extends Playback implements EventListener {
 
     @Override
     public void play() {
-        if (earpiece == true) {
-            AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                .setContentType(C.CONTENT_TYPE_MUSIC)
-                .build();
-
-            player.setAudioAttributes(audioAttributes);
-
-            earpiece = false;
-        }
-
-        player.setPlayWhenReady(true);
+        play(this.earpiece);
     }
+    
     @Override
-    public void playWithEarPiece() {
-        if (earpiece == false) {
-            AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                .setContentType(C.CONTENT_TYPE_SPEECH)
-                .setUsage(C.USAGE_VOICE_COMMUNICATION)
-                .build();
+    public void play(boolean earpiece) {
+        if (this.earpiece != earpiece) {
+            AudioAttributes audioAttributes = null;
+
+            if (earpiece) {
+                audioAttributes = new AudioAttributes.Builder()
+                    .setContentType(C.CONTENT_TYPE_SPEECH)
+                    .setUsage(C.USAGE_VOICE_COMMUNICATION)
+                    .build();
+            } else {
+                audioAttributes = new AudioAttributes.Builder()
+                    .setContentType(C.CONTENT_TYPE_MUSIC)
+                    .build();
+            }
 
             player.setAudioAttributes(audioAttributes);
-
-            earpiece = true;
+            this.earpiece = earpiece;
         }
 
         player.setPlayWhenReady(true);

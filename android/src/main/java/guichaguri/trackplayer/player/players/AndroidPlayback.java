@@ -125,31 +125,14 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
 
     @Override
     public void play() {
-        started = true;
-
-        if (earpiece == true) {
-            earpiece = false;
-
-            Track track;
-            track = super.getCurrentTrack();
-
-            load(track, null);
-        }
-
-        if(!loaded) return;
-
-        player.start();
-
-        buffering = false;
-        ended = false;
-        updateState();
+        play(this.earpiece);
     }
     @Override
-    public void playWithEarPiece() {
+    public void play(boolean earpiece) {
         started = true;
 
-        if (earpiece == false) {
-            earpiece = true;
+        if (this.earpiece != earpiece) {
+            this.earpiece = earpiece;
 
             Track track;
             track = super.getCurrentTrack();

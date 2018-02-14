@@ -270,13 +270,12 @@ public class AudioPlayer: NSObject {
     }
     
     // MARK: Public Methods
+
+    func setEarPiece(earpiece: Bool) {
+        self.earpiece = earpiece
+    }
     
     func play(track: Track) {
-        earPiece = false
-        currentItem = track
-    }
-    func playWithEarPiece(track: Track) {
-        earPiece = true
         currentItem = track
     }
 
@@ -309,7 +308,7 @@ public class AudioPlayer: NSObject {
     var qualityIsBeingChanged = false
 
     /// A boolean value indicating if output for audio is ear-piece (true) or loundspeaker (false)
-    var earPiece = false
+    var earpiece = false
 
     /// The state before the player went into .Buffering. It helps to know whether to restart or not the player.
     var stateBeforeBuffering: AudioPlayerState?
@@ -357,7 +356,7 @@ public class AudioPlayer: NSObject {
     /// - Parameter active: A boolean value indicating whether the audio session should be set to active or not.
     func setAudioSession(active: Bool) {
         #if os(iOS) || os(tvOS)
-            if earPiece {
+            if earpiece {
                 _ = try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayAndRecord)
                 _ = try? AVAudioSession.sharedInstance().setMode(AVAudioSessionModeVoiceChat)
             } else {

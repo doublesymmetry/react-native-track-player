@@ -134,7 +134,7 @@ public abstract class Playback {
 
     public abstract void play();
 
-    public abstract void playWithEarPiece();
+    public abstract void play(boolean earpiece);
 
     public abstract void pause();
 
