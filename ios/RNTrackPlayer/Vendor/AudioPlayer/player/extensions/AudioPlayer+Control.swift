@@ -25,6 +25,10 @@ extension AudioPlayer {
             state = .playing
         }
 
+        // Ensures the category is set up correctly
+        ensureCategory()
+
+
         retryEventProducer.startProducingEvents()
     }
 

@@ -356,14 +356,20 @@ public class AudioPlayer: NSObject {
     /// - Parameter active: A boolean value indicating whether the audio session should be set to active or not.
     func setAudioSession(active: Bool) {
         #if os(iOS) || os(tvOS)
+            self.ensureCategory()
+
+            _ = try? AVAudioSession.sharedInstance().setActive(active)
+        #endif
+    }
+    /// Sets the right category.
+    func ensureCategory() {
+        #if os(iOS) || os(tvOS)
             if earpiece {
                 _ = try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayAndRecord)
                 _ = try? AVAudioSession.sharedInstance().setMode(AVAudioSessionModeVoiceChat)
             } else {
                 _ = try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
             }
-
-            _ = try? AVAudioSession.sharedInstance().setActive(active)
         #endif
     }
 
