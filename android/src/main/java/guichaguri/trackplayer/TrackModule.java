@@ -304,6 +304,16 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
+    public void getQueue(final Promise callback) {
+        waitForConnection(new Runnable() {
+            @Override
+            public void run() {
+                binder.getQueue(callback);
+            }
+        });
+    }
+
+    @ReactMethod
     public void getDuration(final Promise callback) {
         waitForConnection(new Runnable() {
             @Override

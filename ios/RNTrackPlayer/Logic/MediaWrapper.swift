@@ -37,6 +37,10 @@ class MediaWrapper: AudioPlayerDelegate {
         return queue.indices.contains(0) ? queue[currentIndex] : nil
     }
     
+    var currentQueue: [Track] {
+        return queue
+    }
+    
     var bufferedPosition: Double {
         return player.currentItemLoadedRange?.latest ?? 0
     }
