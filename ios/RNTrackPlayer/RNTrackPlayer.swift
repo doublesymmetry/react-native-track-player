@@ -307,7 +307,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     }
     
     func remoteSendSkipForward(event: MPSkipIntervalCommandEvent) {
-        sendEvent(withName: "remote-jump-foward", body: ["interval": event.interval])
+        sendEvent(withName: "remote-jump-forward", body: ["interval": event.interval])
     }
     
     func remoteSendSkipBackward(event: MPSkipIntervalCommandEvent) {
