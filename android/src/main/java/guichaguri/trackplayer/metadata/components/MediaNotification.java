@@ -34,9 +34,10 @@ public class MediaNotification {
     private MediaStyle style;
 
     private int color = NotificationCompat.COLOR_DEFAULT;
-    private int smallIcon, playIcon, pauseIcon, stopIcon, previousIcon, nextIcon;
-    private Action play, pause, stop, previous, next;
+    private int smallIcon, playIcon, pauseIcon, stopIcon, previousIcon, nextIcon, rewindIcon, forwardIcon;
+    private Action play, pause, stop, previous, next, rewind, forward;
 
+    private int notificationCapabilities = -1;
     private int compactCapabilities = 0;
 
     private boolean showing = false;
@@ -62,6 +63,8 @@ public class MediaNotification {
         stopIcon = loadIcon("stop");
         previousIcon = loadIcon("previous");
         nextIcon = loadIcon("next");
+        rewindIcon = loadIcon("rewind");
+        forwardIcon = loadIcon("forward");
 
         nb.setSmallIcon(playIcon);
     }
@@ -74,6 +77,8 @@ public class MediaNotification {
         stopIcon = loadIcon(data, "stopIcon", stopIcon);
         previousIcon = loadIcon(data, "previousIcon", previousIcon);
         nextIcon = loadIcon(data, "nextIcon", nextIcon);
+        rewindIcon = loadIcon(data, "rewindIcon", rewindIcon);
+        forwardIcon = loadIcon(data, "forwardIcon", forwardIcon);
 
         // Load the color and the small icon
         color = (int)data.getDouble("color", color);
@@ -84,12 +89,24 @@ public class MediaNotification {
         nb.setLights(color, 250, 250);
         nb.setSmallIcon(smallIcon != 0 ? smallIcon : playIcon);
 
-        // Update compact capabilities
-        List<Integer> array = data.getIntegerArrayList("compactCapabilities");
+        // Update notification capabilities
+        List<Integer> notification = data.getIntegerArrayList("notificationCapabilities");
 
-        if(array != null) {
+        if(notification != null) {
+            notificationCapabilities = 0;
+            for(int cap : notification) {
+                notificationCapabilities |= cap;
+            }
+        } else {
+            notificationCapabilities = -1;
+        }
+
+        // Update compact capabilities
+        List<Integer> compact = data.getIntegerArrayList("compactCapabilities");
+
+        if(compact != null) {
             compactCapabilities = 0;
-            for(int cap : array) {
+            for(int cap : compact) {
                 compactCapabilities |= cap;
             }
         }
@@ -134,11 +151,13 @@ public class MediaNotification {
 
         // Check and update action buttons
         long mask = playback.getActions();
+        rewind = addAction(rewind, mask, PlaybackStateCompat.ACTION_REWIND, "Rewind", rewindIcon, actions, compact, playing);
         previous = addAction(previous, mask, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS, "Previous", previousIcon, actions, compact, playing);
         play = addAction(play, mask, PlaybackStateCompat.ACTION_PLAY, "Play", playIcon, actions, compact, playing);
         pause = addAction(pause, mask, PlaybackStateCompat.ACTION_PAUSE, "Pause", pauseIcon, actions, compact, playing);
         stop = addAction(stop, mask, PlaybackStateCompat.ACTION_STOP, "Stop", stopIcon, actions, compact, playing);
         next = addAction(next, mask, PlaybackStateCompat.ACTION_SKIP_TO_NEXT, "Next", nextIcon, actions, compact, playing);
+        forward = addAction(forward, mask, PlaybackStateCompat.ACTION_FAST_FORWARD, "Forward", forwardIcon, actions, compact, playing);
 
         // Create the compact indexes array
         int[] compactIndexes = new int[compact.size()];
@@ -181,7 +200,7 @@ public class MediaNotification {
         if(action == PlaybackStateCompat.ACTION_PAUSE && !playing) return instance;
 
         // Add it to the compact view if it's allowed to
-        if((compactCapabilities & action) == action) {
+        if((compactCapabilities & action) != 0) {
             compactView.add(instance);
         }
 
@@ -194,6 +213,7 @@ public class MediaNotification {
     private Action updateAction(Action instance, long mask, long action, String title, int icon) {
         // The action is disabled, we'll not create it
         if((mask & action) == 0) return null;
+        if(notificationCapabilities != -1 && (notificationCapabilities & action) == 0) return null;
 
         // The action is already created
         if(instance != null) return instance;

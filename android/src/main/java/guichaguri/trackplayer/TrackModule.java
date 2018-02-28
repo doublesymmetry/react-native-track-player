@@ -83,8 +83,9 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
         // Binds the service to get a MediaWrapper instance
         Intent intent = new Intent(context, PlayerService.class);
+        context.startService(intent);
         intent.setAction(PlayerService.ACTION_CONNECT);
-        context.bindService(intent, this, Service.BIND_AUTO_CREATE);
+        context.bindService(intent, this, 0);
 
         connecting = true;
     }
@@ -107,6 +108,8 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
         constants.put("CAPABILITY_SKIP_TO_NEXT", PlaybackStateCompat.ACTION_SKIP_TO_NEXT);
         constants.put("CAPABILITY_SKIP_TO_PREVIOUS", PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
         constants.put("CAPABILITY_SET_RATING", PlaybackStateCompat.ACTION_SET_RATING);
+        constants.put("CAPABILITY_JUMP_FORWARD", PlaybackStateCompat.ACTION_FAST_FORWARD);
+        constants.put("CAPABILITY_JUMP_BACKWARD", PlaybackStateCompat.ACTION_REWIND);
 
         // Pitch algorithms - this is basically a placeholder, as they are not used
         constants.put("PITCH_ALGORITHM_LINEAR", "linear");

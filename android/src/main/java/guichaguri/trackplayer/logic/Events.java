@@ -21,6 +21,8 @@ public class Events {
     public static final String BUTTON_SKIP_PREVIOUS = "remote-previous";
     public static final String BUTTON_SEEK_TO = "remote-seek";
     public static final String BUTTON_SET_RATING = "remote-set-rating";
+    public static final String BUTTON_JUMP_FORWARD = "remote-jump-forward";
+    public static final String BUTTON_JUMP_BACKWARD = "remote-jump-backward";
     public static final String BUTTON_DUCK = "remote-duck";
 
     // Playback Events
@@ -28,6 +30,7 @@ public class Events {
     public static final String PLAYBACK_TRACK_CHANGED = "playback-track-changed";
     public static final String PLAYBACK_QUEUE_ENDED = "playback-queue-ended";
     public static final String PLAYBACK_ERROR = "playback-error";
+    public static final String PLAYBACK_UNBIND = "playback-unbind";
 
     public static void dispatchEvent(Context context, String event, Bundle data) {
         Intent i = new Intent(context, PlayerTask.class);

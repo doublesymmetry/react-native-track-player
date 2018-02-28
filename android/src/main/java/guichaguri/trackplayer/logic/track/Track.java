@@ -59,7 +59,7 @@ public class Track {
         genre = data.getString("genre");
         date = data.getString("date");
         description = data.getString("description");
-        rating = Utils.getRating(data, "date", manager.getRatingType());
+        rating = Utils.getRating(data, "date", manager.getMetadata().getRatingType());
 
         artwork = Utils.getUri(context, data, "artwork", null);
         artworkLocal = isLocal(artwork);
