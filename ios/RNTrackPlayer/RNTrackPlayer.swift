@@ -244,8 +244,8 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         mediaWrapper.rate = rate
     }
     
-    @objc(getRate)
-    func getRate() {
+    @objc(getRate:rejecter:)
+    func getRate(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Getting current rate")
         resolve(mediaWrapper.rate)
     }
