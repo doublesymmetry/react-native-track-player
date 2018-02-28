@@ -108,6 +108,11 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
         constants.put("CAPABILITY_SKIP_TO_PREVIOUS", PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
         constants.put("CAPABILITY_SET_RATING", PlaybackStateCompat.ACTION_SET_RATING);
 
+        // Pitch algorithms - this is basically a placeholder, as they are not used
+        constants.put("PITCH_ALGORITHM_LINEAR", "linear");
+        constants.put("PITCH_ALGORITHM_MUSIC", "music");
+        constants.put("PITCH_ALGORITHM_VOICE", "voice");
+
         // States
         constants.put("STATE_NONE", PlaybackStateCompat.STATE_NONE);
         constants.put("STATE_PLAYING", PlaybackStateCompat.STATE_PLAYING);

@@ -60,7 +60,11 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
             "CAPABILITY_PAUSE": Capability.pause,
             "CAPABILITY_STOP": Capability.stop,
             "CAPABILITY_SKIP_TO_NEXT": Capability.next,
-            "CAPABILITY_SKIP_TO_PREVIOUS": Capability.previous
+            "CAPABILITY_SKIP_TO_PREVIOUS": Capability.previous,
+            
+            "PITCH_ALGORITHM_LINEAR": PitchAlgorithm.linear,
+            "PITCH_ALGORITHM_MUSIC": PitchAlgorithm.music,
+            "PITCH_ALGORITHM_VOICE": PitchAlgorithm.voice
         ]
     }
     

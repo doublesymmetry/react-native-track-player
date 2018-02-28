@@ -189,12 +189,12 @@ class MediaWrapper: AudioPlayerDelegate {
     func setPitchAlgorithm(for track: Track) {
         if let pitchAlgorithm = track.pitchAlgorithm {
             switch pitchAlgorithm {
-            case "voice":
-                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmTimeDomain
-            case "music":
-                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmSpectral
-            case "linear":
+            case PitchAlgorithm.linear:
                 player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmVarispeed
+            case PitchAlgorithm.music:
+                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmSpectral
+            case PitchAlgorithm.voice:
+                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmTimeDomain
             default:
                 player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmLowQualityZeroLatency
             }

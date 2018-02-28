@@ -47,6 +47,11 @@ namespace TrackPlayer
                     {"CAPABILITY_SKIP_TO_PREVIOUS", (int)Capability.Previous},
                     {"CAPABILITY_SET_RATING", (int)Capability.Unsupported},
 
+                    // Pitch algorithms is unsupported
+                    {"PITCH_ALGORITHM_LINEAR", 0},
+                    {"PITCH_ALGORITHM_MUSIC", 0},
+                    {"PITCH_ALGORITHM_VOICE", 0},
+
                     // Rating is unsupported
                     {"RATING_HEART", 0},
                     {"RATING_THUMBS_UP_DOWN", 0},
