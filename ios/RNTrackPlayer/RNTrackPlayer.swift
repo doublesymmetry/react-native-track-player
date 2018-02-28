@@ -60,9 +60,9 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
             "STATE_STOPPED": "STATE_STOPPED",
             "STATE_BUFFERING": "STATE_BUFFERING",
             
-            "PITCH_ALGORITHM_LINEAR": PitchAlgorithm.linear,
-            "PITCH_ALGORITHM_MUSIC": PitchAlgorithm.music,
-            "PITCH_ALGORITHM_VOICE": PitchAlgorithm.voice,
+            "PITCH_ALGORITHM_LINEAR": PitchAlgorithm.linear.rawValue,
+            "PITCH_ALGORITHM_MUSIC": PitchAlgorithm.music.rawValue,
+            "PITCH_ALGORITHM_VOICE": PitchAlgorithm.voice.rawValue,
 
             "CAPABILITY_PLAY": Capability.play.rawValue,
             "CAPABILITY_PAUSE": Capability.pause.rawValue,
