@@ -44,6 +44,7 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
     private int startPos = 0;
     private float buffered = 0;
     private float volume = 1;
+    private float rate = 1;
 
     public AndroidPlayback(Context context, MediaManager manager, Bundle options) {
         super(context, manager);
@@ -125,6 +126,10 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
 
         player.start();
 
+        if(VERSION.SDK_INT >= VERSION_CODES.M) {
+            player.setPlaybackParams(player.getPlaybackParams().setSpeed(rate));
+        }
+
         buffering = false;
         ended = false;
         updateState();
@@ -189,15 +194,14 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
     }
 
     public float getRate() {
-        if(VERSION.SDK_INT >= VERSION_CODES.M) {
-            return player.getPlaybackParams().getSpeed();
-        }
-        return 1;
+        return rate;
     }
 
     public void setRate(float rate) {
-        if(VERSION.SDK_INT >= VERSION_CODES.M) {
-            player.getPlaybackParams().setSpeed(rate);
+        this.rate = rate;
+
+        if(player.isPlaying() && VERSION.SDK_INT >= VERSION_CODES.M) {
+            player.setPlaybackParams(player.getPlaybackParams().setSpeed(rate));
         }
     }
 
@@ -267,7 +271,13 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
             buffering = false;
         }
 
-        if(started) player.start();
+        if(started) {
+            player.start();
+
+            if(VERSION.SDK_INT >= VERSION_CODES.M) {
+                player.setPlaybackParams(player.getPlaybackParams().setSpeed(rate));
+            }
+        }
 
         Utils.resolveCallback(loadCallback);
         loadCallback = null;
