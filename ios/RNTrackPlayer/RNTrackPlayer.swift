@@ -220,14 +220,14 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     @objc(setRate:)
     func setRate(rate: Float) {
-        /* TODO */
+        print("Setting rate to \(rate)")
         mediaWrapper.rate = rate
     }
     
     @objc(getRate)
     func getRate() {
         print("Getting current rate")
-        /* TODO */
+        resolve(mediaWrapper.rate)
     }
     
     @objc(getTrack:resolver:rejecter:)
