@@ -1,6 +1,6 @@
 package guichaguri.trackplayer.metadata.components;
 
-import android.annotation.TargetApi;
+import android.support.annotation.RequiresApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -46,8 +46,7 @@ public class MediaNotification {
 
     private boolean showing = false;
 
-//    @RequiresApi(api = Build.VERSION_CODES.O)
-    @TargetApi(Build.VERSION_CODES.O)
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void createChannel(Context context) {
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         // The id of the channel.

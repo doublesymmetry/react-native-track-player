@@ -39,8 +39,8 @@ public class Events {
         if(event != null) i.putExtra(PlayerTask.EVENT_TYPE, event);
         if(data != null) i.putExtra(PlayerTask.EVENT_DATA, data);
 
-//        Context.startService(context, i);
-        ContextCompat.startForegroundService(context, i);
+        context.startService(i);
+//        ContextCompat.startForegroundService(context, i);
     }
 
 }
