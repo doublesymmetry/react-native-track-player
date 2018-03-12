@@ -1,19 +1,22 @@
 package guichaguri.trackplayer.metadata.components;
 
+import android.support.annotation.RequiresApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Action;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.support.v7.app.NotificationCompat;
-import android.support.v7.app.NotificationCompat.MediaStyle;
+import android.support.v4.media.app.NotificationCompat.MediaStyle;
 import android.util.Log;
 import android.view.KeyEvent;
 import guichaguri.trackplayer.logic.Utils;
@@ -26,6 +29,7 @@ import java.util.List;
  */
 public class MediaNotification {
 
+    public static final String CHANNEL_ID = "media_playback_channel";
     public static final int NOTIFICATION_ID = 6402;
 
     private final Context context;
@@ -42,10 +46,32 @@ public class MediaNotification {
 
     private boolean showing = false;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void createChannel(Context context) {
+        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        // The id of the channel.
+        String id = CHANNEL_ID;
+        // The user-visible name of the channel.
+        CharSequence name = "Media playback";
+        // The user-visible description of the channel.
+        String description = "Media playback controls";
+        int importance = NotificationManager.IMPORTANCE_LOW;
+        NotificationChannel mChannel = new NotificationChannel(id, name, importance);
+        // Configure the notification channel.
+        mChannel.setDescription(description);
+        mChannel.setShowBadge(false);
+        mChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+        mNotificationManager.createNotificationChannel(mChannel);
+    }
+
     public MediaNotification(Context context, MediaSessionCompat session) {
         this.context = context;
 
-        this.nb = new NotificationCompat.Builder(context);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createChannel(context);
+        }
+
+        this.nb = new NotificationCompat.Builder(context, CHANNEL_ID);
         this.style = new MediaStyle().setMediaSession(session.getSessionToken());
 
         nb.setStyle(style);

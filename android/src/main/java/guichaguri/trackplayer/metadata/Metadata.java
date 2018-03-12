@@ -116,7 +116,12 @@ public class Metadata {
         md.putString(MediaMetadataCompat.METADATA_KEY_GENRE, track.genre);
         md.putString(MediaMetadataCompat.METADATA_KEY_DATE, track.date);
         md.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION, track.description);
-        md.putRating(MediaMetadataCompat.METADATA_KEY_RATING, track.rating);
+
+        if (android.os.Build.VERSION.SDK_INT > 19) {
+            md.putRating(MediaMetadataCompat.METADATA_KEY_RATING, track.rating);
+        }
+
+
         md.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration);
 
         // Update the queue item

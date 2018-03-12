@@ -3,6 +3,7 @@ package guichaguri.trackplayer.logic;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import guichaguri.trackplayer.logic.services.PlayerTask;
 
 /**
@@ -39,6 +40,7 @@ public class Events {
         if(data != null) i.putExtra(PlayerTask.EVENT_DATA, data);
 
         context.startService(i);
+//        ContextCompat.startForegroundService(context, i);
     }
 
 }
