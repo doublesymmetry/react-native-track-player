@@ -21,6 +21,8 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.upstream.cache.Cache;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor;
@@ -73,7 +75,14 @@ public class ExoPlayback extends Playback implements EventListener {
         Uri url = track.url;
 
         String userAgent = Util.getUserAgent(context, "react-native-track-player");
-        DataSource.Factory factory = new DefaultDataSourceFactory(context, userAgent);
+        DefaultHttpDataSourceFactory httpDataSourceFactory = new DefaultHttpDataSourceFactory(
+            userAgent,
+            null,
+            DefaultHttpDataSource.DEFAULT_CONNECT_TIMEOUT_MILLIS,
+            DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS,
+            true
+        );
+        DataSource.Factory factory = new DefaultDataSourceFactory(context, null, httpDataSourceFactory);
         MediaSource source;
 
         if(cacheMaxSize > 0 && !track.urlLocal) {
