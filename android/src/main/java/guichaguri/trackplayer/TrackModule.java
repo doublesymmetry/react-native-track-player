@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.support.v4.content.Context;
 import android.support.v4.content.ContextCompat;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
