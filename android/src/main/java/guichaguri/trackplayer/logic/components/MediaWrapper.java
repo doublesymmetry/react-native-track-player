@@ -146,7 +146,7 @@ public class MediaWrapper extends Binder {
     }
 
     public void getQueue(final Promise callback) {
-        Playback pb = manage.getPlayback();
+        Playback pb = manager.getPlayback();
         if(pb == null) return;
 
         Utils.resolveCallback(callback, pb.getQueue());

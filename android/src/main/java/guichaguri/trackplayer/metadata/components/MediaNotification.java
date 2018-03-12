@@ -1,19 +1,22 @@
 package guichaguri.trackplayer.metadata.components;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Action;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.support.v4.media.app.NotificationCompat.MediaStyle;
+import android.support.v4.app.NotificationCompat;
+import android.support.v7.app.NotificationCompat.MediaStyle;
 import android.util.Log;
 import android.view.KeyEvent;
 import guichaguri.trackplayer.logic.Utils;
@@ -43,12 +46,10 @@ public class MediaNotification {
 
     private boolean showing = false;
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void createChannel() {
-        NotificationManager
-                mNotificationManager =
-                (NotificationManager) mContext
-                        .getSystemService(Context.NOTIFICATION_SERVICE);
+//    @RequiresApi(api = Build.VERSION_CODES.O)
+    @TargetApi(Build.VERSION_CODES.O)
+    private void createChannel(Context context) {
+        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         // The id of the channel.
         String id = CHANNEL_ID;
         // The user-visible name of the channel.
@@ -68,7 +69,7 @@ public class MediaNotification {
         this.context = context;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createChannel();
+            createChannel(context);
         }
 
         this.nb = new NotificationCompat.Builder(context, CHANNEL_ID);
