@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.support.v4.content.ContextCompat;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -83,7 +84,8 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
 
         // Binds the service to get a MediaWrapper instance
         Intent intent = new Intent(context, PlayerService.class);
-        context.startService(intent);
+        // context.startService(intent);
+        ContextCompat.startServiceForeground(context, intent);
         intent.setAction(PlayerService.ACTION_CONNECT);
         context.bindService(intent, this, 0);
 
