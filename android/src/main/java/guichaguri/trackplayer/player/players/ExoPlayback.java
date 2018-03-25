@@ -6,7 +6,8 @@ import android.os.Bundle;
 import android.support.v4.media.session.PlaybackStateCompat;
 import com.facebook.react.bridge.Promise;
 import com.google.android.exoplayer2.*;
-import com.google.android.exoplayer2.ExoPlayer.EventListener;
+import com.google.android.exoplayer2.Player.EventListener;
+import com.google.android.exoplayer2.audio.AudioAttributes;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -55,14 +56,14 @@ public class ExoPlayback extends Playback implements EventListener {
 
         int minBuffer = (int)Utils.toMillis(options.getDouble("minBuffer", Utils.toSeconds(DEFAULT_MIN_BUFFER_MS)));
         int maxBuffer = (int)Utils.toMillis(options.getDouble("maxBuffer", Utils.toSeconds(DEFAULT_MAX_BUFFER_MS)));
-        long playBuffer = Utils.toMillis(options.getDouble("playBuffer", Utils.toSeconds(DEFAULT_BUFFER_FOR_PLAYBACK_MS)));
+        int playBuffer = (int)Utils.toMillis(options.getDouble("playBuffer", Utils.toSeconds(DEFAULT_BUFFER_FOR_PLAYBACK_MS)));
         int multiplier = DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS / DEFAULT_BUFFER_FOR_PLAYBACK_MS;
 
         DefaultAllocator allocator = new DefaultAllocator(true, 0x10000);
-        LoadControl control = new DefaultLoadControl(allocator, minBuffer, maxBuffer, playBuffer, playBuffer * multiplier);
+        LoadControl control = new DefaultLoadControl(allocator, minBuffer, maxBuffer, playBuffer, playBuffer * multiplier, -1, true);
 
         player = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(context), new DefaultTrackSelector(), control);
-        player.setAudioStreamType(C.STREAM_TYPE_MUSIC);
+        player.setAudioAttributes(new AudioAttributes.Builder().setContentType(C.CONTENT_TYPE_MUSIC).setUsage(C.USAGE_MEDIA).build());
         player.addListener(this);
 
         cacheMaxSize = (long)(options.getDouble("maxCacheSize", 0) * 1024);
@@ -132,13 +133,13 @@ public class ExoPlayback extends Playback implements EventListener {
 
     private int getState(int playerState) {
         switch(playerState) {
-            case SimpleExoPlayer.STATE_BUFFERING:
+            case Player.STATE_BUFFERING:
                 return PlaybackStateCompat.STATE_BUFFERING;
-            case SimpleExoPlayer.STATE_ENDED:
+            case Player.STATE_ENDED:
                 return PlaybackStateCompat.STATE_STOPPED;
-            case SimpleExoPlayer.STATE_IDLE:
+            case Player.STATE_IDLE:
                 return PlaybackStateCompat.STATE_NONE;
-            case SimpleExoPlayer.STATE_READY:
+            case Player.STATE_READY:
                 return playing ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED;
         }
         return PlaybackStateCompat.STATE_NONE;
@@ -190,7 +191,7 @@ public class ExoPlayback extends Playback implements EventListener {
     }
 
     @Override
-    public void onTimelineChanged(Timeline timeline, Object manifest) {
+    public void onTimelineChanged(Timeline timeline, Object o, int i) {
 
     }
 
@@ -209,12 +210,12 @@ public class ExoPlayback extends Playback implements EventListener {
         playing = playWhenReady;
         updateState(getState(playbackState));
 
-        if(playbackState == SimpleExoPlayer.STATE_READY) {
+        if(playbackState == Player.STATE_READY) {
 
             Utils.resolveCallback(loadCallback);
             loadCallback = null;
 
-        } else if(playbackState == SimpleExoPlayer.STATE_ENDED) {
+        } else if(playbackState == Player.STATE_ENDED) {
 
             if(hasNext()) {
                 updateCurrentTrack(currentTrack + 1, null);
@@ -226,6 +227,16 @@ public class ExoPlayback extends Playback implements EventListener {
     }
 
     @Override
+    public void onRepeatModeChanged(int i) {
+
+    }
+
+    @Override
+    public void onShuffleModeEnabledChanged(boolean b) {
+
+    }
+
+    @Override
     public void onPlayerError(ExoPlaybackException error) {
         Utils.rejectCallback(loadCallback, error);
         loadCallback = null;
@@ -234,12 +245,17 @@ public class ExoPlayback extends Playback implements EventListener {
     }
 
     @Override
-    public void onPositionDiscontinuity() {
+    public void onPositionDiscontinuity(int i) {
 
     }
 
     @Override
     public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+
+    }
+
+    @Override
+    public void onSeekProcessed() {
 
     }
 

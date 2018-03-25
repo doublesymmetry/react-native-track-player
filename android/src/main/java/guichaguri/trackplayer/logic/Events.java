@@ -3,12 +3,16 @@ package guichaguri.trackplayer.logic;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import guichaguri.trackplayer.logic.services.PlayerTask;
 
 /**
  * @author Guilherme Chaguri
  */
 public class Events {
+
+    // Internal intent constants
+    public static final String INTENT_ACTION = "guichaguri.trackplayer.events";
+    public static final String INTENT_EVENT = "event";
+    public static final String INTENT_DATA = "data";
 
     // Media Control Events
     public static final String BUTTON_PLAY = "remote-play";
@@ -33,12 +37,12 @@ public class Events {
     public static final String PLAYBACK_UNBIND = "playback-unbind";
 
     public static void dispatchEvent(Context context, String event, Bundle data) {
-        Intent i = new Intent(context, PlayerTask.class);
+        Intent i = new Intent(INTENT_ACTION);
 
-        if(event != null) i.putExtra(PlayerTask.EVENT_TYPE, event);
-        if(data != null) i.putExtra(PlayerTask.EVENT_DATA, data);
+        if(event != null) i.putExtra(INTENT_EVENT, event);
+        if(data != null) i.putExtra(INTENT_DATA, data);
 
-        context.startService(i);
+        context.sendBroadcast(i);
     }
 
 }

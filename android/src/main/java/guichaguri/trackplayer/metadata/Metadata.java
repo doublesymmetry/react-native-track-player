@@ -50,7 +50,7 @@ public class Metadata {
     public Metadata(Context context, MediaManager manager) {
         this.context = context;
 
-        session = new MediaSessionCompat(context, "TrackPlayer");
+        session = new MediaSessionCompat(context, "TrackPlayer", null, null);
 
         session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
                 MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);

@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.view.KeyEvent;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
 import org.json.JSONException;
@@ -146,31 +145,6 @@ public class Utils {
 
     public static void rejectCallback(Promise promise, String code, String error) {
         if(promise != null) promise.reject(code, error);
-    }
-
-    /**
-     * Code taken from an updated version of the support library located in PlaybackStateCompat.toKeyCode
-     * Replace this to PlaybackStateCompat.toKeyCode when React Native updates the support library
-     */
-    public static int toKeyCode(long action) {
-        if(action == PlaybackStateCompat.ACTION_PLAY) {
-            return KeyEvent.KEYCODE_MEDIA_PLAY;
-        } else if(action == PlaybackStateCompat.ACTION_PAUSE) {
-            return KeyEvent.KEYCODE_MEDIA_PAUSE;
-        } else if(action == PlaybackStateCompat.ACTION_SKIP_TO_NEXT) {
-            return KeyEvent.KEYCODE_MEDIA_NEXT;
-        } else if(action == PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS) {
-            return KeyEvent.KEYCODE_MEDIA_PREVIOUS;
-        } else if(action == PlaybackStateCompat.ACTION_STOP) {
-            return KeyEvent.KEYCODE_MEDIA_STOP;
-        } else if(action == PlaybackStateCompat.ACTION_FAST_FORWARD) {
-            return KeyEvent.KEYCODE_MEDIA_FAST_FORWARD;
-        } else if(action == PlaybackStateCompat.ACTION_REWIND) {
-            return KeyEvent.KEYCODE_MEDIA_REWIND;
-        } else if(action == PlaybackStateCompat.ACTION_PLAY_PAUSE) {
-            return KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE;
-        }
-        return KeyEvent.KEYCODE_UNKNOWN;
     }
 
 }
