@@ -10,14 +10,14 @@ import android.support.v4.app.NotificationCompat.Action;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.NotificationCompat;
 import android.support.v7.app.NotificationCompat.MediaStyle;
 import android.util.Log;
-import android.view.KeyEvent;
+import guichaguri.trackplayer.R;
 import guichaguri.trackplayer.logic.Utils;
-import guichaguri.trackplayer.logic.services.PlayerService;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,20 +51,20 @@ public class MediaNotification {
         nb.setStyle(style);
         nb.setCategory(NotificationCompat.CATEGORY_TRANSPORT);
         nb.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-        nb.setDeleteIntent(createActionIntent(PlaybackStateCompat.ACTION_STOP));
+        nb.setDeleteIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_STOP));
 
         String packageName = context.getPackageName();
         Intent openApp = context.getPackageManager().getLaunchIntentForPackage(packageName);
         nb.setContentIntent(PendingIntent.getActivity(context, 0, openApp, 0));
 
-        smallIcon = 0;
-        playIcon = loadIcon("play");
-        pauseIcon = loadIcon("pause");
-        stopIcon = loadIcon("stop");
-        previousIcon = loadIcon("previous");
-        nextIcon = loadIcon("next");
-        rewindIcon = loadIcon("rewind");
-        forwardIcon = loadIcon("forward");
+        smallIcon = R.drawable.play;
+        playIcon = R.drawable.play;
+        pauseIcon = R.drawable.pause;
+        stopIcon = R.drawable.stop;
+        previousIcon = R.drawable.previous;
+        nextIcon = R.drawable.next;
+        rewindIcon = R.drawable.rewind;
+        forwardIcon = R.drawable.forward;
 
         nb.setSmallIcon(playIcon);
     }
@@ -141,7 +141,7 @@ public class MediaNotification {
                 style.setShowCancelButton(false);
             } else {
                 // Add the cancel button and set its action when not playing
-                style.setCancelButtonIntent(createActionIntent(PlaybackStateCompat.ACTION_STOP));
+                style.setCancelButtonIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_STOP));
                 style.setShowCancelButton(true);
             }
         }
@@ -183,11 +183,6 @@ public class MediaNotification {
         return icon;
     }
 
-    private int loadIcon(String iconName) {
-        // Load icon resource from name
-        return context.getResources().getIdentifier(iconName, "drawable", context.getPackageName());
-    }
-
     private Action addAction(Action instance, long mask, long action, String title, int icon,
                              List<Action> list, List<Action> compactView, boolean playing) {
         // Update the action
@@ -219,24 +214,7 @@ public class MediaNotification {
         if(instance != null) return instance;
 
         // Create the action
-        return new Action(icon, title, createActionIntent(action));
-    }
-
-    /**
-     * TODO
-     * We should take a look at MediaButtonReceiver.buildMediaButtonPendingIntent
-     * when React Native updates to a newer support library version
-     */
-    private PendingIntent createActionIntent(long action) {
-        // Create an intent for the service
-        int keyCode = Utils.toKeyCode(action);
-        KeyEvent event = new KeyEvent(KeyEvent.ACTION_DOWN, keyCode);
-
-        Intent intent = new Intent(context, PlayerService.class);
-        intent.setAction(Intent.ACTION_MEDIA_BUTTON);
-        intent.putExtra(Intent.EXTRA_KEY_EVENT, event);
-
-        return PendingIntent.getService(context, keyCode, intent, 0);
+        return new Action(icon, title, MediaButtonReceiver.buildMediaButtonPendingIntent(context, action));
     }
 
     private void update() {
