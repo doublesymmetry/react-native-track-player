@@ -19,7 +19,6 @@ protocol MediaWrapperDelegate: class {
 class MediaWrapper: AudioPlayerDelegate {
     private var queue: [Track]
     private var currentIndex: Int
-    private var _rate: Float
     private let player: AudioPlayer
     private var trackImageTask: URLSessionDataTask?
     
@@ -35,10 +34,9 @@ class MediaWrapper: AudioPlayerDelegate {
     }
     var rate: Float {
         get {
-            return _rate
+            return player.rate
         }
         set {
-            _rate = newValue
             player.rate = newValue
         }
     }
@@ -81,7 +79,6 @@ class MediaWrapper: AudioPlayerDelegate {
         self.queue = []
         self.currentIndex = 0
         self.player = AudioPlayer()
-        self._rate = 1
         
         self.player.delegate = self
         self.player.bufferingStrategy = .playWhenBufferNotEmpty
