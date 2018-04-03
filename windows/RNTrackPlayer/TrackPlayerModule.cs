@@ -47,6 +47,11 @@ namespace TrackPlayer
                     {"CAPABILITY_SKIP_TO_PREVIOUS", (int)Capability.Previous},
                     {"CAPABILITY_SET_RATING", (int)Capability.Unsupported},
 
+                    // Pitch algorithms is unsupported
+                    {"PITCH_ALGORITHM_LINEAR", 0},
+                    {"PITCH_ALGORITHM_MUSIC", 0},
+                    {"PITCH_ALGORITHM_VOICE", 0},
+
                     // Rating is unsupported
                     {"RATING_HEART", 0},
                     {"RATING_THUMBS_UP_DOWN", 0},
@@ -195,6 +200,19 @@ namespace TrackPlayer
         [ReactMethod]
         public void setVolume(double volume) {
             manager?.GetPlayer()?.SetVolume(volume);
+        }
+
+        [ReactMethod]
+        public void getRate(IPromise promise) {
+            Playback player = manager?.GetPlayer();
+            if(Utils.CheckPlayback(player, promise)) return;
+
+            promise.Resolve(player.GetRate());
+        }
+
+        [ReactMethod]
+        public void setRate(double rate) {
+            manager?.GetPlayer()?.SetRate(rate);
         }
 
         [ReactMethod]

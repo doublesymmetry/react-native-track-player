@@ -60,6 +60,10 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
             "STATE_STOPPED": "STATE_STOPPED",
             "STATE_BUFFERING": "STATE_BUFFERING",
             
+            "PITCH_ALGORITHM_LINEAR": PitchAlgorithm.linear.rawValue,
+            "PITCH_ALGORITHM_MUSIC": PitchAlgorithm.music.rawValue,
+            "PITCH_ALGORITHM_VOICE": PitchAlgorithm.voice.rawValue,
+
             "CAPABILITY_PLAY": Capability.play.rawValue,
             "CAPABILITY_PAUSE": Capability.pause.rawValue,
             "CAPABILITY_STOP": Capability.stop.rawValue,
@@ -232,6 +236,18 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     func setVolume(level: Float) {
         print("Setting volume to \(level)")
         mediaWrapper.volume = level
+    }
+    
+    @objc(setRate:)
+    func setRate(rate: Float) {
+        print("Setting rate to \(rate)")
+        mediaWrapper.rate = rate
+    }
+    
+    @objc(getRate:rejecter:)
+    func getRate(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        print("Getting current rate")
+        resolve(mediaWrapper.rate)
     }
     
     @objc(getTrack:resolver:rejecter:)

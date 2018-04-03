@@ -119,6 +119,18 @@ public class MediaWrapper extends Binder {
         Utils.resolveCallback(callback, pb.getVolume());
     }
 
+    public void setRate(final float rate) {
+        Playback pb = manager.getPlayback();
+        if(pb == null) return;
+        pb.setRate(rate);
+    }
+
+    public void getRate(final Promise callback) {
+        Playback pb = manager.getPlayback();
+        if(checkPlayback(pb, callback)) return;
+        Utils.resolveCallback(callback, pb.getRate());
+    }
+
     public void getTrack(final String id, final Promise callback) {
         Playback pb = manager.getPlayback();
         if(checkPlayback(pb, callback)) return;

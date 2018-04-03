@@ -165,8 +165,14 @@ public class ExoPlayback extends Playback implements EventListener {
     }
 
     @Override
-    public float getSpeed() {
+    public float getRate() {
         return player.getPlaybackParameters().speed;
+    }
+
+    @Override
+    public void setRate(float rate) {
+        PlaybackParameters params = player.getPlaybackParameters();
+        player.setPlaybackParameters(new PlaybackParameters(rate, params.pitch));
     }
 
     @Override
@@ -219,7 +225,7 @@ public class ExoPlayback extends Playback implements EventListener {
             if(hasNext()) {
                 updateCurrentTrack(currentTrack + 1, null);
             } else {
-                onEnd();
+                manager.onEnd(getCurrentTrack(), getPosition());
             }
 
         }
