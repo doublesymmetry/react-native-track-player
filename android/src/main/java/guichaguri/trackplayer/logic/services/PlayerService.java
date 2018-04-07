@@ -1,28 +1,31 @@
 package guichaguri.trackplayer.logic.services;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.media.MediaBrowserCompat.MediaItem;
-import android.support.v4.media.MediaBrowserServiceCompat;
 import android.util.Log;
+import com.facebook.react.HeadlessJsTaskService;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.jstasks.HeadlessJsTaskConfig;
 import guichaguri.trackplayer.logic.MediaManager;
 import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.components.MediaWrapper;
-import java.util.Collections;
-import java.util.List;
+import javax.annotation.Nullable;
 
 /**
  * The main service!
  * @author Guilherme Chaguri
  */
-public class PlayerService extends MediaBrowserServiceCompat {
+public class PlayerService extends HeadlessJsTaskService {
 
     public static final String ACTION_CONNECT = "trackplayer.connect";
 
     private MediaManager manager;
+
+    @Nullable
+    @Override
+    protected HeadlessJsTaskConfig getTaskConfig(Intent intent) {
+        return new HeadlessJsTaskConfig("TrackPlayer", Arguments.createMap(), 0, true);
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -44,25 +47,17 @@ public class PlayerService extends MediaBrowserServiceCompat {
         return true;
     }
 
-    @Nullable
-    @Override
-    public BrowserRoot onGetRoot(@NonNull String clientPackageName, int clientUid, @Nullable Bundle rootHints) {
-        return new BrowserRoot("root", null);
-    }
-
-    @Override
-    public void onLoadChildren(@NonNull String parentId, @NonNull Result<List<MediaItem>> result) {
-        //TODO
-        result.sendResult(Collections.<MediaItem>emptyList());
-    }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(Utils.TAG, "Service command (" + (intent != null ? intent.getAction() : "Unknown") + ")");
 
         manager.onCommand(intent);
 
-        return intent == null ? START_NOT_STICKY : START_STICKY;
+        if(intent == null) {
+            return super.onStartCommand(intent, flags, startId);
+        }
+
+        return START_STICKY;
     }
 
     @Override
