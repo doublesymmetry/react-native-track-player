@@ -9,12 +9,13 @@ AppRegistry.registerComponent('example', () => App);
 
 TrackPlayer.registerEventHandler(async (data) => {
   if (data.type === 'playback-track-changed') {
-    const track = await TrackPlayer.getTrack(data.nextTrack);
-    TrackStore.title = track.title;
-    TrackStore.artist = track.artist;
-    TrackStore.artwork = track.artwork;
+    if (data.nextTrack) {
+      const track = await TrackPlayer.getTrack(data.nextTrack);
+      TrackStore.title = track.title;
+      TrackStore.artist = track.artist;
+      TrackStore.artwork = track.artwork;
+    }
   } else if (data.type === 'playback-state') {
-    PlayerStore.playbackState = data.state;
     if (data.state === TrackPlayer.STATE_BUFFERING || data.state === TrackPlayer.STATE_PLAYING) {
       TrackStore.playbackState = playbackStates.playing;
     } else {
