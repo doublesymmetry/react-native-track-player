@@ -262,7 +262,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     @objc(getCurrentTrack:rejecter:)
     func getCurrentTrack(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        resolve(mediaWrapper.currentTrack?.toObject()["id"])
+        resolve(mediaWrapper.currentTrack?.id)
     }
     
     @objc(getDuration:rejecter:)
