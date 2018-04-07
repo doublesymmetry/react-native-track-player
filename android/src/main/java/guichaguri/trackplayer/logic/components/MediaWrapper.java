@@ -151,7 +151,7 @@ public class MediaWrapper extends Binder {
         Track track = pb.getCurrentTrack();
 
         if(track == null) {
-            Utils.rejectCallback(callback, "track", "No track playing");
+            Utils.resolveCallback(callback, null);
         } else {
             Utils.resolveCallback(callback, track.id);
         }
