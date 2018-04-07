@@ -22,6 +22,7 @@ class Track: NSObject {
     let pitchAlgorithm: String?
     let duration: Double?
     let artworkURL: MediaURL?
+    var skipped: Bool = false
     dynamic let album: String?
     dynamic var artwork: MPMediaItemArtwork?
     

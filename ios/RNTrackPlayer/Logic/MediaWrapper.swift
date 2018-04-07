@@ -42,7 +42,7 @@ class MediaWrapper: AudioPlayerDelegate {
     }
     
     var currentTrack: Track? {
-        return queue.indices.contains(0) ? queue[currentIndex] : nil
+        return player.currentItem
     }
     
     var bufferedPosition: Double {
@@ -131,6 +131,7 @@ class MediaWrapper: AudioPlayerDelegate {
     
     func skipToTrack(id: String) {
         if let trackIndex = queue.index(where: { $0.id == id }) {
+            currentTrack?.skipped = true
             currentIndex = trackIndex
             play()
         }
@@ -159,8 +160,8 @@ class MediaWrapper: AudioPlayerDelegate {
     }
     
     func play() {
-        // resume playback if it was paused
-        if player.state == .paused {
+        // resume playback if it was paused and check currentIndex wasn't changed by a skip/previous
+        if player.state == .paused && currentTrack?.id == queue[currentIndex].id {
             player.resume()
             return
         }
@@ -224,6 +225,7 @@ class MediaWrapper: AudioPlayerDelegate {
     }
     
     func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: Track, at position: TimeInterval?) {
+        if item.skipped { return }
         if (!playNext()) {
             delegate?.playerExhaustedQueue(trackId: item.id, time: position)
         }
