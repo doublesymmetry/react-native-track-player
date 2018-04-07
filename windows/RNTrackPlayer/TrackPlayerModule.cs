@@ -185,7 +185,7 @@ namespace TrackPlayer
             if(track != null) {
                 promise.Resolve(track);
             } else {
-                promise.Reject("track", "No track found");
+                promise.Resolve(null);
             }
         }
 
