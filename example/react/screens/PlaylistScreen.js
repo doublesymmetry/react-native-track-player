@@ -16,7 +16,11 @@ export default class LandingScreen extends Component {
   };
 
   componentDidMount() {
-    TrackPlayer.setupPlayer();
+    TrackPlayer.setupPlayer(() => {
+      TrackPlayer.updateOptions({
+        stopWithApp: true
+      });
+    });
   }
 
   togglePlayback = async () => {
