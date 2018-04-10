@@ -170,6 +170,12 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         resolve(NSNull())
     }
     
+    @objc(clearQueue)
+    func clearQueue() {
+        print("Clearing queue")
+        mediaWrapper.clearQueue()
+    }
+    
     @objc(skip:resolver:rejecter:)
     func skip(to trackId: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !mediaWrapper.queueContainsTrack(trackId: trackId) {

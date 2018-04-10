@@ -77,7 +77,7 @@ class MediaWrapper: AudioPlayerDelegate {
     
     init() {
         self.queue = []
-        self.currentIndex = 0
+        self.currentIndex = -1
         self.player = AudioPlayer()
         
         self.player.delegate = self
@@ -129,6 +129,11 @@ class MediaWrapper: AudioPlayerDelegate {
         queue = queue.filter { ids.contains($0.id) }
     }
     
+    func clearQueue() {
+        currentIndex = -1
+        queue.removeAll()
+    }
+    
     func skipToTrack(id: String) {
         if let trackIndex = queue.index(where: { $0.id == id }) {
             currentTrack?.skipped = true
@@ -160,6 +165,8 @@ class MediaWrapper: AudioPlayerDelegate {
     }
     
     func play() {
+        if (currentIndex == -1) { currentIndex = 0 }
+        
         // resume playback if it was paused and check currentIndex wasn't changed by a skip/previous
         if player.state == .paused && currentTrack?.id == queue[currentIndex].id {
             player.resume()
@@ -212,7 +219,7 @@ class MediaWrapper: AudioPlayerDelegate {
     }
     
     func reset() {
-        currentIndex = 0
+        currentIndex = -1
         rate = 1
         queue.removeAll()
         stop()
