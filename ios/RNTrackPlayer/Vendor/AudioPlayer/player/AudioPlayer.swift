@@ -62,14 +62,15 @@ public class AudioPlayer: NSObject {
                 playerEventProducer.player = player
                 trackEventProducer.item = currentItem
                 playerEventProducer.startProducingEvents()
-                networkEventProducer.startProducingEvents()
                 trackEventProducer.startProducingEvents()
                 qualityAdjustmentEventProducer.startProducingEvents()
+                
+                // Start producing network events if not already doing so
+                networkEventProducer.startProducingEvents()
             } else {
                 playerEventProducer.player = nil
                 trackEventProducer.item = nil
                 playerEventProducer.stopProducingEvents()
-                networkEventProducer.stopProducingEvents()
                 trackEventProducer.stopProducingEvents()
                 qualityAdjustmentEventProducer.stopProducingEvents()
             }
@@ -91,7 +92,7 @@ public class AudioPlayer: NSObject {
                 setAudioSession(active: true)
 
                 // Sets new state
-                if reachability.isReachable() || currentItem.url.isLocal {
+                if isOnline || currentItem.url.isLocal {
                     state = .buffering
                     backgroundHandler.beginBackgroundTask()
                 } else {
@@ -308,6 +309,13 @@ public class AudioPlayer: NSObject {
 
     /// The state of the player when the connection was lost
     var stateWhenConnectionLost: AudioPlayerState?
+    
+    /// Convenience for checking if platform is currently online
+    var isOnline: Bool {
+        get {
+            return reachability?.isReachable ?? false
+        }
+    }
 
     // MARK: Initialization
 
@@ -324,6 +332,7 @@ public class AudioPlayer: NSObject {
     /// Deinitializes the AudioPlayer. On deinit, the player will simply stop playing anything it was previously
     /// playing.
     deinit {
+        networkEventProducer.stopProducingEvents()
         stop()
     }
 
