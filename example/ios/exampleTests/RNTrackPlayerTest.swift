@@ -63,7 +63,6 @@ class RNTrackPlayerSpec: QuickSpec {
                 expect(remoteCenter.nextTrackCommand.isEnabled).to(beTrue())
                 expect(remoteCenter.previousTrackCommand.isEnabled).to(beTrue())
                 
-                
                 module.update(options: [
                     "capabilities": [
                         constants["CAPABILITY_SKIP_TO_NEXT"],
@@ -258,7 +257,7 @@ class RNTrackPlayerSpec: QuickSpec {
                 }) { _ in }
             }
             
-            it("rejects if no more tracks left to play") {
+            it("rejects if no more tracks left to play and stops playback") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack], before: nil, resolve: { _ in }) { _ in }
                 module.play()
@@ -290,7 +289,7 @@ class RNTrackPlayerSpec: QuickSpec {
                 }) { _ in }
             }
             
-            it("rejects if no tracks before current one") {
+            it("rejects if no tracks before current one and stops playback") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack], before: nil, resolve: { _ in }) { _ in }
                 module.play()
