@@ -1,10 +1,11 @@
 import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
-import { ProgressComponent } from 'react-native-track-player';
+import TrackPlayer, { ProgressComponent } from 'react-native-track-player';
 import { Image, StyleSheet, Text, TouchableOpacity, View, ViewPropTypes } from 'react-native';
 
-import TrackStore, { playbackStates } from '../stores/Track';
+import TrackStore from '../stores/Track';
+import PlayerStore from '../stores/Player';
 
 class ProgressBar extends ProgressComponent {
   render() {
@@ -45,7 +46,12 @@ export default class Player extends Component {
 
   render() {
     const { style, onNext, onPrevious, onTogglePlayback } = this.props;
-    const middleButtonText = TrackStore.playbackState === playbackStates.playing ? 'Pause' : 'Play';
+    var middleButtonText = 'Play'
+
+    if (PlayerStore.playbackState === TrackPlayer.STATE_PLAYING
+      || PlayerStore.playbackState === TrackPlayer.STATE_BUFFERING) {
+      middleButtonText = 'Pause'
+    }
 
     return (
       <View style={[styles.card, style]}>

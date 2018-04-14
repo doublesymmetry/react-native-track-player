@@ -2,8 +2,8 @@ import { AppRegistry } from 'react-native';
 import TrackPlayer from 'react-native-track-player';
 
 import App from './App';
-import PlayerStore from './react/stores/Player';
-import TrackStore, { playbackStates } from './react/stores/Track';
+import PlayerStore, { playbackStates } from './react/stores/Player';
+import TrackStore from './react/stores/Track';
 
 AppRegistry.registerComponent('example', () => App);
 
@@ -15,11 +15,15 @@ TrackPlayer.registerEventHandler(async (data) => {
       TrackStore.artist = track.artist;
       TrackStore.artwork = track.artwork;
     }
+  } else if(data.type == 'remote-play') {
+    TrackPlayer.play()
+  } else if(data.type == 'remote-pause') {
+    TrackPlayer.pause()
+  } else if(data.type == 'remote-next') {
+    TrackPlayer.skipToNext()
+  } else if(data.type == 'remote-previous') {
+    TrackPlayer.skipToPrevious()
   } else if (data.type === 'playback-state') {
-    if (data.state === TrackPlayer.STATE_BUFFERING || data.state === TrackPlayer.STATE_PLAYING) {
-      TrackStore.playbackState = playbackStates.playing;
-    } else {
-      TrackStore.playbackState = playbackStates.halted;
-    }
+    PlayerStore.playbackState = data.state;
   }
 });

@@ -7,7 +7,6 @@ import Player from '../components/Player';
 import playlistData from '../data/playlist.json';
 
 import PlayerStore from '../stores/Player';
-import TrackStore, { playbackStates } from '../stores/Track';
 
 @observer
 export default class LandingScreen extends Component {
@@ -16,25 +15,30 @@ export default class LandingScreen extends Component {
   };
 
   componentDidMount() {
-    TrackPlayer.setupPlayer(() => {
-      TrackPlayer.updateOptions({
-        stopWithApp: true
-      });
+    TrackPlayer.setupPlayer();
+    TrackPlayer.updateOptions({
+      stopWithApp: true,
+      capabilities: [
+        TrackPlayer.CAPABILITY_PLAY,
+        TrackPlayer.CAPABILITY_PAUSE,
+        TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
+        TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
+      ]
     });
   }
 
   togglePlayback = async () => {
-    try {
-      await TrackPlayer.getCurrentTrack();
-      if (TrackStore.playbackState === playbackStates.halted) {
+    const currentTrack = await TrackPlayer.getCurrentTrack();
+    if (currentTrack == null) {
+      TrackPlayer.reset();
+      await TrackPlayer.add(playlistData);
+      TrackPlayer.play();
+    } else {
+      if (PlayerStore.playbackState === TrackPlayer.STATE_PAUSED) {
         TrackPlayer.play();
       } else {
         TrackPlayer.pause();
       }
-    } catch(error) {
-      TrackPlayer.reset();
-      await TrackPlayer.add(playlistData);
-      TrackPlayer.play();
     }
   }
 

@@ -54,11 +54,11 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     @objc(constantsToExport)
     override func constantsToExport() -> [AnyHashable: Any] {
         return [
-            "STATE_NONE": "STATE_NONE",
-            "STATE_PLAYING": "STATE_PLAYING",
-            "STATE_PAUSED": "STATE_PAUSED",
-            "STATE_STOPPED": "STATE_STOPPED",
-            "STATE_BUFFERING": "STATE_BUFFERING",
+            "STATE_NONE": MediaWrapper.PlaybackState.none.rawValue,
+            "STATE_PLAYING": MediaWrapper.PlaybackState.playing.rawValue,
+            "STATE_PAUSED": MediaWrapper.PlaybackState.paused.rawValue,
+            "STATE_STOPPED": MediaWrapper.PlaybackState.stopped.rawValue,
+            "STATE_BUFFERING": MediaWrapper.PlaybackState.buffering.rawValue,
             
             "PITCH_ALGORITHM_LINEAR": PitchAlgorithm.linear.rawValue,
             "PITCH_ALGORITHM_MUSIC": PitchAlgorithm.music.rawValue,
