@@ -53,22 +53,30 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     // MARK: - Required Methods
     
+    override open static func requiresMainQueueSetup() -> Bool {
+        return true;
+    }
+    
     @objc(constantsToExport)
     override func constantsToExport() -> [AnyHashable: Any] {
         return [
-            "STATE_NONE": AudioPlayerState.stopped,
-            "STATE_PLAYING": AudioPlayerState.playing,
-            "STATE_PAUSED": AudioPlayerState.paused,
-            "STATE_STOPPED": AudioPlayerState.stopped,
-            "STATE_BUFFERING": AudioPlayerState.buffering,
+            "STATE_NONE": "STATE_NONE",
+            "STATE_PLAYING": "STATE_PLAYING",
+            "STATE_PAUSED": "STATE_PAUSED",
+            "STATE_STOPPED": "STATE_STOPPED",
+            "STATE_BUFFERING": "STATE_BUFFERING",
             
-            "CAPABILITY_PLAY": Capability.play,
-            "CAPABILITY_PAUSE": Capability.pause,
-            "CAPABILITY_STOP": Capability.stop,
-            "CAPABILITY_SKIP_TO_NEXT": Capability.next,
-            "CAPABILITY_SKIP_TO_PREVIOUS": Capability.previous,
-            "CAPABILITY_JUMP_FORWARD": Capability.jumpForward,
-            "CAPABILITY_JUMP_BACKWARD": Capability.jumpBackward
+            "PITCH_ALGORITHM_LINEAR": PitchAlgorithm.linear.rawValue,
+            "PITCH_ALGORITHM_MUSIC": PitchAlgorithm.music.rawValue,
+            "PITCH_ALGORITHM_VOICE": PitchAlgorithm.voice.rawValue,
+
+            "CAPABILITY_PLAY": Capability.play.rawValue,
+            "CAPABILITY_PAUSE": Capability.pause.rawValue,
+            "CAPABILITY_STOP": Capability.stop.rawValue,
+            "CAPABILITY_SKIP_TO_NEXT": Capability.next.rawValue,
+            "CAPABILITY_SKIP_TO_PREVIOUS": Capability.previous.rawValue,
+            "CAPABILITY_JUMP_FORWARD": Capability.jumpForward.rawValue,
+            "CAPABILITY_JUMP_BACKWARD": Capability.jumpBackward.rawValue
         ]
     }
     
@@ -85,7 +93,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
             "remote-play",
             "remote-next",
             "remote-previous",
-            "remote-jump-foward",
+            "remote-jump-forward",
             "remote-jump-backward",
         ]
     }
@@ -121,8 +129,8 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
             let enablePlay = capabilities.contains(.play)
             let enablePlayNext = capabilities.contains(.next)
             let enablePlayPrevious = capabilities.contains(.previous)
-            let enableSkipForward = capabilities.contains(.skipForward)
-            let enableSkipBackward = capabilities.contains(.skipBackward)
+            let enableSkipForward = capabilities.contains(.jumpForward)
+            let enableSkipBackward = capabilities.contains(.jumpBackward)
             
             toggleRemoteHandler(command: remoteCenter.stopCommand, selector: #selector(remoteSentStop), enabled: enableStop)
             toggleRemoteHandler(command: remoteCenter.pauseCommand, selector: #selector(remoteSentPause), enabled: enablePause)
@@ -239,6 +247,18 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         mediaWrapper.volume = level
     }
     
+    @objc(setRate:)
+    func setRate(rate: Float) {
+        print("Setting rate to \(rate)")
+        mediaWrapper.rate = rate
+    }
+    
+    @objc(getRate:rejecter:)
+    func getRate(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        print("Getting current rate")
+        resolve(mediaWrapper.rate)
+    }
+    
     @objc(getTrack:resolver:rejecter:)
     func getTrack(id: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !mediaWrapper.queueContainsTrack(trackId: id) {
@@ -251,12 +271,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     @objc(getCurrentTrack:rejecter:)
     func getCurrentTrack(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        guard let currentTrack = mediaWrapper.currentTrack else {
-            reject("no_track_playing", "There is no track playing", nil)
-            return
-        }
-        
-        resolve(currentTrack.id)
+        resolve(mediaWrapper.currentTrack?.id)
     }
     
     @objc(getDuration:rejecter:)
@@ -323,7 +338,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     func remoteSendSkipForward(event: MPSkipIntervalCommandEvent) {
         seek(to: mediaWrapper.currentTrackProgression + event.interval)
-        sendRemoteEvent(name: "remote-jump-foward", payload: ["interval": event.interval])
+        sendRemoteEvent(name: "remote-jump-forward", payload: ["interval": event.interval])
     }
     
     func remoteSendSkipBackward(event: MPSkipIntervalCommandEvent) {

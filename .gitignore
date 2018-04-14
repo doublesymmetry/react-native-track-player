@@ -6,6 +6,7 @@ build/
 DerivedData/
 package-lock.json
 yarn.lock
+.idea/
 
 # Android
 

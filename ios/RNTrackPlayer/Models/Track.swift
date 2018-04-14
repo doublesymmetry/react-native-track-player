@@ -19,8 +19,10 @@ class Track: NSObject {
     let date: String?
     let desc: String?
     let genre: String?
+    let pitchAlgorithm: String?
     let duration: Double?
     let artworkURL: MediaURL?
+    var skipped: Bool = false
     dynamic let album: String?
     dynamic var artwork: MPMediaItemArtwork?
     
@@ -42,6 +44,7 @@ class Track: NSObject {
         self.album = dictionary["album"] as? String
         self.genre = dictionary["genre"] as? String
         self.desc = dictionary["description"] as? String
+        self.pitchAlgorithm = dictionary["pitchAlgorithm"] as? String
         self.duration = dictionary["duration"] as? Double
         self.artworkURL = MediaURL(object: dictionary["artwork"])
         

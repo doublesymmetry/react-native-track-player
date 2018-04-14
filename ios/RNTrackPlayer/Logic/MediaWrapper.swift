@@ -32,9 +32,17 @@ class MediaWrapper: AudioPlayerDelegate {
             player.volume = newValue
         }
     }
+    var rate: Float {
+        get {
+            return player.rate
+        }
+        set {
+            player.rate = newValue
+        }
+    }
     
     var currentTrack: Track? {
-        return queue.indices.contains(0) ? queue[currentIndex] : nil
+        return player.currentItem
     }
     
     var bufferedPosition: Double {
@@ -123,6 +131,7 @@ class MediaWrapper: AudioPlayerDelegate {
     
     func skipToTrack(id: String) {
         if let trackIndex = queue.index(where: { $0.id == id }) {
+            currentTrack?.skipped = true
             currentIndex = trackIndex
             play()
         }
@@ -151,14 +160,16 @@ class MediaWrapper: AudioPlayerDelegate {
     }
     
     func play() {
-        // resume playback if it was paused
-        if player.state == .paused {
+        // resume playback if it was paused and check currentIndex wasn't changed by a skip/previous
+        if player.state == .paused && currentTrack?.id == queue[currentIndex].id {
             player.resume()
             return
         }
         
         let track = queue[currentIndex]
         player.play(track: track)
+        
+        setPitchAlgorithm(for: track)
         
         // fetch artwork and cancel any previous requests
         trackImageTask?.cancel()
@@ -171,6 +182,21 @@ class MediaWrapper: AudioPlayerDelegate {
         }
 
         trackImageTask?.resume()
+    }
+    
+    func setPitchAlgorithm(for track: Track) {
+        if let pitchAlgorithm = track.pitchAlgorithm {
+            switch pitchAlgorithm {
+            case PitchAlgorithm.linear.rawValue:
+                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmVarispeed
+            case PitchAlgorithm.music.rawValue:
+                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmSpectral
+            case PitchAlgorithm.voice.rawValue:
+                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmTimeDomain
+            default:
+                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmLowQualityZeroLatency
+            }
+        }
     }
     
     func pause() {
@@ -187,10 +213,10 @@ class MediaWrapper: AudioPlayerDelegate {
     
     func reset() {
         currentIndex = 0
+        rate = 1
         queue.removeAll()
         stop()
     }
-    
     
     // MARK: - AudioPlayerDelegate
     
@@ -199,6 +225,7 @@ class MediaWrapper: AudioPlayerDelegate {
     }
     
     func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: Track, at position: TimeInterval?) {
+        if item.skipped { return }
         if (!playNext()) {
             delegate?.playerExhaustedQueue(trackId: item.id, time: position)
         }
