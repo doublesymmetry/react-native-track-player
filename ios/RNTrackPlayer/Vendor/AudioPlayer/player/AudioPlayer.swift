@@ -196,6 +196,10 @@ public class AudioPlayer: NSObject {
             player?.volume = volume
         }
     }
+    
+    func getVolume() -> Float {
+        return player?.volume ?? 1
+    }
 
     /// Defines the rate of the player. Default value is 1.
     var rate = Float(1) {
@@ -205,6 +209,10 @@ public class AudioPlayer: NSObject {
                 updateNowPlayingInfoCenter()
             }
         }
+    }
+    
+    func getRate() -> Float {
+        return player?.rate ?? 0
     }
     
     /// Defines the buffering strategy used to determine how much to buffer before starting playback

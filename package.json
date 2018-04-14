@@ -6,6 +6,7 @@
   "keywords": [
     "react",
     "react-native",
+    "track-player",
     "audio-player",
     "audio",
     "player",
@@ -27,5 +28,14 @@
   "peerDependencies": {
     "react-native": ">=0.49.0",
     "react": ">=16.0.0"
-  }
+  },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "lib/",
+    "ios/",
+    "android/",
+    "windows/",
+    "index.js"
+  ]
 }

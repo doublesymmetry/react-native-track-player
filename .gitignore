@@ -50,3 +50,4 @@ xcuserdata/
 *.ipa
 *.dSYM.zip
 *.dSYM
+example/ios/Pods

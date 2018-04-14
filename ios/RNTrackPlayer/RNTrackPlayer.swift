@@ -22,7 +22,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     // MARK: - MediaWrapperDelegate Methods
     
     func playerUpdatedState() {
-        sendEvent(withName: "playback-state", body: ["state": mediaWrapper.state])
+        sendEvent(withName: "playback-state", body: ["state": mediaWrapper.mappedState.rawValue])
     }
     
     func playerSwitchedTracks(trackId: String?, time: TimeInterval?, nextTrackId: String?) {
@@ -244,8 +244,15 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         mediaWrapper.volume = level
     }
     
+    @objc(getVolume:rejecter:)
+    func getVolume(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        print("Getting current volume")
+        resolve(mediaWrapper.volume)
+    }
+    
     @objc(setRate:)
     func setRate(rate: Float) {
+        guard [.playing].contains(mediaWrapper.mappedState) else { return }
         print("Setting rate to \(rate)")
         mediaWrapper.rate = rate
     }
@@ -263,7 +270,14 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
             return
         }
         
-        resolve(mediaWrapper.currentTrack!.toObject())
+        let track = mediaWrapper.queue.first(where: { $0.id == id })
+        resolve(track!.toObject())
+    }
+    
+    @objc(getQueue:rejecter:)
+    func getQueue(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        let queue = mediaWrapper.queue.map { $0.toObject() }
+        resolve(queue)
     }
     
     @objc(getCurrentTrack:rejecter:)
@@ -288,7 +302,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     @objc(getState:rejecter:)
     func getState(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        resolve(mediaWrapper.state)
+        resolve(mediaWrapper.mappedState.rawValue)
     }
     
     
@@ -332,7 +346,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     }
     
     func remoteSentPlayPause() {
-        if mediaWrapper.state == "STATE_PAUSED" {
+        if mediaWrapper.mappedState == .paused {
             sendEvent(withName: "remote-play", body: nil)
             return
         }

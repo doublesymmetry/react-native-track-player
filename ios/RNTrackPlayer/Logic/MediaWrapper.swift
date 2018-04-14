@@ -17,16 +17,20 @@ protocol MediaWrapperDelegate: class {
 }
 
 class MediaWrapper: AudioPlayerDelegate {
-    private var queue: [Track]
+    private(set) var queue: [Track]
     private var currentIndex: Int
     private let player: AudioPlayer
     private var trackImageTask: URLSessionDataTask?
     
     weak var delegate: MediaWrapperDelegate?
     
+    enum PlaybackState: String {
+        case playing, paused, stopped, buffering, none
+    }
+    
     var volume: Float {
         get {
-            return player.volume
+            return player.getVolume()
         }
         set {
             player.volume = newValue
@@ -34,7 +38,7 @@ class MediaWrapper: AudioPlayerDelegate {
     }
     var rate: Float {
         get {
-            return player.rate
+            return player.getRate()
         }
         set {
             player.rate = newValue
@@ -57,18 +61,18 @@ class MediaWrapper: AudioPlayerDelegate {
         return player.currentItemProgression ?? 0
     }
     
-    var state: String {
+    var mappedState: PlaybackState {
         switch player.state {
         case .playing:
-            return "STATE_PLAYING"
+            return .playing
         case .paused:
-            return "STATE_PAUSED"
+            return .paused
         case .stopped:
-            return "STATE_STOPPED"
+            return .stopped
         case .buffering:
-            return "STATE_BUFFERING"
+            return .buffering
         default:
-            return "STATE_NONE"
+            return .none
         }
     }
     
@@ -108,25 +112,24 @@ class MediaWrapper: AudioPlayerDelegate {
     }
     
     func removeTracks(ids: [String]) {
-        var removedCurrentTrack = false
-        
+        var removingCurrentItem = false
         for (index, track) in queue.enumerated() {
             if ids.contains(track.id) {
-                if (index == currentIndex) { removedCurrentTrack = true }
+                if (index == currentIndex) { removingCurrentItem = true }
                 else if (index < currentIndex) { currentIndex = currentIndex - 1 }
             }
         }
         
-        if (removedCurrentTrack) {
-            if (currentIndex > queue.count - 1) {
-                currentIndex = queue.count
+        queue = queue.filter { !ids.contains($0.id) }
+        
+        if (removingCurrentItem) {
+            if (currentIndex == queue.count) {
+                currentIndex = queue.count - 1
                 stop()
             } else {
                 play()
             }
         }
-        
-        queue = queue.filter { ids.contains($0.id) }
     }
     
     func clearQueue() {
@@ -149,7 +152,7 @@ class MediaWrapper: AudioPlayerDelegate {
             return true
         }
         
-        pause()
+        stop()
         return false
     }
     
@@ -165,6 +168,7 @@ class MediaWrapper: AudioPlayerDelegate {
     }
     
     func play() {
+        guard queue.count > 0 else { return }
         if (currentIndex == -1) { currentIndex = 0 }
         
         // resume playback if it was paused and check currentIndex wasn't changed by a skip/previous
@@ -211,6 +215,7 @@ class MediaWrapper: AudioPlayerDelegate {
     }
     
     func stop() {
+        currentIndex = -1
         player.stop()
     }
     
@@ -219,26 +224,28 @@ class MediaWrapper: AudioPlayerDelegate {
     }
     
     func reset() {
-        currentIndex = -1
         rate = 1
-        queue.removeAll()
+        clearQueue()
         stop()
     }
     
     // MARK: - AudioPlayerDelegate
     
-    func audioPlayer(_ audioPlayer: AudioPlayer, willChangeTrackFrom from: Track?, at position: TimeInterval?, to track: Track) {
+    func audioPlayer(_ audioPlayer: AudioPlayer, willChangeTrackFrom from: Track?, at position: TimeInterval?, to track: Track) {guard !isTesting else { return }
         delegate?.playerSwitchedTracks(trackId: from?.id, time: position, nextTrackId: track.id)
     }
     
     func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: Track, at position: TimeInterval?) {
         if item.skipped { return }
         if (!playNext()) {
+            guard !isTesting else { return }
             delegate?.playerExhaustedQueue(trackId: item.id, time: position)
         }
     }
     
     func audioPlayer(_ audioPlayer: AudioPlayer, didChangeStateFrom from: AudioPlayerState, to state: AudioPlayerState) {
+        guard !isTesting else { return }
+        
         switch state {
         case .failed(let error):
             delegate?.playbackFailed(error: error)
@@ -246,4 +253,14 @@ class MediaWrapper: AudioPlayerDelegate {
             delegate?.playerUpdatedState()
         }
     }
+    
+    let isTesting = { () -> Bool in
+        if let _ = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] {
+            return true
+        } else if let testingEnv = ProcessInfo.processInfo.environment["DYLD_INSERT_LIBRARIES"] {
+            return testingEnv.contains("libXCTTargetBootstrapInject.dylib")
+        } else {
+            return false
+        }
+    }()
 }

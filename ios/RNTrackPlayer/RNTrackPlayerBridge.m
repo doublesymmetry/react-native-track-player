@@ -52,6 +52,9 @@ RCT_EXTERN_METHOD(seekTo:(double)time);
 
 RCT_EXTERN_METHOD(setVolume:(float)volume);
 
+RCT_EXTERN_METHOD(getVolume:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject);
+
 RCT_EXTERN_METHOD(setRate:(float)rate);
 
 RCT_EXTERN_METHOD(getRate:(RCTPromiseResolveBlock)resolve
@@ -59,6 +62,9 @@ RCT_EXTERN_METHOD(getRate:(RCTPromiseResolveBlock)resolve
 
 RCT_EXTERN_METHOD(getTrack:(NSString *)trackId
                   resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject);
+
+RCT_EXTERN_METHOD(getQueue:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(getCurrentTrack:(RCTPromiseResolveBlock)resolve
