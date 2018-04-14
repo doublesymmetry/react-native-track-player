@@ -291,13 +291,6 @@
 			remoteGlobalIDString = 58B5119B1A9E6C1200147676;
 			remoteInfo = RCTText;
 		};
-		9B7BB07420821679007012FE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 5F25BAC408CD4025B0E47299 /* RNTrackPlayer.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 9B7BB035208214FB007012FE;
-			remoteInfo = RNTrackPlayerTests;
-		};
 		9BC9EC832074284D005D3D30 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 5F25BAC408CD4025B0E47299 /* RNTrackPlayer.xcodeproj */;
@@ -599,7 +592,6 @@
 			isa = PBXGroup;
 			children = (
 				9BC9EC842074284D005D3D30 /* libRNTrackPlayer.a */,
-				9B7BB07520821679007012FE /* RNTrackPlayerTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1005,13 +997,6 @@
 			remoteRef = 832341B41AAA6A8300B99B32 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		9B7BB07520821679007012FE /* RNTrackPlayerTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = RNTrackPlayerTests.xctest;
-			remoteRef = 9B7BB07420821679007012FE /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		9BC9EC842074284D005D3D30 /* libRNTrackPlayer.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1166,7 +1151,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 654D128EDFC9D6409404B928 /* Pods-exampleTests.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1200,7 +1185,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EC80156B376F07CCE8A3AB46 /* Pods-exampleTests.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				COPY_PHASE_STRIP = NO;
