@@ -99,6 +99,22 @@ class RNTrackPlayerSpec: QuickSpec {
                     expect(castedQueue).to(haveCount(0))
                 }) { _ in fail() }
             }
+          
+            it("updates current track index correctly if items are inserted before current track") {
+                let module = RNTrackPlayer()
+                
+                var extraItem = correctTrack
+                extraItem["id"] = "test-correct-3"
+                module.add(trackDicts: [correctTrack, extraItem], before: nil, resolve: { _ in }) { _ in fail() }
+                module.play()
+              
+                module.add(trackDicts: [anotherCorrectTrack], before: "test-correct", resolve: { _ in }) { _ in fail() }
+                module.skipToNext(resolve: { _ in }) { _ in }
+                
+                module.getCurrentTrack(resolve: { trackId in
+                    expect(trackId as? String).to(equal("test-correct-3"))
+                }) { _ in }
+            }
             
             it("inserts before given ID") {
                 let module = RNTrackPlayer()
@@ -198,6 +214,55 @@ class RNTrackPlayerSpec: QuickSpec {
                     expect(trackId as? String).to(equal("test-correct-2"))
                 }) { _ in }
             }
+          
+          it("correctly handles current track being removed as well as others") {
+              let module = RNTrackPlayer()
+            
+              var middleItem = correctTrack
+              middleItem["id"] = "test-correct-3"
+              var lastItem = correctTrack
+              lastItem["id"] = "test-correct-4"
+              module.add(trackDicts: [correctTrack, middleItem, anotherCorrectTrack, lastItem], before: nil, resolve: { _ in }) { _ in }
+              module.play()
+              module.skipToNext(resolve: { _ in }) { _ in }
+            
+              module.remove(tracks: ["test-correct-3", "test-correct"], resolve: { _ in }) { _ in fail() }
+            
+              module.getQueue(resolve: { queue in
+                let castedQueue = queue as? [[String: Any]]
+                expect(castedQueue).to(haveCount(2))
+              }) { _ in }
+            
+              module.getCurrentTrack(resolve: { trackId in
+                expect(trackId as? String).to(equal("test-correct-2"))
+              }) { _ in }
+          }
+          
+          it("correcly handles current track becoming last track, then being removed") {
+              let module = RNTrackPlayer()
+            
+              var middleItem = correctTrack
+              middleItem["id"] = "test-correct-3"
+              module.add(trackDicts: [correctTrack, middleItem, anotherCorrectTrack], before: nil, resolve: { _ in }) { _ in }
+              module.play()
+              module.skipToNext(resolve: { _ in }) { _ in }
+            
+              module.remove(tracks: ["test-correct-2"], resolve: { _ in }) { _ in fail() }
+              module.remove(tracks: ["test-correct-3"], resolve: { _ in }) { _ in fail() }
+            
+              module.getQueue(resolve: { queue in
+                let castedQueue = queue as? [[String: Any]]
+                expect(castedQueue).to(haveCount(1))
+              }) { _ in }
+            
+              module.getState(resolve: { state in
+                expect(state as? String).to(equal(MediaWrapper.PlaybackState.stopped.rawValue))
+              }) { _ in }
+            
+              module.getCurrentTrack(resolve: { trackId in
+                expect(trackId).to(beNil())
+              }) { _ in }
+          }
         }
         
         describe(".clearQueue") {

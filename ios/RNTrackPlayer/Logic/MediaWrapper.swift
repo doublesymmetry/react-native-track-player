@@ -106,29 +106,28 @@ class MediaWrapper: AudioPlayerDelegate {
     func addTracks(_ tracks: [Track], before trackId: String?) {
         if let trackIndex = queue.index(where: { $0.id == trackId }) {
             queue.insert(contentsOf: tracks, at: trackIndex)
+            if (currentIndex >= trackIndex) { currentIndex = currentIndex + tracks.count }
         } else {
             addTracks(tracks)
         }
     }
     
     func removeTracks(ids: [String]) {
-        var removingCurrentItem = false
-        for (index, track) in queue.enumerated() {
-            if ids.contains(track.id) {
-                if (index == currentIndex) { removingCurrentItem = true }
-                else if (index < currentIndex) { currentIndex = currentIndex - 1 }
+        var actionAfterRemovals = "none"
+        for id in ids {
+            if let trackIndex = queue.index(where: { $0.id == id }) {
+                if trackIndex < currentIndex { currentIndex = currentIndex - 1 }
+                else if id == queue.last?.id { actionAfterRemovals = "stop" }
+                else if trackIndex == currentIndex { actionAfterRemovals = "play" }
+                
+                queue.remove(at: trackIndex)
             }
         }
         
-        queue = queue.filter { !ids.contains($0.id) }
-        
-        if (removingCurrentItem) {
-            if (currentIndex == queue.count) {
-                currentIndex = queue.count - 1
-                stop()
-            } else {
-                play()
-            }
+        switch actionAfterRemovals {
+            case "play": play()
+            case "stop": stop()
+            default: break;
         }
     }
     
