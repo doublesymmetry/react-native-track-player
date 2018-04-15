@@ -22,10 +22,12 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     // MARK: - MediaWrapperDelegate Methods
     
     func playerUpdatedState() {
+        guard !isTesting else { return }
         sendEvent(withName: "playback-state", body: ["state": mediaWrapper.mappedState.rawValue])
     }
     
     func playerSwitchedTracks(trackId: String?, time: TimeInterval?, nextTrackId: String?) {
+        guard !isTesting else { return }
         sendEvent(withName: "playback-track-changed", body: [
             "track": trackId,
             "position": time,
@@ -34,15 +36,27 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     }
     
     func playerExhaustedQueue(trackId: String?, time: TimeInterval?) {
-      sendEvent(withName: "playback-queue-ended", body: [
-          "track": trackId,
-          "position": time,
-      ])
+        guard !isTesting else { return }
+        sendEvent(withName: "playback-queue-ended", body: [
+            "track": trackId,
+            "position": time,
+        ])
     }
     
     func playbackFailed(error: Error) {
+        guard !isTesting else { return }
         sendEvent(withName: "playback-error", body: ["error": error.localizedDescription])
     }
+    
+    private let isTesting = { () -> Bool in
+        if let _ = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] {
+            return true
+        } else if let testingEnv = ProcessInfo.processInfo.environment["DYLD_INSERT_LIBRARIES"] {
+            return testingEnv.contains("libXCTTargetBootstrapInject.dylib")
+        } else {
+            return false
+        }
+    }()
     
     
     // MARK: - Required Methods

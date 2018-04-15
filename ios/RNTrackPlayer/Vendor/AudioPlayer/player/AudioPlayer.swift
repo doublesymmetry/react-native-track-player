@@ -80,10 +80,10 @@ public class AudioPlayer: NSObject {
     /// The current item being played.
     internal(set) var currentItem: Track? {
         didSet {
+            // Save previous item's progression
+            let oldProgression = currentItemProgression
+            
             if let currentItem = currentItem {
-                // Save previous item's progression
-                let oldProgression = currentItemProgression
-                
                 // Stops the current player
                 player?.rate = 0
                 player = nil
@@ -124,6 +124,7 @@ public class AudioPlayer: NSObject {
                 }
                 player?.rate = rate
             } else {
+                delegate?.audioPlayer(self, willChangeTrackFrom: oldValue, at: oldProgression, to: nil)
                 pause()
             }
         }

@@ -231,21 +231,19 @@ class MediaWrapper: AudioPlayerDelegate {
     
     // MARK: - AudioPlayerDelegate
     
-    func audioPlayer(_ audioPlayer: AudioPlayer, willChangeTrackFrom from: Track?, at position: TimeInterval?, to track: Track) {guard !isTesting else { return }
-        delegate?.playerSwitchedTracks(trackId: from?.id, time: position, nextTrackId: track.id)
+    func audioPlayer(_ audioPlayer: AudioPlayer, willChangeTrackFrom from: Track?, at position: TimeInterval?, to track: Track?) {
+        guard from?.id != track?.id else { return }
+        delegate?.playerSwitchedTracks(trackId: from?.id, time: position, nextTrackId: track?.id)
     }
     
     func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: Track, at position: TimeInterval?) {
         if item.skipped { return }
         if (!playNext()) {
-            guard !isTesting else { return }
             delegate?.playerExhaustedQueue(trackId: item.id, time: position)
         }
     }
     
     func audioPlayer(_ audioPlayer: AudioPlayer, didChangeStateFrom from: AudioPlayerState, to state: AudioPlayerState) {
-        guard !isTesting else { return }
-        
         switch state {
         case .failed(let error):
             delegate?.playbackFailed(error: error)
@@ -253,14 +251,4 @@ class MediaWrapper: AudioPlayerDelegate {
             delegate?.playerUpdatedState()
         }
     }
-    
-    let isTesting = { () -> Bool in
-        if let _ = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] {
-            return true
-        } else if let testingEnv = ProcessInfo.processInfo.environment["DYLD_INSERT_LIBRARIES"] {
-            return testingEnv.contains("libXCTTargetBootstrapInject.dylib")
-        } else {
-            return false
-        }
-    }()
 }
