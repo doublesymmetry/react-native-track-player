@@ -188,11 +188,11 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void clearQueue() {
+    public void removeUpcomingTracks() {
         waitForConnection(new Runnable() {
             @Override
             public void run() {
-                binder.clearQueue();
+                binder.removeUpcomingTracks();
             }
         });
     }

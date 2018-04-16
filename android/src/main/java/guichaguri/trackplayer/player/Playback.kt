@@ -20,7 +20,7 @@ abstract class Playback(protected val context: Context, protected val manager: M
      * Attributes
      */
     var queue = mutableListOf<Track>()
-        protected set
+        private set
 
     var currentIndex = -1
         set(value) {
@@ -77,10 +77,9 @@ abstract class Playback(protected val context: Context, protected val manager: M
         manager.onQueueUpdate()
     }
 
-    fun clearQueue() {
-        queue.clear()
+    fun removeUpcomingTracks() {
+        queue = queue.filterIndexed { index, _ -> index <= currentIndex  } as MutableList
         manager.onQueueUpdate()
-        currentIndex = -1
     }
 
     fun skip(id: String, callback: Promise) {
