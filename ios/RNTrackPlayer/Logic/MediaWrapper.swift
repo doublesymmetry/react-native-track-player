@@ -46,7 +46,7 @@ class MediaWrapper: AudioPlayerDelegate {
     }
     
     var currentTrack: Track? {
-        return player.currentItem
+        return queue[safe: currentIndex]
     }
     
     var bufferedPosition: Double {
@@ -131,9 +131,8 @@ class MediaWrapper: AudioPlayerDelegate {
         }
     }
     
-    func clearQueue() {
-        currentIndex = -1
-        queue.removeAll()
+    func removeUpcomingTracks() {
+        queue = queue.filter { $0.0 <= currentIndex }
     }
     
     func skipToTrack(id: String) {
@@ -224,7 +223,7 @@ class MediaWrapper: AudioPlayerDelegate {
     
     func reset() {
         rate = 1
-        clearQueue()
+        queue.removeAll()
         stop()
     }
     

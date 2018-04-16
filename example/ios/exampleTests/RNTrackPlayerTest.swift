@@ -271,14 +271,24 @@ class RNTrackPlayerSpec: QuickSpec {
                 module.add(trackDicts: [correctTrack, anotherCorrectTrack], before: nil, resolve: { _ in }) { _ in }
                 module.play()
                 
-                module.clearQueue()
+                module.removeUpcomingTracks()
                 module.getQueue(resolve: { queue in
                     let castedQueue = queue as? [[String: Any]]
-                    expect(castedQueue).to(haveCount(0))
+                    expect(castedQueue).to(haveCount(1))
                 }) { _ in }
-                
                 module.getCurrentTrack(resolve: { trackId in
                     expect(trackId as? String).to(equal("test-correct"))
+                }) { _ in }
+                
+                module.add(trackDicts: [anotherCorrectTrack], before: nil, resolve: { _ in }) { _ in }
+                module.getQueue(resolve: { queue in
+                    let castedQueue = queue as? [[String: Any]]
+                    expect(castedQueue).to(haveCount(2))
+                }) { _ in }
+                
+                module.skipToNext(resolve: { _ in }) { _ in }
+                module.getCurrentTrack(resolve: { trackId in
+                    expect(trackId as? String).to(equal("test-correct-2"))
                 }) { _ in }
             }
         }

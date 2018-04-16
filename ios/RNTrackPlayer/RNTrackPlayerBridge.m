@@ -28,7 +28,7 @@ RCT_EXTERN_METHOD(remove:(NSArray *)objects
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(clearQueue);
+RCT_EXTERN_METHOD(removeUpcomingTracks);
 
 RCT_EXTERN_METHOD(skip:(NSString *)trackId
                   resolver:(RCTPromiseResolveBlock)resolve

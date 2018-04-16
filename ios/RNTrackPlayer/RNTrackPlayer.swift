@@ -184,10 +184,10 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         resolve(NSNull())
     }
     
-    @objc(clearQueue)
-    func clearQueue() {
-        print("Clearing queue")
-        mediaWrapper.clearQueue()
+    @objc(removeUpcomingTracks)
+    func removeUpcomingTracks() {
+        print("Removing upcoming tracks")
+        mediaWrapper.removeUpcomingTracks()
     }
     
     @objc(skip:resolver:rejecter:)
