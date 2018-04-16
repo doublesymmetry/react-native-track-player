@@ -74,7 +74,7 @@ public class ExoPlayback extends Playback implements EventListener {
 
         Uri url = track.url;
 
-        String userAgent = Util.getUserAgent(context, "react-native-track-player");
+        String userAgent = Util.getUserAgent(getContext(), "react-native-track-player");
         DefaultHttpDataSourceFactory httpDataSourceFactory = new DefaultHttpDataSourceFactory(
             userAgent,
             null,
@@ -82,11 +82,11 @@ public class ExoPlayback extends Playback implements EventListener {
             DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS,
             true
         );
-        DataSource.Factory factory = new DefaultDataSourceFactory(context, null, httpDataSourceFactory);
+        DataSource.Factory factory = new DefaultDataSourceFactory(getContext(), null, httpDataSourceFactory);
         MediaSource source;
 
         if(cacheMaxSize > 0 && !track.urlLocal) {
-            File cacheDir = new File(context.getCacheDir(), "TrackPlayer");
+            File cacheDir = new File(getContext().getCacheDir(), "TrackPlayer");
             Cache cache = new SimpleCache(cacheDir, new LeastRecentlyUsedCacheEvictor(cacheMaxSize));
             factory = new CacheDataSourceFactory(cache, factory, 0, cacheMaxSize);
         }
@@ -123,6 +123,7 @@ public class ExoPlayback extends Playback implements EventListener {
     @Override
     public void stop() {
         player.stop();
+        super.stop();
     }
 
     @Override
@@ -223,9 +224,9 @@ public class ExoPlayback extends Playback implements EventListener {
         } else if(playbackState == SimpleExoPlayer.STATE_ENDED) {
 
             if(hasNext()) {
-                updateCurrentTrack(currentTrack + 1, null);
+                updateCurrentTrack(getCurrentIndex() + 1, null);
             } else {
-                manager.onEnd(getCurrentTrack(), getPosition());
+                getManager().onEnd(getCurrentTrack(), getPosition());
             }
 
         }
@@ -236,7 +237,7 @@ public class ExoPlayback extends Playback implements EventListener {
         Utils.rejectCallback(loadCallback, error);
         loadCallback = null;
 
-        manager.onError(error);
+        getManager().onError(error);
     }
 
     @Override
