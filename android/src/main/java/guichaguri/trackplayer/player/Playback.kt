@@ -23,11 +23,6 @@ abstract class Playback(protected val context: Context, protected val manager: M
         private set
 
     var currentIndex = -1
-        set(value) {
-            field = value
-            updateCurrentTrack(value)
-        }
-
     val currentTrack get() = queue.getOrNull(currentIndex)
 
     /**
@@ -69,7 +64,7 @@ abstract class Playback(protected val context: Context, protected val manager: M
         }
 
         when (actionAfterRemovals) {
-            "play" -> updateCurrentTrack(currentIndex)
+            "play" -> changeCurrentTrack()
             "stop" -> stop()
         }
 
@@ -85,14 +80,14 @@ abstract class Playback(protected val context: Context, protected val manager: M
     fun skip(id: String, callback: Promise) {
         queue.indexOfFirstOrNull { track -> track.id == id }?.let {
             currentIndex = it
-            play()
+            changeCurrentTrack()
         } ?: Utils.rejectCallback(callback, "track_not_in_queue", "Given track ID was not found in queue")
     }
 
     fun skipToNext(): Boolean = when (queue.indices.contains(currentIndex + 1)) {
         true -> {
             currentIndex += 1
-            play()
+            changeCurrentTrack()
             true
         }
         false -> {
@@ -104,7 +99,7 @@ abstract class Playback(protected val context: Context, protected val manager: M
     fun skipToPrevious(): Boolean = when (queue.indices.contains(currentIndex - 1)) {
         true -> {
             currentIndex -= 1
-            play()
+            changeCurrentTrack()
             true
         }
         false -> {
@@ -131,8 +126,11 @@ abstract class Playback(protected val context: Context, protected val manager: M
     abstract fun pause()
 
     open fun stop() {
+        val prev = currentTrack
+        val pos = position
+
         currentIndex = -1
-        updateCurrentTrack(0)
+        manager.onTrackUpdate(prev, pos, null, true)
     }
 
     abstract fun seekTo(ms: Long)
@@ -140,10 +138,9 @@ abstract class Playback(protected val context: Context, protected val manager: M
     fun copyPlayback(playback: Playback) {
         queue = playback.queue
         currentIndex = playback.currentIndex
+        if (currentTrack == null) return
 
-        val track = currentTrack ?: return
-
-        load(track)
+        changeCurrentTrack()
         seekTo(playback.position)
 
         when {
@@ -168,15 +165,12 @@ abstract class Playback(protected val context: Context, protected val manager: M
         prevState = state
     }
 
-    private fun updateCurrentTrack(index: Int) {
-        if (!queue.indices.contains(index)) return
-
-        val previousTrack = currentTrack
+    fun changeCurrentTrack() {
+        val previousTrack = queue.getOrNull(currentIndex - 1)
         val oldProgression = position
 
-        val track = queue[index]
-        load(track)
-
+        val track = queue.getOrNull(currentIndex)
+        track?.let { load(it) }
         manager.onTrackUpdate(previousTrack, oldProgression, track, true)
     }
 }
