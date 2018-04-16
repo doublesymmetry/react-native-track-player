@@ -23,10 +23,6 @@
             </intent-filter>
         </receiver>
 
-        <!-- Android Auto support, removed if not allowed in track-player.json -->
-        <meta-data android:name="${autoMetadata}"
-                   android:resource="@xml/automotive_app_desc" />
-
     </application>
 
 </manifest>
