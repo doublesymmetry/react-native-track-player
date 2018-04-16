@@ -14,10 +14,8 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.v4.media.session.PlaybackStateCompat;
-import com.facebook.react.bridge.Promise;
 import guichaguri.trackplayer.logic.LibHelper;
 import guichaguri.trackplayer.logic.MediaManager;
-import guichaguri.trackplayer.logic.Utils;
 import guichaguri.trackplayer.logic.track.Track;
 import guichaguri.trackplayer.player.Playback;
 import guichaguri.trackplayer.player.components.ProxyCache;
@@ -33,8 +31,6 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
 
     private final MediaPlayer player;
     private final ProxyCache cache;
-
-    private Promise loadCallback;
 
     private boolean loaded = false;
     private boolean buffering = false;
@@ -70,7 +66,7 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
     }
 
     @Override
-    public void load(Track track, Promise callback) {
+    public void load(Track track) {
         Uri url = track.url;
 
         // Resets the player to update its state to idle
@@ -89,14 +85,11 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
 
         try {
             // Loads the uri
-            loadCallback = callback;
             if(player.isPlaying()) player.stop();
             player.reset();
             player.setDataSource(getContext(), url);
             player.prepareAsync();
         } catch(IOException ex) {
-            loadCallback = null;
-            Utils.rejectCallback(callback, ex);
             getManager().onError(ex);
         }
 
@@ -249,9 +242,7 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
         ended = true;
         updateState();
 
-        if(hasNext()) {
-            updateCurrentTrack(getCurrentIndex() + 1, null);
-        } else {
+        if (!skipToNext()) {
             getManager().onEnd(getCurrentTrack(), getPosition());
         }
     }
@@ -280,9 +271,6 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
             }
         }
 
-        Utils.resolveCallback(loadCallback);
-        loadCallback = null;
-
         loaded = true;
         updateState();
     }
@@ -301,9 +289,6 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
         } else {
             ex = new RuntimeException("Unknown error");
         }
-
-        Utils.rejectCallback(loadCallback, ex);
-        loadCallback = null;
 
         getManager().onError(ex);
         return true;
