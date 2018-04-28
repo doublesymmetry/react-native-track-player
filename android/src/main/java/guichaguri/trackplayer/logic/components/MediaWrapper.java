@@ -104,10 +104,7 @@ public class MediaWrapper extends Binder {
 
         if(pb == null) return;
         if (pb.getQueue().size() < 1) return;
-        if (pb.getCurrentIndex() == -1) {
-            pb.setCurrentIndex(0);
-            pb.changeCurrentTrack();
-        }
+        if (pb.getCurrentIndex() == -1) { pb.setCurrentIndex(0); }
 
         pb.play();
     }
