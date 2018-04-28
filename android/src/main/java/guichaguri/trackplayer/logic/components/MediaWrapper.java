@@ -4,8 +4,6 @@ import android.content.Context;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.media.session.PlaybackStateCompat;
-
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import guichaguri.trackplayer.logic.MediaManager;
@@ -45,9 +43,7 @@ public class MediaWrapper extends Binder {
 
     public void add(final List<Bundle> tracks, final String insertBeforeId, final Promise promise) {
         Playback pb = manager.getPlayback();
-
         if(pb == null) return;
-        if (tracks.size() == 0) return;
 
         List<Track> list = new ArrayList<>();
         for(int i = 0; i < tracks.size(); i++) {
@@ -78,19 +74,13 @@ public class MediaWrapper extends Binder {
     public void skipToNext(final Promise promise) {
         Playback pb = manager.getPlayback();
         if(pb == null) return;
-
-        if (!pb.skipToNext()) {
-            Utils.rejectCallback(promise, "queue_exhausted", "There is no tracks left to play");
-        }
+        pb.skipToNext(promise);
     }
 
     public void skipToPrevious(final Promise promise) {
         Playback pb = manager.getPlayback();
         if(pb == null) return;
-
-        if (!pb.skipToPrevious()) {
-            Utils.rejectCallback(promise, "no_previous_track", "There is no previous track");
-        }
+        pb.skipToPrevious(promise);
     }
 
     public void reset() {
@@ -101,11 +91,7 @@ public class MediaWrapper extends Binder {
 
     public void play() {
         Playback pb = manager.getPlayback();
-
         if(pb == null) return;
-        if (pb.getQueue().size() < 1) return;
-        if (pb.getCurrentIndex() == -1) { pb.setCurrentIndex(0); }
-
         pb.play();
     }
 

@@ -16,19 +16,10 @@ import java.util.Collections
  * @author David Chavez
  */
 abstract class Playback(protected val context: Context, protected val manager: MediaManager) {
-
-    /**
-     * Attributes
-     */
     var queue: MutableList<Track> = Collections.synchronizedList(ArrayList())
         protected set
 
-    var currentIndex = -1
-        set(value) {
-            field = value
-            updateCurrentTrack(value)
-        }
-
+    protected var currentIndex = -1
     private var prevState = PlaybackStateCompat.STATE_NONE
 
     /**
@@ -58,7 +49,9 @@ abstract class Playback(protected val context: Context, protected val manager: M
             queue.addAll(trackIndex, tracks)
             if (currentIndex >= trackIndex) { currentIndex += tracks.size }
         } else {
+            val wasEmpty = queue.isEmpty()
             queue.addAll(tracks)
+            if (wasEmpty) { updateCurrentTrack(0, null) }
         }
 
         Utils.resolveCallback(callback)
@@ -80,7 +73,7 @@ abstract class Playback(protected val context: Context, protected val manager: M
         }
 
         when (actionAfterRemovals) {
-            "play" -> updateCurrentTrack(currentIndex)
+            "play" -> updateCurrentTrack(currentIndex, null)
             "stop" -> stop()
         }
 
@@ -101,34 +94,32 @@ abstract class Playback(protected val context: Context, protected val manager: M
             return
         }
 
-        updateCurrentTrack(trackIndex)
+        updateCurrentTrack(trackIndex, callback)
     }
 
-    fun skipToNext(): Boolean = when (queue.indices.contains(currentIndex + 1)) {
-        true -> {
-            currentIndex += 1
-            play()
-            true
-        }
-        false -> {
+    fun hasNext(): Boolean {
+        return queue.indices.contains(currentIndex + 1)
+    }
+
+    fun skipToNext(callback: Promise) {
+        if (queue.indices.contains(currentIndex + 1)) {
+            updateCurrentTrack(currentIndex + 1, callback)
+        } else {
             stop()
-            false
+            Utils.rejectCallback(callback, "queue_exhausted", "There is no tracks left to play")
         }
     }
 
-    fun skipToPrevious(): Boolean = when (queue.indices.contains(currentIndex - 1)) {
-        true -> {
-            currentIndex -= 1
-            play()
-            true
-        }
-        false -> {
+    fun skipToPrevious(callback: Promise) {
+        if (queue.indices.contains(currentIndex - 1)) {
+            updateCurrentTrack(currentIndex - 1, callback)
+        } else {
             stop()
-            false
+            Utils.rejectCallback(callback, "no_previous_track", "There is no previous track")
         }
     }
 
-    abstract fun load(track: Track)
+    abstract fun load(track: Track, callback: Promise?)
 
     open fun reset() {
         val prev = getCurrentTrack()
@@ -147,7 +138,7 @@ abstract class Playback(protected val context: Context, protected val manager: M
 
     open fun stop() {
         currentIndex = -1
-        updateCurrentTrack(0)
+        updateCurrentTrack(0, null)
     }
 
     abstract fun seekTo(ms: Long)
@@ -158,7 +149,7 @@ abstract class Playback(protected val context: Context, protected val manager: M
 
         val track = getCurrentTrack() ?: return
 
-        load(track)
+        load(track, null)
         seekTo(playback.position)
 
         when {
@@ -184,15 +175,33 @@ abstract class Playback(protected val context: Context, protected val manager: M
         prevState = state
     }
 
-    private fun updateCurrentTrack(index: Int) {
-        if (queue.indices.contains(index)) {
-            val previousTrack = getCurrentTrack()
-            val oldProgression = position
-
-            val track = queue[index]
-            load(track)
-
-            manager.onTrackUpdate(previousTrack, oldProgression, track, true)
+    protected fun updateCurrentTrack(track: Int, callback: Promise?) {
+        var updatedTrackIndex = track
+        when {
+            queue.isEmpty() -> {
+                reset()
+                Utils.rejectCallback(callback, "queue", "The queue is empty")
+            }
+            updatedTrackIndex >= queue.size -> { updatedTrackIndex = queue.size - 1 }
+            updatedTrackIndex < 0 -> updatedTrackIndex = 0
         }
+
+        val previous = getCurrentTrack()
+        val position = position
+        val oldState = state
+
+        Log.d(Utils.TAG, "Updating current track...")
+
+        val next = queue[updatedTrackIndex]
+        currentIndex = updatedTrackIndex
+
+        load(next, callback)
+
+        when {
+            Utils.isPlaying(oldState) -> play()
+            Utils.isPaused(oldState) -> pause()
+        }
+
+        manager.onTrackUpdate(previous, position, next, true)
     }
 }

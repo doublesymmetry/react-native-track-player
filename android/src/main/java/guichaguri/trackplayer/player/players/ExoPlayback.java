@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.media.session.PlaybackStateCompat;
+import com.facebook.react.bridge.Promise;
 import com.google.android.exoplayer2.*;
 import com.google.android.exoplayer2.ExoPlayer.EventListener;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
@@ -46,6 +47,7 @@ public class ExoPlayback extends Playback implements EventListener {
     private final SimpleExoPlayer player;
     private final long cacheMaxSize;
 
+    private Promise loadCallback = null;
     private boolean playing = false;
 
     public ExoPlayback(Context context, MediaManager manager, Bundle options) {
@@ -67,7 +69,9 @@ public class ExoPlayback extends Playback implements EventListener {
     }
 
     @Override
-    public void load(Track track) {
+    public void load(Track track, Promise callback) {
+        loadCallback = callback;
+
         Uri url = track.url;
 
         String userAgent = Util.getUserAgent(getContext(), "react-native-track-player");
@@ -212,15 +216,27 @@ public class ExoPlayback extends Playback implements EventListener {
         playing = playWhenReady;
         updateState(getState(playbackState));
 
-        if(playbackState == SimpleExoPlayer.STATE_ENDED) {
-            if (!skipToNext()) {
+        if(playbackState == SimpleExoPlayer.STATE_READY) {
+
+            Utils.resolveCallback(loadCallback);
+            loadCallback = null;
+
+        } else if(playbackState == SimpleExoPlayer.STATE_ENDED) {
+
+            if(hasNext()) {
+                updateCurrentTrack(getCurrentIndex() + 1, null);
+            } else {
                 getManager().onEnd(getCurrentTrack(), getPosition());
             }
+
         }
     }
 
     @Override
     public void onPlayerError(ExoPlaybackException error) {
+        Utils.rejectCallback(loadCallback, error);
+        loadCallback = null;
+
         getManager().onError(error);
     }
 
