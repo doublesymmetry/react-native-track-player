@@ -33,6 +33,7 @@
 		9B8D9F8E1F40AF8F003A0C0B /* AudioPlayer+CurrentItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8D9F721F40AEC3003A0C0B /* AudioPlayer+CurrentItem.swift */; };
 		9B8D9F901F40AF93003A0C0B /* AudioPlayerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8D9F741F40AEC3003A0C0B /* AudioPlayerDelegate.swift */; };
 		9B8D9F921F40AF93003A0C0B /* AudioPlayerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8D9F761F40AEC3003A0C0B /* AudioPlayerState.swift */; };
+		9BCFF5B92084B4E20043C887 /* Collections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BCFF5B82084B4E20043C887 /* Collections.swift */; };
 		9BFBA4D21F3DFA3F00453D3A /* MediaWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BFBA4D11F3DFA3F00453D3A /* MediaWrapper.swift */; };
 		9BFC1F7B1F619A09008795BF /* TrackEventProducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC1F7A1F619A09008795BF /* TrackEventProducer.swift */; };
 		9BFC1F7D1F619C0B008795BF /* AudioPlayer+TrackEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC1F7C1F619C0B008795BF /* AudioPlayer+TrackEvent.swift */; };
@@ -80,6 +81,7 @@
 		9B8D9F721F40AEC3003A0C0B /* AudioPlayer+CurrentItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AudioPlayer+CurrentItem.swift"; sourceTree = "<group>"; };
 		9B8D9F741F40AEC3003A0C0B /* AudioPlayerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayerDelegate.swift; sourceTree = "<group>"; };
 		9B8D9F761F40AEC3003A0C0B /* AudioPlayerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayerState.swift; sourceTree = "<group>"; };
+		9BCFF5B82084B4E20043C887 /* Collections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Collections.swift; sourceTree = "<group>"; };
 		9BFBA4D01F3DFA3F00453D3A /* RNTrackPlayer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNTrackPlayer-Bridging-Header.h"; sourceTree = "<group>"; };
 		9BFBA4D11F3DFA3F00453D3A /* MediaWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaWrapper.swift; sourceTree = "<group>"; };
 		9BFC1F7A1F619A09008795BF /* TrackEventProducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackEventProducer.swift; sourceTree = "<group>"; };
@@ -125,6 +127,7 @@
 		9B0E282B1F07D76F00B71D2A /* RNTrackPlayer */ = {
 			isa = PBXGroup;
 			children = (
+				9BCFF5B72084B4CE0043C887 /* Extensions */,
 				9BFBA4D31F3DFA4B00453D3A /* Support */,
 				9B0AF8E71F22304200C50DC1 /* Logic */,
 				9B0E287A1F0831A400B71D2A /* Models */,
@@ -216,6 +219,14 @@
 			path = extensions;
 			sourceTree = "<group>";
 		};
+		9BCFF5B72084B4CE0043C887 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				9BCFF5B82084B4E20043C887 /* Collections.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		9BFBA4D31F3DFA4B00453D3A /* Support */ = {
 			isa = PBXGroup;
 			children = (
@@ -290,6 +301,7 @@
 				9B78A2481F3F12C9002B5E3C /* MediaURL.swift in Sources */,
 				9B8D9F771F40AF7B003A0C0B /* BackgroundHandler.swift in Sources */,
 				9B8D9F801F40AF85003A0C0B /* PlayerEventProducer.swift in Sources */,
+				9BCFF5B92084B4E20043C887 /* Collections.swift in Sources */,
 				9BFC1F7B1F619A09008795BF /* TrackEventProducer.swift in Sources */,
 				9B8D9F7D1F40AF85003A0C0B /* EventProducer.swift in Sources */,
 				9B8D9F8C1F40AF8F003A0C0B /* AudioPlayer+NetworkEvent.swift in Sources */,

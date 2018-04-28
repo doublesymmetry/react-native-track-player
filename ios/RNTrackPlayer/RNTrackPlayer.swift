@@ -22,10 +22,12 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     // MARK: - MediaWrapperDelegate Methods
     
     func playerUpdatedState() {
-        sendEvent(withName: "playback-state", body: ["state": mediaWrapper.state])
+        guard !isTesting else { return }
+        sendEvent(withName: "playback-state", body: ["state": mediaWrapper.mappedState.rawValue])
     }
     
     func playerSwitchedTracks(trackId: String?, time: TimeInterval?, nextTrackId: String?) {
+        guard !isTesting else { return }
         sendEvent(withName: "playback-track-changed", body: [
             "track": trackId,
             "position": time,
@@ -34,15 +36,27 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     }
     
     func playerExhaustedQueue(trackId: String?, time: TimeInterval?) {
-      sendEvent(withName: "playback-queue-ended", body: [
-          "track": trackId,
-          "position": time,
-      ])
+        guard !isTesting else { return }
+        sendEvent(withName: "playback-queue-ended", body: [
+            "track": trackId,
+            "position": time,
+        ])
     }
     
     func playbackFailed(error: Error) {
+        guard !isTesting else { return }
         sendEvent(withName: "playback-error", body: ["error": error.localizedDescription])
     }
+    
+    private let isTesting = { () -> Bool in
+        if let _ = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] {
+            return true
+        } else if let testingEnv = ProcessInfo.processInfo.environment["DYLD_INSERT_LIBRARIES"] {
+            return testingEnv.contains("libXCTTargetBootstrapInject.dylib")
+        } else {
+            return false
+        }
+    }()
     
     
     // MARK: - Required Methods
@@ -54,11 +68,11 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     @objc(constantsToExport)
     override func constantsToExport() -> [AnyHashable: Any] {
         return [
-            "STATE_NONE": "STATE_NONE",
-            "STATE_PLAYING": "STATE_PLAYING",
-            "STATE_PAUSED": "STATE_PAUSED",
-            "STATE_STOPPED": "STATE_STOPPED",
-            "STATE_BUFFERING": "STATE_BUFFERING",
+            "STATE_NONE": MediaWrapper.PlaybackState.none.rawValue,
+            "STATE_PLAYING": MediaWrapper.PlaybackState.playing.rawValue,
+            "STATE_PAUSED": MediaWrapper.PlaybackState.paused.rawValue,
+            "STATE_STOPPED": MediaWrapper.PlaybackState.stopped.rawValue,
+            "STATE_BUFFERING": MediaWrapper.PlaybackState.buffering.rawValue,
             
             "PITCH_ALGORITHM_LINEAR": PitchAlgorithm.linear.rawValue,
             "PITCH_ALGORITHM_MUSIC": PitchAlgorithm.music.rawValue,
@@ -170,6 +184,12 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         resolve(NSNull())
     }
     
+    @objc(removeUpcomingTracks)
+    func removeUpcomingTracks() {
+        print("Removing upcoming tracks")
+        mediaWrapper.removeUpcomingTracks()
+    }
+    
     @objc(skip:resolver:rejecter:)
     func skip(to trackId: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !mediaWrapper.queueContainsTrack(trackId: trackId) {
@@ -238,8 +258,15 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         mediaWrapper.volume = level
     }
     
+    @objc(getVolume:rejecter:)
+    func getVolume(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        print("Getting current volume")
+        resolve(mediaWrapper.volume)
+    }
+    
     @objc(setRate:)
     func setRate(rate: Float) {
+        guard [.playing].contains(mediaWrapper.mappedState) else { return }
         print("Setting rate to \(rate)")
         mediaWrapper.rate = rate
     }
@@ -257,7 +284,14 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
             return
         }
         
-        resolve(mediaWrapper.currentTrack!.toObject())
+        let track = mediaWrapper.queue.first(where: { $0.id == id })
+        resolve(track!.toObject())
+    }
+    
+    @objc(getQueue:rejecter:)
+    func getQueue(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        let queue = mediaWrapper.queue.map { $0.toObject() }
+        resolve(queue)
     }
     
     @objc(getCurrentTrack:rejecter:)
@@ -282,7 +316,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     @objc(getState:rejecter:)
     func getState(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        resolve(mediaWrapper.state)
+        resolve(mediaWrapper.mappedState.rawValue)
     }
     
     
@@ -326,7 +360,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     }
     
     func remoteSentPlayPause() {
-        if mediaWrapper.state == "STATE_PAUSED" {
+        if mediaWrapper.mappedState == .paused {
             sendEvent(withName: "remote-play", body: nil)
             return
         }

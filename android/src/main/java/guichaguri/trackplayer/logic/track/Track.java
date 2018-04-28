@@ -41,6 +41,7 @@ public class Track {
     public final boolean artworkLocal;
 
     public QueueItem queueItem;
+    public Bundle originalItem;
 
     public Track(Context context, MediaManager manager, Bundle data) {
         id = data.getString("id");
@@ -63,6 +64,8 @@ public class Track {
 
         artwork = Utils.getUri(context, data, "artwork", null);
         artworkLocal = isLocal(artwork);
+
+        originalItem = data;
     }
 
     private boolean isLocal(Uri uri) {
@@ -75,26 +78,6 @@ public class Track {
                 scheme.equals(ContentResolver.SCHEME_ANDROID_RESOURCE) ||
                 scheme.equals(ContentResolver.SCHEME_CONTENT) ||
                 scheme.equals("res");
-    }
-
-    public Bundle toBundle() {
-        Bundle bundle = new Bundle();
-
-        bundle.putString("id", id);
-        bundle.putString("url", url.toString());
-        bundle.putDouble("duration", Utils.toSeconds(duration));
-        bundle.putString("type", type.name);
-        bundle.putString("contentType", contentType);
-        bundle.putString("title", title);
-        bundle.putString("artist", artist);
-        bundle.putString("album", album);
-        bundle.putString("genre", genre);
-        bundle.putString("date", date);
-        bundle.putString("description", description);
-        Utils.setRating(bundle, "rating", rating);
-        bundle.putString("artwork", artwork.toString());
-
-        return bundle;
     }
 
     public QueueItem toQueueItem() {

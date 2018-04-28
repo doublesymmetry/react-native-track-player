@@ -59,6 +59,7 @@ extension AudioPlayer {
 
         if let _ = player {
             player?.rate = 0
+            player?.replaceCurrentItem(with: nil)
             player = nil
         }
         if let _ = currentItem {
