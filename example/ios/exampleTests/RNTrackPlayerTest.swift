@@ -265,7 +265,7 @@ class RNTrackPlayerSpec: QuickSpec {
           }
         }
         
-        describe(".clearQueue") {
+        describe(".removeUpcomingTracks") {
             it("removes all items from queue but does not stop current playback") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack, anotherCorrectTrack], before: nil, resolve: { _ in }) { _ in }

@@ -87,11 +87,12 @@ public abstract class Playback {
         manager.onQueueUpdate();
     }
 
-    public void clearQueue() {
-        queue.clear();
-        manager.onQueueUpdate();
+    public void removeUpcomingTracks() {
+        for(int i = currentTrack + 1; i < queue.size(); i++) {
+            queue.remove(i);
+        }
 
-        currentTrack = -1;
+        manager.onQueueUpdate();
     }
 
     public void skip(String id, Promise callback) {
