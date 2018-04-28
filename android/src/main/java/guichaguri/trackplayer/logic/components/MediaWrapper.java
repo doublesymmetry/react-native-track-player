@@ -63,10 +63,10 @@ public class MediaWrapper extends Binder {
         pb.remove(ids, promise);
     }
 
-    public void removeUpcomingTracks() {
+    public void clearQueue() {
         Playback pb = manager.getPlayback();
         if(pb == null) return;
-        pb.removeUpcomingTracks();
+        pb.clearQueue();
     }
 
     public void skip(final String id, final Promise promise) {
