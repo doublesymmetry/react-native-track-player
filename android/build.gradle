@@ -15,28 +15,32 @@ buildscript {
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
+boolean exoplayer = false, cache = false, auto = false;
 boolean dash = false, hls = false, smoothstreaming = false;
 
 File file = file('../../../track-player.json')
 if(file.exists()) {
     def json = new JsonSlurper().parseText(file.text)
+    cache = json.cache ?: cache
     dash = json.dash ?: dash
     hls = json.hls ?: hls
     smoothstreaming = json.smoothstreaming ?: smoothstreaming
+    auto = json.auto ?: auto
+
+    exoplayer = json.exoplayer || dash || hls || smoothstreaming
 }
 
 
-ext.sdkVersion = 27
-ext.buildToolsVersion = '27.0.3'
-ext.supportVersion = '27.1.1'
+ext.buildToolsVersion = '23.0.3'
+ext.supportVersion = '23.2.0'
 
 android {
-    compileSdkVersion sdkVersion
+    compileSdkVersion 23
     buildToolsVersion buildToolsVersion
 
     defaultConfig {
         minSdkVersion 16 // RN's minimum version
-        targetSdkVersion sdkVersion
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
         ndk {
@@ -46,15 +50,18 @@ android {
         consumerProguardFiles 'proguard-rules.txt'
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+    buildTypes {
+        buildTypes.each {
+            def autoMd = auto ? 'com.google.android.gms.car.application' : 'disabled.car.application'
+            it.manifestPlaceholders = [autoMetadata: autoMd]
+        }
     }
 }
 
 repositories {
     google()
     jcenter()
+    mavenCentral()
     maven {
         // As RN is not updated in jcenter anymore, we'll have to grab it from npm
         url "../node_modules/react-native/android"
@@ -63,37 +70,43 @@ repositories {
 
 dependencies {
     //noinspection GradleDynamicVersion
-    implementation('com.facebook.react:react-native:+') {
-        exclude group: 'com.android.support', module: 'support-compat'
-        exclude group: 'com.android.support', module: 'appcompat-v7'
-    }
+    implementation 'com.facebook.react:react-native:+'
 
     // ExoPlayer Core
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.7.1'
+    if(exoplayer) {
+        implementation 'com.google.android.exoplayer:exoplayer-core:r2.4.3'
+    } else {
+        compileOnly 'com.google.android.exoplayer:exoplayer-core:r2.4.3'
+    }
 
     // ExoPlayer DASH
     if(dash) {
-        implementation 'com.google.android.exoplayer:exoplayer-dash:2.7.1'
+        implementation 'com.google.android.exoplayer:exoplayer-dash:r2.4.3'
     } else {
-        compileOnly 'com.google.android.exoplayer:exoplayer-dash:2.7.1'
+        compileOnly 'com.google.android.exoplayer:exoplayer-dash:r2.4.3'
     }
 
     // ExoPlayer HLS
     if(hls) {
-        implementation 'com.google.android.exoplayer:exoplayer-hls:2.7.1'
+        implementation 'com.google.android.exoplayer:exoplayer-hls:r2.4.3'
     } else {
-        compileOnly 'com.google.android.exoplayer:exoplayer-hls:2.7.1'
+        compileOnly 'com.google.android.exoplayer:exoplayer-hls:r2.4.3'
     }
 
     // ExoPlayer SmoothStreaming
     if(smoothstreaming) {
-        implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.7.1'
+        implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:r2.4.3'
     } else {
-        compileOnly 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.7.1'
+        compileOnly 'com.google.android.exoplayer:exoplayer-smoothstreaming:r2.4.3'
     }
 
-    implementation "com.android.support:support-compat:$supportVersion"
+    // Caching (for the default Android player)
+    if(cache && !exoplayer) {
+        implementation 'com.danikula:videocache:2.7.0'
+    } else {
+        compileOnly 'com.danikula:videocache:2.7.0'
+    }
+
     implementation "com.android.support:appcompat-v7:$supportVersion"
-    implementation "com.android.support:support-media-compat:$supportVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }

@@ -100,7 +100,7 @@ android {
     defaultConfig {
         applicationId "com.example"
         minSdkVersion 16
-        targetSdkVersion 27
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
         ndk {
@@ -138,10 +138,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation('com.facebook.react:react-native:+') {
-        exclude group: 'com.android.support', module: 'support-compat'
-        exclude group: 'com.android.support', module: 'appcompat-v7'
-    }
+    implementation "com.facebook.react:react-native:+"  // From node_modules
+    implementation "com.android.support:appcompat-v7:23.2.0"
     implementation project(':react-native-track-player')
 }
 
@@ -152,6 +150,5 @@ task copyDownloadableDepsToLibs(type: Copy) {
     into 'libs'
 }
 repositories {
-    google()
     mavenCentral()
 }

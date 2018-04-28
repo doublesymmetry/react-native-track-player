@@ -5,8 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.media.session.PlaybackStateCompat;
 import com.google.android.exoplayer2.*;
-import com.google.android.exoplayer2.Player.EventListener;
-import com.google.android.exoplayer2.audio.AudioAttributes;
+import com.google.android.exoplayer2.ExoPlayer.EventListener;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -54,14 +53,14 @@ public class ExoPlayback extends Playback implements EventListener {
 
         int minBuffer = (int)Utils.toMillis(options.getDouble("minBuffer", Utils.toSeconds(DEFAULT_MIN_BUFFER_MS)));
         int maxBuffer = (int)Utils.toMillis(options.getDouble("maxBuffer", Utils.toSeconds(DEFAULT_MAX_BUFFER_MS)));
-        int playBuffer = (int)Utils.toMillis(options.getDouble("playBuffer", Utils.toSeconds(DEFAULT_BUFFER_FOR_PLAYBACK_MS)));
+        long playBuffer = Utils.toMillis(options.getDouble("playBuffer", Utils.toSeconds(DEFAULT_BUFFER_FOR_PLAYBACK_MS)));
         int multiplier = DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS / DEFAULT_BUFFER_FOR_PLAYBACK_MS;
 
         DefaultAllocator allocator = new DefaultAllocator(true, 0x10000);
-        LoadControl control = new DefaultLoadControl(allocator, minBuffer, maxBuffer, playBuffer, playBuffer * multiplier, -1, true);
+        LoadControl control = new DefaultLoadControl(allocator, minBuffer, maxBuffer, playBuffer, playBuffer * multiplier);
 
         player = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(context), new DefaultTrackSelector(), control);
-        player.setAudioAttributes(new AudioAttributes.Builder().setContentType(C.CONTENT_TYPE_MUSIC).setUsage(C.USAGE_MEDIA).build());
+        player.setAudioStreamType(C.STREAM_TYPE_MUSIC);
         player.addListener(this);
 
         cacheMaxSize = (long)(options.getDouble("maxCacheSize", 0) * 1024);
@@ -130,13 +129,13 @@ public class ExoPlayback extends Playback implements EventListener {
 
     private int getState(int playerState) {
         switch(playerState) {
-            case Player.STATE_BUFFERING:
+            case SimpleExoPlayer.STATE_BUFFERING:
                 return PlaybackStateCompat.STATE_BUFFERING;
-            case Player.STATE_ENDED:
+            case SimpleExoPlayer.STATE_ENDED:
                 return PlaybackStateCompat.STATE_STOPPED;
-            case Player.STATE_IDLE:
+            case SimpleExoPlayer.STATE_IDLE:
                 return PlaybackStateCompat.STATE_NONE;
-            case Player.STATE_READY:
+            case SimpleExoPlayer.STATE_READY:
                 return playing ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED;
         }
         return PlaybackStateCompat.STATE_NONE;
@@ -194,7 +193,7 @@ public class ExoPlayback extends Playback implements EventListener {
     }
 
     @Override
-    public void onTimelineChanged(Timeline timeline, Object o, int i) {
+    public void onTimelineChanged(Timeline timeline, Object manifest) {
 
     }
 
@@ -213,21 +212,11 @@ public class ExoPlayback extends Playback implements EventListener {
         playing = playWhenReady;
         updateState(getState(playbackState));
 
-        if(playbackState == Player.STATE_ENDED) {
+        if(playbackState == SimpleExoPlayer.STATE_ENDED) {
             if (!skipToNext()) {
                 getManager().onEnd(getCurrentTrack(), getPosition());
             }
         }
-    }
-
-    @Override
-    public void onRepeatModeChanged(int repeatMode) {
-
-    }
-
-    @Override
-    public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
-
     }
 
     @Override
@@ -236,7 +225,7 @@ public class ExoPlayback extends Playback implements EventListener {
     }
 
     @Override
-    public void onPositionDiscontinuity(int i) {
+    public void onPositionDiscontinuity() {
 
     }
 
@@ -245,8 +234,4 @@ public class ExoPlayback extends Playback implements EventListener {
 
     }
 
-    @Override
-    public void onSeekProcessed() {
-
-    }
 }

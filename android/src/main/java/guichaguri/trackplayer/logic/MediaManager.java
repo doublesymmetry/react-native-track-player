@@ -14,6 +14,7 @@ import guichaguri.trackplayer.logic.track.Track;
 import guichaguri.trackplayer.metadata.Metadata;
 import guichaguri.trackplayer.metadata.components.MediaNotification;
 import guichaguri.trackplayer.player.Playback;
+import guichaguri.trackplayer.player.players.AndroidPlayback;
 import guichaguri.trackplayer.player.players.ExoPlayback;
 
 /**
@@ -59,7 +60,13 @@ public class MediaManager {
     }
 
     public Playback createLocalPlayback() {
-        return new ExoPlayback(service, this, playbackOptions);
+        if(LibHelper.isExoPlayerAvailable()) {
+            Log.i(Utils.TAG, "Creating an ExoPlayer instance...");
+            return new ExoPlayback(service, this, playbackOptions);
+        } else {
+            Log.i(Utils.TAG, "Creating a MediaPlayer instance...");
+            return new AndroidPlayback(service, this, playbackOptions);
+        }
     }
 
     public void setupPlayer(Bundle options) {
