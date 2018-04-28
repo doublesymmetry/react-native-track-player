@@ -2,12 +2,13 @@ package guichaguri.trackplayer.player
 
 import android.content.Context
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import com.facebook.react.bridge.Promise
-import guichaguri.trackplayer.extensions.*
 import guichaguri.trackplayer.logic.MediaManager
 import guichaguri.trackplayer.logic.Utils
 import guichaguri.trackplayer.logic.track.Track
-
+import java.util.ArrayList
+import java.util.Collections
 
 /**
  * Base player object
@@ -19,7 +20,7 @@ abstract class Playback(protected val context: Context, protected val manager: M
     /**
      * Attributes
      */
-    var queue = mutableListOf<Track>()
+    var queue: MutableList<Track> = Collections.synchronizedList(ArrayList())
         protected set
 
     var currentIndex = -1
@@ -28,28 +29,37 @@ abstract class Playback(protected val context: Context, protected val manager: M
             updateCurrentTrack(value)
         }
 
-    val currentTrack get() = queue.getOrNull(currentIndex)
+    private var prevState = PlaybackStateCompat.STATE_NONE
 
     /**
      * State from [android.support.v4.media.session.PlaybackStateCompat]
      */
     abstract val state: Int
-    private var prevState = PlaybackStateCompat.STATE_NONE
 
-    abstract var rate: Float
-    abstract var volume: Float
     abstract val position: Long
-    abstract val duration: Long
-    abstract val isRemote: Boolean
+
     abstract val bufferedPosition: Long
 
-    /**
-     * Public API
-     */
+    abstract val duration: Long
+
+    abstract var rate: Float
+
+    abstract var volume: Float
+
+    abstract val isRemote: Boolean
+
+    fun getCurrentTrack(): Track? {
+        return if (currentIndex < queue.size && currentIndex >= 0) queue[currentIndex] else null
+    }
+
     fun add(tracks: List<Track>, insertBeforeId: String?, callback: Promise) {
-        queue.indexOfFirstOrNull { track -> track.id == insertBeforeId }?.let {
-            queue.addAll(it, tracks)
-        } ?: queue.addAll(tracks)
+        val trackIndex = queue.indexOfFirst { track -> track.id == insertBeforeId }
+        if (trackIndex != -1) {
+            queue.addAll(trackIndex, tracks)
+            if (currentIndex >= trackIndex) { currentIndex += tracks.size }
+        } else {
+            queue.addAll(tracks)
+        }
 
         Utils.resolveCallback(callback)
     }
@@ -57,15 +67,16 @@ abstract class Playback(protected val context: Context, protected val manager: M
     fun remove(ids: List<String>, callback: Promise) {
         var actionAfterRemovals = "none"
         for (id in ids) {
-            queue.indexOfFirstOrNull { track -> track.id == id }?.let {
-                when {
-                    it < currentIndex -> currentIndex -= 1
-                    queue.last().id == id -> actionAfterRemovals = "stop"
-                    it == currentIndex -> actionAfterRemovals = "play"
-                }
+            val trackIndex = queue.indexOfFirst { track -> track.id == id }
+            if (trackIndex == -1) { return }
 
-                queue.removeAt(it);
+            when {
+                trackIndex < currentIndex   -> currentIndex -= 1
+                queue.last().id == id       -> actionAfterRemovals = "stop"
+                trackIndex == currentIndex  -> actionAfterRemovals = "play"
             }
+
+            queue.removeAt(trackIndex);
         }
 
         when (actionAfterRemovals) {
@@ -84,10 +95,13 @@ abstract class Playback(protected val context: Context, protected val manager: M
     }
 
     fun skip(id: String, callback: Promise) {
-        queue.indexOfFirstOrNull { track -> track.id == id }?.let {
-            currentIndex = it
-            play()
-        } ?: Utils.rejectCallback(callback, "track_not_in_queue", "Given track ID was not found in queue")
+        val trackIndex = queue.indexOfFirst { track -> track.id == id }
+        if (trackIndex == -1) {
+            Utils.rejectCallback(callback, "track_not_in_queue", "Given track ID was not found in queue")
+            return
+        }
+
+        updateCurrentTrack(trackIndex)
     }
 
     fun skipToNext(): Boolean = when (queue.indices.contains(currentIndex + 1)) {
@@ -117,7 +131,7 @@ abstract class Playback(protected val context: Context, protected val manager: M
     abstract fun load(track: Track)
 
     open fun reset() {
-        val prev = currentTrack
+        val prev = getCurrentTrack()
         val pos = position
 
         queue.clear()
@@ -142,7 +156,7 @@ abstract class Playback(protected val context: Context, protected val manager: M
         queue = playback.queue
         currentIndex = playback.currentIndex
 
-        val track = currentTrack ?: return
+        val track = getCurrentTrack() ?: return
 
         load(track)
         seekTo(playback.position)
@@ -157,6 +171,7 @@ abstract class Playback(protected val context: Context, protected val manager: M
 
     protected fun updateState(state: Int) {
         manager.onPlaybackUpdate()
+
         if (state == prevState) return
 
         when {
@@ -170,14 +185,14 @@ abstract class Playback(protected val context: Context, protected val manager: M
     }
 
     private fun updateCurrentTrack(index: Int) {
-        if (!queue.indices.contains(index)) return
+        if (queue.indices.contains(index)) {
+            val previousTrack = getCurrentTrack()
+            val oldProgression = position
 
-        val previousTrack = currentTrack
-        val oldProgression = position
+            val track = queue[index]
+            load(track)
 
-        val track = queue[index]
-        load(track)
-
-        manager.onTrackUpdate(previousTrack, oldProgression, track, true)
+            manager.onTrackUpdate(previousTrack, oldProgression, track, true)
+        }
     }
 }
