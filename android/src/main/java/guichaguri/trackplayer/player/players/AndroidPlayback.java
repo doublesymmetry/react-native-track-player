@@ -92,12 +92,12 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
             loadCallback = callback;
             if(player.isPlaying()) player.stop();
             player.reset();
-            player.setDataSource(getContext(), url);
+            player.setDataSource(context, url);
             player.prepareAsync();
         } catch(IOException ex) {
             loadCallback = null;
             Utils.rejectCallback(callback, ex);
-            getManager().onError(ex);
+            manager.onError(ex);
         }
 
         updateState();
@@ -156,7 +156,6 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
 
         ended = true;
         updateState();
-        super.stop();
     }
 
     @Override
@@ -215,7 +214,7 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
     public void setVolume(float vol) {
         volume = vol;
         player.setVolume(vol, vol);
-        getManager().onPlaybackUpdate();
+        manager.onPlaybackUpdate();
     }
 
     @Override
@@ -250,9 +249,9 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
         updateState();
 
         if(hasNext()) {
-            updateCurrentTrack(getCurrentIndex() + 1, null);
+            updateCurrentTrack(currentTrack + 1, null);
         } else {
-            getManager().onEnd(getCurrentTrack(), getPosition());
+            manager.onEnd(getCurrentTrack(), getPosition());
         }
     }
 
@@ -290,7 +289,7 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
     @Override
     public void onBufferingUpdate(MediaPlayer mp, int percent) {
         buffered = percent / 100F;
-        getManager().onPlaybackUpdate();
+        manager.onPlaybackUpdate();
     }
 
     @Override
@@ -305,7 +304,7 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
         Utils.rejectCallback(loadCallback, ex);
         loadCallback = null;
 
-        getManager().onError(ex);
+        manager.onError(ex);
         return true;
     }
 
