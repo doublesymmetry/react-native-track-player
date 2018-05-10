@@ -78,6 +78,14 @@ public class MediaManager {
         playback = createLocalPlayback();
     }
 
+     public void updateMeta(Track options) {
+        if(playback == null) return;
+
+        Log.d(Utils.TAG, "Updating Metadata from Stream");
+        
+        metadata.updateMetadata(playback, options);
+    }
+
     public void destroyPlayer() {
         Log.d(Utils.TAG, "Destroying the player");
 

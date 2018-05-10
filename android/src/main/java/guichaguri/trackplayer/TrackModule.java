@@ -15,6 +15,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import guichaguri.trackplayer.logic.Utils;
+import guichaguri.trackplayer.logic.track.Track;
 import guichaguri.trackplayer.logic.components.MediaWrapper;
 import guichaguri.trackplayer.logic.services.PlayerService;
 import java.util.ArrayDeque;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
 
+import android.util.Log;
 /**
  * @author Guilherme Chaguri
  */
@@ -141,6 +143,18 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
             @Override
             public void run() {
                 binder.setupPlayer(options, promise);
+            }
+        });
+    }
+
+    @ReactMethod
+    public void updateMetaData(ReadableMap data) {
+        final Bundle metadata = Arguments.toBundle(data);
+        
+        waitForConnection(new Runnable() {
+            @Override
+            public void run() {
+                binder.updateMeta(metadata);
             }
         });
     }
