@@ -37,6 +37,11 @@ public class MediaWrapper extends Binder {
         Utils.resolveCallback(promise);
     }
 
+    public void updateMeta(final Bundle data) {
+        Track track = new Track(context, manager, data);
+        manager.updateMeta(track);
+    }
+
     public void updateOptions(final Bundle bundle) {
         manager.updateOptions(bundle);
     }
