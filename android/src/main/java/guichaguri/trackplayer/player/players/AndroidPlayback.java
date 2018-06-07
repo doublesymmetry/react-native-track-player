@@ -45,6 +45,7 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
     private float buffered = 0;
     private float volume = 1;
     private float rate = 1;
+    private String repeatting;
 
     public AndroidPlayback(Context context, MediaManager manager, Bundle options) {
         super(context, manager);
@@ -246,17 +247,26 @@ public class AndroidPlayback extends Playback implements OnInfoListener, OnCompl
     @Override
     public void onCompletion(MediaPlayer mp) {
         ended = true;
-        updateState();
-
-        if(hasNext()) {
+        if (isRepeatSong) {
+            Track track = getCurrentTrack();
+            ended = false;
+            repeatting = track.id;
+            player.seekTo(0);
+        } else if(hasNext()) {
             updateCurrentTrack(currentTrack + 1, null);
         } else {
             manager.onEnd(getCurrentTrack(), getPosition());
         }
+        updateState();
     }
 
     @Override
     public void onSeekComplete(MediaPlayer mp) {
+        Track track = getCurrentTrack();
+        if (isRepeatSong && repeatting != null && repeatting == track.id) {
+            play();
+            repeatting = null;
+        }
         buffering = false;
         updateState();
     }

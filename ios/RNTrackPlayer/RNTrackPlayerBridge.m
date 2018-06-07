@@ -57,6 +57,8 @@ RCT_EXTERN_METHOD(getVolume:(RCTPromiseResolveBlock)resolve
 
 RCT_EXTERN_METHOD(setRate:(float)rate);
 
+RCT_EXTERN_METHOD(setRepeat:(BOOL)isRepeat);
+
 RCT_EXTERN_METHOD(getRate:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 

@@ -25,6 +25,7 @@ public abstract class Playback {
     protected int currentTrack = -1;
 
     protected int prevState = PlaybackStateCompat.STATE_NONE;
+    protected boolean isRepeatSong = false;
 
     protected Playback(Context context, MediaManager manager) {
         this.context = context;
@@ -46,7 +47,7 @@ public abstract class Playback {
 
             if(empty) updateCurrentTrack(0, null);
         } else {
-            int index = queue.size();
+            int index = 0;
             for(int i = 0; i < queue.size(); i++) {
                 if(queue.get(i).id.equals(insertBeforeId)) break;
                 index = i;
@@ -169,6 +170,10 @@ public abstract class Playback {
 
     public abstract boolean isRemote();
 
+    public void setRepeat(boolean isRepeat) {
+        isRepeatSong = isRepeat;
+    }
+    
     public void updateData() {
         // NOOP
     }

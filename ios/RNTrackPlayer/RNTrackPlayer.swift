@@ -47,6 +47,14 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         guard !isTesting else { return }
         sendEvent(withName: "playback-error", body: ["error": error.localizedDescription])
     }
+
+    func playerItemEnd(trackId: String?, time: TimeInterval?) {
+        guard !isTesting else { return }
+        sendEvent(withName: "playback-item-ended", body: [
+            "track": trackId,
+            "position": time,
+            ])
+    }
     
     private let isTesting = { () -> Bool in
         if let _ = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] {
@@ -95,6 +103,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
             "playback-state",
             "playback-error",
             "playback-track-changed",
+            "playback-item-ended",
             
             "remote-stop",
             "remote-pause",
@@ -317,6 +326,12 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     @objc(getState:rejecter:)
     func getState(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         resolve(mediaWrapper.mappedState.rawValue)
+    }
+
+    @objc(setRepeat:)
+    func setRepeat(isRepeat: Bool) {
+        print("Repeatting current track")
+        mediaWrapper.setRepeat(isRepeat: isRepeat)
     }
     
     
