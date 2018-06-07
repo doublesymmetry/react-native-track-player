@@ -85,7 +85,7 @@ class MediaWrapper: AudioPlayerDelegate {
         self.queue = []
         self.currentIndex = -1
         self.player = AudioPlayer()
-        
+        self.isRepeatSong = false
         self.player.delegate = self
         self.player.bufferingStrategy = .playWhenBufferNotEmpty
         
