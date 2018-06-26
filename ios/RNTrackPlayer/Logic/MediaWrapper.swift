@@ -14,6 +14,7 @@ protocol MediaWrapperDelegate: class {
     func playerSwitchedTracks(trackId: String?, time: TimeInterval?, nextTrackId: String?)
     func playerExhaustedQueue(trackId: String?, time: TimeInterval?)
     func playbackFailed(error: Error)
+    func playerItemEnd(trackId: String?, time: TimeInterval?)
 }
 
 class MediaWrapper: AudioPlayerDelegate {
@@ -21,6 +22,7 @@ class MediaWrapper: AudioPlayerDelegate {
     private var currentIndex: Int
     private let player: AudioPlayer
     private var trackImageTask: URLSessionDataTask?
+    private var isRepeatSong: Bool
     
     weak var delegate: MediaWrapperDelegate?
     
@@ -83,7 +85,7 @@ class MediaWrapper: AudioPlayerDelegate {
         self.queue = []
         self.currentIndex = -1
         self.player = AudioPlayer()
-        
+        self.isRepeatSong = false
         self.player.delegate = self
         self.player.bufferingStrategy = .playWhenBufferNotEmpty
         
@@ -129,6 +131,10 @@ class MediaWrapper: AudioPlayerDelegate {
             case "stop": stop()
             default: break;
         }
+    }
+
+    func setRepeat(isRepeat: Bool) {
+        isRepeatSong = isRepeat;
     }
     
     func removeUpcomingTracks() {
@@ -236,6 +242,14 @@ class MediaWrapper: AudioPlayerDelegate {
     
     func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: Track, at position: TimeInterval?) {
         if item.skipped { return }
+        
+        delegate?.playerItemEnd(trackId: item.id, time: position)
+
+        if (isRepeatSong) {
+            seek(to: 0)
+            return;
+        }
+
         if (!playNext()) {
             delegate?.playerExhaustedQueue(trackId: item.id, time: position)
         }

@@ -203,6 +203,12 @@ public class MediaWrapper extends Binder {
         Utils.resolveCallback(callback, pb.getState());
     }
 
+    public void setRepeat(boolean isRepeat) {
+        Playback pb = manager.getPlayback();
+        if(pb == null) return;
+        pb.setRepeat(isRepeat);
+    }
+
     public void destroy() {
         manager.destroyPlayer();
     }
