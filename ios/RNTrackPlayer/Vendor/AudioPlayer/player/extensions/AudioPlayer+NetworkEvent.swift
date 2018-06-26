@@ -16,12 +16,12 @@ extension AudioPlayer {
         switch event {
         case .connectionLost:
             //Early exit if state prevents us to handle connection loss
-            guard let currentItem = currentItem, !state.isWaitingForConnection else {
+            guard currentItem != nil, !state.isWaitingForConnection else {
                 return
             }
 
             //In case we're not playing offline file
-            if !(currentItem.url.isLocal ?? false) {
+            if currentItem?.url.isLocal == false {
                 stateWhenConnectionLost = state
 
                 if let currentItem = player?.currentItem, currentItem.isPlaybackBufferEmpty {

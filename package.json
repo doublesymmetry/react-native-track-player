@@ -1,11 +1,12 @@
 {
   "name": "react-native-track-player",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "A fully fledged audio module created for music apps",
   "author": "Guichaguri",
   "keywords": [
     "react",
     "react-native",
+    "track-player",
     "audio-player",
     "audio",
     "player",
