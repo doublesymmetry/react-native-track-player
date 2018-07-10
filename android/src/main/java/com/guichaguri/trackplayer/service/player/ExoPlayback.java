@@ -10,6 +10,7 @@ import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Player.EventListener;
 import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.Timeline.Window;
 import com.google.android.exoplayer2.source.DynamicConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
@@ -31,6 +32,10 @@ public class ExoPlayback implements EventListener {
 
     private DynamicConcatenatingMediaSource source;
     private List<Track> queue = Collections.synchronizedList(new ArrayList<>());
+
+    // https://github.com/google/ExoPlayer/issues/2728
+    private int lastKnownWindow = C.INDEX_UNSET;
+    private long lastKnownPosition = C.POSITION_UNSET;
 
     public ExoPlayback(Context context, MusicManager manager, ExoPlayer player) {
         this.context = context;
@@ -68,10 +73,14 @@ public class ExoPlayback implements EventListener {
     }
 
     public Track getCurrentTrack() {
-        return queue.get(player.getCurrentWindowIndex());
+        int index = player.getCurrentWindowIndex();
+        return index == C.INDEX_UNSET ? null : queue.get(index);
     }
 
     public void skip(String id, Promise promise) {
+        lastKnownWindow = player.getCurrentWindowIndex();
+        lastKnownPosition = player.getCurrentPosition();
+
         for(int i = 0; i < queue.size(); i++) {
             if(id.equals(queue.get(i).id)) {
                 player.seekToDefaultPosition(i);
@@ -80,7 +89,7 @@ public class ExoPlayback implements EventListener {
             }
         }
 
-        promise.reject("queue", "Could'nt find the track");
+        promise.reject("queue", "Couldn't find the track");
     }
 
     public void skipToPrevious(Promise promise) {
@@ -90,6 +99,9 @@ public class ExoPlayback implements EventListener {
             promise.reject("queue", "Couldn't skip to previous");
             return;
         }
+
+        lastKnownWindow = player.getCurrentWindowIndex();
+        lastKnownPosition = player.getCurrentPosition();
 
         player.seekToDefaultPosition(prev);
         promise.resolve(null); // TODO check
@@ -102,6 +114,9 @@ public class ExoPlayback implements EventListener {
             promise.reject("queue", "Couldn't skip to previous");
             return;
         }
+
+        lastKnownWindow = player.getCurrentWindowIndex();
+        lastKnownPosition = player.getCurrentPosition();
 
         player.seekToDefaultPosition(next);
         promise.resolve(null); // TODO check
@@ -179,6 +194,8 @@ public class ExoPlayback implements EventListener {
 
         if(playbackState == Player.STATE_ENDED) {
             manager.onEnd(getCurrentTrack(), getPosition());
+        } else if(playbackState == Player.STATE_READY) {
+
         }
     }
 
@@ -199,7 +216,24 @@ public class ExoPlayback implements EventListener {
 
     @Override
     public void onPositionDiscontinuity(int reason) {
-        // on track changed
+        // Track changed
+        if(lastKnownWindow != player.getCurrentWindowIndex()) {
+
+            Track previous = lastKnownWindow == C.INDEX_UNSET ? null : queue.get(lastKnownWindow);
+            Track next = getCurrentTrack();
+
+            // Track changed because it ended
+            // We'll use its duration instead of the last known position
+            if(reason == Player.DISCONTINUITY_REASON_PERIOD_TRANSITION) {
+                long duration = player.getCurrentTimeline().getWindow(lastKnownWindow, new Window()).getDurationMs();
+                if(duration != C.TIME_UNSET) lastKnownPosition = duration;
+            }
+
+            manager.onTrackUpdate(previous, lastKnownPosition, next);
+        }
+
+        lastKnownWindow = player.getCurrentWindowIndex();
+        lastKnownPosition = player.getCurrentPosition();
     }
 
     @Override

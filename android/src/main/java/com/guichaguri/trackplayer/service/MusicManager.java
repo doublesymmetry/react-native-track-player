@@ -7,6 +7,7 @@ import com.guichaguri.trackplayer.module.MusicEvents;
 import com.guichaguri.trackplayer.service.metadata.MetadataManager;
 import com.guichaguri.trackplayer.service.models.Track;
 import com.guichaguri.trackplayer.service.player.ExoPlayback;
+import guichaguri.trackplayer.logic.Events;
 
 /**
  * @author Guichaguri
@@ -24,6 +25,18 @@ public class MusicManager extends Binder {
 
     public ExoPlayback getPlayback() {
         return playback;
+    }
+
+    public void onTrackUpdate(Track previous, long prevPos, Track next) {
+        Log.d(Utils.LOG, "onTrackUpdate");
+
+        metadata.updateMetadata(next);
+
+        Bundle bundle = new Bundle();
+        bundle.putString("track", previous != null ? previous.id : null);
+        bundle.putDouble("position", Utils.toSeconds(prevPos));
+        bundle.putString("nextTrack", next != null ? next.id : null);
+        Events.dispatchEvent(service, Events.PLAYBACK_TRACK_CHANGED, bundle);
     }
 
     public void onEnd(Track previous, long prevPos) {
