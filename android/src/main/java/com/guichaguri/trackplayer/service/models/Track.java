@@ -25,6 +25,8 @@ import com.google.android.exoplayer2.upstream.cache.SimpleCache;
 import com.google.android.exoplayer2.util.Util;
 import com.guichaguri.trackplayer.service.Utils;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.support.v4.media.MediaMetadataCompat.*;
 
@@ -32,6 +34,20 @@ import static android.support.v4.media.MediaMetadataCompat.*;
  * @author Guichaguri
  */
 public class Track {
+
+    public static List<Track> createTracks(List objects, int ratingType) {
+        List<Track> tracks = new ArrayList<>();
+
+        for(Object o : objects) {
+            if(o instanceof Bundle) {
+                tracks.add(new Track((Bundle)o, ratingType));
+            } else {
+                return null;
+            }
+        }
+
+        return tracks;
+    }
 
     public String id;
     public Uri uri;

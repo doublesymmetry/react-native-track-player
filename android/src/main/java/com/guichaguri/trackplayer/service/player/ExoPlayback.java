@@ -12,12 +12,14 @@ import com.google.android.exoplayer2.Player.EventListener;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.Timeline.Window;
 import com.google.android.exoplayer2.source.DynamicConcatenatingMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.guichaguri.trackplayer.service.MusicManager;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.models.Track;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -59,7 +61,18 @@ public class ExoPlayback implements EventListener {
 
     public void add(Track track, int index, Promise promise) {
         queue.add(index, track);
-        source.addMediaSource(index, track.toMediaSource(context), Utils.toRunnable(promise));
+        source.addMediaSource(index, track.toMediaSource(context, ), Utils.toRunnable(promise));
+    }
+
+    public void add(Collection<Track> tracks, int index, Promise promise) {
+        List<MediaSource> trackList = new ArrayList<>();
+
+        for(Track track : tracks) {
+            trackList.add(track.toMediaSource(context, ));
+        }
+
+        queue.addAll(index, tracks);
+        source.addMediaSources(index, trackList, Utils.toRunnable(promise));
     }
 
     public void remove(int index, Promise promise) {
@@ -139,16 +152,20 @@ public class ExoPlayback implements EventListener {
         resetQueue();
     }
 
-    public void destroy() {
-        player.release();
-    }
-
     public long getPosition() {
         return player.getCurrentPosition();
     }
 
     public long getBufferedPosition() {
         return player.getBufferedPosition();
+    }
+
+    public long getDuration() {
+        return player.getDuration();
+    }
+
+    public void seekTo(long time) {
+        player.seekTo(time);
     }
 
     public float getRate() {
@@ -171,6 +188,10 @@ public class ExoPlayback implements EventListener {
                 return player.getPlayWhenReady() ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED;
         }
         return PlaybackStateCompat.STATE_NONE;
+    }
+
+    public void destroy() {
+        player.release();
     }
 
     @Override
