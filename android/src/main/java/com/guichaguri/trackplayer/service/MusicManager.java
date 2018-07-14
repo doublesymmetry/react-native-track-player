@@ -1,18 +1,16 @@
 package com.guichaguri.trackplayer.service;
 
-import android.os.Binder;
 import android.os.Bundle;
 import android.util.Log;
 import com.guichaguri.trackplayer.module.MusicEvents;
 import com.guichaguri.trackplayer.service.metadata.MetadataManager;
 import com.guichaguri.trackplayer.service.models.Track;
 import com.guichaguri.trackplayer.service.player.ExoPlayback;
-import guichaguri.trackplayer.logic.Events;
 
 /**
  * @author Guichaguri
  */
-public class MusicManager extends Binder {
+public class MusicManager {
 
     private final MusicService service;
 
@@ -36,7 +34,7 @@ public class MusicManager extends Binder {
         bundle.putString("track", previous != null ? previous.id : null);
         bundle.putDouble("position", Utils.toSeconds(prevPos));
         bundle.putString("nextTrack", next != null ? next.id : null);
-        Events.dispatchEvent(service, Events.PLAYBACK_TRACK_CHANGED, bundle);
+        service.emit(MusicEvents.PLAYBACK_TRACK_CHANGED, bundle);
     }
 
     public void onEnd(Track previous, long prevPos) {

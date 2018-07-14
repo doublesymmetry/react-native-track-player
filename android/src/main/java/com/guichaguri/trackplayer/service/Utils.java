@@ -13,6 +13,7 @@ import com.facebook.react.bridge.Promise;
 public class Utils {
 
     public static final String EVENT_INTENT = "com.guichaguri.trackplayer.event";
+    public static final String CONNECT_INTENT = "com.guichaguri.trackplayer.connect";
     public static final String LOG = "RNTrackPlayer";
 
     public static Runnable toRunnable(Promise promise) {
@@ -22,6 +23,14 @@ public class Utils {
                 promise.resolve(null);
             }
         };
+    }
+
+    public static long toMillis(double seconds) {
+        return (long)(seconds * 1000);
+    }
+
+    public static double toSeconds(long millis) {
+        return millis / 1000D;
     }
 
     public static boolean isLocal(Uri uri) {
