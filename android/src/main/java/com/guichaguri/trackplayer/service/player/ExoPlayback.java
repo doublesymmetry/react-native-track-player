@@ -38,6 +38,7 @@ public class ExoPlayback implements EventListener {
     // https://github.com/google/ExoPlayer/issues/2728
     private int lastKnownWindow = C.INDEX_UNSET;
     private long lastKnownPosition = C.POSITION_UNSET;
+    private int previousState = PlaybackStateCompat.STATE_NONE;
 
     public ExoPlayback(Context context, MusicManager manager, ExoPlayer player) {
         this.context = context;
@@ -211,7 +212,12 @@ public class ExoPlayback implements EventListener {
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        // on state changed
+        int state = getState();
+
+        if(state != previousState) {
+            manager.onStateChange(state);
+            previousState = state;
+        }
 
         if(playbackState == Player.STATE_ENDED) {
             manager.onEnd(getCurrentTrack(), getPosition());

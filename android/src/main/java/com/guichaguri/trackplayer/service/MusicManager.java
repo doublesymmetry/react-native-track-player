@@ -25,6 +25,14 @@ public class MusicManager {
         return playback;
     }
 
+    public void onStateChange(int state) {
+        Log.d(Utils.LOG, "onStateChange");
+
+        Bundle bundle = new Bundle();
+        bundle.putInt("state", state);
+        service.emit(MusicEvents.PLAYBACK_STATE, bundle);
+    }
+
     public void onTrackUpdate(Track previous, long prevPos, Track next) {
         Log.d(Utils.LOG, "onTrackUpdate");
 
