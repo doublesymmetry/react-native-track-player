@@ -1,12 +1,17 @@
 package com.guichaguri.trackplayer.service;
 
 import android.content.Context;
+import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
+import android.media.AudioManager;
+import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import com.guichaguri.trackplayer.module.MusicEvents;
 import com.guichaguri.trackplayer.service.metadata.MetadataManager;
@@ -16,7 +21,7 @@ import com.guichaguri.trackplayer.service.player.ExoPlayback;
 /**
  * @author Guichaguri
  */
-public class MusicManager {
+public class MusicManager implements OnAudioFocusChangeListener {
 
     private final MusicService service;
 
@@ -25,7 +30,10 @@ public class MusicManager {
 
     private MetadataManager metadata;
     private ExoPlayback playback;
-    private AudioFocusRequest focus;
+
+    @RequiresApi(26)
+    private AudioFocusRequest focus = null;
+    private boolean hasAudioFocus = false;
 
     public MusicManager(MusicService service) {
         this.service = service;
@@ -48,7 +56,7 @@ public class MusicManager {
         Log.d(Utils.LOG, "onPlay");
 
         if(!playback.isRemote()) {
-            //TODO audio focus
+            requestFocus();
 
             if(!wakeLock.isHeld()) wakeLock.acquire();
 
@@ -67,7 +75,7 @@ public class MusicManager {
         if(wakeLock.isHeld()) wakeLock.release();
         if(wifiLock.isHeld()) wifiLock.release();
 
-        // TODO disable focus
+        abandonFocus();
 
         metadata.setForeground(false, true);
     }
@@ -79,7 +87,7 @@ public class MusicManager {
         if(wakeLock.isHeld()) wakeLock.release();
         if(wifiLock.isHeld()) wifiLock.release();
 
-        // TODO disable focus
+        abandonFocus();
 
         metadata.setForeground(false, false);
     }
@@ -113,6 +121,15 @@ public class MusicManager {
         service.emit(MusicEvents.PLAYBACK_QUEUE_ENDED, bundle);
     }
 
+    public void onDuck(boolean paused, boolean ducking) {
+        Log.d(Utils.LOG, "onDuck");
+
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("paused", paused);
+        bundle.putBoolean("ducking", ducking);
+        service.emit(MusicEvents.BUTTON_DUCK, bundle);
+    }
+
     public void onError(String code, String error) {
         Log.d(Utils.LOG, "onError");
         Log.e(Utils.LOG, "Playback error: " + code + " - " + error);
@@ -123,8 +140,82 @@ public class MusicManager {
         service.emit(MusicEvents.PLAYBACK_ERROR, bundle);
     }
 
+    @Override
+    public void onAudioFocusChange(int focus) {
+        switch(focus) {
+            case AudioManager.AUDIOFOCUS_LOSS:
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                onDuck(true, false);
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                onDuck(false, true);
+                break;
+            case AudioManager.AUDIOFOCUS_GAIN:
+                onDuck(false, false);
+                break;
+        }
+    }
+
+    private void requestFocus() {
+        if(hasAudioFocus) return;
+        Log.d(Utils.LOG, "Requesting audio focus...");
+
+        AudioManager manager = (AudioManager)service.getSystemService(Context.AUDIO_SERVICE);
+        int r;
+
+        if(manager == null) {
+            r = AudioManager.AUDIOFOCUS_REQUEST_FAILED;
+        } else if(Build.VERSION.SDK_INT >= 26) {
+            focus = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                    .setOnAudioFocusChangeListener(this)
+                    .setAudioAttributes(new AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .build())
+                    .build();
+
+            r = manager.requestAudioFocus(focus);
+        } else {
+            //noinspection deprecation
+            r = manager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+        }
+
+        hasAudioFocus = r == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+    }
+
+    private void abandonFocus() {
+        if(!hasAudioFocus) return;
+        Log.d(Utils.LOG, "Abandoning audio focus...");
+
+        AudioManager manager = (AudioManager)service.getSystemService(Context.AUDIO_SERVICE);
+        int r;
+
+        if(manager == null) {
+            r = AudioManager.AUDIOFOCUS_REQUEST_FAILED;
+        } else if(Build.VERSION.SDK_INT >= 26) {
+            r = manager.abandonAudioFocusRequest(focus);
+        } else {
+            //noinspection deprecation
+            r = manager.abandonAudioFocus(this);
+        }
+
+        hasAudioFocus = r != AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+    }
+
     public void destroy() {
+        Log.d(Utils.LOG, "Releasing service resources...");
+
+        // Disable audio focus
+        abandonFocus();
+
+        // Release the playback resources
         playback.destroy();
+
+        // Release the metadata resources
         metadata.destroy();
+
+        // Release the locks
+        if(wifiLock.isHeld()) wifiLock.release();
+        if(wakeLock.isHeld()) wakeLock.release();
     }
 }
