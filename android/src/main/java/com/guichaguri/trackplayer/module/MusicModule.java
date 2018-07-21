@@ -252,6 +252,16 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
+    public void setRate(final float rate) {
+        waitForConnection(() -> binder.getPlayback().setRate(rate));
+    }
+
+    @ReactMethod
+    public void getRate(final Promise callback) {
+        waitForConnection(() -> callback.resolve(binder.getPlayback().getRate()));
+    }
+
+    @ReactMethod
     public void getTrack(final String id, final Promise callback) {
         waitForConnection(() -> {
             List<Track> tracks = binder.getPlayback().getQueue();
