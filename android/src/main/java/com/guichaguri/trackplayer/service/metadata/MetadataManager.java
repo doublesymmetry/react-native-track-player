@@ -215,8 +215,9 @@ public class MetadataManager {
         updateNotification();
     }
 
-    public void setForeground(boolean foreground) {
+    public void setForeground(boolean foreground, boolean active) {
         this.foreground = foreground;
+        this.session.setActive(active);
 
         if(foreground) {
             updateNotification();

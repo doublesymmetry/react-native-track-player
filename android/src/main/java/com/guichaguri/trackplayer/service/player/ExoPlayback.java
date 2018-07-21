@@ -153,6 +153,10 @@ public class ExoPlayback implements EventListener {
         resetQueue();
     }
 
+    public boolean isRemote() {
+        return false;
+    }
+
     public long getPosition() {
         return player.getCurrentPosition();
     }
@@ -197,7 +201,7 @@ public class ExoPlayback implements EventListener {
 
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
-        // on queue changed
+        // Queue updates
     }
 
     @Override
@@ -207,7 +211,7 @@ public class ExoPlayback implements EventListener {
 
     @Override
     public void onLoadingChanged(boolean isLoading) {
-
+        // Buffering updates
     }
 
     @Override
@@ -215,25 +219,32 @@ public class ExoPlayback implements EventListener {
         int state = getState();
 
         if(state != previousState) {
+
+            if(Utils.isPlaying(state) && !Utils.isPlaying(previousState)) {
+                manager.onPlay();
+            } else if(Utils.isPaused(state) && !Utils.isPaused(previousState)) {
+                manager.onPause();
+            } else if(Utils.isStopped(state) && !Utils.isStopped(previousState)) {
+                manager.onStop();
+            }
+
             manager.onStateChange(state);
             previousState = state;
         }
 
         if(playbackState == Player.STATE_ENDED) {
             manager.onEnd(getCurrentTrack(), getPosition());
-        } else if(playbackState == Player.STATE_READY) {
-
         }
     }
 
     @Override
     public void onRepeatModeChanged(int repeatMode) {
-
+        // Repeat mode update
     }
 
     @Override
     public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
-
+        // Shuffle mode update
     }
 
     @Override
@@ -265,11 +276,11 @@ public class ExoPlayback implements EventListener {
 
     @Override
     public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-
+        // Speed or pitch changes
     }
 
     @Override
     public void onSeekProcessed() {
-        // on seek
+        // Finished seeking
     }
 }
