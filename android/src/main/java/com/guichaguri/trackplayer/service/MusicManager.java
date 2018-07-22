@@ -58,7 +58,10 @@ public class MusicManager implements OnAudioFocusChangeListener {
         if(!playback.isRemote()) {
             requestFocus();
 
-            if(!wakeLock.isHeld()) wakeLock.acquire();
+            if(!wakeLock.isHeld()) {
+                long timeout = playback.getDuration() - playback.getPosition();
+                wakeLock.acquire(timeout <= 0 ? (5 * 60 * 1000) : (timeout + 5000));
+            }
 
             if(!Utils.isLocal(playback.getCurrentTrack().uri)) {
                 if(!wifiLock.isHeld()) wifiLock.acquire();
@@ -121,15 +124,6 @@ public class MusicManager implements OnAudioFocusChangeListener {
         service.emit(MusicEvents.PLAYBACK_QUEUE_ENDED, bundle);
     }
 
-    public void onDuck(boolean paused, boolean ducking) {
-        Log.d(Utils.LOG, "onDuck");
-
-        Bundle bundle = new Bundle();
-        bundle.putBoolean("paused", paused);
-        bundle.putBoolean("ducking", ducking);
-        service.emit(MusicEvents.BUTTON_DUCK, bundle);
-    }
-
     public void onError(String code, String error) {
         Log.d(Utils.LOG, "onError");
         Log.e(Utils.LOG, "Playback error: " + code + " - " + error);
@@ -142,18 +136,27 @@ public class MusicManager implements OnAudioFocusChangeListener {
 
     @Override
     public void onAudioFocusChange(int focus) {
+        Log.d(Utils.LOG, "onDuck");
+
+        boolean paused = false;
+        boolean ducking = false;
+
         switch(focus) {
             case AudioManager.AUDIOFOCUS_LOSS:
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                onDuck(true, false);
+                paused = true;
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                onDuck(false, true);
+                ducking = true;
                 break;
             case AudioManager.AUDIOFOCUS_GAIN:
-                onDuck(false, false);
                 break;
         }
+
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("paused", paused);
+        bundle.putBoolean("ducking", ducking);
+        service.emit(MusicEvents.BUTTON_DUCK, bundle);
     }
 
     private void requestFocus() {

@@ -31,6 +31,7 @@ public class ExoPlayback implements EventListener {
     private final Context context;
     private final MusicManager manager;
     private final ExoPlayer player;
+    private final long cacheMaxSize;
 
     private DynamicConcatenatingMediaSource source;
     private List<Track> queue = Collections.synchronizedList(new ArrayList<>());
@@ -40,10 +41,11 @@ public class ExoPlayback implements EventListener {
     private long lastKnownPosition = C.POSITION_UNSET;
     private int previousState = PlaybackStateCompat.STATE_NONE;
 
-    public ExoPlayback(Context context, MusicManager manager, ExoPlayer player) {
+    public ExoPlayback(Context context, MusicManager manager, ExoPlayer player, long maxCacheSize) {
         this.context = context;
         this.manager = manager;
         this.player = player;
+        this.cacheMaxSize = maxCacheSize;
 
         player.addListener(this);
         resetQueue();
@@ -62,14 +64,14 @@ public class ExoPlayback implements EventListener {
 
     public void add(Track track, int index, Promise promise) {
         queue.add(index, track);
-        source.addMediaSource(index, track.toMediaSource(context, ), Utils.toRunnable(promise));
+        source.addMediaSource(index, track.toMediaSource(context, cacheMaxSize), Utils.toRunnable(promise));
     }
 
     public void add(Collection<Track> tracks, int index, Promise promise) {
         List<MediaSource> trackList = new ArrayList<>();
 
         for(Track track : tracks) {
-            trackList.add(track.toMediaSource(context, ));
+            trackList.add(track.toMediaSource(context, cacheMaxSize));
         }
 
         queue.addAll(index, tracks);
@@ -202,6 +204,7 @@ public class ExoPlayback implements EventListener {
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
         // Queue updates
+        onPositionDiscontinuity(Player.DISCONTINUITY_REASON_PERIOD_TRANSITION);
     }
 
     @Override
