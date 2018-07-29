@@ -13,10 +13,21 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.LoadControl;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.guichaguri.trackplayer.module.MusicEvents;
 import com.guichaguri.trackplayer.service.metadata.MetadataManager;
 import com.guichaguri.trackplayer.service.models.Track;
 import com.guichaguri.trackplayer.service.player.ExoPlayback;
+
+import static com.google.android.exoplayer2.DefaultLoadControl.*;
+import static com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS;
 
 /**
  * @author Guichaguri
@@ -37,6 +48,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
 
     public MusicManager(MusicService service) {
         this.service = service;
+        this.metadata = new MetadataManager(service, this);
 
         PowerManager powerManager = (PowerManager)service.getSystemService(Context.POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "track-player-wake-lock");
@@ -50,6 +62,36 @@ public class MusicManager implements OnAudioFocusChangeListener {
 
     public ExoPlayback getPlayback() {
         return playback;
+    }
+
+    public void switchPlayback(ExoPlayback playback) {
+        if(this.playback != null) {
+            this.playback.destroy();
+        }
+
+        this.playback = playback;
+    }
+
+    public ExoPlayback createLocalPlayback(Bundle options) {
+        int minBuffer = (int)Utils.toMillis(options.getDouble("minBuffer", Utils.toSeconds(DEFAULT_MIN_BUFFER_MS)));
+        int maxBuffer = (int)Utils.toMillis(options.getDouble("maxBuffer", Utils.toSeconds(DEFAULT_MAX_BUFFER_MS)));
+        int playBuffer = (int)Utils.toMillis(options.getDouble("playBuffer", Utils.toSeconds(DEFAULT_BUFFER_FOR_PLAYBACK_MS)));
+        long cacheMaxSize = (long)(options.getDouble("maxCacheSize", 0) * 1024);
+        int multiplier = DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS / DEFAULT_BUFFER_FOR_PLAYBACK_MS;
+
+        DefaultAllocator allocator = new DefaultAllocator(true, 0x10000);
+        LoadControl control = new DefaultLoadControl(allocator, minBuffer, maxBuffer, playBuffer, playBuffer * multiplier, -1, true);
+
+        SimpleExoPlayer player = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(service), new DefaultTrackSelector(), control);
+
+        player.setAudioAttributes(new com.google.android.exoplayer2.audio.AudioAttributes.Builder()
+                .setContentType(C.CONTENT_TYPE_MUSIC).setUsage(C.USAGE_MEDIA).build());
+
+        return new ExoPlayback(service, this, player, cacheMaxSize);
+    }
+
+    public void updateOptions(Bundle options) {
+        metadata.updateOptions(options);
     }
 
     public void onPlay() {

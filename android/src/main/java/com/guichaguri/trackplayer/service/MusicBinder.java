@@ -1,7 +1,9 @@
 package com.guichaguri.trackplayer.service;
 
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.Handler;
+import com.facebook.react.bridge.Promise;
 import com.guichaguri.trackplayer.service.player.ExoPlayback;
 
 /**
@@ -23,6 +25,15 @@ public class MusicBinder extends Binder {
 
     public ExoPlayback getPlayback() {
         return manager.getPlayback();
+    }
+
+    public void setupPlayer(Bundle bundle, Promise promise) {
+        manager.switchPlayback(manager.createLocalPlayback(bundle));
+        promise.resolve(null);
+    }
+
+    public void updateOptions(Bundle bundle) {
+        manager.updateOptions(bundle);
     }
 
     public void destroy() {
