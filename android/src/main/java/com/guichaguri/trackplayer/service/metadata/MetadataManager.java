@@ -33,6 +33,7 @@ public class MetadataManager {
     private final ArtworkCache artwork;
 
     private boolean foreground = false;
+    private int ratingType = RatingCompat.RATING_NONE;
     private long actions = 0;
     private long compactActions = 0;
     private NotificationCompat.Builder builder;
@@ -114,9 +115,14 @@ public class MetadataManager {
         builder.setSmallIcon(getIcon(options, "icon", R.drawable.play));
 
         // Update the rating type
-        session.setRatingType(options.getInt("ratingType", RatingCompat.RATING_NONE));
+        ratingType = options.getInt("ratingType", RatingCompat.RATING_NONE);
+        session.setRatingType(ratingType);
 
         updateNotification();
+    }
+
+    public int getRatingType() {
+        return ratingType;
     }
 
     /**

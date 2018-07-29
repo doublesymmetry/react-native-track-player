@@ -64,6 +64,10 @@ public class MusicManager implements OnAudioFocusChangeListener {
         return playback;
     }
 
+    public MetadataManager getMetadata() {
+        return metadata;
+    }
+
     public void switchPlayback(ExoPlayback playback) {
         if(this.playback != null) {
             this.playback.destroy();
@@ -88,10 +92,6 @@ public class MusicManager implements OnAudioFocusChangeListener {
                 .setContentType(C.CONTENT_TYPE_MUSIC).setUsage(C.USAGE_MEDIA).build());
 
         return new ExoPlayback(service, this, player, cacheMaxSize);
-    }
-
-    public void updateOptions(Bundle options) {
-        metadata.updateOptions(options);
     }
 
     public void onPlay() {

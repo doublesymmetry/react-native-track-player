@@ -33,7 +33,11 @@ public class MusicBinder extends Binder {
     }
 
     public void updateOptions(Bundle bundle) {
-        manager.updateOptions(bundle);
+        manager.getMetadata().updateOptions(bundle);
+    }
+
+    public int getRatingType() {
+        return manager.getMetadata().getRatingType();
     }
 
     public void destroy() {

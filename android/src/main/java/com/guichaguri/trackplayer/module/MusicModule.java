@@ -6,7 +6,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -14,7 +13,6 @@ import android.util.Log;
 import com.facebook.react.bridge.*;
 import com.google.android.exoplayer2.C;
 import com.guichaguri.trackplayer.service.MusicBinder;
-import com.guichaguri.trackplayer.service.MusicManager;
 import com.guichaguri.trackplayer.service.MusicService;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.models.Track;
@@ -199,7 +197,31 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     public void remove(ReadableArray tracks, final Promise callback) {
         final ArrayList trackList = Arguments.toList(tracks);
 
-        waitForConnection(() -> binder.getPlayback().remove(trackList, callback));
+        waitForConnection(() -> {
+            List<Track> queue = binder.getPlayback().getQueue();
+            List<Integer> indexes = new ArrayList<>();
+
+            for(Object o : trackList) {
+                String id = o.toString();
+
+                for(int i = 0; i < queue.size(); i++) {
+                    if(queue.get(i).id.equals(id)) {
+                        indexes.add(i);
+                        break;
+                    }
+                }
+            }
+
+            if(trackList.isEmpty()) {
+                callback.reject("invalid", "Couldn't remove an invalid list of tracks");
+            } else if(indexes.isEmpty()) {
+                callback.reject("invalid", "No tracks found");
+            } else if (indexes.size() == 1) {
+                binder.getPlayback().remove(indexes.get(0), callback);
+            } else {
+                binder.getPlayback().remove(indexes, callback);
+            }
+        });
     }
 
     @ReactMethod

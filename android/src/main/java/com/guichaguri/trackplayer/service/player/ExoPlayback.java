@@ -83,6 +83,22 @@ public class ExoPlayback implements EventListener {
         source.removeMediaSource(index, Utils.toRunnable(promise));
     }
 
+    public void remove(List<Integer> indexes, Promise promise) {
+        Collections.sort(indexes);
+
+        for(int i = indexes.size() - 1; i >= 0; i--) {
+            int index = indexes.get(i);
+
+            queue.remove(index);
+
+            if(i == 0) {
+                source.removeMediaSource(index, Utils.toRunnable(promise));
+            } else {
+                source.removeMediaSource(index, null);
+            }
+        }
+    }
+
     public void move(int fromIndex, int toIndex, Promise promise) {
         queue.add(toIndex, queue.remove(fromIndex));
         source.moveMediaSource(fromIndex, toIndex, Utils.toRunnable(promise));
