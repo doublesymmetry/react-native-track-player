@@ -39,7 +39,7 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @Override
     public String getName() {
-        return "TrackPlayer";
+        return "TrackPlayerModule";
     }
 
     @Override
