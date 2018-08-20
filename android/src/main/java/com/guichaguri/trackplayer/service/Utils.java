@@ -17,12 +17,7 @@ public class Utils {
     public static final String LOG = "RNTrackPlayer";
 
     public static Runnable toRunnable(Promise promise) {
-        return new Runnable() {
-            @Override
-            public void run() {
-                promise.resolve(null);
-            }
-        };
+        return () -> promise.resolve(null);
     }
 
     public static long toMillis(double seconds) {
@@ -37,12 +32,17 @@ public class Utils {
         if(uri == null) return false;
 
         String scheme = uri.getScheme();
+        String host = uri.getHost();
 
         return scheme == null ||
                 scheme.equals(ContentResolver.SCHEME_FILE) ||
                 scheme.equals(ContentResolver.SCHEME_ANDROID_RESOURCE) ||
                 scheme.equals(ContentResolver.SCHEME_CONTENT) ||
-                scheme.equals("res");
+                scheme.equals("res") ||
+                host == null ||
+                host.equals("localhost") ||
+                host.equals("127.0.0.1") ||
+                host.equals("[::1]");
     }
 
     public static boolean isPlaying(int state) {
