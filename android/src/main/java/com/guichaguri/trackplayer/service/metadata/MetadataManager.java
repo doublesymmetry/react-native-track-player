@@ -18,7 +18,7 @@ import com.guichaguri.trackplayer.service.MusicService;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.models.Track;
 import com.guichaguri.trackplayer.service.player.ExoPlayback;
-import guichaguri.trackplayer.R;
+import com.guichaguri.trackplayer.R;
 import java.util.ArrayList;
 import java.util.List;
 
