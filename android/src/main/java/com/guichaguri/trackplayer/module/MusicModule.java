@@ -296,7 +296,7 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
                 }
             }
 
-            callback.reject("unknown", "Track not found");
+            callback.resolve(null);
         });
     }
 
