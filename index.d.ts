@@ -39,6 +39,7 @@ declare namespace RNTrackPlayer {
     | 'remote-previous'
     | 'remote-jump-forward'
     | 'remote-jump-backward'
+    | 'remote-seek'
   
   type Handler = (type: EventType, ...args: any[]) => void;
   export function registerEventHandler(handler: Handler): void;
