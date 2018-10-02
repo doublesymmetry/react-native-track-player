@@ -306,7 +306,7 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
             Track track = binder.getPlayback().getCurrentTrack();
 
             if(track == null) {
-                callback.reject("unknown", "Not playing any track");
+                callback.resolve(null);
             } else {
                 callback.resolve(track.id);
             }
