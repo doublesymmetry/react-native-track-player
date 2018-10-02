@@ -266,7 +266,7 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     @objc(setRate:)
     func setRate(rate: Float) {
-        guard [.playing].contains(mediaWrapper.mappedState) else { return }
+        guard [.buffering, .playing].contains(mediaWrapper.mappedState) else { return }
         print("Setting rate to \(rate)")
         mediaWrapper.rate = rate
     }
