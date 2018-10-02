@@ -1,11 +1,12 @@
 {
   "name": "react-native-track-player",
-  "version": "0.2.2",
+  "version": "0.2.5",
   "description": "A fully fledged audio module created for music apps",
   "author": "Guichaguri",
   "keywords": [
     "react",
     "react-native",
+    "track-player",
     "audio-player",
     "audio",
     "player",
@@ -16,7 +17,7 @@
     "ios",
     "windows"
   ],
-  "license": "GPL-3.0",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/react-native-kit/react-native-track-player.git"

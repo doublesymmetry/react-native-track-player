@@ -17,24 +17,36 @@ protocol MediaWrapperDelegate: class {
 }
 
 class MediaWrapper: AudioPlayerDelegate {
-    private var queue: [Track]
+    private(set) var queue: [Track]
     private var currentIndex: Int
     private let player: AudioPlayer
     private var trackImageTask: URLSessionDataTask?
     
     weak var delegate: MediaWrapperDelegate?
     
+    enum PlaybackState: String {
+        case playing, paused, stopped, buffering, none
+    }
+    
     var volume: Float {
         get {
-            return player.volume
+            return player.getVolume()
         }
         set {
             player.volume = newValue
         }
     }
+    var rate: Float {
+        get {
+            return player.getRate()
+        }
+        set {
+            player.rate = newValue
+        }
+    }
     
     var currentTrack: Track? {
-        return queue.indices.contains(0) ? queue[currentIndex] : nil
+        return queue[safe: currentIndex]
     }
     
     var bufferedPosition: Double {
@@ -49,18 +61,18 @@ class MediaWrapper: AudioPlayerDelegate {
         return player.currentItemProgression ?? 0
     }
     
-    var state: String {
+    var mappedState: PlaybackState {
         switch player.state {
         case .playing:
-            return "STATE_PLAYING"
+            return .playing
         case .paused:
-            return "STATE_PAUSED"
+            return .paused
         case .stopped:
-            return "STATE_STOPPED"
+            return .stopped
         case .buffering:
-            return "STATE_BUFFERING"
+            return .buffering
         default:
-            return "STATE_NONE"
+            return .none
         }
     }
     
@@ -69,7 +81,7 @@ class MediaWrapper: AudioPlayerDelegate {
     
     init() {
         self.queue = []
-        self.currentIndex = 0
+        self.currentIndex = -1
         self.player = AudioPlayer()
         
         self.player.delegate = self
@@ -94,35 +106,38 @@ class MediaWrapper: AudioPlayerDelegate {
     func addTracks(_ tracks: [Track], before trackId: String?) {
         if let trackIndex = queue.index(where: { $0.id == trackId }) {
             queue.insert(contentsOf: tracks, at: trackIndex)
+            if (currentIndex >= trackIndex) { currentIndex = currentIndex + tracks.count }
         } else {
             addTracks(tracks)
         }
     }
     
     func removeTracks(ids: [String]) {
-        var removedCurrentTrack = false
-        
-        for (index, track) in queue.enumerated() {
-            if ids.contains(track.id) {
-                if (index == currentIndex) { removedCurrentTrack = true }
-                else if (index < currentIndex) { currentIndex = currentIndex - 1 }
+        var actionAfterRemovals = "none"
+        for id in ids {
+            if let trackIndex = queue.index(where: { $0.id == id }) {
+                if trackIndex < currentIndex { currentIndex = currentIndex - 1 }
+                else if id == queue.last?.id { actionAfterRemovals = "stop" }
+                else if trackIndex == currentIndex { actionAfterRemovals = "play" }
+                
+                queue.remove(at: trackIndex)
             }
         }
         
-        if (removedCurrentTrack) {
-            if (currentIndex > queue.count - 1) {
-                currentIndex = queue.count
-                stop()
-            } else {
-                play()
-            }
+        switch actionAfterRemovals {
+            case "play": play()
+            case "stop": stop()
+            default: break;
         }
-        
-        queue = queue.filter { ids.contains($0.id) }
+    }
+    
+    func removeUpcomingTracks() {
+        queue = queue.filter { $0.0 <= currentIndex }
     }
     
     func skipToTrack(id: String) {
         if let trackIndex = queue.index(where: { $0.id == id }) {
+            currentTrack?.skipped = true
             currentIndex = trackIndex
             play()
         }
@@ -135,7 +150,7 @@ class MediaWrapper: AudioPlayerDelegate {
             return true
         }
         
-        pause()
+        stop()
         return false
     }
     
@@ -151,14 +166,19 @@ class MediaWrapper: AudioPlayerDelegate {
     }
     
     func play() {
-        // resume playback if it was paused
-        if player.state == .paused {
+        guard queue.count > 0 else { return }
+        if (currentIndex == -1) { currentIndex = 0 }
+        
+        // resume playback if it was paused and check currentIndex wasn't changed by a skip/previous
+        if player.state == .paused && currentTrack?.id == queue[currentIndex].id {
             player.resume()
             return
         }
         
         let track = queue[currentIndex]
         player.play(track: track)
+        
+        setPitchAlgorithm(for: track)
         
         // fetch artwork and cancel any previous requests
         trackImageTask?.cancel()
@@ -173,11 +193,27 @@ class MediaWrapper: AudioPlayerDelegate {
         trackImageTask?.resume()
     }
     
+    func setPitchAlgorithm(for track: Track) {
+        if let pitchAlgorithm = track.pitchAlgorithm {
+            switch pitchAlgorithm {
+            case PitchAlgorithm.linear.rawValue:
+                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmVarispeed
+            case PitchAlgorithm.music.rawValue:
+                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmSpectral
+            case PitchAlgorithm.voice.rawValue:
+                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmTimeDomain
+            default:
+                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmLowQualityZeroLatency
+            }
+        }
+    }
+    
     func pause() {
         player.pause()
     }
     
     func stop() {
+        currentIndex = -1
         player.stop()
     }
     
@@ -186,19 +222,20 @@ class MediaWrapper: AudioPlayerDelegate {
     }
     
     func reset() {
-        currentIndex = 0
+        rate = 1
         queue.removeAll()
         stop()
     }
     
-    
     // MARK: - AudioPlayerDelegate
     
-    func audioPlayer(_ audioPlayer: AudioPlayer, willChangeTrackFrom from: Track?, at position: TimeInterval?, to track: Track) {
-        delegate?.playerSwitchedTracks(trackId: from?.id, time: position, nextTrackId: track.id)
+    func audioPlayer(_ audioPlayer: AudioPlayer, willChangeTrackFrom from: Track?, at position: TimeInterval?, to track: Track?) {
+        guard from?.id != track?.id else { return }
+        delegate?.playerSwitchedTracks(trackId: from?.id, time: position, nextTrackId: track?.id)
     }
     
     func audioPlayer(_ audioPlayer: AudioPlayer, didFinishPlaying item: Track, at position: TimeInterval?) {
+        if item.skipped { return }
         if (!playNext()) {
             delegate?.playerExhaustedQueue(trackId: item.id, time: position)
         }

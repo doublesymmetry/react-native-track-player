@@ -75,6 +75,14 @@ namespace TrackPlayer.Players {
             return player.Volume;
         }
 
+        public override void SetRate(double rate) {
+            player.PlaybackSession.PlaybackRate = rate;
+        }
+
+        public override double GetRate() {
+            return player.PlaybackSession.PlaybackRate;
+        }
+
         public override void SeekTo(double seconds) {
             startPos = seconds;
             player.PlaybackSession.Position = TimeSpan.FromSeconds(seconds);
@@ -128,7 +136,7 @@ namespace TrackPlayer.Players {
                 UpdateCurrentTrack(currentTrack + 1, null);
                 Play();
             } else {
-                HandleOnEnd();
+                manager.OnEnd(GetCurrentTrack(), GetPosition());
             }
         }
 

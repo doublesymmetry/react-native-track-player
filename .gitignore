@@ -50,3 +50,5 @@ xcuserdata/
 *.ipa
 *.dSYM.zip
 *.dSYM
+example/ios/Pods
+/ios/RNTrackPlayer.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
