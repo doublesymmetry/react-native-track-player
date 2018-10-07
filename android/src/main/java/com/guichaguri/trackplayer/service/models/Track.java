@@ -35,12 +35,12 @@ import static android.support.v4.media.MediaMetadataCompat.*;
  */
 public class Track {
 
-    public static List<Track> createTracks(List objects, int ratingType) {
+    public static List<Track> createTracks(Context context, List objects, int ratingType) {
         List<Track> tracks = new ArrayList<>();
 
         for(Object o : objects) {
             if(o instanceof Bundle) {
-                tracks.add(new Track((Bundle)o, ratingType));
+                tracks.add(new Track(context, (Bundle)o, ratingType));
             } else {
                 return null;
             }
@@ -52,7 +52,7 @@ public class Track {
     public String id;
     public Uri uri;
 
-    public TrackType type;
+    public TrackType type = TrackType.DEFAULT;
 
     public String userAgent;
 
@@ -69,8 +69,28 @@ public class Track {
 
     public final long queueId;
 
-    public Track(Bundle bundle, int ratingType) {
+    public Track(Context context, Bundle bundle, int ratingType) {
         id = bundle.getString("id");
+        uri = Utils.getUri(context, bundle, "uri");
+
+        String trackType = bundle.getString("type", "default");
+
+        for(TrackType t : TrackType.values()) {
+            if(t.name.equalsIgnoreCase(trackType)) {
+                type = t;
+                break;
+            }
+        }
+
+        userAgent = bundle.getString("userAgent");
+        artwork = Utils.getUri(context, bundle, "artwork");
+
+        title = bundle.getString("title");
+        artist = bundle.getString("artist");
+        album = bundle.getString("album");
+        date = bundle.getString("date");
+        genre = bundle.getString("genre");
+        duration = Utils.toMillis(bundle.getDouble("duration", 0));
 
         rating = Utils.getRating(bundle, "rating", ratingType);
 
