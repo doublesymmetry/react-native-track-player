@@ -47,6 +47,7 @@ android {
 repositories {
     maven {
         // As RN is not updated in jcenter anymore, we'll have to grab it from npm
+        // Make sure you have installed the react-native npm package before compiling
         url "../node_modules/react-native/android"
     }
 
@@ -56,35 +57,33 @@ repositories {
 
 dependencies {
     //noinspection GradleDynamicVersion
-    implementation('com.facebook.react:react-native:+') {
-        exclude group: 'com.android.support', module: 'support-compat'
-    }
+    implementation 'com.facebook.react:react-native:+'
 
     // ExoPlayer Core
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.7.1'
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.9.0'
 
     // ExoPlayer DASH
     if (dash) {
-        implementation 'com.google.android.exoplayer:exoplayer-dash:2.7.1'
+        implementation 'com.google.android.exoplayer:exoplayer-dash:2.9.0'
     } else {
-        compileOnly 'com.google.android.exoplayer:exoplayer-dash:2.7.1'
+        compileOnly 'com.google.android.exoplayer:exoplayer-dash:2.9.0'
     }
 
     // ExoPlayer HLS
     if (hls) {
-        implementation 'com.google.android.exoplayer:exoplayer-hls:2.7.1'
+        implementation 'com.google.android.exoplayer:exoplayer-hls:2.9.0'
     } else {
-        compileOnly 'com.google.android.exoplayer:exoplayer-hls:2.7.1'
+        compileOnly 'com.google.android.exoplayer:exoplayer-hls:2.9.0'
     }
 
     // ExoPlayer SmoothStreaming
     if (smoothstreaming) {
-        implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.7.1'
+        implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.9.0'
     } else {
-        compileOnly 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.7.1'
+        compileOnly 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.9.0'
     }
 
-    // Make sure we're using at least the support library 27.1.0
-    implementation 'com.android.support:support-compat:27.1.0'
-    implementation 'com.android.support:support-media-compat:27.1.0'
+    // Make sure we're using at least the support library 27.1.1
+    implementation 'com.android.support:support-compat:27.1.1'
+    implementation 'com.android.support:support-media-compat:27.1.1'
 }
