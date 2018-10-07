@@ -165,7 +165,7 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
         final ArrayList bundleList = Arguments.toList(tracks);
 
         waitForConnection(() -> {
-            List<Track> trackList = Track.createTracks(bundleList, binder.getRatingType());
+            List<Track> trackList = Track.createTracks(getReactApplicationContext(), bundleList, binder.getRatingType());
 
             List<Track> queue = binder.getPlayback().getQueue();
             int index = -1;
