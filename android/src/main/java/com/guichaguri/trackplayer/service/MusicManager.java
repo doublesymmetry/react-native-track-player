@@ -95,6 +95,10 @@ public class MusicManager implements OnAudioFocusChangeListener {
 
     public void onPlay() {
         Log.d(Utils.LOG, "onPlay");
+        if(playback == null) return;
+
+        Track track = playback.getCurrentTrack();
+        if(track == null) return;
 
         if(!playback.isRemote()) {
             requestFocus();
@@ -104,7 +108,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
                 wakeLock.acquire(timeout <= 0 ? (5 * 60 * 1000) : (timeout + 5000));
             }
 
-            if(!Utils.isLocal(playback.getCurrentTrack().uri)) {
+            if(!Utils.isLocal(track.uri)) {
                 if(!wifiLock.isHeld()) wifiLock.acquire();
             }
         }
@@ -147,7 +151,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
     public void onTrackUpdate(Track previous, long prevPos, Track next) {
         Log.d(Utils.LOG, "onTrackUpdate");
 
-        metadata.updateMetadata(next);
+        if(next != null) metadata.updateMetadata(next);
 
         Bundle bundle = new Bundle();
         bundle.putString("track", previous != null ? previous.id : null);
@@ -253,7 +257,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
         abandonFocus();
 
         // Release the playback resources
-        playback.destroy();
+        if(playback != null) playback.destroy();
 
         // Release the metadata resources
         metadata.destroy();

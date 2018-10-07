@@ -11,7 +11,7 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Player.EventListener;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.Timeline.Window;
-import com.google.android.exoplayer2.source.DynamicConcatenatingMediaSource;
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
@@ -33,7 +33,7 @@ public class ExoPlayback implements EventListener {
     private final ExoPlayer player;
     private final long cacheMaxSize;
 
-    private DynamicConcatenatingMediaSource source;
+    private ConcatenatingMediaSource source;
     private List<Track> queue = Collections.synchronizedList(new ArrayList<>());
 
     // https://github.com/google/ExoPlayer/issues/2728
@@ -54,7 +54,7 @@ public class ExoPlayback implements EventListener {
     private void resetQueue() {
         queue.clear();
 
-        source = new DynamicConcatenatingMediaSource();
+        source = new ConcatenatingMediaSource();
         player.prepare(source);
     }
 
@@ -106,7 +106,7 @@ public class ExoPlayback implements EventListener {
 
     public Track getCurrentTrack() {
         int index = player.getCurrentWindowIndex();
-        return index == C.INDEX_UNSET ? null : queue.get(index);
+        return index == C.INDEX_UNSET || index < 0 || index >= queue.size() ? null : queue.get(index);
     }
 
     public void skip(String id, Promise promise) {
@@ -202,7 +202,7 @@ public class ExoPlayback implements EventListener {
     public int getState() {
         switch(player.getPlaybackState()) {
             case Player.STATE_BUFFERING:
-                return PlaybackStateCompat.STATE_BUFFERING;
+                return player.getPlayWhenReady() ? PlaybackStateCompat.STATE_BUFFERING : PlaybackStateCompat.STATE_NONE;
             case Player.STATE_ENDED:
                 return PlaybackStateCompat.STATE_STOPPED;
             case Player.STATE_IDLE:
@@ -281,7 +281,7 @@ public class ExoPlayback implements EventListener {
 
             // Track changed because it ended
             // We'll use its duration instead of the last known position
-            if(reason == Player.DISCONTINUITY_REASON_PERIOD_TRANSITION) {
+            if(reason == Player.DISCONTINUITY_REASON_PERIOD_TRANSITION && lastKnownWindow != C.INDEX_UNSET) {
                 long duration = player.getCurrentTimeline().getWindow(lastKnownWindow, new Window()).getDurationMs();
                 if(duration != C.TIME_UNSET) lastKnownPosition = duration;
             }

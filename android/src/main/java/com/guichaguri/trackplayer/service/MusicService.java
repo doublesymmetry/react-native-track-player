@@ -22,6 +22,11 @@ public class MusicService extends HeadlessJsTaskService {
         return new HeadlessJsTaskConfig("TrackPlayer", Arguments.createMap(), 0, true);
     }
 
+    @Override
+    public void onHeadlessJsTaskFinish(int taskId) {
+        // Overridden to prevent the service from being terminated
+    }
+
     public void emit(String event, Bundle data) {
         Intent intent = new Intent(Utils.EVENT_INTENT);
 
@@ -45,7 +50,9 @@ public class MusicService extends HeadlessJsTaskService {
     public int onStartCommand(Intent intent, int flags, int startId) {
         manager = new MusicManager(this);
 
-        return super.onStartCommand(intent, flags, startId);
+        super.onStartCommand(intent, flags, startId);
+
+        return START_STICKY;
     }
 
     @Override
