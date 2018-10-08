@@ -129,16 +129,22 @@ class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     @objc(updateOptions:)
     func update(options: [String: Any]) {
         let remoteCenter = MPRemoteCommandCenter.shared()
-        let castedCapabilities = (options["capabilities"] as? [String])
-        let capabilities = castedCapabilities?.flatMap { Capability(rawValue: $0) } ?? []
+        let rawCapabilites = options["capabilities"]
+        var capabilities = [String]()
         
-        let enableStop = capabilities.contains(.stop)
-        let enablePause = capabilities.contains(.pause)
-        let enablePlay = capabilities.contains(.play)
-        let enablePlayNext = capabilities.contains(.next)
-        let enablePlayPrevious = capabilities.contains(.previous)
-        let enableSkipForward = capabilities.contains(.jumpForward)
-        let enableSkipBackward = capabilities.contains(.jumpBackward)
+        if (rawCapabilites != nil)
+        {
+            let castedCapabilities = rawCapabilites as! [Any]
+            capabilities = castedCapabilities.flatMap { $0 as? String }
+        }
+        
+        let enableStop = capabilities.contains("stop")
+        let enablePause = capabilities.contains("pause")
+        let enablePlay = capabilities.contains("play")
+        let enablePlayNext = capabilities.contains("next")
+        let enablePlayPrevious = capabilities.contains("previous")
+        let enableSkipForward = capabilities.contains("jumpForward")
+        let enableSkipBackward = capabilities.contains("jumpBackward")
         
         toggleRemoteHandler(command: remoteCenter.stopCommand, selector: #selector(remoteSentStop), enabled: enableStop)
         toggleRemoteHandler(command: remoteCenter.pauseCommand, selector: #selector(remoteSentPause), enabled: enablePause)
