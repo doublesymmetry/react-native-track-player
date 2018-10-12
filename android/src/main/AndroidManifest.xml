@@ -7,14 +7,14 @@
     <application>
 
         <!-- The main service, handles playback, playlists, media buttons and chromecast -->
-        <service android:name=".logic.services.PlayerService" android:enabled="true" android:exported="true">
+        <service android:name=".logic.services.PlayerService" android:stopWithTask="true" android:enabled="true" android:exported="true">
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
         </service>
 
         <!-- The service for the headless tasks in which events can be received by the JS side -->
-        <service android:name=".logic.services.PlayerTask" android:enabled="true" />
+        <service android:name=".logic.services.PlayerTask" android:stopWithTask="true" android:enabled="true" />
 
         <!-- A receiver that will receive media buttons. Required on pre-lollipop devices -->
         <receiver android:name="android.support.v4.media.session.MediaButtonReceiver">

@@ -262,7 +262,9 @@ public class TrackModule extends ReactContextBaseJavaModule implements ServiceCo
         waitForConnection(new Runnable() {
             @Override
             public void run() {
-                binder.stop();
+                if (binder != null) {
+                    binder.stop();
+                }
             }
         });
     }

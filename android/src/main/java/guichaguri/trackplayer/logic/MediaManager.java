@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
+import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -126,11 +127,13 @@ public class MediaManager {
     public void onPlay() {
         Log.d(Utils.TAG, "onPlay: The service is now on foreground, audio focus, wake and wifi locks have been acquired");
 
-        MediaNotification notification = metadata.getNotification();
+        if (VERSION.SDK_INT >= 23) {
+            MediaNotification notification = metadata.getNotification();
 
-        // Set the service as foreground, updating and showing the notification
-        service.startForeground(MediaNotification.NOTIFICATION_ID, notification.build());
-        notification.setShowing(true);
+            // Set the service as foreground, updating and showing the notification
+            service.startForeground(MediaNotification.NOTIFICATION_ID, notification.build());
+            notification.setShowing(true);
+        }
 
         // Activate the session
         metadata.setEnabled(true);
@@ -151,7 +154,11 @@ public class MediaManager {
 
         if(!serviceStarted) {
             Log.d(Utils.TAG, "Marking the service as started, as there is now playback");
-            service.startService(new Intent(service, PlayerService.class));
+            if (VERSION.SDK_INT >= 26) {
+                service.startForegroundService(new Intent(service, PlayerService.class));
+            } else {
+                service.startService(new Intent(service, PlayerService.class));
+            }
             serviceStarted = true;
         }
     }

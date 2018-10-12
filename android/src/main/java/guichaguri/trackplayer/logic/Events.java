@@ -33,12 +33,14 @@ public class Events {
     public static final String PLAYBACK_UNBIND = "playback-unbind";
 
     public static void dispatchEvent(Context context, String event, Bundle data) {
-        Intent i = new Intent(context, PlayerTask.class);
+        if (event != PLAYBACK_UNBIND) {
+            Intent i = new Intent(context, PlayerTask.class);
 
-        if(event != null) i.putExtra(PlayerTask.EVENT_TYPE, event);
-        if(data != null) i.putExtra(PlayerTask.EVENT_DATA, data);
+            if(event != null) i.putExtra(PlayerTask.EVENT_TYPE, event);
+            if(data != null) i.putExtra(PlayerTask.EVENT_DATA, data);
 
-        context.startService(i);
+            context.startService(i);
+        }
     }
 
 }
