@@ -1,7 +1,11 @@
 package com.guichaguri.trackplayer.service.metadata;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Action;
@@ -37,6 +41,7 @@ public class MetadataManager {
     private long actions = 0;
     private long compactActions = 0;
     private NotificationCompat.Builder builder;
+    private String notificationChannel = "trackplayer";
 
     private Action previousAction, rewindAction, playAction, pauseAction, stopAction, forwardAction, nextAction;
 
@@ -44,7 +49,17 @@ public class MetadataManager {
         this.service = service;
         this.manager = manager;
         this.artwork = new ArtworkCache(service, this);
-        this.builder = new NotificationCompat.Builder(service, "trackplayer");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(notificationChannel, "notification service", NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setShowBadge(false);
+            channel.setSound(null, null);
+
+            NotificationManager not = (NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE);
+            not.createNotificationChannel(channel);
+        }
+
+        this.builder = new NotificationCompat.Builder(service, notificationChannel);
         this.session = new MediaSessionCompat(service, "TrackPlayer", null, null);
 
         session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |

@@ -291,7 +291,7 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
 
             for(Track track : tracks) {
                 if(track.id.equals(id)) {
-                    callback.resolve(track); // TODO serialize
+                    callback.resolve(Arguments.fromBundle(track.originalItem));
                     return;
                 }
             }

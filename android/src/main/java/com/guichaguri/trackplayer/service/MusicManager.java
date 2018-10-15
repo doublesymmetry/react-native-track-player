@@ -1,5 +1,6 @@
 package com.guichaguri.trackplayer.service;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
@@ -44,6 +45,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
     private AudioFocusRequest focus = null;
     private boolean hasAudioFocus = false;
 
+    @SuppressLint("InvalidWakeLockTag")
     public MusicManager(MusicService service) {
         this.service = service;
         this.metadata = new MetadataManager(service, this);

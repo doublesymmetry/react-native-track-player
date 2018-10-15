@@ -114,6 +114,7 @@ public class ArtworkCache {
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
+            if (bitmap == null) return;
             cache.artworks.put(cache.taskUri, bitmap);
             cache.manager.updateArtwork(bitmap);
             cache.task = null;

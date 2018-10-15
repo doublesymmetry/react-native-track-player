@@ -64,6 +64,7 @@ public class Track {
     public String date;
     public String genre;
     public long duration;
+    public Bundle originalItem;
 
     public RatingCompat rating;
 
@@ -71,7 +72,7 @@ public class Track {
 
     public Track(Context context, Bundle bundle, int ratingType) {
         id = bundle.getString("id");
-        uri = Utils.getUri(context, bundle, "uri");
+        uri = Utils.getUri(context, bundle, "url");
 
         String trackType = bundle.getString("type", "default");
 
@@ -95,6 +96,7 @@ public class Track {
         rating = Utils.getRating(bundle, "rating", ratingType);
 
         queueId = System.currentTimeMillis();
+        originalItem = bundle;
     }
 
     public MediaMetadataCompat.Builder toMediaMetadata() {
@@ -111,8 +113,8 @@ public class Track {
 
         builder.putLong(METADATA_KEY_DURATION, duration);
 
-        builder.putRating(METADATA_KEY_RATING, rating);
         // TODO
+//        builder.putRating(METADATA_KEY_RATING, rating);
 
         return builder;
     }
@@ -164,5 +166,4 @@ public class Track {
                         .createMediaSource(uri);
         }
     }
-
 }
