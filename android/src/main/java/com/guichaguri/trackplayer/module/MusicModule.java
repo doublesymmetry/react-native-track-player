@@ -165,6 +165,7 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
         final ArrayList bundleList = Arguments.toList(tracks);
 
         waitForConnection(() -> {
+            // TODO: reject if missing attributes (not valid Track object)
             List<Track> trackList = Track.createTracks(getReactApplicationContext(), bundleList, binder.getRatingType());
 
             List<Track> queue = binder.getPlayback().getQueue();
@@ -182,9 +183,9 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
             }
 
             if(index == -1) {
-                callback.reject("invalid", "Track ID not found");
+                callback.reject("track_not_in_queue", "Given track ID was not found in queue");
             } else if(trackList == null || trackList.isEmpty()) {
-                callback.reject("invalid", "Couldn't add an invalid list of tracks");
+                callback.reject("invalid_track_object", "Track is missing a required key");
             } else if(trackList.size() == 1) {
                 binder.getPlayback().add(trackList.get(0), index, callback);
             } else {
@@ -212,13 +213,7 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
                 }
             }
 
-            if(trackList.isEmpty()) {
-                callback.reject("invalid", "Couldn't remove an invalid list of tracks");
-            } else if(indexes.isEmpty()) {
-                callback.reject("invalid", "No tracks found");
-            } else if (indexes.size() == 1) {
-                binder.getPlayback().remove(indexes.get(0), callback);
-            } else {
+            if (indexes.size() > 0) {
                 binder.getPlayback().remove(indexes, callback);
             }
         });

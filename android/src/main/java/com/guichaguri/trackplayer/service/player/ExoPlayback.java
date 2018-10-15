@@ -83,11 +83,6 @@ public class ExoPlayback implements EventListener {
         player.prepare(source);
     }
 
-    public void remove(int index, Promise promise) {
-        queue.remove(index);
-        source.removeMediaSource(index, Utils.toRunnable(promise));
-    }
-
     public void remove(List<Integer> indexes, Promise promise) {
         Collections.sort(indexes);
 
@@ -102,11 +97,8 @@ public class ExoPlayback implements EventListener {
                 source.removeMediaSource(index, null);
             }
         }
-    }
 
-    public void move(int fromIndex, int toIndex, Promise promise) {
-        queue.add(toIndex, queue.remove(fromIndex));
-        source.moveMediaSource(fromIndex, toIndex, Utils.toRunnable(promise));
+        player.prepare(source);
     }
 
     public Track getCurrentTrack() {
@@ -121,19 +113,19 @@ public class ExoPlayback implements EventListener {
         for(int i = 0; i < queue.size(); i++) {
             if(id.equals(queue.get(i).id)) {
                 player.seekToDefaultPosition(i);
-                promise.resolve(null); // TODO check
+                promise.resolve(null);
                 return;
             }
         }
 
-        promise.reject("queue", "Couldn't find the track");
+        promise.reject("track_not_in_queue", "Given track ID was not found in queue");
     }
 
     public void skipToPrevious(Promise promise) {
         int prev = player.getPreviousWindowIndex();
 
         if(prev == C.INDEX_UNSET) {
-            promise.reject("queue", "Couldn't skip to previous");
+            promise.reject("no_previous_track", "There is no previous track");
             return;
         }
 
@@ -141,14 +133,14 @@ public class ExoPlayback implements EventListener {
         lastKnownPosition = player.getCurrentPosition();
 
         player.seekToDefaultPosition(prev);
-        promise.resolve(null); // TODO check
+        promise.resolve(null);
     }
 
     public void skipToNext(Promise promise) {
         int next = player.getNextWindowIndex();
 
         if(next == C.INDEX_UNSET) {
-            promise.reject("queue", "Couldn't skip to previous");
+            promise.reject("queue_exhausted", "There is no tracks left to play");
             return;
         }
 
@@ -156,7 +148,7 @@ public class ExoPlayback implements EventListener {
         lastKnownPosition = player.getCurrentPosition();
 
         player.seekToDefaultPosition(next);
-        promise.resolve(null); // TODO check
+        promise.resolve(null);
     }
 
     public void play() {
