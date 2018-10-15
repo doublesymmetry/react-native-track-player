@@ -56,6 +56,9 @@ public class ExoPlayback implements EventListener {
 
         source = new ConcatenatingMediaSource();
         player.prepare(source);
+
+        lastKnownWindow = C.INDEX_UNSET;
+        lastKnownPosition = C.POSITION_UNSET;
     }
 
     public List<Track> getQueue() {
@@ -284,6 +287,7 @@ public class ExoPlayback implements EventListener {
             // Track changed because it ended
             // We'll use its duration instead of the last known position
             if(reason == Player.DISCONTINUITY_REASON_PERIOD_TRANSITION && lastKnownWindow != C.INDEX_UNSET) {
+                if (lastKnownWindow >= player.getCurrentTimeline().getWindowCount()) return;
                 long duration = player.getCurrentTimeline().getWindow(lastKnownWindow, new Window()).getDurationMs();
                 if(duration != C.TIME_UNSET) lastKnownPosition = duration;
             }
