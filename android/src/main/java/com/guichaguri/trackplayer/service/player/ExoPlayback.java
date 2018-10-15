@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 /**
  * @author Guichaguri
  */
@@ -103,6 +105,37 @@ public class ExoPlayback implements EventListener {
                 source.removeMediaSource(index, null);
             }
         }
+    }
+
+    public void removeUpcomingTracks() {
+        if (lastKnownWindow == C.INDEX_UNSET) return;
+        if (lastKnownWindow + 1 >= queue.size()) return;
+
+        List<Integer> indexes = new ArrayList<>();
+
+        for (int i = lastKnownWindow + 1; i < queue.size(); i++) {
+            indexes.add(i);
+        }
+
+        remove(indexes, new Promise() {
+            @Override
+            public void resolve(@Nullable Object value) {}
+
+            @Override
+            public void reject(String code, String message) {}
+
+            @Override
+            public void reject(String code, Throwable e) {}
+
+            @Override
+            public void reject(String code, String message, Throwable e) {}
+
+            @Override
+            public void reject(String message) {}
+
+            @Override
+            public void reject(Throwable reason) {}
+        });
     }
 
     public Track getCurrentTrack() {

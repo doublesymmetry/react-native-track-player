@@ -220,6 +220,11 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
+    public void removeUpcomingTracks() {
+        waitForConnection(() -> binder.getPlayback().removeUpcomingTracks());
+    }
+
+    @ReactMethod
     public void skip(final String track, final Promise callback) {
         waitForConnection(() -> binder.getPlayback().skip(track, callback));
     }
