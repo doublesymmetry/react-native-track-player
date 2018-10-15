@@ -65,7 +65,7 @@ declare namespace RNTrackPlayer {
   }
 
   export function add(tracks: Track|Track[], insertBeforeId?: string): Promise<void>;
-  export function remove(tracks: Track|Track[]): Promise<void>;
+  export function remove(trackIds: String|String[]): Promise<void>;
   export function skip(trackId: string): Promise<void>;
   export function getQueue(): Promise<Track[]>;
   export function skipToNext(): Promise<void>;

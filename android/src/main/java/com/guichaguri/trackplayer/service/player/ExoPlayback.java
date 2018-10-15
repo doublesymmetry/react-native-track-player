@@ -68,7 +68,10 @@ public class ExoPlayback implements EventListener {
     public void add(Track track, int index, Promise promise) {
         queue.add(index, track);
         source.addMediaSource(index, track.toMediaSource(context, cacheMaxSize), Utils.toRunnable(promise));
-        player.prepare(source);
+
+        if (queue.size() == 1) {
+            player.prepare(source);
+        }
     }
 
     public void add(Collection<Track> tracks, int index, Promise promise) {
@@ -80,7 +83,10 @@ public class ExoPlayback implements EventListener {
 
         queue.addAll(index, tracks);
         source.addMediaSources(index, trackList, Utils.toRunnable(promise));
-        player.prepare(source);
+
+        if (queue.size() == tracks.size()) {
+            player.prepare(source);
+        }
     }
 
     public void remove(List<Integer> indexes, Promise promise) {
@@ -97,8 +103,6 @@ public class ExoPlayback implements EventListener {
                 source.removeMediaSource(index, null);
             }
         }
-
-        player.prepare(source);
     }
 
     public Track getCurrentTrack() {
