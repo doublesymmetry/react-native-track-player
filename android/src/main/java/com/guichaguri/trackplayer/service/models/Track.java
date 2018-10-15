@@ -20,10 +20,10 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.cache.Cache;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
-import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor;
-import com.google.android.exoplayer2.upstream.cache.SimpleCache;
 import com.google.android.exoplayer2.util.Util;
 import com.guichaguri.trackplayer.service.Utils;
+import com.guichaguri.trackplayer.service.metadata.SimpleCacheManager;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -147,7 +147,7 @@ public class Track {
         if(cacheMaxSize > 0 && !Utils.isLocal(uri)) {
             // Enable caching
             File cacheDir = new File(ctx.getCacheDir(), "TrackPlayer");
-            Cache cache = new SimpleCache(cacheDir, new LeastRecentlyUsedCacheEvictor(cacheMaxSize));
+            Cache cache = SimpleCacheManager.INSTANCE.getCache(cacheDir, cacheMaxSize);
             ds = new CacheDataSourceFactory(cache, ds, CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR, cacheMaxSize);
         }
 
