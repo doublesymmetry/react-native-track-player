@@ -301,6 +301,20 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
+    public void getQueue(Promise callback) {
+        waitForConnection(() -> {
+            List queue = new ArrayList();
+            List<Track> tracks = binder.getPlayback().getQueue();
+
+            for(Track track : tracks) {
+                queue.add(track.originalItem);
+            }
+
+            callback.resolve(Arguments.fromList(queue));
+        });
+    }
+
+    @ReactMethod
     public void getCurrentTrack(final Promise callback) {
         waitForConnection(() -> {
             Track track = binder.getPlayback().getCurrentTrack();
