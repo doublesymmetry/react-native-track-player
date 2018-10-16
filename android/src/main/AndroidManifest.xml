@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="guichaguri.trackplayer">
+          package="com.guichaguri.trackplayer">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application>
 
-        <!-- The main service, handles playback, playlists, media buttons and chromecast -->
-        <service android:name=".logic.services.PlayerService" android:enabled="true" android:exported="true">
+        <!-- The main service, handles playback, playlists and media buttons -->
+        <service android:name=".service.MusicService" android:enabled="true" android:exported="true">
             <intent-filter>
-                <action android:name="android.media.browse.MediaBrowserService" />
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </service>
-
-        <!-- The service for the headless tasks in which events can be received by the JS side -->
-        <service android:name=".logic.services.PlayerTask" android:enabled="true" />
 
         <!-- A receiver that will receive media buttons. Required on pre-lollipop devices -->
         <receiver android:name="android.support.v4.media.session.MediaButtonReceiver">
@@ -22,10 +19,6 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
-
-        <!-- Android Auto support, removed if not allowed in track-player.json -->
-        <meta-data android:name="${autoMetadata}"
-                   android:resource="@xml/automotive_app_desc" />
 
     </application>
 
