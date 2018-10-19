@@ -1,3 +1,4 @@
+import { Component } from 'react';
 import { NativeModules } from 'react-native';
 
 export = RNTrackPlayer;
@@ -6,6 +7,16 @@ export as namespace RNTrackPlayer;
 declare namespace RNTrackPlayer {
 
   // General
+  interface IProgressComponentState {
+    position: number;
+    bufferedPosition: number;
+    duration: number;
+  }
+
+  export class ProgressComponent extends Component<null, IProgressComponentState> {
+    public getProgress: () => number;
+    public getBufferedProgress: () => number;
+  }
 
   export interface PlayerOptions {
     ratingType?: any;
