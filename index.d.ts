@@ -12,8 +12,8 @@ declare namespace RNTrackPlayer {
     bufferedPosition: number;
     duration: number;
   }
-
-  export class ProgressComponent extends Component<null, IProgressComponentState> {
+  
+  export class ProgressComponent<P = {}, S = {}> extends Component<P, IProgressComponentState & S> {
     public getProgress: () => number;
     public getBufferedProgress: () => number;
   }
