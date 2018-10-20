@@ -131,8 +131,8 @@ public class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         print("Destroying player")
     }
     
-    @objc(updateOptions:)
-    public func update(options: [String: Any]) {
+    @objc(updateOptions:resolver:rejecter:)
+    public func update(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         let remoteCenter = MPRemoteCommandCenter.shared()
         let castedCapabilities = (options["capabilities"] as? [String])
         let supportedCapabilities = castedCapabilities?.filter { Capability(rawValue: $0) != nil }
@@ -158,6 +158,8 @@ public class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         remoteCenter.skipBackwardCommand.preferredIntervals = [options["jumpInterval"] as? NSNumber ?? 15]
         toggleRemoteHandler(command: remoteCenter.skipForwardCommand, selector: #selector(remoteSendSkipForward), enabled: enableSkipForward)
         toggleRemoteHandler(command: remoteCenter.skipBackwardCommand, selector: #selector(remoteSendSkipBackward), enabled: enableSkipBackward)
+        
+        resolve(NSNull())
     }
     
     @objc(add:before:resolver:rejecter:)
@@ -190,10 +192,11 @@ public class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         resolve(NSNull())
     }
     
-    @objc(removeUpcomingTracks)
-    public func removeUpcomingTracks() {
+    @objc(removeUpcomingTracks:rejecter:)
+    public func removeUpcomingTracks(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Removing upcoming tracks")
         mediaWrapper.removeUpcomingTracks()
+        resolve(NSNull())
     }
     
     @objc(skip:resolver:rejecter:)
@@ -228,40 +231,46 @@ public class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         }
     }
     
-    @objc(reset)
-    public func reset() {
+    @objc(reset:rejecter:)
+    public func reset(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Resetting player.")
         mediaWrapper.reset()
+        resolve(NSNull())
     }
     
-    @objc(play)
-    public func play() {
+    @objc(play:rejecter:)
+    public func play(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Starting/Resuming playback")
         mediaWrapper.play()
+        resolve(NSNull())
     }
     
-    @objc(pause)
-    public func pause() {
+    @objc(pause:rejecter:)
+    public func pause(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Pausing playback")
         mediaWrapper.pause()
+        resolve(NSNull())
     }
     
-    @objc(stop)
-    public func stop() {
+    @objc(stop:rejecter:)
+    public func stop(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Stopping playback")
         mediaWrapper.stop()
+        resolve(NSNull())
     }
     
-    @objc(seekTo:)
-    public func seek(to time: Double) {
+    @objc(seekTo:resolver:rejecter:)
+    public func seek(to time: Double, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Seeking to \(time) seconds")
         mediaWrapper.seek(to: time)
+        resolve(NSNull())
     }
     
-    @objc(setVolume:)
-    public func setVolume(level: Float) {
+    @objc(setVolume:resolver:rejecter:)
+    public func setVolume(level: Float, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Setting volume to \(level)")
         mediaWrapper.volume = level
+        resolve(NSNull())
     }
     
     @objc(getVolume:rejecter:)
@@ -270,11 +279,12 @@ public class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         resolve(mediaWrapper.volume)
     }
     
-    @objc(setRate:)
-    public func setRate(rate: Float) {
+    @objc(setRate:resolver:rejecter:)
+    public func setRate(rate: Float, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         guard [.buffering, .playing].contains(mediaWrapper.mappedState) else { return }
         print("Setting rate to \(rate)")
         mediaWrapper.rate = rate
+        resolve(NSNull())
     }
     
     @objc(getRate:rejecter:)

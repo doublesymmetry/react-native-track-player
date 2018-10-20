@@ -156,10 +156,13 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void updateOptions(ReadableMap data) {
+    public void updateOptions(ReadableMap data, final Promise callback) {
         final Bundle options = Arguments.toBundle(data);
 
-        waitForConnection(() -> binder.updateOptions(options));
+        waitForConnection(() -> {
+            binder.updateOptions(options);
+            callback.resolve(null);
+        });
     }
 
     @ReactMethod
@@ -222,8 +225,11 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void removeUpcomingTracks() {
-        waitForConnection(() -> binder.getPlayback().removeUpcomingTracks());
+    public void removeUpcomingTracks(final Promise callback) {
+        waitForConnection(() -> {
+            binder.getPlayback().removeUpcomingTracks();
+            callback.resolve(null);
+        });
     }
 
     @ReactMethod
@@ -242,43 +248,65 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void reset() {
-        waitForConnection(() -> binder.getPlayback().reset());
+    public void reset(final Promise callback) {
+        waitForConnection(() -> {
+            binder.getPlayback().reset();
+            callback.resolve(null);
+        });
     }
 
     @ReactMethod
-    public void play() {
-        waitForConnection(() -> binder.getPlayback().play());
+    public void play(final Promise callback) {
+        waitForConnection(() -> {
+            binder.getPlayback().play();
+            callback.resolve(null);
+        });
     }
 
     @ReactMethod
-    public void pause() {
-        waitForConnection(() -> binder.getPlayback().pause());
+    public void pause(final Promise callback) {
+        waitForConnection(() -> {
+            binder.getPlayback().pause();
+            callback.resolve(null);
+        });
     }
 
     @ReactMethod
-    public void stop() {
-        waitForConnection(() -> binder.getPlayback().stop());
+    public void stop(final Promise callback) {
+        waitForConnection(() -> {
+            binder.getPlayback().stop();
+            callback.resolve(null);
+        });
     }
 
     @ReactMethod
-    public void seekTo(final double seconds) {
-        waitForConnection(() -> binder.getPlayback().seekTo(Utils.toMillis(seconds)));
+    public void seekTo(final float seconds, final Promise callback) {
+        waitForConnection(() -> {
+            long secondsToSkip = Utils.toMillis(seconds);
+            binder.getPlayback().seekTo(secondsToSkip);
+            callback.resolve(null);
+        });
     }
 
     @ReactMethod
-    public void setVolume(final float volume) {
-        Log.e(Utils.LOG, "Updating the volume is currently unsupported");
+    public void setVolume(final float volume, final Promise callback) {
+        waitForConnection(() -> {
+            binder.getPlayback().setVolume(volume);
+            callback.resolve(null);
+        });
     }
 
     @ReactMethod
     public void getVolume(final Promise callback) {
-        callback.reject("unsupported", "Retrieving the volume is currently unsupported");
+        waitForConnection(() -> callback.resolve(binder.getPlayback().getVolume()));
     }
 
     @ReactMethod
-    public void setRate(final float rate) {
-        waitForConnection(() -> binder.getPlayback().setRate(rate));
+    public void setRate(final float rate, final Promise callback) {
+        waitForConnection(() -> {
+            binder.getPlayback().setRate(rate);
+            callback.resolve(null);
+        });
     }
 
     @ReactMethod
@@ -335,7 +363,7 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
             long duration = binder.getPlayback().getDuration();
 
             if(duration == C.TIME_UNSET) {
-                callback.reject("unknown", "Unknown duration");
+                callback.resolve(Utils.toSeconds(0));
             } else {
                 callback.resolve(Utils.toSeconds(duration));
             }
@@ -348,7 +376,7 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
             long position = binder.getPlayback().getBufferedPosition();
 
             if(position == C.POSITION_UNSET) {
-                callback.reject("unknown", "Unknown buffered position");
+                callback.resolve(Utils.toSeconds(0));
             } else {
                 callback.resolve(Utils.toSeconds(position));
             }

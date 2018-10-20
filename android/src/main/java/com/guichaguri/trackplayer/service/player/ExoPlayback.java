@@ -9,6 +9,7 @@ import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Player.EventListener;
+import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.Timeline.Window;
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
@@ -32,7 +33,7 @@ public class ExoPlayback implements EventListener {
 
     private final Context context;
     private final MusicManager manager;
-    private final ExoPlayer player;
+    private final SimpleExoPlayer player;
     private final long cacheMaxSize;
 
     private ConcatenatingMediaSource source;
@@ -43,7 +44,7 @@ public class ExoPlayback implements EventListener {
     private long lastKnownPosition = C.POSITION_UNSET;
     private int previousState = PlaybackStateCompat.STATE_NONE;
 
-    public ExoPlayback(Context context, MusicManager manager, ExoPlayer player, long maxCacheSize) {
+    public ExoPlayback(Context context, MusicManager manager, SimpleExoPlayer player, long maxCacheSize) {
         this.context = context;
         this.manager = manager;
         this.player = player;
@@ -223,6 +224,14 @@ public class ExoPlayback implements EventListener {
 
     public void seekTo(long time) {
         player.seekTo(time);
+    }
+
+    public float getVolume() {
+        return player.getVolume();
+    }
+
+    public void setVolume(float volume) {
+        player.setVolume(volume);
     }
 
     public float getRate() {
