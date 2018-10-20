@@ -77,6 +77,10 @@ public class MetadataManager {
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
     }
 
+    public MediaSessionCompat getSession() {
+        return session;
+    }
+
     /**
      * Updates the metadata options
      * @param options The options

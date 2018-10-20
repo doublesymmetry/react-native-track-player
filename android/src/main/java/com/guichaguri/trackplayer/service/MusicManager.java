@@ -148,6 +148,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
         Bundle bundle = new Bundle();
         bundle.putInt("state", state);
         service.emit(MusicEvents.PLAYBACK_STATE, bundle);
+        metadata.updatePlayback(playback);
     }
 
     public void onTrackUpdate(Track previous, long prevPos, Track next) {

@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.media.session.MediaButtonReceiver;
+
 import com.facebook.react.HeadlessJsTaskService;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.jstasks.HeadlessJsTaskConfig;
@@ -48,10 +50,14 @@ public class MusicService extends HeadlessJsTaskService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        String action = intent.getAction();
+        if (action != null && action.equals("android.intent.action.MEDIA_BUTTON")) {
+            MediaButtonReceiver.handleIntent(manager.getMetadata().getSession(), intent);
+            return START_NOT_STICKY;
+        }
+
         manager = new MusicManager(this);
-
         super.onStartCommand(intent, flags, startId);
-
         return START_STICKY;
     }
 

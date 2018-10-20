@@ -272,7 +272,6 @@ public class ExoPlayback implements EventListener {
         int state = getState();
 
         if(state != previousState) {
-
             if(Utils.isPlaying(state) && !Utils.isPlaying(previousState)) {
                 manager.onPlay();
             } else if(Utils.isPaused(state) && !Utils.isPaused(previousState)) {
