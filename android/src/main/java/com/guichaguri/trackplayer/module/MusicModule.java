@@ -150,7 +150,9 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     @ReactMethod
     public void destroy() {
         if(binder != null) binder.destroy();
-        getReactApplicationContext().unbindService(this);
+        
+        ReactContext context = getReactApplicationContext();
+        if (context != null) context.unbindService(this);
     }
 
     @ReactMethod
