@@ -57,7 +57,7 @@ class RNTrackPlayerSpec: QuickSpec {
                 let module = RNTrackPlayer()
                 let remoteCenter = MPRemoteCommandCenter.shared()
                 
-                module.update(options: [:])
+                module.update(options: [:], resolve: { _ in }, reject: { _ in fail() })
                 
                 expect(remoteCenter.playCommand.isEnabled).to(beFalse())
                 expect(remoteCenter.pauseCommand.isEnabled).to(beFalse())
@@ -71,7 +71,7 @@ class RNTrackPlayerSpec: QuickSpec {
                 
                 module.update(options: [
                     "capabilities": []
-                ])
+                ], resolve: { _ in }, reject: { _ in fail() })
                 
                 expect(remoteCenter.playCommand.isEnabled).to(beFalse())
                 expect(remoteCenter.pauseCommand.isEnabled).to(beFalse())
@@ -88,7 +88,7 @@ class RNTrackPlayerSpec: QuickSpec {
                     "capabilities": [
                         constants["UNSUPPORTED"]
                     ]
-                ])
+                ], resolve: { _ in }, reject: { _ in fail() })
                 
                 expect(remoteCenter.playCommand.isEnabled).to(beFalse())
                 expect(remoteCenter.pauseCommand.isEnabled).to(beFalse())
@@ -109,7 +109,7 @@ class RNTrackPlayerSpec: QuickSpec {
                         constants["CAPABILITY_SKIP_TO_PREVIOUS"],
                         constants["CAPABILITY_SEEK_TO"],
                     ]
-                ])
+                ], resolve: { _ in }, reject: { _ in fail() })
                 
                 expect(remoteCenter.playCommand.isEnabled).to(beTrue())
                 expect(remoteCenter.pauseCommand.isEnabled).to(beTrue())
@@ -128,7 +128,7 @@ class RNTrackPlayerSpec: QuickSpec {
                         constants["CAPABILITY_SKIP_TO_PREVIOUS"],
                         constants["CAPABILITY_SEEK_TO"],
                     ]
-                ])
+                ], resolve: { _ in }, reject: { _ in fail() })
                 
                 expect(remoteCenter.playCommand.isEnabled).to(beFalse())
                 expect(remoteCenter.pauseCommand.isEnabled).to(beFalse())
@@ -167,7 +167,7 @@ class RNTrackPlayerSpec: QuickSpec {
                 var extraItem = correctTrack
                 extraItem["id"] = "test-correct-3"
                 module.add(trackDicts: [correctTrack, extraItem], before: nil, resolve: { _ in }) { _ in fail() }
-                module.play()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
               
                 module.add(trackDicts: [anotherCorrectTrack], before: "test-correct", resolve: { _ in }) { _ in fail() }
                 module.skipToNext(resolve: { _ in }) { _ in }
@@ -222,7 +222,7 @@ class RNTrackPlayerSpec: QuickSpec {
             it("correctly adjusts current index when previous items are removed") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack, anotherCorrectTrack], before: nil, resolve: { _ in }) { _ in }
-                module.play()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
                 module.skipToNext(resolve: { _ in }) { _ in }
                 
                 module.remove(tracks: ["test-correct"], resolve: { _ in }) { _ in fail() }
@@ -240,7 +240,7 @@ class RNTrackPlayerSpec: QuickSpec {
             it("stops playback if current track is last in queue and is removed") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack, anotherCorrectTrack], before: nil, resolve: { _ in }) { _ in }
-                module.play()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
                 module.skipToNext(resolve: { _ in }) { _ in }
                 
                 module.remove(tracks: ["test-correct-2"], resolve: { _ in }) { _ in fail() }
@@ -262,7 +262,7 @@ class RNTrackPlayerSpec: QuickSpec {
             it("continues to next track if current track is removed and it wasn't the last") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack, anotherCorrectTrack], before: nil, resolve: { _ in }) { _ in }
-                module.play()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
                 
                 module.remove(tracks: ["test-correct"], resolve: { _ in }) { _ in fail() }
                 
@@ -284,7 +284,7 @@ class RNTrackPlayerSpec: QuickSpec {
               var lastItem = correctTrack
               lastItem["id"] = "test-correct-4"
               module.add(trackDicts: [correctTrack, middleItem, anotherCorrectTrack, lastItem], before: nil, resolve: { _ in }) { _ in }
-              module.play()
+              module.play(resolve: { _ in }, reject: { _ in fail() })
               module.skipToNext(resolve: { _ in }) { _ in }
             
               module.remove(tracks: ["test-correct-3", "test-correct"], resolve: { _ in }) { _ in fail() }
@@ -305,7 +305,7 @@ class RNTrackPlayerSpec: QuickSpec {
               var middleItem = correctTrack
               middleItem["id"] = "test-correct-3"
               module.add(trackDicts: [correctTrack, middleItem, anotherCorrectTrack], before: nil, resolve: { _ in }) { _ in }
-              module.play()
+              module.play(resolve: { _ in }, reject: { _ in fail() })
               module.skipToNext(resolve: { _ in }) { _ in }
             
               module.remove(tracks: ["test-correct-2"], resolve: { _ in }) { _ in fail() }
@@ -330,9 +330,9 @@ class RNTrackPlayerSpec: QuickSpec {
             it("removes all items from queue but does not stop current playback") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack, anotherCorrectTrack], before: nil, resolve: { _ in }) { _ in }
-                module.play()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
                 
-                module.removeUpcomingTracks()
+                module.removeUpcomingTracks(resolve: { _ in }, reject: { _ in fail() })
                 module.getQueue(resolve: { queue in
                     let castedQueue = queue as? [[String: Any]]
                     expect(castedQueue).to(haveCount(1))
@@ -358,7 +358,7 @@ class RNTrackPlayerSpec: QuickSpec {
             it("skips to track if given a valid id") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack, anotherCorrectTrack], before: nil, resolve: { _ in }) { _ in }
-                module.play()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
                 
                 module.skip(to: "test-correct-2", resolve: { _ in }) { _ in fail() }
                 module.getCurrentTrack(resolve: { trackId in
@@ -369,7 +369,7 @@ class RNTrackPlayerSpec: QuickSpec {
             it("rejects if given track id is not in queue") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack, anotherCorrectTrack], before: nil, resolve: { _ in }) { _ in }
-                module.play()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
                 
                 module.skip(to: "test-correct-3", resolve: { _ in }) { code, _, _ in
                     expect(code).to(equal("track_not_in_queue"))
@@ -385,7 +385,7 @@ class RNTrackPlayerSpec: QuickSpec {
             it("skips to next track if possible") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack, anotherCorrectTrack], before: nil, resolve: { _ in }) { _ in }
-                module.play()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
                 
                 module.skipToNext(resolve: { _ in }) { _ in fail() }
                 module.getCurrentTrack(resolve: { trackId in
@@ -396,7 +396,7 @@ class RNTrackPlayerSpec: QuickSpec {
             it("rejects if no more tracks left to play and stops playback") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack], before: nil, resolve: { _ in }) { _ in }
-                module.play()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
                 
                 module.skipToNext(resolve: { _ in }) { code, _, _ in
                     expect(code).to(equal("queue_exhausted"))
@@ -416,7 +416,7 @@ class RNTrackPlayerSpec: QuickSpec {
             it("plays previous track if possible") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack, anotherCorrectTrack], before: nil, resolve: { _ in }) { _ in }
-                module.play()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
                 module.skipToNext(resolve: { _ in }) { _ in }
                 
                 module.skipToPrevious(resolve: { _ in }) { _ in fail() }
@@ -428,7 +428,7 @@ class RNTrackPlayerSpec: QuickSpec {
             it("rejects if no tracks before current one and stops playback") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack], before: nil, resolve: { _ in }) { _ in }
-                module.play()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
                 
                 module.skipToPrevious(resolve: { _ in }) { code, _, _ in
                     expect(code).to(equal("no_previous_track"))
@@ -448,7 +448,7 @@ class RNTrackPlayerSpec: QuickSpec {
             it("clears queue and stops playback") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack], before: nil, resolve: { _ in }) { _ in }
-                module.reset()
+                module.reset(resolve: { _ in }, reject: { _ in fail() })
                 
                 module.getRate(resolve: { rate in
                     expect(rate as? Float).to(equal(0))
@@ -472,7 +472,7 @@ class RNTrackPlayerSpec: QuickSpec {
         describe(".play") {
             it("cannot start playback without tracks") {
                 let module = RNTrackPlayer()
-                module.play()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
                 
                 module.getCurrentTrack(resolve: { trackId in
                     expect(trackId).to(beNil())
@@ -483,7 +483,7 @@ class RNTrackPlayerSpec: QuickSpec {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack], before: nil, resolve: { _ in }) { _ in }
                 
-                module.play()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
                 module.getCurrentTrack(resolve: { trackId in
                     expect(trackId as? String).to(equal("test-correct"))
                 }) { _ in }
@@ -492,11 +492,11 @@ class RNTrackPlayerSpec: QuickSpec {
             it("correctly starts playback from start of queue after a having stopped") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [anotherCorrectTrack, correctTrack], before: nil, resolve: { _ in }) { _ in }
-                module.play()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
                 module.skipToNext(resolve: { _ in }) { _ in }
-                module.stop()
+                module.stop(resolve: { _ in }, reject: { _ in fail() })
                 
-                module.play()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
                 module.getCurrentTrack(resolve: { trackId in
                     expect(trackId as? String).to(equal("test-correct-2"))
                 }) { _ in }
@@ -505,10 +505,10 @@ class RNTrackPlayerSpec: QuickSpec {
             it("correctly resumes playback when playing after a pause") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack], before: nil, resolve: { _ in }) { _ in }
-                module.play()
-                module.pause()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
+                module.pause(resolve: { _ in }, reject: { _ in fail() })
                 
-                module.play()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
                 module.getCurrentTrack(resolve: { trackId in
                     expect(trackId as? String).to(equal("test-correct"))
                 }) { _ in }
@@ -519,9 +519,9 @@ class RNTrackPlayerSpec: QuickSpec {
             it("correct pauses playback to be ready for resuming") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack], before: nil, resolve: { _ in }) { _ in }
-                module.play()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
                 
-                module.pause()
+                module.pause(resolve: { _ in }, reject: { _ in fail() })
                 module.getState(resolve: { state in
                     expect(state as? String).to(equal(MediaWrapper.PlaybackState.paused.rawValue))
                 }) { _ in }
@@ -536,10 +536,10 @@ class RNTrackPlayerSpec: QuickSpec {
             it("correct stops playback and resets current index") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack, anotherCorrectTrack], before: nil, resolve: { _ in }) { _ in }
-                module.play()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
                 module.skipToNext(resolve: { _ in }) { _ in }
                 
-                module.stop()
+                module.stop(resolve: { _ in }, reject: { _ in fail() })
                 module.getState(resolve: { state in
                     expect(state as? String).to(equal(MediaWrapper.PlaybackState.stopped.rawValue))
                 }) { _ in }
@@ -548,7 +548,7 @@ class RNTrackPlayerSpec: QuickSpec {
                     expect(trackId).to(beNil())
                 }) { _ in }
                 
-                module.play()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
                 module.getCurrentTrack(resolve: { trackId in
                     expect(trackId as? String).to(equal("test-correct"))
                 }) { _ in }
@@ -559,9 +559,9 @@ class RNTrackPlayerSpec: QuickSpec {
             it("seeks to provided time") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack, anotherCorrectTrack], before: nil, resolve: { _ in }) { _ in }
-                module.play()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
                 
-                module.seek(to: 5)
+                module.seek(to: 5, resolve: { _ in }, reject: { _ in fail() })
                 module.getPosition(resolve: { position in
                     expect(position as? Double).to(equal(5))
                 }) { _ in }
@@ -574,10 +574,10 @@ class RNTrackPlayerSpec: QuickSpec {
             it("does not restart playback if you seek while paused") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack, anotherCorrectTrack], before: nil, resolve: { _ in }) { _ in }
-                module.play()
-                module.pause()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
+                module.pause(resolve: { _ in }, reject: { _ in fail() })
                 
-                module.seek(to: 5)
+                module.seek(to: 5, resolve: { _ in }, reject: { _ in fail() })
                 module.getPosition(resolve: { position in
                     expect(position as? Double).to(equal(5))
                 }) { _ in }
@@ -596,9 +596,9 @@ class RNTrackPlayerSpec: QuickSpec {
             it("sets volume to given level") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack, anotherCorrectTrack], before: nil, resolve: { _ in }) { _ in }
-                module.play()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
                 
-                module.setVolume(level: 0.2)
+                module.setVolume(level: 0.2, resolve: { _ in }, reject: { _ in fail() })
                 module.getVolume(resolve: { level in
                     expect(level as? Float).to(equal(0.2))
                 }) { _ in }
@@ -613,14 +613,14 @@ class RNTrackPlayerSpec: QuickSpec {
             it("only sets rate if state is playing") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack, anotherCorrectTrack], before: nil, resolve: { _ in }) { _ in }
-                module.play()
-                module.pause()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
+                module.pause(resolve: { _ in }, reject: { _ in fail() })
                 
                 module.getState(resolve: { state in
                     expect(state as? String).to(equal(MediaWrapper.PlaybackState.paused.rawValue))
                 }) { _ in }
                 
-                module.setRate(rate: 1)
+                module.setRate(rate: 1, resolve: { _ in }, reject: { _ in fail() })
                 module.getRate(resolve: { rate in
                     expect(rate as? Float).toNot(equal(1))
                 }) { _ in }
@@ -688,7 +688,7 @@ class RNTrackPlayerSpec: QuickSpec {
             it("returns id of currently playing track") {
                 let module = RNTrackPlayer()
                 module.add(trackDicts: [correctTrack, anotherCorrectTrack], before: nil, resolve: { _ in }) { _ in }
-                module.play()
+                module.play(resolve: { _ in }, reject: { _ in fail() })
                 
                 module.getCurrentTrack(resolve: { trackId in
                     expect(trackId as? String).to(equal("test-correct"))

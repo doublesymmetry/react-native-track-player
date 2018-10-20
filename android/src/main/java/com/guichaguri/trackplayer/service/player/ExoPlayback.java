@@ -43,6 +43,7 @@ public class ExoPlayback implements EventListener {
     private int lastKnownWindow = C.INDEX_UNSET;
     private long lastKnownPosition = C.POSITION_UNSET;
     private int previousState = PlaybackStateCompat.STATE_NONE;
+    private boolean didInitialSetup = false;
 
     public ExoPlayback(Context context, MusicManager manager, SimpleExoPlayer player, long maxCacheSize) {
         this.context = context;
@@ -315,9 +316,13 @@ public class ExoPlayback implements EventListener {
 
     @Override
     public void onPositionDiscontinuity(int reason) {
+        if (!didInitialSetup) {
+            didInitialSetup = true;
+            return;
+        }
+
         // Track changed
         if(lastKnownWindow != player.getCurrentWindowIndex()) {
-
             Track previous = lastKnownWindow == C.INDEX_UNSET ? null : queue.get(lastKnownWindow);
             Track next = getCurrentTrack();
 

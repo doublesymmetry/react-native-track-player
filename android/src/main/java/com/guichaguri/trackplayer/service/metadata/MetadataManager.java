@@ -3,7 +3,9 @@ package com.guichaguri.trackplayer.service.metadata;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
@@ -66,7 +68,11 @@ public class MetadataManager {
                 MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
         session.setCallback(new ButtonEvents(service, manager));
 
-        builder.setContentIntent(session.getController().getSessionActivity());
+        Context context = service.getApplicationContext();
+        String packageName = context.getPackageName();
+        Intent openApp = context.getPackageManager().getLaunchIntentForPackage(packageName);
+        builder.setContentIntent(PendingIntent.getActivity(context, 0, openApp, 0));
+
         builder.setSmallIcon(R.drawable.play);
         builder.setCategory(NotificationCompat.CATEGORY_TRANSPORT);
 
@@ -166,14 +172,17 @@ public class MetadataManager {
      * @param track The new track
      */
     public void updateMetadata(Track track) {
+        Bitmap bitmap = null;
         MediaMetadataCompat.Builder metadata = track.toMediaMetadata();
 
-        Bitmap bitmap = artwork.getBitmap(track.artwork);
+        if (track.artwork != null) {
+            bitmap = artwork.getBitmap(track.artwork);
+        }
 
         if(bitmap != null) {
             metadata.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, bitmap);
             builder.setLargeIcon(bitmap);
-        } else {
+        } else if (track.artwork != null) {
             artwork.loadBackground(track.artwork);
         }
 
