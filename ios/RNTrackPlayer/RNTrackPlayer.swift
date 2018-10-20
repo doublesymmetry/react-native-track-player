@@ -79,12 +79,17 @@ public class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
             "PITCH_ALGORITHM_VOICE": PitchAlgorithm.voice.rawValue,
 
             "CAPABILITY_PLAY": Capability.play.rawValue,
+            "CAPABILITY_PLAY_FROM_ID": Capability.unsupported.rawValue,
+            "CAPABILITY_PLAY_FROM_SEARCH": Capability.unsupported.rawValue,
             "CAPABILITY_PAUSE": Capability.pause.rawValue,
             "CAPABILITY_STOP": Capability.stop.rawValue,
+            "CAPABILITY_SEEK_TO": Capability.unsupported.rawValue,
+            "CAPABILITY_SKIP": Capability.unsupported.rawValue,
             "CAPABILITY_SKIP_TO_NEXT": Capability.next.rawValue,
             "CAPABILITY_SKIP_TO_PREVIOUS": Capability.previous.rawValue,
+            "CAPABILITY_SET_RATING": Capability.unsupported.rawValue,
             "CAPABILITY_JUMP_FORWARD": Capability.jumpForward.rawValue,
-            "CAPABILITY_JUMP_BACKWARD": Capability.jumpBackward.rawValue
+            "CAPABILITY_JUMP_BACKWARD": Capability.jumpBackward.rawValue,
         ]
     }
     
@@ -130,7 +135,8 @@ public class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     public func update(options: [String: Any]) {
         let remoteCenter = MPRemoteCommandCenter.shared()
         let castedCapabilities = (options["capabilities"] as? [String])
-        let capabilities = castedCapabilities?.flatMap { Capability(rawValue: $0) } ?? []
+        let supportedCapabilities = castedCapabilities?.filter { Capability(rawValue: $0) != nil }
+        let capabilities = supportedCapabilities?.flatMap { Capability(rawValue: $0) } ?? []
         
         let enableStop = capabilities.contains(.stop)
         let enablePause = capabilities.contains(.pause)

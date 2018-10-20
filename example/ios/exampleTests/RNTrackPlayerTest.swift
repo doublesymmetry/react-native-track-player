@@ -34,11 +34,11 @@ let incompleteTrack = [
 class RNTrackPlayerSpec: QuickSpec {
     override func spec() {
         describe(".constantsToExport") {
-            it("has 15 exported constants") {
+            it("has 20 exported constants") {
                 let module = RNTrackPlayer()
                 let constants = module.constantsToExport()
                 
-                expect(constants).to(haveCount(15))
+                expect(constants).to(haveCount(20))
                 expect(constants).to(allPass { $0?.value as? String != nil })
             }
         }
@@ -53,25 +53,86 @@ class RNTrackPlayerSpec: QuickSpec {
         }
         
         describe(".update") {
-            it("maps capabilities correctly") {
+            it("handles empty capabilities correctly: 1") {
+                let module = RNTrackPlayer()
+                let remoteCenter = MPRemoteCommandCenter.shared()
+                
+                module.update(options: [:])
+                
+                expect(remoteCenter.playCommand.isEnabled).to(beFalse())
+                expect(remoteCenter.pauseCommand.isEnabled).to(beFalse())
+                expect(remoteCenter.stopCommand.isEnabled).to(beFalse())
+                expect(remoteCenter.nextTrackCommand.isEnabled).to(beFalse())
+                expect(remoteCenter.previousTrackCommand.isEnabled).to(beFalse())
+            }
+            it("handles empty capabilities correctly: 2") {
+                let module = RNTrackPlayer()
+                let remoteCenter = MPRemoteCommandCenter.shared()
+                
+                module.update(options: [
+                    "capabilities": []
+                ])
+                
+                expect(remoteCenter.playCommand.isEnabled).to(beFalse())
+                expect(remoteCenter.pauseCommand.isEnabled).to(beFalse())
+                expect(remoteCenter.stopCommand.isEnabled).to(beFalse())
+                expect(remoteCenter.nextTrackCommand.isEnabled).to(beFalse())
+                expect(remoteCenter.previousTrackCommand.isEnabled).to(beFalse())
+            }
+            it("handles unsupported capability") {
                 let module = RNTrackPlayer()
                 let constants = module.constantsToExport()
                 let remoteCenter = MPRemoteCommandCenter.shared()
                 
-                expect(remoteCenter.playCommand.isEnabled).to(beTrue())
-                expect(remoteCenter.pauseCommand.isEnabled).to(beTrue())
-                expect(remoteCenter.nextTrackCommand.isEnabled).to(beTrue())
-                expect(remoteCenter.previousTrackCommand.isEnabled).to(beTrue())
-                
                 module.update(options: [
                     "capabilities": [
-                        constants["CAPABILITY_SKIP_TO_NEXT"],
-                        constants["CAPABILITY_SKIP_TO_PREVIOUS"],
+                        constants["UNSUPPORTED"]
                     ]
                 ])
                 
                 expect(remoteCenter.playCommand.isEnabled).to(beFalse())
                 expect(remoteCenter.pauseCommand.isEnabled).to(beFalse())
+                expect(remoteCenter.stopCommand.isEnabled).to(beFalse())
+                expect(remoteCenter.nextTrackCommand.isEnabled).to(beFalse())
+                expect(remoteCenter.previousTrackCommand.isEnabled).to(beFalse())
+            }
+            it("maps partial capabilities correctly: 1") {
+                let module = RNTrackPlayer()
+                let constants = module.constantsToExport()
+                let remoteCenter = MPRemoteCommandCenter.shared()
+                
+                module.update(options: [
+                    "capabilities": [
+                        constants["CAPABILITY_PLAY"],
+                        constants["CAPABILITY_PAUSE"],
+                        constants["CAPABILITY_SKIP_TO_NEXT"],
+                        constants["CAPABILITY_SKIP_TO_PREVIOUS"],
+                        constants["CAPABILITY_SEEK_TO"],
+                    ]
+                ])
+                
+                expect(remoteCenter.playCommand.isEnabled).to(beTrue())
+                expect(remoteCenter.pauseCommand.isEnabled).to(beTrue())
+                expect(remoteCenter.stopCommand.isEnabled).to(beFalse())
+                expect(remoteCenter.nextTrackCommand.isEnabled).to(beTrue())
+                expect(remoteCenter.previousTrackCommand.isEnabled).to(beTrue())
+            }
+            it("maps capabilities correctly: 2") {
+                let module = RNTrackPlayer()
+                let constants = module.constantsToExport()
+                let remoteCenter = MPRemoteCommandCenter.shared()
+                
+                module.update(options: [
+                    "capabilities": [
+                        constants["CAPABILITY_SKIP_TO_NEXT"],
+                        constants["CAPABILITY_SKIP_TO_PREVIOUS"],
+                        constants["CAPABILITY_SEEK_TO"],
+                    ]
+                ])
+                
+                expect(remoteCenter.playCommand.isEnabled).to(beFalse())
+                expect(remoteCenter.pauseCommand.isEnabled).to(beFalse())
+                expect(remoteCenter.stopCommand.isEnabled).to(beFalse())
                 expect(remoteCenter.nextTrackCommand.isEnabled).to(beTrue())
                 expect(remoteCenter.previousTrackCommand.isEnabled).to(beTrue())
             }
