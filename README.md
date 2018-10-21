@@ -83,8 +83,8 @@ TrackPlayer.setupPlayer().then(async () => {
 
 ## Support the development
 Support the further development of this and other libraries.
-- [Support via Patreon](https://www.patreon.com/dcvz)
-- [Support via Paypal](paypal.me/dcvz)
+- [Support via Patreon](https://patreon.com/dcvz)
+- [Support via Paypal](https://paypal.me/dcvz)
 
 ## Community
 [Spectrum](https://spectrum.chat/rntrackplayer)
