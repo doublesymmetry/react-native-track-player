@@ -1,3 +1,4 @@
+import { Component } from 'react';
 import { NativeModules } from 'react-native';
 
 export = RNTrackPlayer;
@@ -5,6 +6,23 @@ export as namespace RNTrackPlayer;
 
 declare namespace RNTrackPlayer {
 
+  export type EventType = 'playback-state'
+    | 'playback-error'
+    | 'playback-queue-ended'
+    | 'playback-track-changed'
+    | 'remote-play'
+    | 'remote-pause'
+    | 'remote-stop'
+    | 'remote-next'
+    | 'remote-previous'
+    | 'remote-jump-forward'
+    | 'remote-jump-backward'
+    | 'remote-seek'
+
+  type Handler = (type: EventType, ...args: any[]) => void;
+  export function registerEventHandler(handler: Handler): void;
+
+  
   // General
 
   export interface PlayerOptions {
@@ -28,21 +46,6 @@ declare namespace RNTrackPlayer {
   export function destroy(): void;
   export function updateOptions(options?: PlayerOptions): Promise<void>;
 
-  export type EventType = 'playback-state'
-    | 'playback-error'
-    | 'playback-queue-ended'
-    | 'playback-track-changed'
-    | 'remote-play'
-    | 'remote-pause'
-    | 'remote-stop'
-    | 'remote-next'
-    | 'remote-previous'
-    | 'remote-jump-forward'
-    | 'remote-jump-backward'
-  
-  type Handler = (type: EventType, ...args: any[]) => void;
-  export function registerEventHandler(handler: Handler): void;
-
 
   // Player Queue Commands
 
@@ -65,7 +68,7 @@ declare namespace RNTrackPlayer {
   }
 
   export function add(tracks: Track|Track[], insertBeforeId?: string): Promise<void>;
-  export function remove(trackIds: String|String[]): Promise<void>;
+  export function remove(trackIds: string|string[]): Promise<void>;
   export function skip(trackId: string): Promise<void>;
   export function getQueue(): Promise<Track[]>;
   export function skipToNext(): Promise<void>;
@@ -94,4 +97,17 @@ declare namespace RNTrackPlayer {
   export function getBufferedPosition(): Promise<number>;
   export function getState(): Promise<string>;
   export function getRate(): Promise<number>;
+}
+
+// Components
+
+export interface ProgressComponentState {
+  position: number;
+  bufferedPosition: number;
+  duration: number;
+}
+
+export class ProgressComponent<P = {}, S = {}> extends Component<P, ProgressComponentState & S> {
+  public getProgress: () => number;
+  public getBufferedProgress: () => number;
 }
