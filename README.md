@@ -79,6 +79,4 @@ TrackPlayer.setupPlayer().then(async () => {
 ```
 
 ## Maintainers
-* Android: [Guilherme Chaguri](https://github.com/Guichaguri)
-* iOS: [David Chavez](https://github.com/dcvz)
-* Windows: [Guilherme Chaguri](https://github.com/Guichaguri)
+[David Chavez](https://github.com/dcvz) & [Guilherme Chaguri](https://github.com/Guichaguri)
