@@ -80,3 +80,6 @@ TrackPlayer.setupPlayer().then(async () => {
 
 ## Maintainers
 [David Chavez](https://github.com/dcvz) & [Guilherme Chaguri](https://github.com/Guichaguri)
+
+## Community
+[Spectrum](https://spectrum.chat/rntrackplayer)
