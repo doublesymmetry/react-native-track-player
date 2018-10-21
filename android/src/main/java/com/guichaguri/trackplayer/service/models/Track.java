@@ -116,8 +116,7 @@ public class Track {
             builder.putString(METADATA_KEY_ART_URI, artwork.toString());
         }
 
-        // TODO
-//        builder.putRating(METADATA_KEY_RATING, rating);
+        builder.putRating(METADATA_KEY_RATING, rating);
 
         return builder;
     }
