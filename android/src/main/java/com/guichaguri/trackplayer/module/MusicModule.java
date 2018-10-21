@@ -9,7 +9,6 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.util.Log;
 import com.facebook.react.bridge.*;
 import com.google.android.exoplayer2.C;
 import com.guichaguri.trackplayer.service.MusicBinder;

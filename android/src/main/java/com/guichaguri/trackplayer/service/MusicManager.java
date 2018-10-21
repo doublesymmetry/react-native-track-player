@@ -44,6 +44,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
     @RequiresApi(26)
     private AudioFocusRequest focus = null;
     private boolean hasAudioFocus = false;
+    private boolean stopWithApp = false;
 
     @SuppressLint("InvalidWakeLockTag")
     public MusicManager(MusicService service) {
@@ -62,6 +63,14 @@ public class MusicManager implements OnAudioFocusChangeListener {
 
     public ExoPlayback getPlayback() {
         return playback;
+    }
+
+    public boolean shouldStopWithApp() {
+        return stopWithApp;
+    }
+
+    public void setStopWithApp(boolean stopWithApp) {
+        this.stopWithApp = stopWithApp;
     }
 
     public MetadataManager getMetadata() {
