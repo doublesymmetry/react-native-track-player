@@ -44,11 +44,11 @@ class RNTrackPlayerSpec: QuickSpec {
         }
         
         describe(".supportedEvents") {
-            it("supports 11 events") {
+            it("supports 12 events") {
                 let module = RNTrackPlayer()
                 let events = module.supportedEvents()
                 
-                expect(events).to(haveCount(11))
+                expect(events).to(haveCount(12))
             }
         }
         
