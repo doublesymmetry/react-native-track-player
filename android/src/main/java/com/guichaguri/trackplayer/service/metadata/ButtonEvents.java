@@ -74,7 +74,7 @@ public class ButtonEvents extends MediaSessionCompat.Callback {
     @Override
     public void onSeekTo(long pos) {
         Bundle bundle = new Bundle();
-        bundle.putLong("position", pos);
+        bundle.putDouble("position", Utils.toSeconds(pos));
         service.emit(MusicEvents.BUTTON_SEEK_TO, bundle);
     }
 
