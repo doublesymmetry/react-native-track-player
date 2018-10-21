@@ -98,7 +98,7 @@ public class Utils {
     }
 
     public static RatingCompat getRating(Bundle data, String key, int ratingType) {
-        if(!data.containsKey(key)) {
+        if(!data.containsKey(key) || ratingType == RatingCompat.RATING_NONE) {
             return RatingCompat.newUnratedRating(ratingType);
         } else if(ratingType == RatingCompat.RATING_HEART) {
             return RatingCompat.newHeartRating(data.getBoolean(key, true));

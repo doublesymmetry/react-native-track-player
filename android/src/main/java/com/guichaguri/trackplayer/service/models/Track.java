@@ -103,7 +103,7 @@ public class Track {
         MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
 
         builder.putString(METADATA_KEY_TITLE, title);
-        builder.putString(METADATA_KEY_ARTIST, title);
+        builder.putString(METADATA_KEY_ARTIST, artist);
         builder.putString(METADATA_KEY_ALBUM, album);
         builder.putString(METADATA_KEY_DATE, date);
         builder.putString(METADATA_KEY_GENRE, genre);
@@ -116,7 +116,9 @@ public class Track {
             builder.putString(METADATA_KEY_ART_URI, artwork.toString());
         }
 
-        builder.putRating(METADATA_KEY_RATING, rating);
+        if (rating != null) {
+            builder.putRating(METADATA_KEY_RATING, rating);
+        }
 
         return builder;
     }
