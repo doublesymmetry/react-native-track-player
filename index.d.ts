@@ -26,7 +26,7 @@ declare namespace RNTrackPlayer {
 
   export function setupPlayer(options?: PlayerOptions): Promise<void>;
   export function destroy(): void;
-  export function updateOptions(options?: PlayerOptions): void;
+  export function updateOptions(options?: PlayerOptions): Promise<void>;
 
   export type EventType = 'playback-state'
     | 'playback-error'
@@ -65,23 +65,23 @@ declare namespace RNTrackPlayer {
   }
 
   export function add(tracks: Track|Track[], insertBeforeId?: string): Promise<void>;
-  export function remove(tracks: Track|Track[]): Promise<void>;
+  export function remove(trackIds: String|String[]): Promise<void>;
   export function skip(trackId: string): Promise<void>;
   export function getQueue(): Promise<Track[]>;
   export function skipToNext(): Promise<void>;
   export function skipToPrevious(): Promise<void>;
-  export function removeUpcomingTracks(): void;
+  export function removeUpcomingTracks(): Promise<void>;
 
 
   // Player Playback Commands
 
-  export function reset(): void;
-  export function play(): void;
-  export function pause(): void;
-  export function stop(): void;
-  export function seekTo(time: number): void;
-  export function setVolume(level: number): void;
-  export function setRate(rate: number): void;
+  export function reset(): Promise<void>;
+  export function play(): Promise<void>;
+  export function pause(): Promise<void>;
+  export function stop(): Promise<void>;
+  export function seekTo(time: number): Promise<void>;
+  export function setVolume(level: number): Promise<void>;
+  export function setRate(rate: number): Promise<void>;
 
 
   // Player Getters

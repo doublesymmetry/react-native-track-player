@@ -99,29 +99,34 @@ namespace TrackPlayer
         }
 
         [ReactMethod]
-        public void updateOptions(JObject options) {
+        public void updateOptions(JObject options, IPromise promise) {
             // TODO remove the necessity of setupPlayer
             manager?.UpdateOptions(options);
+            promise.Resolve(null);
         }
 
         [ReactMethod]
-        public void play() {
+        public void play(IPromise promise) {
             manager?.GetPlayer()?.Play();
+            promise.Resolve(null);
         }
 
         [ReactMethod]
-        public void pause() {
+        public void pause(IPromise promise) {
             manager?.GetPlayer()?.Pause();
+            promise.Resolve(null);
         }
 
         [ReactMethod]
-        public void stop() {
+        public void stop(IPromise promise) {
             manager?.GetPlayer()?.Stop();
+            promise.Resolve(null);
         }
 
         [ReactMethod]
-        public void reset() {
+        public void reset(IPromise promise) {
             manager?.GetPlayer()?.Reset();
+            promise.Resolve(null);
         }
 
         [ReactMethod]
@@ -198,8 +203,9 @@ namespace TrackPlayer
         }
 
         [ReactMethod]
-        public void setVolume(double volume) {
+        public void setVolume(double volume, IPromise promise) {
             manager?.GetPlayer()?.SetVolume(volume);
+            promise.Resolve(null);
         }
 
         [ReactMethod]
@@ -211,13 +217,15 @@ namespace TrackPlayer
         }
 
         [ReactMethod]
-        public void setRate(double rate) {
+        public void setRate(double rate, IPromise promise) {
             manager?.GetPlayer()?.SetRate(rate);
+            promise.Resolve(null);
         }
 
         [ReactMethod]
-        public void seekTo(double seconds) {
+        public void seekTo(double seconds, IPromise promise) {
             manager?.GetPlayer()?.SeekTo(seconds);
+            promise.Resolve(null);
         }
 
         [ReactMethod]
@@ -251,12 +259,5 @@ namespace TrackPlayer
 
             promise.Resolve(player.GetState());
         }
-
-        [ReactMethod]
-        public void getCastState(IPromise promise) {
-            // TODO
-            promise.Resolve(0);
-        }
-
     }
 }

@@ -17,7 +17,9 @@ RCT_EXTERN_METHOD(setupPlayer:(NSDictionary *)data
 
 RCT_EXTERN_METHOD(destroy);
 
-RCT_EXTERN_METHOD(updateOptions:(NSDictionary *)options);
+RCT_EXTERN_METHOD(updateOptions:(NSDictionary *)options
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(add:(NSArray *)objects
                   before:(NSString *)trackId
@@ -28,7 +30,8 @@ RCT_EXTERN_METHOD(remove:(NSArray *)objects
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(removeUpcomingTracks);
+RCT_EXTERN_METHOD(removeUpcomingTracks:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(skip:(NSString *)trackId
                   resolver:(RCTPromiseResolveBlock)resolve
@@ -40,22 +43,32 @@ RCT_EXTERN_METHOD(skipToNext:(RCTPromiseResolveBlock)resolve
 RCT_EXTERN_METHOD(skipToPrevious:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(reset);
+RCT_EXTERN_METHOD(reset:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(play);
+RCT_EXTERN_METHOD(play:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(pause);
+RCT_EXTERN_METHOD(pause:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(stop);
+RCT_EXTERN_METHOD(stop:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(seekTo:(double)time);
+RCT_EXTERN_METHOD(seekTo:(double)time
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(setVolume:(float)volume);
+RCT_EXTERN_METHOD(setVolume:(float)volume
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(getVolume:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(setRate:(float)rate);
+RCT_EXTERN_METHOD(setRate:(float)rate
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(getRate:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);

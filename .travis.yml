@@ -1,5 +1,5 @@
 language: objective-c
-osx_image: xcode9.3
+osx_image: xcode10
 
 cache:
   yarn: true
@@ -27,7 +27,4 @@ script:
     -scheme example
     -configuration Debug
     -workspace example.xcworkspace
-    -destination "platform=iOS Simulator,name=iPhone X"
-    ONLY_ACTIVE_ARCH=YES
-    GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES
-    GCC_GENERATE_TEST_COVERAGE_FILES=YES | xcpretty
+    -destination "platform=iOS Simulator,name=iPhone X" | xcpretty
