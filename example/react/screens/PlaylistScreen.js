@@ -30,14 +30,14 @@ export default class LandingScreen extends Component {
   togglePlayback = async () => {
     const currentTrack = await TrackPlayer.getCurrentTrack();
     if (currentTrack == null) {
-      TrackPlayer.reset();
+      await TrackPlayer.reset();
       await TrackPlayer.add(playlistData);
-      TrackPlayer.play();
+      await TrackPlayer.play();
     } else {
       if (PlayerStore.playbackState === TrackPlayer.STATE_PAUSED) {
-        TrackPlayer.play();
+        await TrackPlayer.play();
       } else {
-        TrackPlayer.pause();
+        await TrackPlayer.pause();
       }
     }
   }
@@ -45,9 +45,7 @@ export default class LandingScreen extends Component {
   skipToNext = async () => {
     try {
       await TrackPlayer.skipToNext()
-    } catch (_) {
-      TrackPlayer.reset();
-    }
+    } catch (_) {}
   }
 
   skipToPrevious = async () => {

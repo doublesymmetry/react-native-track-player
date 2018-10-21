@@ -18,6 +18,10 @@ import android.support.v4.media.app.NotificationCompat.MediaStyle;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
 import com.guichaguri.trackplayer.service.MusicManager;
 import com.guichaguri.trackplayer.service.MusicService;
@@ -36,7 +40,6 @@ public class MetadataManager {
     private final MusicService service;
     private final MusicManager manager;
     private final MediaSessionCompat session;
-    private final ArtworkCache artwork;
 
     private boolean foreground = false;
     private int ratingType = RatingCompat.RATING_NONE;
@@ -50,7 +53,6 @@ public class MetadataManager {
     public MetadataManager(MusicService service, MusicManager manager) {
         this.service = service;
         this.manager = manager;
-        this.artwork = new ArtworkCache(service, this);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannel, "notification service", NotificationManager.IMPORTANCE_DEFAULT);
@@ -129,10 +131,6 @@ public class MetadataManager {
             }
         }
 
-        // Update the maximum artwork size
-        int size = options.getInt("maxArtworkSize", 500);
-        artwork.updateOptions(options.getInt("maxArtworkWidth", size), options.getInt("maxArtworkHeight", size));
-
         // Update the color
         builder.setColor(options.getInt("color", NotificationCompat.COLOR_DEFAULT));
 
@@ -148,6 +146,13 @@ public class MetadataManager {
 
     public int getRatingType() {
         return ratingType;
+    }
+
+    public void removeNotifications() {
+        String ns = Context.NOTIFICATION_SERVICE;
+        Context context = service.getApplicationContext();
+        NotificationManager manager = (NotificationManager) context.getSystemService(ns);
+        manager.cancelAll();
     }
 
     /**
@@ -172,18 +177,26 @@ public class MetadataManager {
      * @param track The new track
      */
     public void updateMetadata(Track track) {
-        Bitmap bitmap = null;
         MediaMetadataCompat.Builder metadata = track.toMediaMetadata();
 
         if (track.artwork != null) {
-            bitmap = artwork.getBitmap(track.artwork);
-        }
+            Glide.with(service.getApplicationContext())
+                    .asBitmap()
+                    .load(track.artwork)
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                            metadata.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, resource);
+                            builder.setLargeIcon(resource);
 
-        if(bitmap != null) {
-            metadata.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, bitmap);
-            builder.setLargeIcon(bitmap);
-        } else if (track.artwork != null) {
-            artwork.loadBackground(track.artwork);
+                            builder.setContentTitle(track.title);
+                            builder.setContentText(track.artist);
+                            builder.setSubText(track.album);
+
+                            session.setMetadata(metadata.build());
+                            updateNotification();
+                        }
+                    });
         }
 
         builder.setContentTitle(track.title);
@@ -272,6 +285,12 @@ public class MetadataManager {
     }
 
     private void updateNotification() {
+        int state = manager.getPlayback().getState();
+        if (Utils.isStopped(state)) {
+            removeNotifications();
+            return;
+        }
+
         Notification n = builder.build();
 
         if(foreground) {

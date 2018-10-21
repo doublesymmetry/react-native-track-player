@@ -43,7 +43,6 @@ public class ExoPlayback implements EventListener {
     private int lastKnownWindow = C.INDEX_UNSET;
     private long lastKnownPosition = C.POSITION_UNSET;
     private int previousState = PlaybackStateCompat.STATE_NONE;
-    private boolean didInitialSetup = false;
 
     public ExoPlayback(Context context, MusicManager manager, SimpleExoPlayer player, long maxCacheSize) {
         this.context = context;
@@ -63,6 +62,8 @@ public class ExoPlayback implements EventListener {
 
         lastKnownWindow = C.INDEX_UNSET;
         lastKnownPosition = C.POSITION_UNSET;
+
+        manager.onReset();
     }
 
     public List<Track> getQueue() {
@@ -110,12 +111,13 @@ public class ExoPlayback implements EventListener {
     }
 
     public void removeUpcomingTracks() {
-        if (lastKnownWindow == C.INDEX_UNSET) return;
-        if (lastKnownWindow + 1 >= queue.size()) return;
+        int currentIndex = player.getCurrentWindowIndex();
+        if (currentIndex == C.INDEX_UNSET) return;
+        if (currentIndex + 1 >= queue.size()) return;
 
         List<Integer> indexes = new ArrayList<>();
 
-        for (int i = lastKnownWindow + 1; i < queue.size(); i++) {
+        for (int i = currentIndex + 1; i < queue.size(); i++) {
             indexes.add(i);
         }
 
@@ -146,11 +148,11 @@ public class ExoPlayback implements EventListener {
     }
 
     public void skip(String id, Promise promise) {
-        lastKnownWindow = player.getCurrentWindowIndex();
-        lastKnownPosition = player.getCurrentPosition();
-
         for(int i = 0; i < queue.size(); i++) {
             if(id.equals(queue.get(i).id)) {
+                lastKnownWindow = player.getCurrentWindowIndex();
+                lastKnownPosition = player.getCurrentPosition();
+
                 player.seekToDefaultPosition(i);
                 promise.resolve(null);
                 return;
@@ -263,8 +265,30 @@ public class ExoPlayback implements EventListener {
 
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
-        // Queue updates
-        onPositionDiscontinuity(Player.DISCONTINUITY_REASON_PERIOD_TRANSITION);
+        if ((reason == Player.TIMELINE_CHANGE_REASON_PREPARED || reason == Player.TIMELINE_CHANGE_REASON_DYNAMIC) && !timeline.isEmpty()) {
+            onPositionDiscontinuity(Player.DISCONTINUITY_REASON_PERIOD_TRANSITION);
+        }
+    }
+
+    @Override
+    public void onPositionDiscontinuity(int reason) {
+        if(lastKnownWindow != player.getCurrentWindowIndex()) {
+            Track previous = lastKnownWindow == C.INDEX_UNSET ? null : queue.get(lastKnownWindow);
+            Track next = getCurrentTrack();
+
+            // Track changed because it ended
+            // We'll use its duration instead of the last known position
+            if (reason == Player.DISCONTINUITY_REASON_PERIOD_TRANSITION && lastKnownWindow != C.INDEX_UNSET) {
+                if (lastKnownWindow >= player.getCurrentTimeline().getWindowCount()) return;
+                long duration = player.getCurrentTimeline().getWindow(lastKnownWindow, new Window()).getDurationMs();
+                if(duration != C.TIME_UNSET) lastKnownPosition = duration;
+            }
+
+            manager.onTrackUpdate(previous, lastKnownPosition, next);
+        }
+
+        lastKnownWindow = player.getCurrentWindowIndex();
+        lastKnownPosition = player.getCurrentPosition();
     }
 
     @Override
@@ -312,33 +336,6 @@ public class ExoPlayback implements EventListener {
     @Override
     public void onPlayerError(ExoPlaybackException error) {
         manager.onError("exoplayer", error.getCause().getMessage());
-    }
-
-    @Override
-    public void onPositionDiscontinuity(int reason) {
-        if (!didInitialSetup) {
-            didInitialSetup = true;
-            return;
-        }
-
-        // Track changed
-        if(lastKnownWindow != player.getCurrentWindowIndex()) {
-            Track previous = lastKnownWindow == C.INDEX_UNSET ? null : queue.get(lastKnownWindow);
-            Track next = getCurrentTrack();
-
-            // Track changed because it ended
-            // We'll use its duration instead of the last known position
-            if(reason == Player.DISCONTINUITY_REASON_PERIOD_TRANSITION && lastKnownWindow != C.INDEX_UNSET) {
-                if (lastKnownWindow >= player.getCurrentTimeline().getWindowCount()) return;
-                long duration = player.getCurrentTimeline().getWindow(lastKnownWindow, new Window()).getDurationMs();
-                if(duration != C.TIME_UNSET) lastKnownPosition = duration;
-            }
-
-            manager.onTrackUpdate(previous, lastKnownPosition, next);
-        }
-
-        lastKnownWindow = player.getCurrentWindowIndex();
-        lastKnownPosition = player.getCurrentPosition();
     }
 
     @Override
