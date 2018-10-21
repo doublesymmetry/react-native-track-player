@@ -43,6 +43,7 @@ public class MetadataManager {
 
     private boolean foreground = false;
     private int ratingType = RatingCompat.RATING_NONE;
+    private int jumpInterval = 15;
     private long actions = 0;
     private long compactActions = 0;
     private NotificationCompat.Builder builder;
@@ -137,6 +138,9 @@ public class MetadataManager {
         // Update the icon
         builder.setSmallIcon(getIcon(options, "icon", R.drawable.play));
 
+        // Update the jump interval
+        jumpInterval = options.getInt("jumpInterval", 15);
+
         // Update the rating type
         ratingType = options.getInt("ratingType", RatingCompat.RATING_NONE);
         session.setRatingType(ratingType);
@@ -146,6 +150,10 @@ public class MetadataManager {
 
     public int getRatingType() {
         return ratingType;
+    }
+
+    public int getJumpInterval() {
+        return jumpInterval;
     }
 
     public void removeNotifications() {
