@@ -2,7 +2,18 @@
   "name": "react-native-track-player",
   "version": "0.2.5",
   "description": "A fully fledged audio module created for music apps",
-  "author": "Guichaguri",
+  "contributors": [
+    {
+      "name": "David Chavez",
+      "email": "david@dcvz.io",
+      "url": "http://dcvz.io"
+    },
+    {
+      "name": "Guilherme Chaguri",
+      "email": "david@dcvz.io",
+      "url": "http://guichaguri.com/"
+    }
+  ],
   "keywords": [
     "react",
     "react-native",
