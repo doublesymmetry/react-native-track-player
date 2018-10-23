@@ -15,6 +15,7 @@ import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.cache.Cache;
@@ -140,19 +141,30 @@ public class Track {
         if(userAgent == null || !userAgent.isEmpty())
             userAgent = Util.getUserAgent(ctx, "react-native-track-player");
 
-        // Creates a default source factory, enabling cross protocol redirects
-        DataSource.Factory ds = new DefaultHttpDataSourceFactory(
-                userAgent, null,
-                DefaultHttpDataSource.DEFAULT_CONNECT_TIMEOUT_MILLIS,
-                DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS,
-                true
-        );
+        DataSource.Factory ds;
 
-        if(cacheMaxSize > 0 && !Utils.isLocal(uri)) {
-            // Enable caching
-            File cacheDir = new File(ctx.getCacheDir(), "TrackPlayer");
-            Cache cache = SimpleCacheManager.INSTANCE.getCache(cacheDir, cacheMaxSize);
-            ds = new CacheDataSourceFactory(cache, ds, CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR, cacheMaxSize);
+        if (Utils.isLocal(uri)) {
+
+            // Creates a local source factory
+            ds = new DefaultDataSourceFactory(ctx, userAgent);
+
+        } else {
+
+            // Creates a default http source factory, enabling cross protocol redirects
+            ds = new DefaultHttpDataSourceFactory(
+                    userAgent, null,
+                    DefaultHttpDataSource.DEFAULT_CONNECT_TIMEOUT_MILLIS,
+                    DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS,
+                    true
+            );
+
+            if(cacheMaxSize > 0) {
+                // Enable caching
+                File cacheDir = new File(ctx.getCacheDir(), "TrackPlayer");
+                Cache cache = SimpleCacheManager.INSTANCE.getCache(cacheDir, cacheMaxSize);
+                ds = new CacheDataSourceFactory(cache, ds, CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR, cacheMaxSize);
+            }
+
         }
 
         switch(type) {
