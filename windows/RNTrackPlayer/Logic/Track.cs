@@ -5,33 +5,44 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrackPlayer.Logic {
-    public class Track {
+namespace TrackPlayer.Logic
+{
+    public class Track
+    {
+        public string Id { get; set; }
+        public Uri Url { get; set; }
+        public string Type { get; set; }
+        public double Duration { get; set; }
 
-        public string id;
-        public Uri url;
-        public bool adaptive;
-        public double duration;
+        public string Title { get; set; }
+        public string Artist { get; set; }
+        public string Album { get; set; }
+        public Uri Artwork { get; set; }
 
-        public string title;
-        public string artist;
-        public string album;
-        public Uri artwork;
+        public Track(JObject data)
+        {
+            Id = (string)data.GetValue("id");
+            Url = Utils.GetUri(data, "url", null);
+            Type = Utils.GetValue<string>(data, "type", TrackType.Default);
+            Duration = Utils.GetValue<double>(data, "duration", 0);
 
-        public Track(JObject data) {
-            this.id = (string)data.GetValue("id");
-            this.url = Utils.GetUri(data, "url", null);
-            this.adaptive = Utils.GetValue<string>(data, "type", "default") != "default";
-            this.duration = Utils.GetValue<double>(data, "duration", 0.0);
-            this.title = Utils.GetValue<string>(data, "title", null);
-            this.artist = Utils.GetValue<string>(data, "artist", null);
-            this.album = Utils.GetValue<string>(data, "album", null);
-            this.artwork = Utils.GetUri(data, "artwork", null);
+            Title = Utils.GetValue<string>(data, "title", null);
+            Artist = Utils.GetValue<string>(data, "artist", null);
+            Album = Utils.GetValue<string>(data, "album", null);
+            Artwork = Utils.GetUri(data, "artwork", null);
         }
 
-        public JObject ToObject() {
+        public JObject ToObject()
+        {
             return JObject.FromObject(this);
         }
+    }
 
+    public static class TrackType
+    {
+        public const string Default = "default";
+        public const string Dash = "dash";
+        public const string Hls = "hls";
+        public const string SmoothStreaming = "smoothstreaming";
     }
 }

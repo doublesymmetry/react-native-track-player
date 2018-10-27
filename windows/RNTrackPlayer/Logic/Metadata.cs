@@ -10,18 +10,22 @@ using Windows.Media.Playback;
 using Windows.Media.Core;
 using Windows.Storage.Streams;
 
-namespace TrackPlayer.Logic {
-    class Metadata {
-
+namespace TrackPlayer.Logic
+{
+    class Metadata
+    {
         private MediaManager manager;
         private SystemMediaTransportControls controls;
 
-        public Metadata(MediaManager manager) {
+        public Metadata(MediaManager manager)
+        {
             this.manager = manager;
         }
 
-        public void SetTransportControls(SystemMediaTransportControls transportControls) {
-            if(controls != null) {
+        public void SetTransportControls(SystemMediaTransportControls transportControls)
+        {
+            if (controls != null)
+            {
                 controls.IsEnabled = false;
                 controls.PlaybackPositionChangeRequested -= OnSeekTo;
                 controls.ButtonPressed -= OnButtonPressed;
@@ -29,7 +33,8 @@ namespace TrackPlayer.Logic {
 
             controls = transportControls;
 
-            if(controls != null) {
+            if (controls != null)
+            {
                 controls.IsEnabled = true;
                 controls.DisplayUpdater.Type = MediaPlaybackType.Music;
 
@@ -38,9 +43,10 @@ namespace TrackPlayer.Logic {
             }
         }
 
-        public void UpdateOptions(JObject data) {
+        public void UpdateOptions(JObject data)
+        {
             Debug.WriteLine("Updating options...");
-            JArray capabilities = (JArray)data.GetValue("capabilities");
+            JArray capabilities = (JArray) data.GetValue("capabilities");
 
             controls.IsPlayEnabled = Utils.ContainsInt(capabilities, (int)Capability.Play);
             controls.IsPauseEnabled = Utils.ContainsInt(capabilities, (int)Capability.Pause);
@@ -56,35 +62,40 @@ namespace TrackPlayer.Logic {
             controls.IsRecordEnabled = false;
         }
 
-        public void UpdateMetadata(Track track) {
+        public void UpdateMetadata(Track track)
+        {
             var display = controls.DisplayUpdater;
             var properties = display.MusicProperties;
 
-            display.AppMediaId = track.id;
-            display.Thumbnail = RandomAccessStreamReference.CreateFromUri(track.artwork);
+            display.AppMediaId = track.Id;
+            display.Thumbnail = RandomAccessStreamReference.CreateFromUri(track.Artwork);
 
-            properties.Title = track.title;
-            properties.Artist = track.artist;
-            properties.AlbumTitle = track.album;
+            properties.Title = track.Title;
+            properties.Artist = track.Artist;
+            properties.AlbumTitle = track.Album;
         }
 
-        public void Dispose() {
+        public void Dispose()
+        {
             controls.IsEnabled = false;
             controls.PlaybackPositionChangeRequested -= OnSeekTo;
             controls.ButtonPressed -= OnButtonPressed;
             controls = null;
         }
 
-        private void OnSeekTo(SystemMediaTransportControls sender, PlaybackPositionChangeRequestedEventArgs args) {
+        private void OnSeekTo(SystemMediaTransportControls sender, PlaybackPositionChangeRequestedEventArgs args)
+        {
             JObject obj = new JObject();
             obj.Add("position", args.RequestedPlaybackPosition.TotalSeconds);
             manager.SendEvent(Events.ButtonSeekTo, obj);
         }
 
-        private void OnButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args) {
+        private void OnButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
+        {
             string eventType = null;
 
-            switch(args.Button) {
+            switch(args.Button)
+            {
                 case SystemMediaTransportControlsButton.Play:
                     eventType = Events.ButtonPlay;
                     break;
@@ -110,12 +121,12 @@ namespace TrackPlayer.Logic {
     }
 
     enum Capability {
-        Unsupported,
-        Play,
-        Pause,
-        Stop,
-        Previous,
-        Next,
-        Seek
+        Unsupported = 0,
+        Play = 1,
+        Pause = 2,
+        Stop = 3,
+        Previous = 4,
+        Next = 5,
+        Seek = 6
     }
 }
