@@ -131,6 +131,11 @@ public class MetadataManager {
                 for(int cap : compact) compactActions |= cap;
             }
         }
+        
+        // make the notification ongoing
+        if(options.getBoolean("onGoing") == true){
+            builder.setOngoing(true);
+        }
 
         // Update the color
         builder.setColor(options.getInt("color", NotificationCompat.COLOR_DEFAULT));
