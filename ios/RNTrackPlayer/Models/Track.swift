@@ -10,7 +10,7 @@ import Foundation
 import MediaPlayer
 import AVFoundation
 
-class Track: NSObject {
+public class Track: NSObject {
     let id: String
     let url: MediaURL
     dynamic let title: String
