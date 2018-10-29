@@ -10,7 +10,7 @@ import Foundation
 import MediaPlayer
 import AVFoundation
 
-class Track: NSObject {
+class Track: NSObject, AudioItem {
     let id: String
     let url: MediaURL
     dynamic let title: String
@@ -56,5 +56,58 @@ class Track: NSObject {
     
     func toObject() -> [String: Any] {
         return originalObject
+    }
+    
+    // MARK: - AudioItem Protocol
+    
+    func getSourceUrl() -> String {
+        return url.value.absoluteString
+    }
+    
+    func getArtist() -> String? {
+        return artist
+    }
+    
+    func getTitle() -> String? {
+        return title
+    }
+    
+    func getAlbumTitle() -> String? {
+        return album
+    }
+    
+    func getSourceType() -> SourceType {
+        return url.isLocal ? .file : .stream
+    }
+    
+    func getPitchAlgorithmType() -> AVAudioTimePitchAlgorithm {
+        if let pitchAlgorithm = pitchAlgorithm {
+            switch pitchAlgorithm {
+            case PitchAlgorithm.linear.rawValue:
+                return AVAudioTimePitchAlgorithmVarispeed as NSString
+            case PitchAlgorithm.music.rawValue:
+                return AVAudioTimePitchAlgorithmSpectral as NSString
+            case PitchAlgorithm.voice.rawValue:
+                return AVAudioTimePitchAlgorithmTimeDomain as NSString
+            default:
+                return AVAudioTimePitchAlgorithmLowQualityZeroLatency as NSString
+            }
+        }
+        
+        return AVAudioTimePitchAlgorithmLowQualityZeroLatency as NSString
+    }
+    
+    func getArtwork(_ handler: @escaping (UIImage?) -> Void) {
+        if let artworkURL = artworkURL?.value {
+            URLSession.shared.dataTask(with: artworkURL, completionHandler: { (data, _, error) in
+                if let data = data, let artwork = UIImage(data: data), error == nil {
+                    handler(artwork)
+                }
+                
+                handler(nil)
+            })
+        }
+        
+        handler(nil)
     }
 }
