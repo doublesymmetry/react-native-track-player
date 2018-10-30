@@ -1,7 +1,7 @@
 export as namespace RNTrackPlayer;
 
 declare namespace RNTrackPlayer {
-  
+
   export type EventType =
     | "playback-state"
     | "playback-error"
@@ -62,10 +62,7 @@ declare namespace RNTrackPlayer {
     [key: string]: any;
   }
 
-  export function add(
-    tracks: Track | Track[],
-    insertBeforeId?: string
-  ): Promise<void>;
+  export function add(tracks: Track | Track[], insertBeforeId?: string): Promise<void>;
   export function remove(trackIds: string | string[]): Promise<void>;
   export function skip(trackId: string): Promise<void>;
   export function getQueue(): Promise<Track[]>;
@@ -103,10 +100,7 @@ export interface ProgressComponentState {
   duration: number;
 }
 
-export class ProgressComponent<P = {}, S = {}> extends Component<
-  P,
-  ProgressComponentState & S
-> {
+export class ProgressComponent<P = {}, S = {}> extends Component<P, ProgressComponentState & S> {
   public getProgress: () => number;
   public getBufferedProgress: () => number;
 }
