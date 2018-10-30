@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 import com.facebook.react.bridge.*;
 import com.google.android.exoplayer2.C;
 import com.guichaguri.trackplayer.service.MusicBinder;
@@ -151,10 +152,18 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @ReactMethod
     public void destroy() {
-        if(binder != null) binder.destroy();
-        
-        ReactContext context = getReactApplicationContext();
-        if (context != null) context.unbindService(this);
+        try {
+            if(binder != null) {
+                binder.destroy();
+                binder = null;
+            }
+
+            ReactContext context = getReactApplicationContext();
+            if(context != null) context.unbindService(this);
+        } catch(Exception ex) {
+            // This method shouldn't be throwing unhandled errors even if something goes wrong.
+            Log.e(Utils.LOG, "An error occurred while destroying the service", ex);
+        }
     }
 
     @ReactMethod
