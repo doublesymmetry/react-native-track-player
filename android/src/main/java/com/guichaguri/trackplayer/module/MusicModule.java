@@ -252,7 +252,7 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     @ReactMethod
     public void reset(final Promise callback) {
         waitForConnection(() -> {
-            binder.getPlayback().reset();
+            binder.getPlayback().stop(true);
             callback.resolve(null);
         });
     }
@@ -276,7 +276,7 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     @ReactMethod
     public void stop(final Promise callback) {
         waitForConnection(() -> {
-            binder.getPlayback().stop();
+            binder.getPlayback().stop(false);
             callback.resolve(null);
         });
     }
