@@ -42,7 +42,7 @@ public class MusicService extends HeadlessJsTaskService {
     @Override
     public IBinder onBind(Intent intent) {
         if(Utils.CONNECT_INTENT.equals(intent.getAction())) {
-            return new MusicBinder(manager);
+            return new MusicBinder(this, manager);
         }
 
         return super.onBind(intent);
@@ -64,8 +64,10 @@ public class MusicService extends HeadlessJsTaskService {
     public void onDestroy() {
         super.onDestroy();
 
-        manager.destroy();
-        manager = null;
+        if (manager != null) {
+            manager.destroy();
+            manager = null;
+        }
     }
 
     @Override

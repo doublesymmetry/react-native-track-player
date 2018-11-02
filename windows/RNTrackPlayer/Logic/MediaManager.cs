@@ -12,46 +12,53 @@ using Windows.Media.Playback;
 using Windows.Media.Core;
 using TrackPlayer.Players;
 
-namespace TrackPlayer.Logic {
-    public class MediaManager {
-
+namespace TrackPlayer.Logic
+{
+    public class MediaManager
+    {
         private ReactContext context;
         private Metadata metadata;
 
         private JObject options;
         private Playback player;
 
-        public MediaManager(ReactContext context, JObject options) {
+        public MediaManager(ReactContext context, JObject options)
+        {
             this.context = context;
             this.options = options;
 
             this.player = new LocalPlayback(this, options);
             this.metadata = new Metadata(this);
-            this.metadata.SetTransportControls(this.player.GetTransportControls());
+            this.metadata.SetTransportControls(player.GetTransportControls());
         }
 
-        public void SendEvent(string eventName, object data) {
+        public void SendEvent(string eventName, object data)
+        {
             context.GetJavaScriptModule<RCTDeviceEventEmitter>().emit(eventName, data);
         }
 
-        public void UpdateOptions(JObject options) {
+        public void UpdateOptions(JObject options)
+        {
             metadata.UpdateOptions(options);
         }
 
-        public Playback GetPlayer() {
+        public Playback GetPlayer()
+        {
             return player;
         }
 
-        public void OnEnd(Track previous, double prevPos) {
+        public void OnEnd(Track previous, double prevPos)
+        {
             Debug.WriteLine("OnEnd");
 
             JObject obj = new JObject();
-            obj.Add("track", previous?.id);
+            obj.Add("track", previous?.Id);
             obj.Add("position", prevPos);
             SendEvent(Events.PlaybackQueueEnded, obj);
         }
 
-        public void OnStateChange(MediaPlaybackState state) {
+        public void OnStateChange(MediaPlaybackState state)
+        {
             Debug.WriteLine("OnStateChange");
 
             JObject obj = new JObject();
@@ -59,21 +66,24 @@ namespace TrackPlayer.Logic {
             SendEvent(Events.PlaybackState, obj);
         }
 
-        public void OnTrackUpdate(Track previous, double prevPos, Track next, bool changed) {
+        public void OnTrackUpdate(Track previous, double prevPos, Track next, bool changed)
+        {
             Debug.WriteLine("OnTrackUpdate");
 
             metadata.UpdateMetadata(next);
 
-            if(changed) {
+            if(changed)
+            {
                 JObject obj = new JObject();
-                obj.Add("track", previous?.id);
+                obj.Add("track", previous?.Id);
                 obj.Add("position", prevPos);
-                obj.Add("nextTrack", next?.id);
+                obj.Add("nextTrack", next?.Id);
                 SendEvent(Events.PlaybackTrackChanged, obj);
             }
         }
 
-        public void OnError(string error) {
+        public void OnError(string error)
+        {
             Debug.WriteLine("OnError: " + error);
 
             JObject obj = new JObject();
@@ -81,8 +91,10 @@ namespace TrackPlayer.Logic {
             SendEvent(Events.PlaybackError, obj);
         }
 
-        public void Dispose() {
-            if(player != null) {
+        public void Dispose()
+        {
+            if(player != null)
+            {
                 player.Dispose();
                 player = null;
             }
