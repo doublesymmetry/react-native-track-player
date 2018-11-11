@@ -18,17 +18,17 @@ import android.support.v4.media.app.NotificationCompat.MediaStyle;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
+import com.guichaguri.trackplayer.R;
 import com.guichaguri.trackplayer.service.MusicManager;
 import com.guichaguri.trackplayer.service.MusicService;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.models.Track;
 import com.guichaguri.trackplayer.service.player.ExoPlayback;
-import com.guichaguri.trackplayer.R;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +46,7 @@ public class MetadataManager {
     private int jumpInterval = 15;
     private long actions = 0;
     private long compactActions = 0;
+    private SimpleTarget<Bitmap> artworkTarget;
     private NotificationCompat.Builder builder;
     private String notificationChannel = "trackplayer";
 
@@ -187,9 +188,11 @@ public class MetadataManager {
     public void updateMetadata(Track track) {
         MediaMetadataCompat.Builder metadata = track.toMediaMetadata();
 
-        if (track.artwork != null) {
-            Glide.with(service.getApplicationContext())
-                    .asBitmap()
+        RequestManager rm = Glide.with(service.getApplicationContext());
+        if(artworkTarget != null) rm.clear(artworkTarget);
+
+        if(track.artwork != null) {
+            artworkTarget = rm.asBitmap()
                     .load(track.artwork)
                     .into(new SimpleTarget<Bitmap>() {
                         @Override
@@ -197,12 +200,9 @@ public class MetadataManager {
                             metadata.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, resource);
                             builder.setLargeIcon(resource);
 
-                            builder.setContentTitle(track.title);
-                            builder.setContentText(track.artist);
-                            builder.setSubText(track.album);
-
                             session.setMetadata(metadata.build());
                             updateNotification();
+                            artworkTarget = null;
                         }
                     });
         }
