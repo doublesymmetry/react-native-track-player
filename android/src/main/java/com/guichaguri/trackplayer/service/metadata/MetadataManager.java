@@ -48,7 +48,6 @@ public class MetadataManager {
     private long compactActions = 0;
     private SimpleTarget<Bitmap> artworkTarget;
     private NotificationCompat.Builder builder;
-    private String notificationChannel = "trackplayer";
 
     private Action previousAction, rewindAction, playAction, pauseAction, stopAction, forwardAction, nextAction;
 
@@ -57,7 +56,7 @@ public class MetadataManager {
         this.manager = manager;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(notificationChannel, "notification service", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel(Utils.NOTIFICATION_CHANNEL, "Playback", NotificationManager.IMPORTANCE_DEFAULT);
             channel.setShowBadge(false);
             channel.setSound(null, null);
 
@@ -65,7 +64,7 @@ public class MetadataManager {
             not.createNotificationChannel(channel);
         }
 
-        this.builder = new NotificationCompat.Builder(service, notificationChannel);
+        this.builder = new NotificationCompat.Builder(service, Utils.NOTIFICATION_CHANNEL);
         this.session = new MediaSessionCompat(service, "TrackPlayer", null, null);
 
         session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
@@ -75,7 +74,11 @@ public class MetadataManager {
         Context context = service.getApplicationContext();
         String packageName = context.getPackageName();
         Intent openApp = context.getPackageManager().getLaunchIntentForPackage(packageName);
-        builder.setContentIntent(PendingIntent.getActivity(context, 0, openApp, 0));
+
+        // Prevent the app from launching a new instance
+        openApp.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        builder.setContentIntent(PendingIntent.getActivity(context, 0, openApp, PendingIntent.FLAG_CANCEL_CURRENT));
 
         builder.setSmallIcon(R.drawable.play);
         builder.setCategory(NotificationCompat.CATEGORY_TRANSPORT);
