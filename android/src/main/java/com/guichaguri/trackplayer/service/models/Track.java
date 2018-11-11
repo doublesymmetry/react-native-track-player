@@ -18,14 +18,9 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
-import com.google.android.exoplayer2.upstream.cache.Cache;
-import com.google.android.exoplayer2.upstream.cache.CacheDataSource;
-import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.guichaguri.trackplayer.service.Utils;
-import com.guichaguri.trackplayer.service.metadata.SimpleCacheManager;
-
-import java.io.File;
+import com.guichaguri.trackplayer.service.player.ExoPlayback;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -136,7 +131,7 @@ public class Track {
         return new QueueItem(descr, queueId);
     }
 
-    public MediaSource toMediaSource(Context ctx, long cacheMaxSize) {
+    public MediaSource toMediaSource(Context ctx, ExoPlayback playback) {
         // Updates the user agent if not set
         if(userAgent == null || !userAgent.isEmpty())
             userAgent = Util.getUserAgent(ctx, "react-native-track-player");
@@ -158,12 +153,7 @@ public class Track {
                     true
             );
 
-            if(cacheMaxSize > 0) {
-                // Enable caching
-                File cacheDir = new File(ctx.getCacheDir(), "TrackPlayer");
-                Cache cache = SimpleCacheManager.INSTANCE.getCache(cacheDir, cacheMaxSize);
-                ds = new CacheDataSourceFactory(cache, ds, CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR, cacheMaxSize);
-            }
+            ds = playback.enableCaching(ds);
 
         }
 

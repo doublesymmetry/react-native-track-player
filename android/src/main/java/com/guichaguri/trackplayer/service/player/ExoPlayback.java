@@ -15,9 +15,15 @@ import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.cache.CacheDataSource;
+import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
+import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor;
+import com.google.android.exoplayer2.upstream.cache.SimpleCache;
 import com.guichaguri.trackplayer.service.MusicManager;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.models.Track;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,6 +37,7 @@ public class ExoPlayback implements EventListener {
     private final Context context;
     private final MusicManager manager;
     private final SimpleExoPlayer player;
+    private final SimpleCache cache;
     private final long cacheMaxSize;
 
     private ConcatenatingMediaSource source;
@@ -46,6 +53,13 @@ public class ExoPlayback implements EventListener {
         this.manager = manager;
         this.player = player;
         this.cacheMaxSize = maxCacheSize;
+
+        if(cacheMaxSize > 0) {
+            File cacheDir = new File(context.getCacheDir(), "TrackPlayer");
+            cache = new SimpleCache(cacheDir, new LeastRecentlyUsedCacheEvictor(cacheMaxSize));
+        } else {
+            cache = null;
+        }
 
         player.addListener(this);
         resetQueue();
@@ -63,13 +77,19 @@ public class ExoPlayback implements EventListener {
         manager.onReset();
     }
 
+    public DataSource.Factory enableCaching(DataSource.Factory ds) {
+        if(cache == null || cacheMaxSize <= 0) return ds;
+
+        return new CacheDataSourceFactory(cache, ds, CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR, cacheMaxSize);
+    }
+
     public List<Track> getQueue() {
         return queue;
     }
 
     public void add(Track track, int index, Promise promise) {
         queue.add(index, track);
-        source.addMediaSource(index, track.toMediaSource(context, cacheMaxSize), Utils.toRunnable(promise));
+        source.addMediaSource(index, track.toMediaSource(context, this), Utils.toRunnable(promise));
 
         if (queue.size() == 1) {
             player.prepare(source);
@@ -80,7 +100,7 @@ public class ExoPlayback implements EventListener {
         List<MediaSource> trackList = new ArrayList<>();
 
         for(Track track : tracks) {
-            trackList.add(track.toMediaSource(context, cacheMaxSize));
+            trackList.add(track.toMediaSource(context, this));
         }
 
         queue.addAll(index, tracks);
