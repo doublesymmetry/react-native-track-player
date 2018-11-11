@@ -311,10 +311,10 @@ public class ExoPlayback implements EventListener {
 
             manager.onStateChange(state);
             previousState = state;
-        }
 
-        if (player.getPlaybackState() == Player.STATE_ENDED) {
-            manager.onEnd(getCurrentTrack(), getPosition());
+            if(state == PlaybackStateCompat.STATE_STOPPED) {
+                manager.onEnd(getCurrentTrack(), getPosition());
+            }
         }
     }
 
