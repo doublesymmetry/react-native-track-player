@@ -1,7 +1,10 @@
 package com.guichaguri.trackplayer.service;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
@@ -44,6 +47,16 @@ public class MusicManager implements OnAudioFocusChangeListener {
     @RequiresApi(26)
     private AudioFocusRequest focus = null;
     private boolean hasAudioFocus = false;
+
+    private BroadcastReceiver noisyReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent != null && AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
+                service.emit(MusicEvents.BUTTON_PAUSE, null);
+            }
+        }
+    };
+
     private boolean stopWithApp = false;
 
     @SuppressLint("InvalidWakeLockTag")
@@ -245,6 +258,10 @@ public class MusicManager implements OnAudioFocusChangeListener {
         }
 
         hasAudioFocus = r == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+
+        if(hasAudioFocus) {
+            service.registerReceiver(noisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
+        }
     }
 
     private void abandonFocus() {
@@ -264,6 +281,10 @@ public class MusicManager implements OnAudioFocusChangeListener {
         }
 
         hasAudioFocus = r != AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+
+        if(!hasAudioFocus) {
+            service.unregisterReceiver(noisyReceiver);
+        }
     }
 
     public void destroy() {
