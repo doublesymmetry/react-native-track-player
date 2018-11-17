@@ -137,6 +137,8 @@ public class MusicManager implements OnAudioFocusChangeListener {
             }
         }
 
+        // Put the service in the "started" state
+        service.startService(new Intent(service.getApplicationContext(), MusicService.class));
         metadata.setForeground(true, true);
     }
 
