@@ -352,39 +352,39 @@ public class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     // MARK: - Remote Dynamic Methods
     
-    func remoteSentStop() {
+    @objc func remoteSentStop() {
         sendEvent(withName: "remote-stop", body: nil)
     }
     
-    func remoteSentPause() {
+    @objc func remoteSentPause() {
         sendEvent(withName: "remote-pause", body: nil)
     }
 
-    func remoteSentSeek(event: MPChangePlaybackPositionCommandEvent) {
+    @objc func remoteSentSeek(event: MPChangePlaybackPositionCommandEvent) {
         sendEvent(withName: "remote-seek", body: ["position": event.positionTime])
     }
 
-    func remoteSentPlay() {
+    @objc func remoteSentPlay() {
         sendEvent(withName: "remote-play", body: nil)
     }
     
-    func remoteSentNext() {
+    @objc func remoteSentNext() {
         sendEvent(withName: "remote-next", body: nil)
     }
     
-    func remoteSentPrevious() {
+    @objc func remoteSentPrevious() {
         sendEvent(withName: "remote-previous", body: nil)
     }
     
-    func remoteSendSkipForward(event: MPSkipIntervalCommandEvent) {
+    @objc func remoteSendSkipForward(event: MPSkipIntervalCommandEvent) {
         sendEvent(withName: "remote-jump-forward", body: ["interval": event.interval])
     }
     
-    func remoteSendSkipBackward(event: MPSkipIntervalCommandEvent) {
+    @objc func remoteSendSkipBackward(event: MPSkipIntervalCommandEvent) {
         sendEvent(withName: "remote-jump-backward", body: ["interval": event.interval])
     }
     
-    func remoteSentPlayPause() {
+    @objc func remoteSentPlayPause() {
         if mediaWrapper.mappedState == .paused {
             sendEvent(withName: "remote-play", body: nil)
             return
