@@ -104,7 +104,13 @@ public class ExoPlayback implements EventListener {
         }
 
         queue.addAll(index, tracks);
-        source.addMediaSources(index, trackList, Utils.toRunnable(promise));
+        if(promise != null) {
+            source.addMediaSources(index, trackList, Utils.toRunnable(promise));
+        } else {
+            // Empty promise! Does this have consequences?
+            source.addMediaSources(index, trackList);
+        }
+
 
         if (queue.size() == tracks.size()) {
             player.prepare(source);

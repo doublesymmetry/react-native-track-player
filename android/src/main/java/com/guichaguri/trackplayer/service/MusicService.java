@@ -1,6 +1,5 @@
 package com.guichaguri.trackplayer.service;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -13,22 +12,20 @@ import android.util.Log;
 
 import com.facebook.react.HeadlessJsTaskService;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.jstasks.HeadlessJsTaskConfig;
 import com.guichaguri.trackplayer.service.models.Track;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.guichaguri.trackplayer.service.player.ExoPlayback;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+
+import static com.guichaguri.trackplayer.service.Utils.jsonStringToBundle;
 
 /**
  * @author Guichaguri
@@ -61,7 +58,7 @@ public class MusicService extends HeadlessJsTaskService {
     @Override
     public IBinder onBind(Intent intent) {
         if(Utils.CONNECT_INTENT.equals(intent.getAction())) {
-            return new MusicBinder(this, manager);
+            return new MusicBinder(this, manager, getApplicationContext());
         }
 
         return super.onBind(intent);
@@ -69,50 +66,60 @@ public class MusicService extends HeadlessJsTaskService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         if (intent != null && Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())) {
-            try {
+
+            if (manager != null && manager.getMetadata().getSession() != null) {
+                Log.d(Utils.LOG, "Manager not null and session returned");
                 MediaButtonReceiver.handleIntent(manager.getMetadata().getSession(), intent);
-            } catch (NullPointerException e) {
-                Log.d(Utils.LOG, "MusicService trying to handle intent with manager that does not exist");
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                Set<String> cachedQueueSet = prefs.getStringSet("cachedQueue", null);
-                List<Track> cachedQueue = Collections.emptyList();
-                for (String s : cachedQueueSet) {
-                    Bundle trackBundle = jsonStringToBundle(s);
-                    Track track = new Track(getApplicationContext(), trackBundle, RatingCompat.RATING_NONE); // Temp rating none;
-                    cachedQueue.add(track);
-                }
+                return START_NOT_STICKY;
+            } else if (manager != null) {
+                Log.d(Utils.LOG, "MusicService trying to recover lost player");
+            } else {
+                Log.d(Utils.LOG, "Manager null");
+                manager = new MusicManager(this, getApplicationContext());
+                recoverLostPlayer();
+
             }
-            return START_NOT_STICKY;
+
         }
 
-        manager = new MusicManager(this);
+        if (manager == null) {
+            manager = new MusicManager(this, getApplicationContext());
+        }
+
         super.onStartCommand(intent, flags, startId);
         return START_STICKY;
     }
 
-    public static Bundle jsonStringToBundle(String jsonString){
-        try {
-            JSONObject jsonObject = toJsonObject(jsonString);
-            return jsonToBundle(jsonObject);
-        } catch (JSONException ignored) {
+    private void recoverLostPlayer() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        Set<String> cachedQueueSet = prefs.getStringSet("cachedQueue", null);
+        List<Track> cachedQueue = new ArrayList<>();
+        for (String s : cachedQueueSet) {
+            Bundle trackBundle = jsonStringToBundle(s);
+            Log.d(Utils.LOG, "" + trackBundle + "");
+            Track track = new Track(getApplicationContext(), trackBundle, RatingCompat.RATING_NONE); // Temp rating none;
+            Log.d(Utils.LOG, "" + track.originalItem + "");
+            cachedQueue.add(track);
+            Log.d(Utils.LOG, "And that worked");
+        }
+//        String cachedPlayerOptionsJsonString = prefs.getString("cachedPlayerOptions", null);
+//        Bundle cachedPlayerOptions = null;
+//        if (cachedPlayerOptionsJsonString == null) {
+//            Log.d(Utils.LOG, "cachedPlayerOptionsJsonString is NULL");
+//            cachedPlayerOptions = jsonStringToBundle(cachedPlayerOptionsJsonString);
+//        }
 
+        ExoPlayback playback = manager.getPlayback();
+        if(playback == null) {
+            playback = manager.createLocalPlayback(new Bundle());
+            manager.switchPlayback(playback);
         }
-        return null;
+        playback.add(cachedQueue, 0, null);
+        playback.play();
     }
-    public static JSONObject toJsonObject(String jsonString) throws JSONException {
-        return new JSONObject(jsonString);
-    }
-    public static Bundle jsonToBundle(JSONObject jsonObject) throws JSONException {
-        Bundle bundle = new Bundle();
-        Iterator iter = jsonObject.keys();
-        while(iter.hasNext()){
-            String key = (String)iter.next();
-            String value = jsonObject.getString(key);
-            bundle.putString(key,value);
-        }
-        return bundle;
-    }
+
 
     @Override
     public void onDestroy() {
@@ -120,18 +127,24 @@ public class MusicService extends HeadlessJsTaskService {
 
         if (manager != null) {
 
-            Set<String> set = new HashSet<>();
 
-            List<Track> tracks = manager.getPlayback().getQueue();
+            if (manager.getPlayback() != null) {
+                Set<String> set = new HashSet<>();
+                List<Track> tracks = manager.getPlayback().getQueue();
+                Log.d(Utils.LOG, "Caching queue");
 
-            for(Track track : tracks) {
-                set.add(track.json.toString());
+                for(Track track : tracks) {
+                    set.add(track.json.toString());
+                }
+
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putStringSet("cachedQueue", set);
+                editor.apply();
+
+            } else {
+                Log.d(Utils.LOG, "manager.getPlayback() == null");
             }
-
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putStringSet("cachedQueue", set);
-            editor.apply();
 
             manager.destroy();
             manager = null;

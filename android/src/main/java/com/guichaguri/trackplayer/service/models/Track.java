@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 import static android.support.v4.media.MediaMetadataCompat.*;
+import static com.guichaguri.trackplayer.service.Utils.bundleToJson;
 
 /**
  * @author Guichaguri
@@ -101,17 +102,7 @@ public class Track {
 
         queueId = System.currentTimeMillis();
 
-        json = new JSONObject();
-        Set<String> keys = bundle.keySet();
-        for (String key : keys) {
-            try {
-                // json.put(key, bundle.get(key)); see edit below
-                json.put(key, JSONObject.wrap(bundle.get(key)));
-            } catch(JSONException e) {
-                //Handle exception here
-                Log.d(Utils.LOG, "Something went Track, creating json");
-            }
-        }
+        json = bundleToJson(bundle);
 
         originalItem = bundle;
 

@@ -2,13 +2,23 @@ package com.guichaguri.trackplayer.service;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
+
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * @author Guichaguri
@@ -125,6 +135,52 @@ public class Utils {
         } else {
             data.putDouble(key, rating.getStarRating());
         }
+    }
+
+    public static JSONObject bundleToJson(Bundle bundle) {
+        JSONObject json = new JSONObject();
+        Set<String> keys = bundle.keySet();
+        for (String key : keys) {
+            try {
+                // json.put(key, bundle.get(key)); see edit below
+                json.put(key, JSONObject.wrap(bundle.get(key)));
+            } catch(JSONException e) {
+                //Handle exception here
+                Log.d(Utils.LOG, "bundleToJson: Something went wrong, creating json");
+            }
+        }
+
+        return json;
+    }
+
+    public static Bundle jsonStringToBundle(String jsonString){
+        try {
+            JSONObject jsonObject = toJsonObject(jsonString);
+            return jsonToBundle(jsonObject);
+        } catch (JSONException ignored) {
+
+        }
+        return null;
+    }
+    private static JSONObject toJsonObject(String jsonString) throws JSONException {
+        return new JSONObject(jsonString);
+    }
+    private static Bundle jsonToBundle(JSONObject jsonObject) throws JSONException {
+        Bundle bundle = new Bundle();
+        Iterator iter = jsonObject.keys();
+        while(iter.hasNext()){
+            String key = (String)iter.next();
+            String value = jsonObject.getString(key);
+            bundle.putString(key,value);
+        }
+        return bundle;
+    }
+
+    public static void saveStringToSharedPreferences(String identifier, String data, Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("cachedQueue", data);
+        editor.apply();
     }
 
 }
