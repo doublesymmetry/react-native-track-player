@@ -7,6 +7,8 @@ import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat.QueueItem;
+import android.util.Log;
+
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
@@ -21,8 +23,13 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.player.ExoPlayback;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static android.support.v4.media.MediaMetadataCompat.*;
 
@@ -61,6 +68,7 @@ public class Track {
     public String genre;
     public long duration;
     public Bundle originalItem;
+    public JSONObject json;
 
     public RatingCompat rating;
 
@@ -92,7 +100,21 @@ public class Track {
         rating = Utils.getRating(bundle, "rating", ratingType);
 
         queueId = System.currentTimeMillis();
+
+        json = new JSONObject();
+        Set<String> keys = bundle.keySet();
+        for (String key : keys) {
+            try {
+                // json.put(key, bundle.get(key)); see edit below
+                json.put(key, JSONObject.wrap(bundle.get(key)));
+            } catch(JSONException e) {
+                //Handle exception here
+                Log.d(Utils.LOG, "Something went Track, creating json");
+            }
+        }
+
         originalItem = bundle;
+
     }
 
     public MediaMetadataCompat.Builder toMediaMetadata() {
