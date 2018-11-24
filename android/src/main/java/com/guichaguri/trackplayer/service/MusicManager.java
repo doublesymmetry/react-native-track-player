@@ -117,6 +117,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
         return new ExoPlayback(service, this, player, cacheMaxSize);
     }
 
+    @SuppressLint("WakelockTimeout")
     public void onPlay() {
         Log.d(Utils.LOG, "onPlay");
         if(playback == null) return;
@@ -127,18 +128,13 @@ public class MusicManager implements OnAudioFocusChangeListener {
         if(!playback.isRemote()) {
             requestFocus();
 
-            if(!wakeLock.isHeld()) {
-                long timeout = playback.getDuration() - playback.getPosition();
-                wakeLock.acquire(timeout <= 0 ? (5 * 60 * 1000) : (timeout + 5000));
-            }
+            if(!wakeLock.isHeld()) wakeLock.acquire();
 
             if(!Utils.isLocal(track.uri)) {
                 if(!wifiLock.isHeld()) wifiLock.acquire();
             }
         }
 
-        // Put the service in the "started" state
-        service.startService(new Intent(service.getApplicationContext(), MusicService.class));
         metadata.setForeground(true, true);
     }
 
