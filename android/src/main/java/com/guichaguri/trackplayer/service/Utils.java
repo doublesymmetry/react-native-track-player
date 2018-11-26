@@ -17,6 +17,7 @@ public class Utils {
 
     public static final String EVENT_INTENT = "com.guichaguri.trackplayer.event";
     public static final String CONNECT_INTENT = "com.guichaguri.trackplayer.connect";
+    public static final String NOTIFICATION_CHANNEL = "com.guichaguri.trackplayer";
     public static final String LOG = "RNTrackPlayer";
 
     public static Runnable toRunnable(Promise promise) {

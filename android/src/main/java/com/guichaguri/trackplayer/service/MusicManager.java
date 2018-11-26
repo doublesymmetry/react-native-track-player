@@ -1,7 +1,10 @@
 package com.guichaguri.trackplayer.service;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
@@ -44,6 +47,16 @@ public class MusicManager implements OnAudioFocusChangeListener {
     @RequiresApi(26)
     private AudioFocusRequest focus = null;
     private boolean hasAudioFocus = false;
+
+    private BroadcastReceiver noisyReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent != null && AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
+                service.emit(MusicEvents.BUTTON_PAUSE, null);
+            }
+        }
+    };
+
     private boolean stopWithApp = false;
 
     @SuppressLint("InvalidWakeLockTag")
@@ -104,6 +117,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
         return new ExoPlayback(service, this, player, cacheMaxSize);
     }
 
+    @SuppressLint("WakelockTimeout")
     public void onPlay() {
         Log.d(Utils.LOG, "onPlay");
         if(playback == null) return;
@@ -114,10 +128,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
         if(!playback.isRemote()) {
             requestFocus();
 
-            if(!wakeLock.isHeld()) {
-                long timeout = playback.getDuration() - playback.getPosition();
-                wakeLock.acquire(timeout <= 0 ? (5 * 60 * 1000) : (timeout + 5000));
-            }
+            if(!wakeLock.isHeld()) wakeLock.acquire();
 
             if(!Utils.isLocal(track.uri)) {
                 if(!wifiLock.isHeld()) wifiLock.acquire();
@@ -249,6 +260,10 @@ public class MusicManager implements OnAudioFocusChangeListener {
         }
 
         hasAudioFocus = r == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+
+        if(hasAudioFocus) {
+            service.registerReceiver(noisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
+        }
     }
 
     private void abandonFocus() {
@@ -268,6 +283,10 @@ public class MusicManager implements OnAudioFocusChangeListener {
         }
 
         hasAudioFocus = r != AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+
+        if(!hasAudioFocus) {
+            service.unregisterReceiver(noisyReceiver);
+        }
     }
 
     public void destroy() {
