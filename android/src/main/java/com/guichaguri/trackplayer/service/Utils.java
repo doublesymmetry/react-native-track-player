@@ -14,10 +14,15 @@ import android.util.Log;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 
 /**
@@ -168,10 +173,23 @@ public class Utils {
     private static Bundle jsonToBundle(JSONObject jsonObject) throws JSONException {
         Bundle bundle = new Bundle();
         Iterator iter = jsonObject.keys();
-        while(iter.hasNext()){
+        while(iter.hasNext()) {
             String key = (String)iter.next();
-            String value = jsonObject.getString(key);
-            bundle.putString(key,value);
+            Object keyObject = jsonObject.get(key);
+            if (key.equals("capabilities") || key.equals("compactCapabilities")) {
+                // this check should be more generic but is functional for now. Decoding should probably live where data is instead.
+                ArrayList<Integer> value = new ArrayList<Integer>();
+                JSONArray jsonArray = jsonObject.getJSONArray(key);
+                int len = jsonArray.length();
+                for (int i=0;i<len;i++){
+                    value.add(jsonArray.getInt(i));
+                }
+                bundle.putIntegerArrayList(key,value);
+            } else {
+                String value = jsonObject.getString(key);
+                bundle.putString(key,value);
+            }
+
         }
         return bundle;
     }

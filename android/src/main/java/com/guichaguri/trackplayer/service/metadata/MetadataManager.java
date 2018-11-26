@@ -6,9 +6,11 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Action;
 import android.support.v4.app.NotificationManagerCompat;
@@ -18,6 +20,8 @@ import android.support.v4.media.app.NotificationCompat.MediaStyle;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -32,6 +36,9 @@ import com.guichaguri.trackplayer.service.player.ExoPlayback;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.guichaguri.trackplayer.service.Utils.bundleToJson;
+import static com.guichaguri.trackplayer.service.Utils.saveStringToSharedPreferences;
+
 /**
  * @author Guichaguri
  */
@@ -40,6 +47,7 @@ public class MetadataManager {
     private final MusicService service;
     private final MusicManager manager;
     private final MediaSessionCompat session;
+    private Context applicationContext;
 
     private boolean foreground = false;
     private int ratingType = RatingCompat.RATING_NONE;
@@ -48,12 +56,14 @@ public class MetadataManager {
     private long compactActions = 0;
     private SimpleTarget<Bitmap> artworkTarget;
     private NotificationCompat.Builder builder;
+    private Bundle optionsBundle = null;
 
     private Action previousAction, rewindAction, playAction, pauseAction, stopAction, forwardAction, nextAction;
 
-    public MetadataManager(MusicService service, MusicManager manager) {
+    public MetadataManager(MusicService service, MusicManager manager, Context applicationContext) {
         this.service = service;
         this.manager = manager;
+        this.applicationContext = applicationContext;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(Utils.NOTIFICATION_CHANNEL, "Playback", NotificationManager.IMPORTANCE_DEFAULT);
@@ -99,6 +109,7 @@ public class MetadataManager {
      * @param options The options
      */
     public void updateOptions(Bundle options) {
+        optionsBundle = options;
         List<Integer> capabilities = options.getIntegerArrayList("capabilities");
         List<Integer> notification = options.getIntegerArrayList("notificationCapabilities");
         List<Integer> compact = options.getIntegerArrayList("compactCapabilities");
@@ -151,6 +162,8 @@ public class MetadataManager {
 
         updateNotification();
     }
+
+    public Bundle getOptionsBundle() { return optionsBundle; }
 
     public int getRatingType() {
         return ratingType;
@@ -288,11 +301,11 @@ public class MetadataManager {
         if(foreground) {
             NotificationManagerCompat.from(service).cancel(1);
         } else {
-            service.stopForeground(true);
+            service.stopForeground(false);
         }
 
         session.setActive(false);
-        session.release();
+        //session.release();
     }
 
     private void updateNotification() {
