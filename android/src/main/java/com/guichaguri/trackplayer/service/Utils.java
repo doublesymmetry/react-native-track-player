@@ -19,10 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
 
 /**
@@ -175,9 +172,8 @@ public class Utils {
         Iterator iter = jsonObject.keys();
         while(iter.hasNext()) {
             String key = (String)iter.next();
-            Object keyObject = jsonObject.get(key);
             if (key.equals("capabilities") || key.equals("compactCapabilities")) {
-                // this check should be more generic but is functional for now. Decoding should probably live where data is instead.
+                // this check should be more generic but is functional for now.
                 ArrayList<Integer> value = new ArrayList<Integer>();
                 JSONArray jsonArray = jsonObject.getJSONArray(key);
                 int len = jsonArray.length();
@@ -193,12 +189,5 @@ public class Utils {
         }
         return bundle;
     }
-
-    public static void saveStringToSharedPreferences(String identifier, String data, Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("cachedQueue", data);
-        editor.apply();
-    }
-
+    
 }
