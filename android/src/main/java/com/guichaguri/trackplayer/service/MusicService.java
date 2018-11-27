@@ -85,7 +85,7 @@ public class MusicService extends HeadlessJsTaskService {
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 String cachedCurrentTrack = prefs.getString("cachedCurrentTrack", null);
                 if (cachedCurrentTrack != null) {
-                    manager = new MusicManager(this, getApplicationContext());
+                    manager = new MusicManager(this);
                     recoverLostPlayer(intent);
                     return START_NOT_STICKY;
                 }
@@ -93,7 +93,7 @@ public class MusicService extends HeadlessJsTaskService {
         }
 
         if (manager == null) {
-            manager = new MusicManager(this, getApplicationContext());
+            manager = new MusicManager(this);
         }
 
         super.onStartCommand(intent, flags, startId);
