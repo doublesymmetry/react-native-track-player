@@ -36,9 +36,6 @@ import com.guichaguri.trackplayer.service.player.ExoPlayback;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.guichaguri.trackplayer.service.Utils.bundleToJson;
-import static com.guichaguri.trackplayer.service.Utils.saveStringToSharedPreferences;
-
 /**
  * @author Guichaguri
  */
@@ -47,7 +44,6 @@ public class MetadataManager {
     private final MusicService service;
     private final MusicManager manager;
     private final MediaSessionCompat session;
-    private Context applicationContext;
 
     private boolean foreground = false;
     private int ratingType = RatingCompat.RATING_NONE;
@@ -60,10 +56,9 @@ public class MetadataManager {
 
     private Action previousAction, rewindAction, playAction, pauseAction, stopAction, forwardAction, nextAction;
 
-    public MetadataManager(MusicService service, MusicManager manager, Context applicationContext) {
+    public MetadataManager(MusicService service, MusicManager manager) {
         this.service = service;
         this.manager = manager;
-        this.applicationContext = applicationContext;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(Utils.NOTIFICATION_CHANNEL, "Playback", NotificationManager.IMPORTANCE_DEFAULT);
