@@ -95,6 +95,7 @@ public class MusicService extends HeadlessJsTaskService {
     }
 
     private void recoverLostPlayer() {
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         Integer resumeAt = 0;
@@ -103,6 +104,8 @@ public class MusicService extends HeadlessJsTaskService {
         String cachedCurrentTrack = prefs.getString("cachedCurrentTrack", null);
         Track currentTrack = new Track(getApplicationContext(), jsonStringToBundle(cachedCurrentTrack), RatingCompat.RATING_NONE); // Temp rating none, because we use none;
 
+        // Get current track position
+        Long currentPosition = prefs.getLong("cachedPosition", 0);
 
         // Get cached queue
         Set<String> cachedQueueSet = prefs.getStringSet("cachedQueue", null);
@@ -126,8 +129,8 @@ public class MusicService extends HeadlessJsTaskService {
             manager.switchPlayback(playback);
         }
 
-
         playback.add(cachedQueue, resumeAt, null);
+        playback.seekTo(currentPosition);
         playback.play();
 
         // Get back player options
@@ -147,10 +150,12 @@ public class MusicService extends HeadlessJsTaskService {
             // Cache current track
             Track currentTrack = playback.getCurrentTrack();
             editor.putString("cachedCurrentTrack", currentTrack.json.toString());
-            // TODO GET POSITION
+
+            // Cache current track position
+            Long currentPosition = playback.getPosition();
+            editor.putLong("cachedPosition", currentPosition);
 
             // Cache queue
-            Log.d(Utils.LOG, "Caching queue");
             Set<String> set = new HashSet<>();
             List<Track> tracks = playback.getQueue();
             for(Track track : tracks) {
@@ -159,7 +164,6 @@ public class MusicService extends HeadlessJsTaskService {
             editor.putStringSet("cachedQueue", set);
 
             // Cache options
-            Log.d(Utils.LOG, "Caching options");
             Bundle options = manager.getMetadata().getOptionsBundle();
             editor.putString("cachedOptions", bundleToJson(options).toString());
 
