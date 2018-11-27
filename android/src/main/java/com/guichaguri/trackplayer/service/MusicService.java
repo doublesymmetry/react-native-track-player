@@ -74,7 +74,6 @@ public class MusicService extends HeadlessJsTaskService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(Utils.LOG, "Intent action is " + intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT));
 
         if (intent != null && Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())) {
 
