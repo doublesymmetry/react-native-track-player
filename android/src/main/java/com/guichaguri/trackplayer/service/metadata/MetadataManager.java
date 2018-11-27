@@ -265,6 +265,7 @@ public class MetadataManager {
         // Links the media session
         style.setMediaSession(session.getSessionToken());
 
+
         // Updates the compact media buttons for the notification
         if(!compact.isEmpty()) {
             int[] compactIndexes = new int[compact.size()];
@@ -305,7 +306,8 @@ public class MetadataManager {
         }
 
         session.setActive(false);
-        //session.release();
+        session.release();
+        updateNotification();
     }
 
     private void updateNotification() {
