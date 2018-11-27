@@ -9,24 +9,29 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.util.Log;
+import android.view.KeyEvent;
 
 import com.facebook.react.HeadlessJsTaskService;
 import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.Promise;
 import com.facebook.react.jstasks.HeadlessJsTaskConfig;
+import com.guichaguri.trackplayer.module.MusicEvents;
+import com.guichaguri.trackplayer.service.metadata.ButtonEvents;
 import com.guichaguri.trackplayer.service.models.Track;
 import com.guichaguri.trackplayer.service.player.ExoPlayback;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import static android.view.KeyEvent.KEYCODE_HEADSETHOOK;
+import static android.view.KeyEvent.KEYCODE_MEDIA_FAST_FORWARD;
+import static android.view.KeyEvent.KEYCODE_MEDIA_NEXT;
+import static android.view.KeyEvent.KEYCODE_MEDIA_PLAY;
+import static android.view.KeyEvent.KEYCODE_MEDIA_PREVIOUS;
+import static android.view.KeyEvent.KEYCODE_MEDIA_REWIND;
 import static com.guichaguri.trackplayer.service.Utils.jsonStringToBundle;
 import static com.guichaguri.trackplayer.service.Utils.bundleToJson;
 
@@ -69,21 +74,22 @@ public class MusicService extends HeadlessJsTaskService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(Utils.LOG, "Intent action is " + intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT));
 
         if (intent != null && Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())) {
 
             if (manager != null && manager.getMetadata().getSession() != null) {
-                Log.d(Utils.LOG, "Manager not null and session returned");
                 MediaButtonReceiver.handleIntent(manager.getMetadata().getSession(), intent);
                 return START_NOT_STICKY;
-            } else if (manager != null) {
-                Log.d(Utils.LOG, "MusicService trying to recover lost player");
-            } else {
-                Log.d(Utils.LOG, "Manager null");
-                manager = new MusicManager(this, getApplicationContext());
-                recoverLostPlayer();
+            } else if (manager == null) {
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                String cachedCurrentTrack = prefs.getString("cachedCurrentTrack", null);
+                if (cachedCurrentTrack != null) {
+                    manager = new MusicManager(this, getApplicationContext());
+                    recoverLostPlayer(intent);
+                    return START_NOT_STICKY;
+                }
             }
-
         }
 
         if (manager == null) {
@@ -94,18 +100,23 @@ public class MusicService extends HeadlessJsTaskService {
         return START_STICKY;
     }
 
-    private void recoverLostPlayer() {
+    private void recoverLostPlayer(Intent intent) {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-        Integer resumeAt = 0;
-
-        // Get current track
+        // Get current track and return if it is not available
         String cachedCurrentTrack = prefs.getString("cachedCurrentTrack", null);
-        Track currentTrack = new Track(getApplicationContext(), jsonStringToBundle(cachedCurrentTrack), RatingCompat.RATING_NONE); // Temp rating none, because we use none;
+        if (cachedCurrentTrack == null) return;
+
+        // Get back player options
+        String cachedOptionsJsonString = prefs.getString("cachedOptions", null);
+        Bundle optionsBundle = jsonStringToBundle(cachedOptionsJsonString);
 
         // Get current track position
+        Integer ratingType = optionsBundle.getInt("ratingType", RatingCompat.RATING_NONE);
+        Track currentTrack = new Track(getApplicationContext(), jsonStringToBundle(cachedCurrentTrack), ratingType);
         Long currentPosition = prefs.getLong("cachedPosition", 0);
+        Integer resumeAt = 0;
 
         // Get cached queue
         Set<String> cachedQueueSet = prefs.getStringSet("cachedQueue", null);
@@ -113,14 +124,13 @@ public class MusicService extends HeadlessJsTaskService {
         Integer index = 0;
         for (String s : cachedQueueSet) {
             Bundle trackBundle = jsonStringToBundle(s);
-            Track track = new Track(getApplicationContext(), trackBundle, RatingCompat.RATING_NONE); // Temp rating none, because we use none;
+            Track track = new Track(getApplicationContext(), trackBundle, ratingType);
             if (track.id.equals(currentTrack.id)) {
                 resumeAt = index;
             }
             cachedQueue.add(track);
             index ++;
         }
-
 
         // Reestablish manager
         ExoPlayback playback = manager.getPlayback();
@@ -130,13 +140,36 @@ public class MusicService extends HeadlessJsTaskService {
         }
 
         playback.add(cachedQueue, resumeAt, null);
-        playback.seekTo(currentPosition);
-        playback.play();
 
-        // Get back player options
-        String cachedOptionsJsonString = prefs.getString("cachedOptions", null);
-        Bundle optionsBundle = jsonStringToBundle(cachedOptionsJsonString);
+        // Set player options
         manager.getMetadata().updateOptions(optionsBundle);
+
+        // Interpret event
+        KeyEvent intentExtra = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+        ButtonEvents buttonEvents = new ButtonEvents(this, manager);
+        if (intentExtra.getKeyCode() == KEYCODE_MEDIA_PLAY || intentExtra.getKeyCode() == KEYCODE_HEADSETHOOK) {
+            playback.seekTo(currentPosition);
+            buttonEvents.onPlay();
+        } else if (intentExtra.getKeyCode() == KEYCODE_MEDIA_NEXT) {
+            this.emit(MusicEvents.BUTTON_SKIP_NEXT, null);
+            buttonEvents.onSkipToNext();
+        } else if (intentExtra.getKeyCode() == KEYCODE_MEDIA_FAST_FORWARD) {
+            buttonEvents.onFastForward();
+        } else if (intentExtra.getKeyCode() == KEYCODE_MEDIA_REWIND) {
+            buttonEvents.onRewind();
+        } else if (intentExtra.getKeyCode() == KEYCODE_MEDIA_PREVIOUS) {
+            buttonEvents.onSkipToPrevious();
+        } else {
+            Log.d(Utils.LOG, "keyCode " + intentExtra.getKeyCode() + " is not handled");
+        }
+
+        // Clear cache
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.remove("cachedCurrentTrack");
+        editor.remove("cachedPosition");
+        editor.remove("cachedQueue");
+        editor.remove("cachedOptions");
+        editor.apply();
     }
 
     private void cachePlayer(MusicManager manager) {
