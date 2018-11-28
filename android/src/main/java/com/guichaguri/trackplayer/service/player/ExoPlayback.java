@@ -2,6 +2,7 @@ package com.guichaguri.trackplayer.service.player;
 
 import android.content.Context;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 import com.facebook.react.bridge.Promise;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -202,10 +203,17 @@ public class ExoPlayback implements EventListener {
     }
 
     public void stop() {
+        lastKnownWindow = player.getCurrentWindowIndex();
+        lastKnownPosition = player.getCurrentPosition();
+
         player.stop(false);
+        player.seekTo(0);
     }
 
     public void reset() {
+        lastKnownWindow = player.getCurrentWindowIndex();
+        lastKnownPosition = player.getCurrentPosition();
+
         player.stop(true);
         resetQueue();
     }
@@ -227,6 +235,9 @@ public class ExoPlayback implements EventListener {
     }
 
     public void seekTo(long time) {
+        lastKnownWindow = player.getCurrentWindowIndex();
+        lastKnownPosition = player.getCurrentPosition();
+
         player.seekTo(time);
     }
 
@@ -266,13 +277,17 @@ public class ExoPlayback implements EventListener {
 
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
+        Log.d(Utils.LOG, "onTimelineChanged: " + reason);
+
         if ((reason == Player.TIMELINE_CHANGE_REASON_PREPARED || reason == Player.TIMELINE_CHANGE_REASON_DYNAMIC) && !timeline.isEmpty()) {
-            onPositionDiscontinuity(Player.DISCONTINUITY_REASON_PERIOD_TRANSITION);
+            onPositionDiscontinuity(Player.DISCONTINUITY_REASON_INTERNAL);
         }
     }
 
     @Override
     public void onPositionDiscontinuity(int reason) {
+        Log.d(Utils.LOG, "onPositionDiscontinuity: " + reason);
+
         if(lastKnownWindow != player.getCurrentWindowIndex()) {
             Track previous = lastKnownWindow == C.INDEX_UNSET ? null : queue.get(lastKnownWindow);
             Track next = getCurrentTrack();
