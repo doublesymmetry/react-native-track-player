@@ -181,11 +181,14 @@ public class Utils {
                     value.add(jsonArray.getInt(i));
                 }
                 bundle.putIntegerArrayList(key,value);
+            } else if (key.equals("duration")) {
+                // this check should be in Track
+                Double value = jsonObject.getDouble(key);
+                bundle.putDouble(key, value);
             } else {
                 String value = jsonObject.getString(key);
                 bundle.putString(key,value);
             }
-
         }
         return bundle;
     }

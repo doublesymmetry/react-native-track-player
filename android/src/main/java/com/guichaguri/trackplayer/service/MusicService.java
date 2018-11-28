@@ -164,6 +164,7 @@ public class MusicService extends HeadlessJsTaskService {
         ButtonEvents buttonEvents = new ButtonEvents(this, manager);
         if (intentExtra.getKeyCode() == KEYCODE_MEDIA_PLAY || intentExtra.getKeyCode() == KEYCODE_HEADSETHOOK) {
             playback.seekTo(currentPosition);
+            manager.getMetadata().updateMetadata(currentTrack);
             buttonEvents.onPlay();
         } else if (intentExtra.getKeyCode() == KEYCODE_MEDIA_NEXT) {
             this.emit(MusicEvents.BUTTON_SKIP_NEXT, null);

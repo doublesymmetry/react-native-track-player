@@ -302,8 +302,7 @@ public class MetadataManager {
         }
 
         if (!intentToStop) {
-            Notification n = builder.build();
-            NotificationManagerCompat.from(service).notify(1, n);
+            updateNotification();
         } else {
             session.setActive(false);
             session.release();
