@@ -293,25 +293,27 @@ public class MetadataManager {
         }
     }
 
-    public void destroy() {
-        Log.d(Utils.LOG, "Destroy!");
+    public void destroy(Boolean intentToStop) {
 
         if(foreground) {
             NotificationManagerCompat.from(service).cancel(1);
         } else {
-            service.stopForeground(true);
+            service.stopForeground(false);
         }
 
-        session.setActive(false);
-        session.release();
-
+        if (!intentToStop) {
+            Notification n = builder.build();
+            NotificationManagerCompat.from(service).notify(1, n);
+        } else {
+            session.setActive(false);
+            session.release();
+        }
 
     }
 
     private void updateNotification() {
         int state = manager.getPlayback().getState();
         if (Utils.isStopped(state)) {
-            Log.d(Utils.LOG, "updateNotification: isStopped");
             removeNotifications();
             return;
         }

@@ -285,7 +285,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
         }
     }
 
-    public void destroy() {
+    public void destroy(Boolean intentToStop) {
         Log.d(Utils.LOG, "Releasing service resources...");
 
         // Disable audio focus
@@ -295,7 +295,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
         if(playback != null) playback.destroy();
 
         // Release the metadata resources
-        metadata.destroy();
+        metadata.destroy(intentToStop);
 
         // Release the locks
         if(wifiLock.isHeld()) wifiLock.release();

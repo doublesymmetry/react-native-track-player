@@ -42,6 +42,7 @@ import static com.guichaguri.trackplayer.service.Utils.bundleToJson;
 public class MusicService extends HeadlessJsTaskService {
 
     private MusicManager manager;
+    private Boolean intentToStop = false;
 
     @Nullable
     @Override
@@ -77,9 +78,14 @@ public class MusicService extends HeadlessJsTaskService {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         if (intent != null && Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())) {
+
             // Interpret event
             KeyEvent intentExtra = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-            Log.d(Utils.LOG, "keyCode " + intentExtra.getKeyCode());
+            if (intentExtra.getKeyCode() == KEYCODE_MEDIA_STOP) {
+                intentToStop = true;
+            } else {
+                intentToStop = false;
+            }
 
             if (manager != null && manager.getMetadata().getSession() != null) {
                 MediaButtonReceiver.handleIntent(manager.getMetadata().getSession(), intent);
@@ -223,8 +229,10 @@ public class MusicService extends HeadlessJsTaskService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        cachePlayer(manager);
-        manager.destroy();
+        if (!intentToStop) {
+            cachePlayer(manager);
+        }
+        manager.destroy(intentToStop);
         manager = null;
     }
 
