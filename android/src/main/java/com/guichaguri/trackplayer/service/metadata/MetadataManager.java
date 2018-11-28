@@ -294,20 +294,24 @@ public class MetadataManager {
     }
 
     public void destroy() {
+        Log.d(Utils.LOG, "Destroy!");
+
         if(foreground) {
             NotificationManagerCompat.from(service).cancel(1);
         } else {
-            service.stopForeground(false);
+            service.stopForeground(true);
         }
 
         session.setActive(false);
         session.release();
-        updateNotification();
+
+
     }
 
     private void updateNotification() {
         int state = manager.getPlayback().getState();
         if (Utils.isStopped(state)) {
+            Log.d(Utils.LOG, "updateNotification: isStopped");
             removeNotifications();
             return;
         }

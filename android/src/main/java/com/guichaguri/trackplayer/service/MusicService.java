@@ -32,6 +32,7 @@ import static android.view.KeyEvent.KEYCODE_MEDIA_NEXT;
 import static android.view.KeyEvent.KEYCODE_MEDIA_PLAY;
 import static android.view.KeyEvent.KEYCODE_MEDIA_PREVIOUS;
 import static android.view.KeyEvent.KEYCODE_MEDIA_REWIND;
+import static android.view.KeyEvent.KEYCODE_MEDIA_STOP;
 import static com.guichaguri.trackplayer.service.Utils.jsonStringToBundle;
 import static com.guichaguri.trackplayer.service.Utils.bundleToJson;
 
@@ -76,6 +77,9 @@ public class MusicService extends HeadlessJsTaskService {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         if (intent != null && Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())) {
+            // Interpret event
+            KeyEvent intentExtra = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+            Log.d(Utils.LOG, "keyCode " + intentExtra.getKeyCode());
 
             if (manager != null && manager.getMetadata().getSession() != null) {
                 MediaButtonReceiver.handleIntent(manager.getMetadata().getSession(), intent);
@@ -102,6 +106,13 @@ public class MusicService extends HeadlessJsTaskService {
     private void recoverLostPlayer(Intent intent) {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        // Get intent extra and return if stop (swipe away)
+        KeyEvent intentExtra = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+        if (intentExtra.getKeyCode() == KEYCODE_MEDIA_STOP) {
+            clearCache();
+            return;
+        }
 
         // Get current track and return if it is not available
         String cachedCurrentTrack = prefs.getString("cachedCurrentTrack", null);
@@ -143,8 +154,7 @@ public class MusicService extends HeadlessJsTaskService {
         // Set player options
         manager.getMetadata().updateOptions(optionsBundle);
 
-        // Interpret event
-        KeyEvent intentExtra = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+        // Act on event
         ButtonEvents buttonEvents = new ButtonEvents(this, manager);
         if (intentExtra.getKeyCode() == KEYCODE_MEDIA_PLAY || intentExtra.getKeyCode() == KEYCODE_HEADSETHOOK) {
             playback.seekTo(currentPosition);
@@ -163,6 +173,11 @@ public class MusicService extends HeadlessJsTaskService {
         }
 
         // Clear cache
+        clearCache();
+    }
+
+    private void clearCache() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor editor = prefs.edit();
         editor.remove("cachedCurrentTrack");
         editor.remove("cachedPosition");
