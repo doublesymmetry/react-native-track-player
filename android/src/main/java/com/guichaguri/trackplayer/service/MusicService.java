@@ -203,6 +203,7 @@ public class MusicService extends HeadlessJsTaskService {
 
             // Cache current track
             Track currentTrack = playback.getCurrentTrack();
+            if (currentTrack == null) return;
             editor.putString("cachedCurrentTrack", currentTrack.json.toString());
 
             // Cache current track position
