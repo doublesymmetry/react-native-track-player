@@ -1,10 +1,16 @@
 package com.guichaguri.trackplayer.service;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
@@ -14,6 +20,7 @@ import android.view.KeyEvent;
 import com.facebook.react.HeadlessJsTaskService;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.jstasks.HeadlessJsTaskConfig;
+import com.guichaguri.trackplayer.R;
 import com.guichaguri.trackplayer.module.MusicEvents;
 import com.guichaguri.trackplayer.service.metadata.ButtonEvents;
 import com.guichaguri.trackplayer.service.models.Track;
@@ -26,6 +33,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import static android.support.v4.app.NotificationCompat.PRIORITY_MIN;
 import static android.view.KeyEvent.KEYCODE_HEADSETHOOK;
 import static android.view.KeyEvent.KEYCODE_MEDIA_FAST_FORWARD;
 import static android.view.KeyEvent.KEYCODE_MEDIA_NEXT;
@@ -83,6 +91,8 @@ public class MusicService extends HeadlessJsTaskService {
             KeyEvent intentExtra = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
             if (intentExtra.getKeyCode() == KEYCODE_MEDIA_STOP) {
                 intentToStop = true;
+                startServiceOreoAndAbove();
+                stopSelf();
             } else {
                 intentToStop = false;
             }
@@ -227,12 +237,30 @@ public class MusicService extends HeadlessJsTaskService {
 
     }
 
+    public void startServiceOreoAndAbove(){
+        // Needed to prevent crash when dismissing notification
+        // https://stackoverflow.com/questions/47609261/bound-service-crash-with-context-startforegroundservice-did-not-then-call-ser?rq=1
+        if (Build.VERSION.SDK_INT >= 26) {
+            String CHANNEL_ID = Utils.NOTIFICATION_CHANNEL;
+            String CHANNEL_NAME = "Playback";
+
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_NONE);
+            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+
+            Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setCategory(Notification.CATEGORY_SERVICE).setSmallIcon(R.drawable.play).setPriority(PRIORITY_MIN).build();
+
+            startForeground(1, notification);
+        }
+    }
+
 
     @Override
     public void onDestroy() {
+
         super.onDestroy();
-        if (!intentToStop) {
-            cachePlayer(manager);
+        if (!intentToStop && manager != null) {
+           cachePlayer(manager);
         }
         manager.destroy(intentToStop);
         manager = null;
