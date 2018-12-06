@@ -345,7 +345,17 @@ public class ExoPlayback implements EventListener {
 
     @Override
     public void onPlayerError(ExoPlaybackException error) {
-        manager.onError("exoplayer", error.getCause().getMessage());
+        String code;
+
+        if(error.type == ExoPlaybackException.TYPE_SOURCE) {
+            code = "playback-source";
+        } else if(error.type == ExoPlaybackException.TYPE_RENDERER) {
+            code = "playback-renderer";
+        } else {
+            code = "playback"; // Other unexpected errors related to the playback
+        }
+
+        manager.onError(code, error.getCause().getMessage());
     }
 
     @Override
