@@ -206,6 +206,7 @@ public class MusicService extends HeadlessJsTaskService {
     private void cachePlayer(MusicManager manager) {
         if (manager != null) {
             ExoPlayback playback = manager.getPlayback();
+            if (playback == null) return;
 
             // Make editor
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -257,13 +258,14 @@ public class MusicService extends HeadlessJsTaskService {
 
     @Override
     public void onDestroy() {
-
         super.onDestroy();
-        if (!intentToStop && manager != null) {
-           cachePlayer(manager);
+        if (manager != null) {
+            if (!intentToStop) {
+               cachePlayer(manager);
+            }
+            manager.destroy(intentToStop);
+            manager = null;
         }
-        manager.destroy(intentToStop);
-        manager = null;
     }
 
     @Override
