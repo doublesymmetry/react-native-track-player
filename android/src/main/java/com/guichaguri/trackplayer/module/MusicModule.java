@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
@@ -97,7 +98,16 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
 
         // Binds the service to get a MediaWrapper instance
         Intent intent = new Intent(context, MusicService.class);
-        context.startService(intent);
+        try {
+            context.startService(intent);
+        } catch (Exception e) {
+            if (Build.VERSION.SDK_INT >= 26) {
+                context.startForegroundService(intent);
+            } else {
+                context.startService(intent);
+            }
+        }
+
         intent.setAction(Utils.CONNECT_INTENT);
         context.bindService(intent, this, 0);
 

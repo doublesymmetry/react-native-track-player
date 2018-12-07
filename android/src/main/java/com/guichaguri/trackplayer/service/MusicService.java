@@ -14,6 +14,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -105,8 +106,8 @@ public class MusicService extends HeadlessJsTaskService {
                 String cachedCurrentTrack = prefs.getString("cachedCurrentTrack", null);
                 if (cachedCurrentTrack != null) {
                     manager = new MusicManager(this);
-                    recoverLostPlayer(intent);
-                    return START_NOT_STICKY;
+                    recoverLostPlayer(intentExtra.getKeyCode());
+                    return START_REDELIVER_INTENT;
                 }
             }
         }
@@ -119,13 +120,12 @@ public class MusicService extends HeadlessJsTaskService {
         return START_STICKY;
     }
 
-    private void recoverLostPlayer(Intent intent) {
+    private void recoverLostPlayer(Integer keycode) {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-        // Get intent extra and return if stop (swipe away)
-        KeyEvent intentExtra = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-        if (intentExtra.getKeyCode() == KEYCODE_MEDIA_STOP) {
+        // Return if stop (swipe away)
+        if (keycode == KEYCODE_MEDIA_STOP) {
             clearCache();
             return;
         }
@@ -169,24 +169,23 @@ public class MusicService extends HeadlessJsTaskService {
 
         // Set player options
         manager.getMetadata().updateOptions(optionsBundle);
+        manager.getMetadata().updateMetadata(currentTrack);
+        playback.seekTo(currentPosition);
 
         // Act on event
         ButtonEvents buttonEvents = new ButtonEvents(this, manager);
-        if (intentExtra.getKeyCode() == KEYCODE_MEDIA_PLAY || intentExtra.getKeyCode() == KEYCODE_HEADSETHOOK) {
-            playback.seekTo(currentPosition);
-            manager.getMetadata().updateMetadata(currentTrack);
-            buttonEvents.onPlay();
-        } else if (intentExtra.getKeyCode() == KEYCODE_MEDIA_NEXT) {
-            this.emit(MusicEvents.BUTTON_SKIP_NEXT, null);
-            buttonEvents.onSkipToNext();
-        } else if (intentExtra.getKeyCode() == KEYCODE_MEDIA_FAST_FORWARD) {
+        if (keycode == KEYCODE_MEDIA_PLAY) {
+            playback.play();
+        } else if (keycode == KEYCODE_MEDIA_NEXT) {
+             buttonEvents.onSkipToNext();
+        } else if (keycode == KEYCODE_MEDIA_FAST_FORWARD) {
             buttonEvents.onFastForward();
-        } else if (intentExtra.getKeyCode() == KEYCODE_MEDIA_REWIND) {
+        } else if (keycode == KEYCODE_MEDIA_REWIND) {
             buttonEvents.onRewind();
-        } else if (intentExtra.getKeyCode() == KEYCODE_MEDIA_PREVIOUS) {
+        } else if (keycode == KEYCODE_MEDIA_PREVIOUS) {
             buttonEvents.onSkipToPrevious();
         } else {
-            Log.d(Utils.LOG, "keyCode " + intentExtra.getKeyCode() + " is not handled");
+            Log.d(Utils.LOG, "keyCode " + keycode + " is not handled");
         }
 
         // Clear cache
@@ -203,38 +202,39 @@ public class MusicService extends HeadlessJsTaskService {
         editor.apply();
     }
 
-    private void cachePlayer(MusicManager manager) {
-        if (manager != null) {
-            ExoPlayback playback = manager.getPlayback();
-            if (playback == null) return;
+    private void cachePlayer() {
+        ExoPlayback playback = manager.getPlayback();
+        if (playback == null) return;
 
-            // Make editor
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            SharedPreferences.Editor editor = prefs.edit();
+        // Make editor
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = prefs.edit();
 
-            // Cache current track
-            Track currentTrack = playback.getCurrentTrack();
-            if (currentTrack == null) return;
-            editor.putString("cachedCurrentTrack", currentTrack.json.toString());
+        // Cache current track
+        Track currentTrack = playback.getCurrentTrack();
+        if (currentTrack == null) return;
+        editor.putString("cachedCurrentTrack", currentTrack.json.toString());
 
-            // Cache current track position
-            Long currentPosition = playback.getPosition();
-            editor.putLong("cachedPosition", currentPosition);
+        // Cache current track position
+        Long currentPosition = playback.getPosition();
+        editor.putLong("cachedPosition", currentPosition);
 
-            // Cache queue
-            Set<String> set = new HashSet<>();
-            List<Track> tracks = playback.getQueue();
-            for(Track track : tracks) {
-                set.add(track.json.toString());
-            }
-            editor.putStringSet("cachedQueue", set);
-
-            // Cache options
-            Bundle options = manager.getMetadata().getOptionsBundle();
-            editor.putString("cachedOptions", bundleToJson(options).toString());
-
-            editor.apply();
+        // Cache queue
+        Set<String> set = new HashSet<>();
+        List<Track> tracks = playback.getQueue();
+        for(Track track : tracks) {
+            set.add(track.json.toString());
         }
+        editor.putStringSet("cachedQueue", set);
+
+        // Cache options
+        Bundle options = manager.getMetadata().getOptionsBundle();
+        editor.putString("cachedOptions", bundleToJson(options).toString());
+
+        editor.apply();
+
+        manager.destroy(intentToStop);
+        manager = null;
 
     }
 
@@ -261,11 +261,14 @@ public class MusicService extends HeadlessJsTaskService {
         super.onDestroy();
         if (manager != null) {
             if (!intentToStop) {
-               cachePlayer(manager);
+               cachePlayer();
+            } else {
+                manager.destroy(intentToStop);
+                manager = null;
             }
-            manager.destroy(intentToStop);
-            manager = null;
+
         }
+
     }
 
     @Override
