@@ -96,6 +96,10 @@ public class MusicManager implements OnAudioFocusChangeListener {
         }
 
         this.playback = playback;
+
+        if(this.playback != null) {
+            this.playback.initialize();
+        }
     }
 
     public ExoPlayback createLocalPlayback(Bundle options) {

@@ -38,9 +38,9 @@ public class ExoPlayback implements EventListener {
     private final Context context;
     private final MusicManager manager;
     private final SimpleExoPlayer player;
-    private final SimpleCache cache;
     private final long cacheMaxSize;
 
+    private SimpleCache cache;
     private ConcatenatingMediaSource source;
     private List<Track> queue = Collections.synchronizedList(new ArrayList<>());
 
@@ -54,7 +54,9 @@ public class ExoPlayback implements EventListener {
         this.manager = manager;
         this.player = player;
         this.cacheMaxSize = maxCacheSize;
+    }
 
+    public void initialize() {
         if(cacheMaxSize > 0) {
             File cacheDir = new File(context.getCacheDir(), "TrackPlayer");
             cache = new SimpleCache(cacheDir, new LeastRecentlyUsedCacheEvictor(cacheMaxSize));
@@ -267,6 +269,16 @@ public class ExoPlayback implements EventListener {
 
     public void destroy() {
         player.release();
+
+        if(cache != null) {
+            try {
+                cache.release();
+                cache = null;
+            } catch(Exception ex) {
+                // Couldn't write the cache
+                // We'll just ignore it for now
+            }
+        }
     }
 
     @Override
