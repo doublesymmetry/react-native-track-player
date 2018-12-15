@@ -284,9 +284,11 @@ public class MetadataManager {
     }
 
     private void updateNotification() {
-        if(!session.isActive()) return;
-
-        service.startForeground(1, builder.build());
+        if(session.isActive()) {
+            service.startForeground(1, builder.build());
+        } else {
+            service.stopForeground(true);
+        }
     }
 
     private int getIcon(Bundle options, String propertyName, int defaultIcon) {
