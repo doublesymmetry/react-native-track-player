@@ -1,6 +1,5 @@
 package com.guichaguri.trackplayer.service.metadata;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,7 +10,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Action;
-import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.app.NotificationCompat.MediaStyle;
@@ -41,7 +39,6 @@ public class MetadataManager {
     private final MusicManager manager;
     private final MediaSessionCompat session;
 
-    private boolean foreground = false;
     private int ratingType = RatingCompat.RATING_NONE;
     private int jumpInterval = 15;
     private long actions = 0;
@@ -273,41 +270,24 @@ public class MetadataManager {
         updateNotification();
     }
 
-    public void setForeground(boolean foreground, boolean active) {
-        this.foreground = foreground;
+    public void setActive(boolean active) {
         this.session.setActive(active);
 
-        if(foreground) {
-            updateNotification();
-        } else {
-            service.stopForeground(false);
-        }
+        updateNotification();
     }
 
     public void destroy() {
-        if(foreground) {
-            NotificationManagerCompat.from(service).cancel(1);
-        } else {
-            service.stopForeground(true);
-        }
+        service.stopForeground(true);
 
         session.setActive(false);
         session.release();
     }
 
     private void updateNotification() {
-        int state = manager.getPlayback().getState();
-        if (Utils.isStopped(state)) {
-            removeNotifications();
-            return;
-        }
-
-        Notification n = builder.build();
-
-        if(foreground) {
-            service.startForeground(1, n);
+        if(session.isActive()) {
+            service.startForeground(1, builder.build());
         } else {
-            NotificationManagerCompat.from(service).notify(1, n);
+            service.stopForeground(true);
         }
     }
 

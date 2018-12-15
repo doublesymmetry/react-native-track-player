@@ -2,6 +2,7 @@ package com.guichaguri.trackplayer.service.player;
 
 import android.content.Context;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 import com.facebook.react.bridge.Promise;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -37,9 +38,9 @@ public class ExoPlayback implements EventListener {
     private final Context context;
     private final MusicManager manager;
     private final SimpleExoPlayer player;
-    private final SimpleCache cache;
     private final long cacheMaxSize;
 
+    private SimpleCache cache;
     private ConcatenatingMediaSource source;
     private List<Track> queue = Collections.synchronizedList(new ArrayList<>());
 
@@ -53,7 +54,9 @@ public class ExoPlayback implements EventListener {
         this.manager = manager;
         this.player = player;
         this.cacheMaxSize = maxCacheSize;
+    }
 
+    public void initialize() {
         if(cacheMaxSize > 0) {
             File cacheDir = new File(context.getCacheDir(), "TrackPlayer");
             cache = new SimpleCache(cacheDir, new LeastRecentlyUsedCacheEvictor(cacheMaxSize));
@@ -196,10 +199,17 @@ public class ExoPlayback implements EventListener {
     }
 
     public void stop() {
+        lastKnownWindow = player.getCurrentWindowIndex();
+        lastKnownPosition = player.getCurrentPosition();
+
         player.stop(false);
+        player.seekTo(0);
     }
 
     public void reset() {
+        lastKnownWindow = player.getCurrentWindowIndex();
+        lastKnownPosition = player.getCurrentPosition();
+
         player.stop(true);
         resetQueue();
     }
@@ -221,6 +231,9 @@ public class ExoPlayback implements EventListener {
     }
 
     public void seekTo(long time) {
+        lastKnownWindow = player.getCurrentWindowIndex();
+        lastKnownPosition = player.getCurrentPosition();
+
         player.seekTo(time);
     }
 
@@ -256,17 +269,31 @@ public class ExoPlayback implements EventListener {
 
     public void destroy() {
         player.release();
+
+        if(cache != null) {
+            try {
+                cache.release();
+                cache = null;
+            } catch(Exception ex) {
+                // Couldn't write the cache
+                // We'll just ignore it for now
+            }
+        }
     }
 
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
+        Log.d(Utils.LOG, "onTimelineChanged: " + reason);
+
         if ((reason == Player.TIMELINE_CHANGE_REASON_PREPARED || reason == Player.TIMELINE_CHANGE_REASON_DYNAMIC) && !timeline.isEmpty()) {
-            onPositionDiscontinuity(Player.DISCONTINUITY_REASON_PERIOD_TRANSITION);
+            onPositionDiscontinuity(Player.DISCONTINUITY_REASON_INTERNAL);
         }
     }
 
     @Override
     public void onPositionDiscontinuity(int reason) {
+        Log.d(Utils.LOG, "onPositionDiscontinuity: " + reason);
+
         if(lastKnownWindow != player.getCurrentWindowIndex()) {
             Track previous = lastKnownWindow == C.INDEX_UNSET ? null : queue.get(lastKnownWindow);
             Track next = getCurrentTrack();
@@ -330,7 +357,17 @@ public class ExoPlayback implements EventListener {
 
     @Override
     public void onPlayerError(ExoPlaybackException error) {
-        manager.onError("exoplayer", error.getCause().getMessage());
+        String code;
+
+        if(error.type == ExoPlaybackException.TYPE_SOURCE) {
+            code = "playback-source";
+        } else if(error.type == ExoPlaybackException.TYPE_RENDERER) {
+            code = "playback-renderer";
+        } else {
+            code = "playback"; // Other unexpected errors related to the playback
+        }
+
+        manager.onError(code, error.getCause().getMessage());
     }
 
     @Override
