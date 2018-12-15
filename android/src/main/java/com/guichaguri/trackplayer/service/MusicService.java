@@ -2,6 +2,7 @@ package com.guichaguri.trackplayer.service;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.media.session.MediaButtonReceiver;
@@ -16,7 +17,8 @@ import javax.annotation.Nullable;
  */
 public class MusicService extends HeadlessJsTaskService {
 
-    private MusicManager manager;
+    MusicManager manager;
+    Handler handler;
 
     @Nullable
     @Override
@@ -38,6 +40,18 @@ public class MusicService extends HeadlessJsTaskService {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
+    public void destroy() {
+        if(handler != null) {
+            handler.removeMessages(0);
+            handler = null;
+        }
+
+        if(manager != null) {
+            manager.destroy();
+            manager = null;
+        }
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -56,6 +70,8 @@ public class MusicService extends HeadlessJsTaskService {
         }
 
         manager = new MusicManager(this);
+        handler = new Handler();
+
         super.onStartCommand(intent, flags, startId);
         return START_STICKY;
     }
@@ -64,10 +80,7 @@ public class MusicService extends HeadlessJsTaskService {
     public void onDestroy() {
         super.onDestroy();
 
-        if (manager != null) {
-            manager.destroy();
-            manager = null;
-        }
+        destroy();
     }
 
     @Override

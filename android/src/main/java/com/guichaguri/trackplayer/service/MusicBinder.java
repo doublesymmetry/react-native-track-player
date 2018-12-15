@@ -2,7 +2,6 @@ package com.guichaguri.trackplayer.service;
 
 import android.os.Binder;
 import android.os.Bundle;
-import android.os.Handler;
 import com.facebook.react.bridge.Promise;
 import com.guichaguri.trackplayer.service.player.ExoPlayback;
 
@@ -13,16 +12,14 @@ public class MusicBinder extends Binder {
 
     private final MusicService service;
     private final MusicManager manager;
-    private final Handler handler;
 
     public MusicBinder(MusicService service, MusicManager manager) {
         this.service = service;
         this.manager = manager;
-        this.handler = new Handler();
     }
 
     public void post(Runnable r) {
-        this.handler.post(r);
+        service.handler.post(r);
     }
 
     public ExoPlayback getPlayback() {
@@ -52,7 +49,7 @@ public class MusicBinder extends Binder {
     }
 
     public void destroy() {
-        handler.removeMessages(0);
+        service.destroy();
         service.stopSelf();
     }
 
