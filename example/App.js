@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
+import TrackPlayer from 'react-native-track-player';
 import { StackNavigator } from 'react-navigation';
+
+import PlayerStore from './react/stores/Player';
+import TrackStore from './react/stores/Track';
 
 import LandingScreen from './react/screens/LandingScreen';
 import PlaylistScreen from './react/screens/PlaylistScreen';
@@ -14,6 +18,22 @@ const RootStack = StackNavigator({
 }, { initialRouteName: 'Landing' })
 
 export default class App extends Component {
+
+  componentDidMount() {
+    TrackPlayer.addEventHandler('playback-track-changed', async (data) => {
+      if (data.nextTrack) {
+        const track = await TrackPlayer.getTrack(data.nextTrack);
+        TrackStore.title = track.title;
+        TrackStore.artist = track.artist;
+        TrackStore.artwork = track.artwork;
+      }
+    })
+
+    TrackPlayer.addEventHandler('playback-state', (data) => {
+      PlayerStore.playbackState = data.state;
+    })
+  }
+
   render() {
     return (
       <RootStack />
