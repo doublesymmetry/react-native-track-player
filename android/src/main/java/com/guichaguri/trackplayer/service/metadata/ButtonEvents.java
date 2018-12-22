@@ -8,6 +8,7 @@ import com.guichaguri.trackplayer.service.MusicManager;
 import com.guichaguri.trackplayer.service.MusicService;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.models.Track;
+import java.util.List;
 
 /**
  * @author Guichaguri
@@ -39,7 +40,9 @@ public class ButtonEvents extends MediaSessionCompat.Callback {
 
     @Override
     public void onSkipToQueueItem(long id) {
-        for(Track track : manager.getPlayback().getQueue()) {
+        List<Track> tracks = manager.getPlayback().getQueue();
+
+        for(Track track : tracks) {
             if(track.queueId != id) continue;
 
             Bundle bundle = new Bundle();

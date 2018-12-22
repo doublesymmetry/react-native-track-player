@@ -28,6 +28,7 @@ import com.guichaguri.trackplayer.module.MusicEvents;
 import com.guichaguri.trackplayer.service.metadata.MetadataManager;
 import com.guichaguri.trackplayer.service.models.Track;
 import com.guichaguri.trackplayer.service.player.ExoPlayback;
+import com.guichaguri.trackplayer.service.player.LocalPlayback;
 
 import static com.google.android.exoplayer2.DefaultLoadControl.*;
 
@@ -102,7 +103,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
         }
     }
 
-    public ExoPlayback createLocalPlayback(Bundle options) {
+    public LocalPlayback createLocalPlayback(Bundle options) {
         int minBuffer = (int)Utils.toMillis(options.getDouble("minBuffer", Utils.toSeconds(DEFAULT_MIN_BUFFER_MS)));
         int maxBuffer = (int)Utils.toMillis(options.getDouble("maxBuffer", Utils.toSeconds(DEFAULT_MAX_BUFFER_MS)));
         int playBuffer = (int)Utils.toMillis(options.getDouble("playBuffer", Utils.toSeconds(DEFAULT_BUFFER_FOR_PLAYBACK_MS)));
@@ -118,7 +119,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
         player.setAudioAttributes(new com.google.android.exoplayer2.audio.AudioAttributes.Builder()
                 .setContentType(C.CONTENT_TYPE_MUSIC).setUsage(C.USAGE_MEDIA).build());
 
-        return new ExoPlayback(service, this, player, cacheMaxSize);
+        return new LocalPlayback(service, this, player, cacheMaxSize);
     }
 
     @SuppressLint("WakelockTimeout")

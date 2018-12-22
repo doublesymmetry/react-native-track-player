@@ -9,22 +9,13 @@ import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Player.EventListener;
-import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.Timeline.Window;
-import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.cache.CacheDataSource;
-import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
-import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor;
-import com.google.android.exoplayer2.upstream.cache.SimpleCache;
 import com.guichaguri.trackplayer.service.MusicManager;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.models.Track;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,112 +24,40 @@ import java.util.List;
 /**
  * @author Guichaguri
  */
-public class ExoPlayback implements EventListener {
+public abstract class ExoPlayback<T extends Player> implements EventListener {
 
-    private final Context context;
-    private final MusicManager manager;
-    private final SimpleExoPlayer player;
-    private final long cacheMaxSize;
+    final Context context;
+    final MusicManager manager;
+    final T player;
 
-    private SimpleCache cache;
-    private ConcatenatingMediaSource source;
-    private List<Track> queue = Collections.synchronizedList(new ArrayList<>());
+    List<Track> queue = Collections.synchronizedList(new ArrayList<>());
 
     // https://github.com/google/ExoPlayer/issues/2728
-    private int lastKnownWindow = C.INDEX_UNSET;
-    private long lastKnownPosition = C.POSITION_UNSET;
-    private int previousState = PlaybackStateCompat.STATE_NONE;
+    int lastKnownWindow = C.INDEX_UNSET;
+    long lastKnownPosition = C.POSITION_UNSET;
+    int previousState = PlaybackStateCompat.STATE_NONE;
 
-    public ExoPlayback(Context context, MusicManager manager, SimpleExoPlayer player, long maxCacheSize) {
+    public ExoPlayback(Context context, MusicManager manager, T player) {
         this.context = context;
         this.manager = manager;
         this.player = player;
-        this.cacheMaxSize = maxCacheSize;
     }
 
     public void initialize() {
-        if(cacheMaxSize > 0) {
-            File cacheDir = new File(context.getCacheDir(), "TrackPlayer");
-            cache = new SimpleCache(cacheDir, new LeastRecentlyUsedCacheEvictor(cacheMaxSize));
-        } else {
-            cache = null;
-        }
-
         player.addListener(this);
-        resetQueue();
-    }
-
-    private void resetQueue() {
-        queue.clear();
-
-        source = new ConcatenatingMediaSource();
-        player.prepare(source);
-
-        lastKnownWindow = C.INDEX_UNSET;
-        lastKnownPosition = C.POSITION_UNSET;
-
-        manager.onReset();
-    }
-
-    public DataSource.Factory enableCaching(DataSource.Factory ds) {
-        if(cache == null || cacheMaxSize <= 0) return ds;
-
-        return new CacheDataSourceFactory(cache, ds, CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR, cacheMaxSize);
     }
 
     public List<Track> getQueue() {
         return queue;
     }
 
-    public void add(Track track, int index, Promise promise) {
-        queue.add(index, track);
-        source.addMediaSource(index, track.toMediaSource(context, this), Utils.toRunnable(promise));
+    public abstract void add(Track track, int index, Promise promise);
 
-        if (queue.size() == 1) {
-            player.prepare(source);
-        }
-    }
+    public abstract void add(Collection<Track> tracks, int index, Promise promise);
 
-    public void add(Collection<Track> tracks, int index, Promise promise) {
-        List<MediaSource> trackList = new ArrayList<>();
+    public abstract void remove(List<Integer> indexes, Promise promise);
 
-        for(Track track : tracks) {
-            trackList.add(track.toMediaSource(context, this));
-        }
-
-        queue.addAll(index, tracks);
-        source.addMediaSources(index, trackList, Utils.toRunnable(promise));
-
-        if (queue.size() == tracks.size()) {
-            player.prepare(source);
-        }
-    }
-
-    public void remove(List<Integer> indexes, Promise promise) {
-        Collections.sort(indexes);
-
-        for(int i = indexes.size() - 1; i >= 0; i--) {
-            int index = indexes.get(i);
-
-            queue.remove(index);
-
-            if(i == 0) {
-                source.removeMediaSource(index, Utils.toRunnable(promise));
-            } else {
-                source.removeMediaSource(index, null);
-            }
-        }
-    }
-
-    public void removeUpcomingTracks() {
-        int currentIndex = player.getCurrentWindowIndex();
-        if (currentIndex == C.INDEX_UNSET) return;
-
-        for (int i = queue.size() - 1; i > currentIndex; i--) {
-            queue.remove(i);
-            source.removeMediaSource(i, null);
-        }
-    }
+    public abstract void removeUpcomingTracks();
 
     public Track getCurrentTrack() {
         int index = player.getCurrentWindowIndex();
@@ -211,7 +130,6 @@ public class ExoPlayback implements EventListener {
         lastKnownPosition = player.getCurrentPosition();
 
         player.stop(true);
-        resetQueue();
     }
 
     public boolean isRemote() {
@@ -237,13 +155,9 @@ public class ExoPlayback implements EventListener {
         player.seekTo(time);
     }
 
-    public float getVolume() {
-        return player.getVolume();
-    }
+    public abstract float getVolume();
 
-    public void setVolume(float volume) {
-        player.setVolume(volume);
-    }
+    public abstract void setVolume(float volume);
 
     public float getRate() {
         return player.getPlaybackParameters().speed;
@@ -269,16 +183,6 @@ public class ExoPlayback implements EventListener {
 
     public void destroy() {
         player.release();
-
-        if(cache != null) {
-            try {
-                cache.release();
-                cache = null;
-            } catch(Exception ex) {
-                // Couldn't write the cache
-                // We'll just ignore it for now
-            }
-        }
     }
 
     @Override

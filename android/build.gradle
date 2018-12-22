@@ -61,27 +61,27 @@ dependencies {
     implementation 'com.facebook.react:react-native:+'
 
     // ExoPlayer Core
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.9.0'
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.9.2'
 
     // ExoPlayer DASH
     if (dash) {
-        implementation 'com.google.android.exoplayer:exoplayer-dash:2.9.0'
+        implementation 'com.google.android.exoplayer:exoplayer-dash:2.9.2'
     } else {
-        compileOnly 'com.google.android.exoplayer:exoplayer-dash:2.9.0'
+        compileOnly 'com.google.android.exoplayer:exoplayer-dash:2.9.2'
     }
 
     // ExoPlayer HLS
     if (hls) {
-        implementation 'com.google.android.exoplayer:exoplayer-hls:2.9.0'
+        implementation 'com.google.android.exoplayer:exoplayer-hls:2.9.2'
     } else {
-        compileOnly 'com.google.android.exoplayer:exoplayer-hls:2.9.0'
+        compileOnly 'com.google.android.exoplayer:exoplayer-hls:2.9.2'
     }
 
     // ExoPlayer SmoothStreaming
     if (smoothstreaming) {
-        implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.9.0'
+        implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.9.2'
     } else {
-        compileOnly 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.9.0'
+        compileOnly 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.9.2'
     }
 
     // Make sure we're using at least the support library 27.1.1
