@@ -20,7 +20,7 @@ const RootStack = StackNavigator({
 export default class App extends Component {
 
   componentDidMount() {
-    TrackPlayer.addEventHandler('playback-track-changed', async (data) => {
+    this._onTrackChanged = TrackPlayer.addEventListener('playback-track-changed', async (data) => {
       if (data.nextTrack) {
         const track = await TrackPlayer.getTrack(data.nextTrack);
         TrackStore.title = track.title;
@@ -29,9 +29,14 @@ export default class App extends Component {
       }
     })
 
-    TrackPlayer.addEventHandler('playback-state', (data) => {
+    this._onStateChanged = TrackPlayer.addEventListener('playback-state', (data) => {
       PlayerStore.playbackState = data.state;
     })
+  }
+
+  componentWillUnmount() {
+    this._onTrackChanged.remove()
+    this._onStateChanged.remove()
   }
 
   render() {
