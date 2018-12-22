@@ -57,6 +57,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
             }
         }
     };
+    private boolean receivingNoisyEvents = false;
 
     private boolean stopWithApp = false;
 
@@ -133,6 +134,11 @@ public class MusicManager implements OnAudioFocusChangeListener {
         if(!playback.isRemote()) {
             requestFocus();
 
+            if(!receivingNoisyEvents) {
+                service.registerReceiver(noisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
+                receivingNoisyEvents = true;
+            }
+
             if(!wakeLock.isHeld()) wakeLock.acquire();
 
             if(!Utils.isLocal(track.uri)) {
@@ -145,6 +151,12 @@ public class MusicManager implements OnAudioFocusChangeListener {
 
     public void onPause() {
         Log.d(Utils.LOG, "onPause");
+
+        // Unregisters the noisy receiver
+        if(receivingNoisyEvents) {
+            service.unregisterReceiver(noisyReceiver);
+            receivingNoisyEvents = false;
+        }
 
         // Release the wake and the wifi locks
         if(wakeLock.isHeld()) wakeLock.release();
@@ -259,10 +271,6 @@ public class MusicManager implements OnAudioFocusChangeListener {
         }
 
         hasAudioFocus = r == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
-
-        if(hasAudioFocus) {
-            service.registerReceiver(noisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
-        }
     }
 
     private void abandonFocus() {
@@ -282,10 +290,6 @@ public class MusicManager implements OnAudioFocusChangeListener {
         }
 
         hasAudioFocus = r != AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
-
-        if(!hasAudioFocus) {
-            service.unregisterReceiver(noisyReceiver);
-        }
     }
 
     public void destroy() {
@@ -293,6 +297,12 @@ public class MusicManager implements OnAudioFocusChangeListener {
 
         // Disable audio focus
         abandonFocus();
+
+        // Stop receiving audio becoming noisy events
+        if(receivingNoisyEvents) {
+            service.unregisterReceiver(noisyReceiver);
+            receivingNoisyEvents = false;
+        }
 
         // Release the playback resources
         if(playback != null) playback.destroy();
