@@ -181,8 +181,14 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
         final ArrayList bundleList = Arguments.toList(tracks);
 
         waitForConnection(() -> {
-            // TODO: reject if missing attributes (not valid Track object)
-            List<Track> trackList = Track.createTracks(getReactApplicationContext(), bundleList, binder.getRatingType());
+            List<Track> trackList;
+
+            try {
+                trackList = Track.createTracks(getReactApplicationContext(), bundleList, binder.getRatingType());
+            } catch(Exception ex) {
+                callback.reject("invalid_track_object", ex);
+                return;
+            }
 
             List<Track> queue = binder.getPlayback().getQueue();
             int index = -1;

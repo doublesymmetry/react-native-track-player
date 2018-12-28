@@ -56,6 +56,9 @@ public class Utils {
         if(obj instanceof String) {
             // Remote or Local Uri
 
+            if(((String)obj).trim().isEmpty())
+                throw new RuntimeException("The URL cannot be empty");
+
             return Uri.parse((String)obj);
 
         } else if(obj instanceof Bundle) {
