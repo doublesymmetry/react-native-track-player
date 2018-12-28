@@ -222,7 +222,6 @@ public class MetadataManager {
     public void updatePlayback(ExoPlayback playback) {
         int state = playback.getState();
         boolean playing = Utils.isPlaying(state);
-        MediaStyle style = new MediaStyle();
         List<Integer> compact = new ArrayList<>();
         builder.mActions.clear();
 
@@ -233,32 +232,43 @@ public class MetadataManager {
 
         if(playing) {
             addAction(pauseAction, PlaybackStateCompat.ACTION_PAUSE, compact);
-            style.setShowCancelButton(false);
         } else {
             addAction(playAction, PlaybackStateCompat.ACTION_PLAY, compact);
-
-            // Shows the cancel button on pre-lollipop versions due to a bug
-            style.setShowCancelButton(true);
-            style.setCancelButtonIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(service, PlaybackStateCompat.ACTION_STOP));
         }
 
         addAction(stopAction, PlaybackStateCompat.ACTION_STOP, compact);
         addAction(forwardAction, PlaybackStateCompat.ACTION_FAST_FORWARD, compact);
         addAction(nextAction, PlaybackStateCompat.ACTION_SKIP_TO_NEXT, compact);
 
-        // Links the media session
-        style.setMediaSession(session.getSessionToken());
+        // Prevent the media style from being used in older Huawei devices that don't support custom styles
+        if(!Build.MANUFACTURER.toLowerCase().contains("huawei") || Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
-        // Updates the compact media buttons for the notification
-        if(!compact.isEmpty()) {
-            int[] compactIndexes = new int[compact.size()];
+            MediaStyle style = new MediaStyle();
 
-            for(int i = 0; i < compact.size(); i++) compactIndexes[i] = compact.get(i);
+            if(playing) {
+                style.setShowCancelButton(false);
+            } else {
+                // Shows the cancel button on pre-lollipop versions due to a bug
+                style.setShowCancelButton(true);
+                style.setCancelButtonIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(service,
+                        PlaybackStateCompat.ACTION_STOP));
+            }
 
-            style.setShowActionsInCompactView(compactIndexes);
+            // Links the media session
+            style.setMediaSession(session.getSessionToken());
+
+            // Updates the compact media buttons for the notification
+            if (!compact.isEmpty()) {
+                int[] compactIndexes = new int[compact.size()];
+
+                for (int i = 0; i < compact.size(); i++) compactIndexes[i] = compact.get(i);
+
+                style.setShowActionsInCompactView(compactIndexes);
+            }
+
+            builder.setStyle(style);
+
         }
-
-        builder.setStyle(style);
 
         // Updates the media session state
         PlaybackStateCompat.Builder pb = new PlaybackStateCompat.Builder();
