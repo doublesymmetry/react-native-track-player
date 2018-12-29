@@ -1,6 +1,8 @@
 package com.guichaguri.trackplayer.service.metadata;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import com.guichaguri.trackplayer.module.MusicEvents;
@@ -36,6 +38,52 @@ public class ButtonEvents extends MediaSessionCompat.Callback {
     @Override
     public void onStop() {
         service.emit(MusicEvents.BUTTON_STOP, null);
+    }
+
+
+    @Override
+    public void onPlayFromMediaId(String mediaId, Bundle extras) {
+        Bundle bundle = new Bundle();
+        bundle.putString("id", mediaId);
+        service.emit(MusicEvents.BUTTON_PLAY_FROM_ID, bundle);
+    }
+
+    @SuppressLint("InlinedApi")
+    @Override
+    public void onPlayFromSearch(String query, Bundle extras) {
+        Bundle bundle = new Bundle();
+        bundle.putString("query", query);
+
+        if(extras.containsKey(MediaStore.EXTRA_MEDIA_FOCUS)) {
+            String focus = extras.getString(MediaStore.EXTRA_MEDIA_FOCUS);
+
+            if(MediaStore.Audio.Artists.ENTRY_CONTENT_TYPE.equals(focus)) {
+                focus = "artist";
+            } else if(MediaStore.Audio.Albums.ENTRY_CONTENT_TYPE.equals(focus)) {
+                focus = "album";
+            } else if(MediaStore.Audio.Playlists.ENTRY_CONTENT_TYPE.equals(focus)) {
+                focus = "playlist";
+            } else if(MediaStore.Audio.Genres.ENTRY_CONTENT_TYPE.equals(focus)) {
+                focus = "genre";
+            } else if(MediaStore.Audio.Media.ENTRY_CONTENT_TYPE.equals(focus)) {
+                focus = "title";
+            }
+
+            bundle.putString("focus", focus);
+        }
+
+        if(extras.containsKey(MediaStore.EXTRA_MEDIA_TITLE))
+            bundle.putString("title", extras.getString(MediaStore.EXTRA_MEDIA_TITLE));
+        if(extras.containsKey(MediaStore.EXTRA_MEDIA_ARTIST))
+            bundle.putString("artist", extras.getString(MediaStore.EXTRA_MEDIA_ARTIST));
+        if(extras.containsKey(MediaStore.EXTRA_MEDIA_ALBUM))
+            bundle.putString("album", extras.getString(MediaStore.EXTRA_MEDIA_ALBUM));
+        if(extras.containsKey(MediaStore.EXTRA_MEDIA_GENRE))
+            bundle.putString("genre", extras.getString(MediaStore.EXTRA_MEDIA_GENRE));
+        if(extras.containsKey(MediaStore.EXTRA_MEDIA_PLAYLIST))
+            bundle.putString("playlist", extras.getString(MediaStore.EXTRA_MEDIA_PLAYLIST));
+
+        service.emit(MusicEvents.BUTTON_PLAY_FROM_SEARCH, bundle);
     }
 
     @Override

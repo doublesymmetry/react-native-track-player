@@ -52,9 +52,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
     private BroadcastReceiver noisyReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent != null && AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
-                service.emit(MusicEvents.BUTTON_PAUSE, null);
-            }
+            service.emit(MusicEvents.BUTTON_PAUSE, null);
         }
     };
     private boolean receivingNoisyEvents = false;
