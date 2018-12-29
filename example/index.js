@@ -6,4 +6,4 @@ import PlayerStore, { playbackStates } from './react/stores/Player';
 import TrackStore from './react/stores/Track';
 
 AppRegistry.registerComponent('example', () => App);
-TrackPlayer.registerBackendService(() => require('./background'));
+TrackPlayer.registerPlaybackService(() => require('./service'));
