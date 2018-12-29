@@ -92,6 +92,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
 
     public void switchPlayback(ExoPlayback playback) {
         if(this.playback != null) {
+            this.playback.stop();
             this.playback.destroy();
         }
 
