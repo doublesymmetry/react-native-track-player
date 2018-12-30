@@ -167,7 +167,7 @@ namespace TrackPlayer.Players
 
         private void OnError(MediaPlayer sender, MediaPlayerFailedEventArgs args)
         {
-            loadCallback?.Reject("load", args.ErrorMessage);
+            loadCallback?.Reject("error", args.ErrorMessage);
             loadCallback = null;
 
             Debug.WriteLine(args.Error);

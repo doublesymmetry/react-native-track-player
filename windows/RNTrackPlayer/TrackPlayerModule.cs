@@ -200,17 +200,29 @@ namespace TrackPlayer
         }
 
         [ReactMethod]
-        public void getCurrentTrack(IPromise promise)
+        public void getQueue(IPromise promise)
         {
             var player = manager?.GetPlayer();
             if (Utils.CheckPlayback(player, promise)) return;
 
-            var id = player.GetCurrentTrack()?.Id;
+            var queue = player.GetQueue();
+            var array = new JArray();
+            
+            foreach(var track in queue)
+            {
+                array.Add(track.ToObject());
+            }
+            
+            promise.Resolve(array);
+        }
 
-            if (id != null)
-                promise.Resolve(id);
-            else
-                promise.Reject("track", "No track playing");
+        [ReactMethod]
+        public void getCurrentTrack(IPromise promise)
+        {
+            var player = manager?.GetPlayer();
+            if (Utils.CheckPlayback(player, promise)) return;
+            
+            promise.Resolve(player.GetCurrentTrack()?.Id);
         }
 
         [ReactMethod]
@@ -219,12 +231,7 @@ namespace TrackPlayer
             var player = manager?.GetPlayer();
             if (Utils.CheckPlayback(player, promise)) return;
 
-            var track = player.GetTrack(id)?.ToObject();
-
-            if (track != null)
-                promise.Resolve(track);
-            else
-                promise.Resolve(null);
+            promise.Resolve(player.GetTrack(id)?.ToObject());
         }
 
         [ReactMethod]

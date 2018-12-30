@@ -32,7 +32,7 @@ namespace TrackPlayer.Players
             if (queue.Count == 0)
             {
                 Reset();
-                promise.Reject("queue", "The queue is empty");
+                promise?.Reject("queue_exhausted", "The queue is empty");
                 return;
             }
             else if (index < 0)
@@ -71,6 +71,11 @@ namespace TrackPlayer.Players
         public Track GetTrack(string id)
         {
             return queue.Find(track => track.Id == id);
+        }
+
+        public List<Track> GetQueue()
+        {
+            return queue;
         }
 
         public void Add(List<Track> tracks, string insertBeforeId, IPromise promise)
@@ -153,7 +158,7 @@ namespace TrackPlayer.Players
             if (index >= 0)
                 UpdateCurrentTrack(index, promise);
             else
-                promise?.Reject("skip", "The track was not found");
+                promise?.Reject("track_not_in_queue", "Given track ID was not found in queue");
         }
 
         protected bool HasNext()
@@ -166,7 +171,7 @@ namespace TrackPlayer.Players
             if (HasNext())
                 UpdateCurrentTrack(currentTrack + 1, promise);
             else
-                promise?.Reject("skip", "There is no next tracks");
+                promise?.Reject("queue_exhausted", "There is no tracks left to play");
         }
 
         public void SkipToPrevious(IPromise promise)
@@ -174,7 +179,7 @@ namespace TrackPlayer.Players
             if (currentTrack > 0)
                 UpdateCurrentTrack(currentTrack - 1, promise);
             else
-                promise?.Reject("skip", "There is no previous tracks");
+                promise?.Reject("no_previous_track", "There is no previous tracks");
         }
 
         public abstract void SetVolume(double volume);

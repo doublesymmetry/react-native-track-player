@@ -15,6 +15,8 @@ namespace TrackPlayer.Logic
         public string Album { get; set; }
         public Uri Artwork { get; set; }
 
+        private JObject _originalObj;
+
         public Track(JObject data)
         {
             Id = (string)data.GetValue("id");
@@ -26,11 +28,13 @@ namespace TrackPlayer.Logic
             Artist = Utils.GetValue<string>(data, "artist", null);
             Album = Utils.GetValue<string>(data, "album", null);
             Artwork = Utils.GetUri(data, "artwork", null);
+
+            _originalObj = data;
         }
 
         public JObject ToObject()
         {
-            return JObject.FromObject(this);
+            return _originalObj;
         }
     }
 
