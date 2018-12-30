@@ -1,12 +1,7 @@
 using ReactNative.Bridge;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Windows.Media;
-using Windows.Media.Playback;
 using TrackPlayer.Logic;
 
 namespace TrackPlayer.Players
@@ -17,14 +12,14 @@ namespace TrackPlayer.Players
 
         protected List<Track> queue = new List<Track>();
         protected int currentTrack = -1;
-        protected MediaPlaybackState prevState = MediaPlaybackState.None;
+        protected PlaybackState prevState = PlaybackState.None;
 
         public Playback(MediaManager manager)
         {
             this.manager = manager;
         }
 
-        protected void UpdateState(MediaPlaybackState state)
+        protected void UpdateState(PlaybackState state)
         {
             if (prevState == state) return;
 
@@ -51,7 +46,7 @@ namespace TrackPlayer.Players
 
             Track previous = GetCurrentTrack();
             double position = GetPosition();
-            MediaPlaybackState oldState = GetState();
+            PlaybackState oldState = GetState();
 
             Debug.WriteLine("Updating current track...");
 
@@ -143,6 +138,14 @@ namespace TrackPlayer.Players
             manager.OnTrackUpdate(prev, pos, null, true);
         }
 
+        public void RemoveUpcomingTracks()
+        {
+            for (int i = queue.Count - 1; i > currentTrack; i--)
+            {
+                queue.RemoveAt(i);
+            }
+        }
+
         public void Skip(string id, IPromise promise)
         {
             int index = queue.FindIndex(track => track.Id == id);
@@ -190,10 +193,19 @@ namespace TrackPlayer.Players
 
         public abstract double GetDuration();
 
-        public abstract MediaPlaybackState GetState();
+        public abstract PlaybackState GetState();
 
         public abstract void Dispose();
 
+    }
+
+    public enum PlaybackState
+    {
+        None = 0,
+        Playing = 1,
+        Paused = 2,
+        Buffering = 3,
+        Stopped = 4
     }
 
 }

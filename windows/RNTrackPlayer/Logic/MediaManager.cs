@@ -1,15 +1,7 @@
 using Newtonsoft.Json.Linq;
 using ReactNative.Bridge;
 using ReactNative.Modules.Core;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.Media;
-using Windows.Media.Playback;
-using Windows.Media.Core;
 using TrackPlayer.Players;
 
 namespace TrackPlayer.Logic
@@ -18,23 +10,36 @@ namespace TrackPlayer.Logic
     {
         private ReactContext context;
         private Metadata metadata;
-
-        private JObject options;
+        
         private Playback player;
 
-        public MediaManager(ReactContext context, JObject options)
+        public MediaManager(ReactContext context)
         {
             this.context = context;
-            this.options = options;
-
-            this.player = new LocalPlayback(this, options);
+            
             this.metadata = new Metadata(this);
-            this.metadata.SetTransportControls(player.GetTransportControls());
         }
 
         public void SendEvent(string eventName, object data)
         {
             context.GetJavaScriptModule<RCTDeviceEventEmitter>().emit(eventName, data);
+        }
+
+        public void SwitchPlayback(Playback pb)
+        {
+            if (player != null)
+            {
+                player.Stop();
+                player.Dispose();
+            }
+
+            player = pb;
+            metadata.SetTransportControls(pb?.GetTransportControls());
+        }
+
+        public LocalPlayback CreateLocalPlayback(JObject options)
+        {
+            return new LocalPlayback(this, options);
         }
 
         public void UpdateOptions(JObject options)
@@ -57,12 +62,12 @@ namespace TrackPlayer.Logic
             SendEvent(Events.PlaybackQueueEnded, obj);
         }
 
-        public void OnStateChange(MediaPlaybackState state)
+        public void OnStateChange(PlaybackState state)
         {
             Debug.WriteLine("OnStateChange");
 
             JObject obj = new JObject();
-            obj.Add("state", (int)state);
+            obj.Add("state", (int) state);
             SendEvent(Events.PlaybackState, obj);
         }
 
@@ -82,12 +87,13 @@ namespace TrackPlayer.Logic
             }
         }
 
-        public void OnError(string error)
+        public void OnError(string code, string error)
         {
             Debug.WriteLine("OnError: " + error);
 
             JObject obj = new JObject();
-            obj.Add("error", error);
+            obj.Add("code", code);
+            obj.Add("message", error);
             SendEvent(Events.PlaybackError, obj);
         }
 
