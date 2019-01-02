@@ -64,8 +64,10 @@ public class MusicService extends HeadlessJsTaskService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null && Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())) {
-            MediaButtonReceiver.handleIntent(manager.getMetadata().getSession(), intent);
+        if(intent != null && Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())) {
+            if(manager != null) {
+                MediaButtonReceiver.handleIntent(manager.getMetadata().getSession(), intent);
+            }
             return START_NOT_STICKY;
         }
 
@@ -87,7 +89,7 @@ public class MusicService extends HeadlessJsTaskService {
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
 
-        if (manager.shouldStopWithApp()) {
+        if (manager == null || manager.shouldStopWithApp()) {
             stopSelf();
         }
     }
