@@ -1,8 +1,11 @@
 package com.guichaguri.trackplayer.service.player;
 
 import android.content.Context;
+import android.util.Log;
 import com.facebook.react.bridge.Promise;
 import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -29,6 +32,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
 
     private SimpleCache cache;
     private ConcatenatingMediaSource source;
+    private boolean prepared = false;
 
     public LocalPlayback(Context context, MusicManager manager, SimpleExoPlayer player, long maxCacheSize) {
         super(context, manager, player);
@@ -55,14 +59,20 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
         return new CacheDataSourceFactory(cache, ds, CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR, cacheMaxSize);
     }
 
+    private void prepare() {
+        if(!prepared) {
+            Log.d(Utils.LOG, "Preparing the media source...");
+            player.prepare(source, false, false);
+            prepared = true;
+        }
+    }
+
     @Override
     public void add(Track track, int index, Promise promise) {
         queue.add(index, track);
         source.addMediaSource(index, track.toMediaSource(context, this), Utils.toRunnable(promise));
 
-        if (queue.size() == 1) {
-            player.prepare(source);
-        }
+        prepare();
     }
 
     @Override
@@ -76,9 +86,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
         queue.addAll(index, tracks);
         source.addMediaSources(index, trackList, Utils.toRunnable(promise));
 
-        if (queue.size() == tracks.size()) {
-            player.prepare(source);
-        }
+        prepare();
     }
 
     @Override
@@ -113,12 +121,31 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
         queue.clear();
 
         source = new ConcatenatingMediaSource();
-        player.prepare(source);
+        player.prepare(source, true, true);
+        prepared = false; // We set it to false as the queue is now empty
 
         lastKnownWindow = C.INDEX_UNSET;
         lastKnownPosition = C.POSITION_UNSET;
 
         manager.onReset();
+    }
+
+    @Override
+    public void play() {
+        prepare();
+        super.play();
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        prepared = false;
+    }
+
+    @Override
+    public void seekTo(long time) {
+        prepare();
+        super.seekTo(time);
     }
 
     @Override
@@ -138,6 +165,21 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     }
 
     @Override
+    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+        if(playbackState == Player.STATE_ENDED) {
+            prepared = false;
+        }
+
+        super.onPlayerStateChanged(playWhenReady, playbackState);
+    }
+
+    @Override
+    public void onPlayerError(ExoPlaybackException error) {
+        prepared = false;
+        super.onPlayerError(error);
+    }
+
+    @Override
     public void destroy() {
         super.destroy();
 
@@ -146,8 +188,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
                 cache.release();
                 cache = null;
             } catch(Exception ex) {
-                // Couldn't write the cache
-                // We'll just ignore it for now
+                Log.w(Utils.LOG, "Couldn't release the cache properly", ex);
             }
         }
     }
