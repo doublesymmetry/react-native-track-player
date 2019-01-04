@@ -132,6 +132,14 @@ public class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
         print("Destroying player")
     }
     
+    @objc(updateMetadata:)
+    public func updateMetadata(_ item: [String: Any]) {
+        guard let track = Track(dictionary: item) else {
+            return
+        }
+        mediaWrapper.updateMetadata(track)
+    }
+    
     @objc(updateOptions:resolver:rejecter:)
     public func update(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         let remoteCenter = MPRemoteCommandCenter.shared()

@@ -4,8 +4,9 @@ import android.os.Binder;
 import android.os.Bundle;
 import com.facebook.react.bridge.Promise;
 import com.guichaguri.trackplayer.service.player.ExoPlayback;
-
+import com.guichaguri.trackplayer.service.models.Track;
 import com.guichaguri.trackplayer.service.player.IcyStreamUpdate;
+
 /**
  * @author Guichaguri
  */
@@ -53,6 +54,10 @@ public class MusicBinder extends Binder {
 
     public int getRatingType() {
         return manager.getMetadata().getRatingType();
+    }
+    
+    public void updateMetadata(Track track) {
+        manager.updateMetadata(track);
     }
 
     public void destroy() {

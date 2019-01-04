@@ -112,6 +112,14 @@ class MediaWrapper: AudioPlayerDelegate {
         }
     }
     
+    func updateMetadata(_ item: Track, duration: Int) {
+        MPNowPlayingInfoCenter.default().ap_update(
+            with: item,
+            duration: duration,
+            progression: 0,
+            playbackRate: 1)
+    }
+
     func removeTracks(ids: [String]) {
         var actionAfterRemovals = "none"
         for id in ids {

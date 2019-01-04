@@ -10,7 +10,7 @@ import Foundation
 import MediaPlayer
 import AVFoundation
 
-class Track: NSObject {
+public class Track: NSObject {
     let id: String
     let url: MediaURL
     dynamic let title: String
@@ -22,6 +22,7 @@ class Track: NSObject {
     let pitchAlgorithm: String?
     let duration: Double?
     let artworkURL: MediaURL?
+    let icymetadata: Bool?
     var skipped: Bool = false
     dynamic let album: String?
     dynamic var artwork: MPMediaItemArtwork?
@@ -47,6 +48,7 @@ class Track: NSObject {
         self.pitchAlgorithm = dictionary["pitchAlgorithm"] as? String
         self.duration = dictionary["duration"] as? Double
         self.artworkURL = MediaURL(object: dictionary["artwork"])
+        self.icymetadata = dictionary["icymetadata"] as? Bool
         
         self.originalObject = dictionary
     }
