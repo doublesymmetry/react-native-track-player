@@ -1,7 +1,10 @@
 package com.guichaguri.trackplayer.service;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
@@ -25,6 +28,7 @@ import com.guichaguri.trackplayer.module.MusicEvents;
 import com.guichaguri.trackplayer.service.metadata.MetadataManager;
 import com.guichaguri.trackplayer.service.models.Track;
 import com.guichaguri.trackplayer.service.player.ExoPlayback;
+import com.guichaguri.trackplayer.service.player.LocalPlayback;
 
 import static com.google.android.exoplayer2.DefaultLoadControl.*;
 
@@ -44,6 +48,15 @@ public class MusicManager implements OnAudioFocusChangeListener {
     @RequiresApi(26)
     private AudioFocusRequest focus = null;
     private boolean hasAudioFocus = false;
+
+    private BroadcastReceiver noisyReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            service.emit(MusicEvents.BUTTON_PAUSE, null);
+        }
+    };
+    private boolean receivingNoisyEvents = false;
+
     private boolean stopWithApp = false;
 
     @SuppressLint("InvalidWakeLockTag")
@@ -79,13 +92,18 @@ public class MusicManager implements OnAudioFocusChangeListener {
 
     public void switchPlayback(ExoPlayback playback) {
         if(this.playback != null) {
+            this.playback.stop(false);
             this.playback.destroy();
         }
 
         this.playback = playback;
+
+        if(this.playback != null) {
+            this.playback.initialize();
+        }
     }
 
-    public ExoPlayback createLocalPlayback(Bundle options) {
+    public LocalPlayback createLocalPlayback(Bundle options) {
         int minBuffer = (int)Utils.toMillis(options.getDouble("minBuffer", Utils.toSeconds(DEFAULT_MIN_BUFFER_MS)));
         int maxBuffer = (int)Utils.toMillis(options.getDouble("maxBuffer", Utils.toSeconds(DEFAULT_MAX_BUFFER_MS)));
         int playBuffer = (int)Utils.toMillis(options.getDouble("playBuffer", Utils.toSeconds(DEFAULT_BUFFER_FOR_PLAYBACK_MS)));
@@ -101,9 +119,10 @@ public class MusicManager implements OnAudioFocusChangeListener {
         player.setAudioAttributes(new com.google.android.exoplayer2.audio.AudioAttributes.Builder()
                 .setContentType(C.CONTENT_TYPE_MUSIC).setUsage(C.USAGE_MEDIA).build());
 
-        return new ExoPlayback(service, this, player, cacheMaxSize);
+        return new LocalPlayback(service, this, player, cacheMaxSize);
     }
 
+    @SuppressLint("WakelockTimeout")
     public void onPlay() {
         Log.d(Utils.LOG, "onPlay");
         if(playback == null) return;
@@ -114,29 +133,35 @@ public class MusicManager implements OnAudioFocusChangeListener {
         if(!playback.isRemote()) {
             requestFocus();
 
-            if(!wakeLock.isHeld()) {
-                long timeout = playback.getDuration() - playback.getPosition();
-                wakeLock.acquire(timeout <= 0 ? (5 * 60 * 1000) : (timeout + 5000));
+            if(!receivingNoisyEvents) {
+                service.registerReceiver(noisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
+                receivingNoisyEvents = true;
             }
+
+            if(!wakeLock.isHeld()) wakeLock.acquire();
 
             if(!Utils.isLocal(track.uri)) {
                 if(!wifiLock.isHeld()) wifiLock.acquire();
             }
         }
 
-        metadata.setForeground(true, true);
+        metadata.setActive(true);
     }
 
     public void onPause() {
         Log.d(Utils.LOG, "onPause");
 
+        // Unregisters the noisy receiver
+        if(receivingNoisyEvents) {
+            service.unregisterReceiver(noisyReceiver);
+            receivingNoisyEvents = false;
+        }
+
         // Release the wake and the wifi locks
         if(wakeLock.isHeld()) wakeLock.release();
         if(wifiLock.isHeld()) wifiLock.release();
 
-        abandonFocus();
-
-        metadata.setForeground(false, true);
+        metadata.setActive(true);
     }
 
     public void onStop() {
@@ -148,7 +173,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
 
         abandonFocus();
 
-        metadata.setForeground(false, false);
+        metadata.setActive(false);
     }
 
     public void onStateChange(int state) {
@@ -272,6 +297,12 @@ public class MusicManager implements OnAudioFocusChangeListener {
 
         // Disable audio focus
         abandonFocus();
+
+        // Stop receiving audio becoming noisy events
+        if(receivingNoisyEvents) {
+            service.unregisterReceiver(noisyReceiver);
+            receivingNoisyEvents = false;
+        }
 
         // Release the playback resources
         if(playback != null) playback.destroy();

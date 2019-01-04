@@ -2,6 +2,7 @@ package com.guichaguri.trackplayer.service;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.media.session.MediaButtonReceiver;
@@ -16,7 +17,8 @@ import javax.annotation.Nullable;
  */
 public class MusicService extends HeadlessJsTaskService {
 
-    private MusicManager manager;
+    MusicManager manager;
+    Handler handler;
 
     @Nullable
     @Override
@@ -38,11 +40,23 @@ public class MusicService extends HeadlessJsTaskService {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
+    public void destroy() {
+        if(handler != null) {
+            handler.removeMessages(0);
+            handler = null;
+        }
+
+        if(manager != null) {
+            manager.destroy();
+            manager = null;
+        }
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         if(Utils.CONNECT_INTENT.equals(intent.getAction())) {
-            return new MusicBinder(manager);
+            return new MusicBinder(this, manager);
         }
 
         return super.onBind(intent);
@@ -50,12 +64,16 @@ public class MusicService extends HeadlessJsTaskService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null && Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())) {
-            MediaButtonReceiver.handleIntent(manager.getMetadata().getSession(), intent);
+        if(intent != null && Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())) {
+            if(manager != null) {
+                MediaButtonReceiver.handleIntent(manager.getMetadata().getSession(), intent);
+            }
             return START_NOT_STICKY;
         }
 
         manager = new MusicManager(this);
+        handler = new Handler();
+
         super.onStartCommand(intent, flags, startId);
         return START_STICKY;
     }
@@ -64,15 +82,14 @@ public class MusicService extends HeadlessJsTaskService {
     public void onDestroy() {
         super.onDestroy();
 
-        manager.destroy();
-        manager = null;
+        destroy();
     }
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
 
-        if (manager.shouldStopWithApp()) {
+        if (manager == null || manager.shouldStopWithApp()) {
             stopSelf();
         }
     }

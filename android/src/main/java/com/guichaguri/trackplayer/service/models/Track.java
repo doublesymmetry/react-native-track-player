@@ -14,18 +14,12 @@ import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
-import com.google.android.exoplayer2.upstream.cache.Cache;
-import com.google.android.exoplayer2.upstream.cache.CacheDataSource;
-import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
+import com.google.android.exoplayer2.upstream.*;
 import com.google.android.exoplayer2.util.Util;
 import com.guichaguri.trackplayer.service.Utils;
-import com.guichaguri.trackplayer.service.metadata.SimpleCacheManager;
+import com.guichaguri.trackplayer.service.player.LocalPlayback;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +46,7 @@ public class Track {
 
     public String id;
     public Uri uri;
+    public int resourceId;
 
     public TrackType type = TrackType.DEFAULT;
 
@@ -73,7 +68,14 @@ public class Track {
 
     public Track(Context context, Bundle bundle, int ratingType) {
         id = bundle.getString("id");
-        uri = Utils.getUri(context, bundle, "url");
+
+        resourceId = Utils.getRawResourceId(context, bundle, "url");
+
+        if(resourceId == 0) {
+            uri = Utils.getUri(context, bundle, "url");
+        } else {
+            uri = RawResourceDataSource.buildRawResourceUri(resourceId);
+        }
 
         String trackType = bundle.getString("type", "default");
 
@@ -136,14 +138,30 @@ public class Track {
         return new QueueItem(descr, queueId);
     }
 
-    public MediaSource toMediaSource(Context ctx, long cacheMaxSize) {
+    public MediaSource toMediaSource(Context ctx, LocalPlayback playback) {
         // Updates the user agent if not set
         if(userAgent == null || !userAgent.isEmpty())
             userAgent = Util.getUserAgent(ctx, "react-native-track-player");
 
         DataSource.Factory ds;
 
-        if (Utils.isLocal(uri)) {
+        if(resourceId != 0) {
+
+            try {
+                RawResourceDataSource raw = new RawResourceDataSource(ctx);
+                raw.open(new DataSpec(uri));
+                ds = new DataSource.Factory() {
+                    @Override
+                    public DataSource createDataSource() {
+                        return raw;
+                    }
+                };
+            } catch(IOException ex) {
+                // Should never happen
+                throw new RuntimeException(ex);
+            }
+
+        } else if(Utils.isLocal(uri)) {
 
             // Creates a local source factory
             ds = new DefaultDataSourceFactory(ctx, userAgent);
@@ -158,12 +176,7 @@ public class Track {
                     true
             );
 
-            if(cacheMaxSize > 0) {
-                // Enable caching
-                File cacheDir = new File(ctx.getCacheDir(), "TrackPlayer");
-                Cache cache = SimpleCacheManager.INSTANCE.getCache(cacheDir, cacheMaxSize);
-                ds = new CacheDataSourceFactory(cache, ds, CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR, cacheMaxSize);
-            }
+            ds = playback.enableCaching(ds);
 
         }
 

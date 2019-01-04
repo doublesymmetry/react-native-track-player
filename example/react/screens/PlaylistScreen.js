@@ -23,6 +23,11 @@ export default class LandingScreen extends Component {
         TrackPlayer.CAPABILITY_PAUSE,
         TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
         TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
+        TrackPlayer.CAPABILITY_STOP
+      ],
+      compactCapabilities: [
+        TrackPlayer.CAPABILITY_PLAY,
+        TrackPlayer.CAPABILITY_PAUSE
       ]
     });
   }
@@ -54,6 +59,16 @@ export default class LandingScreen extends Component {
     } catch (_) {}
   }
 
+  getStateName(state) {
+    switch (state) {
+      case TrackPlayer.STATE_NONE: return 'None'
+      case TrackPlayer.STATE_PLAYING: return 'Playing'
+      case TrackPlayer.STATE_PAUSED: return 'Paused'
+      case TrackPlayer.STATE_STOPPED: return 'Stopped'
+      case TrackPlayer.STATE_BUFFERING: return 'Buffering'
+    }
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -67,7 +82,7 @@ export default class LandingScreen extends Component {
           onPrevious={() => this.skipToPrevious()}
           onTogglePlayback={() => this.togglePlayback()}
         />
-        <Text style={styles.state}>{PlayerStore.playbackState}</Text>
+        <Text style={styles.state}>{this.getStateName(PlayerStore.playbackState)}</Text>
       </View>
     );
   }

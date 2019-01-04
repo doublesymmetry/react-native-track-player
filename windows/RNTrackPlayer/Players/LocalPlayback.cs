@@ -1,11 +1,7 @@
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using ReactNative.Bridge;
-using System.Text;
-using System.Threading.Tasks;
 using Windows.Media;
 using Windows.Media.Playback;
 using Windows.Media.Core;
@@ -13,7 +9,7 @@ using TrackPlayer.Logic;
 
 namespace TrackPlayer.Players
 {
-    class LocalPlayback : Playback
+    public class LocalPlayback : Playback
     {
         private MediaPlayer player;
 
@@ -49,7 +45,6 @@ namespace TrackPlayer.Players
             loadCallback = promise;
 
             player.Source = MediaSource.CreateFromUri(track.Url);
-            // TODO: check whether adaptive streaming works without "CreateFromAdaptiveMediaSource"
         }
 
         public override void Play()
@@ -129,16 +124,22 @@ namespace TrackPlayer.Players
             return duration;
         }
 
-        public override MediaPlaybackState GetState()
+        public override PlaybackState GetState()
         {
             MediaPlaybackState state = player.PlaybackSession.PlaybackState;
 
-            if (ended && Utils.IsPaused(state))
-            {
-                state = MediaPlaybackState.None;
-            }
+            if (ended && (state == MediaPlaybackState.Paused || state == MediaPlaybackState.None))
+                return PlaybackState.Stopped;
+            else if (state == MediaPlaybackState.Opening || state == MediaPlaybackState.Buffering)
+                return PlaybackState.Buffering;
+            else if (state == MediaPlaybackState.None)
+                return PlaybackState.None;
+            else if (state == MediaPlaybackState.Paused)
+                return PlaybackState.Paused;
+            else if (state == MediaPlaybackState.Playing)
+                return PlaybackState.Playing;
 
-            return Utils.GetState(state);
+            return PlaybackState.None;
         }
 
         public override void Dispose()
@@ -166,14 +167,20 @@ namespace TrackPlayer.Players
 
         private void OnError(MediaPlayer sender, MediaPlayerFailedEventArgs args)
         {
-            loadCallback?.Reject("load", args.ErrorMessage);
+            loadCallback?.Reject("error", args.ErrorMessage);
             loadCallback = null;
 
             Debug.WriteLine(args.Error);
             Debug.WriteLine(args.ErrorMessage);
-            Debug.WriteLine(args.ExtendedErrorCode);
 
-            manager.OnError(args.ErrorMessage);
+            string code = "playback";
+
+            if (args.Error == MediaPlayerError.DecodingError || args.Error == MediaPlayerError.SourceNotSupported)
+                code = "playback-renderer";
+            else if (args.Error == MediaPlayerError.NetworkError)
+                code = "playback-source";
+
+            manager.OnError(code, args.ErrorMessage);
         }
 
         private void OnLoad(MediaPlayer sender, object args)

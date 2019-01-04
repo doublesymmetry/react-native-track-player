@@ -1,12 +1,7 @@
 using ReactNative.Bridge;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Windows.Media;
-using Windows.Media.Playback;
 using TrackPlayer.Logic;
 
 namespace TrackPlayer.Players
@@ -17,14 +12,14 @@ namespace TrackPlayer.Players
 
         protected List<Track> queue = new List<Track>();
         protected int currentTrack = -1;
-        protected MediaPlaybackState prevState = MediaPlaybackState.None;
+        protected PlaybackState prevState = PlaybackState.None;
 
         public Playback(MediaManager manager)
         {
             this.manager = manager;
         }
 
-        protected void UpdateState(MediaPlaybackState state)
+        protected void UpdateState(PlaybackState state)
         {
             if (prevState == state) return;
 
@@ -37,7 +32,7 @@ namespace TrackPlayer.Players
             if (queue.Count == 0)
             {
                 Reset();
-                promise.Reject("queue", "The queue is empty");
+                promise?.Reject("queue_exhausted", "The queue is empty");
                 return;
             }
             else if (index < 0)
@@ -51,7 +46,7 @@ namespace TrackPlayer.Players
 
             Track previous = GetCurrentTrack();
             double position = GetPosition();
-            MediaPlaybackState oldState = GetState();
+            PlaybackState oldState = GetState();
 
             Debug.WriteLine("Updating current track...");
 
@@ -76,6 +71,11 @@ namespace TrackPlayer.Players
         public Track GetTrack(string id)
         {
             return queue.Find(track => track.Id == id);
+        }
+
+        public List<Track> GetQueue()
+        {
+            return queue;
         }
 
         public void Add(List<Track> tracks, string insertBeforeId, IPromise promise)
@@ -143,6 +143,14 @@ namespace TrackPlayer.Players
             manager.OnTrackUpdate(prev, pos, null, true);
         }
 
+        public void RemoveUpcomingTracks()
+        {
+            for (int i = queue.Count - 1; i > currentTrack; i--)
+            {
+                queue.RemoveAt(i);
+            }
+        }
+
         public void Skip(string id, IPromise promise)
         {
             int index = queue.FindIndex(track => track.Id == id);
@@ -150,7 +158,7 @@ namespace TrackPlayer.Players
             if (index >= 0)
                 UpdateCurrentTrack(index, promise);
             else
-                promise?.Reject("skip", "The track was not found");
+                promise?.Reject("track_not_in_queue", "Given track ID was not found in queue");
         }
 
         protected bool HasNext()
@@ -163,7 +171,7 @@ namespace TrackPlayer.Players
             if (HasNext())
                 UpdateCurrentTrack(currentTrack + 1, promise);
             else
-                promise?.Reject("skip", "There is no next tracks");
+                promise?.Reject("queue_exhausted", "There is no tracks left to play");
         }
 
         public void SkipToPrevious(IPromise promise)
@@ -171,7 +179,7 @@ namespace TrackPlayer.Players
             if (currentTrack > 0)
                 UpdateCurrentTrack(currentTrack - 1, promise);
             else
-                promise?.Reject("skip", "There is no previous tracks");
+                promise?.Reject("no_previous_track", "There is no previous tracks");
         }
 
         public abstract void SetVolume(double volume);
@@ -190,10 +198,19 @@ namespace TrackPlayer.Players
 
         public abstract double GetDuration();
 
-        public abstract MediaPlaybackState GetState();
+        public abstract PlaybackState GetState();
 
         public abstract void Dispose();
 
+    }
+
+    public enum PlaybackState
+    {
+        None = 0,
+        Playing = 1,
+        Paused = 2,
+        Buffering = 3,
+        Stopped = 4
     }
 
 }
