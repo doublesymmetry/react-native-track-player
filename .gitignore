@@ -12,12 +12,15 @@ yarn.lock
 
 android/.gradle/
 android/.idea/
+android/.settings/
 android/build/
 android/gradle/
 android/captures/
 android/local.properties
 gradle.properties
 android/*.iml
+android/.project
+android/.classpath
 
 # Windows
 
