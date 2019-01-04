@@ -5,6 +5,7 @@ import android.os.Bundle;
 import com.facebook.react.bridge.Promise;
 import com.guichaguri.trackplayer.service.player.ExoPlayback;
 
+import com.guichaguri.trackplayer.service.player.IcyStreamUpdate;
 /**
  * @author Guichaguri
  */
@@ -16,6 +17,8 @@ public class MusicBinder extends Binder {
     public MusicBinder(MusicService service, MusicManager manager) {
         this.service = service;
         this.manager = manager;
+        
+        IcyStreamUpdate.setService(service);
     }
 
     public void post(Runnable r) {

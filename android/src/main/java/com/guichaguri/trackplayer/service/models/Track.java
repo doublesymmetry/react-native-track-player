@@ -19,9 +19,18 @@ import com.google.android.exoplayer2.util.Util;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.player.LocalPlayback;
 
+// Icy metadata
+import android.util.Log;
+import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Call;
+import saschpe.exoplayer2.ext.icy.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import com.guichaguri.trackplayer.service.player.IcyStreamUpdate;
 
 import static android.support.v4.media.MediaMetadataCompat.*;
 
@@ -51,8 +60,8 @@ public class Track {
     public TrackType type = TrackType.DEFAULT;
 
     public String userAgent;
-
     public Uri artwork;
+    public Boolean icymetadata;
 
     public String title;
     public String artist;
@@ -88,6 +97,7 @@ public class Track {
 
         userAgent = bundle.getString("userAgent");
         artwork = Utils.getUri(context, bundle, "artwork");
+        icymetadata = bundle.getBoolean("icymetadata");
 
         title = bundle.getString("title");
         artist = bundle.getString("artist");
@@ -166,8 +176,16 @@ public class Track {
             // Creates a local source factory
             ds = new DefaultDataSourceFactory(ctx, userAgent);
 
+        } else if ( icymetadata ) {
+            OkHttpClient client = new OkHttpClient.Builder().build();
+            IcyHttpDataSourceFactory icyDataSource = new IcyHttpDataSourceFactory.Builder(client)
+                            .setUserAgent(userAgent)
+                            .setIcyHeadersListener(IcyStreamUpdate.HeaderUpdate)
+                            .setIcyMetadataChangeListener(IcyStreamUpdate.MetaDataUpdate)
+                            .build();
+            ds = new DefaultDataSourceFactory(ctx, null, icyDataSource);
+            ds = playback.enableCaching(ds);
         } else {
-
             // Creates a default http source factory, enabling cross protocol redirects
             ds = new DefaultHttpDataSourceFactory(
                     userAgent, null,
@@ -175,10 +193,9 @@ public class Track {
                     DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS,
                     true
             );
-
             ds = playback.enableCaching(ds);
-
         }
+
 
         switch(type) {
             case DASH:
@@ -195,4 +212,5 @@ public class Track {
                         .createMediaSource(uri);
         }
     }
+    
 }
