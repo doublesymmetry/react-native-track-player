@@ -12,7 +12,7 @@ yarn.lock
 
 android/.gradle/
 android/.idea/
-android/.settings/
+android/.settings
 android/build/
 android/gradle/
 android/captures/
