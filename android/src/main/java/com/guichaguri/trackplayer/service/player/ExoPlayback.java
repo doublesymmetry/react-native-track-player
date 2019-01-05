@@ -16,6 +16,7 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.guichaguri.trackplayer.service.MusicManager;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.models.Track;
+import saschpe.exoplayer2.ext.icy.IcyHttpDataSource.IcyMetadataListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -284,5 +285,9 @@ public abstract class ExoPlayback<T extends Player> implements EventListener {
     @Override
     public void onSeekProcessed() {
         // Finished seeking
+    }
+   
+    public IcyMetadataListener onIcyMetadaUpdate(){
+        return manager.onIcyMetadaUpdate();
     }
 }

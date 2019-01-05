@@ -23,7 +23,12 @@ public enum TrackType {
     /**
      * The SmoothStreaming media type for adaptive streams. Should be used with SmoothStreaming manifests
      */
-    SMOOTH_STREAMING("smoothstreaming");
+    SMOOTH_STREAMING("smoothstreaming"),
+    
+    /**
+     * The Icy midia type. Should be used for streams over HTTP (Icecast/Shoutcast)
+     */
+    ICY("ICY");
 
 
     public final String name;

@@ -36,6 +36,9 @@ public class MusicEvents extends BroadcastReceiver {
     public static final String PLAYBACK_ERROR = "playback-error";
     public static final String PLAYBACK_UNBIND = "playback-unbind";
 
+    // Icy Metadata Events
+    public static final String ICY_UPDATE = "icy-update";
+
     private final ReactContext reactContext;
 
     public MusicEvents(ReactContext reactContext) {

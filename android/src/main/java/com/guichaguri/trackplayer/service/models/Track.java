@@ -19,6 +19,9 @@ import com.google.android.exoplayer2.util.Util;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.player.LocalPlayback;
 
+import saschpe.exoplayer2.ext.icy.IcyHttpDataSourceFactory;
+import okhttp3.OkHttpClient;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -165,6 +168,20 @@ public class Track {
 
             // Creates a local source factory
             ds = new DefaultDataSourceFactory(ctx, userAgent);
+
+        } else if(type == TrackType.ICY) {
+
+            // Create a streaming HTTP source factory, enabling icy-metadata
+            OkHttpClient client = new OkHttpClient.Builder().build();
+            IcyHttpDataSourceFactory icyDataSource = new IcyHttpDataSourceFactory
+                    .Builder(client)
+                    .setUserAgent(userAgent)
+                    .setIcyMetadataChangeListener(playback.onIcyMetadaUpdate())
+                    .build();
+
+            ds = new DefaultDataSourceFactory(ctx, null, icyDataSource);
+
+            ds = playback.enableCaching(ds);
 
         } else {
 
