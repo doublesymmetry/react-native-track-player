@@ -52,3 +52,9 @@ xcuserdata/
 *.dSYM
 example/ios/Pods
 /ios/RNTrackPlayer.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+
+
+## Visual Code Project
+*.settings
+*.classpath
+*.project
