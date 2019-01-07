@@ -181,7 +181,7 @@ public class Track {
             ds = new IcyHttpDataSourceFactory.Builder(OkHttpClientProvider.getOkHttpClient())
                     .setUserAgent(userAgent)
                     .setIcyMetadataChangeListener(listener)
-                    .setIcyMetadataChangeListener(listener)
+                    .setIcyHeadersListener(listener)
                     .build();
 
             ds = new DefaultDataSourceFactory(ctx, null, ds);
