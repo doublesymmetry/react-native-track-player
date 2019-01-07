@@ -12,7 +12,7 @@ buildscript {
 
 apply plugin: 'com.android.library'
 
-boolean dash = false, hls = false, smoothstreaming = false, icymetadata = false
+boolean dash = false, hls = false, smoothstreaming = false, icy = false
 
 File file = file('../../../track-player.json')
 if(file.exists()) {
@@ -20,7 +20,7 @@ if(file.exists()) {
     dash = json.dash ?: dash
     hls = json.hls ?: hls
     smoothstreaming = json.smoothstreaming ?: smoothstreaming
-    icymetadata = json.icymetadata ?: icymetadata
+    icy = json.icy ?: icy
 }
 
 android {
@@ -85,8 +85,8 @@ dependencies {
         compileOnly 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.9.2'
     }
     
-    // ExoPlayer IcyMetaData
-    if(icymetadata) {
+    // ExoPlayer Icy Extension
+    if (icy) {
         implementation 'saschpe.android:exoplayer2-ext-icy:2.1.0'
     } else {
         compileOnly 'saschpe.android:exoplayer2-ext-icy:2.1.0'

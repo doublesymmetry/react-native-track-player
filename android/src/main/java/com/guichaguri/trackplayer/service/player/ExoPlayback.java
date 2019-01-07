@@ -14,6 +14,7 @@ import com.google.android.exoplayer2.Timeline.Window;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.guichaguri.trackplayer.service.MusicManager;
+import com.guichaguri.trackplayer.service.MusicService;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.models.Track;
 import saschpe.exoplayer2.ext.icy.IcyHttpDataSource.IcyMetadataListener;
@@ -27,7 +28,7 @@ import java.util.List;
  */
 public abstract class ExoPlayback<T extends Player> implements EventListener {
 
-    protected final Context context;
+    protected final MusicService context;
     protected final MusicManager manager;
     protected final T player;
 
@@ -38,7 +39,7 @@ public abstract class ExoPlayback<T extends Player> implements EventListener {
     protected long lastKnownPosition = C.POSITION_UNSET;
     protected int previousState = PlaybackStateCompat.STATE_NONE;
 
-    public ExoPlayback(Context context, MusicManager manager, T player) {
+    public ExoPlayback(MusicService context, MusicManager manager, T player) {
         this.context = context;
         this.manager = manager;
         this.player = player;
@@ -285,9 +286,5 @@ public abstract class ExoPlayback<T extends Player> implements EventListener {
     @Override
     public void onSeekProcessed() {
         // Finished seeking
-    }
-   
-    public IcyMetadataListener onIcyMetadaUpdate(){
-        return manager.onIcyMetadaUpdate();
     }
 }

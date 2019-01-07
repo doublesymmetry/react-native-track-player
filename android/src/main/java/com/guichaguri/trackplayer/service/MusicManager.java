@@ -31,7 +31,6 @@ import com.guichaguri.trackplayer.service.player.ExoPlayback;
 import com.guichaguri.trackplayer.service.player.LocalPlayback;
 
 import static com.google.android.exoplayer2.DefaultLoadControl.*;
-import saschpe.exoplayer2.ext.icy.IcyHttpDataSource.*;
 
 /**
  * @author Guichaguri
@@ -59,16 +58,6 @@ public class MusicManager implements OnAudioFocusChangeListener {
     private boolean receivingNoisyEvents = false;
 
     private boolean stopWithApp = false;
-
-    private IcyMetadataListener icyMetadaUpdate = new IcyMetadataListener() {
-        @Override
-        public void onIcyMetaData(IcyMetadata icyMetadata) {             
-            Bundle bundle = new Bundle();
-            bundle.putString("streamTitle", icyMetadata.getStreamTitle());
-            bundle.putString("streamUrl", icyMetadata.getStreamUrl());
-            service.emit(MusicEvents.ICY_UPDATE, bundle);      
-        }
-    };
 
     @SuppressLint("InvalidWakeLockTag")
     public MusicManager(MusicService service) {
@@ -323,9 +312,5 @@ public class MusicManager implements OnAudioFocusChangeListener {
         // Release the locks
         if(wifiLock.isHeld()) wifiLock.release();
         if(wakeLock.isHeld()) wakeLock.release();
-    }
-
-    public IcyMetadataListener onIcyMetadaUpdate(){
-        return icyMetadaUpdate;
     }
 }

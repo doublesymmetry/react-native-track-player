@@ -1,6 +1,5 @@
 package com.guichaguri.trackplayer.service.player;
 
-import android.content.Context;
 import android.util.Log;
 import com.facebook.react.bridge.Promise;
 import com.google.android.exoplayer2.C;
@@ -15,8 +14,10 @@ import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor;
 import com.google.android.exoplayer2.upstream.cache.SimpleCache;
 import com.guichaguri.trackplayer.service.MusicManager;
+import com.guichaguri.trackplayer.service.MusicService;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.models.Track;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,7 +35,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     private ConcatenatingMediaSource source;
     private boolean prepared = false;
 
-    public LocalPlayback(Context context, MusicManager manager, SimpleExoPlayer player, long maxCacheSize) {
+    public LocalPlayback(MusicService context, MusicManager manager, SimpleExoPlayer player, long maxCacheSize) {
         super(context, manager, player);
         this.cacheMaxSize = maxCacheSize;
     }

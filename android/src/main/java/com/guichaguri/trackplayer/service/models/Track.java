@@ -7,6 +7,7 @@ import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat.QueueItem;
+import com.facebook.react.modules.network.OkHttpClientProvider;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
@@ -16,7 +17,10 @@ import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.upstream.*;
 import com.google.android.exoplayer2.util.Util;
+import com.guichaguri.trackplayer.service.MusicManager;
+import com.guichaguri.trackplayer.service.MusicService;
 import com.guichaguri.trackplayer.service.Utils;
+import com.guichaguri.trackplayer.service.metadata.IcyEvents;
 import com.guichaguri.trackplayer.service.player.LocalPlayback;
 
 import saschpe.exoplayer2.ext.icy.IcyHttpDataSourceFactory;
@@ -141,7 +145,7 @@ public class Track {
         return new QueueItem(descr, queueId);
     }
 
-    public MediaSource toMediaSource(Context ctx, LocalPlayback playback) {
+    public MediaSource toMediaSource(MusicService ctx, LocalPlayback playback) {
         // Updates the user agent if not set
         if(userAgent == null || !userAgent.isEmpty())
             userAgent = Util.getUserAgent(ctx, "react-native-track-player");
@@ -171,15 +175,16 @@ public class Track {
 
         } else if(type == TrackType.ICY) {
 
-            // Create a streaming HTTP source factory, enabling icy-metadata
-            OkHttpClient client = new OkHttpClient.Builder().build();
-            IcyHttpDataSourceFactory icyDataSource = new IcyHttpDataSourceFactory
-                    .Builder(client)
+            // Creates a data source that intercepts icy metadata
+            IcyEvents listener = new IcyEvents(ctx);
+
+            ds = new IcyHttpDataSourceFactory.Builder(OkHttpClientProvider.getOkHttpClient())
                     .setUserAgent(userAgent)
-                    .setIcyMetadataChangeListener(playback.onIcyMetadaUpdate())
+                    .setIcyMetadataChangeListener(listener)
+                    .setIcyMetadataChangeListener(listener)
                     .build();
 
-            ds = new DefaultDataSourceFactory(ctx, null, icyDataSource);
+            ds = new DefaultDataSourceFactory(ctx, null, ds);
 
             ds = playback.enableCaching(ds);
 

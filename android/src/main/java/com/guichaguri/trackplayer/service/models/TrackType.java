@@ -26,9 +26,9 @@ public enum TrackType {
     SMOOTH_STREAMING("smoothstreaming"),
     
     /**
-     * The Icy midia type. Should be used for streams over HTTP (Icecast/Shoutcast)
+     * The Icy media type. Should be used for Icecast/Shoutcast streams
      */
-    ICY("ICY");
+    ICY("icy");
 
 
     public final String name;
