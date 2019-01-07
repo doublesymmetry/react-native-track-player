@@ -23,9 +23,6 @@ import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.metadata.IcyEvents;
 import com.guichaguri.trackplayer.service.player.LocalPlayback;
 
-import saschpe.exoplayer2.ext.icy.IcyHttpDataSourceFactory;
-import okhttp3.OkHttpClient;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -176,15 +173,9 @@ public class Track {
         } else if(type == TrackType.ICY) {
 
             // Creates a data source that intercepts icy metadata
-            IcyEvents listener = new IcyEvents(ctx);
+            IcyEvents listener = new IcyEvents(ctx, userAgent);
 
-            ds = new IcyHttpDataSourceFactory.Builder(OkHttpClientProvider.getOkHttpClient())
-                    .setUserAgent(userAgent)
-                    .setIcyMetadataChangeListener(listener)
-                    .setIcyHeadersListener(listener)
-                    .build();
-
-            ds = new DefaultDataSourceFactory(ctx, null, ds);
+            ds = new DefaultDataSourceFactory(ctx, null, listener.getIcyDataSource());
 
             ds = playback.enableCaching(ds);
 
