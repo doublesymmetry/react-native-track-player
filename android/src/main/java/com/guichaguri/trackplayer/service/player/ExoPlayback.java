@@ -26,16 +26,16 @@ import java.util.List;
  */
 public abstract class ExoPlayback<T extends Player> implements EventListener {
 
-    final Context context;
-    final MusicManager manager;
-    final T player;
+    protected final Context context;
+    protected final MusicManager manager;
+    protected final T player;
 
-    List<Track> queue = Collections.synchronizedList(new ArrayList<>());
+    protected List<Track> queue = Collections.synchronizedList(new ArrayList<>());
 
     // https://github.com/google/ExoPlayer/issues/2728
-    int lastKnownWindow = C.INDEX_UNSET;
-    long lastKnownPosition = C.POSITION_UNSET;
-    int previousState = PlaybackStateCompat.STATE_NONE;
+    protected int lastKnownWindow = C.INDEX_UNSET;
+    protected long lastKnownPosition = C.POSITION_UNSET;
+    protected int previousState = PlaybackStateCompat.STATE_NONE;
 
     public ExoPlayback(Context context, MusicManager manager, T player) {
         this.context = context;
@@ -66,6 +66,11 @@ public abstract class ExoPlayback<T extends Player> implements EventListener {
     }
 
     public void skip(String id, Promise promise) {
+        if(id == null || id.isEmpty()) {
+            promise.reject("invalid_id", "The ID can't be null or empty");
+            return;
+        }
+
         for(int i = 0; i < queue.size(); i++) {
 
             Track track = queue.get(i);
@@ -214,7 +219,7 @@ public abstract class ExoPlayback<T extends Player> implements EventListener {
     public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
         Log.d(Utils.LOG, "onTimelineChanged: " + reason);
 
-        if ((reason == Player.TIMELINE_CHANGE_REASON_PREPARED || reason == Player.TIMELINE_CHANGE_REASON_DYNAMIC) && !timeline.isEmpty()) {
+        if((reason == Player.TIMELINE_CHANGE_REASON_PREPARED || reason == Player.TIMELINE_CHANGE_REASON_DYNAMIC) && !timeline.isEmpty()) {
             onPositionDiscontinuity(Player.DISCONTINUITY_REASON_INTERNAL);
         }
     }

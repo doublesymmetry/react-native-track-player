@@ -409,7 +409,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     @objc func remoteSentPause() {
         sendEvent(withName: "remote-pause", body: nil)
     }
-    
+
     @objc func remoteSentSeek(event: MPChangePlaybackPositionCommandEvent) {
         sendEvent(withName: "remote-seek", body: ["position": event.positionTime])
     }

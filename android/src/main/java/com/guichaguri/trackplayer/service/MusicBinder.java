@@ -44,7 +44,7 @@ public class MusicBinder extends Binder {
     }
 
     public void updateOptions(Bundle bundle) {
-        manager.setStopWithApp(bundle.getBoolean("stopWithApp"));
+        manager.setStopWithApp(bundle.getBoolean("stopWithApp", false));
         manager.getMetadata().updateOptions(bundle);
     }
 
