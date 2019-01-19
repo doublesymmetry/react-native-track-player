@@ -14,12 +14,12 @@ protocol AVPlayerObserverDelegate: class {
     /**
      Called when the AVPlayer.status changes.
      */
-    func player(statusDidChange status: AVPlayerStatus)
+    func player(statusDidChange status: AVPlayer.Status)
     
     /**
      Called when the AVPlayer.timeControlStatus changes.
      */
-    func player(didChangeTimeControlStatus status: AVPlayerTimeControlStatus)
+    func player(didChangeTimeControlStatus status: AVPlayer.TimeControlStatus)
     
 }
 
@@ -92,9 +92,9 @@ class AVPlayerObserver: NSObject {
     }
     
     private func handleStatusChange(_ change: [NSKeyValueChangeKey: Any]?) {
-        let status: AVPlayerStatus
+        let status: AVPlayer.Status
         if let statusNumber = change?[.newKey] as? NSNumber {
-            status = AVPlayerStatus(rawValue: statusNumber.intValue)!
+            status = AVPlayer.Status(rawValue: statusNumber.intValue)!
         }
         else {
             status = .unknown
@@ -104,9 +104,9 @@ class AVPlayerObserver: NSObject {
     
     private func handleTimeControlStatusChange(_ change: [NSKeyValueChangeKey: Any]?) {
         
-        let status: AVPlayerTimeControlStatus
+        let status: AVPlayer.TimeControlStatus
         if let statusNumber = change?[.newKey] as? NSNumber {
-            status = AVPlayerTimeControlStatus(rawValue: statusNumber.intValue)!
+            status = AVPlayer.TimeControlStatus(rawValue: statusNumber.intValue)!
             delegate?.player(didChangeTimeControlStatus: status)
         }
     }

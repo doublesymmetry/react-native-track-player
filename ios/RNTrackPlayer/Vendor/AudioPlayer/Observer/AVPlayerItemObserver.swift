@@ -27,6 +27,7 @@ class AVPlayerItemObserver: NSObject {
     
     private struct AVPlayerItemKeyPath {
         static let duration = #keyPath(AVPlayerItem.duration)
+        static let loadedTimeRanges = #keyPath(AVPlayerItem.loadedTimeRanges)
     }
     
     var isObserving: Bool = false
@@ -53,11 +54,13 @@ class AVPlayerItemObserver: NSObject {
             self.isObserving = true
             self.observingItem = item
             item.addObserver(self, forKeyPath: AVPlayerItemKeyPath.duration, options: [.new], context: &AVPlayerItemObserver.context)
+            item.addObserver(self, forKeyPath: AVPlayerItemKeyPath.loadedTimeRanges, options: [.new], context: &AVPlayerItemObserver.context)
         }
     }
     
-    private func stopObservingCurrentItem() {
+    func stopObservingCurrentItem() {
         observingItem?.removeObserver(self, forKeyPath: AVPlayerItemKeyPath.duration, context: &AVPlayerItemObserver.context)
+        observingItem?.removeObserver(self, forKeyPath: AVPlayerItemKeyPath.loadedTimeRanges, context: &AVPlayerItemObserver.context)
         self.isObserving = false
         self.observingItem = nil
     }
@@ -73,8 +76,12 @@ class AVPlayerItemObserver: NSObject {
             if let duration = change?[.newKey] as? CMTime {
                 self.delegate?.item(didUpdateDuration: duration.seconds)
             }
-        default:
-            break
+        
+        case AVPlayerItemKeyPath.loadedTimeRanges:
+            if let ranges = change?[.newKey] as? [NSValue], let duration = ranges.first?.timeRangeValue.duration {
+                self.delegate?.item(didUpdateDuration: duration.seconds)
+            }
+        default: break
             
         }
     }

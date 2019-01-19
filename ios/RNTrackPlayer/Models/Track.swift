@@ -13,8 +13,8 @@ import AVFoundation
 class Track: NSObject, AudioItem {
     let id: String
     let url: MediaURL
-    dynamic let title: String
-    dynamic let artist: String
+    @objc let title: String
+    @objc let artist: String
     
     let date: String?
     let desc: String?
@@ -23,8 +23,8 @@ class Track: NSObject, AudioItem {
     let duration: Double?
     let artworkURL: MediaURL?
     var skipped: Bool = false
-    dynamic let album: String?
-    dynamic var artwork: MPMediaItemArtwork?
+    @objc let album: String?
+    @objc var artwork: MPMediaItemArtwork?
     
     private let originalObject: [String: Any]
     
@@ -84,17 +84,17 @@ class Track: NSObject, AudioItem {
         if let pitchAlgorithm = pitchAlgorithm {
             switch pitchAlgorithm {
             case PitchAlgorithm.linear.rawValue:
-                return AVAudioTimePitchAlgorithmVarispeed as NSString
+                return .varispeed
             case PitchAlgorithm.music.rawValue:
-                return AVAudioTimePitchAlgorithmSpectral as NSString
+                return .spectral
             case PitchAlgorithm.voice.rawValue:
-                return AVAudioTimePitchAlgorithmTimeDomain as NSString
+                return .timeDomain
             default:
-                return AVAudioTimePitchAlgorithmLowQualityZeroLatency as NSString
+                return .lowQualityZeroLatency
             }
         }
         
-        return AVAudioTimePitchAlgorithmLowQualityZeroLatency as NSString
+        return .lowQualityZeroLatency
     }
     
     func getArtwork(_ handler: @escaping (UIImage?) -> Void) {

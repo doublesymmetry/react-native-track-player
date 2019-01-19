@@ -14,16 +14,18 @@ public protocol NowPlayingInfoKeyValue {
     func getValue() -> Any?
 }
 
-/**
- Wrapper class to control the NowPlayingInfoCenter
- */
 public class NowPlayingInfoController {
     
     let infoCenter: MPNowPlayingInfoCenter
     
     var info: [String: Any]
     
-    public init(infoCenter: MPNowPlayingInfoCenter) {
+    /**
+     Create a new NowPlayingInfoController.
+     
+     - parameter infoCenter: The MPNowPlayingInfoCenter to use. Default is `MPNowPlayingInfoCenter.default()`
+     */
+    public init(infoCenter: MPNowPlayingInfoCenter = MPNowPlayingInfoCenter.default()) {
         self.infoCenter = infoCenter
         self.info = [:]
     }

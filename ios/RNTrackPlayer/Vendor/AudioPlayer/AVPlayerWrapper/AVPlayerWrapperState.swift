@@ -26,7 +26,7 @@ public enum AVPlayerWrapperState: String {
     /// The player is playing.
     case playing
     
-    /// No item loaded, the player is stopped. Call play(from:) to start loading.
+    /// No item loaded, the player is stopped.
     case idle
     
 }

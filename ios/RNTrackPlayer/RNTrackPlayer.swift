@@ -8,7 +8,6 @@
 
 import Foundation
 import MediaPlayer
-import AVFoundation
 
 @objc(RNTrackPlayer)
 public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
@@ -28,14 +27,14 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     }
     
     public func audioPlayer(itemPlaybackEndedWithReason reason: PlaybackEndedReason) {
-        sendEvent(withName: "playback-track-done", body: [
-            "position": player.currentTime,
-            "track": (player.currentItem as! Track).id,
-            "reason": reason.rawValue
-        ])
-        
         if reason == .playedUntilEnd && player.nextItems.count == 0 {
             sendEvent(withName: "playback-queue-ended", body: nil)
+        } else if reason == .playedUntilEnd {
+            sendEvent(withName: "playback-track-changed", body: [
+                "track": (player.currentItem as? Track)?.id,
+                "position": player.currentTime,
+                "nextTrack": (player.nextItems.first as? Track)?.id,
+            ])
         }
     }
     
@@ -107,7 +106,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
             "playback-queue-ended",
             "playback-state",
             "playback-error",
-            "playback-track-done",
+            "playback-track-changed",
             
             "remote-stop",
             "remote-pause",
@@ -125,7 +124,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     @objc(setupPlayer:resolver:rejecter:)
     public func setupPlayer(config: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         do {
-            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
             try AVAudioSession.sharedInstance().setActive(true)
         } catch {
             reject("setup_audio_session_failed", "Failed to setup audio session", error)
@@ -197,6 +196,14 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
             
             try? player.add(items: tracks, at: insertIndex)
         } else {
+            if (player.currentItem == nil && tracks.count > 0) {
+                sendEvent(withName: "playback-track-changed", body: [
+                    "track": nil,
+                    "position": 0,
+                    "nextTrack": tracks.first!.id
+                ])
+            }
+            
             try? player.add(items: tracks)
         }
         
@@ -237,6 +244,12 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
             return
         }
         
+        sendEvent(withName: "playback-track-changed", body: [
+            "track": (player.currentItem as? Track)?.id,
+            "position": player.currentTime,
+            "nextTrack": trackId,
+        ])
+        
         print("Skipping to track:", trackId)
         try? player.jumpToItem(atIndex: trackIndex, playWhenReady: player.playerState == .playing)
         resolve(NSNull())
@@ -246,6 +259,11 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     public func skipToNext(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Skipping to next track")
         do {
+            sendEvent(withName: "playback-track-changed", body: [
+                "track": (player.currentItem as? Track)?.id,
+                "position": player.currentTime,
+                "nextTrack": (player.nextItems.first as? Track)?.id,
+            ])
             try player.next()
             resolve(NSNull())
         } catch (_) {
@@ -257,6 +275,11 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     public func skipToPrevious(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Skipping to next track")
         do {
+            sendEvent(withName: "playback-track-changed", body: [
+                "track": (player.currentItem as? Track)?.id,
+                "position": player.currentTime,
+                "nextTrack": (player.previousItems.last as? Track)?.id,
+            ])
             try player.previous()
             resolve(NSNull())
         } catch (_) {
@@ -379,39 +402,39 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     
     // MARK: - Remote Dynamic Methods
     
-    func remoteSentStop() {
+    @objc func remoteSentStop() {
         sendEvent(withName: "remote-stop", body: nil)
     }
     
-    func remoteSentPause() {
+    @objc func remoteSentPause() {
         sendEvent(withName: "remote-pause", body: nil)
     }
     
-    func remoteSentSeek(event: MPChangePlaybackPositionCommandEvent) {
+    @objc func remoteSentSeek(event: MPChangePlaybackPositionCommandEvent) {
         sendEvent(withName: "remote-seek", body: ["position": event.positionTime])
     }
 
-    func remoteSentPlay() {
+    @objc func remoteSentPlay() {
         sendEvent(withName: "remote-play", body: nil)
     }
     
-    func remoteSentNext() {
+    @objc func remoteSentNext() {
         sendEvent(withName: "remote-next", body: nil)
     }
     
-    func remoteSentPrevious() {
+    @objc func remoteSentPrevious() {
         sendEvent(withName: "remote-previous", body: nil)
     }
     
-    func remoteSendSkipForward(event: MPSkipIntervalCommandEvent) {
+    @objc func remoteSendSkipForward(event: MPSkipIntervalCommandEvent) {
         sendEvent(withName: "remote-jump-forward", body: ["interval": event.interval])
     }
     
-    func remoteSendSkipBackward(event: MPSkipIntervalCommandEvent) {
+    @objc func remoteSendSkipBackward(event: MPSkipIntervalCommandEvent) {
         sendEvent(withName: "remote-jump-backward", body: ["interval": event.interval])
     }
     
-    func remoteSentPlayPause() {
+    @objc func remoteSentPlayPause() {
         if player.playerState == .paused {
             sendEvent(withName: "remote-play", body: nil)
             return

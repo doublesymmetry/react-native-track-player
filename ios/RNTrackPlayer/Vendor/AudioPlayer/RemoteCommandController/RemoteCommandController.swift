@@ -14,27 +14,29 @@ public protocol RemoteCommandable {
 
 public class RemoteCommandController {
         
-    private let center = MPRemoteCommandCenter.shared()
+    private let center: MPRemoteCommandCenter
     
     weak var audioPlayer: AudioPlayer?
     
     var commandTargetPointers: [String: Any] = [:]
     
-    public init() {}
-    
     /**
-     Enable a set of RemoteCommands. Calling this will disable all earlier set commands, so include all commands that needs to be active.
+     Create a new RemoteCommandController.
      
-     - parameter commands: The RemoteCommands that is to be enabled.
+     - parameter remoteCommandCenter: The MPRemoteCommandCenter used. Default is `MPRemoteCommandCenter.shared()`
      */
-    public func enable(commands: [RemoteCommand]) {
+    public init(remoteCommandCenter: MPRemoteCommandCenter = MPRemoteCommandCenter.shared()) {
+        self.center = remoteCommandCenter
+    }
+    
+    internal func enable(commands: [RemoteCommand]) {
         self.disable(commands: RemoteCommand.all())
         commands.forEach { (command) in
             self.enable(command: command)
         }
     }
     
-    private func disable(commands: [RemoteCommand]) {
+    internal func disable(commands: [RemoteCommand]) {
         commands.forEach { (command) in
             self.disable(command: command)
         }
@@ -93,26 +95,16 @@ public class RemoteCommandController {
     
     private func handlePlayCommandDefault(event: MPRemoteCommandEvent) -> MPRemoteCommandHandlerStatus {
         if let audioPlayer = self.audioPlayer {
-            do {
-                try audioPlayer.play()
-                return MPRemoteCommandHandlerStatus.success
-            }
-            catch let error {
-                return self.getRemoteCommandHandlerStatus(forError: error)
-            }
+            audioPlayer.play()
+            return MPRemoteCommandHandlerStatus.success
         }
         return MPRemoteCommandHandlerStatus.commandFailed
     }
     
     private func handlePauseCommandDefault(event: MPRemoteCommandEvent) -> MPRemoteCommandHandlerStatus {
         if let audioPlayer = self.audioPlayer {
-            do {
-                try audioPlayer.pause()
-                return MPRemoteCommandHandlerStatus.success
-            }
-            catch let error {
-                return self.getRemoteCommandHandlerStatus(forError: error)
-            }
+            audioPlayer.pause()
+            return MPRemoteCommandHandlerStatus.success
         }
         return MPRemoteCommandHandlerStatus.commandFailed
     }
@@ -127,13 +119,8 @@ public class RemoteCommandController {
     
     private func handleTogglePlayPauseCommandDefault(event: MPRemoteCommandEvent) -> MPRemoteCommandHandlerStatus {
         if let audioPlayer = self.audioPlayer {
-            do {
-                try audioPlayer.togglePlaying()
-                return MPRemoteCommandHandlerStatus.success
-            }
-            catch let error {
-                return self.getRemoteCommandHandlerStatus(forError: error)
-            }
+            audioPlayer.togglePlaying()
+            return MPRemoteCommandHandlerStatus.success
         }
         return MPRemoteCommandHandlerStatus.commandFailed
     }
@@ -142,13 +129,8 @@ public class RemoteCommandController {
         if let command = event.command as? MPSkipIntervalCommand,
             let interval = command.preferredIntervals.first,
             let audioPlayer = self.audioPlayer {
-            do {
-                try audioPlayer.seek(to: audioPlayer.currentTime + Double(truncating: interval))
-                return MPRemoteCommandHandlerStatus.success
-            }
-            catch let error {
-                return self.getRemoteCommandHandlerStatus(forError: error)
-            }
+            audioPlayer.seek(to: audioPlayer.currentTime + Double(truncating: interval))
+            return MPRemoteCommandHandlerStatus.success
         }
         return MPRemoteCommandHandlerStatus.commandFailed
     }
@@ -157,13 +139,8 @@ public class RemoteCommandController {
         if let command = event.command as? MPSkipIntervalCommand,
             let interval = command.preferredIntervals.first,
             let audioPlayer = self.audioPlayer {
-            do {
-                try audioPlayer.seek(to: audioPlayer.currentTime - Double(truncating: interval))
-                return MPRemoteCommandHandlerStatus.success
-            }
-            catch let error {
-                return self.getRemoteCommandHandlerStatus(forError: error)
-            }
+            audioPlayer.seek(to: audioPlayer.currentTime - Double(truncating: interval))
+            return MPRemoteCommandHandlerStatus.success
         }
         return MPRemoteCommandHandlerStatus.commandFailed
     }
@@ -171,13 +148,8 @@ public class RemoteCommandController {
     private func handleChangePlaybackPositionCommandDefault(event: MPRemoteCommandEvent) -> MPRemoteCommandHandlerStatus {
         if let event = event as? MPChangePlaybackPositionCommandEvent,
             let audioPlayer = self.audioPlayer {
-            do {
-                try audioPlayer.seek(to: event.positionTime)
-                return MPRemoteCommandHandlerStatus.success
-            }
-            catch let error {
-                return self.getRemoteCommandHandlerStatus(forError: error)
-            }
+            audioPlayer.seek(to: event.positionTime)
+            return MPRemoteCommandHandlerStatus.success
         }
         return MPRemoteCommandHandlerStatus.commandFailed
     }
@@ -209,13 +181,7 @@ public class RemoteCommandController {
     }
     
     private func getRemoteCommandHandlerStatus(forError error: Error) -> MPRemoteCommandHandlerStatus {
-        if let error = error as? APError.PlaybackError {
-            switch error {
-            case .noLoadedItem:
-                return MPRemoteCommandHandlerStatus.noActionableNowPlayingItem
-            }
-        }
-        else if let error = error as? APError.LoadError {
+        if let error = error as? APError.LoadError {
             switch error {
             case .invalidSourceUrl(_):
                 return MPRemoteCommandHandlerStatus.commandFailed
