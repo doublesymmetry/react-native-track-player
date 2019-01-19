@@ -49,6 +49,8 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
         }
 
         super.initialize();
+
+        resetQueue();
     }
 
     public DataSource.Factory enableCaching(DataSource.Factory ds) {
@@ -94,11 +96,11 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
         // Sort the list so we can loop through sequentially
         Collections.sort(indexes);
 
-        // Loop in a descending order, so we don't remove unaligned ids
         for(int i = indexes.size() - 1; i >= 0; i--) {
             int index = indexes.get(i);
 
-            if(index == currentIndex || index < 0 || index >= queue.size()) continue;
+            // Skip indexes that are the current track or are out of bounds
+            if (index == currentIndex || index < 0 || index >= queue.size()) continue;
 
             queue.remove(index);
 
@@ -121,8 +123,9 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
         }
     }
 
-    @Override
-    protected void resetQueue() {
+    private void resetQueue() {
+        queue.clear();
+
         source = new ConcatenatingMediaSource();
         player.prepare(source, true, true);
         prepared = false; // We set it to false as the queue is now empty
@@ -130,7 +133,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
         lastKnownWindow = C.INDEX_UNSET;
         lastKnownPosition = C.POSITION_UNSET;
 
-        super.resetQueue();
+        manager.onReset();
     }
 
     @Override
@@ -140,8 +143,8 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     }
 
     @Override
-    public void stop(boolean reset) {
-        super.stop(reset);
+    public void stop() {
+        super.stop();
         prepared = false;
     }
 
@@ -149,6 +152,12 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     public void seekTo(long time) {
         prepare();
         super.seekTo(time);
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        resetQueue();
     }
 
     @Override
