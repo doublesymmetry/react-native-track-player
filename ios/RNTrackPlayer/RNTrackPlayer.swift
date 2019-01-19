@@ -112,6 +112,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
             "remote-pause",
             "remote-play",
             "remote-next",
+            "remote-seek",
             "remote-previous",
             "remote-jump-forward",
             "remote-jump-backward",
