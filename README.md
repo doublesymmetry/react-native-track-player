@@ -57,6 +57,7 @@ All audio modules (like `react-native-sound`) don't play in a separated service 
 
 If you want to get started with this module, check the [API](https://github.com/react-native-kit/react-native-track-player/wiki/API) page.
 If you want detailed information about the API, check the [Documentation](https://github.com/react-native-kit/react-native-track-player/wiki/Documentation).
+You can also look at our example project [here](https://github.com/react-native-kit/react-native-track-player/tree/dev/example).
 ```javascript
 import TrackPlayer from 'react-native-track-player';
 
