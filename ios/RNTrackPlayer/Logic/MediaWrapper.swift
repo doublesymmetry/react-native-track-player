@@ -132,7 +132,7 @@ class MediaWrapper: AudioPlayerDelegate {
     }
     
     func removeUpcomingTracks() {
-        queue = queue.filter { $0.0 <= currentIndex }
+        queue = queue.filter { (currentIndex, _) in currentIndex <= currentIndex }
     }
     
     func skipToTrack(id: String) {
@@ -196,13 +196,13 @@ class MediaWrapper: AudioPlayerDelegate {
         if let pitchAlgorithm = track.pitchAlgorithm {
             switch pitchAlgorithm {
             case PitchAlgorithm.linear.rawValue:
-                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmVarispeed
+                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithm.varispeed
             case PitchAlgorithm.music.rawValue:
-                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmSpectral
+                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithm.spectral
             case PitchAlgorithm.voice.rawValue:
-                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmTimeDomain
+                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithm.timeDomain
             default:
-                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmLowQualityZeroLatency
+                player.player?.currentItem?.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithm.lowQualityZeroLatency
             }
         }
     }
