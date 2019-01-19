@@ -10,11 +10,11 @@ import Foundation
 import MediaPlayer
 import AVFoundation
 
-class Track: NSObject {
+class Track: NSObject, AudioItem {
     let id: String
     let url: MediaURL
-    @objc dynamic let title: String
-    @objc dynamic let artist: String
+    @objc let title: String
+    @objc let artist: String
     
     let date: String?
     let desc: String?
@@ -23,8 +23,8 @@ class Track: NSObject {
     let duration: Double?
     let artworkURL: MediaURL?
     var skipped: Bool = false
-    @objc dynamic let album: String?
-    @objc dynamic var artwork: MPMediaItemArtwork?
+    @objc let album: String?
+    @objc var artwork: MPMediaItemArtwork?
     
     private let originalObject: [String: Any]
     
@@ -56,5 +56,58 @@ class Track: NSObject {
     
     func toObject() -> [String: Any] {
         return originalObject
+    }
+    
+    // MARK: - AudioItem Protocol
+    
+    func getSourceUrl() -> String {
+        return url.value.absoluteString
+    }
+    
+    func getArtist() -> String? {
+        return artist
+    }
+    
+    func getTitle() -> String? {
+        return title
+    }
+    
+    func getAlbumTitle() -> String? {
+        return album
+    }
+    
+    func getSourceType() -> SourceType {
+        return url.isLocal ? .file : .stream
+    }
+    
+    func getPitchAlgorithmType() -> AVAudioTimePitchAlgorithm {
+        if let pitchAlgorithm = pitchAlgorithm {
+            switch pitchAlgorithm {
+            case PitchAlgorithm.linear.rawValue:
+                return .varispeed
+            case PitchAlgorithm.music.rawValue:
+                return .spectral
+            case PitchAlgorithm.voice.rawValue:
+                return .timeDomain
+            default:
+                return .lowQualityZeroLatency
+            }
+        }
+        
+        return .lowQualityZeroLatency
+    }
+    
+    func getArtwork(_ handler: @escaping (UIImage?) -> Void) {
+        if let artworkURL = artworkURL?.value {
+            URLSession.shared.dataTask(with: artworkURL, completionHandler: { (data, _, error) in
+                if let data = data, let artwork = UIImage(data: data), error == nil {
+                    handler(artwork)
+                }
+                
+                handler(nil)
+            })
+        }
+        
+        handler(nil)
     }
 }

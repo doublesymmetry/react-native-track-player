@@ -6,7 +6,7 @@ Pod::Spec.new do |s|
   s.name         = "react-native-track-player"
   s.version      = package["version"]
   s.summary      = "A fully fledged audio module created for music apps"
-  s.author       = "Guilherme Chaguri"
+  s.author       = "David Chavez"
   s.homepage     = "https://github.com/react-native-kit/react-native-track-player"
   s.license      = "Apache-2.0"
   s.platform     = :ios, "9.0"
