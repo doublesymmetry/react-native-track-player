@@ -5,6 +5,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import Player from '../components/Player';
 import playlistData from '../data/playlist.json';
+import localTrack from '../resources/pure.m4a';
 
 import PlayerStore from '../stores/Player';
 
@@ -37,6 +38,13 @@ export default class LandingScreen extends Component {
     if (currentTrack == null) {
       await TrackPlayer.reset();
       await TrackPlayer.add(playlistData);
+      await TrackPlayer.add({
+        id: 'local-track',
+        url: localTrack,
+        title: 'Pure (Demo)',
+        artist: 'David Chavez',
+        artwork: 'https://picsum.photos/200',
+      });
       await TrackPlayer.play();
     } else {
       if (PlayerStore.playbackState === TrackPlayer.STATE_PAUSED) {
