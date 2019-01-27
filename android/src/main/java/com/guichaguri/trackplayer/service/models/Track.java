@@ -50,6 +50,7 @@ public class Track {
 
     public TrackType type = TrackType.DEFAULT;
 
+    public String contentType;
     public String userAgent;
 
     public Uri artwork;
@@ -86,6 +87,7 @@ public class Track {
             }
         }
 
+        contentType = bundle.getString("contentType");
         userAgent = bundle.getString("userAgent");
         artwork = Utils.getUri(context, bundle, "artwork");
 
