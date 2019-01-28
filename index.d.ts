@@ -163,7 +163,7 @@ declare namespace RNTrackPlayer {
   export const CAPABILITY_STOP: Capability;
   export const CAPABILITY_SEEK_TO: Capability;
   export const CAPABILITY_SKIP: Capability;
-  export const CAPABILITY_SLIP_TO_NEXT: Capability;
+  export const CAPABILITY_SKIP_TO_NEXT: Capability;
   export const CAPABILITY_SKIP_TO_PREVIOUS: Capability;
   export const CAPABILITY_SET_RATING: Capability;
   export const CAPABILITY_JUMP_FORWARD: Capability;
