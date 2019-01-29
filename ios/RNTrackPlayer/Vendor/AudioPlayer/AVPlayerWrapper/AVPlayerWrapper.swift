@@ -74,6 +74,8 @@ class AVPlayerWrapper: AVPlayerWrapperProtocol {
         return avPlayer.currentItem
     }
     
+    var _pendingAsset: AVAsset? = nil
+    
     var automaticallyWaitsToMinimizeStalling: Bool {
         get { return avPlayer.automaticallyWaitsToMinimizeStalling }
         set { avPlayer.automaticallyWaitsToMinimizeStalling = newValue }
@@ -121,11 +123,19 @@ class AVPlayerWrapper: AVPlayerWrapperProtocol {
     }
     
     func play() {
-        avPlayer.play()
+        if (_state == .loading) {
+            _playWhenReady = true
+        } else {
+            avPlayer.play()
+        }
     }
     
     func pause() {
-        avPlayer.pause()
+        if (_state == .loading) {
+            _playWhenReady = false
+        } else {
+            avPlayer.pause()
+        }
     }
     
     func togglePlaying() {
@@ -149,21 +159,55 @@ class AVPlayerWrapper: AVPlayerWrapperProtocol {
     }
 
     func load(from url: URL, playWhenReady: Bool) {
-        reset(soft: true)
+        reset(soft: false)
         _playWhenReady = playWhenReady
         _state = .loading
 
-        // Set item
-        let currentAsset = AVURLAsset(url: url)
-        let currentItem = AVPlayerItem(asset: currentAsset, automaticallyLoadedAssetKeys: [Constants.assetPlayableKey])
-        currentItem.preferredForwardBufferDuration = bufferDuration
-        avPlayer.replaceCurrentItem(with: currentItem)
-
-        // Register for events
-        playerTimeObserver.registerForBoundaryTimeEvents()
-        playerObserver.startObserving()
-        playerItemNotificationObserver.startObserving(item: currentItem)
-        playerItemObserver.startObserving(item: currentItem)
+        if (self._pendingAsset != nil) {
+            self._pendingAsset?.cancelLoading()
+            self._pendingAsset = nil
+        }
+        
+        self._pendingAsset = AVURLAsset(url: url)
+        
+        if let pendingAsset = self._pendingAsset {
+            pendingAsset.loadValuesAsynchronously(forKeys: [Constants.assetPlayableKey], completionHandler: {
+                var error: NSError? = nil
+                if (self._pendingAsset != nil && pendingAsset.isEqual(self._pendingAsset)) {
+                    let status = pendingAsset.statusOfValue(forKey: Constants.assetPlayableKey, error: &error)
+                    switch status {
+                    case .loaded:
+                        DispatchQueue.main.async {
+                                let currentItem = AVPlayerItem(asset: pendingAsset)
+                                self.avPlayer.automaticallyWaitsToMinimizeStalling = false
+                                self.avPlayer.replaceCurrentItem(with: currentItem)
+                            
+                                // Register for events
+                                self.playerTimeObserver.registerForBoundaryTimeEvents()
+                                self.playerObserver.startObserving()
+                                self.playerItemNotificationObserver.startObserving(item: currentItem)
+                                self.playerItemObserver.startObserving(item: currentItem)
+                                self._pendingAsset = nil
+                        }
+                        break
+                    case .failed:
+                        DispatchQueue.main.async {
+                            // print("load asset failed")
+                            self.delegate?.AVWrapper(failedWithError: error)
+                            self._pendingAsset = nil
+                        }
+                        break
+                    case .cancelled:
+                        DispatchQueue.main.async {
+                            // print("load asset cancelled")
+                        }
+                        break
+                    default:
+                        break
+                    }
+                }
+            })
+        }
     }
     
     // MARK: - Util
