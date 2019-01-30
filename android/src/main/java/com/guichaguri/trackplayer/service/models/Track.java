@@ -50,6 +50,7 @@ public class Track {
 
     public TrackType type = TrackType.DEFAULT;
 
+    public String contentType;
     public String userAgent;
 
     public Uri artwork;
@@ -86,6 +87,7 @@ public class Track {
             }
         }
 
+        contentType = bundle.getString("contentType");
         userAgent = bundle.getString("userAgent");
         artwork = Utils.getUri(context, bundle, "artwork");
 
@@ -140,7 +142,7 @@ public class Track {
 
     public MediaSource toMediaSource(Context ctx, LocalPlayback playback) {
         // Updates the user agent if not set
-        if(userAgent == null || !userAgent.isEmpty())
+        if(userAgent == null || userAgent.isEmpty())
             userAgent = Util.getUserAgent(ctx, "react-native-track-player");
 
         DataSource.Factory ds;
