@@ -76,6 +76,8 @@ class AVPlayerWrapper: AVPlayerWrapperProtocol {
     
     var _pendingAsset: AVAsset? = nil
     
+    var _pendingSeekTo: TimeInterval = 0
+    
     var automaticallyWaitsToMinimizeStalling: Bool {
         get { return avPlayer.automaticallyWaitsToMinimizeStalling }
         set { avPlayer.automaticallyWaitsToMinimizeStalling = newValue }
@@ -155,8 +157,13 @@ class AVPlayerWrapper: AVPlayerWrapperProtocol {
     }
     
     func seek(to seconds: TimeInterval) {
-        avPlayer.seek(to: CMTimeMakeWithSeconds(seconds, preferredTimescale: 1)) { (finished) in
-            self.delegate?.AVWrapper(seekTo: Int(seconds), didFinish: finished)
+        if _state == .loading {
+            _pendingSeekTo = seconds
+        }
+        else {
+            avPlayer.seek(to: CMTimeMakeWithSeconds(seconds, preferredTimescale: 1)) { (finished) in
+                self.delegate?.AVWrapper(seekTo: Int(seconds), didFinish: finished)
+            }
         }
     }
 
@@ -192,7 +199,7 @@ class AVPlayerWrapper: AVPlayerWrapperProtocol {
                         break
                     
                     case .failed:
-                        print("load asset failed")
+                        // print("load asset failed")
                         if isPendingAsset {
                             self.delegate?.AVWrapper(failedWithError: error)
                             self._pendingAsset = nil
@@ -200,7 +207,7 @@ class AVPlayerWrapper: AVPlayerWrapperProtocol {
                         break
                     
                     case .cancelled:
-                        print("load asset cancelled")
+                        // print("load asset cancelled")
                         break
                     
                     default:
@@ -257,6 +264,10 @@ extension AVPlayerWrapper: AVPlayerObserverDelegate {
         case .readyToPlay:
             self._state = .ready
             if _playWhenReady {
+                if (self._pendingSeekTo > 0) {
+                    self.seek(to: self._pendingSeekTo)
+                    self._pendingSeekTo = 0
+                }
                 self.play()
             }
             break
