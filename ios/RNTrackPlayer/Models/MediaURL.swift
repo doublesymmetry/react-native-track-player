@@ -17,10 +17,12 @@ struct MediaURL {
         guard let object = object else { return nil }
         originalObject = object
         
+        var url = ""
         if let localObject = object as? [String: Any] {
-            let url = localObject["uri"] as! String
-        } else {
-            let url = object as! String
+            url = localObject["uri"] as! String
+        }
+        else {
+            url = object as! String
         }
         isLocal = url.contains("http") ? false : true
         let encodedURI = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
