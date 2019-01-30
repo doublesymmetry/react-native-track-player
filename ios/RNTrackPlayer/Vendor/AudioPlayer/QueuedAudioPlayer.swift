@@ -68,7 +68,7 @@ public class QueuedAudioPlayer: AudioPlayer {
      - parameter playWhenReady: If the AudioPlayer has no item loaded, it will load the `item`. If this is `true` it will automatically start playback. Default is `true`.
      - throws: `APError`
      */
-    public func add(item: AudioItem, playWhenReady: Bool = true) throws {
+    public func add(item: AudioItem, playWhenReady: Bool = false) throws {
         if currentItem == nil {
             queueManager.addItem(item)
             try self.load(item: item, playWhenReady: playWhenReady)
@@ -85,7 +85,7 @@ public class QueuedAudioPlayer: AudioPlayer {
      - parameter playWhenReady: If the AudioPlayer has no item loaded, it will load the first item in the list. If this is `true` it will automatically start playback. Default is `true`.
      - throws: `APError`
      */
-    public func add(items: [AudioItem], playWhenReady: Bool = true) throws {
+    public func add(items: [AudioItem], playWhenReady: Bool = false) throws {
         if currentItem == nil {
             queueManager.addItems(items)
             try self.load(item: currentItem!, playWhenReady: playWhenReady)
