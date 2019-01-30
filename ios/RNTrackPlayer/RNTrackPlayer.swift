@@ -13,7 +13,10 @@ import MediaPlayer
 public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     private lazy var player: QueuedAudioPlayer = {
         let player = QueuedAudioPlayer()
+        
         player.delegate = self
+        player.bufferDuration = 1
+        player.automaticallyWaitsToMinimizeStalling = false
         
         return player
     }()
