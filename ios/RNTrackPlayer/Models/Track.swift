@@ -105,7 +105,7 @@ class Track: NSObject, AudioItem {
                 }
                 
                 handler(nil)
-            })
+            }).resume()
         }
         
         handler(nil)

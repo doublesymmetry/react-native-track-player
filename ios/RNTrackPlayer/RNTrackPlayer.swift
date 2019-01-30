@@ -86,15 +86,15 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
             "PITCH_ALGORITHM_VOICE": PitchAlgorithm.voice.rawValue,
 
             "CAPABILITY_PLAY": Capability.play.rawValue,
-            "CAPABILITY_PLAY_FROM_ID": Capability.unsupported.rawValue,
-            "CAPABILITY_PLAY_FROM_SEARCH": Capability.unsupported.rawValue,
+            "CAPABILITY_PLAY_FROM_ID": "NOOP",
+            "CAPABILITY_PLAY_FROM_SEARCH": "NOOP",
             "CAPABILITY_PAUSE": Capability.pause.rawValue,
             "CAPABILITY_STOP": Capability.stop.rawValue,
-            "CAPABILITY_SEEK_TO": Capability.unsupported.rawValue,
-            "CAPABILITY_SKIP": Capability.unsupported.rawValue,
+            "CAPABILITY_SEEK_TO": Capability.seek.rawValue,
+            "CAPABILITY_SKIP": "NOOP",
             "CAPABILITY_SKIP_TO_NEXT": Capability.next.rawValue,
             "CAPABILITY_SKIP_TO_PREVIOUS": Capability.previous.rawValue,
-            "CAPABILITY_SET_RATING": Capability.unsupported.rawValue,
+            "CAPABILITY_SET_RATING": "NOOP",
             "CAPABILITY_JUMP_FORWARD": Capability.jumpForward.rawValue,
             "CAPABILITY_JUMP_BACKWARD": Capability.jumpBackward.rawValue,
         ]
@@ -141,35 +141,76 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     
     @objc(updateOptions:resolver:rejecter:)
     public func update(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        let remoteCenter = MPRemoteCommandCenter.shared()
         let castedCapabilities = (options["capabilities"] as? [String])
         let supportedCapabilities = castedCapabilities?.filter { Capability(rawValue: $0) != nil }
-        let capabilities = supportedCapabilities?.flatMap { Capability(rawValue: $0) } ?? []
+        let capabilities = supportedCapabilities?.compactMap { Capability(rawValue: $0) } ?? []
         
-        let enableStop = capabilities.contains(.stop)
-        let enablePause = capabilities.contains(.pause)
-        let enablePlay = capabilities.contains(.play)
-        let enablePlayNext = capabilities.contains(.next)
-        let enablePlayPrevious = capabilities.contains(.previous)
-        let enableSkipForward = capabilities.contains(.jumpForward)
-        let enableSkipBackward = capabilities.contains(.jumpBackward)
-        let enableSeek = capabilities.contains(.seek)
+        let remoteCommands = capabilities.map { $0.mapToPlayerCommand(jumpInterval: options["jumpInterval"] as? NSNumber) }
+        player.remoteCommands.append(contentsOf: remoteCommands)
         
-        toggleRemoteHandler(command: remoteCenter.stopCommand, selector: #selector(remoteSentStop), enabled: enableStop)
-        toggleRemoteHandler(command: remoteCenter.pauseCommand, selector: #selector(remoteSentPause), enabled: enablePause)
-        toggleRemoteHandler(command: remoteCenter.playCommand, selector: #selector(remoteSentPlay), enabled: enablePlay)
-        toggleRemoteHandler(command: remoteCenter.togglePlayPauseCommand, selector: #selector(remoteSentPlayPause), enabled: enablePause && enablePlay)
-        toggleRemoteHandler(command: remoteCenter.nextTrackCommand, selector: #selector(remoteSentNext), enabled: enablePlayNext)
-        toggleRemoteHandler(command: remoteCenter.previousTrackCommand, selector: #selector(remoteSentPrevious), enabled: enablePlayPrevious)
-        if #available(iOS 9.1, *) {
-            toggleRemoteHandler(command: remoteCenter.changePlaybackPositionCommand, selector: #selector(remoteSentSeek), enabled: enableSeek)
+        player.remoteCommandController.handleChangePlaybackPositionCommand = { [weak self] event in
+            if let event = event as? MPChangePlaybackPositionCommandEvent {
+                self?.sendEvent(withName: "remote-seek", body: ["position": event.positionTime])
+                return MPRemoteCommandHandlerStatus.success
+            }
+
+            return MPRemoteCommandHandlerStatus.commandFailed
         }
         
+        player.remoteCommandController.handleNextTrackCommand = { [weak self] _ in
+            self?.sendEvent(withName: "remote-next", body: nil)
+            return MPRemoteCommandHandlerStatus.success
+        }
         
-        remoteCenter.skipForwardCommand.preferredIntervals = [options["jumpInterval"] as? NSNumber ?? 15]
-        remoteCenter.skipBackwardCommand.preferredIntervals = [options["jumpInterval"] as? NSNumber ?? 15]
-        toggleRemoteHandler(command: remoteCenter.skipForwardCommand, selector: #selector(remoteSendSkipForward), enabled: enableSkipForward)
-        toggleRemoteHandler(command: remoteCenter.skipBackwardCommand, selector: #selector(remoteSendSkipBackward), enabled: enableSkipBackward)
+        player.remoteCommandController.handlePauseCommand = { [weak self] _ in
+            self?.sendEvent(withName: "remote-pause", body: nil)
+            return MPRemoteCommandHandlerStatus.success
+        }
+        
+        player.remoteCommandController.handlePlayCommand = { [weak self] _ in
+            self?.sendEvent(withName: "remote-play", body: nil)
+            return MPRemoteCommandHandlerStatus.success
+        }
+        
+        player.remoteCommandController.handlePreviousTrackCommand = { [weak self] _ in
+            self?.sendEvent(withName: "remote-previous", body: nil)
+            return MPRemoteCommandHandlerStatus.success
+        }
+        
+        player.remoteCommandController.handleSkipBackwardCommand = { [weak self] event in
+            if let command = event.command as? MPSkipIntervalCommand,
+                let interval = command.preferredIntervals.first {
+                self?.sendEvent(withName: "remote-jump-backward", body: ["interval": interval])
+                return MPRemoteCommandHandlerStatus.success
+            }
+            
+            return MPRemoteCommandHandlerStatus.commandFailed
+        }
+        
+        player.remoteCommandController.handleSkipForwardCommand = { [weak self] event in
+            if let command = event.command as? MPSkipIntervalCommand,
+                let interval = command.preferredIntervals.first {
+                self?.sendEvent(withName: "remote-jump-forward", body: ["interval": interval])
+                return MPRemoteCommandHandlerStatus.success
+            }
+            
+            return MPRemoteCommandHandlerStatus.commandFailed
+        }
+        
+        player.remoteCommandController.handleStopCommand = { [weak self] _ in
+            self?.sendEvent(withName: "remote-stop", body: nil)
+            return MPRemoteCommandHandlerStatus.success
+        }
+        
+        player.remoteCommandController.handleTogglePlayPauseCommand = { [weak self] _ in
+            if self?.player.playerState == .paused {
+                self?.sendEvent(withName: "remote-play", body: nil)
+                return MPRemoteCommandHandlerStatus.success
+            }
+            
+            self?.sendEvent(withName: "remote-pause", body: nil)
+            return MPRemoteCommandHandlerStatus.success
+        }
         
         resolve(NSNull())
     }
@@ -389,58 +430,5 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     @objc(getState:rejecter:)
     public func getState(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         resolve(player.playerState.rawValue)
-    }
-    
-    
-    // MARK: - Private Helpers
-    
-    private func toggleRemoteHandler(command: MPRemoteCommand, selector: Selector, enabled: Bool) {
-        command.removeTarget(self, action: selector)
-        command.addTarget(self, action: selector)
-        command.isEnabled = enabled
-    }
-    
-    
-    // MARK: - Remote Dynamic Methods
-    
-    @objc func remoteSentStop() {
-        sendEvent(withName: "remote-stop", body: nil)
-    }
-    
-    @objc func remoteSentPause() {
-        sendEvent(withName: "remote-pause", body: nil)
-    }
-
-    @objc func remoteSentSeek(event: MPChangePlaybackPositionCommandEvent) {
-        sendEvent(withName: "remote-seek", body: ["position": event.positionTime])
-    }
-
-    @objc func remoteSentPlay() {
-        sendEvent(withName: "remote-play", body: nil)
-    }
-    
-    @objc func remoteSentNext() {
-        sendEvent(withName: "remote-next", body: nil)
-    }
-    
-    @objc func remoteSentPrevious() {
-        sendEvent(withName: "remote-previous", body: nil)
-    }
-    
-    @objc func remoteSendSkipForward(event: MPSkipIntervalCommandEvent) {
-        sendEvent(withName: "remote-jump-forward", body: ["interval": event.interval])
-    }
-    
-    @objc func remoteSendSkipBackward(event: MPSkipIntervalCommandEvent) {
-        sendEvent(withName: "remote-jump-backward", body: ["interval": event.interval])
-    }
-    
-    @objc func remoteSentPlayPause() {
-        if player.playerState == .paused {
-            sendEvent(withName: "remote-play", body: nil)
-            return
-        }
-        
-        sendEvent(withName: "remote-pause", body: nil)
     }
 }
