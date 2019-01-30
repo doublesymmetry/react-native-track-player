@@ -123,17 +123,19 @@ class AVPlayerWrapper: AVPlayerWrapperProtocol {
     }
     
     func play() {
-        if (_state == .loading) {
+        if _state == .loading {
             _playWhenReady = true
-        } else {
+        }
+        else {
             avPlayer.play()
         }
     }
     
     func pause() {
-        if (_state == .loading) {
+        if _state == .loading {
             _playWhenReady = false
-        } else {
+        }
+        else {
             avPlayer.pause()
         }
     }
@@ -162,46 +164,45 @@ class AVPlayerWrapper: AVPlayerWrapperProtocol {
         reset(soft: false)
         _playWhenReady = playWhenReady
         _state = .loading
-
-        if (self._pendingAsset != nil) {
-            self._pendingAsset?.cancelLoading()
-            self._pendingAsset = nil
-        }
         
         self._pendingAsset = AVURLAsset(url: url)
         
         if let pendingAsset = self._pendingAsset {
             pendingAsset.loadValuesAsynchronously(forKeys: [Constants.assetPlayableKey], completionHandler: {
                 var error: NSError? = nil
-                if (self._pendingAsset != nil && pendingAsset.isEqual(self._pendingAsset)) {
-                    let status = pendingAsset.statusOfValue(forKey: Constants.assetPlayableKey, error: &error)
+                let status = pendingAsset.statusOfValue(forKey: Constants.assetPlayableKey, error: &error)
+                
+                DispatchQueue.main.async {
+                    let isPendingAsset = (self._pendingAsset != nil && pendingAsset.isEqual(self._pendingAsset))
+                    
                     switch status {
                     case .loaded:
-                        DispatchQueue.main.async {
-                                let currentItem = AVPlayerItem(asset: pendingAsset)
-                                self.avPlayer.automaticallyWaitsToMinimizeStalling = false
-                                self.avPlayer.replaceCurrentItem(with: currentItem)
+                        if isPendingAsset {
+                            let currentItem = AVPlayerItem(asset: pendingAsset)
+                            self.avPlayer.automaticallyWaitsToMinimizeStalling = false
+                            self.avPlayer.replaceCurrentItem(with: currentItem)
                             
-                                // Register for events
-                                self.playerTimeObserver.registerForBoundaryTimeEvents()
-                                self.playerObserver.startObserving()
-                                self.playerItemNotificationObserver.startObserving(item: currentItem)
-                                self.playerItemObserver.startObserving(item: currentItem)
-                                self._pendingAsset = nil
+                            // Register for events
+                            self.playerTimeObserver.registerForBoundaryTimeEvents()
+                            self.playerObserver.startObserving()
+                            self.playerItemNotificationObserver.startObserving(item: currentItem)
+                            self.playerItemObserver.startObserving(item: currentItem)
+                            self._pendingAsset = nil
                         }
                         break
+                    
                     case .failed:
-                        DispatchQueue.main.async {
-                            // print("load asset failed")
+                        print("load asset failed")
+                        if isPendingAsset {
                             self.delegate?.AVWrapper(failedWithError: error)
                             self._pendingAsset = nil
                         }
                         break
+                    
                     case .cancelled:
-                        DispatchQueue.main.async {
-                            // print("load asset cancelled")
-                        }
+                        print("load asset cancelled")
                         break
+                    
                     default:
                         break
                     }
@@ -216,6 +217,12 @@ class AVPlayerWrapper: AVPlayerWrapperProtocol {
         playerItemObserver.stopObservingCurrentItem()
         playerTimeObserver.unregisterForBoundaryTimeEvents()
         playerItemNotificationObserver.stopObservingCurrentItem()
+        
+        
+        if self._pendingAsset != nil {
+            self._pendingAsset?.cancelLoading()
+            self._pendingAsset = nil
+        }
         
         if !soft {
             avPlayer.replaceCurrentItem(with: nil)
