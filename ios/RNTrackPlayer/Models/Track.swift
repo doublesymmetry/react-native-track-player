@@ -103,11 +103,13 @@ class Track: NSObject, AudioItem {
                 if let data = data, let artwork = UIImage(data: data), error == nil {
                     handler(artwork)
                 }
-                
-                handler(nil)
-            })
+                else {
+                    handler(nil)
+                }
+            }).resume()
         }
-        
-        handler(nil)
+        else {
+            handler(nil)
+        }
     }
 }

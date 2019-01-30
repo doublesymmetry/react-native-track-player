@@ -55,12 +55,6 @@ public class AudioPlayer: AVPlayerWrapperDelegate {
      */
     public var audioTimePitchAlgorithm: AVAudioTimePitchAlgorithm = AVAudioTimePitchAlgorithm.lowQualityZeroLatency
     
-    /**
-     Default remote commands to use for each playing item
-     */
-    public var remoteCommands: [RemoteCommand] = []
-    
-    
     // MARK: - Getters from AVPlayerWrapper
     
     /**
@@ -179,7 +173,6 @@ public class AudioPlayer: AVPlayerWrapperDelegate {
         self._currentItem = item
         self.updateMetaValues(item: item)
         setArtwork(forItem: item)
-        enableRemoteCommands(forItem: item)
     }
     
     /**
@@ -217,21 +210,6 @@ public class AudioPlayer: AVPlayerWrapperDelegate {
      */
     public func seek(to seconds: TimeInterval) {
         self.wrapper.seek(to: seconds)
-    }
-    
-    // MARK: - Remote Command Center
-    
-    func enableRemoteCommands(_ commands: [RemoteCommand]) {
-        self.remoteCommandController.enable(commands: commands)
-    }
-    
-    func enableRemoteCommands(forItem item: AudioItem) {
-        if let item = item as? RemoteCommandable {
-            self.enableRemoteCommands(item.getCommands())
-        }
-        else {
-            self.enableRemoteCommands(remoteCommands)
-        }
     }
     
     // MARK: - NowPlayingInfo
