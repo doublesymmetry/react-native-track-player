@@ -28,7 +28,10 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     
     public func audioPlayer(itemPlaybackEndedWithReason reason: PlaybackEndedReason) {
         if reason == .playedUntilEnd && player.nextItems.count == 0 {
-            sendEvent(withName: "playback-queue-ended", body: nil)
+            sendEvent(withName: "playback-queue-ended", body: [
+                "track": (player.currentItem as? Track)?.id,
+                "position": player.currentTime,
+            ])
         } else if reason == .playedUntilEnd {
             sendEvent(withName: "playback-track-changed", body: [
                 "track": (player.currentItem as? Track)?.id,
