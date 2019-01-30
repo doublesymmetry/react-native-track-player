@@ -270,6 +270,9 @@ extension AVPlayerWrapper: AVPlayerObserverDelegate {
                 }
                 self.play()
             }
+            else {
+                self.pause()
+            }
             break
 
         case .failed:
