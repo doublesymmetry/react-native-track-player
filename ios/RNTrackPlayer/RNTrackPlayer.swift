@@ -252,7 +252,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
                 ])
             }
             
-            try? player.add(items: tracks)
+            try? player.add(items: tracks, playWhenReady: false)
         }
         
         resolve(NSNull())
