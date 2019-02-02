@@ -92,6 +92,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     @Override
     public void remove(List<Integer> indexes, Promise promise) {
         int currentIndex = player.getCurrentWindowIndex();
+        boolean promiseWasCalled = false;
 
         // Sort the list so we can loop through sequentially
         Collections.sort(indexes);
@@ -106,9 +107,14 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
 
             if(i == 0) {
                 source.removeMediaSource(index, Utils.toRunnable(promise));
+                promiseWasCalled = true;
             } else {
                 source.removeMediaSource(index, null);
             }
+        }
+        
+        if(!promiseWasCalled){
+            promise.resolve(null);
         }
     }
 
