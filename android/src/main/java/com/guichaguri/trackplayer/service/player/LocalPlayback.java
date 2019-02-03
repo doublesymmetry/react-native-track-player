@@ -100,7 +100,11 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
             int index = indexes.get(i);
 
             // Skip indexes that are the current track or are out of bounds
-            if (index == currentIndex || index < 0 || index >= queue.size()) continue;
+            if(index == currentIndex || index < 0 || index >= queue.size()) {
+                // Resolve the promise when the last index is invalid
+                if(i == 0) promise.resolve(null);
+                continue;
+            }
 
             queue.remove(index);
 
