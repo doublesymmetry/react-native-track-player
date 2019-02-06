@@ -65,10 +65,10 @@ declare namespace RNTrackPlayer {
   }
 
   export interface PlayerOptions {
-    minBuffer: number;
-    maxBuffer: number;
-    playBuffer: number;
-    maxCacheSize: number;
+    minBuffer?: number;
+    maxBuffer?: number;
+    playBuffer?: number;
+    maxCacheSize?: number;
   }
 
   export interface MetadataOptions {
@@ -77,7 +77,7 @@ declare namespace RNTrackPlayer {
     stopWithApp?: boolean;
 
     capabilities?: Capability[];
-    notificationCapabilities: Capability[];
+    notificationCapabilities?: Capability[];
     compactCapabilities?: Capability[];
 
     icon?: ResourceObject;
