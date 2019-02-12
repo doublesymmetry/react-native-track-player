@@ -22,13 +22,16 @@ if(file.exists()) {
     smoothstreaming = json.smoothstreaming ?: smoothstreaming
 }
 
+def safeExtGet(prop, fallback) {
+    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
 android {
-    compileSdkVersion 27
-    buildToolsVersion "27.0.3"
+    compileSdkVersion safeExtGet("compileSdkVersion", 27)
 
     defaultConfig {
-        minSdkVersion 16 // RN's minimum version
-        targetSdkVersion 27
+        minSdkVersion safeExtGet('minSdkVersion', 16) // RN's minimum version
+        targetSdkVersion safeExtGet("compileSdkVersion", 27)
         versionCode 1
         versionName "1.0"
         ndk {
