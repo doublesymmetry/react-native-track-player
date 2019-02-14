@@ -22,13 +22,17 @@ if(file.exists()) {
     smoothstreaming = json.smoothstreaming ?: smoothstreaming
 }
 
+def safeExtGet(prop, fallback) {
+    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
 android {
-    compileSdkVersion 27
-    buildToolsVersion "27.0.3"
+    compileSdkVersion safeExtGet("compileSdkVersion", 27)
 
     defaultConfig {
-        minSdkVersion 16 // RN's minimum version
-        targetSdkVersion 27
+        minSdkVersion safeExtGet("minSdkVersion", 16) // RN's minimum version
+        targetSdkVersion safeExtGet("targetSdkVersion", 27)
+
         versionCode 1
         versionName "1.0"
         ndk {
@@ -85,8 +89,7 @@ dependencies {
     }
 
     // Make sure we're using at least the support library 27.1.1
-    implementation 'com.android.support:support-compat:27.1.1'
-    implementation 'com.android.support:support-media-compat:27.1.1'
-
+    implementation "com.android.support:support-compat:${safeExtGet('supportLibVersion', '27.1.1')}"
+    implementation "com.android.support:support-media-compat:${safeExtGet('supportLibVersion', '27.1.1')}"
     implementation 'com.github.bumptech.glide:glide:4.7.1'
 }
