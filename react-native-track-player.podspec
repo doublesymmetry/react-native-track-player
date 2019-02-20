@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.homepage     = "https://github.com/react-native-kit/react-native-track-player"
   s.license      = "Apache-2.0"
   s.platform     = :ios, "9.0"
-  s.source       = { :git => "https://github.com/react-native-kit/react-native-track-player.git", :tag => "#{s.version}" }
+  s.source       = { :git => "https://github.com/react-native-kit/react-native-track-player.git", :tag => "v#{s.version}" }
   s.source_files  = "ios/**/*.{h,m,swift}"
   s.dependency "React"
 end
