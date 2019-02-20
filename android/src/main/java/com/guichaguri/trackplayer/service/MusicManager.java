@@ -113,8 +113,8 @@ public class MusicManager implements OnAudioFocusChangeListener {
 
         LoadControl control = new DefaultLoadControl.Builder()
                 .setBufferDurationsMs(minBuffer, maxBuffer, playBuffer, playBuffer * multiplier)
-				.setBackBuffer(backBuffer, false)
-				.createDefaultLoadControl();
+                .setBackBuffer(backBuffer, false)
+                .createDefaultLoadControl();
 
         SimpleExoPlayer player = ExoPlayerFactory.newSimpleInstance(service, new DefaultRenderersFactory(service), new DefaultTrackSelector(), control);
 
