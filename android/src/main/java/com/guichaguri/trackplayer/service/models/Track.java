@@ -108,6 +108,9 @@ public class Track {
         duration = Utils.toMillis(bundle.getDouble("duration", 0));
 
         rating = Utils.getRating(bundle, "rating", ratingType);
+        
+        if (originalItem != null && originalItem != bundle)
+            originalItem.putAll(bundle);
     }
 
     public MediaMetadataCompat.Builder toMediaMetadata() {

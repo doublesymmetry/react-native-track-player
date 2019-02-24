@@ -36,6 +36,9 @@ namespace TrackPlayer.Logic
             Artist = Utils.GetValue<string>(data, "artist", null);
             Album = Utils.GetValue<string>(data, "album", null);
             Artwork = Utils.GetUri(data, "artwork", null);
+
+            if (_originalObj != null && _originalObj != data)
+                _originalObj.Merge(data);
         }
 
         public JObject ToObject()
