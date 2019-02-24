@@ -59,6 +59,15 @@ public abstract class ExoPlayback<T extends Player> implements EventListener {
 
     public abstract void removeUpcomingTracks();
 
+    public void updateTrack(int index, Track track) {
+        int currentIndex = player.getCurrentWindowIndex();
+
+        queue.set(index, track);
+
+        if(currentIndex == index)
+            manager.getMetadata().updateMetadata(track);
+    }
+
     public Track getCurrentTrack() {
         int index = player.getCurrentWindowIndex();
         return index == C.INDEX_UNSET || index < 0 || index >= queue.size() ? null : queue.get(index);
