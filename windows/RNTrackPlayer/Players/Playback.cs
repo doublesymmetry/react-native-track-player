@@ -120,6 +120,14 @@ namespace TrackPlayer.Players
             promise?.Resolve(null);
         }
 
+        public void UpdateTrack(int index, Track track)
+        {
+            queue[index] = track;
+
+            if (index == currentTrack)
+                manager.GetMetadata().UpdateMetadata(track);
+        }
+
         public abstract SystemMediaTransportControls GetTransportControls();
 
         protected abstract void Load(Track track, IPromise promise);

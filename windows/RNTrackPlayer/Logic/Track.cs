@@ -22,14 +22,20 @@ namespace TrackPlayer.Logic
             Id = (string)data.GetValue("id");
             Url = Utils.GetUri(data, "url", null);
             Type = Utils.GetValue<string>(data, "type", TrackType.Default);
+
+            SetMetadata(data);
+
+            _originalObj = data;
+        }
+
+        public void SetMetadata(JObject data)
+        {
             Duration = Utils.GetValue<double>(data, "duration", 0);
 
             Title = Utils.GetValue<string>(data, "title", null);
             Artist = Utils.GetValue<string>(data, "artist", null);
             Album = Utils.GetValue<string>(data, "album", null);
             Artwork = Utils.GetUri(data, "artwork", null);
-
-            _originalObj = data;
         }
 
         public JObject ToObject()
