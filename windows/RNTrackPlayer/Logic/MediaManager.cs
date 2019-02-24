@@ -52,6 +52,11 @@ namespace TrackPlayer.Logic
             return player;
         }
 
+        public Metadata GetMetadata()
+        {
+            return metadata;
+        }
+
         public void OnEnd(Track previous, double prevPos)
         {
             Debug.WriteLine("OnEnd");
