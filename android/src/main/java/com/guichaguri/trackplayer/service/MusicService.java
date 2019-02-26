@@ -64,6 +64,7 @@ public class MusicService extends HeadlessJsTaskService {
         boolean serviceForeground = false;
 
         if(manager != null) {
+            // The session is only active when the service is on foreground
             serviceForeground = manager.getMetadata().getSession().isActive();
         }
 
@@ -71,6 +72,7 @@ public class MusicService extends HeadlessJsTaskService {
             ReactInstanceManager reactInstanceManager = getReactNativeHost().getReactInstanceManager();
             ReactContext reactContext = reactInstanceManager.getCurrentReactContext();
 
+            // Checks whether there is a React activity
             if(reactContext == null || !reactContext.hasCurrentActivity()) {
                 String channel = null;
 
@@ -78,7 +80,9 @@ public class MusicService extends HeadlessJsTaskService {
                     channel = NotificationChannel.DEFAULT_CHANNEL_ID;
                 }
 
+                // Sets the service to foreground with an empty notification
                 startForeground(1, new NotificationCompat.Builder(this, channel).build());
+                // Stops the service right after
                 stopSelf();
             }
         }
@@ -97,11 +101,13 @@ public class MusicService extends HeadlessJsTaskService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(intent != null && Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())) {
+            // Check if the app is on background, then starts a foreground service and then ends it right after
+            onStartForeground();
+            
             if(manager != null) {
                 MediaButtonReceiver.handleIntent(manager.getMetadata().getSession(), intent);
             }
-
-            onStartForeground();
+            
             return START_NOT_STICKY;
         }
 
