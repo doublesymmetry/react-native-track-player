@@ -52,3 +52,7 @@ xcuserdata/
 *.dSYM
 example/ios/Pods
 /ios/RNTrackPlayer.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+android/.project
+android/.settings/org.eclipse.buildship.core.prefs
+example/android/.project
+example/android/.settings/org.eclipse.buildship.core.prefs
