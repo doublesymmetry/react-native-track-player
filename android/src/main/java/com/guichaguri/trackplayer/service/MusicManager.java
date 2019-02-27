@@ -113,8 +113,8 @@ public class MusicManager implements OnAudioFocusChangeListener {
 
         LoadControl control = new DefaultLoadControl.Builder()
                 .setBufferDurationsMs(minBuffer, maxBuffer, playBuffer, playBuffer * multiplier)
-				.setBackBuffer(backBuffer, false)
-				.createDefaultLoadControl();
+                .setBackBuffer(backBuffer, false)
+                .createDefaultLoadControl();
 
         SimpleExoPlayer player = ExoPlayerFactory.newSimpleInstance(service, new DefaultRenderersFactory(service), new DefaultTrackSelector(), control);
 
@@ -226,22 +226,26 @@ public class MusicManager implements OnAudioFocusChangeListener {
     public void onAudioFocusChange(int focus) {
         Log.d(Utils.LOG, "onDuck");
 
+        boolean permanent = false;
         boolean paused = false;
         boolean ducking = false;
 
         switch(focus) {
             case AudioManager.AUDIOFOCUS_LOSS:
+                permanent = true;
+                abandonFocus();
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                 paused = true;
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
                 ducking = true;
                 break;
-            case AudioManager.AUDIOFOCUS_GAIN:
+            default:
                 break;
         }
 
         Bundle bundle = new Bundle();
+        bundle.putBoolean("permanent", permanent);
         bundle.putBoolean("paused", paused);
         bundle.putBoolean("ducking", ducking);
         service.emit(MusicEvents.BUTTON_DUCK, bundle);
