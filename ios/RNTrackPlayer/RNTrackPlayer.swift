@@ -131,13 +131,21 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     @objc(setupPlayer:resolver:rejecter:)
     public func setupPlayer(config: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            let categoryOption: String = config["iosCategory"] as? String ?? "playback"
+            let category: AVAudioSession.Category
+            if categoryOption.isEqual("playAndRecord") {
+                category = .playAndRecord
+            } else if categoryOption.isEqual("multiRoute") {
+                category = .multiRoute
+            } else {
+                category = .playback
+            }
+            try AVAudioSession.sharedInstance().setCategory(category, mode: .default)
             try AVAudioSession.sharedInstance().setActive(true)
+            resolve(NSNull())
         } catch {
             reject("setup_audio_session_failed", "Failed to setup audio session", error)
         }
-        
-        resolve(NSNull())
     }
     
     @objc(destroy)
