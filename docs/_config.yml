@@ -1,7 +1,4 @@
 title: react-native-track-player
-markdown: kramdown
-plugins:
-  - jekyll-feed
 
 links:
 - title: Installation
