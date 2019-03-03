@@ -64,6 +64,7 @@ a {
     justify-content: center;
     font-weight: normal;
     border-top: 1px solid $headerBorder;
+    margin-top: 1em;
 }
 
 section, #header > div {
@@ -74,6 +75,13 @@ section, #header > div {
 section {
     ul li {
         line-height: 1.75em;
+    }
+    .buttons {
+        text-align: right;
+        a {
+            margin-left: 1em;
+            display: inline-block;
+        }
     }
 }
 
