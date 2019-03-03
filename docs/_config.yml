@@ -2,20 +2,20 @@ title: react-native-track-player
 
 links:
 - title: Installation
-  url: /install/
+  url: https://react-native-kit.github.io/react-native-track-player/install/
   menu: true
 - title: Getting Started
-  url: /api/
+  url: https://react-native-kit.github.io/react-native-track-player/api/
   menu: true
 - title: Documentation
-  url: /documentation/
+  url: https://react-native-kit.github.io/react-native-track-player/documentation/
   menu: true
 - title: Platform Support
-  url: /platform-support/
+  url: https://react-native-kit.github.io/react-native-track-player/platform-support/
 - title: Background Mode
-  url: /background/
+  url: https://react-native-kit.github.io/react-native-track-player/background/
 - title: Build Preferences
-  url: /build-preferences/
+  url: https://react-native-kit.github.io/react-native-track-player/build-preferences/
 - title: GitHub
   url: https://github.com/react-native-kit/react-native-track-player
   menu: true
