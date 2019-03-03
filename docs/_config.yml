@@ -1,0 +1,24 @@
+title: react-native-track-player
+markdown: kramdown
+plugins:
+  - jekyll-feed
+
+links:
+- title: Installation
+  url: /install/
+  menu: true
+- title: Getting Started
+  url: /api/
+  menu: true
+- title: Documentation
+  url: /documentation/
+  menu: true
+- title: Platform Support
+  url: /platform-support/
+- title: Background Mode
+  url: /background/
+- title: Build Preferences
+  url: /build-preferences/
+- title: GitHub
+  url: https://github.com/react-native-kit/react-native-track-player
+  menu: true

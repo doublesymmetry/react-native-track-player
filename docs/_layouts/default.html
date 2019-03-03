@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        {% seo %}
+        <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
+    </head>
+    <body>
+        <div id="header">
+            <div>
+                <a href="/">react-native-track-player</a>
+                <ul>
+                    {% for page in site.links %}
+                        {% if page.menu == true %}
+                            <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <section>
+            <h1>{{ page.title }}</h1>
+            {{ content }}
+        </section>
+        <div id="footer">
+            <div>
+                <ul>
+                    {% for page in site.links %}
+                        <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/anchor-js/4.2.0/anchor.js"></script>
+        <script type="text/javascript">
+            (function () {
+                'use strict';
+                anchors.options.placement = 'right';
+                anchors.add('h2, h3, h4, h5, h6');
+            })();
+        </script>
+    </body>
+</html>
