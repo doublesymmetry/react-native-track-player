@@ -31,7 +31,7 @@ module.exports = async function() {
 ### Initializing a Track
 Using the newly created player, you can add a media file from the network or from the app bundle.
 
-First of all, you need to create a [Track Structure](https://github.com/react-native-kit/react-native-track-player/wiki/Documentation#track-structure) to provide all the information for the player
+First of all, you need to create a [Track Structure](https://react-native-kit.github.io/react-native-track-player/documentation/#track-structure) to provide all the information for the player
 
 ```javascript
 var track = {
@@ -52,9 +52,9 @@ var track = {
     artwork: 'file:///storage/sdcard0/Downloads/artwork.png' // Load artwork from the file system
 };
 ```
-[Check the documentation](https://github.com/react-native-kit/react-native-track-player/wiki/Documentation#track-structure) for more information about the properties you can have in a track structure.
+[Check the documentation](https://react-native-kit.github.io/react-native-track-player/documentation/#track-structure) for more information about the properties you can have in a track structure.
 
-After creating it, you can [add](https://github.com/react-native-kit/react-native-track-player/wiki/Documentation#addtracks-insertbeforeid) it to the queue:
+After creating it, you can [add](https://react-native-kit.github.io/react-native-track-player/documentation/#addtracks-insertbeforeid) it to the queue:
 
 ```javascript
 // Adding to the queue
@@ -65,7 +65,7 @@ TrackPlayer.add([track, track2]).then(function() {
 ```
 
 ### Player Information
-After a media file has been loaded, you can get information about it (such as retrieving the [state](https://github.com/react-native-kit/react-native-track-player/wiki/Documentation#state))
+After a media file has been loaded, you can get information about it (such as retrieving the [state](https://react-native-kit.github.io/react-native-track-player/documentation/#state))
 
 ```javascript
 // State is one of STATE_NONE, STATE_PLAYING, STATE_PAUSED, STATE_STOPPED, STATE_BUFFERING
@@ -183,7 +183,7 @@ module.exports = async function() {
 };
 ```
 
-You can find a full list of events (and its parameters) in the [full documentation reference](https://github.com/react-native-kit/react-native-track-player/wiki/Documentation#events).
+You can find a full list of events (and its parameters) in the [full documentation reference](https://react-native-kit.github.io/react-native-track-player/documentation/#events).
 
 ## Progress
 Music apps usually need an automated way to update its progress, for that, we created a React Component that updates itself. You can build your own player bar on top of it:
@@ -210,7 +210,7 @@ Note: `formatTime` and `ProgressBar` are just examples, replace them with your o
 
 Be careful, as the component will be re-rendered every progress update!
 
-You can find more information about the ProgressComponent in the [documentation](https://github.com/react-native-kit/react-native-track-player/wiki/Documentation#progresscomponent).
+You can find more information about the ProgressComponent in the [documentation](https://react-native-kit.github.io/react-native-track-player/documentation/#progresscomponent).
 
 ## Options
 You can define the rating type, capabilities, icons, etc.
@@ -219,7 +219,7 @@ You can also call this function multiple times, you don't need to specify all th
 
 It's recommended to set the options right before using any other function (other than `setupPlayer`)
 
-For more information about the properties you can set, [check the documentation](https://github.com/react-native-kit/react-native-track-player/wiki/Documentation#updateoptionsdata).
+For more information about the properties you can set, [check the documentation](https://react-native-kit.github.io/react-native-track-player/documentation/#updateoptionsdata).
 ```javascript
 TrackPlayer.updateOptions({
     // One of RATING_HEART, RATING_THUMBS_UP_DOWN, RATING_3_STARS, RATING_4_STARS, RATING_5_STARS, RATING_PERCENTAGE

@@ -27,7 +27,7 @@ Create a `track-player.json` file in the root of your app (same folder as `index
 }
 ```
 
-See more about the `track-player.json` structure in [[Build Preferences|build-preferences]]
+See more about the `track-player.json` structure in [Build Preferences](https://react-native-kit.github.io/react-native-track-player/build-preferences/)
 
 ## Adding the Cast Button
 The Cast Button is the most important component for Google Cast integration, as it lets the user select and connect to a cast device.
