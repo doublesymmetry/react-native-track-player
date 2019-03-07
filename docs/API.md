@@ -3,7 +3,7 @@ title: Getting Started
 permalink: /api/
 ---
 
-## Getting Started
+## Starting off
 First of all, you need to initialize the player.
 ```javascript
 import TrackPlayer from 'react-native-track-player';
@@ -17,12 +17,13 @@ This usually takes less than a second. If the player is already initialized, the
 You also need to register a playback service right after you have registered the main component of your app:
 ```javascript
 //AppRegistry.registerComponent(...);
-TrackPlayer.registerPlaybackService(() => require('service.js'));
+TrackPlayer.registerPlaybackService(() => require('./service.js'));
 ```
 ```javascript
 // service.js
 module.exports = async function() {
-    // ...
+    // This service needs to be registered for the module to work
+	// but it will be used later in the "Receiving Events" section
 }
 ```
 
