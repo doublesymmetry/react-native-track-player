@@ -130,13 +130,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     
     @objc(setupPlayer:resolver:rejecter:)
     public func setupPlayer(config: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
-            try AVAudioSession.sharedInstance().setActive(true)
-        } catch {
-            reject("setup_audio_session_failed", "Failed to setup audio session", error)
-        }
-        
         resolve(NSNull())
     }
     
@@ -346,6 +339,12 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     @objc(play:rejecter:)
     public func play(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Starting/Resuming playback")
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            reject("setup_audio_session_failed", "Failed to setup audio session", error)
+        }
         try? player.play()
         resolve(NSNull())
     }
