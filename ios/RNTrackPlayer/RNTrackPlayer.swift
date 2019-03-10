@@ -350,8 +350,8 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
         resolve(NSNull())
         //tell app to stop receiving remote control events
         //so the MPNowPlayingInfoCenter clears properly
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            UIApplication.shared.beginReceivingRemoteControlEvents();
+        DispatchQueue.main.async {
+            UIApplication.shared.endReceivingRemoteControlEvents();
         }
     }
     
