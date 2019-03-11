@@ -21,7 +21,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
         return player
     }()
     
-    private var sessionCategory: AVAudioSession.Category?
+    private var sessionCategory: AVAudioSession.Category
     
     // MARK: - AudioPlayerDelegate
     
@@ -349,14 +349,8 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     public func play(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Starting/Resuming playback")
         //do this here so we can have bg audio until we play
-        let category : AVAudioSession.Category
-        if(sessionCategory != nil){
-            category = sessionCategory!
-        } else {
-            category = .playback
-        }
         try? AVAudioSession.sharedInstance().setActive(false)
-        try? AVAudioSession.sharedInstance().setCategory(category, mode: .default)
+        try? AVAudioSession.sharedInstance().setCategory(self.sessionCategory, mode: .default)
         try? AVAudioSession.sharedInstance().setActive(true)
         try? player.play()
         resolve(NSNull())
