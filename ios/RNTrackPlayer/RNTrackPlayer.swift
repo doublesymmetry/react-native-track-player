@@ -16,7 +16,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
         
         player.delegate = self
         player.bufferDuration = 1
-        player.automaticallyWaitsToMinimizeStalling = false
+        player.automaticallyWaitsToMinimizeStalling = true
         
         return player
     }()
