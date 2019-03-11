@@ -21,6 +21,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
         return player
     }()
     
+    private var sessionCategory: AVAudioSession.Category?
     
     // MARK: - AudioPlayerDelegate
     
@@ -130,6 +131,14 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     
     @objc(setupPlayer:resolver:rejecter:)
     public func setupPlayer(config: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        let categoryOption: String = config["iosCategory"] as? String ?? "playback"
+        if categoryOption.isEqual("playAndRecord") {
+            self.sessionCategory = .playAndRecord
+        } else if categoryOption.isEqual("multiRoute") {
+            self.sessionCategory = .multiRoute
+        } else {
+            self.sessionCategory = .playback
+        }
         resolve(NSNull())
     }
     
@@ -339,12 +348,16 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     @objc(play:rejecter:)
     public func play(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Starting/Resuming playback")
-        do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
-            try AVAudioSession.sharedInstance().setActive(true)
-        } catch {
-            reject("setup_audio_session_failed", "Failed to setup audio session", error)
+        //do this here so we can have bg audio until we play
+        let category : AVAudioSession.Category
+        if(sessionCategory != nil){
+            category = sessionCategory!
+        } else {
+            category = .playback
         }
+        try? AVAudioSession.sharedInstance().setActive(false)
+        try? AVAudioSession.sharedInstance().setCategory(category, mode: .default)
+        try? AVAudioSession.sharedInstance().setActive(true)
         try? player.play()
         resolve(NSNull())
     }

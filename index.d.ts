@@ -69,6 +69,7 @@ declare namespace RNTrackPlayer {
     maxBuffer?: number;
     playBuffer?: number;
     maxCacheSize?: number;
+    iosCategory?: 'playback' | 'playAndRecord' | 'multiRoute';
   }
 
   export interface MetadataOptions {
