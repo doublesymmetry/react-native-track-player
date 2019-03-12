@@ -22,6 +22,8 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     }()
     
     private var sessionCategory: AVAudioSession.Category = .playback
+    private var sessionCategoryOptions: AVAudioSession.CategoryOptions? = nil
+    private var sessionCategoryMode: AVAudioSession.Mode = .default
     
     // MARK: - AudioPlayerDelegate
     
@@ -131,14 +133,74 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     
     @objc(setupPlayer:resolver:rejecter:)
     public func setupPlayer(config: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        let categoryOption: String = config["iosCategory"] as? String ?? "playback"
-        if categoryOption.isEqual("playAndRecord") {
-            self.sessionCategory = .playAndRecord
-        } else if categoryOption.isEqual("multiRoute") {
-            self.sessionCategory = .multiRoute
-        } else {
-            self.sessionCategory = .playback
+        
+        let sessionCategory: String = config["iosCategory"] as? String ?? "playback"
+        switch sessionCategory {
+            case "playAndRecord":
+                self.sessionCategory = .playAndRecord
+            case "multiRoute":
+                self.sessionCategory = .multiRoute
+            case "playback":
+                self.sessionCategory = .playback
+            case "ambient":
+                self.sessionCategory = .ambient
+            case "soloAmbient":
+                self.sessionCategory = .soloAmbient
+            default:
+                self.sessionCategory = .playback
         }
+        
+        let sessionCategoryOpts: String = config["iosCategoryOptions"] as? String ?? ""
+        
+        switch sessionCategoryOpts {
+        case "mixWithOthers":
+            self.sessionCategoryOptions = .mixWithOthers
+        case "duckOthers":
+            self.sessionCategoryOptions = .duckOthers
+        case "interruptSpokenAudioAndMixWithOthers":
+            self.sessionCategoryOptions = .interruptSpokenAudioAndMixWithOthers
+        case "allowBluetooth":
+            self.sessionCategoryOptions = .allowBluetooth
+        case "allowBluetoothA2DP":
+            self.sessionCategoryOptions = .allowBluetoothA2DP
+        case "allowAirPlay":
+            self.sessionCategoryOptions = .allowAirPlay
+        case "defaultToSpeaker":
+            self.sessionCategoryOptions = .defaultToSpeaker
+        default:
+            //do nothing
+            self.sessionCategoryOptions = nil
+        }
+        
+        let sessionCategoryMode: String = config["iosCategoryMode"] as? String ?? "default"
+        
+        switch sessionCategoryMode {
+        case "default":
+            self.sessionCategoryMode = .default
+        case "gameChat":
+            self.sessionCategoryMode = .gameChat
+        case "measurement":
+            self.sessionCategoryMode = .measurement
+        case "moviePlayback":
+            self.sessionCategoryMode = .moviePlayback
+        case "spokenAudio":
+            self.sessionCategoryMode = .spokenAudio
+        case "videoChat":
+            self.sessionCategoryMode = .videoChat
+        case "videoRecording":
+            self.sessionCategoryMode = .videoRecording
+        case "voiceChat":
+            self.sessionCategoryMode = .voiceChat
+        case "voicePrompt":
+            if #available(iOS 12.0, *) {
+                self.sessionCategoryMode = .voicePrompt
+            } else {
+                // Do Nothing
+            }
+        default:
+            self.sessionCategoryMode = .default
+        }
+        
         resolve(NSNull())
     }
     
@@ -350,7 +412,11 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
         print("Starting/Resuming playback")
         //do this here so we can have bg audio until we play
         try? AVAudioSession.sharedInstance().setActive(false)
-        try? AVAudioSession.sharedInstance().setCategory(self.sessionCategory, mode: .default)
+        if(self.sessionCategoryOptions != nil) {
+            try? AVAudioSession.sharedInstance().setCategory(self.sessionCategory, mode: self.sessionCategoryMode, options: self.sessionCategoryOptions!)
+        } else {
+            try? AVAudioSession.sharedInstance().setCategory(self.sessionCategory, mode: self.sessionCategoryMode)
+        }
         try? AVAudioSession.sharedInstance().setActive(true)
         try? player.play()
         resolve(NSNull())
