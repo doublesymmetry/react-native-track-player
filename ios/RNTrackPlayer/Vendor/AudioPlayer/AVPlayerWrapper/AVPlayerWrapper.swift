@@ -102,7 +102,7 @@ class AVPlayerWrapper: AVPlayerWrapperProtocol {
 		return currentItem?.loadedTimeRanges.last?.timeRangeValue.end.seconds ?? 0
 	}
 
-	weak var delegate: AVPlayerWrapperDelegate? = nil
+    weak var delegate: AVPlayerWrapperDelegate? = nil
     
     var bufferDuration: TimeInterval = 0
     
