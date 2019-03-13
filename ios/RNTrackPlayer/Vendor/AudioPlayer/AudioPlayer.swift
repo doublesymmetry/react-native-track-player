@@ -78,6 +78,13 @@ public class AudioPlayer: AVPlayerWrapperDelegate {
     }
     
     /**
+     The bufferedPosition of the current AudioItem.
+     */
+    public var bufferedPosition: Double {
+        return wrapper.bufferedPosition
+    }
+    
+    /**
      The current state of the underlying `AudioPlayer`.
      */
     public var playerState: AudioPlayerState {
