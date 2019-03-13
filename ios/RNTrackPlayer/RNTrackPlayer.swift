@@ -133,73 +133,23 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     
     @objc(setupPlayer:resolver:rejecter:)
     public func setupPlayer(config: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        
+
+        //configure base category -- defaults to .playback
         let sessionCategory: String = config["iosCategory"] as? String ?? "playback"
-        switch sessionCategory {
-            case "playAndRecord":
-                self.sessionCategory = .playAndRecord
-            case "multiRoute":
-                self.sessionCategory = .multiRoute
-            case "playback":
-                self.sessionCategory = .playback
-            case "ambient":
-                self.sessionCategory = .ambient
-            case "soloAmbient":
-                self.sessionCategory = .soloAmbient
-            default:
-                self.sessionCategory = .playback
-        }
+        self.sessionCategory = SessionCategory(rawValue: sessionCategory)!.mapConfigToAVAudioSessionCategory()
         
-        let sessionCategoryOpts: String = config["iosCategoryOptions"] as? String ?? ""
-        
-        switch sessionCategoryOpts {
-        case "mixWithOthers":
-            self.sessionCategoryOptions = .mixWithOthers
-        case "duckOthers":
-            self.sessionCategoryOptions = .duckOthers
-        case "interruptSpokenAudioAndMixWithOthers":
-            self.sessionCategoryOptions = .interruptSpokenAudioAndMixWithOthers
-        case "allowBluetooth":
-            self.sessionCategoryOptions = .allowBluetooth
-        case "allowBluetoothA2DP":
-            self.sessionCategoryOptions = .allowBluetoothA2DP
-        case "allowAirPlay":
-            self.sessionCategoryOptions = .allowAirPlay
-        case "defaultToSpeaker":
-            self.sessionCategoryOptions = .defaultToSpeaker
-        default:
-            //do nothing
+        //configure extra opts -- defaults to nil
+        let sessionCategoryOpts: String? = config["iosCategoryOptions"] as? String ?? nil
+        //this is because this doesnt default as anything
+        if(sessionCategoryOpts != nil) {
+            self.sessionCategoryOptions = SessionCategoryOptions(rawValue: sessionCategoryOpts!)!.mapConfigToAVAudioSessionCategoryOptions()
+        } else {
             self.sessionCategoryOptions = nil
         }
-        
+
+        //configure mode -- defaults to .default
         let sessionCategoryMode: String = config["iosCategoryMode"] as? String ?? "default"
-        
-        switch sessionCategoryMode {
-        case "default":
-            self.sessionCategoryMode = .default
-        case "gameChat":
-            self.sessionCategoryMode = .gameChat
-        case "measurement":
-            self.sessionCategoryMode = .measurement
-        case "moviePlayback":
-            self.sessionCategoryMode = .moviePlayback
-        case "spokenAudio":
-            self.sessionCategoryMode = .spokenAudio
-        case "videoChat":
-            self.sessionCategoryMode = .videoChat
-        case "videoRecording":
-            self.sessionCategoryMode = .videoRecording
-        case "voiceChat":
-            self.sessionCategoryMode = .voiceChat
-        case "voicePrompt":
-            if #available(iOS 12.0, *) {
-                self.sessionCategoryMode = .voicePrompt
-            } else {
-                // Do Nothing
-            }
-        default:
-            self.sessionCategoryMode = .default
-        }
+        self.sessionCategoryMode = SessionCategoryMode(rawValue: sessionCategoryMode)!.mapConfigToAVAudioSessionCategoryMode()
         
         resolve(NSNull())
     }
