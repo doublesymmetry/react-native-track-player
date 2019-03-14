@@ -22,7 +22,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     }()
     
     private var sessionCategory: AVAudioSession.Category = .playback
-    private var sessionCategoryOptions: AVAudioSession.CategoryOptions = []
+    private var sessionCategoryOptions: AVAudioSession.CategoryOptions? = []
     private var sessionCategoryMode: AVAudioSession.Mode = .default
     
     // MARK: - AudioPlayerDelegate
