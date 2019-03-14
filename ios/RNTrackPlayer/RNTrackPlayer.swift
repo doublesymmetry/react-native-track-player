@@ -22,7 +22,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     }()
     
     private var sessionCategory: AVAudioSession.Category = .playback
-    private var sessionCategoryOptions: AVAudioSession.CategoryOptions? = nil
+    private var sessionCategoryOptions: AVAudioSession.CategoryOptions? = []
     private var sessionCategoryMode: AVAudioSession.Mode = .default
     
     // MARK: - AudioPlayerDelegate
@@ -135,21 +135,20 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     public func setupPlayer(config: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
 
         //configure base category -- defaults to .playback
-        let sessionCategory: String = config["iosCategory"] as? String ?? "playback"
-        self.sessionCategory = SessionCategory(rawValue: sessionCategory)!.mapConfigToAVAudioSessionCategory()
+        if let sessionCategory = config["iosCategory"] as? String {
+          let mappedCategory = SessionCategory(rawValue: sessionCategory)
+          self.sessionCategory = (mappedCategory ?? .playback).mapConfigToAVAudioSessionCategory()
+        }
         
-        //configure extra opts -- defaults to nil
-        let sessionCategoryOpts: String? = config["iosCategoryOptions"] as? String ?? nil
-        //this is because this doesnt default as anything
-        if(sessionCategoryOpts != nil) {
-            self.sessionCategoryOptions = SessionCategoryOptions(rawValue: sessionCategoryOpts!)!.mapConfigToAVAudioSessionCategoryOptions()
-        } else {
-            self.sessionCategoryOptions = nil
+        if let sessionCategoryOpts = config["iosCategoryOptions"] as? String, let mappedCategoryOptions = SessionCategoryOptions(rawValue: sessionCategoryOpts) {
+          self.sessionCategoryOptions = mappedCategory.mapConfigToAVAudioSessionCategoryOptions()
         }
 
         //configure mode -- defaults to .default
-        let sessionCategoryMode: String = config["iosCategoryMode"] as? String ?? "default"
-        self.sessionCategoryMode = SessionCategoryMode(rawValue: sessionCategoryMode)!.mapConfigToAVAudioSessionCategoryMode()
+        if let sessionCategoryMode = config["iosCategoryMode"] as? String {
+          let mappedCategoryMode = SessionCategory(rawValue: sessionCategory)
+          self.sessionCategoryMode = (mappedCategoryMode ?? .default).mapConfigToAVAudioSessionCategory()
+        }
         
         resolve(NSNull())
     }
@@ -362,11 +361,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
         print("Starting/Resuming playback")
         //do this here so we can have bg audio until we play
         try? AVAudioSession.sharedInstance().setActive(false)
-        if(self.sessionCategoryOptions != nil) {
-            try? AVAudioSession.sharedInstance().setCategory(self.sessionCategory, mode: self.sessionCategoryMode, options: self.sessionCategoryOptions!)
-        } else {
-            try? AVAudioSession.sharedInstance().setCategory(self.sessionCategory, mode: self.sessionCategoryMode)
-        }
+        try? AVAudioSession.sharedInstance().setCategory(self.sessionCategory, mode: self.sessionCategoryMode, options: self.sessionCategoryOptions)
         try? AVAudioSession.sharedInstance().setActive(true)
         try? player.play()
         resolve(NSNull())
