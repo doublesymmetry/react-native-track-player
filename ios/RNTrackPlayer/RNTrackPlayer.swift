@@ -140,8 +140,9 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
             self.sessionCategory = (mappedCategory ?? .playback).mapConfigToAVAudioSessionCategory()
         }
         
-        if let sessionCategoryOpts = config["iosCategoryOptions"] as? String, let mappedCategoryOptions = SessionCategoryOptions(rawValue: sessionCategoryOpts) {
-            self.sessionCategoryOptions = mappedCategoryOptions.mapConfigToAVAudioSessionCategoryOptions()!
+        if let sessionCategoryOpts = config["iosCategoryOptions"] as? [String] {
+            let mappedCategoryOpts = sessionCategoryOpts.compactMap { SessionCategoryOptions(rawValue: $0)?.mapConfigToAVAudioSessionCategoryOptions() }
+            self.sessionCategoryOptions = AVAudioSession.CategoryOptions(mappedCategoryOpts)
         }
         
         //configure mode -- defaults to .default
