@@ -21,6 +21,9 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
         return player
     }()
     
+    private var sessionCategory: AVAudioSession.Category = .playback
+    private var sessionCategoryOptions: AVAudioSession.CategoryOptions = []
+    private var sessionCategoryMode: AVAudioSession.Mode = .default
     
     // MARK: - AudioPlayerDelegate
     
@@ -130,11 +133,21 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     
     @objc(setupPlayer:resolver:rejecter:)
     public func setupPlayer(config: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
-            try AVAudioSession.sharedInstance().setActive(true)
-        } catch {
-            reject("setup_audio_session_failed", "Failed to setup audio session", error)
+
+        //configure base category -- defaults to .playback
+        if let sessionCategory = config["iosCategory"] as? String {
+            let mappedCategory = SessionCategory(rawValue: sessionCategory)
+            self.sessionCategory = (mappedCategory ?? .playback).mapConfigToAVAudioSessionCategory()
+        }
+        
+        if let sessionCategoryOpts = config["iosCategoryOptions"] as? String, let mappedCategoryOptions = SessionCategoryOptions(rawValue: sessionCategoryOpts) {
+            self.sessionCategoryOptions = mappedCategoryOptions.mapConfigToAVAudioSessionCategoryOptions()!
+        }
+        
+        //configure mode -- defaults to .default
+        if let sessionCategoryMode = config["iosCategoryMode"] as? String {
+            let mappedCategoryMode = SessionCategoryMode(rawValue: sessionCategoryMode)
+            self.sessionCategoryMode = (mappedCategoryMode ?? .default).mapConfigToAVAudioSessionCategoryMode()
         }
         
         resolve(NSNull())
@@ -346,6 +359,10 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     @objc(play:rejecter:)
     public func play(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Starting/Resuming playback")
+        //do this here so we can have bg audio until we play
+        try? AVAudioSession.sharedInstance().setActive(false)
+        try? AVAudioSession.sharedInstance().setCategory(self.sessionCategory, mode: self.sessionCategoryMode, options: self.sessionCategoryOptions)
+        try? AVAudioSession.sharedInstance().setActive(true)
         try? player.play()
         resolve(NSNull())
     }
