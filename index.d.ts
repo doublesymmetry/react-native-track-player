@@ -69,6 +69,9 @@ declare namespace RNTrackPlayer {
     maxBuffer?: number;
     playBuffer?: number;
     maxCacheSize?: number;
+    iosCategory?: 'playback' | 'playAndRecord' | 'multiRoute' | 'ambient' | 'soloAmbient' | 'record';
+    iosCategoryOptions?: 'mixWithOthers' | 'duckOthers' | 'interruptSpokenAudioAndMixWithOthers' | 'allowBluetooth' | 'allowBluetoothA2DP' | 'allowAirPlay' | 'defaultToSpeaker';
+    iosCategoryMode?: 'default' | 'gameChat' | 'measurement' | 'moviePlayback' | 'spokenAudio' | 'videoChat' | 'videoRecording' | 'voiceChat' | 'voicePrompt';
   }
 
   export interface MetadataOptions {

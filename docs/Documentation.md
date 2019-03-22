@@ -20,7 +20,7 @@ permalink: /documentation/
 * [Components](#components)
   * [ProgressComponent](#progresscomponent)
 * [Objects](#objects)
-  * [Track Structure](#track-structure)
+  * [Track Object](#track-object)
   * [Resource Object](#resource-object)
 
 ## Constants
@@ -145,40 +145,40 @@ Registers an event handler. This function should only be called once, and should
 
 ### Queue Functions
 #### `add(tracks, insertBeforeId)`
-Adds an array of tracks to the queue.
+Adds one or more tracks to the queue.
 
 **Returns:** `Promise`
 
 | Param          | Type     | Description   |
 | -------------- | -------- | ------------- |
-| tracks         | `array` or a single [Track Structure](#track-structure) | The tracks that will be added |
+| tracks         | `array` of [Track Object](#track-object) or a single one | The tracks that will be added |
 | insertBeforeId | `string` | The ID of the track that will be located immediately after the inserted tracks. Set it to `null` to add it at the end of the queue |
 
 #### `remove(tracks)`
-Removes an array of tracks from the queue
+Removes one or more tracks from the queue.
 
 **Returns:** `Promise`
 
 | Param  | Type     | Description   |
 | ------ | -------- | ------------- |
-| tracks | `array` or a single track ID | The tracks that will be removed |
+| tracks | `array` of track ids or a single one | The tracks that will be removed |
 
-#### `skip(track)`
-Skips to a track in the queue
+#### `skip(id)`
+Skips to a track in the queue.
 
 **Returns:** `Promise`
 
 | Param  | Type     | Description   |
 | ------ | -------- | ------------- |
-| track  | `string` | The track id  |
+| id  | `string` | The track id  |
 
 #### `skipToNext()`
-Skips to the next track in the queue
+Skips to the next track in the queue.
 
 **Returns:** `Promise`
 
 #### `skipToPrevious()`
-Skips to the previous track in the queue
+Skips to the previous track in the queue.
 
 **Returns:** `Promise`
 
@@ -186,29 +186,29 @@ Skips to the previous track in the queue
 Resets the player stopping the current track and clearing the queue.
 
 #### `getTrack(id)`
-Gets a track structure from the queue
+Gets a track object from the queue.
 
-**Returns:** `Promise<`[Track Structure](#track-structure)`>`
+**Returns:** `Promise<`Object as described in [Track Object](#track-object)`>`
 
 | Param    | Type       | Description   |
 | -------- | ---------- | ------------- |
 | id       | `string`   | The track ID  |
 
 #### `getCurrentTrack()`
-Gets the current track ID of the player
+Gets the id of the current track
 
 **Returns:** `Promise<string>`
 
 #### `getQueue()`
 Gets the whole queue
 
-**Returns:** `Promise<Array<`[Track Structure](#track-structure)`>>`
+**Returns:** `Promise<Array<`Object as described in [Track Object](#track-object)`>>`
 
 #### `removeUpcomingTracks()`
 Clears any upcoming tracks from the queue.
 
 ### Player Functions
-#### `updateOptions(data)`
+#### `updateOptions(options)`
 Updates the configuration for the components.
 
 All parameters are optional. You also only need to specify the ones you want to update.
@@ -219,22 +219,22 @@ Some parameters are unused depending on platform.
 
 | Param     | Type       | Description          | Android | iOS | Windows |
 | --------- | ---------- | -------------------- | :-----: | :-: | :-----: |
-| data      | `object`   | The data |
-| data.ratingType | [Rating Constant](#rating) | The rating type | ✓ | ✗ | ✗ |
-| data.jumpInterval | `number` | The interval in seconds for the jump forward/backward buttons | ✓ | ✓ | ✓ |
-| data.stopWithApp | `boolean` | Whether the player will be destroyed when the app closes | ✓ | ✗ | ✗ |
-| data.capabilities | `array` of [Capability Constants](#capability) | The media controls that will be enabled | ✓ | ✓ | ✓ |
-| data.notificationCapabilities | `array` of [Capability Constants](#capability) | The buttons that it will show in the notification. Defaults to `data.capabilities`  | ✓ | ✗ | ✗ |
-| data.compactCapabilities | `array` of [Capability Constants](#capability) | The buttons that it will show in the compact notification | ✓ | ✗ | ✗ |
-| data.icon | [Resource Object](#resource-object) | The notification icon | ✓ | ✗ | ✗ |
-| data.playIcon | [Resource Object](#resource-object) | The play icon | ✓ | ✗ | ✗ |
-| data.pauseIcon | [Resource Object](#resource-object) | The pause icon | ✓ | ✗ | ✗ |
-| data.stopIcon | [Resource Object](#resource-object) | The stop icon | ✓ | ✗ | ✗ |
-| data.previousIcon | [Resource Object](#resource-object) | The previous icon | ✓ | ✗ | ✗ |
-| data.nextIcon | [Resource Object](#resource-object) | The next icon | ✓ | ✗ | ✗ |
-| data.rewindIcon | [Resource Object](#resource-object) | The jump backward icon | ✓ | ✗ | ✗ |
-| data.forwardIcon | [Resource Object](#resource-object) | The jump forward icon | ✓ | ✗ | ✗ |
-| data.color | `number` | The notification color in an ARGB hex | ✓ | ✗ | ✗ |
+| options      | `object`   | The options |
+| options.ratingType | [Rating Constant](#rating) | The rating type | ✓ | ✗ | ✗ |
+| options.jumpInterval | `number` | The interval in seconds for the jump forward/backward buttons | ✓ | ✓ | ✓ |
+| options.stopWithApp | `boolean` | Whether the player will be destroyed when the app closes | ✓ | ✗ | ✗ |
+| options.capabilities | `array` of [Capability Constants](#capability) | The media controls that will be enabled | ✓ | ✓ | ✓ |
+| options.notificationCapabilities | `array` of [Capability Constants](#capability) | The buttons that it will show in the notification. Defaults to `data.capabilities`  | ✓ | ✗ | ✗ |
+| options.compactCapabilities | `array` of [Capability Constants](#capability) | The buttons that it will show in the compact notification | ✓ | ✗ | ✗ |
+| options.icon | [Resource Object](#resource-object) | The notification icon | ✓ | ✗ | ✗ |
+| options.playIcon | [Resource Object](#resource-object) | The play icon | ✓ | ✗ | ✗ |
+| options.pauseIcon | [Resource Object](#resource-object) | The pause icon | ✓ | ✗ | ✗ |
+| options.stopIcon | [Resource Object](#resource-object) | The stop icon | ✓ | ✗ | ✗ |
+| options.previousIcon | [Resource Object](#resource-object) | The previous icon | ✓ | ✗ | ✗ |
+| options.nextIcon | [Resource Object](#resource-object) | The next icon | ✓ | ✗ | ✗ |
+| options.rewindIcon | [Resource Object](#resource-object) | The jump backward icon | ✓ | ✗ | ✗ |
+| options.forwardIcon | [Resource Object](#resource-object) | The jump forward icon | ✓ | ✗ | ✗ |
+| options.color | `number` | The notification color in an ARGB hex | ✓ | ✗ | ✗ |
 
 #### `play()`
 Plays or resumes the current track.
@@ -246,21 +246,21 @@ Pauses the current track.
 Stops the current track.
 
 #### `seekTo(seconds)`
-Seeks to a specified time position
+Seeks to a specified time position in the current track.
 
 | Param   | Type     | Description             |
 | ------- | -------- | ----------------------- |
 | seconds | `number` | The position in seconds |
 
 #### `setVolume(volume)`
-Sets the volume of the player (a number between 0 and 1)
+Sets the volume of the player.
 
 | Param  | Type     | Description                       |
 | ------ | -------- | --------------------------------- |
 | volume | `number` | The volume in a range from 0 to 1 |
 
 #### `getVolume()`
-Gets the current volume of the player (a number between 0 and 1)
+Gets the volume of the player (a number between 0 and 1).
 
 **Returns:** `Promise<number>`
 
@@ -269,30 +269,30 @@ Sets the playback rate
 
 | Param  | Type     | Description                       |
 | ------ | -------- | --------------------------------- |
-| rate   | `number` | The playback rate being 1 the regular speed |
+| rate   | `number` | The playback rate where 1 is the regular speed |
 
 #### `getRate()`
-Gets the playback rate, being 1 the regular speed.
+Gets the playback rate, where 1 is the regular speed.
 
 **Returns:** `Promise<number>`
 
 #### `getDuration()`
-Gets the duration of the current track in seconds
+Gets the duration of the current track in seconds.
 
 **Returns:** `Promise<number>`
 
 #### `getPosition()`
-Gets the position of the player in seconds
+Gets the position of the player in seconds.
 
 **Returns:** `Promise<number>`
 
 #### `getBufferedPosition()`
-Gets the buffered position of the player in seconds
+Gets the buffered position of the player in seconds.
 
 **Returns:** `Promise<number>`
 
 #### `getState()`
-Gets the state of the player
+Gets the state of the player.
 
 **Returns:** `Promise<`[State Constant](#state)`>`
 
@@ -398,62 +398,62 @@ Fired when the state of the player changes.
 #### `playback-track-changed`
 Fired when a track is changed.
 
-| Param | Type     | Description   |
-| ----- | -------- | ------------- |
-| track | `string` | The previous track id. Might be null |
-| position | `number` | The previous track position in seconds |
-| nextTrack | `string` | The next track id. Might be null |
+| Param     | Type     | Description                            |
+| --------- | -------- | -------------------------------------- |
+| track     | `string` | The previous track id. Might be null   |
+| position  | `number` | The previous track position in seconds |
+| nextTrack | `string` | The next track id. Might be null       |
 
 #### `playback-queue-ended`
 Fired when the queue reaches the end.
 
-| Param | Type     | Description   |
-| ----- | -------- | ------------- |
-| track | `string` | The previous track id. Might be null |
-| position | `number` | The previous track position in seconds |
+| Param    | Type     | Description                               |
+| -------- | -------- | ----------------------------------------- |
+| track    | `string` | The previous track id. Might be null      |
+| position | `number` | The previous track position in seconds    |
 
 #### `playback-error`
 Fired when an error occurs.
 
-| Param   | Type     | Description   |
-| ------- | -------- | ------------- |
-| code    | `string` | The error code |
+| Param   | Type     | Description       |
+| ------- | -------- | ----------------- |
+| code    | `string` | The error code    |
 | message | `string` | The error message |
 
 ## Components
 #### `ProgressComponent`
 A component base that updates itself every second with a new position. Your app should extend it with a custom render.
 
-| State    | Type     | Description  |
-| -------- | -------- | ------------ |
-| position | `number` | The current position in seconds |
+| State            | Type     | Description                      |
+| ---------------- | -------- | -------------------------------- |
+| position         | `number` | The current position in seconds  |
 | bufferedPosition | `number` | The buffered position in seconds |
-| duration | `number` | The duration in seconds |
+| duration         | `number` | The duration in seconds          |
 
-| Functions | Return Type | Description  |
-| --------- | ----------- | ------------ |
-| getProgress | `number` | The current progress expressed between 0 and 1 |
-| getBufferedProgress | `number` | The buffered progress expressed between 0 and 1 |
+| Functions           | Return Type | Description                                     |
+| ------------------- | ----------- | ----------------------------------------------- |
+| getProgress         | `number`    | The current progress expressed between 0 and 1  |
+| getBufferedProgress | `number`    | The buffered progress expressed between 0 and 1 |
 
 ## Objects
-### Track Structure
-The track structure is an object that can be used to add or load tracks into players.
+### Track Object
+Tracks in the player queue are plain javascript objects as described below.
 
-Only the `id`, `url`, `title` and `artist` are required for basic playback
+Only the `id`, `url`, `title` and `artist` properties are required for basic playback
 
 | Param          | Type                        | Description  |
 | -------------- | --------------------------- | ------------ |
-| id             | `string`                    | The track ID |
+| id             | `string`                    | The track id                |
 | url            | `string` or [Resource Object](#resource-object) | The media URL |
 | type           | `string`                    | Stream type. One of `dash`, `hls`, `smoothstreaming` or `default` |
-| userAgent      | `string`                    | The user agent HTTP header |
+| userAgent      | `string`                    | The user agent HTTP header  |
 | contentType    | `string`                    | Mime type of the media file |
-| duration       | `number`                    | The duration in seconds |
-| title          | `string`                    | The track title |
-| artist         | `string`                    | The track artist |
-| album          | `string`                    | The track album |
-| description    | `string`                    | The track description |
-| genre          | `string`                    | The track genre |
+| duration       | `number`                    | The duration in seconds     |
+| title          | `string`                    | The track title             |
+| artist         | `string`                    | The track artist            |
+| album          | `string`                    | The track album             |
+| description    | `string`                    | The track description       |
+| genre          | `string`                    | The track genre             |
 | date           | `string`                    | The track release date in [RFC 3339](https://www.ietf.org/rfc/rfc3339.txt) |
 | rating         | Depends on the [rating type](#rating)  | The track rating value |
 | artwork        | `string` or [Resource Object](#resource-object) | The artwork url |
