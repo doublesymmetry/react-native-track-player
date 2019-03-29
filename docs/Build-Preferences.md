@@ -3,7 +3,7 @@ title: Build Preferences
 permalink: /build-preferences/
 ---
 
-You can change a few properties for building the module in your app, those properties can be set in a JSON file in the root folder of your app (the same folder where `index.android.js` and `node_modules` are stored). The file should be named `track-player.json`, and it should look like this:
+You can optionally configure a few options for how the Track Player module is built in your app. Add a JSON file named `track-player.json` to the root folder of your app (the same folder where `index.android.js` and `node_modules` are stored) and set one or more of the following properties:
 
 ```json
 {
@@ -14,10 +14,10 @@ You can change a few properties for building the module in your app, those prope
 ```
 
 #### `dash` (Android Only)
-Whether it will add support for DASH streams. This option adds an extension for handling DASH streams, which changes the app size.
+Whether it will add support for [DASH](https://en.wikipedia.org/wiki/Dynamic_Adaptive_Streaming_over_HTTP) streams. This option adds an extension for handling DASH streams, which changes the app size. Defaults to `false`.
 
 #### `hls` (Android Only)
-Whether it will add support for HLS streams. This option adds an extension for handling HLS streams, which changes the app size.
+Whether it will add support for [HLS](https://en.wikipedia.org/wiki/HTTP_Live_Streaming) streams. This option adds an extension for handling HLS streams, which changes the app size. Defaults to `false`.
 
 #### `smoothstreaming` (Android Only)
-Whether it will add support for SmoothStreaming streams. This option adds an extension for handling SmoothStreaming streams, which changes the app size.
+Whether it will add support for [Smooth Streaming](https://en.wikipedia.org/wiki/Adaptive_bitrate_streaming#Microsoft_Smooth_Streaming) streams. This option adds an extension for handling SmoothStreaming streams, which changes the app size. Defaults to `false`.
