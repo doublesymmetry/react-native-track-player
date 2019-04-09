@@ -78,6 +78,7 @@ public class RNTrackPlayer: RCTEventEmitter {
             "remote-stop",
             "remote-pause",
             "remote-play",
+            "remote-duck",
             "remote-next",
             "remote-seek",
             "remote-previous",
@@ -86,11 +87,53 @@ public class RNTrackPlayer: RCTEventEmitter {
         ]
     }
     
+    func setupInterruptionHandling() {
+        let notificationCenter = NotificationCenter.default
+        notificationCenter.removeObserver(self)
+        notificationCenter.addObserver(self,
+                                       selector: #selector(handleInterruption),
+                                       name: AVAudioSession.interruptionNotification,
+                                       object: nil)
+    }
     
+    @objc func handleInterruption(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+            let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
+            let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
+                return
+        }
+        if type == .began {
+            // Interruption began, take appropriate actions
+            self.sendEvent(withName: "remote-duck", body: [
+                "ducking": true,
+                "paused": true
+                ])
+        }
+        else if type == .ended {
+            if let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
+                let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
+                if options.contains(.shouldResume) {
+                    // Interruption Ended - playback should resume
+                    self.sendEvent(withName: "remote-duck", body: [
+                        "ducking": false,
+                        "paused": false
+                        ])
+                } else {
+                    // Interruption Ended - playback should NOT resume
+                    self.sendEvent(withName: "remote-duck", body: [
+                        "permanent": true
+                        ])
+                }
+            }
+        }
+    }
+
     // MARK: - Bridged Methods
     
     @objc(setupPlayer:resolver:rejecter:)
     public func setupPlayer(config: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        setupInterruptionHandling();
+
         // configure if player waits to play
         let autoWait: Bool = config["waitForBuffer"] as? Bool ?? false
         player.automaticallyWaitsToMinimizeStalling = autoWait
