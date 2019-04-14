@@ -78,6 +78,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     override public func constantsToExport() -> [AnyHashable: Any] {
         return [
             "STATE_NONE": AVPlayerWrapperState.idle.rawValue,
+            "STATE_READY": AVPlayerWrapperState.ready.rawValue,
             "STATE_PLAYING": AVPlayerWrapperState.playing.rawValue,
             "STATE_PAUSED": AVPlayerWrapperState.paused.rawValue,
             "STATE_STOPPED": AVPlayerWrapperState.idle.rawValue,
