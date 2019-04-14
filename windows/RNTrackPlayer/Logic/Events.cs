@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TrackPlayer.Logic {
+﻿namespace TrackPlayer.Logic
+{
 
     public static class Events
     {
@@ -14,6 +9,8 @@ namespace TrackPlayer.Logic {
         public const string ButtonSkipNext = "remote-next";
         public const string ButtonSkipPrevious = "remote-previous";
         public const string ButtonSeekTo = "remote-seek";
+        public const string ButtonJumpForward = "remote-jump-forward";
+        public const string ButtonJumpBackward = "remote-jump-backward";
 
         public const string PlaybackState = "playback-state";
         public const string PlaybackTrackChanged = "playback-track-changed";

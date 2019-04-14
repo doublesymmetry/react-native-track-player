@@ -1,13 +1,6 @@
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Windows.Media;
-using Windows.Media.Playback;
-using Windows.Media.Core;
 using Windows.Storage.Streams;
 
 namespace TrackPlayer.Logic
@@ -16,6 +9,8 @@ namespace TrackPlayer.Logic
     {
         private MediaManager manager;
         private SystemMediaTransportControls controls;
+        private double jumpInterval = 15;
+        private bool play, pause, stop, previous, next, jumpForward, jumpBackward, seek;
 
         public Metadata(MediaManager manager)
         {
@@ -36,30 +31,54 @@ namespace TrackPlayer.Logic
             if (controls != null)
             {
                 controls.IsEnabled = true;
-                controls.DisplayUpdater.Type = MediaPlaybackType.Music;
 
                 controls.PlaybackPositionChangeRequested += OnSeekTo;
                 controls.ButtonPressed += OnButtonPressed;
+
+                UpdateCapabilities();
             }
+        }
+
+        private void UpdateCapabilities()
+        {
+            controls.IsPlayEnabled = play;
+            controls.IsPauseEnabled = pause;
+            controls.IsStopEnabled = stop;
+            controls.IsPreviousEnabled = previous;
+            controls.IsNextEnabled = next;
+            controls.IsFastForwardEnabled = jumpForward;
+            controls.IsRewindEnabled = jumpBackward;
+
+            // Unsupported for now
+            controls.IsChannelDownEnabled = false;
+            controls.IsChannelUpEnabled = false;
+            controls.IsRecordEnabled = false;
         }
 
         public void UpdateOptions(JObject data)
         {
             Debug.WriteLine("Updating options...");
-            JArray capabilities = (JArray) data.GetValue("capabilities");
 
-            controls.IsPlayEnabled = Utils.ContainsInt(capabilities, (int)Capability.Play);
-            controls.IsPauseEnabled = Utils.ContainsInt(capabilities, (int)Capability.Pause);
-            controls.IsStopEnabled = Utils.ContainsInt(capabilities, (int)Capability.Stop);
-            controls.IsPreviousEnabled = Utils.ContainsInt(capabilities, (int)Capability.Previous);
-            controls.IsNextEnabled = Utils.ContainsInt(capabilities, (int)Capability.Next);
+            if (data.TryGetValue("jumpInterval", out var ji))
+            {
+                jumpInterval = (double)ji;
+            }
 
-            // Unsupported for now
-            controls.IsChannelDownEnabled = false;
-            controls.IsChannelUpEnabled = false;
-            controls.IsFastForwardEnabled = false;
-            controls.IsRewindEnabled = false;
-            controls.IsRecordEnabled = false;
+            if (data.TryGetValue("capabilities", out var caps))
+            {
+                JArray capabilities = (JArray) caps;
+
+                play = Utils.ContainsInt(capabilities, (int) Capability.Play);
+                pause = Utils.ContainsInt(capabilities, (int) Capability.Pause);
+                stop = Utils.ContainsInt(capabilities, (int) Capability.Stop);
+                previous = Utils.ContainsInt(capabilities, (int) Capability.Previous);
+                next = Utils.ContainsInt(capabilities, (int) Capability.Next);
+                jumpForward = Utils.ContainsInt(capabilities, (int) Capability.JumpForward);
+                jumpBackward = Utils.ContainsInt(capabilities, (int) Capability.JumpBackward);
+                seek = Utils.ContainsInt(capabilities, (int)Capability.Seek);
+
+                if (controls != null) UpdateCapabilities();
+            }
         }
 
         public void UpdateMetadata(Track track)
@@ -69,6 +88,7 @@ namespace TrackPlayer.Logic
 
             display.AppMediaId = track.Id;
             display.Thumbnail = RandomAccessStreamReference.CreateFromUri(track.Artwork);
+            display.Type = MediaPlaybackType.Music;
 
             properties.Title = track.Title;
             properties.Artist = track.Artist;
@@ -85,6 +105,8 @@ namespace TrackPlayer.Logic
 
         private void OnSeekTo(SystemMediaTransportControls sender, PlaybackPositionChangeRequestedEventArgs args)
         {
+            if (!seek) return;
+
             JObject obj = new JObject();
             obj.Add("position", args.RequestedPlaybackPosition.TotalSeconds);
             manager.SendEvent(Events.ButtonSeekTo, obj);
@@ -93,6 +115,7 @@ namespace TrackPlayer.Logic
         private void OnButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
         {
             string eventType = null;
+            JObject data = null;
 
             switch(args.Button)
             {
@@ -111,11 +134,21 @@ namespace TrackPlayer.Logic
                 case SystemMediaTransportControlsButton.Next:
                     eventType = Events.ButtonSkipNext;
                     break;
+                case SystemMediaTransportControlsButton.FastForward:
+                    eventType = Events.ButtonJumpForward;
+                    data = new JObject();
+                    data["interval"] = jumpInterval;
+                    break;
+                case SystemMediaTransportControlsButton.Rewind:
+                    eventType = Events.ButtonJumpBackward;
+                    data = new JObject();
+                    data["interval"] = jumpInterval;
+                    break;
                 default:
                     return;
             }
 
-            manager.SendEvent(eventType, null);
+            manager.SendEvent(eventType, data);
         }
 
     }
@@ -127,6 +160,8 @@ namespace TrackPlayer.Logic
         Stop = 3,
         Previous = 4,
         Next = 5,
-        Seek = 6
+        Seek = 6,
+        JumpForward = 7,
+        JumpBackward = 8
     }
 }

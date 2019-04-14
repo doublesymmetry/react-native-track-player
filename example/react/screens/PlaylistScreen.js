@@ -5,6 +5,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import Player from '../components/Player';
 import playlistData from '../data/playlist.json';
+import localTrack from '../resources/pure.m4a';
 
 import PlayerStore from '../stores/Player';
 
@@ -23,6 +24,11 @@ export default class LandingScreen extends Component {
         TrackPlayer.CAPABILITY_PAUSE,
         TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
         TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
+        TrackPlayer.CAPABILITY_STOP
+      ],
+      compactCapabilities: [
+        TrackPlayer.CAPABILITY_PLAY,
+        TrackPlayer.CAPABILITY_PAUSE
       ]
     });
   }
@@ -32,6 +38,13 @@ export default class LandingScreen extends Component {
     if (currentTrack == null) {
       await TrackPlayer.reset();
       await TrackPlayer.add(playlistData);
+      await TrackPlayer.add({
+        id: 'local-track',
+        url: localTrack,
+        title: 'Pure (Demo)',
+        artist: 'David Chavez',
+        artwork: 'https://picsum.photos/200',
+      });
       await TrackPlayer.play();
     } else {
       if (PlayerStore.playbackState === TrackPlayer.STATE_PAUSED) {
@@ -54,6 +67,16 @@ export default class LandingScreen extends Component {
     } catch (_) {}
   }
 
+  getStateName(state) {
+    switch (state) {
+      case TrackPlayer.STATE_NONE: return 'None'
+      case TrackPlayer.STATE_PLAYING: return 'Playing'
+      case TrackPlayer.STATE_PAUSED: return 'Paused'
+      case TrackPlayer.STATE_STOPPED: return 'Stopped'
+      case TrackPlayer.STATE_BUFFERING: return 'Buffering'
+    }
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -67,7 +90,7 @@ export default class LandingScreen extends Component {
           onPrevious={() => this.skipToPrevious()}
           onTogglePlayback={() => this.togglePlayback()}
         />
-        <Text style={styles.state}>{PlayerStore.playbackState}</Text>
+        <Text style={styles.state}>{this.getStateName(PlayerStore.playbackState)}</Text>
       </View>
     );
   }

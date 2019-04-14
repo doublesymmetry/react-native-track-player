@@ -1,11 +1,6 @@
 using Newtonsoft.Json.Linq;
 using ReactNative.Bridge;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.Media.Playback;
 using TrackPlayer.Players;
 
 namespace TrackPlayer.Logic
@@ -17,22 +12,14 @@ namespace TrackPlayer.Logic
             return obj.TryGetValue(key, out var val) ? val.ToObject<T>() : def;
         }
 
-        public static MediaPlaybackState GetState(MediaPlaybackState state)
+        public static bool IsPlaying(PlaybackState state)
         {
-            if (state == MediaPlaybackState.Opening)
-                return MediaPlaybackState.Buffering;
-
-            return state;
+            return state == PlaybackState.Playing || state == PlaybackState.Buffering;
         }
 
-        public static bool IsPlaying(MediaPlaybackState state)
+        public static bool IsPaused(PlaybackState state)
         {
-            return state == MediaPlaybackState.Playing || state == MediaPlaybackState.Buffering;
-        }
-
-        public static bool IsPaused(MediaPlaybackState state)
-        {
-            return state == MediaPlaybackState.Paused;
+            return state == PlaybackState.Paused;
         }
 
         public static Uri GetUri(JObject obj, string key, Uri def)
@@ -40,11 +27,11 @@ namespace TrackPlayer.Logic
             if (!obj.TryGetValue(key, out var val)) return def;
 
             if (val.Type == JTokenType.Object)
-                return new Uri(((JObject)val).Value<string>("uri"));
+                return new Uri(((JObject) val).Value<string>("uri"));
             else if (val.Type == JTokenType.String)
-                return new Uri((string)val);
+                return new Uri((string) val);
             else if (val.Type == JTokenType.Uri)
-                return (Uri)val;
+                return (Uri) val;
 
             return def;
         }
@@ -65,8 +52,9 @@ namespace TrackPlayer.Logic
             for (int i = 0; i < array.Count; i++)
             {
                 JToken token = array[i];
-                if (token.Type == JTokenType.Integer && (int)token == val) return true;
+                if (token.Type == JTokenType.Integer && (int) token == val) return true;
             }
+
             return false;
         }
 

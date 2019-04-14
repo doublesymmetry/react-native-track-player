@@ -1,0 +1,203 @@
+---
+---
+
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,700');
+
+$text: #292929;
+$codeBg: rgba(0, 0, 0, 0.05);
+$codeBlockBg: rgba(0, 0, 0, 0.03);
+$headerBg: rgba(0, 0, 0, 0.01);
+$headerBorder: rgba(0, 0, 0, 0.1);
+$link: #0366d6;
+
+* {
+    box-sizing: border-box;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Open Sans', sans-serif;
+    color: $text;
+}
+
+a {
+    color: $link;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+#header, #footer {
+    background: $headerBg;
+    border-bottom: 1px solid $headerBorder;
+    padding: 15px;
+    
+    > div {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    a {
+        color: $text;
+    }
+
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        li {
+            display: inline-block;
+            margin-left: 1em;
+        }
+    }
+}
+
+#footer {
+    display: flex;
+    justify-content: center;
+    font-weight: normal;
+    border-top: 1px solid $headerBorder;
+    margin-top: 2em;
+}
+
+section, #header > div {
+    margin: 0 auto;
+    max-width: 1000px;
+}
+
+section {
+    line-height: 1.7;
+
+    p {
+        margin: 0.7em 0;
+    }
+
+    .info {
+        display: flex;
+        justify-content: space-between;
+        margin: 1em 0;
+
+        .buttons {
+            text-align: right;
+
+            a {
+                margin-left: 1em;
+                display: inline-block;
+            }
+        }
+    }
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0.1em;
+    margin-top: 0.5em;
+    line-height: 1.5em;
+}
+
+h1 {
+    font-size: 2em;
+    font-weight: 300;
+    text-align: center;
+    margin: 0.5em;
+}
+
+h2 {
+    font-size: 1.6em;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 0.3em;
+}
+
+h3 {
+    font-size: 1.3em;
+}
+
+h4 {
+    font-size: 1.25em;
+}
+
+table {
+    overflow: auto;
+    border-collapse: collapse;
+    margin: 0.5em 0;
+
+    td, th {
+        border: 1px solid #dfdfdf;
+        padding: 6px 13px;
+    }
+
+    tr {
+        background: #ffffff;
+
+        &:nth-child(even) {
+            background: #f8f8f8;
+        }
+    }
+}
+
+hr {
+    color: $headerBorder;
+    height: 2px;
+    border: 1px solid $headerBorder;
+    margin: 1em 0;
+}
+
+img {
+    max-width: 100%;
+}
+
+code, pre {
+    font-family: Consolas, Menlo, Courier, monospace;
+    border-radius: 1px;
+    background: $codeBg;
+    padding: 1px 3px;
+}
+
+pre {
+    border-radius: 3px;
+    padding: 15px;
+    overflow: auto;
+    background: $codeBlockBg;
+
+    code {
+        background: transparent;
+        padding: 0;
+    }
+}
+
+.highlight {
+    .ge { font-style: italic; }
+    .gs, .gh, .gu { font-weight: bold; }
+
+    .o, .ow, .nd, .nt, .kn { color: #39adb5; } // Operators
+    .k, .kc, .kd, .kp, .kr { color: #7c4dff; } // Keywords
+    .c, .cm, .cp, .c1, .cs, .sd { color: #8e908c; } // Comments
+    .n, .py, .nl, .ni, .nb, .bp, .sc, .p, .w, .gh { color: #4d4d4c; } // Names (primary)
+    .nf, .nx { color: #6182b8; } // Names (secondary)
+    .nc, .nn, .kt, .gp { color: #ffb62c; } // Names (namespace)
+    .no, .ne, .nv, .vc, .vg, .vi, .err, .gd, .gu, .na { color: #ff5370; } // Names (scoped)
+    .m, .il, .mf, .mh, .mi, .mo, .se, .si, .l { color: #f76d47; } // Numeric
+    .s, .sr, .sb, .s2, .sh, .sx, .s1, .ss, .ld, .gi { color: #91b859; } // String
+}
+
+.anchorjs-link {
+    color: rgba(0, 0, 0, 0.6);
+
+    &:hover {
+        text-decoration: none;
+    }
+}
+
+@media (max-width: 1050px) {
+    section {
+        p, h1, h2, h3, h4, h5, h6 {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+    }
+}

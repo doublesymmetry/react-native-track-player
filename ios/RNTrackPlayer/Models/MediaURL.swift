@@ -18,14 +18,23 @@ struct MediaURL {
         originalObject = object
         
         if let localObject = object as? [String: Any] {
-            isLocal = true
             let uri = localObject["uri"] as! String
+            isLocal = uri.contains("http") ? false : true
             let encodedURI = uri.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
-            value = URL(string: encodedURI)!
+            value = URL(string: encodedURI.replacingOccurrences(of: "file://", with: ""))!
         } else {
             let url = object as! String
+            let urlencoded = url.removingPercentEncoding
             isLocal = url.lowercased().hasPrefix("file://")
-            value = URL(string: url)!
+            if let encoded = urlencoded!.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlFragmentAllowed
+                .union(.urlHostAllowed)
+                .union(.urlPasswordAllowed)
+                .union(.urlQueryAllowed)
+                .union(.urlUserAllowed)) {
+                value = URL(string: encoded.replacingOccurrences(of: "file://", with: ""))!
+            } else {
+                value = URL(string: url.replacingOccurrences(of: "file://", with: ""))!
+            }
         }
     }
 }

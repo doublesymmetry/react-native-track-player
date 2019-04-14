@@ -1,17 +1,16 @@
-﻿[![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player) [![Chat](https://badges.gitter.im/react-native-track-player/gitter.png)](https://gitter.im/react-native-track-player/Support)
+﻿[![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player) [![Chat](https://badges.gitter.im/react-native-track-player/gitter.png)](https://gitter.im/react-native-track-player/Support) [![Spectrum](https://withspectrum.github.io/badge/badge.svg)](https://spectrum.chat/rntrackplayer)
 # react-native-track-player
 
 A fully fledged audio module created for music apps. Provides audio playback, external media controls, chromecast support, background mode and more!
 
 ---
 
-* [Installation](https://github.com/react-native-kit/react-native-track-player/wiki/Installation)
-* [Getting Started](https://github.com/react-native-kit/react-native-track-player/wiki/API)
-* [Documentation](https://github.com/react-native-kit/react-native-track-player/wiki/Documentation)
-* [Platform Support](https://github.com/react-native-kit/react-native-track-player/wiki/Platform-Support)
-* [Car Integration](https://github.com/react-native-kit/react-native-track-player/wiki/Car-Integration)
-* [Background Mode](https://github.com/react-native-kit/react-native-track-player/wiki/Background-Mode)
-* [Build Preferences](https://github.com/react-native-kit/react-native-track-player/wiki/Build-Preferences)
+* [Installation](https://react-native-kit.github.io/react-native-track-player/install/)
+* [Getting Started](https://react-native-kit.github.io/react-native-track-player/api/)
+* [Documentation](https://react-native-kit.github.io/react-native-track-player/documentation/)
+* [Platform Support](https://react-native-kit.github.io/react-native-track-player/platform-support/)
+* [Background Mode](https://react-native-kit.github.io/react-native-track-player/background/)
+* [Build Preferences](https://react-native-kit.github.io/react-native-track-player/build-preferences/)
 
 ## Features
 
@@ -42,7 +41,7 @@ A fully fledged audio module created for music apps. Provides audio playback, ex
 | Background Mode | ✓ | ✓ | ✓ |
 | [Casting](https://github.com/react-native-kit/react-native-track-casting) | ✓ | ✗ | ✗ |
 
-Check [Platform Support](https://github.com/react-native-kit/react-native-track-player/wiki/Platform-Support) for more information.
+Check [Platform Support](https://react-native-kit.github.io/react-native-track-player/platform-support/) for more information.
 
 ## Why another music module?
 After trying to team up modules like `react-native-sound`, `react-native-music-controls` and `react-native-google-cast`, I've noticed that their structure and the way should be tied together can cause a lot problems (mainly on Android). Those can heavily affect the app stability and user experience.
@@ -55,8 +54,9 @@ All audio modules (like `react-native-sound`) don't play in a separated service 
 
 ## Example
 
-If you want to get started with this module, check the [API](https://github.com/react-native-kit/react-native-track-player/wiki/API) page.
-If you want detailed information about the API, check the [Documentation](https://github.com/react-native-kit/react-native-track-player/wiki/Documentation).
+If you want to get started with this module, check the [API](https://react-native-kit.github.io/react-native-track-player/api/) page.
+If you want detailed information about the API, check the [Documentation](https://react-native-kit.github.io/react-native-track-player/documentation/).
+You can also look at our example project [here](https://github.com/react-native-kit/react-native-track-player/tree/dev/example).
 ```javascript
 import TrackPlayer from 'react-native-track-player';
 
@@ -85,6 +85,3 @@ TrackPlayer.setupPlayer().then(async () => {
 Support the further development of this and other libraries.
 - [Support via Patreon](https://patreon.com/dcvz)
 - [Support via Paypal](https://paypal.me/dcvz)
-
-## Community
-[Spectrum](https://spectrum.chat/rntrackplayer)
