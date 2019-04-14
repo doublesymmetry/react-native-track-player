@@ -40,7 +40,6 @@
 		9B78A2461F3F12BC002B5E3C /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B78A2451F3F12BC002B5E3C /* Track.swift */; };
 		9B78A2481F3F12C9002B5E3C /* MediaURL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B78A2471F3F12C9002B5E3C /* MediaURL.swift */; };
 		9BFC1FDD1F61A8E8008795BF /* Capabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC1FDC1F61A8E8008795BF /* Capabilities.swift */; };
-		F45B42662246C013005A87D9 /* SessionCategories.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45B42652246C013005A87D9 /* SessionCategories.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -92,7 +91,6 @@
 		9B78A2471F3F12C9002B5E3C /* MediaURL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaURL.swift; sourceTree = "<group>"; };
 		9BFBA4D01F3DFA3F00453D3A /* RNTrackPlayer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNTrackPlayer-Bridging-Header.h"; sourceTree = "<group>"; };
 		9BFC1FDC1F61A8E8008795BF /* Capabilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Capabilities.swift; sourceTree = "<group>"; };
-		F45B42652246C013005A87D9 /* SessionCategories.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionCategories.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -151,7 +149,6 @@
 				F45B42652246C013005A87D9 /* SessionCategories.swift */,
 				9BFC1FDC1F61A8E8008795BF /* Capabilities.swift */,
 				9A0CF10D2046E5AC0093A5DF /* PitchAlgorithms.swift */,
-				9B18C2F9226356560019375A /* SessionCategories.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
