@@ -112,14 +112,6 @@ class MediaWrapper: AudioPlayerDelegate {
         }
     }
     
-    func updateMetadata(_ item: Track) {
-        player.nowPlayingInfoController.set(keyValues: [
-            MediaItemProperty.artist(track.artist),
-            MediaItemProperty.title(track.title),
-            MediaItemProperty.albumTitle(track.album),
-        ])
-    }
-    
     func removeTracks(ids: [String]) {
         var actionAfterRemovals = "none"
         for id in ids {
