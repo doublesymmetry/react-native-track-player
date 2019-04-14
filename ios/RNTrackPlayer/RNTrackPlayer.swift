@@ -16,7 +16,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
         
         player.delegate = self
         player.bufferDuration = 1
-        player.automaticallyWaitsToMinimizeStalling = false
         
         return player
     }()
@@ -133,6 +132,9 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     
     @objc(setupPlayer:resolver:rejecter:)
     public func setupPlayer(config: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        // configure if player waits to play
+        let autoWait: Bool = config["waitForBuffer"] as? Bool ?? false
+        player.automaticallyWaitsToMinimizeStalling = autoWait
 
         //configure base category -- defaults to .playback
         if let sessionCategory = config["iosCategory"] as? String {
