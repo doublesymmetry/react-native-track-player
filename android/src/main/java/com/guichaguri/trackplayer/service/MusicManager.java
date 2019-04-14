@@ -199,6 +199,10 @@ public class MusicManager implements OnAudioFocusChangeListener {
         service.emit(MusicEvents.PLAYBACK_TRACK_CHANGED, bundle);
     }
 
+    public void updateMetadata(Track track) {
+        metadata.updateMetadata(track);
+    }
+
     public void onReset() {
         metadata.removeNotifications();
     }
