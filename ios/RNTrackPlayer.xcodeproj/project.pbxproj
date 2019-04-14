@@ -146,9 +146,9 @@
 			children = (
 				9B78A2451F3F12BC002B5E3C /* Track.swift */,
 				9B78A2471F3F12C9002B5E3C /* MediaURL.swift */,
-				F45B42652246C013005A87D9 /* SessionCategories.swift */,
 				9BFC1FDC1F61A8E8008795BF /* Capabilities.swift */,
 				9A0CF10D2046E5AC0093A5DF /* PitchAlgorithms.swift */,
+				9B18C2F9226356560019375A /* SessionCategories.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
