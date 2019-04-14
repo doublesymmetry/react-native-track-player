@@ -10,6 +10,7 @@
 		9A0CF10E2046E5AC0093A5DF /* PitchAlgorithms.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A0CF10D2046E5AC0093A5DF /* PitchAlgorithms.swift */; };
 		9B0E282E1F07D76F00B71D2A /* RNTrackPlayerBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0E282D1F07D76F00B71D2A /* RNTrackPlayerBridge.m */; };
 		9B0E282F1F07D76F00B71D2A /* RNTrackPlayerBridge.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B0E282C1F07D76F00B71D2A /* RNTrackPlayerBridge.h */; };
+		9B18C2FA226356560019375A /* SessionCategories.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B18C2F9226356560019375A /* SessionCategories.swift */; };
 		9B40781521F34CC800F61AA2 /* RemoteCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4077FC21F34CC700F61AA2 /* RemoteCommand.swift */; };
 		9B40781621F34CC800F61AA2 /* RemoteCommandController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4077FD21F34CC700F61AA2 /* RemoteCommandController.swift */; };
 		9B40781721F34CC800F61AA2 /* AudioSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4077FF21F34CC700F61AA2 /* AudioSession.swift */; };
@@ -55,6 +56,7 @@
 		9B0E28291F07D76F00B71D2A /* libRNTrackPlayer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNTrackPlayer.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B0E282C1F07D76F00B71D2A /* RNTrackPlayerBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNTrackPlayerBridge.h; sourceTree = "<group>"; };
 		9B0E282D1F07D76F00B71D2A /* RNTrackPlayerBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNTrackPlayerBridge.m; sourceTree = "<group>"; };
+		9B18C2F9226356560019375A /* SessionCategories.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionCategories.swift; sourceTree = "<group>"; };
 		9B4077FC21F34CC700F61AA2 /* RemoteCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteCommand.swift; sourceTree = "<group>"; };
 		9B4077FD21F34CC700F61AA2 /* RemoteCommandController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteCommandController.swift; sourceTree = "<group>"; };
 		9B4077FF21F34CC700F61AA2 /* AudioSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioSession.swift; sourceTree = "<group>"; };
@@ -138,6 +140,7 @@
 				9B78A2471F3F12C9002B5E3C /* MediaURL.swift */,
 				9BFC1FDC1F61A8E8008795BF /* Capabilities.swift */,
 				9A0CF10D2046E5AC0093A5DF /* PitchAlgorithms.swift */,
+				9B18C2F9226356560019375A /* SessionCategories.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -279,6 +282,7 @@
 				9B40782621F34CC800F61AA2 /* NowPlayingInfoController.swift in Sources */,
 				9B40782121F34CC800F61AA2 /* AVPlayerWrapperProtocol.swift in Sources */,
 				9B40782021F34CC800F61AA2 /* AVPlayerWrapperState.swift in Sources */,
+				9B18C2FA226356560019375A /* SessionCategories.swift in Sources */,
 				9B78A2481F3F12C9002B5E3C /* MediaURL.swift in Sources */,
 				9B40781721F34CC800F61AA2 /* AudioSession.swift in Sources */,
 				9B40781F21F34CC800F61AA2 /* QueueManager.swift in Sources */,

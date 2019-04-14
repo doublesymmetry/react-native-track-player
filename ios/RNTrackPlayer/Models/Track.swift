@@ -10,7 +10,7 @@ import Foundation
 import MediaPlayer
 import AVFoundation
 
-class Track: NSObject, AudioItem {
+class Track: NSObject, AudioItem, TimePitching {
     let id: String
     let url: MediaURL
     @objc let title: String
@@ -80,6 +80,22 @@ class Track: NSObject, AudioItem {
         return url.isLocal ? .file : .stream
     }
     
+    func getArtwork(_ handler: @escaping (UIImage?) -> Void) {
+        if let artworkURL = artworkURL?.value {
+            URLSession.shared.dataTask(with: artworkURL, completionHandler: { (data, _, error) in
+                if let data = data, let artwork = UIImage(data: data), error == nil {
+                    handler(artwork)
+                }
+                
+                handler(nil)
+            }).resume()
+        }
+        
+        handler(nil)
+    }
+
+    // MARK: - TimePitching Protocol
+
     func getPitchAlgorithmType() -> AVAudioTimePitchAlgorithm {
         if let pitchAlgorithm = pitchAlgorithm {
             switch pitchAlgorithm {
@@ -97,17 +113,4 @@ class Track: NSObject, AudioItem {
         return .lowQualityZeroLatency
     }
     
-    func getArtwork(_ handler: @escaping (UIImage?) -> Void) {
-        if let artworkURL = artworkURL?.value {
-            URLSession.shared.dataTask(with: artworkURL, completionHandler: { (data, _, error) in
-                if let data = data, let artwork = UIImage(data: data), error == nil {
-                    handler(artwork)
-                }
-                
-                handler(nil)
-            }).resume()
-        }
-        
-        handler(nil)
-    }
 }
