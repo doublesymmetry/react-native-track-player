@@ -134,10 +134,12 @@ public class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     @objc(updateMetadata:)
     public func updateMetadata(_ item: [String: Any]) {
-        guard let track = Track(dictionary: item) else {
-            return
-        }
-        mediaWrapper.updateMetadata(track)
+        guard let track = Track(dictionary: item) else { return }
+        player.nowPlayingInfoController.set(keyValues: [
+            MediaItemProperty.artist(track.artist),
+            MediaItemProperty.title(track.title),
+            MediaItemProperty.albumTitle(track.album),
+        ])
     }
     
     @objc(updateOptions:resolver:rejecter:)
