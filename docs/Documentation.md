@@ -209,6 +209,7 @@ Clears any upcoming tracks from the queue.
 
 #### `updateMetadataForTrack(id, metadata)`
 Updates the metadata of a track in the queue.
+If the current track is updated, the notification and the Now Playing Center will be updated accordingly.
 
 **Returns:** `Promise`
 
