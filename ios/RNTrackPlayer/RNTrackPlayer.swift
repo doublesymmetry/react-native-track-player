@@ -106,11 +106,9 @@ public class RNTrackPlayer: RCTEventEmitter {
                 sessionCategory = mappedCategory.mapConfigToAVAudioSessionCategory()
         }
         
-        if
-            let sessionCategoryOptsStr = config["iosCategoryOptions"] as? String,
-            let mappedCategoryOptions = SessionCategoryOptions(rawValue: sessionCategoryOptsStr) {
-                sessionCategoryOptions = mappedCategoryOptions.mapConfigToAVAudioSessionCategoryOptions()!
-        }
+        let sessionCategoryOptsStr = config["iosCategoryOptions"] as? [String]
+        let mappedCategoryOpts = sessionCategoryOpts.compactMap { SessionCategoryOptions(rawValue: $0)?.mapConfigToAVAudioSessionCategoryOptions() }
+        sessionCategoryOptions = AVAudioSession.CategoryOptions(mappedCategoryOpts)
         
         if
             let sessionCategoryModeStr = config["iosCategoryMode"] as? String,
@@ -157,9 +155,8 @@ public class RNTrackPlayer: RCTEventEmitter {
     
     @objc(updateOptions:resolver:rejecter:)
     public func update(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        let castedCapabilities = (options["capabilities"] as? [String])
-        let supportedCapabilities = castedCapabilities?.filter { Capability(rawValue: $0) != nil }
-        let capabilities = supportedCapabilities?.compactMap { Capability(rawValue: $0) } ?? []
+        let capabilitiesStr = options["capabilities"] as? [String]
+        let capabilities = capabilitiesStr?.compactMap { Capability(rawValue: $0) } ?? []
         
         let remoteCommands = capabilities.map { $0.mapToPlayerCommand(jumpInterval: options["jumpInterval"] as? NSNumber) }
         player.remoteCommands.removeAll()
