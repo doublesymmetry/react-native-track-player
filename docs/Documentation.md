@@ -207,7 +207,8 @@ Gets the whole queue
 #### `removeUpcomingTracks()`
 Clears any upcoming tracks from the queue.
 
-#### `updateMetadata(id, metadata)`
+#### `updateMetadataForTrack(id, metadata)`
+Updates the metadata of a track in the queue.
 
 **Returns:** `Promise`
 

@@ -244,7 +244,7 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void updateMetadata(String id, ReadableMap map, final Promise callback) {
+    public void updateMetadataForTrack(String id, ReadableMap map, final Promise callback) {
         waitForConnection(() -> {
             ExoPlayback playback = binder.getPlayback();
             List<Track> queue = playback.getQueue();

@@ -131,7 +131,7 @@ namespace TrackPlayer
         }
 
         [ReactMethod]
-        public void updateMetadata(string id, JObject metadata, IPromise promise)
+        public void updateMetadataForTrack(string id, JObject metadata, IPromise promise)
         {
             var player = manager?.GetPlayer();
             if (Utils.CheckPlayback(player, promise)) return;
