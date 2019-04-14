@@ -25,6 +25,13 @@ public class QueuedAudioPlayer: AudioPlayer {
         return queueManager.current
     }
     
+    /**
+     The index of the current item.
+     */
+    public var currentIndex: Int {
+        return queueManager.currentIndex
+    }
+    
      /**
      Stops the player and clears the queue.
      */
@@ -34,6 +41,13 @@ public class QueuedAudioPlayer: AudioPlayer {
     
     override func reset() {
         queueManager.clearQueue()
+    }
+    
+    /**
+     All items currently in the queue.
+     */
+    public var items: [AudioItem] {
+        return queueManager.items
     }
     
     /**
