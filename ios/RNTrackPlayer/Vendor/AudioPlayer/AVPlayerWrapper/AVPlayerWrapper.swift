@@ -99,8 +99,8 @@ class AVPlayerWrapper: AVPlayerWrapperProtocol {
     }
     
     var bufferedPosition: TimeInterval {
-		return currentItem?.loadedTimeRanges.last?.timeRangeValue.end.seconds ?? 0
-	}
+	return currentItem?.loadedTimeRanges.last?.timeRangeValue.end.seconds ?? 0
+    }
 
     weak var delegate: AVPlayerWrapperDelegate? = nil
     
