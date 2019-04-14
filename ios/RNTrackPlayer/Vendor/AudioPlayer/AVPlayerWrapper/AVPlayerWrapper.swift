@@ -36,6 +36,7 @@ class AVPlayerWrapper: AVPlayerWrapperProtocol {
      True if the last call to load(from:playWhenReady) had playWhenReady=true.
      */
     fileprivate var _playWhenReady: Bool = true
+    fileprivate var _initialTime: TimeInterval?
     
     fileprivate var _state: AVPlayerWrapperState = AVPlayerWrapperState.idle {
         didSet {
@@ -146,7 +147,13 @@ class AVPlayerWrapper: AVPlayerWrapperProtocol {
     }
     
     func seek(to seconds: TimeInterval) {
-        avPlayer.seek(to: CMTimeMakeWithSeconds(seconds, preferredTimescale: 1)) { (finished) in
+        avPlayer.seek(to: CMTimeMakeWithSeconds(seconds, preferredTimescale: 1000)) { (finished) in
+            if let _ = self._initialTime {
+                self._initialTime = nil
+                if self._playWhenReady {
+                    self.play()
+                }
+            }
             self.delegate?.AVWrapper(seekTo: Int(seconds), didFinish: finished)
         }
     }
@@ -154,7 +161,6 @@ class AVPlayerWrapper: AVPlayerWrapperProtocol {
     func load(from url: URL, playWhenReady: Bool) {
         reset(soft: true)
         _playWhenReady = playWhenReady
-        _state = .loading
 
         // Set item
         let currentAsset = AVURLAsset(url: url)
@@ -167,6 +173,12 @@ class AVPlayerWrapper: AVPlayerWrapperProtocol {
         playerObserver.startObserving()
         playerItemNotificationObserver.startObserving(item: currentItem)
         playerItemObserver.startObserving(item: currentItem)
+    }
+    
+    func load(from url: URL, playWhenReady: Bool, initialTime: TimeInterval?) {
+        _initialTime = initialTime
+        self.pause()
+        self.load(from: url, playWhenReady: playWhenReady)
     }
     
     // MARK: - Util
@@ -205,12 +217,17 @@ extension AVPlayerWrapper: AVPlayerObserverDelegate {
     
     func player(statusDidChange status: AVPlayer.Status) {
         switch status {
-
+            
         case .readyToPlay:
             self._state = .ready
-            if _playWhenReady {
+            
+            if let initialTime = _initialTime {
+                self.seek(to: initialTime)
+            }
+            else if _playWhenReady {
                 self.play()
             }
+            
             break
 
         case .failed:
@@ -243,7 +260,7 @@ extension AVPlayerWrapper: AVPlayerItemNotificationObserverDelegate {
     // MARK: - AVPlayerItemNotificationObserverDelegate
     
     func itemDidPlayToEndTime() {
-        delegate?.AVWrapper(itemPlaybackDoneWithReason: .playedUntilEnd)
+        delegate?.AVWrapperItemDidPlayToEndTime()
     }
     
 }

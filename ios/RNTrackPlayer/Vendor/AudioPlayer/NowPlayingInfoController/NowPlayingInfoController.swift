@@ -9,45 +9,42 @@ import Foundation
 import MediaPlayer
 
 
-public protocol NowPlayingInfoKeyValue {
-    func getKey() -> String
-    func getValue() -> Any?
-}
-
-public class NowPlayingInfoController {
+public class NowPlayingInfoController: NowPlayingInfoControllerProtocol {
     
-    let infoCenter: MPNowPlayingInfoCenter
+    private var _infoCenter: NowPlayingInfoCenter
+    private var _info: [String: Any] = [:]
     
-    var info: [String: Any]
-    
-    /**
-     Create a new NowPlayingInfoController.
-     
-     - parameter infoCenter: The MPNowPlayingInfoCenter to use. Default is `MPNowPlayingInfoCenter.default()`
-     */
-    public init(infoCenter: MPNowPlayingInfoCenter = MPNowPlayingInfoCenter.default()) {
-        self.infoCenter = infoCenter
-        self.info = [:]
+    var infoCenter: NowPlayingInfoCenter {
+        return _infoCenter
     }
     
-    /**
-     This updates a set of values in the now playing info.
-     
-     - Warning: This will reset the now playing info completely! Use this function when starting playback of a new item.
-     */
+    var info: [String: Any] {
+        return _info
+    }
+    
+    public required init() {
+        self._infoCenter = MPNowPlayingInfoCenter.default()
+    }
+    
+    public required init(infoCenter: NowPlayingInfoCenter) {
+        self._infoCenter = infoCenter
+    }
+    
     public func set(keyValues: [NowPlayingInfoKeyValue]) {
-        self.info = [:]
         keyValues.forEach { (keyValue) in
-            info[keyValue.getKey()] = keyValue.getValue()
+            _info[keyValue.getKey()] = keyValue.getValue()
         }
+        self._infoCenter.nowPlayingInfo = _info
     }
     
-    /**
-     This updates a single value in the now playing info.
-     */
     public func set(keyValue: NowPlayingInfoKeyValue) {
-        info[keyValue.getKey()] = keyValue.getValue()
-        self.infoCenter.nowPlayingInfo = info
+        _info[keyValue.getKey()] = keyValue.getValue()
+        self._infoCenter.nowPlayingInfo = _info
+    }
+    
+    public func clear() {
+        self._info = [:]
+        self._infoCenter.nowPlayingInfo = _info
     }
     
 }

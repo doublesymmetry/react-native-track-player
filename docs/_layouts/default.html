@@ -21,9 +21,13 @@
         <section>
             <h1>{{ page.title }}</h1>
             {{ content }}
-            <div class="buttons">
-                <a href="{{site.github.repository_url}}/issues">Issues / Questions</a>
-                <a href="{{site.github.repository_url}}/edit/dev/docs/{{page.path}}">Improve this page</a>
+            <hr>
+            <div class="info">
+                <p id="last-edit"></p>
+                <p class="buttons">
+                    <a href="{{site.github.repository_url}}/issues">Issues / Questions</a>
+                    <a href="{{site.github.repository_url}}/edit/dev/docs/{{page.path}}">Improve this page</a>
+                </p>
             </div>
         </section>
         <div id="footer">
@@ -42,6 +46,24 @@
                 'use strict';
                 anchors.options.placement = 'right';
                 anchors.add('h2, h3, h4, h5, h6');
+
+                const currentPage = encodeURIComponent("{{page.path}}");
+
+                fetch('https://api.github.com/repos/react-native-kit/react-native-track-player/commits/master?path=docs/' + currentPage)
+                    .then(res => res.json())
+                    .then(json => {
+                        const container = document.getElementById('last-edit');
+                        const dt = new Date(json.commit.author.date);
+
+                        const author = document.createElement('a');
+                        author.innerText = json.author.login;
+                        author.href = json.author.html_url;
+                        author.title = json.commit.author.name;
+                        author.target = '_blank';
+
+                        container.appendChild(document.createTextNode('Last edited ' + dt.toDateString() + ' by '));
+                        container.appendChild(author);
+                    });
             })();
         </script>
     </body>

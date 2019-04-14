@@ -151,7 +151,8 @@ declare namespace RNTrackPlayer {
   export const STATE_PAUSED: State;
   export const STATE_STOPPED: State;
   export const STATE_BUFFERING: State;
-  
+  export const STATE_READY: State;
+
   export const RATING_HEART: RatingType;
   export const RATING_THUMBS_UP_DOWN: RatingType;
   export const RATING_3_STARS: RatingType;
