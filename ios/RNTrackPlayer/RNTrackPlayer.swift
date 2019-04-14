@@ -441,7 +441,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     
     @objc(getBufferedPosition:rejecter:)
     public func getBufferedPosition(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        resolve(0)
+        resolve(player.bufferedPosition)
     }
     
     @objc(getPosition:rejecter:)

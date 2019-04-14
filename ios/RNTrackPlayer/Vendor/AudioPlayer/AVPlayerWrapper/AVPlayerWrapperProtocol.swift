@@ -19,6 +19,8 @@ protocol AVPlayerWrapperProtocol {
     
     var duration: TimeInterval { get }
     
+    var bufferedPosition: TimeInterval { get }
+    
     var reasonForWaitingToPlay: AVPlayer.WaitingReason? { get }
     
     
