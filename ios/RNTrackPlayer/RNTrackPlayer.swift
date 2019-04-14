@@ -223,10 +223,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     }
     
     @objc(add:before:resolver:rejecter:)
-    public func add(trackDicts: [[String: Any]], before trackId: String?, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        
-        //tell app to receive remote control events on add
-        //so we can remove it on remove
+    public func add(trackDicts: [[String: Any]], before trackId: String?, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {        
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             UIApplication.shared.beginReceivingRemoteControlEvents();
         }
@@ -348,8 +345,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
         print("Resetting player.")
         player.stop()
         resolve(NSNull())
-        //tell app to stop receiving remote control events
-        //so the MPNowPlayingInfoCenter clears properly
         DispatchQueue.main.async {
             UIApplication.shared.endReceivingRemoteControlEvents();
         }
