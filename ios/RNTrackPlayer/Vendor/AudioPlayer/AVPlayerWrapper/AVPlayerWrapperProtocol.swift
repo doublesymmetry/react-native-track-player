@@ -49,4 +49,6 @@ protocol AVPlayerWrapperProtocol {
     
     func load(from url: URL, playWhenReady: Bool)
     
+    func load(from url: URL, playWhenReady: Bool, initialTime: TimeInterval?)
+    
 }
