@@ -153,16 +153,6 @@ public class RNTrackPlayer: RCTEventEmitter {
         print("Destroying player")
     }
     
-    @objc(updateMetadata:)
-    public func updateMetadata(_ item: [String: Any]) {
-        guard let track = Track(dictionary: item) else { return }
-        player.nowPlayingInfoController.set(keyValues: [
-            MediaItemProperty.artist(track.artist),
-            MediaItemProperty.title(track.title),
-            MediaItemProperty.albumTitle(track.album),
-        ])
-    }
-    
     @objc(updateOptions:resolver:rejecter:)
     public func update(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         let capabilitiesStr = options["capabilities"] as? [String]
