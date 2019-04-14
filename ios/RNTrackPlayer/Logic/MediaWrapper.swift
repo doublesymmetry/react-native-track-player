@@ -113,11 +113,11 @@ class MediaWrapper: AudioPlayerDelegate {
     }
     
     func updateMetadata(_ item: Track) {
-        MPNowPlayingInfoCenter.default().ap_update(
-            with: item,
-            duration: 100,
-            progression: 0,
-            playbackRate: 1)
+        player.nowPlayingInfoController.set(keyValues: [
+            MediaItemProperty.artist(track.artist),
+            MediaItemProperty.title(track.title),
+            MediaItemProperty.albumTitle(track.album),
+        ])
     }
     
     func removeTracks(ids: [String]) {
