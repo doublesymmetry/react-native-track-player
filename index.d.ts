@@ -45,12 +45,7 @@ declare namespace RNTrackPlayer {
   type EmitterSubscription = { remove: () => void; };
   export function addEventListener(type: EventType, listener: (data: any) => void): EmitterSubscription;
 
-  export interface Track {
-    id: string;
-    url: string | ResourceObject;
-    type?: TrackType;
-    userAgent?: string;
-    contentType?: string;
+  export interface TrackMetadata {
     duration?: number;
     title: string;
     artist: string;
@@ -60,6 +55,14 @@ declare namespace RNTrackPlayer {
     date?: string;
     rating?: number | boolean;
     artwork?: string | ResourceObject;
+  }
+
+  export interface Track extends TrackMetadata {
+    id: string;
+    url: string | ResourceObject;
+    type?: TrackType;
+    userAgent?: string;
+    contentType?: string;
     pitchAlgorithm?: PitchAlgorithm;
     [key: string]: any;
   }
@@ -108,6 +111,7 @@ declare namespace RNTrackPlayer {
   export function skip(trackId: string): Promise<void>;
   export function skipToNext(): Promise<void>;
   export function skipToPrevious(): Promise<void>;
+  export function updateMetadataForTrack(id: string, metadata: TrackMetadata) : Promise<void>;
   export function removeUpcomingTracks(): Promise<void>;
 
   // Player Playback Commands

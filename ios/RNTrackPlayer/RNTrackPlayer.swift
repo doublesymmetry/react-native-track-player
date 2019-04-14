@@ -107,7 +107,7 @@ public class RNTrackPlayer: RCTEventEmitter {
         }
         
         let sessionCategoryOptsStr = config["iosCategoryOptions"] as? [String]
-        let mappedCategoryOpts = sessionCategoryOpts.compactMap { SessionCategoryOptions(rawValue: $0)?.mapConfigToAVAudioSessionCategoryOptions() }
+        let mappedCategoryOpts = sessionCategoryOptsStr?.compactMap { SessionCategoryOptions(rawValue: $0)?.mapConfigToAVAudioSessionCategoryOptions() } ?? []
         sessionCategoryOptions = AVAudioSession.CategoryOptions(mappedCategoryOpts)
         
         if
@@ -452,5 +452,32 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(getState:rejecter:)
     public func getState(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         resolve(player.playerState.rawValue)
+    }
+    
+    @objc(updateMetadataForTrack:properties:resolver:rejecter:)
+    public func updateMetadata(for trackId: String, properties: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        guard let track = player.queueManager.items.first(where: { ($0 as! Track).id == trackId }) as? Track
+            else {
+                reject("track_not_in_queue", "Given track ID was not found in queue", nil)
+                return
+        }
+        
+        track.updateMetadata(dictionary: properties)
+        if (player.currentItem as! Track).id == track.id {
+            player.nowPlayingInfoController.set(keyValues: [
+                MediaItemProperty.artist(track.artist),
+                MediaItemProperty.title(track.title),
+                MediaItemProperty.albumTitle(track.album),
+            ])
+            
+            track.getArtwork { [weak self] image in
+                if let image = image {
+                    let artwork = MPMediaItemArtwork(boundsSize: image.size, requestHandler: { (size) -> UIImage in
+                        return image
+                    })
+                    self?.player.nowPlayingInfoController.set(keyValue: MediaItemProperty.artwork(artwork))
+                }
+            }
+        }
     }
 }

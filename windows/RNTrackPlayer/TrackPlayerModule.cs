@@ -131,6 +131,28 @@ namespace TrackPlayer
         }
 
         [ReactMethod]
+        public void updateMetadataForTrack(string id, JObject metadata, IPromise promise)
+        {
+            var player = manager?.GetPlayer();
+            if (Utils.CheckPlayback(player, promise)) return;
+
+            var queue = player.GetQueue();
+            var index = queue.FindIndex(t => t.Id == id);
+
+            if (index == -1)
+            {
+                promise.Reject("track_not_in_queue", "Track not found");
+            }
+            else
+            {
+                var track = queue[index];
+                track.SetMetadata(metadata);
+                player.UpdateTrack(index, track);
+                promise.Resolve(null);
+            }
+        }
+
+        [ReactMethod]
         public void removeUpcomingTracks(IPromise promise)
         {
             var player = manager?.GetPlayer();

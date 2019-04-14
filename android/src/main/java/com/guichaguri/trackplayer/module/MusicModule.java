@@ -16,6 +16,8 @@ import com.guichaguri.trackplayer.service.MusicBinder;
 import com.guichaguri.trackplayer.service.MusicService;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.models.Track;
+import com.guichaguri.trackplayer.service.player.ExoPlayback;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -237,6 +239,33 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
 
             if (indexes.size() > 0) {
                 binder.getPlayback().remove(indexes, callback);
+            }
+        });
+    }
+
+    @ReactMethod
+    public void updateMetadataForTrack(String id, ReadableMap map, final Promise callback) {
+        waitForConnection(() -> {
+            ExoPlayback playback = binder.getPlayback();
+            List<Track> queue = playback.getQueue();
+            Track track = null;
+            int index = -1;
+
+            for(int i = 0; i < queue.size(); i++) {
+                track = queue.get(i);
+
+                if(track.id.equals(id)) {
+                    index = i;
+                    break;
+                }
+            }
+
+            if(index == -1) {
+                callback.reject("track_not_in_queue", "No track found");
+            } else {
+                track.setMetadata(getReactApplicationContext(), Arguments.toBundle(map), binder.getRatingType());
+                playback.updateTrack(index, track);
+                callback.resolve(null);
             }
         });
     }

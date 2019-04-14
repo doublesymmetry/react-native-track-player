@@ -5,7 +5,7 @@ using Windows.Storage.Streams;
 
 namespace TrackPlayer.Logic
 {
-    class Metadata
+    public class Metadata
     {
         private MediaManager manager;
         private SystemMediaTransportControls controls;

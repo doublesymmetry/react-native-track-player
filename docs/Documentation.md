@@ -207,6 +207,17 @@ Gets the whole queue
 #### `removeUpcomingTracks()`
 Clears any upcoming tracks from the queue.
 
+#### `updateMetadataForTrack(id, metadata)`
+Updates the metadata of a track in the queue.
+If the current track is updated, the notification and the Now Playing Center will be updated accordingly.
+
+**Returns:** `Promise`
+
+| Param    | Type       | Description   |
+| -------- | ---------- | ------------- |
+| id       | `string`   | The track ID  |
+| metadata | `object`   | A subset of the [Track Object](#track-object) with only the `artwork`, `title`, `artist`, `album`, `description`, `genre`, `date`, `rating` and `duration` properties. |
+
 ### Player Functions
 #### `updateOptions(options)`
 Updates the configuration for the components.

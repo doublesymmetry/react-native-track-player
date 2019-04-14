@@ -13,20 +13,20 @@ import AVFoundation
 class Track: NSObject, AudioItem, TimePitching {
     let id: String
     let url: MediaURL
-    @objc let title: String
-    @objc let artist: String
+    @objc var title: String
+    @objc var artist: String
     
-    let date: String?
-    let desc: String?
-    let genre: String?
+    var date: String?
+    var desc: String?
+    var genre: String?
     let pitchAlgorithm: String?
-    let duration: Double?
-    let artworkURL: MediaURL?
+    var duration: Double?
+    var artworkURL: MediaURL?
     var skipped: Bool = false
-    @objc let album: String?
+    @objc var album: String?
     @objc var artwork: MPMediaItemArtwork?
     
-    private let originalObject: [String: Any]
+    private var originalObject: [String: Any]
     
     init?(dictionary: [String: Any]) {
         guard let id = dictionary["id"] as? String,
@@ -56,6 +56,20 @@ class Track: NSObject, AudioItem, TimePitching {
     
     func toObject() -> [String: Any] {
         return originalObject
+    }
+    
+    func updateMetadata(dictionary: [String: Any]) {
+        self.title = (dictionary["title"] as? String) ?? self.title
+        self.artist = (dictionary["artist"] as? String) ?? self.artist
+        
+        self.date = dictionary["date"] as? String
+        self.album = dictionary["album"] as? String
+        self.genre = dictionary["genre"] as? String
+        self.desc = dictionary["description"] as? String
+        self.duration = dictionary["duration"] as? Double
+        self.artworkURL = MediaURL(object: dictionary["artwork"])
+        
+        self.originalObject = self.originalObject.merging(dictionary) { (_, new) in new }
     }
     
     // MARK: - AudioItem Protocol
