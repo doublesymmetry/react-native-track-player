@@ -236,7 +236,11 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
     }
     
     @objc(add:before:resolver:rejecter:)
-    public func add(trackDicts: [[String: Any]], before trackId: String?, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+    public func add(trackDicts: [[String: Any]], before trackId: String?, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            UIApplication.shared.beginReceivingRemoteControlEvents();
+        }
+
         var tracks = [Track]()
         for trackDict in trackDicts {
             guard let track = Track(dictionary: trackDict) else {
@@ -354,6 +358,9 @@ public class RNTrackPlayer: RCTEventEmitter, AudioPlayerDelegate {
         print("Resetting player.")
         player.stop()
         resolve(NSNull())
+        DispatchQueue.main.async {
+            UIApplication.shared.endReceivingRemoteControlEvents();
+        }
     }
     
     @objc(play:rejecter:)
