@@ -131,10 +131,6 @@ declare namespace RNTrackPlayer {
   export function getBufferedPosition(): Promise<number>;
   export function getState(): Promise<State>;
   export function getRate(): Promise<number>;
-  
-  // Metadata
-
-  export function updateMetadata(track: Track): void;
 
   // Components
 

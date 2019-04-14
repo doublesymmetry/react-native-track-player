@@ -151,16 +151,6 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void updateMetadata(ReadableMap track) {
-        final Bundle trackBundle = Arguments.toBundle(track);
-        Track convertedTrack = new Track(getReactApplicationContext(), trackBundle, binder.getRatingType());
-        
-        waitForConnection(() -> {
-            binder.updateMetadata(convertedTrack);
-        });
-    }
-
-    @ReactMethod
     public void destroy() {
         try {
             if(binder != null) {

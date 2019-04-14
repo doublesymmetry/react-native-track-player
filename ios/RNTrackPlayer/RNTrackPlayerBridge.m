@@ -17,8 +17,6 @@ RCT_EXTERN_METHOD(setupPlayer:(NSDictionary *)data
 
 RCT_EXTERN_METHOD(destroy);
 
-RCT_EXTERN_METHOD(updateMetadata:(NSDictionary *)item);
-
 RCT_EXTERN_METHOD(updateOptions:(NSDictionary *)options
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
