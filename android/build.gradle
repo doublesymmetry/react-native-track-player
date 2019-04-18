@@ -27,6 +27,22 @@ def safeExtGet(prop, fallback) {
 }
 
 android {
+	publishNonDefault true
+
+	flavorDimensions "store"
+	productFlavors {
+        google {
+			dimension "store"
+		}
+        amazon {
+			dimension "store"
+		}
+    }
+
+	buildTypes {
+        release {}
+	}
+
     compileSdkVersion safeExtGet("compileSdkVersion", 27)
 
     defaultConfig {
@@ -60,32 +76,49 @@ repositories {
     mavenCentral()
 }
 
+// Build variants get passed to this module,
+// so that it can use either google or amazon libraries.
+// https://medium.com/@elye.project/support-flavors-and-buildtypes-across-library-modules-31acf9c6d806
+
+configurations {
+	google
+	amazon
+}
+
 dependencies {
-    //noinspection GradleDynamicVersion
+    
+	//noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'
 
     // ExoPlayer Core
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.9.2'
+    googleImplementation 'com.google.android.exoplayer:exoplayer-core:2.9.6'
+    amazonImplementation 'com.amazon.android:exoplayer-core:2.9.6'
 
     // ExoPlayer DASH
     if (dash) {
-        implementation 'com.google.android.exoplayer:exoplayer-dash:2.9.2'
+        googleImplementation 'com.google.android.exoplayer:exoplayer-dash:2.9.6'
+        amazonImplementation 'com.amazon.android:exoplayer-dash:2.9.6'
     } else {
-        compileOnly 'com.google.android.exoplayer:exoplayer-dash:2.9.2'
+        googleCompileOnly 'com.google.android.exoplayer:exoplayer-dash:2.9.6'
+        amazonCompileOnly 'com.amazon.android:exoplayer-dash:2.9.6'
     }
 
     // ExoPlayer HLS
     if (hls) {
-        implementation 'com.google.android.exoplayer:exoplayer-hls:2.9.2'
+        googleImplementation 'com.google.android.exoplayer:exoplayer-hls:2.9.6'
+        amazonImplementation 'com.amazon.android:exoplayer-hls:2.9.6'
     } else {
-        compileOnly 'com.google.android.exoplayer:exoplayer-hls:2.9.2'
+        googleCompileOnly 'com.google.android.exoplayer:exoplayer-hls:2.9.6'
+        amazonCompileOnly 'com.amazon.android:exoplayer-hls:2.9.6'
     }
 
     // ExoPlayer SmoothStreaming
     if (smoothstreaming) {
-        implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.9.2'
+        googleImplementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.9.6'
+        amazonImplementation 'com.amazon.android:exoplayer-smoothstreaming:2.9.6'
     } else {
-        compileOnly 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.9.2'
+        googleCompileOnly 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.9.6'
+        amazonCompileOnly 'com.amazon.android:exoplayer-smoothstreaming:2.9.6'
     }
 
     // Make sure we're using at least the support library 27.1.1
