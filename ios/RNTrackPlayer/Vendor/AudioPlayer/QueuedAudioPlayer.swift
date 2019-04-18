@@ -25,6 +25,13 @@ public class QueuedAudioPlayer: AudioPlayer {
         return queueManager.current
     }
     
+    /**
+     The index of the current item.
+     */
+    public var currentIndex: Int {
+        return queueManager.currentIndex
+    }
+    
      /**
      Stops the player and clears the queue.
      */
@@ -34,6 +41,13 @@ public class QueuedAudioPlayer: AudioPlayer {
     
     override func reset() {
         queueManager.clearQueue()
+    }
+    
+    /**
+     All items currently in the queue.
+     */
+    public var items: [AudioItem] {
+        return queueManager.items
     }
     
     /**
@@ -105,7 +119,8 @@ public class QueuedAudioPlayer: AudioPlayer {
      - throws: `APError`
      */
     public func next() throws {
-        AVWrapper(itemPlaybackDoneWithReason: .skippedToNext)
+        event.playbackEnd.emit(data: .skippedToNext)
+        delegate?.audioPlayer(itemPlaybackEndedWithReason: .skippedToNext)
         let nextItem = try queueManager.next()
         try self.load(item: nextItem, playWhenReady: true)
     }
@@ -114,7 +129,8 @@ public class QueuedAudioPlayer: AudioPlayer {
      Step to the previous item in the queue.
      */
     public func previous() throws {
-        AVWrapper(itemPlaybackDoneWithReason: .skippedToPrevious)
+        event.playbackEnd.emit(data: .skippedToPrevious)
+        delegate?.audioPlayer(itemPlaybackEndedWithReason: .skippedToPrevious)
         let previousItem = try queueManager.previous()
         try self.load(item: previousItem, playWhenReady: true)
     }
@@ -137,8 +153,8 @@ public class QueuedAudioPlayer: AudioPlayer {
      - throws: `APError`
      */
     public func jumpToItem(atIndex index: Int, playWhenReady: Bool = true) throws {
-        AVWrapper(itemPlaybackDoneWithReason: .jumpedToIndex)
-
+        event.playbackEnd.emit(data: .jumpedToIndex)
+        delegate?.audioPlayer(itemPlaybackEndedWithReason: .jumpedToIndex)
         let item = try queueManager.jump(to: index)
         try self.load(item: item, playWhenReady: playWhenReady)
     }
@@ -170,10 +186,8 @@ public class QueuedAudioPlayer: AudioPlayer {
     
     // MARK: - AVPlayerWrapperDelegate
     
-    override func AVWrapper(itemPlaybackDoneWithReason reason: PlaybackEndedReason) {
-        super.AVWrapper(itemPlaybackDoneWithReason: reason)
-        guard reason == .playedUntilEnd else { return }
-
+    override func AVWrapperItemDidPlayToEndTime() {
+        super.AVWrapperItemDidPlayToEndTime()
         if automaticallyPlayNextSong {
             try? self.next()
         }

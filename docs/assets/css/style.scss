@@ -1,7 +1,7 @@
 ---
 ---
 
-@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,700');
 
 $text: #292929;
 $codeBg: rgba(0, 0, 0, 0.05);
@@ -33,7 +33,6 @@ a {
 #header, #footer {
     background: $headerBg;
     border-bottom: 1px solid $headerBorder;
-    font-weight: bold;
     padding: 15px;
     
     > div {
@@ -64,7 +63,7 @@ a {
     justify-content: center;
     font-weight: normal;
     border-top: 1px solid $headerBorder;
-    margin-top: 1em;
+    margin-top: 2em;
 }
 
 section, #header > div {
@@ -73,14 +72,24 @@ section, #header > div {
 }
 
 section {
-    ul li {
-        line-height: 1.75em;
+    line-height: 1.7;
+
+    p {
+        margin: 0.7em 0;
     }
-    .buttons {
-        text-align: right;
-        a {
-            margin-left: 1em;
-            display: inline-block;
+
+    .info {
+        display: flex;
+        justify-content: space-between;
+        margin: 1em 0;
+
+        .buttons {
+            text-align: right;
+
+            a {
+                margin-left: 1em;
+                display: inline-block;
+            }
         }
     }
 }
@@ -93,17 +102,21 @@ h1, h2, h3, h4, h5, h6 {
 
 h1 {
     font-size: 2em;
+    font-weight: 300;
     text-align: center;
+    margin: 0.5em;
 }
+
 h2 {
     font-size: 1.6em;
     border-bottom: 1px solid #eaecef;
     padding-bottom: 0.3em;
-    
 }
+
 h3 {
     font-size: 1.3em;
 }
+
 h4 {
     font-size: 1.25em;
 }
@@ -125,6 +138,13 @@ table {
             background: #f8f8f8;
         }
     }
+}
+
+hr {
+    color: $headerBorder;
+    height: 2px;
+    border: 1px solid $headerBorder;
+    margin: 1em 0;
 }
 
 img {
@@ -170,5 +190,14 @@ pre {
 
     &:hover {
         text-decoration: none;
+    }
+}
+
+@media (max-width: 1050px) {
+    section {
+        p, h1, h2, h3, h4, h5, h6 {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
     }
 }

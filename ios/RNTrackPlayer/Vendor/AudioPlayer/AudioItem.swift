@@ -31,6 +31,11 @@ public protocol TimePitching {
     
 }
 
+/// Make your `AudioItem`-subclass conform to this protocol to control enable the ability to start an item at a specific time of playback.
+public protocol InitialTiming {
+    func getInitialTime() -> TimeInterval
+}
+
 public class DefaultAudioItem: AudioItem {
     
     public var audioUrl: String
@@ -98,4 +103,25 @@ public class DefaultAudioItemTimePitching: DefaultAudioItem, TimePitching {
     public func getPitchAlgorithmType() -> AVAudioTimePitchAlgorithm {
         return pitchAlgorithmType
     }
+}
+
+/// An AudioItem that also conforms to the `InitialTiming`-protocol
+public class DefaultAudioItemInitialTime: DefaultAudioItem, InitialTiming {
+    
+    public var initialTime: TimeInterval
+    
+    public override init(audioUrl: String, artist: String?, title: String?, albumTitle: String?, sourceType: SourceType, artwork: UIImage?) {
+        self.initialTime = 0.0
+        super.init(audioUrl: audioUrl, artist: artist, title: title, albumTitle: albumTitle, sourceType: sourceType, artwork: artwork)
+    }
+    
+    public init(audioUrl: String, artist: String?, title: String?, albumTitle: String?, sourceType: SourceType, artwork: UIImage?, initialTime: TimeInterval) {
+        self.initialTime = initialTime
+        super.init(audioUrl: audioUrl, artist: artist, title: title, albumTitle: albumTitle, sourceType: sourceType, artwork: artwork)
+    }
+    
+    public func getInitialTime() -> TimeInterval {
+        return initialTime
+    }
+    
 }

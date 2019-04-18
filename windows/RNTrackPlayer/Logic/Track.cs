@@ -22,6 +22,14 @@ namespace TrackPlayer.Logic
             Id = (string)data.GetValue("id");
             Url = Utils.GetUri(data, "url", null);
             Type = Utils.GetValue<string>(data, "type", TrackType.Default);
+
+            SetMetadata(data);
+
+            _originalObj = data;
+        }
+
+        public void SetMetadata(JObject data)
+        {
             Duration = Utils.GetValue<double>(data, "duration", 0);
 
             Title = Utils.GetValue<string>(data, "title", null);
@@ -29,7 +37,8 @@ namespace TrackPlayer.Logic
             Album = Utils.GetValue<string>(data, "album", null);
             Artwork = Utils.GetUri(data, "artwork", null);
 
-            _originalObj = data;
+            if (_originalObj != null && _originalObj != data)
+                _originalObj.Merge(data);
         }
 
         public JObject ToObject()
