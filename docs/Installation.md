@@ -3,6 +3,9 @@ title: Installation
 permalink: /install/
 ---
 
+## Warning
+**Currently react-native-track-player does not support projects with Expo or Expokit.**
+
 ## Installing the packages
 **1. Install the module from npm or yarn**
 ```
