@@ -27,21 +27,21 @@ def safeExtGet(prop, fallback) {
 }
 
 android {
-	publishNonDefault true
+    publishNonDefault true
 
-	flavorDimensions "store"
-	productFlavors {
+    flavorDimensions "store"
+    productFlavors {
         google {
-			dimension "store"
-		}
+            dimension "store"
+        }
         amazon {
-			dimension "store"
-		}
+            dimension "store"
+        }
     }
 
-	buildTypes {
+    buildTypes {
         release {}
-	}
+    }
 
     compileSdkVersion safeExtGet("compileSdkVersion", 27)
 
@@ -81,12 +81,11 @@ repositories {
 // https://medium.com/@elye.project/support-flavors-and-buildtypes-across-library-modules-31acf9c6d806
 
 configurations {
-	google
-	amazon
+    google
+    amazon
 }
 
 dependencies {
-    
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'
 

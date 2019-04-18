@@ -71,7 +71,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     @Override
     public void add(Track track, int index, Promise promise) {
         queue.add(index, track);
-		source.addMediaSource(index, track.toMediaSource(context, this), new Handler(), Utils.toRunnable(promise));
+        source.addMediaSource(index, track.toMediaSource(context, this), new Handler(), Utils.toRunnable(promise));
 
         prepare();
     }
