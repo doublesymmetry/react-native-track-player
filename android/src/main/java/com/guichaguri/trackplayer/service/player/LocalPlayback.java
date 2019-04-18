@@ -1,5 +1,6 @@
 package com.guichaguri.trackplayer.service.player;
 
+import android.os.Handler;
 import android.content.Context;
 import android.util.Log;
 import com.facebook.react.bridge.Promise;
@@ -70,7 +71,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     @Override
     public void add(Track track, int index, Promise promise) {
         queue.add(index, track);
-        source.addMediaSource(index, track.toMediaSource(context, this), Utils.toRunnable(promise));
+		source.addMediaSource(index, track.toMediaSource(context, this), new Handler(), Utils.toRunnable(promise));
 
         prepare();
     }
@@ -84,7 +85,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
         }
 
         queue.addAll(index, tracks);
-        source.addMediaSources(index, trackList, Utils.toRunnable(promise));
+        source.addMediaSources(index, trackList, new Handler(), Utils.toRunnable(promise));
 
         prepare();
     }
@@ -109,9 +110,9 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
             queue.remove(index);
 
             if(i == 0) {
-                source.removeMediaSource(index, Utils.toRunnable(promise));
+                source.removeMediaSource(index, new Handler(), Utils.toRunnable(promise));
             } else {
-                source.removeMediaSource(index, null);
+                source.removeMediaSource(index, null, null);
             }
         }
     }
@@ -123,7 +124,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
 
         for (int i = queue.size() - 1; i > currentIndex; i--) {
             queue.remove(i);
-            source.removeMediaSource(i, null);
+            source.removeMediaSource(i, null, null);
         }
     }
 
