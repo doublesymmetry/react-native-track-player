@@ -83,6 +83,7 @@ public class RNTrackPlayer: RCTEventEmitter {
             "remote-previous",
             "remote-jump-forward",
             "remote-jump-backward",
+            "remote-duck"
         ]
     }
     
@@ -144,6 +145,8 @@ public class RNTrackPlayer: RCTEventEmitter {
                     ])
             }
         }
+        
+        registerForInterruptionNotification()
         
         resolve(NSNull())
     }
@@ -227,6 +230,37 @@ public class RNTrackPlayer: RCTEventEmitter {
         }
         
         resolve(NSNull())
+    }
+    
+    private func registerForInterruptionNotification() {
+        let notificationCenter = NotificationCenter.default
+        notificationCenter.removeObserver(self, name: AVAudioSession.interruptionNotification, object: nil)
+        notificationCenter.addObserver(self,
+                                       selector: #selector(handleInterruption),
+                                       name: AVAudioSession.interruptionNotification,
+                                       object: nil)
+    }
+    
+    @objc func handleInterruption(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+            let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
+            let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
+                return
+        }
+        if type == .began {
+            self.sendEvent(withName: "remote-duck", body: "began")
+        }
+        else if type == .ended {
+            self.sendEvent(withName: "remote-duck", body: "ended")
+            if let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
+                let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
+                if options.contains(.shouldResume) {
+                    self.sendEvent(withName: "remote-duck", body: "shouldResume")
+                } else {
+                    self.sendEvent(withName: "remote-duck", body: "notResume")
+                }
+            }
+        }
     }
     
     @objc(add:before:resolver:rejecter:)

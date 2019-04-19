@@ -385,6 +385,8 @@ Fired when the user presses the jump backward button. Only fired if the `CAPABIL
 | interval | `number` | The number of seconds to jump backward. It's usually the `jumpInterval` set in the options. |
 
 #### `remote-duck`
+**android**
+
 Fired when the device needs the player to pause or lower the volume for a short amount of time.
 
 - When the event is triggered with `permanent` set to true, you should stop the playback.
@@ -397,6 +399,17 @@ Fired when the device needs the player to pause or lower the volume for a short 
 | paused    | `boolean` | Whether the player should pause the playback |
 | permanent | `boolean` | Whether the player should stop the playback  |
 | ducking   | `boolean` | Whether the player should lower their volume |
+
+**ios**
+
+Fired when you’re watching a movie in the Videos app or you receive a phone call or FaceTime request.
+
+| Param Value    | Type     | Description                                     |
+| -------------- | -------- | ----------------------------------------------- |
+| began          | `string` | Interruption began, take appropriate actions    |
+| ended          | `string` | Interruption ended, take appropriate actions    |
+| shouldResume   | `string` | Interruption Ended - playback should resume     |
+| notResume      | `string` | Interruption Ended - playback should NOT resume |
 
 ### Player
 #### `playback-state`
