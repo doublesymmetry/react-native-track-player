@@ -63,33 +63,35 @@ repositories {
 dependencies {
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'
+    
+    def exoPlayerVersion = '2.10.0-alpha1'
 
     // ExoPlayer Core
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.9.2'
+    implementation "com.google.android.exoplayer:exoplayer-core:${exoPlayerVersion}"
 
     // ExoPlayer DASH
     if (dash) {
-        implementation 'com.google.android.exoplayer:exoplayer-dash:2.9.2'
+        implementation "com.google.android.exoplayer:exoplayer-dash:${exoPlayerVersion}"
     } else {
-        compileOnly 'com.google.android.exoplayer:exoplayer-dash:2.9.2'
+        compileOnly "com.google.android.exoplayer:exoplayer-dash:${exoPlayerVersion}"
     }
 
     // ExoPlayer HLS
     if (hls) {
-        implementation 'com.google.android.exoplayer:exoplayer-hls:2.9.2'
+        implementation "com.google.android.exoplayer:exoplayer-hls:${exoPlayerVersion}"
     } else {
-        compileOnly 'com.google.android.exoplayer:exoplayer-hls:2.9.2'
+        compileOnly "com.google.android.exoplayer:exoplayer-hls:${exoPlayerVersion}"
     }
 
     // ExoPlayer SmoothStreaming
     if (smoothstreaming) {
-        implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.9.2'
+        implementation "com.google.android.exoplayer:exoplayer-smoothstreaming:${exoPlayerVersion}"
     } else {
-        compileOnly 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.9.2'
+        compileOnly "com.google.android.exoplayer:exoplayer-smoothstreaming:${exoPlayerVersion}"
     }
 
     // Make sure we're using at least the support library 27.1.1
     implementation "com.android.support:support-compat:${safeExtGet('supportLibVersion', '27.1.1')}"
     implementation "com.android.support:support-media-compat:${safeExtGet('supportLibVersion', '27.1.1')}"
-    implementation 'com.github.bumptech.glide:glide:4.7.1'
+    implementation "com.github.bumptech.glide:glide:4.7.1"
 }
