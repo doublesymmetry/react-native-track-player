@@ -7,8 +7,6 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.database.DatabaseProvider;
-import com.google.android.exoplayer2.database.ExoDatabaseProvider;
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
@@ -45,8 +43,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     public void initialize() {
         if(cacheMaxSize > 0) {
             File cacheDir = new File(context.getCacheDir(), "TrackPlayer");
-            DatabaseProvider db = new ExoDatabaseProvider(context);
-            cache = new SimpleCache(cacheDir, new LeastRecentlyUsedCacheEvictor(cacheMaxSize), db);
+            cache = new SimpleCache(cacheDir, new LeastRecentlyUsedCacheEvictor(cacheMaxSize));
         } else {
             cache = null;
         }
@@ -59,7 +56,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     public DataSource.Factory enableCaching(DataSource.Factory ds) {
         if(cache == null || cacheMaxSize <= 0) return ds;
 
-        return new CacheDataSourceFactory(cache, ds, CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR);
+        return new CacheDataSourceFactory(cache, ds, CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR, cacheMaxSize);
     }
 
     private void prepare() {
@@ -73,8 +70,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     @Override
     public void add(Track track, int index, Promise promise) {
         queue.add(index, track);
-        MediaSource trackSource = track.toMediaSource(context, this);
-        source.addMediaSource(index, trackSource, manager.getHandler(), Utils.toRunnable(promise));
+        source.addMediaSource(index, track.toMediaSource(context, this), Utils.toRunnable(promise));
 
         prepare();
     }
@@ -88,7 +84,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
         }
 
         queue.addAll(index, tracks);
-        source.addMediaSources(index, trackList, manager.getHandler(), Utils.toRunnable(promise));
+        source.addMediaSources(index, trackList, Utils.toRunnable(promise));
 
         prepare();
     }
@@ -113,9 +109,9 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
             queue.remove(index);
 
             if(i == 0) {
-                source.removeMediaSource(index, manager.getHandler(), Utils.toRunnable(promise));
+                source.removeMediaSource(index, Utils.toRunnable(promise));
             } else {
-                source.removeMediaSource(index);
+                source.removeMediaSource(index, null);
             }
         }
     }
@@ -127,7 +123,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
 
         for (int i = queue.size() - 1; i > currentIndex; i--) {
             queue.remove(i);
-            source.removeMediaSource(i);
+            source.removeMediaSource(i, null);
         }
     }
 
