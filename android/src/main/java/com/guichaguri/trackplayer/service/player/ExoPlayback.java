@@ -4,13 +4,15 @@ import android.content.Context;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import com.facebook.react.bridge.Promise;
-import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.PlaybackParameters;
-import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.*;
 import com.google.android.exoplayer2.Player.EventListener;
-import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.Timeline.Window;
+import com.google.android.exoplayer2.metadata.Metadata;
+import com.google.android.exoplayer2.metadata.MetadataOutput;
+import com.google.android.exoplayer2.metadata.icy.IcyHeaders;
+import com.google.android.exoplayer2.metadata.icy.IcyInfo;
+import com.google.android.exoplayer2.metadata.id3.TextInformationFrame;
+import com.google.android.exoplayer2.metadata.id3.UrlLinkFrame;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.guichaguri.trackplayer.service.MusicManager;
@@ -24,7 +26,7 @@ import java.util.List;
 /**
  * @author Guichaguri
  */
-public abstract class ExoPlayback<T extends Player> implements EventListener {
+public abstract class ExoPlayback<T extends Player> implements EventListener, MetadataOutput {
 
     protected final Context context;
     protected final MusicManager manager;
@@ -41,6 +43,9 @@ public abstract class ExoPlayback<T extends Player> implements EventListener {
         this.context = context;
         this.manager = manager;
         this.player = player;
+
+        Player.MetadataComponent component = player.getMetadataComponent();
+        if(component != null) component.addMetadataOutput(this);
     }
 
     public void initialize() {
@@ -298,5 +303,73 @@ public abstract class ExoPlayback<T extends Player> implements EventListener {
     @Override
     public void onSeekProcessed() {
         // Finished seeking
+    }
+
+    @Override
+    public void onMetadata(Metadata metadata) {
+        String source = null;
+        String title = null, url = null, artist = null, album = null, date = null, genre = null;
+
+        for(int i = 0; i < metadata.length(); i++) {
+            Metadata.Entry entry = metadata.get(i);
+
+            // The ID3 Tag List can be found in
+            // https://en.wikipedia.org/wiki/ID3
+
+            if(entry instanceof TextInformationFrame) {
+                // ID3 text tag
+                TextInformationFrame id3 = (TextInformationFrame)entry;
+                source = "id3";
+
+                if (id3.id.equals("TIT2")) {
+                    title = id3.value;
+                } else if (id3.id.equals("TALB") || id3.id.equals("TOAL")) {
+                    album = id3.value;
+                } else if (id3.id.equals("TOPE")) {
+                    artist = id3.value;
+                } else if (id3.id.equals("TDRC")) {
+                    date = id3.value;
+                }
+
+            } else if (entry instanceof UrlLinkFrame) {
+                UrlLinkFrame id3 = (UrlLinkFrame)entry;
+                source = "id3";
+
+                if (id3.id.equals("WOAS") || id3.id.equals("WORS") || id3.id.equals("WOAF")) {
+                    url = id3.url;
+                }
+
+            } else if(entry instanceof IcyHeaders) {
+                // ICY headers - Only fills missing information
+                IcyHeaders icy = (IcyHeaders)entry;
+
+                if(source == null) source = "icy-headers";
+                if(title == null) title = icy.name;
+                if(url == null) url = icy.url;
+                if(genre == null) genre = icy.genre;
+
+            } else if(entry instanceof IcyInfo) {
+                // ICY data
+                IcyInfo icy = (IcyInfo)entry;
+                source = "icy";
+
+                int index = icy.title == null ? -1 : icy.title.indexOf(" - ");
+
+                if (index != -1) {
+                    artist = icy.title.substring(0, index);
+                    title = icy.title.substring(index + 3);
+                } else {
+                    title = icy.title;
+                }
+
+                url = icy.url;
+
+            }
+
+        }
+
+        if (source != null) {
+            manager.onMetadataReceived(source, title, url, artist, album, date, genre);
+        }
     }
 }
