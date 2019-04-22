@@ -1,18 +1,13 @@
 # Configuration
 
 Run `react-native info` in your project and share the content.
-
 What `react-native-track-player` version are you using?
 
 # Issue
-
-What platform does your issue occur on? (Android/iOS/Both)
-
-Describe your issue as precisely as possible : 
-  1) Steps to reproduce the issue or to explain in which case you get the issue
-  2) Interesting `logs`
-
-Join a screenshot or video of the problem on the simulator or device?
+<!--
+  Please, describe with details the problem, let us know which platform (Android, iOS or Windows) and which OS version are you experiencing this issue.
+  Crash logs, step-by-step instructions, code snippets and device details may also help us identify and reproduce the issue.
+-->
 
 # Code
 
