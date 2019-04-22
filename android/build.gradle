@@ -6,7 +6,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.0'
+        classpath 'com.android.tools.build:gradle:3.4.0'
     }
 }
 
@@ -27,11 +27,11 @@ def safeExtGet(prop, fallback) {
 }
 
 android {
-    compileSdkVersion safeExtGet("compileSdkVersion", 27)
+    compileSdkVersion safeExtGet("compileSdkVersion", 28)
 
     defaultConfig {
         minSdkVersion safeExtGet("minSdkVersion", 16) // RN's minimum version
-        targetSdkVersion safeExtGet("targetSdkVersion", 27)
+        targetSdkVersion safeExtGet("targetSdkVersion", 28)
 
         versionCode 1
         versionName "1.0"
@@ -91,7 +91,7 @@ dependencies {
     }
 
     // Make sure we're using at least the support library 27.1.1
-    implementation "com.android.support:support-compat:${safeExtGet('supportLibVersion', '27.1.1')}"
-    implementation "com.android.support:support-media-compat:${safeExtGet('supportLibVersion', '27.1.1')}"
+    implementation "androidx.core:core:1.1.0-alpha05"
+    implementation "androidx.media:media:1.1.0-alpha04"
     implementation "com.github.bumptech.glide:glide:4.7.1"
 }

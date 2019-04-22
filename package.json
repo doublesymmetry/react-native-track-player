@@ -37,7 +37,7 @@
     "url": "https://github.com/react-native-kit/react-native-track-player/issues"
   },
   "peerDependencies": {
-    "react-native": ">=0.57.0",
-    "react": ">=16.5.0"
+    "react-native": ">=0.59.5",
+    "react": ">=16.8.3"
   }
 }
