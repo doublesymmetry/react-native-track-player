@@ -16,6 +16,8 @@ links:
   url: https://react-native-kit.github.io/react-native-track-player/background/
 - title: Build Preferences
   url: https://react-native-kit.github.io/react-native-track-player/build-preferences/
+- title: FireOS Support
+  url: https://react-native-kit.github.io/react-native-track-player/amazon-fireos-support/
 - title: GitHub
   url: https://github.com/react-native-kit/react-native-track-player
   menu: true
