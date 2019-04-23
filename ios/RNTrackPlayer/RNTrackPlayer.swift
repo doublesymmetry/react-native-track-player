@@ -120,14 +120,17 @@ public class RNTrackPlayer: RCTEventEmitter {
         
         
         // setup event listeners
+        player.event.stateChange.removeListener(self)
         player.event.stateChange.addListener(self) { [weak self] state in
             self?.sendEvent(withName: "playback-state", body: ["state": state.rawValue])
         }
         
+        player.event.fail.removeListener(self)
         player.event.fail.addListener(self) { [weak self] error in
             self?.sendEvent(withName: "playback-error", body: ["error": error?.localizedDescription])
         }
         
+        player.event.playbackEnd.removeListener(self)
         player.event.playbackEnd.addListener(self) { [weak self] reason in
             guard let `self` = self else { return }
 
