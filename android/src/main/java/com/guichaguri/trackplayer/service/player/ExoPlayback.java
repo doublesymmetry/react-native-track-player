@@ -70,7 +70,7 @@ public abstract class ExoPlayback<T extends Player> implements EventListener {
 
     public Track getCurrentTrack() {
         int index = player.getCurrentWindowIndex();
-        return index == C.INDEX_UNSET || index < 0 || index >= queue.size() ? null : queue.get(index);
+        return index < 0 || index >= queue.size() ? null : queue.get(index);
     }
 
     public void skip(String id, Promise promise) {
@@ -161,7 +161,14 @@ public abstract class ExoPlayback<T extends Player> implements EventListener {
     }
 
     public long getDuration() {
-        return player.getDuration();
+        long duration = player.getDuration();
+
+        if (duration == C.TIME_UNSET) {
+            Track current = getCurrentTrack();
+            duration = current != null ? current.duration : 0;
+        }
+
+        return duration;
     }
 
     public void seekTo(long time) {

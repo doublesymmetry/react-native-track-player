@@ -124,7 +124,9 @@ public class Track {
         builder.putString(METADATA_KEY_MEDIA_URI, uri.toString());
         builder.putString(METADATA_KEY_MEDIA_ID, id);
 
-        builder.putLong(METADATA_KEY_DURATION, duration);
+        if (duration > 0) {
+            builder.putLong(METADATA_KEY_DURATION, duration);
+        }
 
         if (artwork != null) {
             builder.putString(METADATA_KEY_ART_URI, artwork.toString());
