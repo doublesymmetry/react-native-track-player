@@ -24,6 +24,7 @@ A fully fledged audio module created for music apps. Provides audio playback, ex
 * **Caching support** - Cache media files to play them again without an internet connection
 * **Background support** - Keep playing audio even after the app is in background
 * **Fully Customizable** - Even the notification icons are customizable!
+* **Supports React Hooks 🎣** - Includes React Hooks for common use-cases so you don't have to write them
 
 ## Platform Support
 
