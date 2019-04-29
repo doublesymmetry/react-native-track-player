@@ -474,3 +474,34 @@ Only the `id`, `url`, `title` and `artist` properties are required for basic pla
 Resource objects are the result of `require`/`import` for files.
 
 For more information about Resource Objects, read the [Images](https://facebook.github.io/react-native/docs/images.html) section of the React Native documentation
+
+## React Hooks
+
+React v16.8 introduced [hooks](https://reactjs.org/docs/hooks-intro.html). If you are using a version of React Native that is before [v0.59.0](https://facebook.github.io/react-native/blog/2019/03/12/releasing-react-native-059), your React Native version does not support hooks. 
+
+#### useTrackPlayerEvent
+Register an event listener for one of the [events](#events) emitted by the TrackPlayer. The subscription is removed when the component unmounts.
+
+Check out the [events section](#events) for a full list of supported events.
+
+```jsx
+import React from 'react';
+import { Text, View } from 'react-native';
+import { useTrackPlayerEvent, TrackPlayerEvents } from 'react-native-track-player';
+
+const MyComponent = () => {
+  const [playerState, setState] = useState(null)
+
+  useTrackPlayerEvent(TrackPlayerEvents.PLAYBACK_STATE, (playbackState) => {
+    setState(playbackState)
+  });
+
+  const isPlaying = playerState === 'STATE_PLAYING';
+
+  return (
+    <View>
+      <Text>The TrackPlayer is {isPlaying ? 'playing' : 'not playing'}</Text>
+    </View>
+  ); 
+};
+```
