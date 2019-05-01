@@ -423,6 +423,19 @@ Fired when the queue reaches the end.
 | track    | `string` | The previous track id. Might be null      |
 | position | `number` | The previous track position in seconds    |
 
+#### `playback-metadata-received`
+Fired when the current track receives metadata encoded in. (e.g. ID3 tags or Icy Metadata).
+
+| Param    | Type     | Description                                         |
+| -------- | -------- | --------------------------------------------------- |
+| source   | `string` | The metadata source (`id3`, `icy` or `icy-headers`) |
+| title    | `string` | The track title. Might be null                      |
+| url      | `string` | The track url. Might be null                        |
+| artist   | `string` | The track artist. Might be null                     |
+| album    | `string` | The track album. Might be null                      |
+| date     | `string` | The track date. Might be null                       |
+| genre    | `string` | The track genre. Might be null                      |
+
 #### `playback-error`
 Fired when an error occurs.
 

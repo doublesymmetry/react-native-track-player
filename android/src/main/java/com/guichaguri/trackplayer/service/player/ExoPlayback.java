@@ -4,13 +4,16 @@ import android.content.Context;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import com.facebook.react.bridge.Promise;
-import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.PlaybackParameters;
-import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.*;
 import com.google.android.exoplayer2.Player.EventListener;
-import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.Timeline.Window;
+import com.google.android.exoplayer2.metadata.Metadata;
+import com.google.android.exoplayer2.metadata.MetadataOutput;
+import com.google.android.exoplayer2.metadata.icy.IcyHeaders;
+import com.google.android.exoplayer2.metadata.icy.IcyInfo;
+import com.google.android.exoplayer2.metadata.id3.TextInformationFrame;
+import com.google.android.exoplayer2.metadata.id3.UrlLinkFrame;
+import com.google.android.exoplayer2.source.TrackGroup;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.guichaguri.trackplayer.service.MusicManager;
@@ -24,7 +27,7 @@ import java.util.List;
 /**
  * @author Guichaguri
  */
-public abstract class ExoPlayback<T extends Player> implements EventListener {
+public abstract class ExoPlayback<T extends Player> implements EventListener, MetadataOutput {
 
     protected final Context context;
     protected final MusicManager manager;
@@ -41,6 +44,9 @@ public abstract class ExoPlayback<T extends Player> implements EventListener {
         this.context = context;
         this.manager = manager;
         this.player = player;
+
+        Player.MetadataComponent component = player.getMetadataComponent();
+        if(component != null) component.addMetadataOutput(this);
     }
 
     public void initialize() {
@@ -242,7 +248,21 @@ public abstract class ExoPlayback<T extends Player> implements EventListener {
 
     @Override
     public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+        for(int i = 0; i < trackGroups.length; i++) {
+            // Loop through all track groups.
+            // As for the current implementation, there should be only one
+            TrackGroup group = trackGroups.get(i);
 
+            for(int f = 0; f < group.length; f++) {
+                // Loop through all formats inside the track group
+                Format format = group.getFormat(f);
+
+                // Parse the metadata if it is present
+                if (format.metadata != null) {
+                    onMetadata(format.metadata);
+                }
+            }
+        }
     }
 
     @Override
@@ -305,5 +325,82 @@ public abstract class ExoPlayback<T extends Player> implements EventListener {
     @Override
     public void onSeekProcessed() {
         // Finished seeking
+    }
+
+    private void handleId3Metadata(Metadata metadata) {
+        String title = null, url = null, artist = null, album = null, date = null, genre = null;
+
+        for(int i = 0; i < metadata.length(); i++) {
+            Metadata.Entry entry = metadata.get(i);
+
+            if (entry instanceof TextInformationFrame) {
+                // ID3 text tag
+                TextInformationFrame id3 = (TextInformationFrame) entry;
+                String id = id3.id.toUpperCase();
+
+                if (id.equals("TIT2") || id.equals("TT2")) {
+                    title = id3.value;
+                } else if (id.equals("TALB") || id.equals("TOAL") || id.equals("TAL")) {
+                    album = id3.value;
+                } else if (id.equals("TOPE") || id.equals("TPE1") || id.equals("TP1")) {
+                    artist = id3.value;
+                } else if (id.equals("TDRC") || id.equals("TOR")) {
+                    date = id3.value;
+                } else if (id.equals("TCON") || id.equals("TCO")) {
+                    genre = id3.value;
+                }
+
+            } else if (entry instanceof UrlLinkFrame) {
+                // ID3 URL tag
+                UrlLinkFrame id3 = (UrlLinkFrame) entry;
+                String id = id3.id.toUpperCase();
+
+                if (id.equals("WOAS") || id.equals("WOAF") || id.equals("WOAR") || id.equals("WAR")) {
+                    url = id3.url;
+                }
+
+            }
+        }
+
+        if (title != null || url != null || artist != null || album != null || date != null || genre != null) {
+            manager.onMetadataReceived("id3", title, url, artist, album, date, genre);
+        }
+    }
+
+    private void handleIcyMetadata(Metadata metadata) {
+        for (int i = 0; i < metadata.length(); i++) {
+            Metadata.Entry entry = metadata.get(i);
+
+            if(entry instanceof IcyHeaders) {
+                // ICY headers
+                IcyHeaders icy = (IcyHeaders)entry;
+
+                manager.onMetadataReceived("icy-headers", icy.name, icy.url, null, null, null, icy.genre);
+
+            } else if(entry instanceof IcyInfo) {
+                // ICY data
+                IcyInfo icy = (IcyInfo)entry;
+
+                String artist, title;
+                int index = icy.title == null ? -1 : icy.title.indexOf(" - ");
+
+                if (index != -1) {
+                    artist = icy.title.substring(0, index);
+                    title = icy.title.substring(index + 3);
+                } else {
+                    artist = null;
+                    title = icy.title;
+                }
+
+                manager.onMetadataReceived("icy", title, icy.url, artist, null, null, null);
+
+            }
+        }
+    }
+
+    @Override
+    public void onMetadata(Metadata metadata) {
+        handleId3Metadata(metadata);
+        handleIcyMetadata(metadata);
     }
 }
