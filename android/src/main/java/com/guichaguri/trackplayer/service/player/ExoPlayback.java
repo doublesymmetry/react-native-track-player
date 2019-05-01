@@ -320,71 +320,80 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
         // Finished seeking
     }
 
-    @Override
-    public void onMetadata(Metadata metadata) {
-        String source = null;
+    private void handleId3Metadata(Metadata metadata) {
         String title = null, url = null, artist = null, album = null, date = null, genre = null;
 
         for(int i = 0; i < metadata.length(); i++) {
             Metadata.Entry entry = metadata.get(i);
 
-            // The ID3 Tag List can be found in
-            // https://en.wikipedia.org/wiki/ID3
-
-            if(entry instanceof TextInformationFrame) {
+            if (entry instanceof TextInformationFrame) {
                 // ID3 text tag
-                TextInformationFrame id3 = (TextInformationFrame)entry;
-                source = "id3";
+                TextInformationFrame id3 = (TextInformationFrame) entry;
+                String id = id3.id.toUpperCase();
 
-                if (id3.id.equals("TIT2")) {
+                if (id.equals("TIT2") || id.equals("TT2")) {
                     title = id3.value;
-                } else if (id3.id.equals("TALB") || id3.id.equals("TOAL")) {
+                } else if (id.equals("TALB") || id.equals("TOAL") || id.equals("TAL")) {
                     album = id3.value;
-                } else if (id3.id.equals("TOPE")) {
+                } else if (id.equals("TOPE") || id.equals("TPE1") || id.equals("TP1")) {
                     artist = id3.value;
-                } else if (id3.id.equals("TDRC")) {
+                } else if (id.equals("TDRC") || id.equals("TOR")) {
                     date = id3.value;
+                } else if (id.equals("TCON") || id.equals("TCO")) {
+                    genre = id3.value;
                 }
 
             } else if (entry instanceof UrlLinkFrame) {
-                UrlLinkFrame id3 = (UrlLinkFrame)entry;
-                source = "id3";
+                // ID3 URL tag
+                UrlLinkFrame id3 = (UrlLinkFrame) entry;
+                String id = id3.id.toUpperCase();
 
-                if (id3.id.equals("WOAS") || id3.id.equals("WORS") || id3.id.equals("WOAF")) {
+                if (id.equals("WOAS") || id.equals("WOAF") || id.equals("WOAR") || id.equals("WAR")) {
                     url = id3.url;
                 }
 
-            } else if(entry instanceof IcyHeaders) {
-                // ICY headers - Only fills missing information
+            }
+        }
+
+        if (title != null || url != null || artist != null || album != null || date != null || genre != null) {
+            manager.onMetadataReceived("id3", title, url, artist, album, date, genre);
+        }
+    }
+
+    private void handleIcyMetadata(Metadata metadata) {
+        for (int i = 0; i < metadata.length(); i++) {
+            Metadata.Entry entry = metadata.get(i);
+
+            if(entry instanceof IcyHeaders) {
+                // ICY headers
                 IcyHeaders icy = (IcyHeaders)entry;
 
-                if(source == null) source = "icy-headers";
-                if(title == null) title = icy.name;
-                if(url == null) url = icy.url;
-                if(genre == null) genre = icy.genre;
+                manager.onMetadataReceived("icy-headers", icy.name, icy.url, null, null, null, icy.genre);
 
             } else if(entry instanceof IcyInfo) {
                 // ICY data
                 IcyInfo icy = (IcyInfo)entry;
-                source = "icy";
 
+                String artist, title;
                 int index = icy.title == null ? -1 : icy.title.indexOf(" - ");
 
                 if (index != -1) {
                     artist = icy.title.substring(0, index);
                     title = icy.title.substring(index + 3);
                 } else {
+                    artist = null;
                     title = icy.title;
                 }
 
-                url = icy.url;
+                manager.onMetadataReceived("icy", title, icy.url, artist, null, null, null);
 
             }
-
         }
+    }
 
-        if (source != null) {
-            manager.onMetadataReceived(source, title, url, artist, album, date, genre);
-        }
+    @Override
+    public void onMetadata(Metadata metadata) {
+        handleId3Metadata(metadata);
+        handleIcyMetadata(metadata);
     }
 }

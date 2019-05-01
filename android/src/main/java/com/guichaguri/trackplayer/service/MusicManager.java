@@ -218,7 +218,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
     }
 
     public void onMetadataReceived(String source, String title, String url, String artist, String album, String date, String genre) {
-        Log.d(Utils.LOG, "onMetadataReceived");
+        Log.d(Utils.LOG, "onMetadataReceived: " + source);
 
         Bundle bundle = new Bundle();
         bundle.putString("source", source);
