@@ -13,6 +13,7 @@ import com.google.android.exoplayer2.metadata.icy.IcyHeaders;
 import com.google.android.exoplayer2.metadata.icy.IcyInfo;
 import com.google.android.exoplayer2.metadata.id3.TextInformationFrame;
 import com.google.android.exoplayer2.metadata.id3.UrlLinkFrame;
+import com.google.android.exoplayer2.source.TrackGroup;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.guichaguri.trackplayer.service.MusicManager;
@@ -240,7 +241,21 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
 
     @Override
     public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+        for(int i = 0; i < trackGroups.length; i++) {
+            // Loop through all track groups.
+            // As for the current implementation, there should be only one
+            TrackGroup group = trackGroups.get(i);
 
+            for(int f = 0; f < group.length; f++) {
+                // Loop through all formats inside the track group
+                Format format = group.getFormat(f);
+
+                // Parse the metadata if it is present
+                if (format.metadata != null) {
+                    onMetadata(format.metadata);
+                }
+            }
+        }
     }
 
     @Override
