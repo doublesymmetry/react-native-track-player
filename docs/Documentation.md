@@ -493,7 +493,7 @@ Check out the [events section](#events) for a full list of supported events.
 ```jsx
 import React from 'react';
 import { Text, View } from 'react-native';
-import { useTrackPlayerEvent, TrackPlayerEvents } from 'react-native-track-player';
+import { useTrackPlayerEvent, TrackPlayerEvents, STATE_PLAYING } from 'react-native-track-player';
 
 // Subscribing to the following events inside MyComponent
 const events = [
@@ -513,7 +513,7 @@ const MyComponent = () => {
     }
   });
 
-  const isPlaying = playerState === 'STATE_PLAYING';
+  const isPlaying = playerState === STATE_PLAYING;
 
   return (
     <View>
