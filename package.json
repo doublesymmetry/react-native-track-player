@@ -26,7 +26,8 @@
     "chromecast",
     "android",
     "ios",
-    "windows"
+    "windows",
+    "hooks"
   ],
   "license": "Apache-2.0",
   "repository": {

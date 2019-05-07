@@ -309,6 +309,12 @@ Gets the state of the player.
 
 ## Events
 
+All event types are made available through the named export `TrackPlayerEventTypes`:
+
+```js
+import { TrackPlayerEventTypes } from 'react-native-track-player';
+```
+
 ### Media Controls
 
 #### `remote-play`
@@ -487,3 +493,73 @@ Only the `id`, `url`, `title` and `artist` properties are required for basic pla
 Resource objects are the result of `require`/`import` for files.
 
 For more information about Resource Objects, read the [Images](https://facebook.github.io/react-native/docs/images.html) section of the React Native documentation
+
+## React Hooks
+
+React v16.8 introduced [hooks](https://reactjs.org/docs/hooks-intro.html). If you are using a version of React Native that is before [v0.59.0](https://facebook.github.io/react-native/blog/2019/03/12/releasing-react-native-059), your React Native version does not support hooks. 
+
+#### useTrackPlayerEvents
+Register an event listener for one or more of the [events](#events) emitted by the TrackPlayer. The subscription is removed when the component unmounts.
+
+Check out the [events section](#events) for a full list of supported events.
+
+```jsx
+import React from 'react';
+import { Text, View } from 'react-native';
+import { useTrackPlayerEvent, TrackPlayerEvents, STATE_PLAYING } from 'react-native-track-player';
+
+// Subscribing to the following events inside MyComponent
+const events = [
+  TrackPlayerEvents.PLAYBACK_STATE,
+  TrackPlayerEvents.PLAYBACK_ERROR
+];
+
+const MyComponent = () => {
+  const [playerState, setState] = useState(null)
+
+  useTrackPlayerEvents(events, (event) => {
+    if (event.type === TrackPlayerEvents.PLAYBACK_ERROR) {
+      console.warn('An error occured while playing the current track.');
+    }
+    if (event.type === TrackPlayerEvents.PLAYBACK_STATE) {
+      setState(playbackState)
+    }
+  });
+
+  const isPlaying = playerState === STATE_PLAYING;
+
+  return (
+    <View>
+      <Text>The TrackPlayer is {isPlaying ? 'playing' : 'not playing'}</Text>
+    </View>
+  ); 
+};
+```
+
+#### useTrackPlayerProgress
+A hook alternative to the [Progress Component](#progresscomponent).
+
+| State            | Type     | Description                      |
+| ---------------- | -------- | -------------------------------- |
+| position         | `number` | The current position in seconds  |
+| bufferedPosition | `number` | The buffered position in seconds |
+| duration         | `number` | The duration in seconds          |
+
+`useTrackPlayerProgress` accepts an interval to set the rate (in miliseconds) to poll the track player's progress. The default value is `1000` or every second.
+
+```jsx
+import React from 'react';
+import { Text, View } from 'react-native';
+import { useTrackPlayerProgress } from 'react-native-track-player';
+
+const MyComponent = () => {
+  const [{ position, bufferedPosition, duration }, setInterval] = useTrackPlayerProgress()
+
+  return (
+    <View>
+      <Text>Track progress: {position} seconds out of {duration} total</Text>
+      <Text>Buffered progress: {bufferedPosition} seconds buffered out of {duration} total</Text>
+    </View>
+  )
+}
+```
