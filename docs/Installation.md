@@ -135,6 +135,9 @@ Note: You don't need to link the module after updating it.
 
 ## Troubleshooting
 
+#### Expo and Expokit support
+Currently react-native-track-player does not support projects with Expo or Expokit.
+
 #### iOS: (Enable Swift) `library not found for -lswiftCoreAudio for architecture x86_64`
 Because the iOS module uses Swift, if the user is using a standard react-native application they'll need to add support for Swift in the project. This can be easily by adding a swift file to the Xcode project -- could be called `dummy.swift` and saying yes when prompted if you'd like to generate a bridging header.
 
