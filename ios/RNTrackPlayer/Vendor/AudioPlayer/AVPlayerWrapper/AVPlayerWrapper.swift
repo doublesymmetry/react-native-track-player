@@ -162,12 +162,18 @@ class AVPlayerWrapper: AVPlayerWrapperProtocol {
         }
     }
 
-    func load(from url: URL, playWhenReady: Bool) {
+    func load(from url: URL, playWhenReady: Bool, headers: NSDictionary? = nil) {
         reset(soft: true)
         _playWhenReady = playWhenReady
+        
+        var options: [String: Any] = [:];
+        
+        if (headers != nil) {
+            options = ["AVURLAssetHTTPHeaderFieldsKey": headers]
+        }
 
         // Set item
-        let currentAsset = AVURLAsset(url: url)
+        let currentAsset = AVURLAsset(url: url, options: options)
         let currentItem = AVPlayerItem(asset: currentAsset, automaticallyLoadedAssetKeys: [Constants.assetPlayableKey])
         currentItem.preferredForwardBufferDuration = bufferDuration
         avPlayer.replaceCurrentItem(with: currentItem)
@@ -179,10 +185,10 @@ class AVPlayerWrapper: AVPlayerWrapperProtocol {
         playerItemObserver.startObserving(item: currentItem)
     }
     
-    func load(from url: URL, playWhenReady: Bool, initialTime: TimeInterval?) {
+    func load(from url: URL, playWhenReady: Bool, initialTime: TimeInterval?, headers: NSDictionary? = nil) {
         _initialTime = initialTime
         self.pause()
-        self.load(from: url, playWhenReady: playWhenReady)
+        self.load(from: url, playWhenReady: playWhenReady, headers: headers)
     }
     
     // MARK: - Util

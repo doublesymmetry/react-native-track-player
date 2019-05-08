@@ -20,6 +20,7 @@ class Track: NSObject, AudioItem, TimePitching {
     var desc: String?
     var genre: String?
     let pitchAlgorithm: String?
+    let headers: NSDictionary?
     var duration: Double?
     var artworkURL: MediaURL?
     var skipped: Bool = false
@@ -32,6 +33,7 @@ class Track: NSObject, AudioItem, TimePitching {
         guard let id = dictionary["id"] as? String,
             let title = dictionary["title"] as? String,
             let artist = dictionary["artist"] as? String,
+            let headers = dictionary["headers"] as? NSDictionary,
             let url = MediaURL(object: dictionary["url"])
             else { return nil }
         
@@ -39,6 +41,7 @@ class Track: NSObject, AudioItem, TimePitching {
         self.url = url
         self.title = title
         self.artist = artist
+        self.headers = headers
         
         self.date = dictionary["date"] as? String
         self.album = dictionary["album"] as? String
@@ -76,6 +79,10 @@ class Track: NSObject, AudioItem, TimePitching {
     
     func getSourceUrl() -> String {
         return url.value.absoluteString
+    }
+    
+    func getHeaders() -> NSDictionary? {
+        return headers
     }
     
     func getArtist() -> String? {
