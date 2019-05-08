@@ -167,10 +167,13 @@ public class AudioPlayer: AVPlayerWrapperDelegate {
      */
     public func load(item: AudioItem, playWhenReady: Bool = true) throws {
         let url: URL
+        var headers: NSDictionary? = nil
+
         switch item.getSourceType() {
         case .stream:
             if let itemUrl = URL(string: item.getSourceUrl()) {
                 url = itemUrl
+                headers = item.getHeaders()
             }
             else {
                 throw APError.LoadError.invalidSourceUrl(item.getSourceUrl())
@@ -181,7 +184,9 @@ public class AudioPlayer: AVPlayerWrapperDelegate {
         
         wrapper.load(from: url,
                      playWhenReady: playWhenReady,
-                     initialTime: (item as? InitialTiming)?.getInitialTime())
+                     initialTime: (item as? InitialTiming)?.getInitialTime(),
+                     headers: headers
+        )
         
         if let item = item as? TimePitching {
             wrapper.currentItem?.audioTimePitchAlgorithm = item.getPitchAlgorithmType()
