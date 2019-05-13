@@ -6,7 +6,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
@@ -18,12 +18,9 @@ import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.models.Track;
 import com.guichaguri.trackplayer.service.player.ExoPlayback;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.*;
 
 /**
  * @author Guichaguri
@@ -40,6 +37,7 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @Override
+    @Nonnull
     public String getName() {
         return "TrackPlayerModule";
     }
@@ -237,8 +235,10 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
                 }
             }
 
-            if (indexes.size() > 0) {
+            if (!indexes.isEmpty()) {
                 binder.getPlayback().remove(indexes, callback);
+            } else {
+                callback.resolve(null);
             }
         });
     }
