@@ -1,72 +1,56 @@
 import PropTypes from 'prop-types';
-import { observer } from 'mobx-react';
-import React, { Component } from 'react';
-import TrackPlayer, { ProgressComponent } from 'react-native-track-player';
-import { Image, StyleSheet, Text, TouchableOpacity, View, ViewPropTypes } from 'react-native';
+import React from 'react';
+import TrackPlayer, { useTrackPlayerEvents } from 'react-native-track-player';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  View
+} from 'react-native';
+import { ProgressBar } from './ProgressBar';
+import { Controls } from './Controls';
 
-import TrackStore from '../stores/Track';
-import PlayerStore from '../stores/Player';
+export default function Player({ tracks, style }) {
+  const [track, setTrack] = useState(tracks[0]);
 
-class ProgressBar extends ProgressComponent {
-  render() {
-    return (
-      <View style={styles.progress}>
-        <View style={{ flex: this.getProgress(), backgroundColor: 'red' }} />
-        <View style={{ flex: 1 - this.getProgress(), backgroundColor: 'grey' }} />
-      </View>
-    );
-  }
-}
+  useEffect(async () => {
+    TrackPlayer.setupPlayer();
+    TrackPlayer.updateOptions({
+      stopWithApp: true,
+      capabilities: [
+        TrackPlayer.CAPABILITY_PLAY,
+        TrackPlayer.CAPABILITY_PAUSE,
+        TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
+        TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
+        TrackPlayer.CAPABILITY_STOP
+      ],
+      compactCapabilities: [
+        TrackPlayer.CAPABILITY_PLAY,
+        TrackPlayer.CAPABILITY_PAUSE
+      ]
+    });
+  }, []);
 
-function ControlButton({ title, onPress }) {
+  useTrackPlayerEvents([PLAYBACK_TRACK_CHANGED], ({ nextTrack }) => {
+    setTrack(tracks.find(({ id }) => id === nextTrack));
+  });
+
+  useEffect(async () => {
+    await TrackPlayer.reset();
+    await TrackPlayer.add(tracks);
+  }, [tracks]);
+
   return (
-    <TouchableOpacity style={styles.controlButtonContainer} onPress={onPress}>
-      <Text style={styles.controlButtonText}>{title}</Text>
-    </TouchableOpacity>
-  );
-}
-
-ControlButton.propTypes = {
-  title: PropTypes.string.isRequired,
-  onPress: PropTypes.func.isRequired,
-};
-
-@observer
-export default class Player extends Component {
-  static propTypes = {
-    style: ViewPropTypes.style,
-    onNext: PropTypes.func.isRequired,
-    onPrevious: PropTypes.func.isRequired,
-    onTogglePlayback: PropTypes.func.isRequired,
-  };
-
-  static defaultProps = {
-    style: {}
-  };
-
-  render() {
-    const { style, onNext, onPrevious, onTogglePlayback } = this.props;
-    var middleButtonText = 'Play'
-
-    if (PlayerStore.playbackState === TrackPlayer.STATE_PLAYING
-      || PlayerStore.playbackState === TrackPlayer.STATE_BUFFERING) {
-      middleButtonText = 'Pause'
-    }
-
-    return (
+    <>
       <View style={[styles.card, style]}>
-        <Image style={styles.cover} source={{ uri: TrackStore.artwork }} />
+        <Image style={styles.cover} source={{ uri: track.artwork }} />
         <ProgressBar />
-        <Text style={styles.title}>{TrackStore.title}</Text>
-        <Text style={styles.artist}>{TrackStore.artist}</Text>
-        <View style={styles.controls}>
-          <ControlButton title={'<<'} onPress={onPrevious} />
-          <ControlButton title={middleButtonText} onPress={onTogglePlayback} />
-          <ControlButton title={'>>'} onPress={onNext}/>
-        </View>
+        <Text style={styles.title}>{track.title}</Text>
+        <Text style={styles.artist}>{track.artist}</Text>
+        <Controls />
       </View>
-    );
-  }
+    </>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -79,35 +63,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     shadowColor: 'black',
     backgroundColor: 'white',
-    shadowOffset: { width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 }
   },
   cover: {
     width: 140,
     height: 140,
     marginTop: 20,
-    backgroundColor: 'grey',
-  },
-  progress: {
-    height: 1,
-    width: '90%',
-    marginTop: 10,
-    flexDirection: 'row',
+    backgroundColor: 'grey'
   },
   title: {
-    marginTop: 10,
+    marginTop: 10
   },
   artist: {
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
   controls: {
     marginVertical: 20,
-    flexDirection: 'row',
-  },
-  controlButtonContainer: {
-    flex: 1,
-  },
-  controlButtonText: {
-    fontSize: 18,
-    textAlign: 'center',
-  },
+    flexDirection: 'row'
+  }
 });
