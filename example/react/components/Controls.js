@@ -1,10 +1,53 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
   Text,
   TouchableOpacity,
-  StyleSheet
+  StyleSheet,
+  View
 } from 'react-native';
+import TrackPlayer from 'react-native-track-player';
 import { ControlButton } from './ControlButton';
+import { useNextTrack, usePreviousTrack, usePlaybackStateIs } from '../hooks';
+
+const skipToNext = () => {
+  TrackPlayer.skipToNext();
+};
+
+const skipToPrevious = () => {
+  TrackPlayer.skipToPrevious();
+};
+
+export function Controls() {
+  const nextTrack = useNextTrack();
+  const previousTrack = usePreviousTrack();
+  const isPlaying = usePlaybackStateIs(TrackPlayer.STATE_PLAYING);
+  const togglePlayback = () => {
+    if (isPlaying) {
+      TrackPlayer.pause();
+    } else {
+      TrackPlayer.play();
+    }
+  }
+  return (
+    <View style={styles.controls}>
+      <ControlButton
+        title={'<<'}
+        active={!!previousTrack}
+        onPress={previousTrack ? skipToPrevious : null}
+      />
+      <ControlButton
+        title={isPlaying ? 'Pause' : 'Play'}
+        onPress={togglePlayback}
+      />
+      <ControlButton
+        title={'>>'}
+        active={!!nextTrack}
+        onPress={nextTrack ? skipToNext : null}
+      />
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -15,60 +58,10 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   inactive: {
-    opacity: '50%'
+    opacity: 0.5
+  },
+  controls: {
+    marginVertical: 20,
+    flexDirection: 'row'
   }
 });
-
-const skipToNext = () => {
-  TrackPlayer.skipToNext();
-};
-
-const skipToPrevious = () => {
-  TrackPlayer.skipToPrevious();
-};
-
-export default function Controls({ paused, hasNext, hasPrevious }) {
-  const [paused, setPaused] = useState(null);
-  const [hasNext, setHasNext] = useState(true);
-  const [hasPrevious, setHasPrevious] = useState(false);
-
-  useTrackPlayerEvents([TrackPlayer.PLAYBACK_STATE], ({ state }) => {
-    setPaused(state === STATE_PAUSED);
-  });
-
-  useTrackPlayerEvents([PLAYBACK_TRACK_CHANGED], async ({ nextTrack }) => {
-    const queue = await TrackPlayer.getQueue();
-    const index = queue.findIndex(({ id }) => id === nextTrack);
-    setHasNext(index < tracks.length - 1);
-    setHasPrevious(index > 0);
-  });
-
-  const togglePlayback = () => {
-    if (paused) {
-      TrackPlayer.play();
-    } else {
-      TrackPlayer.pause();
-    }
-  };
-
-  return (
-    <View style={styles.controls}>
-      <ControlButton
-        title={'<<'}
-        active={hasNext}
-        onPress={skipToPrevious}
-      />
-      <ControlButton title={paused ? 'Play' : 'Pause'} onPress={togglePlayback} />
-      <ControlButton
-        title={'>>'}
-        active={hasPrevious}
-        onPress={skipToNext}
-      />
-    </View>
-  );
-}
-
-ControlButton.propTypes = {
-  title: PropTypes.string.isRequired,
-  onPress: PropTypes.func.isRequired
-};

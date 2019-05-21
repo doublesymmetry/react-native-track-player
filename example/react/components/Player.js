@@ -1,52 +1,20 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import TrackPlayer, { useTrackPlayerEvents } from 'react-native-track-player';
-import {
-  Image,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
+
 import { ProgressBar } from './ProgressBar';
 import { Controls } from './Controls';
+import { useCurrentTrack, useQueue } from '../hooks';
 
-export default function Player({ tracks, style }) {
-  const [track, setTrack] = useState(tracks[0]);
-
-  useEffect(async () => {
-    TrackPlayer.setupPlayer();
-    TrackPlayer.updateOptions({
-      stopWithApp: true,
-      capabilities: [
-        TrackPlayer.CAPABILITY_PLAY,
-        TrackPlayer.CAPABILITY_PAUSE,
-        TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
-        TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
-        TrackPlayer.CAPABILITY_STOP
-      ],
-      compactCapabilities: [
-        TrackPlayer.CAPABILITY_PLAY,
-        TrackPlayer.CAPABILITY_PAUSE
-      ]
-    });
-  }, []);
-
-  useTrackPlayerEvents([PLAYBACK_TRACK_CHANGED], ({ nextTrack }) => {
-    setTrack(tracks.find(({ id }) => id === nextTrack));
-  });
-
-  useEffect(async () => {
-    await TrackPlayer.reset();
-    await TrackPlayer.add(tracks);
-  }, [tracks]);
-
+export default function Player({ style }) {
+  const currentTrack = useCurrentTrack() || {};
   return (
     <>
       <View style={[styles.card, style]}>
-        <Image style={styles.cover} source={{ uri: track.artwork }} />
+        <Image style={styles.cover} source={{ uri: currentTrack.artwork }} />
         <ProgressBar />
-        <Text style={styles.title}>{track.title}</Text>
-        <Text style={styles.artist}>{track.artist}</Text>
+        <Text style={styles.title}>{currentTrack.title}</Text>
+        <Text style={styles.artist}>{currentTrack.artist}</Text>
         <Controls />
       </View>
     </>
@@ -76,9 +44,5 @@ const styles = StyleSheet.create({
   },
   artist: {
     fontWeight: 'bold'
-  },
-  controls: {
-    marginVertical: 20,
-    flexDirection: 'row'
   }
 });

@@ -1,8 +1,11 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import {
   Text,
   TouchableOpacity,
-  StyleSheet
+  StyleSheet,
+  View
 } from 'react-native';
 
 const styles = StyleSheet.create({
@@ -14,24 +17,27 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   inactive: {
-    opacity: '50%'
+    opacity: 0.25
   }
 });
 
 const hitSlop = { top: 20, left: 20, bottom: 20, right: 20 };
-export function ControlButton({ title, onPress, active }) {
-  return (
-    <TouchableOpacity
-      hitSlop={hitSlop}
-      style={styles.container}
-      onPress={active ? onPress : null}
-    >
-      <Text style={[styles.text, !active && styles.inactive}>{title}</Text>
-    </TouchableOpacity>
-  );
+export function ControlButton({ title, onPress, active = true }) {
+  const text = <Text style={[styles.text, !active && styles.inactive]}>{title}</Text>;
+  return onPress
+    ?
+      <TouchableOpacity
+        hitSlop={hitSlop}
+        style={styles.container}
+        onPress={active ? onPress : null}
+      >
+        {text}
+      </TouchableOpacity>
+    : <View style={styles.container}>{text}</View>
+  ;
 }
 
 ControlButton.propTypes = {
   title: PropTypes.string.isRequired,
-  onPress: PropTypes.func.isRequired
+  onPress: PropTypes.func
 };

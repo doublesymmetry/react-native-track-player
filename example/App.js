@@ -1,47 +1,75 @@
-import React, { Component } from 'react';
-import TrackPlayer from 'react-native-track-player';
-import { StackNavigator } from 'react-navigation';
+import React, { Component, useEffect } from 'react';
+import TrackPlayer, { ProgressComponent } from 'react-native-track-player';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import PlayerStore from './react/stores/Player';
-import TrackStore from './react/stores/Track';
+import Player from './react/components/Player';
+import playlistData from './react/data/playlist.json';
+import localTrack from './react/resources/pure.m4a';
 
-import LandingScreen from './react/screens/LandingScreen';
-import PlaylistScreen from './react/screens/PlaylistScreen';
+import { usePlaybackState, useQueue } from './react/hooks';
 
-const RootStack = StackNavigator({
-  Landing: {
-    screen: LandingScreen,
-  },
-  Playlist: {
-    screen: PlaylistScreen,
-  },
-}, { initialRouteName: 'Landing' })
+const labelByPlaybackState = {
+  [TrackPlayer.STATE_NONE]: 'None',
+  [TrackPlayer.STATE_PLAYING]: 'Playing',
+  [TrackPlayer.STATE_PAUSED]: 'Paused',
+  [TrackPlayer.STATE_STOPPED]: 'Stopped',
+  [TrackPlayer.STATE_BUFFERING]: 'Buffering'
+};
 
-export default class App extends Component {
-
-  componentDidMount() {
-    this._onTrackChanged = TrackPlayer.addEventListener('playback-track-changed', async (data) => {
-      if (data.nextTrack) {
-        const track = await TrackPlayer.getTrack(data.nextTrack);
-        TrackStore.title = track.title;
-        TrackStore.artist = track.artist;
-        TrackStore.artwork = track.artwork;
-      }
-    })
-
-    this._onStateChanged = TrackPlayer.addEventListener('playback-state', (data) => {
-      PlayerStore.playbackState = data.state;
-    })
+const tracks = [
+  ...playlistData,
+  {
+    id: 'local-track',
+    url: localTrack,
+    title: 'Pure (Demo)',
+    artist: 'David Chavez',
+    artwork: 'https://picsum.photos/200'
   }
+];
 
-  componentWillUnmount() {
-    this._onTrackChanged.remove()
-    this._onStateChanged.remove()
-  }
+export default function App() {
+  const playbackState = usePlaybackState();
 
-  render() {
-    return (
-      <RootStack />
-    );
-  }
+  useQueue(tracks);
+
+  useEffect(() => {
+    TrackPlayer.setupPlayer();
+    TrackPlayer.updateOptions({
+      stopWithApp: true,
+      capabilities: [
+        TrackPlayer.CAPABILITY_PLAY,
+        TrackPlayer.CAPABILITY_PAUSE,
+        TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
+        TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
+        TrackPlayer.CAPABILITY_STOP
+      ],
+      compactCapabilities: [TrackPlayer.CAPABILITY_PLAY, TrackPlayer.CAPABILITY_PAUSE]
+    });
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      <Player style={styles.player} />
+      <Text style={styles.state}>{labelByPlaybackState[playbackState]}</Text>
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF',
+  },
+  description: {
+    width: '80%',
+    marginTop: 20,
+    textAlign: 'center',
+  },
+  player: {
+    marginTop: 40,
+  },
+  state: {
+    marginTop: 20,
+  },
+});
