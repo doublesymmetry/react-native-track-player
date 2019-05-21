@@ -102,7 +102,7 @@ export function usePreviousTrack() {
 
 function useWhenPlaybackStateChanges(callback) {
   TrackPlayer.useTrackPlayerEvents(
-    ['nee', TrackPlayerEvents.PLAYBACK_STATE],
+    [TrackPlayerEvents.PLAYBACK_STATE],
     ({ state }) => {
       callback(state);
     }
