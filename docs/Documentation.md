@@ -553,7 +553,7 @@ import { Text, View } from 'react-native';
 import { useTrackPlayerProgress } from 'react-native-track-player';
 
 const MyComponent = () => {
-  const [{ position, bufferedPosition, duration }, setInterval] = useTrackPlayerProgress()
+  const { position, bufferedPosition, duration } = useTrackPlayerProgress()
 
   return (
     <View>
