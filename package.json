@@ -37,6 +37,9 @@
   "bugs": {
     "url": "https://github.com/react-native-kit/react-native-track-player/issues"
   },
+  "scripts": {
+    "prepublishOnly": "git submodule update --init --recursive"
+  },
   "peerDependencies": {
     "react-native": ">=0.59.5",
     "react": ">=16.8.3"
