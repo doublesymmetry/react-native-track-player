@@ -1,0 +1,27 @@
+PODS:
+  - Nimble (8.0.1)
+  - Quick (2.0.0)
+  - SwiftAudio (0.7.2)
+
+DEPENDENCIES:
+  - Nimble (~> 8.0.0)
+  - Quick (~> 2.0.0)
+  - SwiftAudio (from `../`)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Nimble
+    - Quick
+
+EXTERNAL SOURCES:
+  SwiftAudio:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  Nimble: 45f786ae66faa9a709624227fae502db55a8bdd0
+  Quick: ce1276c7c27ba2da3cb2fd0cde053c3648b3b22d
+  SwiftAudio: a7bb22e98fd48fd908f7ffca992166e0057ce8ea
+
+PODFILE CHECKSUM: 08ea4075437f8ff3c4f84ed70827a8132461373f
+
+COCOAPODS: 1.5.3
