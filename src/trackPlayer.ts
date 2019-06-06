@@ -57,6 +57,10 @@ function addEventListener(event: Event, listener: (data: any) => void) {
   return emitter.addListener(event, listener)
 }
 
+function isServiceRunning(): Promise<boolean> {
+  return TrackPlayer.isServiceRunning()
+}
+
 // MARK: - Queue API
 
 /**
@@ -309,6 +313,7 @@ export default {
   destroy,
   registerPlaybackService,
   addEventListener,
+  isServiceRunning,
 
   // MARK: - Queue API
   add,
