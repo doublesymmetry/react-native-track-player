@@ -66,35 +66,41 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
-        binder = (MusicBinder)service;
-        connecting = false;
+        synchronized(this) {
+            binder = (MusicBinder)service;
+            connecting = false;
 
-        // Reapply options that user set before with updateOptions
-        if (options != null) {
-            binder.updateOptions(options);
-        }
+            // Reapply options that user set before with updateOptions
+            if (options != null) {
+                binder.updateOptions(options);
+            }
 
-        // Triggers all callbacks
-        while(!initCallbacks.isEmpty()) {
-            binder.post(initCallbacks.remove());
+            // Triggers all callbacks
+            while(!initCallbacks.isEmpty()) {
+                binder.post(initCallbacks.remove());
+            }
         }
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
-        binder = null;
-        connecting = false;
+        synchronized(this) {
+            binder = null;
+            connecting = false;
+        }
     }
 
     /**
      * Waits for a connection to the service and/or runs the {@link Runnable} in the player thread
      */
     private void waitForConnection(Runnable r) {
-        if(binder != null) {
-            binder.post(r);
-            return;
-        } else {
-            initCallbacks.add(r);
+        synchronized(this) {
+          if(binder != null) {
+              binder.post(r);
+              return;
+          } else {
+              initCallbacks.add(r);
+          }
         }
 
         if(connecting) return;
@@ -161,9 +167,11 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     @ReactMethod
     public void destroy() {
         try {
-            if(binder != null) {
-                binder.destroy();
-                binder = null;
+            synchronized(this) {
+                if(binder != null) {
+                    binder.destroy();
+                    binder = null;
+                }
             }
 
             ReactContext context = getReactApplicationContext();
