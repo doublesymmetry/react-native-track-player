@@ -34,6 +34,7 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     private MusicEvents eventHandler;
     private ArrayDeque<Runnable> initCallbacks = new ArrayDeque<>();
     private boolean connecting = false;
+    private Bundle options;
 
     public MusicModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -69,6 +70,11 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     public void onServiceConnected(ComponentName name, IBinder service) {
         binder = (MusicBinder)service;
         connecting = false;
+
+        // Reapply options that user set before with updateOptions
+        if (this.options != null) {
+            binder.updateOptions(this.options);
+        }
 
         // Triggers all callbacks
         while(!initCallbacks.isEmpty()) {
@@ -171,6 +177,9 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     @ReactMethod
     public void updateOptions(ReadableMap data, final Promise callback) {
         final Bundle options = Arguments.toBundle(data);
+
+        // keep options as we may need them for correct MetadataManager reinitialization later
+        this.options = options;
 
         waitForConnection(() -> {
             binder.updateOptions(options);
