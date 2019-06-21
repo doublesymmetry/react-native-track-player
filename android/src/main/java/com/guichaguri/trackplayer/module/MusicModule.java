@@ -70,8 +70,8 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
         connecting = false;
 
         // Reapply options that user set before with updateOptions
-        if (this.options != null) {
-            binder.updateOptions(this.options);
+        if (options != null) {
+            binder.updateOptions(options);
         }
 
         // Triggers all callbacks
@@ -133,6 +133,7 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
 
         // States
         constants.put("STATE_NONE", PlaybackStateCompat.STATE_NONE);
+        constants.put("STATE_READY", PlaybackStateCompat.STATE_PAUSED);
         constants.put("STATE_PLAYING", PlaybackStateCompat.STATE_PLAYING);
         constants.put("STATE_PAUSED", PlaybackStateCompat.STATE_PAUSED);
         constants.put("STATE_STOPPED", PlaybackStateCompat.STATE_STOPPED);
@@ -174,10 +175,8 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @ReactMethod
     public void updateOptions(ReadableMap data, final Promise callback) {
-        final Bundle options = Arguments.toBundle(data);
-
         // keep options as we may need them for correct MetadataManager reinitialization later
-        this.options = options;
+        options = Arguments.toBundle(data);
 
         waitForConnection(() -> {
             binder.updateOptions(options);
