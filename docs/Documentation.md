@@ -27,6 +27,8 @@ permalink: /documentation/
 ### State
 #### `STATE_NONE`
 State indicating that no media is currently loaded
+#### `STATE_READY`
+State indicating that the player is ready to start playing
 #### `STATE_PLAYING`
 State indicating that the player is currently playing
 #### `STATE_PAUSED`
@@ -34,7 +36,9 @@ State indicating that the player is currently paused
 #### `STATE_STOPPED`
 State indicating that the player is currently stopped
 #### `STATE_BUFFERING`
-State indicating that the player is currently buffering
+State indicating that the player is currently buffering (in "play" state)
+#### `STATE_CONNECTING`
+State indicating that the player is currently buffering (in "pause" state)
 
 ### Rating
 #### `RATING_HEART`

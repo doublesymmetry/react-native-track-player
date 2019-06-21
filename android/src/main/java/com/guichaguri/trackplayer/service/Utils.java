@@ -113,7 +113,7 @@ public class Utils {
     }
 
     public static boolean isPaused(int state) {
-        return state == PlaybackStateCompat.STATE_PAUSED;
+        return state == PlaybackStateCompat.STATE_PAUSED || state == PlaybackStateCompat.STATE_CONNECTING;
     }
 
     public static boolean isStopped(int state) {

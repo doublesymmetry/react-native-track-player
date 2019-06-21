@@ -138,6 +138,7 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
         constants.put("STATE_PAUSED", PlaybackStateCompat.STATE_PAUSED);
         constants.put("STATE_STOPPED", PlaybackStateCompat.STATE_STOPPED);
         constants.put("STATE_BUFFERING", PlaybackStateCompat.STATE_BUFFERING);
+        constants.put("STATE_CONNECTING", PlaybackStateCompat.STATE_CONNECTING);
 
         // Rating Types
         constants.put("RATING_HEART", RatingCompat.RATING_HEART);
