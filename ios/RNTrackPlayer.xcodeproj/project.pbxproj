@@ -437,8 +437,10 @@
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = B82TF96752;
+				HEADER_SEARCH_PATHS = "$(PODS_ROOT)/Headers/Public/React";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
+				PODS_ROOT = "\"${SRCROOT}/../../../ios/Pods\"";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "RNTrackPlayer/Support/RNTrackPlayer-Bridging-Header.h";
@@ -454,8 +456,10 @@
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = B82TF96752;
+				HEADER_SEARCH_PATHS = "$(PODS_ROOT)/Headers/Public/React";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
+				PODS_ROOT = "\"${SRCROOT}/../../../ios/Pods\"";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "RNTrackPlayer/Support/RNTrackPlayer-Bridging-Header.h";
