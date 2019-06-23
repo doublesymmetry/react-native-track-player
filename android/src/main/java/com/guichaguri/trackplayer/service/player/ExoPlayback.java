@@ -167,14 +167,15 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
     }
 
     public long getDuration() {
-        long duration = player.getDuration();
+        Track current = getCurrentTrack();
 
-        if (duration == C.TIME_UNSET) {
-            Track current = getCurrentTrack();
-            duration = current != null ? current.duration : 0;
+        if (current != null && current.duration > 0) {
+            return current.duration;
         }
 
-        return duration;
+        long duration = player.getDuration();
+
+        return duration == C.TIME_UNSET ? 0 : duration;
     }
 
     public void seekTo(long time) {
