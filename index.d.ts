@@ -45,7 +45,7 @@ declare namespace RNTrackPlayer {
   type ServiceHandler = () => Promise<void>;
   export function registerPlaybackService(serviceFactory: () => ServiceHandler): void;
 
-  type EmitterSubscription = { remove: () => void; };
+  interface EmitterSubscription { remove: () => void; }
   export function addEventListener(type: EventType, listener: (data: any) => void): EmitterSubscription;
 
   export interface TrackMetadata {
@@ -70,6 +70,15 @@ declare namespace RNTrackPlayer {
     [key: string]: any;
   }
 
+  interface NowPlayingMetadata {
+    title?: string;
+    album?: string;
+    artist?: string;
+    duration?: number;
+    elapsedTime?: number;
+    artwork?: string | ResourceObject;
+  }
+
   export interface PlayerOptions {
     minBuffer?: number;
     maxBuffer?: number;
@@ -77,7 +86,7 @@ declare namespace RNTrackPlayer {
     maxCacheSize?: number;
     iosCategory?: 'playback' | 'playAndRecord' | 'multiRoute' | 'ambient' | 'soloAmbient' | 'record';
     iosCategoryMode?: 'default' | 'gameChat' | 'measurement' | 'moviePlayback' | 'spokenAudio' | 'videoChat' | 'videoRecording' | 'voiceChat' | 'voicePrompt';
-    iosCategoryOptions?: Array<'mixWithOthers' | 'duckOthers' | 'interruptSpokenAudioAndMixWithOthers' | 'allowBluetooth' | 'allowBluetoothA2DP' | 'allowAirPlay' | 'defaultToSpeaker'>;
+    iosCategoryOptions?: ('mixWithOthers' | 'duckOthers' | 'interruptSpokenAudioAndMixWithOthers' | 'allowBluetooth' | 'allowBluetoothA2DP' | 'allowAirPlay' | 'defaultToSpeaker')[];
     waitForBuffer?: boolean;
   }
 
@@ -127,8 +136,11 @@ declare namespace RNTrackPlayer {
   export function removeUpcomingTracks(): Promise<void>;
 
   // Control Center / Notification Metadata Commands
+  
   export function updateOptions(options: MetadataOptions): void;
   export function updateMetadataForTrack(id: string, metadata: TrackMetadata) : Promise<void>;
+  export function clearNowPlayingMetadata(): Promise<void>
+  export function updateNowPlayingMetadata(metadata: NowPlayingMetadata): Promise<void>
 
   // Player Playback Commands
 
