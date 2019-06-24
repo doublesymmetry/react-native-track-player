@@ -161,6 +161,15 @@ export interface TrackMetadata {
   artwork?: string | ResourceObject
 }
 
+export interface NowPlayingMetadata {
+  title?: string
+  album?: string
+  artist?: string
+  duration?: number
+  elapsedTime?: number
+  artwork?: string | ResourceObject
+}
+
 export interface Track extends TrackMetadata {
   id: string
   url: string | ResourceObject
