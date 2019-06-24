@@ -14,7 +14,7 @@ enum Capability: String {
     func mapToPlayerCommand(jumpInterval: NSNumber?,
                             likeOptions: [String: Any]?,
                             dislikeOptions: [String: Any]?,
-                            bookmarkOptions: [String: Any]?) -> RemoteCommand? {
+                            bookmarkOptions: [String: Any]?) -> RemoteCommand {
         switch self {
         case .stop:
             return .stop
