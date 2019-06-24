@@ -190,6 +190,9 @@ declare namespace RNTrackPlayer {
   export const CAPABILITY_SET_RATING: Capability;
   export const CAPABILITY_JUMP_FORWARD: Capability;
   export const CAPABILITY_JUMP_BACKWARD: Capability;
+  export const CAPABILITY_LIKE: Capability;
+  export const CAPABILITY_DISLIKE: Capability;
+  export const CAPABILITY_BOOKMARK: Capability;
 
   export const PITCH_ALGORITHM_LINEAR: PitchAlgorithm;
   export const PITCH_ALGORITHM_MUSIC: PitchAlgorithm;
