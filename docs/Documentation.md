@@ -499,6 +499,7 @@ Only the `id`, `url`, `title` and `artist` properties are required for basic pla
 | rating         | Depends on the [rating type](#rating)  | The track rating value |
 | artwork        | `string` or [Resource Object](#resource-object) | The artwork url |
 | pitchAlgorithm | [Pitch Algorithm](#pitch-algorithm) | The pitch algorithm |
+| headers        | `object`                    | An object containing all the headers to use in the HTTP request |
 
 ### Resource Object
 Resource objects are the result of `require`/`import` for files.
