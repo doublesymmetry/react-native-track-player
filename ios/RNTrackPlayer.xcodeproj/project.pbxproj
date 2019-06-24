@@ -37,6 +37,7 @@
 		9B18C33D226357940019375A /* AudioSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B18C324226357940019375A /* AudioSession.swift */; };
 		9B18C33E226357940019375A /* AudioSessionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B18C325226357940019375A /* AudioSessionController.swift */; };
 		9B58DF3B1F40C0F000C2105E /* RNTrackPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B58DF3A1F40C0F000C2105E /* RNTrackPlayer.swift */; };
+		9B70466522BFFDEE00065A77 /* Metadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B70466422BFFDEE00065A77 /* Metadata.swift */; };
 		9B78A2461F3F12BC002B5E3C /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B78A2451F3F12BC002B5E3C /* Track.swift */; };
 		9B78A2481F3F12C9002B5E3C /* MediaURL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B78A2471F3F12C9002B5E3C /* MediaURL.swift */; };
 		9BFC1FDD1F61A8E8008795BF /* Capabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC1FDC1F61A8E8008795BF /* Capabilities.swift */; };
@@ -87,6 +88,7 @@
 		9B18C324226357940019375A /* AudioSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioSession.swift; sourceTree = "<group>"; };
 		9B18C325226357940019375A /* AudioSessionController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioSessionController.swift; sourceTree = "<group>"; };
 		9B58DF3A1F40C0F000C2105E /* RNTrackPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNTrackPlayer.swift; sourceTree = "<group>"; };
+		9B70466422BFFDEE00065A77 /* Metadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Metadata.swift; sourceTree = "<group>"; };
 		9B78A2451F3F12BC002B5E3C /* Track.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
 		9B78A2471F3F12C9002B5E3C /* MediaURL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaURL.swift; sourceTree = "<group>"; };
 		9BFBA4D01F3DFA3F00453D3A /* RNTrackPlayer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNTrackPlayer-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -123,6 +125,7 @@
 		9B0E282B1F07D76F00B71D2A /* RNTrackPlayer */ = {
 			isa = PBXGroup;
 			children = (
+				9B70466322BFFDDD00065A77 /* Utils */,
 				9BFBA4D31F3DFA4B00453D3A /* Support */,
 				9B0E287A1F0831A400B71D2A /* Models */,
 				9B0E28621F07DF6200B71D2A /* Vendor */,
@@ -204,6 +207,14 @@
 				9B18C325226357940019375A /* AudioSessionController.swift */,
 			);
 			path = AudioSessionController;
+			sourceTree = "<group>";
+		};
+		9B70466322BFFDDD00065A77 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				9B70466422BFFDEE00065A77 /* Metadata.swift */,
+			);
+			path = Utils;
 			sourceTree = "<group>";
 		};
 		9B8D9F551F40AEC3003A0C0B /* AudioPlayer */ = {
@@ -298,6 +309,7 @@
 				9B18C329226357940019375A /* RemoteCommand.swift in Sources */,
 				9B18C333226357940019375A /* NowPlayingInfoController.swift in Sources */,
 				9B18C32B226357940019375A /* QueuedAudioPlayer.swift in Sources */,
+				9B70466522BFFDEE00065A77 /* Metadata.swift in Sources */,
 				9B18C33D226357940019375A /* AudioSession.swift in Sources */,
 				9B18C32F226357940019375A /* AVPlayerItemNotificationObserver.swift in Sources */,
 				9B18C32A226357940019375A /* RemoteCommandController.swift in Sources */,
