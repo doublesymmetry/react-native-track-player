@@ -64,6 +64,9 @@ public class RNTrackPlayer: RCTEventEmitter {
             "CAPABILITY_SET_RATING": "NOOP",
             "CAPABILITY_JUMP_FORWARD": Capability.jumpForward.rawValue,
             "CAPABILITY_JUMP_BACKWARD": Capability.jumpBackward.rawValue,
+            "CAPABILITY_LIKE": Capability.like.rawValue,
+            "CAPABILITY_DISLIKE": Capability.dislike.rawValue,
+            "CAPABILITY_BOOKMARK": Capability.bookmark.rawValue,
         ]
     }
     
@@ -84,6 +87,9 @@ public class RNTrackPlayer: RCTEventEmitter {
             "remote-previous",
             "remote-jump-forward",
             "remote-jump-backward",
+            "remote-like",
+            "remote-dislike",
+            "remote-bookmark",
         ]
     }
     
@@ -201,7 +207,13 @@ public class RNTrackPlayer: RCTEventEmitter {
         let capabilitiesStr = options["capabilities"] as? [String]
         let capabilities = capabilitiesStr?.compactMap { Capability(rawValue: $0) } ?? []
         
-        let remoteCommands = capabilities.map { $0.mapToPlayerCommand(jumpInterval: options["jumpInterval"] as? NSNumber) }
+        let remoteCommands = capabilities.map { capability in
+            capability.mapToPlayerCommand(jumpInterval: options["jumpInterval"] as? NSNumber,
+                                          likeOptions: options["likeOptions"] as? [String: Any],
+                                          dislikeOptions: options["dislikeOptions"] as? [String: Any],
+                                          bookmarkOptions: options["bookmarkOptions"] as? [String: Any])
+        }
+
         player.remoteCommands.removeAll()
         player.remoteCommands.append(contentsOf: remoteCommands)
         
@@ -266,6 +278,21 @@ public class RNTrackPlayer: RCTEventEmitter {
             }
             
             self?.sendEvent(withName: "remote-pause", body: nil)
+            return MPRemoteCommandHandlerStatus.success
+        }
+        
+        player.remoteCommandController.handleLikeCommand = { [weak self] _ in
+            self?.sendEvent(withName: "remote-like", body: nil)
+            return MPRemoteCommandHandlerStatus.success
+        }
+        
+        player.remoteCommandController.handleDislikeCommand = { [weak self] _ in
+            self?.sendEvent(withName: "remote-dislike", body: nil)
+            return MPRemoteCommandHandlerStatus.success
+        }
+        
+        player.remoteCommandController.handleBookmarkCommand = { [weak self] _ in
+            self?.sendEvent(withName: "remote-bookmark", body: nil)
             return MPRemoteCommandHandlerStatus.success
         }
         

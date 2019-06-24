@@ -78,9 +78,20 @@ declare namespace RNTrackPlayer {
     waitForBuffer?: boolean;
   }
 
+  interface FeedbackOptions {
+    /** Marks wether the option should be marked as active or "done" */
+    isActive: boolean
+
+    /** The title to give the action (relevant for iOS) */
+    title: string
+  }
+
   export interface MetadataOptions {
     ratingType?: RatingType;
     jumpInterval?: number;
+    likeOptions?: FeedbackOptions;
+    dislikeOptions?: FeedbackOptions;
+    bookmarkOptions?: FeedbackOptions;
     stopWithApp?: boolean;
 
     capabilities?: Capability[];
@@ -102,7 +113,6 @@ declare namespace RNTrackPlayer {
 
   export function setupPlayer(options?: PlayerOptions): Promise<void>;
   export function destroy(): void;
-  export function updateOptions(options: MetadataOptions): void;
 
   // Player Queue Commands
 
@@ -111,8 +121,11 @@ declare namespace RNTrackPlayer {
   export function skip(trackId: string): Promise<void>;
   export function skipToNext(): Promise<void>;
   export function skipToPrevious(): Promise<void>;
-  export function updateMetadataForTrack(id: string, metadata: TrackMetadata) : Promise<void>;
   export function removeUpcomingTracks(): Promise<void>;
+
+  // Control Center / Notification Metadata Commands
+  export function updateOptions(options: MetadataOptions): void;
+  export function updateMetadataForTrack(id: string, metadata: TrackMetadata) : Promise<void>;
 
   // Player Playback Commands
 

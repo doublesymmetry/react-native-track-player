@@ -9,9 +9,12 @@
 import Foundation
 
 enum Capability: String {
-    case play, pause, stop, next, previous, jumpForward, jumpBackward, seek
+    case play, pause, stop, next, previous, jumpForward, jumpBackward, seek, like, dislike, bookmark
     
-    func mapToPlayerCommand(jumpInterval: NSNumber?) -> RemoteCommand {
+    func mapToPlayerCommand(jumpInterval: NSNumber?,
+                            likeOptions: [String: Any]?,
+                            dislikeOptions: [String: Any]?,
+                            bookmarkOptions: [String: Any]?) -> RemoteCommand? {
         switch self {
         case .stop:
             return .stop
@@ -29,6 +32,18 @@ enum Capability: String {
             return .skipForward(preferredIntervals: [jumpInterval ?? 15])
         case .jumpBackward:
             return .skipBackward(preferredIntervals: [jumpInterval ?? 15])
+        case .like:
+            return .like(isActive: likeOptions["isActive"] ?? false,
+                         localizedTitle: likeOptions["title"] ?? "Like",
+                         localizedShortTitle: likeOptions["title"] ?? "Like")
+        case .dislike:
+            return .dislike(isActive: likeOptions["isActive"] ?? false,
+                            localizedTitle: likeOptions["title"] ?? "Dislike",
+                            localizedShortTitle: likeOptions["title"] ?? "Dislike")
+        case .bookmark:
+            return .bookmark(isActive: likeOptions["isActive"] ?? false,
+                             localizedTitle: likeOptions["title"] ?? "Bookmark",
+                             localizedShortTitle: likeOptions["title"] ?? "Bookmark")
         }
     }
 }
