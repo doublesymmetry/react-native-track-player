@@ -10,19 +10,22 @@ import Foundation
 import MediaPlayer
 import AVFoundation
 
-class Track: NSObject, AudioItem, TimePitching {
+class Track: NSObject, AudioItem, TimePitching, Authorizing {
     let id: String
     let url: MediaURL
+    
     @objc var title: String
     @objc var artist: String
     
     var date: String?
     var desc: String?
     var genre: String?
-    let pitchAlgorithm: String?
     var duration: Double?
-    var artworkURL: MediaURL?
     var skipped: Bool = false
+    var artworkURL: MediaURL?
+    let headers: [String: Any]?
+    let pitchAlgorithm: String?
+    
     @objc var album: String?
     @objc var artwork: MPMediaItemArtwork?
     
@@ -44,9 +47,10 @@ class Track: NSObject, AudioItem, TimePitching {
         self.album = dictionary["album"] as? String
         self.genre = dictionary["genre"] as? String
         self.desc = dictionary["description"] as? String
-        self.pitchAlgorithm = dictionary["pitchAlgorithm"] as? String
         self.duration = dictionary["duration"] as? Double
+        self.headers = dictionary["headers"] as? [String: Any]
         self.artworkURL = MediaURL(object: dictionary["artwork"])
+        self.pitchAlgorithm = dictionary["pitchAlgorithm"] as? String
         
         self.originalObject = dictionary
     }
@@ -125,6 +129,12 @@ class Track: NSObject, AudioItem, TimePitching {
         }
         
         return .lowQualityZeroLatency
+    }
+    
+    // MARK: - Authorizing Protocol
+    
+    func getHeaders() -> [String : Any] {
+        return headers ?? [:]
     }
     
 }
