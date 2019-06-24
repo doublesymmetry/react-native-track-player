@@ -215,7 +215,7 @@ public class RNTrackPlayer: RCTEventEmitter {
         }
 
         player.remoteCommands.removeAll()
-        player.remoteCommands.append(contentsOf: remoteCommands)
+        player.enableRemoteCommands(remoteCommands)
         
         player.remoteCommandController.handleChangePlaybackPositionCommand = { [weak self] event in
             if let event = event as? MPChangePlaybackPositionCommandEvent {
