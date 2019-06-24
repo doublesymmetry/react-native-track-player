@@ -33,17 +33,17 @@ enum Capability: String {
         case .jumpBackward:
             return .skipBackward(preferredIntervals: [jumpInterval ?? 15])
         case .like:
-            return .like(isActive: likeOptions["isActive"] ?? false,
-                         localizedTitle: likeOptions["title"] ?? "Like",
-                         localizedShortTitle: likeOptions["title"] ?? "Like")
+            return .like(isActive: likeOptions?["isActive"] as? Bool ?? false,
+                         localizedTitle: likeOptions?["title"] as? String ?? "Like",
+                         localizedShortTitle: likeOptions?["title"] as? String ?? "Like")
         case .dislike:
-            return .dislike(isActive: likeOptions["isActive"] ?? false,
-                            localizedTitle: likeOptions["title"] ?? "Dislike",
-                            localizedShortTitle: likeOptions["title"] ?? "Dislike")
+            return .dislike(isActive: dislikeOptions?["isActive"] as? Bool ?? false,
+                            localizedTitle: dislikeOptions?["title"] as? String ?? "Dislike",
+                            localizedShortTitle: dislikeOptions?["title"] as? String ?? "Dislike")
         case .bookmark:
-            return .bookmark(isActive: likeOptions["isActive"] ?? false,
-                             localizedTitle: likeOptions["title"] ?? "Bookmark",
-                             localizedShortTitle: likeOptions["title"] ?? "Bookmark")
+            return .bookmark(isActive: bookmarkOptions?["isActive"] as? Bool ?? false,
+                             localizedTitle: bookmarkOptions?["title"] as? String ?? "Bookmark",
+                             localizedShortTitle: bookmarkOptions?["title"] as? String ?? "Bookmark")
         }
     }
 }
