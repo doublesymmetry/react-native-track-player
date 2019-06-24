@@ -21,7 +21,10 @@ declare namespace RNTrackPlayer {
     | "remote-jump-backward"
     | "remote-seek"
     | "remote-set-rating"
-    | "remote-duck";
+    | "remote-duck"
+    | "remote-like"
+    | "remote-dislike"
+    | "remote-bookmark";
 
   export type TrackType =
     | "default"
