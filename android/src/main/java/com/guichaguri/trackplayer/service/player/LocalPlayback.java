@@ -174,12 +174,12 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     }
 
     @Override
-    public float getVolume() {
+    public float getPlayerVolume() {
         return player.getVolume();
     }
 
     @Override
-    public void setVolume(float volume) {
+    public void setPlayerVolume(float volume) {
         player.setVolume(volume);
     }
 

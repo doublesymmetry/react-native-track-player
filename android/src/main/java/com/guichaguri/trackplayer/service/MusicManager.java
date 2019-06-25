@@ -49,6 +49,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
     @RequiresApi(26)
     private AudioFocusRequest focus = null;
     private boolean hasAudioFocus = false;
+    private boolean wasDucking = false;
 
     private BroadcastReceiver noisyReceiver = new BroadcastReceiver() {
         @Override
@@ -59,6 +60,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
     private boolean receivingNoisyEvents = false;
 
     private boolean stopWithApp = false;
+    private boolean alwaysPauseOnInterruption = false;
 
     @SuppressLint("InvalidWakeLockTag")
     public MusicManager(MusicService service) {
@@ -85,6 +87,10 @@ public class MusicManager implements OnAudioFocusChangeListener {
 
     public void setStopWithApp(boolean stopWithApp) {
         this.stopWithApp = stopWithApp;
+    }
+
+    public void setAlwaysPauseOnInterruption(boolean alwaysPauseOnInterruption) {
+        this.alwaysPauseOnInterruption = alwaysPauseOnInterruption;
     }
 
     public MetadataManager getMetadata() {
@@ -257,16 +263,26 @@ public class MusicManager implements OnAudioFocusChangeListener {
                 paused = true;
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                ducking = true;
+                if (alwaysPauseOnInterruption)
+                    paused = true;
+                else
+                    ducking = true;
                 break;
             default:
                 break;
         }
 
+        if (ducking) {
+            playback.setVolumeMultiplier(0.5F);
+            wasDucking = true;
+        } else if (wasDucking) {
+            playback.setVolumeMultiplier(1.0F);
+            wasDucking = false;
+        }
+
         Bundle bundle = new Bundle();
         bundle.putBoolean("permanent", permanent);
         bundle.putBoolean("paused", paused);
-        bundle.putBoolean("ducking", ducking);
         service.emit(MusicEvents.BUTTON_DUCK, bundle);
     }
 
@@ -286,6 +302,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
                             .setUsage(AudioAttributes.USAGE_MEDIA)
                             .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                             .build())
+                    .setWillPauseWhenDucked(alwaysPauseOnInterruption)
                     .build();
 
             r = manager.requestAudioFocus(focus);
