@@ -111,7 +111,6 @@ public class RNTrackPlayer: RCTEventEmitter {
         if type == .began {
             // Interruption began, take appropriate actions
             self.sendEvent(withName: "remote-duck", body: [
-                "ducking": true,
                 "paused": true
                 ])
         }
@@ -121,7 +120,6 @@ public class RNTrackPlayer: RCTEventEmitter {
                 if options.contains(.shouldResume) {
                     // Interruption Ended - playback should resume
                     self.sendEvent(withName: "remote-duck", body: [
-                        "ducking": false,
                         "paused": false
                         ])
                 } else {
