@@ -39,8 +39,8 @@ dependencies {
   compile (project(':react-native-track-player')) {
     exclude group: 'com.google.android.exoplayer'
   }
-  googleImplementation 'com.google.android.exoplayer:exoplayer-core:2.9.0'
-  amazonImplementation 'com.amazon.android:exoplayer-core:2.9.0'
+  googleImplementation 'com.google.android.exoplayer:exoplayer-core:2.10.1'
+  amazonImplementation 'com.amazon.android:exoplayer-core:2.10.1'
   ...
 }
 ```
