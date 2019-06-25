@@ -241,6 +241,7 @@ Some parameters are unused depending on platform.
 | options.ratingType | [Rating Constant](#rating) | The rating type | ✓ | ✗ | ✗ |
 | options.jumpInterval | `number` | The interval in seconds for the jump forward/backward buttons | ✓ | ✓ | ✓ |
 | options.stopWithApp | `boolean` | Whether the player will be destroyed when the app closes | ✓ | ✗ | ✗ |
+| options.alwaysPauseOnInterruption | `boolean` | Whether the `remote-duck` event will be triggered on every interruption | ✓ | ✗ | ✗ |
 | options.capabilities | `array` of [Capability Constants](#capability) | The media controls that will be enabled | ✓ | ✓ | ✓ |
 | options.notificationCapabilities | `array` of [Capability Constants](#capability) | The buttons that it will show in the notification. Defaults to `data.capabilities`  | ✓ | ✗ | ✗ |
 | options.compactCapabilities | `array` of [Capability Constants](#capability) | The buttons that it will show in the compact notification | ✓ | ✗ | ✗ |
@@ -402,18 +403,19 @@ Fired when the user presses the jump backward button. Only fired if the `CAPABIL
 | interval | `number` | The number of seconds to jump backward. It's usually the `jumpInterval` set in the options. |
 
 #### `remote-duck`
-Fired when the device needs the player to pause or lower the volume for a short amount of time.
+Fired when the device needs the player to pause for a interruption.
+
+The volume may also be lowered on an transient interruption without triggering this event.
+If you want to receive those interruptions, set the `alwaysPauseOnInterruption` option to true.
 
 - When the event is triggered with `permanent` set to true, you should stop the playback.
-- When the event is triggered with `ducking` set to true, you should either lower the volume or pause the app. If it's a music app, you probably want to lower the volume, but if it's a podcast app, you probably want to pause it for a moment.
-- When the event is triggered with `paused` set to true, you should pause the playback. It will also be set to true in both cases described above.
-- When the event is triggered and none of them are set to true, you should resume the track and set the volume back to its original value.
+- When the event is triggered with `paused` set to true, you should pause the playback. It will also be set to true when `permanent` is true.
+- When the event is triggered and none of them are set to true, you should resume the track.
 
 | Param     | Type      | Description                                  |
 | --------- | --------- | -------------------------------------------- |
 | paused    | `boolean` | Whether the player should pause the playback |
 | permanent | `boolean` | Whether the player should stop the playback  |
-| ducking   | `boolean` | Whether the player should lower their volume |
 
 ### Player
 #### `playback-state`
