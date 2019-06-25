@@ -212,7 +212,6 @@ public class RNTrackPlayer: RCTEventEmitter {
                                           bookmarkOptions: options["bookmarkOptions"] as? [String: Any])
         }
 
-        player.remoteCommands.removeAll()
         player.enableRemoteCommands(remoteCommands)
         
         player.remoteCommandController.handleChangePlaybackPositionCommand = { [weak self] event in
