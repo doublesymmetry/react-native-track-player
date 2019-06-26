@@ -96,7 +96,7 @@ RCT_EXTERN_METHOD(getState:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(updateMetadataForTrack:(NSString *)trackId
-                  withProperties:(NSDictionary *)properties
+                  properties:(NSDictionary *)properties
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 

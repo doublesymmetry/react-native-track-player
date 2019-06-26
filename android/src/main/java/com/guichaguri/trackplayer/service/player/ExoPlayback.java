@@ -39,6 +39,7 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
     protected int lastKnownWindow = C.INDEX_UNSET;
     protected long lastKnownPosition = C.POSITION_UNSET;
     protected int previousState = PlaybackStateCompat.STATE_NONE;
+    protected float volumeMultiplier = 1.0F;
 
     public ExoPlayback(Context context, MusicManager manager, T player) {
         this.context = context;
@@ -185,9 +186,22 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
         player.seekTo(time);
     }
 
-    public abstract float getVolume();
+    public float getVolume() {
+        return getPlayerVolume() / volumeMultiplier;
+    }
 
-    public abstract void setVolume(float volume);
+    public void setVolume(float volume) {
+        setPlayerVolume(volume * volumeMultiplier);
+    }
+
+    public void setVolumeMultiplier(float multiplier) {
+        setPlayerVolume(getVolume() * multiplier);
+        this.volumeMultiplier = multiplier;
+    }
+
+    public abstract float getPlayerVolume();
+
+    public abstract void setPlayerVolume(float volume);
 
     public float getRate() {
         return player.getPlaybackParameters().speed;

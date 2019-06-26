@@ -64,6 +64,9 @@ public class RNTrackPlayer: RCTEventEmitter {
             "CAPABILITY_SET_RATING": "NOOP",
             "CAPABILITY_JUMP_FORWARD": Capability.jumpForward.rawValue,
             "CAPABILITY_JUMP_BACKWARD": Capability.jumpBackward.rawValue,
+            "CAPABILITY_LIKE": Capability.like.rawValue,
+            "CAPABILITY_DISLIKE": Capability.dislike.rawValue,
+            "CAPABILITY_BOOKMARK": Capability.bookmark.rawValue,
         ]
     }
     
@@ -78,19 +81,63 @@ public class RNTrackPlayer: RCTEventEmitter {
             "remote-stop",
             "remote-pause",
             "remote-play",
+            "remote-duck",
             "remote-next",
             "remote-seek",
             "remote-previous",
             "remote-jump-forward",
             "remote-jump-backward",
+            "remote-like",
+            "remote-dislike",
+            "remote-bookmark",
         ]
     }
     
+    func setupInterruptionHandling() {
+        let notificationCenter = NotificationCenter.default
+        notificationCenter.removeObserver(self)
+        notificationCenter.addObserver(self,
+                                       selector: #selector(handleInterruption),
+                                       name: AVAudioSession.interruptionNotification,
+                                       object: nil)
+    }
     
+    @objc func handleInterruption(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+            let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
+            let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
+                return
+        }
+        if type == .began {
+            // Interruption began, take appropriate actions
+            self.sendEvent(withName: "remote-duck", body: [
+                "paused": true
+                ])
+        }
+        else if type == .ended {
+            if let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
+                let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
+                if options.contains(.shouldResume) {
+                    // Interruption Ended - playback should resume
+                    self.sendEvent(withName: "remote-duck", body: [
+                        "paused": false
+                        ])
+                } else {
+                    // Interruption Ended - playback should NOT resume
+                    self.sendEvent(withName: "remote-duck", body: [
+                        "permanent": true
+                        ])
+                }
+            }
+        }
+    }
+
     // MARK: - Bridged Methods
     
     @objc(setupPlayer:resolver:rejecter:)
     public func setupPlayer(config: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        setupInterruptionHandling();
+
         // configure if player waits to play
         let autoWait: Bool = config["waitForBuffer"] as? Bool ?? false
         player.automaticallyWaitsToMinimizeStalling = autoWait
@@ -158,9 +205,14 @@ public class RNTrackPlayer: RCTEventEmitter {
         let capabilitiesStr = options["capabilities"] as? [String]
         let capabilities = capabilitiesStr?.compactMap { Capability(rawValue: $0) } ?? []
         
-        let remoteCommands = capabilities.map { $0.mapToPlayerCommand(jumpInterval: options["jumpInterval"] as? NSNumber) }
-        player.remoteCommands.removeAll()
-        player.remoteCommands.append(contentsOf: remoteCommands)
+        let remoteCommands = capabilities.map { capability in
+            capability.mapToPlayerCommand(jumpInterval: options["jumpInterval"] as? NSNumber,
+                                          likeOptions: options["likeOptions"] as? [String: Any],
+                                          dislikeOptions: options["dislikeOptions"] as? [String: Any],
+                                          bookmarkOptions: options["bookmarkOptions"] as? [String: Any])
+        }
+
+        player.enableRemoteCommands(remoteCommands)
         
         player.remoteCommandController.handleChangePlaybackPositionCommand = { [weak self] event in
             if let event = event as? MPChangePlaybackPositionCommandEvent {
@@ -223,6 +275,21 @@ public class RNTrackPlayer: RCTEventEmitter {
             }
             
             self?.sendEvent(withName: "remote-pause", body: nil)
+            return MPRemoteCommandHandlerStatus.success
+        }
+        
+        player.remoteCommandController.handleLikeCommand = { [weak self] _ in
+            self?.sendEvent(withName: "remote-like", body: nil)
+            return MPRemoteCommandHandlerStatus.success
+        }
+        
+        player.remoteCommandController.handleDislikeCommand = { [weak self] _ in
+            self?.sendEvent(withName: "remote-dislike", body: nil)
+            return MPRemoteCommandHandlerStatus.success
+        }
+        
+        player.remoteCommandController.handleBookmarkCommand = { [weak self] _ in
+            self?.sendEvent(withName: "remote-bookmark", body: nil)
             return MPRemoteCommandHandlerStatus.success
         }
         

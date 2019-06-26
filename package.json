@@ -1,6 +1,6 @@
 {
   "name": "react-native-track-player",
-  "version": "1.1.5-rc2",
+  "version": "1.1.5",
   "description": "A fully fledged audio module created for music apps",
   "contributors": [
     {
@@ -41,7 +41,7 @@
     "prepublishOnly": "git submodule update --init --recursive"
   },
   "peerDependencies": {
-    "react": ">=16.8.3",
-    "react-native": ">=0.59.5"
+    "react": ">=16.8.6",
+    "react-native": ">=0.60.0-rc.2"
   }
 }
