@@ -55,14 +55,7 @@
                         const container = document.getElementById('last-edit');
                         const dt = new Date(json.commit.author.date);
 
-                        const author = document.createElement('a');
-                        author.innerText = json.author.login;
-                        author.href = json.author.html_url;
-                        author.title = json.commit.author.name;
-                        author.target = '_blank';
-
-                        container.appendChild(document.createTextNode('Last edited ' + dt.toDateString() + ' by '));
-                        container.appendChild(author);
+                        container.appendChild(document.createTextNode('Last updated on ' + dt.toDateString()));
                     });
             })();
         </script>
