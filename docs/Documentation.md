@@ -518,7 +518,7 @@ Register an event listener for one or more of the [events](#events) emitted by t
 Check out the [events section](#events) for a full list of supported events.
 
 ```jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { Text, View } from 'react-native';
 import { useTrackPlayerEvent, TrackPlayerEvents, STATE_PLAYING } from 'react-native-track-player';
 
