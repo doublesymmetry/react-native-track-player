@@ -533,7 +533,7 @@ const MyComponent = () => {
 
   useTrackPlayerEvents(events, (event) => {
     if (event.type === TrackPlayerEvents.PLAYBACK_ERROR) {
-      console.warn('An error occured while playing the current track.');
+      console.warn('An error occurred while playing the current track.');
     }
     if (event.type === TrackPlayerEvents.PLAYBACK_STATE) {
       setState(playbackState)
