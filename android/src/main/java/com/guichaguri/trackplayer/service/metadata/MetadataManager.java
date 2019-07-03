@@ -65,7 +65,8 @@ public class MetadataManager {
         this.builder = new NotificationCompat.Builder(service, Utils.NOTIFICATION_CHANNEL);
         this.session = new MediaSessionCompat(service, "TrackPlayer", null, null);
 
-        session.setFlags(MediaSessionCompat.FLAG_HANDLES_QUEUE_COMMANDS);
+        session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+                MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
         session.setCallback(new ButtonEvents(service, manager));
 
         Context context = service.getApplicationContext();
