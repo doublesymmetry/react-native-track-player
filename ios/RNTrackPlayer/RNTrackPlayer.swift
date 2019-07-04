@@ -13,6 +13,8 @@ import MediaPlayer
 public class RNTrackPlayer: RCTEventEmitter {
     
     // MARK: - Attributes
+    
+    private var hasInitialized = false
 
     private lazy var player: QueuedAudioPlayer = {
         let player = QueuedAudioPlayer()
@@ -136,6 +138,11 @@ public class RNTrackPlayer: RCTEventEmitter {
     
     @objc(setupPlayer:resolver:rejecter:)
     public func setupPlayer(config: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        if hasInitialized {
+            resolve(NSNull())
+            return
+        }
+        
         setupInterruptionHandling();
 
         // configure if player waits to play
@@ -192,34 +199,12 @@ public class RNTrackPlayer: RCTEventEmitter {
             }
         }
         
-        resolve(NSNull())
-    }
-    
-    @objc(destroy)
-    public func destroy() {
-        print("Destroying player")
-    }
-    
-    @objc(updateOptions:resolver:rejecter:)
-    public func update(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        let capabilitiesStr = options["capabilities"] as? [String]
-        let capabilities = capabilitiesStr?.compactMap { Capability(rawValue: $0) } ?? []
-        
-        let remoteCommands = capabilities.map { capability in
-            capability.mapToPlayerCommand(jumpInterval: options["jumpInterval"] as? NSNumber,
-                                          likeOptions: options["likeOptions"] as? [String: Any],
-                                          dislikeOptions: options["dislikeOptions"] as? [String: Any],
-                                          bookmarkOptions: options["bookmarkOptions"] as? [String: Any])
-        }
-
-        player.enableRemoteCommands(remoteCommands)
-        
         player.remoteCommandController.handleChangePlaybackPositionCommand = { [weak self] event in
             if let event = event as? MPChangePlaybackPositionCommandEvent {
                 self?.sendEvent(withName: "remote-seek", body: ["position": event.positionTime])
                 return MPRemoteCommandHandlerStatus.success
             }
-
+            
             return MPRemoteCommandHandlerStatus.commandFailed
         }
         
@@ -292,6 +277,29 @@ public class RNTrackPlayer: RCTEventEmitter {
             self?.sendEvent(withName: "remote-bookmark", body: nil)
             return MPRemoteCommandHandlerStatus.success
         }
+        
+        hasInitialized = true
+        resolve(NSNull())
+    }
+    
+    @objc(destroy)
+    public func destroy() {
+        print("Destroying player")
+    }
+    
+    @objc(updateOptions:resolver:rejecter:)
+    public func update(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        let capabilitiesStr = options["capabilities"] as? [String]
+        let capabilities = capabilitiesStr?.compactMap { Capability(rawValue: $0) } ?? []
+        
+        let remoteCommands = capabilities.map { capability in
+            capability.mapToPlayerCommand(jumpInterval: options["jumpInterval"] as? NSNumber,
+                                          likeOptions: options["likeOptions"] as? [String: Any],
+                                          dislikeOptions: options["dislikeOptions"] as? [String: Any],
+                                          bookmarkOptions: options["bookmarkOptions"] as? [String: Any])
+        }
+
+        player.enableRemoteCommands(remoteCommands)
         
         resolve(NSNull())
     }
