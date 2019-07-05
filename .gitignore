@@ -3,6 +3,7 @@
 .DS_Store
 node_modules/
 build/
+lib/
 DerivedData/
 package-lock.json
 yarn.lock
