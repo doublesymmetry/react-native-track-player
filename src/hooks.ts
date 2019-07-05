@@ -1,33 +1,22 @@
 import { useEffect, useState, useRef } from 'react'
-import {
-  STATE_NONE,
-  getState,
-  Event,
-  addEventListener,
-  State,
-  STATE_PLAYING,
-  STATE_BUFFERING,
-  getPosition,
-  getBufferedPosition,
-  getDuration,
-} from './index'
+import TrackPlayer, { State, Event } from './index'
 
 /**
  * @description
  *   Get current playback state and subsequent updatates
  */
 export const usePlaybackState = () => {
-  const [state, setState] = useState(STATE_NONE)
+  const [state, setState] = useState(State.None)
 
   useEffect(() => {
     async function setPlayerState() {
-      const playerState = await getState()
+      const playerState = await TrackPlayer.getState()
       setState(playerState)
     }
 
     setPlayerState()
 
-    const sub = addEventListener(Event.PlaybackState, data => {
+    const sub = TrackPlayer.addEventListener(Event.PlaybackState, data => {
       setState(data.state)
     })
 
@@ -70,7 +59,7 @@ export const useTrackPlayerEvents = (events: Event[], handler: Handler) => {
 
     const subs = events.map(event =>
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      addEventListener(event, payload => savedHandler.current!({ ...payload, type: event })),
+      TrackPlayer.addEventListener(event, payload => savedHandler.current!({ ...payload, type: event })),
     )
 
     return () => {
@@ -100,7 +89,7 @@ const useWhenPlaybackStateChanges = (callback: (state: State) => void) => {
   useEffect(() => {
     let didCancel = false
     const fetchPlaybackState = async () => {
-      const playbackState = await getState()
+      const playbackState = await TrackPlayer.getState()
       if (!didCancel) {
         callback(playbackState)
       }
@@ -133,14 +122,14 @@ export const useTrackPlayerProgress = (interval: number = 1000) => {
   }
 
   const [state, setState] = useState(initialState)
-  const needsPoll = usePlaybackStateIs(STATE_PLAYING, STATE_BUFFERING)
+  const needsPoll = usePlaybackStateIs(State.Playing, State.Buffering)
 
   const getProgress = async () => {
     if (!needsPoll) return
     const [position, bufferedPosition, duration] = await Promise.all([
-      getPosition(),
-      getBufferedPosition(),
-      getDuration(),
+      TrackPlayer.getPosition(),
+      TrackPlayer.getBufferedPosition(),
+      TrackPlayer.getDuration(),
     ])
     setState({ position, bufferedPosition, duration })
   }
