@@ -149,6 +149,10 @@ public class RNTrackPlayer: RCTEventEmitter {
         let autoWait: Bool = config["waitForBuffer"] as? Bool ?? false
         player.automaticallyWaitsToMinimizeStalling = autoWait
         
+        // configure if control center metdata should auto update
+        let autoUpdateMetadata: Bool = config["automaticallyUpdateNowPlayingInfo"] as? Bool ?? true
+        player.automaticallyUpdateNowPlayingInfo = autoUpdateMetadata
+        
         // configure audio session - category, options & mode
         var sessionCategory: AVAudioSession.Category = .playback
         var sessionCategoryOptions: AVAudioSession.CategoryOptions = []
