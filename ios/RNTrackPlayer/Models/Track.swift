@@ -10,7 +10,7 @@ import Foundation
 import MediaPlayer
 import AVFoundation
 
-class Track: NSObject, AudioItem, TimePitching, Authorizing {
+class Track: NSObject, AudioItem, TimePitching, AssetOptionsProviding {
     let id: String
     let url: MediaURL
     
@@ -133,8 +133,8 @@ class Track: NSObject, AudioItem, TimePitching, Authorizing {
     
     // MARK: - Authorizing Protocol
     
-    func getHeaders() -> [String : Any] {
-        return headers ?? [:]
+    func getAssetOptions() -> [String : Any] {
+        return headers ? ["AVURLAssetHTTPHeaderFieldsKey": headers] : [:]
     }
     
 }
