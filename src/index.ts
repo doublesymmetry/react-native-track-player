@@ -109,11 +109,11 @@ async function updateMetadataForTrack(trackId: string, metadata: TrackMetadata):
   return TrackPlayer.updateMetadataForTrack(trackId, metadata)
 }
 
-export function clearNowPlayingMetadata(): Promise<void> {
+function clearNowPlayingMetadata(): Promise<void> {
   return TrackPlayer.clearNowPlayingMetadata()
 }
 
-export function updateNowPlayingMetadata(metadata: NowPlayingMetadata): Promise<void> {
+function updateNowPlayingMetadata(metadata: NowPlayingMetadata): Promise<void> {
   return TrackPlayer.updateNowPlayingMetadata(metadata)
 }
 
@@ -192,7 +192,6 @@ export default {
   // MARK: - General API
   setupPlayer,
   destroy,
-  updateOptions,
   registerPlaybackService,
   addEventListener,
 
@@ -203,9 +202,14 @@ export default {
   skip,
   skipToNext,
   skipToPrevious,
-  updateMetadataForTrack,
 
-  // MARK: Playback API
+  // MARK: - Control Center / Notifications API
+  updateOptions,
+  updateMetadataForTrack,
+  clearNowPlayingMetadata,
+  updateNowPlayingMetadata,
+
+  // MARK: - Playback API
   reset,
   play,
   pause,
