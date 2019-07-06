@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import TrackPlayer, {
+  State,
+  Event,
   useTrackPlayerProgress,
   usePlaybackState,
   useTrackPlayerEvents
@@ -49,7 +51,7 @@ export default function Player(props) {
   const [trackArtwork, setTrackArtwork] = useState("");
   const [trackArtist, setTrackArtist] = useState("");
   useTrackPlayerEvents(["playback-track-changed"], async event => {
-    if (event.type === TrackPlayer.TrackPlayerEvents.PLAYBACK_TRACK_CHANGED) {
+    if (event.type === Event.PlaybackTrackChanged) {
       const track = await TrackPlayer.getTrack(event.nextTrack);
       setTrackTitle(track.title);
       setTrackArtist(track.artist);
@@ -62,8 +64,8 @@ export default function Player(props) {
   var middleButtonText = "Play";
 
   if (
-    playbackState === TrackPlayer.STATE_PLAYING ||
-    playbackState === TrackPlayer.STATE_BUFFERING
+    playbackState === State.Playing ||
+    playbackState === State.Buffering
   ) {
     middleButtonText = "Pause";
   }

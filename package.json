@@ -2,6 +2,24 @@
   "name": "react-native-track-player",
   "version": "1.2.0",
   "description": "A fully fledged audio module created for music apps",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "rimraf lib && tsc",
+    "lint": "eslint \"src/**/*.ts\"",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "prepare": "yarn build",
+    "prepublishOnly": "git submodule update --init --recursive && yarn lint",
+    "preversion": "yarn lint",
+    "version": "yarn format && git add -A src",
+    "postversion": "git push && git push --tags"
+  },
+  "files": [
+    "lib/**/*",
+    "ios/**/*",
+    "android/**/*",
+    "*.podspec"
+  ],
   "contributors": [
     {
       "name": "David Chavez",
@@ -37,11 +55,19 @@
   "bugs": {
     "url": "https://github.com/react-native-kit/react-native-track-player/issues"
   },
-  "scripts": {
-    "prepublishOnly": "git submodule update --init --recursive"
-  },
   "peerDependencies": {
     "react": ">=16.8.6",
     "react-native": ">=0.60.0-rc.2"
+  },
+  "devDependencies": {
+    "@types/react-native": "^0.60.0",
+    "@typescript-eslint/eslint-plugin": "^1.7.0",
+    "@typescript-eslint/parser": "^1.7.0",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.2.0",
+    "eslint-plugin-prettier": "^3.0.1",
+    "prettier": "^1.17.0",
+    "rimraf": "^2.6.2",
+    "typescript": "^3.2.4"
   }
 }
