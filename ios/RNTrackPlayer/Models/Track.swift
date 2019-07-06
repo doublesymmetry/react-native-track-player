@@ -133,8 +133,12 @@ class Track: NSObject, AudioItem, TimePitching, AssetOptionsProviding {
     
     // MARK: - Authorizing Protocol
     
-    func getAssetOptions() -> [String : Any] {
-        return headers ? ["AVURLAssetHTTPHeaderFieldsKey": headers] : [:]
+    func getAssetOptions() -> [String: Any] {
+        if let headers = headers {
+            return ["AVURLAssetHTTPHeaderFieldsKey": headers]
+        }
+        
+        return [:]
     }
     
 }
