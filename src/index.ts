@@ -1,6 +1,6 @@
 import { Platform, AppRegistry, DeviceEventEmitter, NativeEventEmitter, NativeModules } from 'react-native'
 // @ts-ignore
-import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource'
+import * as resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource'
 import { MetadataOptions, PlayerOptions, Event, Track, State, TrackMetadata } from './interfaces'
 
 const { TrackPlayerModule: TrackPlayer } = NativeModules
