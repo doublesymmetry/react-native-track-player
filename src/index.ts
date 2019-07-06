@@ -148,7 +148,7 @@ async function getRate(): Promise<number> {
 }
 
 async function getTrack(trackId: string): Promise<Track> {
-  return TrackPlayer.getRate(trackId)
+  return TrackPlayer.getTrack(trackId)
 }
 
 async function getQueue(): Promise<Track[]> {
