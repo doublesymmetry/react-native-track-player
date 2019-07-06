@@ -40,7 +40,16 @@ export interface PlayerOptions {
   iosCategory?: IOSCategory
   iosCategoryMode?: IOSCategoryMode
   iosCategoryOptions?: IOSCategoryOptions[]
+  /**
+   * Indicates whether the player should automatically delay playback in order to minimize stalling.
+   * Defaults to `false`.
+   */
   waitForBuffer?: boolean
+  /**
+   * Indicates whether the player should automatically update now playing metadata data in control center / notification.
+   * Defaults to `true`.
+   */
+  automaticallyUpdateNowPlayingInfo?: boolean
 }
 
 export enum RatingType {
