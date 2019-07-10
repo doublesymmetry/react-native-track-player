@@ -158,25 +158,23 @@ export enum State {
   Connecting = TrackPlayer.STATE_CONNECTING,
 }
 
-export interface TrackMetadata {
-  duration?: number
-  title: string
-  artist: string
-  album?: string
-  description?: string
-  genre?: string
-  date?: string
-  rating?: number | boolean
-  artwork?: string | ResourceObject
-}
-
-export interface NowPlayingMetadata {
+interface TrackMetadataBase {
   title?: string
   album?: string
   artist?: string
   duration?: number
-  elapsedTime?: number
   artwork?: string | ResourceObject
+}
+
+export interface TrackMetadata extends TrackMetadataBase {
+  description?: string
+  genre?: string
+  date?: string
+  rating?: number | boolean
+}
+
+export interface NowPlayingMetadata extends TrackMetadataBase {
+  elapsedTime?: number
 }
 
 export interface Track extends TrackMetadata {
