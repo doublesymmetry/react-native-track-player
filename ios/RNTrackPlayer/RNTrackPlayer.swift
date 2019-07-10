@@ -150,7 +150,7 @@ public class RNTrackPlayer: RCTEventEmitter {
         player.automaticallyWaitsToMinimizeStalling = autoWait
         
         // configure if control center metdata should auto update
-        let autoUpdateMetadata: Bool = config["automaticallyUpdateNowPlayingInfo"] as? Bool ?? true
+        let autoUpdateMetadata: Bool = config["autoUpdateMetadata"] as? Bool ?? true
         player.automaticallyUpdateNowPlayingInfo = autoUpdateMetadata
         
         // configure audio session - category, options & mode
