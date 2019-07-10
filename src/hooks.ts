@@ -69,7 +69,7 @@ export const useTrackPlayerEvents = (events: Event[], handler: Handler) => {
  * Poll for track progress for the given interval (in miliseconds)
  * @param interval - ms interval
  */
-function useProgress(updateInterval?: number) {
+export function useProgress(updateInterval?: number) {
   const [state, setState] = useState({ position: 0, duration: 0, buffered: 0 })
   const playerState = usePlaybackState()
 
