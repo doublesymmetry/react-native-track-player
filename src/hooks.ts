@@ -65,72 +65,28 @@ export const useTrackPlayerEvents = (events: Event[], handler: Handler) => {
   }, events)
 }
 
-const useInterval = (callback: () => void, delay: number) => {
-  const savedCallback = useRef<() => void>()
-
-  useEffect(() => {
-    savedCallback.current = callback
-  })
-
-  useEffect(() => {
-    if (!delay) return
-    const id = setInterval(savedCallback.current, delay)
-    return () => clearInterval(id)
-  }, [delay])
-}
-
-const useWhenPlaybackStateChanges = (callback: (state: State) => void) => {
-  useTrackPlayerEvents([Event.PlaybackState], ({ state }) => {
-    callback(state)
-  })
-  useEffect(() => {
-    let didCancel = false
-    const fetchPlaybackState = async () => {
-      const playbackState = await TrackPlayer.getState()
-      if (!didCancel) {
-        callback(playbackState)
-      }
-    }
-    fetchPlaybackState()
-    return () => {
-      didCancel = true
-    }
-  }, [])
-}
-
-const usePlaybackStateIs = (...states: State[]) => {
-  const [is, setIs] = useState()
-  useWhenPlaybackStateChanges(state => {
-    setIs(states.includes(state))
-  })
-
-  return is
-}
-
 /**
  * Poll for track progress for the given interval (in miliseconds)
  * @param interval - ms interval
  */
-export const useTrackPlayerProgress = (interval: number = 1000) => {
-  const initialState = {
-    position: 0,
-    bufferedPosition: 0,
-    duration: 0,
-  }
-
-  const [state, setState] = useState(initialState)
-  const needsPoll = usePlaybackStateIs(State.Playing, State.Buffering)
+function useProgress(updateInterval?: number) {
+  const [state, setState] = useState({ position: 0, duration: 0, bufferedPosition: 0 })
+  const playerState = usePlaybackState()
 
   const getProgress = async () => {
-    if (!needsPoll) return
-    const [position, bufferedPosition, duration] = await Promise.all([
+    const [position, duration, bufferedPosition] = await Promise.all([
       TrackPlayer.getPosition(),
-      TrackPlayer.getBufferedPosition(),
       TrackPlayer.getDuration(),
+      TrackPlayer.getBufferedPosition(),
     ])
-    setState({ position, bufferedPosition, duration })
+    setState({ position, duration, bufferedPosition })
   }
 
-  useInterval(getProgress, interval)
+  useEffect(() => {
+    if (playerState !== State.Playing && playerState !== State.Buffering) return
+    const poll = setInterval(getProgress, updateInterval || 1000)
+    return () => clearInterval(poll)
+  }, [playerState])
+
   return state
 }
