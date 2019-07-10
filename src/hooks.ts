@@ -70,16 +70,16 @@ export const useTrackPlayerEvents = (events: Event[], handler: Handler) => {
  * @param interval - ms interval
  */
 function useProgress(updateInterval?: number) {
-  const [state, setState] = useState({ position: 0, duration: 0, bufferedPosition: 0 })
+  const [state, setState] = useState({ position: 0, duration: 0, buffered: 0 })
   const playerState = usePlaybackState()
 
   const getProgress = async () => {
-    const [position, duration, bufferedPosition] = await Promise.all([
+    const [position, duration, buffered] = await Promise.all([
       TrackPlayer.getPosition(),
       TrackPlayer.getDuration(),
       TrackPlayer.getBufferedPosition(),
     ])
-    setState({ position, duration, bufferedPosition })
+    setState({ position, duration, buffered })
   }
 
   useEffect(() => {
