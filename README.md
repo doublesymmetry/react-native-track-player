@@ -1,3 +1,4 @@
+[![downloads](https://img.shields.io/npm/dw/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player)
 [![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player) 
 [![discord](https://img.shields.io/discord/567636850513018880.svg)](https://discordapp.com/invite/zRbdGZ)
 # react-native-track-player
@@ -84,7 +85,7 @@ TrackPlayer.setupPlayer().then(async () => {
 [David Chavez](https://github.com/dcvz) & [Guilherme Chaguri](https://github.com/Guichaguri)
 
 ## Community
-You can find us as part of the [React Native Folks](https://discordapp.com/invite/zRbdGZ) Discord in the `#react-native-track- player` channel.
+You can find us as part of the [React Native Folks](https://discordapp.com/invite/zRbdGZ) Discord in the `#react-native-track-player` channel.
 
 ## Support the development
 Support the further development of this and other libraries.
