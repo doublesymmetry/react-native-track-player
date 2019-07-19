@@ -32,6 +32,7 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
     protected final Context context;
     protected final MusicManager manager;
     protected final T player;
+    public Boolean isEarPiece = false;
 
     protected List<Track> queue = Collections.synchronizedList(new ArrayList<>());
 
@@ -131,8 +132,15 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
     }
 
     public void play() {
+        isEarPiece = false;
         player.setPlayWhenReady(true);
     }
+
+    public void playWithEarPiece() {
+        isEarPiece = true;
+        player.setPlayWhenReady(true);
+    }
+
 
     public void pause() {
         player.setPlayWhenReady(false);
@@ -291,7 +299,11 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
 
         if(state != previousState) {
             if(Utils.isPlaying(state) && !Utils.isPlaying(previousState)) {
-                manager.onPlay();
+                if (isEarPiece) {
+                    manager.onPlayWithEarPiece();
+                } else {
+                    manager.onPlay();
+                }
             } else if(Utils.isPaused(state) && !Utils.isPaused(previousState)) {
                 manager.onPause();
             } else if(Utils.isStopped(state) && !Utils.isStopped(previousState)) {

@@ -124,6 +124,10 @@ export enum Event {
   RemoteLike = 'remote-like',
   RemoteDislike = 'remote-dislike',
   RemoteBookmark = 'remote-bookmark',
+  HeadsetPluggedIn = 'headset-plugged-in',
+  HeadsetPluggedOut = 'headset-plugged-out',
+  BluetoothConnected = 'bluetooth-connected',
+  BluetoothDisconnected = 'bluetooth-disconnected',
 }
 
 export enum TrackType {

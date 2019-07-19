@@ -22,6 +22,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
+import android.media.AudioManager;
+import android.bluetooth.BluetoothHeadset;
+
 /**
  * @author Guichaguri
  */
@@ -48,8 +51,13 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
         ReactContext context = getReactApplicationContext();
         LocalBroadcastManager manager = LocalBroadcastManager.getInstance(context);
 
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(AudioManager.ACTION_HEADSET_PLUG);
+        filter.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED);
+        filter.addAction(Utils.EVENT_INTENT);
+
         eventHandler = new MusicEvents(context);
-        manager.registerReceiver(eventHandler, new IntentFilter(Utils.EVENT_INTENT));
+        manager.registerReceiver(eventHandler, filter);
     }
 
     @Override
@@ -314,6 +322,14 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     public void play(final Promise callback) {
         waitForConnection(() -> {
             binder.getPlayback().play();
+            callback.resolve(null);
+        });
+    }
+
+    @ReactMethod
+    public void playWithEarPiece(final Promise callback) {
+        waitForConnection(() -> {
+            binder.getPlayback().playWithEarPiece();
             callback.resolve(null);
         });
     }

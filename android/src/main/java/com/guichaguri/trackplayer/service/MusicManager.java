@@ -156,6 +156,42 @@ public class MusicManager implements OnAudioFocusChangeListener {
             if(!Utils.isLocal(track.uri)) {
                 if(!wifiLock.isHeld()) wifiLock.acquire();
             }
+        } else {
+            AudioManager manager = (AudioManager) service.getSystemService(Context.AUDIO_SERVICE);
+            manager.setSpeakerphoneOn(true);
+            manager.setMode(AudioManager.MODE_NORMAL);
+            metadata.getSession().setPlaybackToLocal(AudioManager.STREAM_MUSIC);
+        }
+
+        metadata.setActive(true);
+    }
+
+    @SuppressLint("WakelockTimeout")
+    public void onPlayWithEarPiece() {
+        Log.d(Utils.LOG, "onPlayWithEarPiece");
+        if(playback == null) return;
+
+        Track track = playback.getCurrentTrack();
+        if(track == null) return;
+
+        if(!playback.isRemote()) {
+            requestFocus();
+
+            if(!receivingNoisyEvents) {
+                service.registerReceiver(noisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
+                receivingNoisyEvents = true;
+            }
+
+            if(!wakeLock.isHeld()) wakeLock.acquire();
+
+            if(!Utils.isLocal(track.uri)) {
+                if(!wifiLock.isHeld()) wifiLock.acquire();
+            }
+        } else {
+            AudioManager manager = (AudioManager) service.getSystemService(Context.AUDIO_SERVICE);
+            manager.setSpeakerphoneOn(false);
+            manager.setMode(AudioManager.MODE_IN_CALL);
+            metadata.getSession().setPlaybackToLocal(AudioManager.STREAM_VOICE_CALL);
         }
 
         metadata.setActive(true);

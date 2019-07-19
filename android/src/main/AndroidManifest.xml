@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
 
     <application>
 
@@ -20,6 +22,14 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
+         <receiver android:name=".BluetoothBroadcastReceiver">
+                <intent-filter>
+                    <action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />
+                    <action android:name="android.bluetooth.adapter.action.CONNECTION_STATE_CHANGED" />
+                    <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
+                    <action android:name="android.bluetooth.device.action.ACL_DISCONNECTED" />
+                </intent-filter>
+         </receiver>
 
     </application>
 
