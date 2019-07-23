@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
@@ -11,6 +12,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEm
 
 import android.media.AudioManager;
 import android.bluetooth.BluetoothHeadset;
+import com.guichaguri.trackplayer.service.Utils;
 
 /**
  * @author Guichaguri
@@ -57,38 +59,10 @@ public class MusicEvents extends BroadcastReceiver {
         String event = intent.getStringExtra("event");
         Bundle data = intent.getBundleExtra("data");
 
-        String action = intent.getAction();
-     
         WritableMap map = data != null ? Arguments.fromBundle(data) : null;
 
-        if (action == "android.intent.action.HEADSET_PLUG") {
-            switch (intent.getIntExtra("state", -1)) {
-            case 0:
-                reactContext.getJSModule(RCTDeviceEventEmitter.class).emit(HEADSET_PLUGGED_OUT, map);
-                break;
-            case 1:
-                reactContext.getJSModule(RCTDeviceEventEmitter.class).emit(HEADSET_PLUGGED_IN, map);
-                break;
-            default:
-                break;
-            }
-        } else if (action == "android.bluetooth.headset.profile.action.CONNECTION_STATE_CHANGED") {
-            switch (intent.getIntExtra(BluetoothHeadset.EXTRA_STATE, BluetoothHeadset.STATE_DISCONNECTED)) {
+        reactContext.getJSModule(RCTDeviceEventEmitter.class).emit(event, map);
 
-            case BluetoothHeadset.STATE_CONNECTED:
-                reactContext.getJSModule(RCTDeviceEventEmitter.class).emit(BLUETOOTH_CONNECTED, map);
-                break;
-            case BluetoothHeadset.STATE_DISCONNECTED:
-                reactContext.getJSModule(RCTDeviceEventEmitter.class).emit(BLUETOOTH_DISCONNECTED, map);
-                break;
-            default:
-                break;
-            }
-
-        } else {
-            reactContext.getJSModule(RCTDeviceEventEmitter.class).emit(event, map);
-
-        }
     }
 
 }

@@ -92,6 +92,11 @@ public class RNTrackPlayer: RCTEventEmitter {
             "remote-like",
             "remote-dislike",
             "remote-bookmark",
+
+            "headset-plugged-in",
+            "headset-plugged-out",
+            "bluetooth-connected",
+            "bluetooth-disconnected",
         ]
     }
     

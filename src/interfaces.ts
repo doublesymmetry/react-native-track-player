@@ -128,6 +128,7 @@ export enum Event {
   HeadsetPluggedOut = 'headset-plugged-out',
   BluetoothConnected = 'bluetooth-connected',
   BluetoothDisconnected = 'bluetooth-disconnected',
+
 }
 
 export enum TrackType {

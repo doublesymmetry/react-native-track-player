@@ -117,8 +117,8 @@ async function play(): Promise<void> {
   return TrackPlayer.play()
 }
 
-async function playWithEarpiece(): Promise<void> {
-  return TrackPlayer.playWithEarpiece()
+async function playWithEarPiece(): Promise<void> {
+  return TrackPlayer.playWithEarPiece()
 }
 
 async function pause(): Promise<void> {
@@ -202,7 +202,7 @@ export default {
   // MARK: Playback API
   reset,
   play,
-  playWithEarpiece,
+  playWithEarPiece,
   pause,
   stop,
   seekTo,

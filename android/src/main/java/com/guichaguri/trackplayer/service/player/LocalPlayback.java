@@ -25,6 +25,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import android.media.AudioManager;
+import android.bluetooth.BluetoothHeadset;
+
 /**
  * @author Guichaguri
  */
@@ -43,7 +46,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
 
     @Override
     public void initialize() {
-        if(cacheMaxSize > 0) {
+        if (cacheMaxSize > 0) {
             File cacheDir = new File(context.getCacheDir(), "TrackPlayer");
             DatabaseProvider db = new ExoDatabaseProvider(context);
             cache = new SimpleCache(cacheDir, new LeastRecentlyUsedCacheEvictor(cacheMaxSize), db);
@@ -57,13 +60,14 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     }
 
     public DataSource.Factory enableCaching(DataSource.Factory ds) {
-        if(cache == null || cacheMaxSize <= 0) return ds;
+        if (cache == null || cacheMaxSize <= 0)
+            return ds;
 
         return new CacheDataSourceFactory(cache, ds, CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR);
     }
 
     private void prepare() {
-        if(!prepared) {
+        if (!prepared) {
             Log.d(Utils.LOG, "Preparing the media source...");
             player.prepare(source, false, false);
             prepared = true;
@@ -83,7 +87,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     public void add(Collection<Track> tracks, int index, Promise promise) {
         List<MediaSource> trackList = new ArrayList<>();
 
-        for(Track track : tracks) {
+        for (Track track : tracks) {
             trackList.add(track.toMediaSource(context, this));
         }
 
@@ -100,19 +104,20 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
         // Sort the list so we can loop through sequentially
         Collections.sort(indexes);
 
-        for(int i = indexes.size() - 1; i >= 0; i--) {
+        for (int i = indexes.size() - 1; i >= 0; i--) {
             int index = indexes.get(i);
 
             // Skip indexes that are the current track or are out of bounds
-            if(index == currentIndex || index < 0 || index >= queue.size()) {
+            if (index == currentIndex || index < 0 || index >= queue.size()) {
                 // Resolve the promise when the last index is invalid
-                if(i == 0) promise.resolve(null);
+                if (i == 0)
+                    promise.resolve(null);
                 continue;
             }
 
             queue.remove(index);
 
-            if(i == 0) {
+            if (i == 0) {
                 source.removeMediaSource(index, manager.getHandler(), Utils.toRunnable(promise));
             } else {
                 source.removeMediaSource(index);
@@ -123,7 +128,8 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     @Override
     public void removeUpcomingTracks() {
         int currentIndex = player.getCurrentWindowIndex();
-        if (currentIndex == C.INDEX_UNSET) return;
+        if (currentIndex == C.INDEX_UNSET)
+            return;
 
         for (int i = queue.size() - 1; i > currentIndex; i--) {
             queue.remove(i);
@@ -148,6 +154,12 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     public void play() {
         prepare();
         super.play();
+    }
+
+    @Override
+    public void playWithEarPiece() {
+        prepare();
+        super.playWithEarPiece();
     }
 
     @Override
@@ -185,7 +197,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        if(playbackState == Player.STATE_ENDED) {
+        if (playbackState == Player.STATE_ENDED) {
             prepared = false;
         }
 
@@ -202,11 +214,11 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     public void destroy() {
         super.destroy();
 
-        if(cache != null) {
+        if (cache != null) {
             try {
                 cache.release();
                 cache = null;
-            } catch(Exception ex) {
+            } catch (Exception ex) {
                 Log.w(Utils.LOG, "Couldn't release the cache properly", ex);
             }
         }
