@@ -15,6 +15,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     // MARK: - Attributes
     
     private var hasInitialized = false
+    
 
     private lazy var player: QueuedAudioPlayer = {
         let player = QueuedAudioPlayer()
@@ -100,7 +101,33 @@ public class RNTrackPlayer: RCTEventEmitter {
         ]
     }
     
+    
+    func lookingOutputs() {
+        let outputs = AVAudioSession.sharedInstance().currentRoute.outputs
+        for output in outputs{
+            if output.portType == AVAudioSession.Port.headphones {
+                self.sendEvent(withName: "headset-plugged-in", body: nil)
+            }
+            else if (output.portType == AVAudioSession.Port.bluetoothHFP || output.portType == AVAudioSession.Port.bluetoothA2DP || output.portType == AVAudioSession.Port.bluetoothLE) {
+                self.sendEvent(withName: "bluetooth-connected", body: nil)
+            }
+            
+        }
+    }
+    
+    func setupHeadsetHandling() {
+         lookingOutputs()
+        let notificationCenter = NotificationCenter.default
+        notificationCenter.removeObserver(self)
+        notificationCenter.addObserver(self,
+                                       selector: #selector(handleHeadset),
+                                       name: AVAudioSession.routeChangeNotification,
+                                       object: nil)
+    }
+    
+    
     func setupInterruptionHandling() {
+       
         let notificationCenter = NotificationCenter.default
         notificationCenter.removeObserver(self)
         notificationCenter.addObserver(self,
@@ -139,6 +166,23 @@ public class RNTrackPlayer: RCTEventEmitter {
         }
     }
 
+    
+    @objc func handleHeadset(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+            let typeValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt else {
+                return
+        
+        }
+        if typeValue == AVAudioSession.RouteChangeReason.newDeviceAvailable.rawValue {
+           lookingOutputs()
+        }
+        else if typeValue == AVAudioSession.RouteChangeReason.oldDeviceUnavailable.rawValue{
+            self.sendEvent(withName: "headset-plugged-out", body: nil)
+            self.sendEvent(withName: "bluetooth-disconnected", body: nil)
+        }
+    }
+    
+    
     // MARK: - Bridged Methods
     
     @objc(setupPlayer:resolver:rejecter:)
@@ -149,6 +193,7 @@ public class RNTrackPlayer: RCTEventEmitter {
         }
         
         setupInterruptionHandling();
+        setupHeadsetHandling();
 
         // configure if player waits to play
         let autoWait: Bool = config["waitForBuffer"] as? Bool ?? false
@@ -440,6 +485,16 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(play:rejecter:)
     public func play(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Starting/Resuming playback")
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+        try? AVAudioSession.sharedInstance().setActive(true)
+        player.play()
+        resolve(NSNull())
+    }
+    
+    @objc(playWithEarPiece:rejecter:)
+    public func playWithEarPiece(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        print("Starting/Resuming playback")
+        try? AVAudioSession.sharedInstance().setCategory(.playAndRecord, mode: .voiceChat)
         try? AVAudioSession.sharedInstance().setActive(true)
         player.play()
         resolve(NSNull())
