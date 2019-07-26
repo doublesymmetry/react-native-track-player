@@ -3,11 +3,11 @@ package com.guichaguri.trackplayer.service.player;
 import android.content.Context;
 import android.util.Log;
 import com.facebook.react.bridge.Promise;
-import android.media.AudioAttributes;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.audio.AudioAttributes;
 import com.google.android.exoplayer2.database.DatabaseProvider;
 import com.google.android.exoplayer2.database.ExoDatabaseProvider;
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
@@ -153,17 +153,21 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
 
     @Override
     public void play() {
-        prepare();
-        player.setAudioAttributes(new com.google.android.exoplayer2.audio.AudioAttributes.Builder()
-        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).setUsage(AudioAttributes.USAGE_MEDIA).build());
+        manager.switchSpeakerOn();
+        player.setAudioAttributes(
+                new AudioAttributes.Builder().setContentType(C.CONTENT_TYPE_MUSIC).setUsage(C.USAGE_MEDIA).build(),
+                false);
+                prepare();
+
         super.play();
     }
 
     @Override
     public void playWithEarPiece() {
+        manager.switchSpeakerOff();
+        player.setAudioAttributes(new AudioAttributes.Builder().setContentType(C.CONTENT_TYPE_SPEECH)
+                .setUsage(C.USAGE_VOICE_COMMUNICATION).build(), false);
         prepare();
-        player.setAudioAttributes(new com.google.android.exoplayer2.audio.AudioAttributes.Builder()
-        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH).setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION).build());
         super.playWithEarPiece();
     }
 

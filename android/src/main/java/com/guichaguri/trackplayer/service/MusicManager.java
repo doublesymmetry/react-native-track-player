@@ -146,6 +146,21 @@ public class MusicManager implements OnAudioFocusChangeListener {
         return service.handler;
     }
 
+    public void switchSpeakerOn() {
+        AudioManager manager = (AudioManager) service.getSystemService(Context.AUDIO_SERVICE);
+        manager.setSpeakerphoneOn(true);
+        manager.setMode(AudioManager.MODE_NORMAL);
+        metadata.getSession().setPlaybackToLocal(AudioManager.STREAM_MUSIC);
+
+    }
+
+    public void switchSpeakerOff() {
+        AudioManager manager = (AudioManager) service.getSystemService(Context.AUDIO_SERVICE);
+        manager.setSpeakerphoneOn(false);
+        manager.setMode(AudioManager.MODE_IN_CALL);
+        metadata.getSession().setPlaybackToLocal(AudioManager.STREAM_VOICE_CALL);
+    }
+
     public void switchPlayback(ExoPlayback playback) {
         if (this.playback != null) {
             this.playback.stop();
