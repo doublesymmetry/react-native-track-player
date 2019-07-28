@@ -36,8 +36,9 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     private ConcatenatingMediaSource source;
     private boolean prepared = false;
 
-    public LocalPlayback(Context context, MusicManager manager, SimpleExoPlayer player, long maxCacheSize) {
-        super(context, manager, player);
+    public LocalPlayback(Context context, MusicManager manager, SimpleExoPlayer player, long maxCacheSize,
+                         boolean autoUpdateMetadata) {
+        super(context, manager, player, autoUpdateMetadata);
         this.cacheMaxSize = maxCacheSize;
     }
 
