@@ -200,5 +200,13 @@ declare namespace RNTrackPlayer {
   export const PITCH_ALGORITHM_LINEAR: PitchAlgorithm;
   export const PITCH_ALGORITHM_MUSIC: PitchAlgorithm;
   export const PITCH_ALGORITHM_VOICE: PitchAlgorithm;
+  
+  // Hooks
+  export function usePlaybackState(): State
+  export function useTrackPlayerEvents(): void
+  export function useInterval(): void
+  export function useWhenPlaybackStateChanges(): void
+  export function usePlaybackStateIs(): boolean
+  export function useTrackPlayerProgress(): ProgressComponentState
 
 }
