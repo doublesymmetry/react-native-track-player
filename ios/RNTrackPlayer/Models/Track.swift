@@ -10,7 +10,7 @@ import Foundation
 import MediaPlayer
 import AVFoundation
 
-class Track: NSObject, AudioItem, TimePitching, Authorizing {
+class Track: NSObject, AudioItem, InitialTiming, TimePitching, Authorizing {
     let id: String
     let url: MediaURL
     
@@ -22,6 +22,7 @@ class Track: NSObject, AudioItem, TimePitching, Authorizing {
     var genre: String?
     var duration: Double?
     var skipped: Bool = false
+    var initialTime: TimeInterval = 0.0;
     var artworkURL: MediaURL?
     let headers: [String: Any]?
     let pitchAlgorithm: String?
@@ -51,7 +52,10 @@ class Track: NSObject, AudioItem, TimePitching, Authorizing {
         self.headers = dictionary["headers"] as? [String: Any]
         self.artworkURL = MediaURL(object: dictionary["artwork"])
         self.pitchAlgorithm = dictionary["pitchAlgorithm"] as? String
-        
+        let initialTime = dictionary["initialTime"] as? Double        
+        if let x = initialTime {
+            self.initialTime = x
+        }
         self.originalObject = dictionary
     }
     
@@ -75,7 +79,11 @@ class Track: NSObject, AudioItem, TimePitching, Authorizing {
         
         self.originalObject = self.originalObject.merging(dictionary) { (_, new) in new }
     }
-    
+    // MARK: - InitialTiming Protocol
+    func getInitialTime() -> TimeInterval {
+        return initialTime
+    }
+
     // MARK: - AudioItem Protocol
     
     func getSourceUrl() -> String {
