@@ -11,6 +11,7 @@ import com.google.android.exoplayer2.database.DatabaseProvider;
 import com.google.android.exoplayer2.database.ExoDatabaseProvider;
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.ShuffleOrder;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
@@ -20,10 +21,7 @@ import com.guichaguri.trackplayer.service.MusicManager;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.models.Track;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Guichaguri
@@ -127,6 +125,12 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     }
 
     @Override
+    public void move(int index, int newIndex, Promise promise) {
+        queue.add(newIndex, queue.remove(index));
+        source.moveMediaSource(index, newIndex, manager.getHandler(), Utils.toRunnable(promise));
+    }
+
+    @Override
     public void removeUpcomingTracks() {
         int currentIndex = player.getCurrentWindowIndex();
         if (currentIndex == C.INDEX_UNSET) return;
@@ -135,6 +139,35 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
             queue.remove(i);
             source.removeMediaSource(i);
         }
+    }
+
+    @Override
+    public void shuffle(final Promise promise) {
+        Random rand = new Random();
+        int length = queue.size();
+
+        // Fisher-Yates shuffle
+        for (int i = 0; i < length; i++) {
+            int swapIndex = rand.nextInt(i + 1);
+
+            queue.add(swapIndex, queue.remove(i));
+
+            if (length - 1 == i) {
+                // Resolve the promise after the last move command
+                source.moveMediaSource(i, swapIndex, manager.getHandler(), Utils.toRunnable(promise));
+            } else {
+                source.moveMediaSource(i, swapIndex);
+            }
+        }
+    }
+
+    @Override
+    public void setRepeatMode(int repeatMode) {
+        player.setRepeatMode(repeatMode);
+    }
+
+    public int getRepeatMode() {
+        return player.getRepeatMode();
     }
 
     private void resetQueue() {
