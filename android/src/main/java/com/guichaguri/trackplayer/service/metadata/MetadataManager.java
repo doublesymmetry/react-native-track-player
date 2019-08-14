@@ -138,16 +138,16 @@ public class MetadataManager {
         }
 
         // Update the color
-        builder.setColor(options.getInt("color", NotificationCompat.COLOR_DEFAULT));
+        builder.setColor(Utils.getInt(options, "color", NotificationCompat.COLOR_DEFAULT));
 
         // Update the icon
         builder.setSmallIcon(getIcon(options, "icon", R.drawable.play));
 
         // Update the jump interval
-        jumpInterval = options.getInt("jumpInterval", 15);
+        jumpInterval = Utils.getInt(options, "jumpInterval", 15);
 
         // Update the rating type
-        ratingType = options.getInt("ratingType", RatingCompat.RATING_NONE);
+        ratingType = Utils.getInt(options, "ratingType", RatingCompat.RATING_NONE);
         session.setRatingType(ratingType);
 
         updateNotification();
