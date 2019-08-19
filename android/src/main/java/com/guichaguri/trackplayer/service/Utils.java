@@ -149,12 +149,10 @@ public class Utils {
         }
     }
 
-    private int getInt(Bundle data, String key, int defaultValue) {
-        Object valueAsObject = data.get(key);
-        if (valueAsObject instanceof Integer) {
-            return data.getInt(key, defaultValue);
-        } else if (valueAsObject instanceof Double) {
-            return (int) data.getDouble(key, defaultValue);
+    public static int getInt(Bundle data, String key, int defaultValue) {
+        Object value = data.get(key);
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
         }
         return defaultValue;
     }
