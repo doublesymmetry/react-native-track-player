@@ -1,3 +1,3 @@
 [submodule "ios/RNTrackPlayer/Vendor/AudioPlayer"]
 	path = ios/RNTrackPlayer/Vendor/AudioPlayer
-	url = https://florianalbrecht@github.com/florianalbrecht/SwiftAudio
+	url = https://github.com/florianalbrecht/SwiftAudio.git
