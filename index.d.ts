@@ -73,6 +73,7 @@ declare namespace RNTrackPlayer {
   export interface PlayerOptions {
     minBuffer?: number;
     maxBuffer?: number;
+    prioritizeTimeOverSize?: boolean;
     playBuffer?: number;
     maxCacheSize?: number;
     iosCategory?: 'playback' | 'playAndRecord' | 'multiRoute' | 'ambient' | 'soloAmbient' | 'record';

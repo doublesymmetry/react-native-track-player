@@ -106,6 +106,7 @@ If the player is already initialized, the promise will resolve instantly.
 | options              | `object` | The options   | 
 | options.minBuffer    | `number` | Minimum time in seconds that needs to be buffered | 15 | ✓ | ✗ | ✗ |
 | options.maxBuffer    | `number` | Maximum time in seconds that needs to be buffered | 50 | ✓ | ✗ | ✗ |
+| options.prioritizeTimeOverSize | `boolean` | Whether buffer cache should prioritize time settings over size. If you're setting `minBuffer`, you probably want to set this to `true`. | false | ✓ | ✗ | ✗ |
 | options.playBuffer   | `number` | Minimum time in seconds that needs to be buffered to start playing | 2.5 | ✓ | ✗ | ✗ |
 | options.backBuffer   | `number` | Time in seconds that should be kept in the buffer behind the current playhead time. | 0 | ✓ | ✗ | ✗ |
 | options.maxCacheSize | `number` | Maximum cache size in kilobytes | 0 | ✓ | ✗ | ✗ |
