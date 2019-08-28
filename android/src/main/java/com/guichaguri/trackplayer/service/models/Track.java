@@ -8,6 +8,7 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat.QueueItem;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.source.ClippingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
@@ -27,11 +28,15 @@ import java.util.List;
 import java.util.Map;
 
 import static android.support.v4.media.MediaMetadataCompat.*;
+import static com.google.android.exoplayer2.C.TIME_END_OF_SOURCE;
 
 /**
  * @author Guichaguri
  */
 public class Track {
+
+    // Multiplier to convert seconds to microseconds.
+    private static final long SEC_TO_US = 1000000;
 
     public static List<Track> createTracks(Context context, List objects, int ratingType) {
         List<Track> tracks = new ArrayList<>();
@@ -64,6 +69,7 @@ public class Track {
     public String date;
     public String genre;
     public long duration;
+    public long startPositionSec;
     public Bundle originalItem;
 
     public RatingCompat rating;
@@ -84,6 +90,7 @@ public class Track {
         }
 
         String trackType = bundle.getString("type", "default");
+        startPositionSec = Utils.getInt(bundle,"startPositionSec", 0);
 
         for(TrackType t : TrackType.values()) {
             if(t.name.equalsIgnoreCase(trackType)) {
@@ -209,20 +216,30 @@ public class Track {
 
         }
 
+        MediaSource mediaSource;
         switch(type) {
             case DASH:
-                return new DashMediaSource.Factory(new DefaultDashChunkSource.Factory(ds), ds)
+                mediaSource = new DashMediaSource.Factory(new DefaultDashChunkSource.Factory(ds), ds)
                         .createMediaSource(uri);
             case HLS:
-                return new HlsMediaSource.Factory(ds)
+                mediaSource = new HlsMediaSource.Factory(ds)
                         .createMediaSource(uri);
             case SMOOTH_STREAMING:
-                return new SsMediaSource.Factory(new DefaultSsChunkSource.Factory(ds), ds)
+                mediaSource = new SsMediaSource.Factory(new DefaultSsChunkSource.Factory(ds), ds)
                         .createMediaSource(uri);
             default:
-                return new ProgressiveMediaSource.Factory(ds, new DefaultExtractorsFactory()
+                mediaSource = new ProgressiveMediaSource.Factory(ds, new DefaultExtractorsFactory()
                         .setConstantBitrateSeekingEnabled(true))
                         .createMediaSource(uri);
+        }
+
+        if (startPositionSec > 0) {
+            return new ClippingMediaSource(
+                    mediaSource,
+                    startPositionSec * SEC_TO_US,
+                    TIME_END_OF_SOURCE);
+        } else {
+            return mediaSource;
         }
     }
 }

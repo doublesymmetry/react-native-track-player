@@ -68,6 +68,7 @@ declare namespace RNTrackPlayer {
     contentType?: string;
     pitchAlgorithm?: PitchAlgorithm;
     [key: string]: any;
+    startPositionSec: number;
   }
 
   export interface PlayerOptions {
