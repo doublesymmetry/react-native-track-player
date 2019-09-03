@@ -23,7 +23,7 @@ class Track: NSObject, AudioItem, InitialTiming, TimePitching, Authorizing {
     var duration: Double?
     var skipped: Bool = false
     var artworkURL: MediaURL?
-    var startPositionSec: TimeInterval = 0.0
+    var initialTime: TimeInterval = 0.0
     let headers: [String: Any]?
     let pitchAlgorithm: String?
     
@@ -51,9 +51,9 @@ class Track: NSObject, AudioItem, InitialTiming, TimePitching, Authorizing {
         self.duration = dictionary["duration"] as? Double
         self.headers = dictionary["headers"] as? [String: Any]
         self.artworkURL = MediaURL(object: dictionary["artwork"])
-        let startPositionSec = dictionary["startPositionSec"] as? Double
-        if let x = startPositionSec {
-            self.startPositionSec = x
+        let initialTime = dictionary["initialTime"] as? Double
+        if let x = initialTime {
+            self.initialTime = x
         }
         self.pitchAlgorithm = dictionary["pitchAlgorithm"] as? String
         
@@ -144,6 +144,6 @@ class Track: NSObject, AudioItem, InitialTiming, TimePitching, Authorizing {
     
     // MARK: - InitialTiming Protocol
     func getInitialTime() -> TimeInterval {
-        return startPositionSec
+        return initialTime
     }
 }
