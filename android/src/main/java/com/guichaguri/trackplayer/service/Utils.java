@@ -16,6 +16,8 @@ import com.google.android.exoplayer2.upstream.RawResourceDataSource;
  */
 public class Utils {
 
+    public static final int NOTIFICATION_ID = 87225752;
+    public static final String SERVICE_NAME = "trackplayer-playback";
     public static final String EVENT_INTENT = "com.guichaguri.trackplayer.event";
     public static final String CONNECT_INTENT = "com.guichaguri.trackplayer.connect";
     public static final String NOTIFICATION_CHANNEL = "com.guichaguri.trackplayer";
