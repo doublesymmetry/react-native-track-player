@@ -106,6 +106,7 @@ public class MusicService extends HeadlessJsTaskService {
 
         this.createWifiLock();
         this.newWakeLock();
+
     }
 
     @Nullable
