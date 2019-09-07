@@ -9,13 +9,9 @@ import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
-import android.net.wifi.WifiManager;
-import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
 import androidx.annotation.RequiresApi;
 import android.util.Log;
 import com.google.android.exoplayer2.C;
@@ -40,9 +36,6 @@ public class MusicManager implements OnAudioFocusChangeListener {
 
     private final MusicService service;
 
-    private final WakeLock wakeLock;
-    private final WifiLock wifiLock;
-
     private MetadataManager metadata;
     private ExoPlayback playback;
 
@@ -62,19 +55,9 @@ public class MusicManager implements OnAudioFocusChangeListener {
     private boolean stopWithApp = false;
     private boolean alwaysPauseOnInterruption = false;
 
-    @SuppressLint("InvalidWakeLockTag")
     public MusicManager(MusicService service) {
         this.service = service;
         this.metadata = new MetadataManager(service, this);
-
-        PowerManager powerManager = (PowerManager)service.getSystemService(Context.POWER_SERVICE);
-        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "track-player-wake-lock");
-        wakeLock.setReferenceCounted(false);
-
-        // Android 7: Use the application context here to prevent any memory leaks
-        WifiManager wifiManager = (WifiManager)service.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        wifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, "track-player-wifi-lock");
-        wifiLock.setReferenceCounted(false);
     }
 
     public ExoPlayback getPlayback() {
@@ -135,7 +118,6 @@ public class MusicManager implements OnAudioFocusChangeListener {
         return new LocalPlayback(service, this, player, cacheMaxSize);
     }
 
-    @SuppressLint("WakelockTimeout")
     public void onPlay() {
         Log.d(Utils.LOG, "onPlay");
         if(playback == null) return;
@@ -151,11 +133,8 @@ public class MusicManager implements OnAudioFocusChangeListener {
                 receivingNoisyEvents = true;
             }
 
-            if(!wakeLock.isHeld()) wakeLock.acquire();
-
-            if(!Utils.isLocal(track.uri)) {
-                if(!wifiLock.isHeld()) wifiLock.acquire();
-            }
+            // Activate the wake and the wifi locks
+            service.lockServices(Utils.isLocal(track.uri));
         }
 
         metadata.setActive(true);
@@ -170,10 +149,6 @@ public class MusicManager implements OnAudioFocusChangeListener {
             receivingNoisyEvents = false;
         }
 
-        // Release the wake and the wifi locks
-        if(wakeLock.isHeld()) wakeLock.release();
-        if(wifiLock.isHeld()) wifiLock.release();
-
         metadata.setActive(true);
     }
 
@@ -181,8 +156,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
         Log.d(Utils.LOG, "onStop");
 
         // Release the wake and the wifi locks
-        if(wakeLock.isHeld()) wakeLock.release();
-        if(wifiLock.isHeld()) wifiLock.release();
+        service.unlockServices();
 
         abandonFocus();
 
@@ -352,7 +326,6 @@ public class MusicManager implements OnAudioFocusChangeListener {
         metadata.destroy();
 
         // Release the locks
-        if(wifiLock.isHeld()) wifiLock.release();
-        if(wakeLock.isHeld()) wakeLock.release();
+        service.unlockServices();
     }
 }
