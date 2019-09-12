@@ -80,15 +80,15 @@ declare namespace RNTrackPlayer {
     maxCacheSize?: number
     iosCategory?: 'playback' | 'playAndRecord' | 'multiRoute' | 'ambient' | 'soloAmbient' | 'record'
     iosCategoryMode?:
-      | 'default'
-      | 'gameChat'
-      | 'measurement'
-      | 'moviePlayback'
-      | 'spokenAudio'
-      | 'videoChat'
-      | 'videoRecording'
-      | 'voiceChat'
-      | 'voicePrompt'
+    | 'default'
+    | 'gameChat'
+    | 'measurement'
+    | 'moviePlayback'
+    | 'spokenAudio'
+    | 'videoChat'
+    | 'videoRecording'
+    | 'voiceChat'
+    | 'voicePrompt'
     iosCategoryOptions?: Array<
       | 'mixWithOthers'
       | 'duckOthers'
@@ -136,6 +136,7 @@ declare namespace RNTrackPlayer {
 
   export function setupPlayer(options?: PlayerOptions): Promise<void>
   export function destroy(): void
+  export function isServiceRunning(): Promise<boolean>
 
   // Player Queue Commands
 

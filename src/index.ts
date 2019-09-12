@@ -189,7 +189,7 @@ export default {
   updateOptions,
   registerPlaybackService,
   addEventListener,
-
+  isServiceRunning: TrackPlayer.isServiceRunning,
   // MARK: - Queue API
   add,
   remove,
