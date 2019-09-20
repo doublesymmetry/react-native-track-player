@@ -110,6 +110,10 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
                 continue;
             }
 
+            if(index < currentIndex) {
+                currentIndex = currentIndex - 1;
+                lastKnownWindow = lastKnownWindow - 1;
+            }
             queue.remove(index);
 
             if(i == 0) {
