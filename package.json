@@ -13,7 +13,7 @@
     "preversion": "yarn lint",
     "version": "yarn format && git add -A src",
     "postversion": "git push && git push --tags",
-    "postinstall": "grep url .gitmodules | sed 's/.*= //' | while read url; do git clone $url; done"
+    "postinstall": "git submodule update --init --recursive"
   },
   "files": [
     "lib/**/*",
