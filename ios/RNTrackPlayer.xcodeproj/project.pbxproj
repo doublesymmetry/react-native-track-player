@@ -222,7 +222,8 @@
 				9B18C30B226357930019375A /* RemoteCommandController */,
 				9B18C30F226357930019375A /* TimeEventFrequency.swift */,
 			);
-			path = AudioPlayer;
+			name = AudioPlayer;
+			path = AudioPlayer/SwiftAudio/Classes;
 			sourceTree = "<group>";
 		};
 		9BFBA4D31F3DFA4B00453D3A /* Support */ = {
@@ -436,13 +437,15 @@
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = B82TF96752;
+				HEADER_SEARCH_PATHS = "$(PODS_ROOT)/Headers/Public/React";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
+				PODS_ROOT = "\"${SRCROOT}/../../../ios/Pods\"";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "RNTrackPlayer/Support/RNTrackPlayer-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -453,12 +456,14 @@
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = B82TF96752;
+				HEADER_SEARCH_PATHS = "$(PODS_ROOT)/Headers/Public/React";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
+				PODS_ROOT = "\"${SRCROOT}/../../../ios/Pods\"";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "RNTrackPlayer/Support/RNTrackPlayer-Bridging-Header.h";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

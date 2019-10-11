@@ -6,7 +6,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.0'
+        classpath 'com.android.tools.build:gradle:3.4.0'
     }
 }
 
@@ -27,18 +27,15 @@ def safeExtGet(prop, fallback) {
 }
 
 android {
-    compileSdkVersion safeExtGet("compileSdkVersion", 27)
+    compileSdkVersion safeExtGet("compileSdkVersion", 28)
 
     defaultConfig {
         minSdkVersion safeExtGet("minSdkVersion", 16) // RN's minimum version
-        targetSdkVersion safeExtGet("targetSdkVersion", 27)
+        targetSdkVersion safeExtGet("targetSdkVersion", 28)
 
         versionCode 1
         versionName "1.0"
-        ndk {
-            abiFilters "armeabi-v7a", "x86"
-        }
-
+        
         consumerProguardFiles 'proguard-rules.txt'
     }
 
@@ -63,33 +60,36 @@ repositories {
 dependencies {
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'
+    
+    def exoPlayerVersion = safeExtGet("exoPlayerVersion", '2.10.1');
 
     // ExoPlayer Core
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.9.2'
+    implementation "com.google.android.exoplayer:exoplayer-core:${exoPlayerVersion}"
 
     // ExoPlayer DASH
     if (dash) {
-        implementation 'com.google.android.exoplayer:exoplayer-dash:2.9.2'
+        implementation "com.google.android.exoplayer:exoplayer-dash:${exoPlayerVersion}"
     } else {
-        compileOnly 'com.google.android.exoplayer:exoplayer-dash:2.9.2'
+        compileOnly "com.google.android.exoplayer:exoplayer-dash:${exoPlayerVersion}"
     }
 
     // ExoPlayer HLS
     if (hls) {
-        implementation 'com.google.android.exoplayer:exoplayer-hls:2.9.2'
+        implementation "com.google.android.exoplayer:exoplayer-hls:${exoPlayerVersion}"
     } else {
-        compileOnly 'com.google.android.exoplayer:exoplayer-hls:2.9.2'
+        compileOnly "com.google.android.exoplayer:exoplayer-hls:${exoPlayerVersion}"
     }
 
     // ExoPlayer SmoothStreaming
     if (smoothstreaming) {
-        implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.9.2'
+        implementation "com.google.android.exoplayer:exoplayer-smoothstreaming:${exoPlayerVersion}"
     } else {
-        compileOnly 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.9.2'
+        compileOnly "com.google.android.exoplayer:exoplayer-smoothstreaming:${exoPlayerVersion}"
     }
 
-    // Make sure we're using at least the support library 27.1.1
-    implementation "com.android.support:support-compat:${safeExtGet('supportLibVersion', '27.1.1')}"
-    implementation "com.android.support:support-media-compat:${safeExtGet('supportLibVersion', '27.1.1')}"
-    implementation 'com.github.bumptech.glide:glide:4.7.1'
+    // Make sure we're using androidx
+    implementation "androidx.core:core:1.2.0-alpha02"
+    implementation "androidx.media:media:1.1.0-rc01"
+    implementation "androidx.localbroadcastmanager:localbroadcastmanager:1.1.0-alpha01"
+    implementation "com.github.bumptech.glide:glide:4.7.1"
 }

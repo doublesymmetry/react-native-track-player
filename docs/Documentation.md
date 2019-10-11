@@ -27,6 +27,8 @@ permalink: /documentation/
 ### State
 #### `STATE_NONE`
 State indicating that no media is currently loaded
+#### `STATE_READY`
+State indicating that the player is ready to start playing
 #### `STATE_PLAYING`
 State indicating that the player is currently playing
 #### `STATE_PAUSED`
@@ -34,7 +36,9 @@ State indicating that the player is currently paused
 #### `STATE_STOPPED`
 State indicating that the player is currently stopped
 #### `STATE_BUFFERING`
-State indicating that the player is currently buffering
+State indicating that the player is currently buffering (in "play" state)
+#### `STATE_CONNECTING`
+State indicating that the player is currently buffering (in "pause" state)
 
 ### Rating
 #### `RATING_HEART`
@@ -105,6 +109,9 @@ If the player is already initialized, the promise will resolve instantly.
 | options.playBuffer   | `number` | Minimum time in seconds that needs to be buffered to start playing | 2.5 | ✓ | ✗ | ✗ |
 | options.backBuffer   | `number` | Time in seconds that should be kept in the buffer behind the current playhead time. | 0 | ✓ | ✗ | ✗ |
 | options.maxCacheSize | `number` | Maximum cache size in kilobytes | 0 | ✓ | ✗ | ✗ |
+| options.iosCategory  | `string` | [AVAudioSession.Category](https://developer.apple.com/documentation/avfoundation/avaudiosession/1616615-category) for iOS. Sets on `play()` | `playback` | ✗ | ✓ | ✗ |
+| options.iosCategoryOptions | `array` | [AVAudioSession.CategoryOptions](https://developer.apple.com/documentation/avfoundation/avaudiosession/1616503-categoryoptions) for iOS. Sets on `play()` | `[]` | ✗ | ✓ | ✗ |
+| options.iosCategoryMode  | `string` | [AVAudioSession.Mode](https://developer.apple.com/documentation/avfoundation/avaudiosession/1616508-mode) for iOS. Sets on `play()` | `default` | ✗ | ✓ | ✗ |
 
 #### `destroy()`
 Destroys the player, cleaning up its resources. After executing this function, you won't be able to use the player anymore, unless you call `setupPlayer()` again.
@@ -234,6 +241,7 @@ Some parameters are unused depending on platform.
 | options.ratingType | [Rating Constant](#rating) | The rating type | ✓ | ✗ | ✗ |
 | options.jumpInterval | `number` | The interval in seconds for the jump forward/backward buttons | ✓ | ✓ | ✓ |
 | options.stopWithApp | `boolean` | Whether the player will be destroyed when the app closes | ✓ | ✗ | ✗ |
+| options.alwaysPauseOnInterruption | `boolean` | Whether the `remote-duck` event will be triggered on every interruption | ✓ | ✗ | ✗ |
 | options.capabilities | `array` of [Capability Constants](#capability) | The media controls that will be enabled | ✓ | ✓ | ✓ |
 | options.notificationCapabilities | `array` of [Capability Constants](#capability) | The buttons that it will show in the notification. Defaults to `data.capabilities`  | ✓ | ✗ | ✗ |
 | options.compactCapabilities | `array` of [Capability Constants](#capability) | The buttons that it will show in the compact notification | ✓ | ✗ | ✗ |
@@ -290,6 +298,10 @@ Gets the playback rate, where 1 is the regular speed.
 #### `getDuration()`
 Gets the duration of the current track in seconds.
 
+Note: `react-native-track-player` is a streaming library, which means it slowly buffers the track and doesn't know exactly when it ends.
+The duration returned by this function is determined through various tricks and *may not be exact or may not be available at all*.
+We highly recommend you to retrieve the duration from a database and feed it to the `duration` parameter in the [Track Object](#track-object).
+
 **Returns:** `Promise<number>`
 
 #### `getPosition()`
@@ -308,6 +320,12 @@ Gets the state of the player.
 **Returns:** `Promise<`[State Constant](#state)`>`
 
 ## Events
+
+All event types are made available through the named export `TrackPlayerEventTypes`:
+
+```js
+import { TrackPlayerEventTypes } from 'react-native-track-player';
+```
 
 ### Media Controls
 
@@ -385,18 +403,19 @@ Fired when the user presses the jump backward button. Only fired if the `CAPABIL
 | interval | `number` | The number of seconds to jump backward. It's usually the `jumpInterval` set in the options. |
 
 #### `remote-duck`
-Fired when the device needs the player to pause or lower the volume for a short amount of time.
+Fired when the device needs the player to pause for a interruption.
+
+The volume may also be lowered on an transient interruption without triggering this event.
+If you want to receive those interruptions, set the `alwaysPauseOnInterruption` option to true.
 
 - When the event is triggered with `permanent` set to true, you should stop the playback.
-- When the event is triggered with `ducking` set to true, you should either lower the volume or pause the app. If it's a music app, you probably want to lower the volume, but if it's a podcast app, you probably want to pause it for a moment.
-- When the event is triggered with `paused` set to true, you should pause the playback. It will also be set to true in both cases described above.
-- When the event is triggered and none of them are set to true, you should resume the track and set the volume back to its original value.
+- When the event is triggered with `paused` set to true, you should pause the playback. It will also be set to true when `permanent` is true.
+- When the event is triggered and none of them are set to true, you should resume the track.
 
 | Param     | Type      | Description                                  |
 | --------- | --------- | -------------------------------------------- |
 | paused    | `boolean` | Whether the player should pause the playback |
 | permanent | `boolean` | Whether the player should stop the playback  |
-| ducking   | `boolean` | Whether the player should lower their volume |
 
 ### Player
 #### `playback-state`
@@ -422,6 +441,19 @@ Fired when the queue reaches the end.
 | -------- | -------- | ----------------------------------------- |
 | track    | `string` | The previous track id. Might be null      |
 | position | `number` | The previous track position in seconds    |
+
+#### `playback-metadata-received`
+Fired when the current track receives metadata encoded in. (e.g. ID3 tags or Icy Metadata).
+
+| Param    | Type     | Description                                         |
+| -------- | -------- | --------------------------------------------------- |
+| source   | `string` | The metadata source (`id3`, `icy` or `icy-headers`) |
+| title    | `string` | The track title. Might be null                      |
+| url      | `string` | The track url. Might be null                        |
+| artist   | `string` | The track artist. Might be null                     |
+| album    | `string` | The track album. Might be null                      |
+| date     | `string` | The track date. Might be null                       |
+| genre    | `string` | The track genre. Might be null                      |
 
 #### `playback-error`
 Fired when an error occurs.
@@ -469,8 +501,79 @@ Only the `id`, `url`, `title` and `artist` properties are required for basic pla
 | rating         | Depends on the [rating type](#rating)  | The track rating value |
 | artwork        | `string` or [Resource Object](#resource-object) | The artwork url |
 | pitchAlgorithm | [Pitch Algorithm](#pitch-algorithm) | The pitch algorithm |
+| headers        | `object`                    | An object containing all the headers to use in the HTTP request |
 
 ### Resource Object
 Resource objects are the result of `require`/`import` for files.
 
 For more information about Resource Objects, read the [Images](https://facebook.github.io/react-native/docs/images.html) section of the React Native documentation
+
+## React Hooks
+
+React v16.8 introduced [hooks](https://reactjs.org/docs/hooks-intro.html). If you are using a version of React Native that is before [v0.59.0](https://facebook.github.io/react-native/blog/2019/03/12/releasing-react-native-059), your React Native version does not support hooks. 
+
+#### useTrackPlayerEvents
+Register an event listener for one or more of the [events](#events) emitted by the TrackPlayer. The subscription is removed when the component unmounts.
+
+Check out the [events section](#events) for a full list of supported events.
+
+```jsx
+import React, { useState } from 'react';
+import { Text, View } from 'react-native';
+import { useTrackPlayerEvent, TrackPlayerEvents, STATE_PLAYING } from 'react-native-track-player';
+
+// Subscribing to the following events inside MyComponent
+const events = [
+  TrackPlayerEvents.PLAYBACK_STATE,
+  TrackPlayerEvents.PLAYBACK_ERROR
+];
+
+const MyComponent = () => {
+  const [playerState, setState] = useState(null)
+
+  useTrackPlayerEvents(events, (event) => {
+    if (event.type === TrackPlayerEvents.PLAYBACK_ERROR) {
+      console.warn('An error occurred while playing the current track.');
+    }
+    if (event.type === TrackPlayerEvents.PLAYBACK_STATE) {
+      setState(playbackState)
+    }
+  });
+
+  const isPlaying = playerState === STATE_PLAYING;
+
+  return (
+    <View>
+      <Text>The TrackPlayer is {isPlaying ? 'playing' : 'not playing'}</Text>
+    </View>
+  ); 
+};
+```
+
+#### useTrackPlayerProgress
+A hook alternative to the [Progress Component](#progresscomponent).
+
+| State            | Type     | Description                      |
+| ---------------- | -------- | -------------------------------- |
+| position         | `number` | The current position in seconds  |
+| bufferedPosition | `number` | The buffered position in seconds |
+| duration         | `number` | The duration in seconds          |
+
+`useTrackPlayerProgress` accepts an interval to set the rate (in miliseconds) to poll the track player's progress. The default value is `1000` or every second.
+
+```jsx
+import React from 'react';
+import { Text, View } from 'react-native';
+import { useTrackPlayerProgress } from 'react-native-track-player';
+
+const MyComponent = () => {
+  const { position, bufferedPosition, duration } = useTrackPlayerProgress()
+
+  return (
+    <View>
+      <Text>Track progress: {position} seconds out of {duration} total</Text>
+      <Text>Buffered progress: {bufferedPosition} seconds buffered out of {duration} total</Text>
+    </View>
+  )
+}
+```

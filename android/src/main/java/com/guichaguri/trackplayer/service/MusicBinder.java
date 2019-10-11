@@ -22,10 +22,6 @@ public class MusicBinder extends Binder {
         service.handler.post(r);
     }
 
-    public MusicManager getManager() {
-        return manager;
-    }
-
     public ExoPlayback getPlayback() {
         ExoPlayback playback = manager.getPlayback();
 
@@ -45,6 +41,7 @@ public class MusicBinder extends Binder {
 
     public void updateOptions(Bundle bundle) {
         manager.setStopWithApp(bundle.getBoolean("stopWithApp", false));
+        manager.setAlwaysPauseOnInterruption(bundle.getBoolean("alwaysPauseOnInterruption", false));
         manager.getMetadata().updateOptions(bundle);
     }
 
