@@ -61,7 +61,7 @@ dependencies {
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'
     
-    def exoPlayerVersion = safeExtGet("exoPlayerVersion", '2.10.1');
+    def exoPlayerVersion = safeExtGet("exoPlayerVersion", '2.10.1')
 
     // ExoPlayer Core
     implementation "com.google.android.exoplayer:exoplayer-core:${exoPlayerVersion}"
@@ -88,8 +88,8 @@ dependencies {
     }
 
     // Make sure we're using androidx
-    implementation "androidx.core:core:1.2.0-alpha02"
-    implementation "androidx.media:media:1.1.0-rc01"
+    implementation "androidx.core:core:1.2.0-beta01"
+    implementation "androidx.media:media:1.1.0"
     implementation "androidx.localbroadcastmanager:localbroadcastmanager:1.1.0-alpha01"
     implementation "com.github.bumptech.glide:glide:4.7.1"
 }

@@ -321,10 +321,10 @@ Gets the state of the player.
 
 ## Events
 
-All event types are made available through the named export `TrackPlayerEventTypes`:
+All event types are made available through the named export `TrackPlayerEvents`:
 
 ```js
-import { TrackPlayerEventTypes } from 'react-native-track-player';
+import { TrackPlayerEvents } from 'react-native-track-player';
 ```
 
 ### Media Controls
