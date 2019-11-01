@@ -2,12 +2,13 @@ package com.guichaguri.trackplayer.service;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.media.session.MediaButtonReceiver;
@@ -26,7 +27,19 @@ public class MusicService extends HeadlessJsTaskService {
 
     MusicManager manager;
     Handler handler;
-    private NotificationCompat.Builder builder;
+
+    @Override
+    public void onCreate(){
+        super.onCreate();
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel channel = new NotificationChannel(Utils.NOTIFICATION_CHANNEL,"MusicService",
+                    NotificationManager.IMPORTANCE_LOW);
+            channel.setShowBadge(false);
+            channel.setSound(null, null);
+            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+        }
+    }
 
     @Nullable
     @Override
@@ -74,26 +87,14 @@ public class MusicService extends HeadlessJsTaskService {
 
             // Checks whether there is a React activity
             if(reactContext == null || !reactContext.hasCurrentActivity()) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    if(builder == null) {
-                        NotificationChannel channel = new NotificationChannel(Utils.NOTIFICATION_CHANNEL, "Playback", NotificationManager.IMPORTANCE_DEFAULT);
-                        channel.setShowBadge(false);
-                        channel.setSound(null, null);
+                String channel = null;
 
-                        try {
-                            NotificationManager not = (NotificationManager) this.getSystemService(reactContext.NOTIFICATION_SERVICE);
-                            not.createNotificationChannel(channel);
-                        } catch(Exception ex) {
-                            // This method shouldn't be throwing unhandled errors even if something goes wrong.
-                            Log.e(Utils.LOG, "An error occurred while create Notification channel", ex);
-                        }
-
-                        builder = new NotificationCompat.Builder(this, Utils.NOTIFICATION_CHANNEL);
-                    }
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    channel = Utils.NOTIFICATION_CHANNEL;
                 }
 
                 // Sets the service to foreground with an empty notification
-                startForeground(1, builder.build());
+                startForeground(1, new NotificationCompat.Builder(this, channel).build());
                 // Stops the service right after
                 stopSelf();
             }
