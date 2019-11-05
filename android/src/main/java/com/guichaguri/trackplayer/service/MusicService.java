@@ -1,6 +1,9 @@
 package com.guichaguri.trackplayer.service;
 
 import android.app.NotificationChannel;
+import android.app.NotificationManager;
+
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,6 +27,19 @@ public class MusicService extends HeadlessJsTaskService {
 
     MusicManager manager;
     Handler handler;
+
+    @Override
+    public void onCreate(){
+        super.onCreate();
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel channel = new NotificationChannel(Utils.NOTIFICATION_CHANNEL,"MusicService",
+                    NotificationManager.IMPORTANCE_LOW);
+            channel.setShowBadge(false);
+            channel.setSound(null, null);
+            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+        }
+    }
 
     @Nullable
     @Override
@@ -74,7 +90,7 @@ public class MusicService extends HeadlessJsTaskService {
                 String channel = null;
 
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    channel = NotificationChannel.DEFAULT_CHANNEL_ID;
+                    channel = Utils.NOTIFICATION_CHANNEL;
                 }
 
                 // Sets the service to foreground with an empty notification
@@ -112,7 +128,7 @@ public class MusicService extends HeadlessJsTaskService {
         handler = new Handler();
 
         super.onStartCommand(intent, flags, startId);
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     @Override
