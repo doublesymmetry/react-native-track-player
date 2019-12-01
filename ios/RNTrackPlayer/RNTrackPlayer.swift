@@ -300,6 +300,7 @@ public class RNTrackPlayer: RCTEventEmitter {
                                           bookmarkOptions: options["bookmarkOptions"] as? [String: Any])
         }
 
+
         resolve(NSNull())
     }
     
