@@ -8,6 +8,7 @@
 
 import Foundation
 import MediaPlayer
+import SwiftAudio
 
 @objc(RNTrackPlayer)
 public class RNTrackPlayer: RCTEventEmitter {
@@ -345,7 +346,7 @@ public class RNTrackPlayer: RCTEventEmitter {
         print("Adding tracks:", tracks)
         
         if let trackId = trackId {
-            guard let insertIndex = player.queueManager.items.firstIndex(where: { ($0 as! Track).id == trackId })
+            guard let insertIndex = player.items.firstIndex(where: { ($0 as! Track).id == trackId })
                 else {
                     reject("track_not_in_queue", "Given track ID was not found in queue", nil)
                     return
@@ -373,8 +374,8 @@ public class RNTrackPlayer: RCTEventEmitter {
         var indexesToRemove: [Int] = []
         
         for id in ids {
-            if let index = player.queueManager.items.firstIndex(where: { ($0 as! Track).id == id }) {
-                if index == player.queueManager.currentIndex { return }
+            if let index = player.items.firstIndex(where: { ($0 as! Track).id == id }) {
+                if index == player.currentIndex { return }
                 indexesToRemove.append(index)
             }
         }
@@ -395,7 +396,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     
     @objc(skip:resolver:rejecter:)
     public func skip(to trackId: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        guard let trackIndex = player.queueManager.items.firstIndex(where: { ($0 as! Track).id == trackId })
+        guard let trackIndex = player.items.firstIndex(where: { ($0 as! Track).id == trackId })
             else {
                 reject("track_not_in_queue", "Given track ID was not found in queue", nil)
                 return
@@ -511,7 +512,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     
     @objc(getTrack:resolver:rejecter:)
     public func getTrack(id: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        guard let track = player.queueManager.items.first(where: { ($0 as! Track).id == id })
+        guard let track = player.items.first(where: { ($0 as! Track).id == id })
             else {
                 reject("track_not_in_queue", "Given track ID was not found in queue", nil)
                 return
@@ -522,7 +523,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     
     @objc(getQueue:rejecter:)
     public func getQueue(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        let serializedQueue = player.queueManager.items.map { ($0 as! Track).toObject() }
+        let serializedQueue = player.items.map { ($0 as! Track).toObject() }
         resolve(serializedQueue)
     }
     
@@ -553,7 +554,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     
     @objc(updateMetadataForTrack:metadata:resolver:rejecter:)
     public func updateMetadata(for trackId: String, metadata: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        guard let track = player.queueManager.items.first(where: { ($0 as! Track).id == trackId }) as? Track
+        guard let track = player.items.first(where: { ($0 as! Track).id == trackId }) as? Track
             else {
                 reject("track_not_in_queue", "Given track ID was not found in queue", nil)
                 return
