@@ -551,6 +551,7 @@ const MyComponent = () => {
 ```
 
 #### useProgress
+A hook alternative to the the deprecated Progress Component.
 
 | State            | Type     | Description                      |
 | ---------------- | -------- | -------------------------------- |
