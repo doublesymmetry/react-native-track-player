@@ -17,5 +17,5 @@ Pod::Spec.new do |s|
   s.source_files  = "ios/**/*.{h,m,swift}"
 
   s.dependency "React"
-  s.dependency "SwiftAudio", :git => 'https://github.com/jorgenhenrichsen/SwiftAudio.git', :commit => '~> 0.11.1'
+  s.dependency "SwiftAudio"
 end
