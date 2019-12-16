@@ -1,0 +1,5 @@
+platform :ios, '10.0'
+
+target 'RNTrackPlayer' do
+    pod 'SwiftAudio', '~> 0.11.1'
+end

@@ -383,7 +383,7 @@ public class RNTrackPlayer: RCTEventEmitter {
             "track": (player.currentItem as? Track)?.id,
             "position": player.currentTime,
             "nextTrack": trackId,
-        ])
+            ] as [String:Any])
         
         print("Skipping to track:", trackId)
         try? player.jumpToItem(atIndex: trackIndex, playWhenReady: player.playerState == .playing)
@@ -398,7 +398,7 @@ public class RNTrackPlayer: RCTEventEmitter {
                 "track": (player.currentItem as? Track)?.id,
                 "position": player.currentTime,
                 "nextTrack": (player.nextItems.first as? Track)?.id,
-            ])
+            ] as [String:Any])
             try player.next()
             resolve(NSNull())
         } catch (_) {
@@ -414,7 +414,7 @@ public class RNTrackPlayer: RCTEventEmitter {
                 "track": (player.currentItem as? Track)?.id,
                 "position": player.currentTime,
                 "nextTrack": (player.previousItems.last as? Track)?.id,
-            ])
+            ] as [String:Any])
             try player.previous()
             resolve(NSNull())
         } catch (_) {

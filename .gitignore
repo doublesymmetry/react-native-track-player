@@ -52,3 +52,7 @@ xcuserdata/
 *.dSYM
 example/ios/Pods
 /ios/RNTrackPlayer.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+Podfile.lock
+Manifest.lock
+/ios/Pods/
+/ios/RNTrackPlayer.xcworkspace/
