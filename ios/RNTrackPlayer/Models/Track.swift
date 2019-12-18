@@ -10,13 +10,15 @@ import Foundation
 import MediaPlayer
 import AVFoundation
 
-class Track: NSObject, AudioItem, TimePitching {
+import SwiftAudio
+
+class Track: NSObject, SwiftAudio.AudioItem, TimePitching {
     let id: String
     let url: MediaURL
-    
+
     @objc var title: String
     @objc var artist: String
-    
+
     var date: String?
     var desc: String?
     var genre: String?
@@ -25,24 +27,24 @@ class Track: NSObject, AudioItem, TimePitching {
     var artworkURL: MediaURL?
     let headers: [String: Any]?
     let pitchAlgorithm: String?
-    
+
     @objc var album: String?
     @objc var artwork: MPMediaItemArtwork?
-    
+
     private var originalObject: [String: Any]
-    
+
     init?(dictionary: [String: Any]) {
         guard let id = dictionary["id"] as? String,
             let title = dictionary["title"] as? String,
             let artist = dictionary["artist"] as? String,
             let url = MediaURL(object: dictionary["url"])
             else { return nil }
-        
+
         self.id = id
         self.url = url
         self.title = title
         self.artist = artist
-        
+
         self.date = dictionary["date"] as? String
         self.album = dictionary["album"] as? String
         self.genre = dictionary["genre"] as? String
@@ -51,50 +53,50 @@ class Track: NSObject, AudioItem, TimePitching {
         self.headers = dictionary["headers"] as? [String: Any]
         self.artworkURL = MediaURL(object: dictionary["artwork"])
         self.pitchAlgorithm = dictionary["pitchAlgorithm"] as? String
-        
+
         self.originalObject = dictionary
     }
-    
-    
+
+
     // MARK: - Public Interface
-    
+
     func toObject() -> [String: Any] {
         return originalObject
     }
-    
+
     func updateMetadata(dictionary: [String: Any]) {
         self.title = (dictionary["title"] as? String) ?? self.title
         self.artist = (dictionary["artist"] as? String) ?? self.artist
-        
+
         self.date = dictionary["date"] as? String
         self.album = dictionary["album"] as? String
         self.genre = dictionary["genre"] as? String
         self.desc = dictionary["description"] as? String
         self.duration = dictionary["duration"] as? Double
         self.artworkURL = MediaURL(object: dictionary["artwork"])
-        
+
         self.originalObject = self.originalObject.merging(dictionary) { (_, new) in new }
     }
-    
+
     // MARK: - AudioItem Protocol
-    
+
     func getSourceUrl() -> String {
         return url.value.absoluteString
     }
-    
+
     func getArtist() -> String? {
         return artist
     }
-    
+
     func getTitle() -> String? {
         return title
     }
-    
+
     func getAlbumTitle() -> String? {
         return album
     }
-    
-    func getSourceType() -> SourceType {
+
+    func getSourceType() -> SwiftAudio.SourceType {
         return url.isLocal ? .file : .stream
     }
     
