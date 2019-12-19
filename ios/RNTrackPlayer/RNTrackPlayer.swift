@@ -17,7 +17,7 @@ public class RNTrackPlayer: RCTEventEmitter {
 
     private var hasInitialized = false
 
-    private lazy var player: QueuedAudioPlayer = {
+    private lazy var player: SwiftAudio.QueuedAudioPlayer = {
         let player = QueuedAudioPlayer()
         player.bufferDuration = 1
         return player
