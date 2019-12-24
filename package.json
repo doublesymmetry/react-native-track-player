@@ -1,7 +1,29 @@
 {
-  "name": "react-native-track-player",
-  "version": "1.2.0",
-  "description": "A fully fledged audio module created for music apps",
+  "_from": "github:react-native-kit/react-native-track-player#v2",
+  "_id": "react-native-track-player@1.2.0",
+  "_inBundle": false,
+  "_integrity": "",
+  "_location": "/react-native-track-player",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "git",
+    "raw": "react-native-kit/react-native-track-player#v2",
+    "rawSpec": "react-native-kit/react-native-track-player#v2",
+    "saveSpec": "github:react-native-kit/react-native-track-player#v2",
+    "fetchSpec": null,
+    "gitCommittish": "v2"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "github:react-native-kit/react-native-track-player#56961c3590b23270c9a336a61bb1d1fde0a9a9c5",
+  "_spec": "react-native-kit/react-native-track-player#v2",
+  "_where": "F:\\Git_2_Main_Projects\\AhangifyReactNative\\NewApp\\ahangify",
+  "bugs": {
+    "url": "https://github.com/react-native-kit/react-native-track-player/issues"
+  },
+  "bundleDependencies": false,
   "contributors": [
     {
       "name": "David Chavez",
@@ -14,6 +36,26 @@
       "url": "http://guichaguri.com"
     }
   ],
+  "deprecated": false,
+  "description": "A fully fledged audio module created for music apps",
+  "devDependencies": {
+    "@types/react-native": "^0.60.0",
+    "@typescript-eslint/eslint-plugin": "^1.7.0",
+    "@typescript-eslint/parser": "^1.7.0",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.2.0",
+    "eslint-plugin-prettier": "^3.0.1",
+    "prettier": "^1.17.0",
+    "rimraf": "^2.6.2",
+    "typescript": "^3.2.4"
+  },
+  "files": [
+    "lib/**/*",
+    "ios/**/*",
+    "android/**/*",
+    "*.podspec"
+  ],
+  "homepage": "https://github.com/react-native-kit/react-native-track-player#readme",
   "keywords": [
     "react",
     "react-native",
@@ -30,18 +72,26 @@
     "hooks"
   ],
   "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/react-native-kit/react-native-track-player.git"
-  },
-  "bugs": {
-    "url": "https://github.com/react-native-kit/react-native-track-player/issues"
-  },
-  "scripts": {
-    "prepublishOnly": "git submodule update --init --recursive"
-  },
+  "main": "lib/index.js",
+  "name": "react-native-track-player",
   "peerDependencies": {
     "react": ">=16.8.6",
     "react-native": ">=0.60.0-rc.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/react-native-kit/react-native-track-player.git"
+  },
+  "scripts": {
+    "build": "rimraf lib && tsc",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint \"src/**/*.ts\"",
+    "postversion": "git push && git push --tags",
+    "prepare": "yarn build",
+    "prepublishOnly": "git submodule update --init --recursive && yarn lint",
+    "preversion": "yarn lint",
+    "version": "yarn format && git add -A src"
+  },
+  "types": "lib/index.d.ts",
+  "version": "1.2.0"
 }

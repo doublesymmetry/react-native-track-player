@@ -1,0 +1,39 @@
+matrix:
+  before_script:
+    - chmod +x build.sh
+  include:
+    - language: node_js
+      node_js:
+        - "9"
+      script: .travis/ci_node.sh
+
+    - language: node_js
+      node_js:
+        - "8"
+      script: .travis/ci_node.sh
+
+    - os: osx
+      language: objective-c
+      osx_image: xcode9.4
+      env:
+        - JOB_NAME=IOS
+      script: .travis/ci.sh
+
+    - os: linux
+      language: android
+      jdk: oraclejdk8
+      sudo: required
+      android:
+        components:
+          - platform-tools
+          - tools
+          - build-tools-26.0.3
+          - android-21
+          - android-26
+          - sys-img-armeabi-v7a-android-21
+          - extra-android-m2repository
+          - extra-google-m2repository
+          - extra-google-google_play_services
+      env:
+        - JOB_NAME=ANDROID
+      script: .travis/ci.sh

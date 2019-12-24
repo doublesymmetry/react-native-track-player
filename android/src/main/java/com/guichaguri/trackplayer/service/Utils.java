@@ -149,11 +149,4 @@ public class Utils {
         }
     }
 
-    public static int getInt(Bundle data, String key, int defaultValue) {
-        Object value = data.get(key);
-        if (value instanceof Number) {
-            return ((Number) value).intValue();
-        }
-        return defaultValue;
-    }
 }
