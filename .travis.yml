@@ -1,6 +1,14 @@
 matrix:
   before_script:
     - chmod +x build.sh
+    cache:
+  directories:
+    - node_modules
+  yarn: true
+
+  install:
+    - npm i -g yarn
+    - yarn
   include:
     - language: node_js
       node_js:
@@ -37,11 +45,3 @@ matrix:
       env:
         - JOB_NAME=ANDROID
       script: .travis/ci.sh
-cache:
-  directories:
-    - node_modules
-  yarn: true
-
-install:
-  - npm i -g yarn
-  - yarn
