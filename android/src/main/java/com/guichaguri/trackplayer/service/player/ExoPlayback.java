@@ -144,7 +144,7 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
 
         player.stop(false);
         player.setPlayWhenReady(false);
-        player.seekTo(0,0);
+        player.seekTo(lastKnownWindow,0);
     }
 
     public void reset() {
@@ -243,7 +243,7 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
         Log.d(Utils.LOG, "onPositionDiscontinuity: " + reason);
 
         if(lastKnownWindow != player.getCurrentWindowIndex()) {
-            Track previous = lastKnownWindow == C.INDEX_UNSET ? null : queue.get(lastKnownWindow);
+            Track previous = lastKnownWindow == C.INDEX_UNSET || lastKnownWindow >= queue.size() ? null : queue.get(lastKnownWindow);
             Track next = getCurrentTrack();
 
             // Track changed because it ended
