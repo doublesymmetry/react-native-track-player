@@ -14,6 +14,7 @@ Pod::Spec.new do |s|
 
   s.source       = { :git => package['repository']['url'], :tag => "v#{s.version}" }
   s.source_files  = "ios/RNTrackPlayer/*.{h,m,swift}",
+                    "ios/RNTrackPlayer/Utils/**/*.{h,m,swift}",
                     "ios/RNTrackPlayer/Models/**/*.{h,m,swift}",
                     "ios/RNTrackPlayer/Support/**/*.{h,m,swift}",
                     "ios/RNTrackPlayer/Vendor/AudioPlayer/SwiftAudio/**/*.{h,m,swift}"

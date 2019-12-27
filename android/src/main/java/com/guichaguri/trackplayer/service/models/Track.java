@@ -31,7 +31,7 @@ import static android.support.v4.media.MediaMetadataCompat.*;
 /**
  * @author Guichaguri
  */
-public class Track {
+public class Track extends TrackMetadata {
 
     public static List<Track> createTracks(Context context, List objects, int ratingType) {
         List<Track> tracks = new ArrayList<>();
@@ -56,17 +56,7 @@ public class Track {
     public String contentType;
     public String userAgent;
 
-    public Uri artwork;
-
-    public String title;
-    public String artist;
-    public String album;
-    public String date;
-    public String genre;
-    public long duration;
     public Bundle originalItem;
-
-    public RatingCompat rating;
 
     public Map<String, String> headers;
 
@@ -109,44 +99,20 @@ public class Track {
         originalItem = bundle;
     }
 
+    @Override
     public void setMetadata(Context context, Bundle bundle, int ratingType) {
-        artwork = Utils.getUri(context, bundle, "artwork");
-
-        title = bundle.getString("title");
-        artist = bundle.getString("artist");
-        album = bundle.getString("album");
-        date = bundle.getString("date");
-        genre = bundle.getString("genre");
-        duration = Utils.toMillis(bundle.getDouble("duration", 0));
-
-        rating = Utils.getRating(bundle, "rating", ratingType);
+        super.setMetadata(context, bundle, ratingType);
 
         if (originalItem != null && originalItem != bundle)
             originalItem.putAll(bundle);
     }
 
+    @Override
     public MediaMetadataCompat.Builder toMediaMetadata() {
-        MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
+        MediaMetadataCompat.Builder builder = super.toMediaMetadata();
 
-        builder.putString(METADATA_KEY_TITLE, title);
-        builder.putString(METADATA_KEY_ARTIST, artist);
-        builder.putString(METADATA_KEY_ALBUM, album);
-        builder.putString(METADATA_KEY_DATE, date);
-        builder.putString(METADATA_KEY_GENRE, genre);
         builder.putString(METADATA_KEY_MEDIA_URI, uri.toString());
         builder.putString(METADATA_KEY_MEDIA_ID, id);
-
-        if (duration > 0) {
-            builder.putLong(METADATA_KEY_DURATION, duration);
-        }
-
-        if (artwork != null) {
-            builder.putString(METADATA_KEY_ART_URI, artwork.toString());
-        }
-
-        if (rating != null) {
-            builder.putRating(METADATA_KEY_RATING, rating);
-        }
 
         return builder;
     }

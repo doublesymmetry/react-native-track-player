@@ -40,7 +40,16 @@ export interface PlayerOptions {
   iosCategory?: IOSCategory
   iosCategoryMode?: IOSCategoryMode
   iosCategoryOptions?: IOSCategoryOptions[]
+  /**
+   * Indicates whether the player should automatically delay playback in order to minimize stalling.
+   * Defaults to `false`.
+   */
   waitForBuffer?: boolean
+  /**
+   * Indicates whether the player should automatically update now playing metadata data in control center / notification.
+   * Defaults to `true`.
+   */
+  autoUpdateMetadata?: boolean
 }
 
 export enum RatingType {
@@ -149,19 +158,23 @@ export enum State {
   Connecting = TrackPlayer.STATE_CONNECTING,
 }
 
-export interface TrackMetadata {
-  duration?: number
-  title: string
-  artist: string
+interface TrackMetadataBase {
+  title?: string
   album?: string
+  artist?: string
+  duration?: number
+  artwork?: string | ResourceObject
   description?: string
   genre?: string
   date?: string
   rating?: number | boolean
-  artwork?: string | ResourceObject
 }
 
-export interface Track extends TrackMetadata {
+export interface NowPlayingMetadata extends TrackMetadataBase {
+  elapsedTime?: number
+}
+
+export interface Track extends TrackMetadataBase {
   id: string
   url: string | ResourceObject
   type?: TrackType

@@ -1,7 +1,7 @@
 import { Platform, AppRegistry, DeviceEventEmitter, NativeEventEmitter, NativeModules } from 'react-native'
 // @ts-ignore
 import * as resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource'
-import { MetadataOptions, PlayerOptions, Event, Track, State, TrackMetadata } from './interfaces'
+import { MetadataOptions, PlayerOptions, Event, Track, State, TrackMetadata, NowPlayingMetadata } from './interfaces'
 
 const { TrackPlayerModule: TrackPlayer } = NativeModules
 const emitter = Platform.OS !== 'android' ? new NativeEventEmitter(TrackPlayer) : DeviceEventEmitter
@@ -21,22 +21,6 @@ async function setupPlayer(options: PlayerOptions = {}): Promise<void> {
 
 function destroy() {
   return TrackPlayer.destroy()
-}
-
-async function updateOptions(options: MetadataOptions = {}): Promise<void> {
-  options = { ...options }
-
-  // Resolve the asset for each icon
-  options.icon = resolveImportedPath(options.icon)
-  options.playIcon = resolveImportedPath(options.playIcon)
-  options.pauseIcon = resolveImportedPath(options.pauseIcon)
-  options.stopIcon = resolveImportedPath(options.stopIcon)
-  options.previousIcon = resolveImportedPath(options.previousIcon)
-  options.nextIcon = resolveImportedPath(options.nextIcon)
-  options.rewindIcon = resolveImportedPath(options.rewindIcon)
-  options.forwardIcon = resolveImportedPath(options.forwardIcon)
-
-  return TrackPlayer.updateOptions(options)
 }
 
 type ServiceHandler = () => Promise<void>
@@ -103,11 +87,37 @@ async function skipToPrevious(): Promise<void> {
   return TrackPlayer.skipToPrevious()
 }
 
+// MARK: - Control Center / Notifications API
+
+async function updateOptions(options: MetadataOptions = {}): Promise<void> {
+  options = { ...options }
+
+  // Resolve the asset for each icon
+  options.icon = resolveImportedPath(options.icon)
+  options.playIcon = resolveImportedPath(options.playIcon)
+  options.pauseIcon = resolveImportedPath(options.pauseIcon)
+  options.stopIcon = resolveImportedPath(options.stopIcon)
+  options.previousIcon = resolveImportedPath(options.previousIcon)
+  options.nextIcon = resolveImportedPath(options.nextIcon)
+  options.rewindIcon = resolveImportedPath(options.rewindIcon)
+  options.forwardIcon = resolveImportedPath(options.forwardIcon)
+
+  return TrackPlayer.updateOptions(options)
+}
+
 async function updateMetadataForTrack(trackId: string, metadata: TrackMetadata): Promise<void> {
   return TrackPlayer.updateMetadataForTrack(trackId, metadata)
 }
 
-// MARK: Playback API
+function clearNowPlayingMetadata(): Promise<void> {
+  return TrackPlayer.clearNowPlayingMetadata()
+}
+
+function updateNowPlayingMetadata(metadata: NowPlayingMetadata): Promise<void> {
+  return TrackPlayer.updateNowPlayingMetadata(metadata)
+}
+
+// MARK: - Playback API
 
 async function reset(): Promise<void> {
   return TrackPlayer.reset()
@@ -182,7 +192,6 @@ export default {
   // MARK: - General API
   setupPlayer,
   destroy,
-  updateOptions,
   registerPlaybackService,
   addEventListener,
 
@@ -193,9 +202,14 @@ export default {
   skip,
   skipToNext,
   skipToPrevious,
-  updateMetadataForTrack,
 
-  // MARK: Playback API
+  // MARK: - Control Center / Notifications API
+  updateOptions,
+  updateMetadataForTrack,
+  clearNowPlayingMetadata,
+  updateNowPlayingMetadata,
+
+  // MARK: - Playback API
   reset,
   play,
   pause,

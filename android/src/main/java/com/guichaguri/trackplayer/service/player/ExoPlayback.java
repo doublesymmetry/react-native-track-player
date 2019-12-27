@@ -40,11 +40,13 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
     protected long lastKnownPosition = C.POSITION_UNSET;
     protected int previousState = PlaybackStateCompat.STATE_NONE;
     protected float volumeMultiplier = 1.0F;
+    protected boolean autoUpdateMetadata;
 
-    public ExoPlayback(Context context, MusicManager manager, T player) {
+    public ExoPlayback(Context context, MusicManager manager, T player, boolean autoUpdateMetadata) {
         this.context = context;
         this.manager = manager;
         this.player = player;
+        this.autoUpdateMetadata = autoUpdateMetadata;
 
         Player.MetadataComponent component = player.getMetadataComponent();
         if(component != null) component.addMetadataOutput(this);
@@ -157,6 +159,10 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
 
     public boolean isRemote() {
         return false;
+    }
+
+    public boolean shouldAutoUpdateMetadata() {
+        return autoUpdateMetadata;
     }
 
     public long getPosition() {
