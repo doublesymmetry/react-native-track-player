@@ -300,7 +300,8 @@ Gets the duration of the current track in seconds.
 
 Note: `react-native-track-player` is a streaming library, which means it slowly buffers the track and doesn't know exactly when it ends.
 The duration returned by this function is determined through various tricks and *may not be exact or may not be available at all*.
-We highly recommend you to retrieve the duration from a database and feed it to the `duration` parameter in the [Track Object](#track-object).
+
+You should **not** trust this function. You should retrieve the duration from a database and feed it to the `duration` parameter in the [Track Object](#track-object).
 
 **Returns:** `Promise<number>`
 
