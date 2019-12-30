@@ -1,6 +1,4 @@
-[![downloads](https://img.shields.io/npm/dw/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player)
-[![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player) 
-[![discord](https://img.shields.io/discord/567636850513018880.svg)](https://discordapp.com/invite/ya2XDCR)
+﻿[![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player) [![Chat](https://badges.gitter.im/react-native-track-player/gitter.png)](https://gitter.im/react-native-track-player/Support) [![Spectrum](https://withspectrum.github.io/badge/badge.svg)](https://spectrum.chat/rntrackplayer)
 # react-native-track-player
 
 A fully fledged audio module created for music apps. Provides audio playback, external media controls, chromecast support, background mode and more!
@@ -35,7 +33,7 @@ A fully fledged audio module created for music apps. Provides audio playback, ex
 | Load from the app bundle | ✓ | ✓ | ✓ |
 | Load from the network | ✓ | ✓ | ✓ |
 | Load from the file system | ✓ | ✓ | ✓ |
-| Adaptive Bitrate Streaming | ✓ | ✓ | ✓ |
+| Adaptive Bitrate Streaming | ✓ | ✗ | ✓ |
 | Play/Pause/Stop/Reset | ✓ | ✓ | ✓ |
 | Seeking/Volume | ✓ | ✓ | ✓ |
 | Remote Media Controls | ✓ | ✓ | ✓ |
@@ -84,10 +82,7 @@ TrackPlayer.setupPlayer().then(async () => {
 ## Maintainers
 [David Chavez](https://github.com/dcvz) & [Guilherme Chaguri](https://github.com/Guichaguri)
 
-## Community
-You can find us as part of the [React Native Folks](https://discordapp.com/invite/ya2XDCR) Discord in the `#react-native-track-player` channel.
-
 ## Support the development
 Support the further development of this and other libraries.
-- @dcvz: [Patreon](https://patreon.com/dcvz) | [Paypal](https://www.paypal.me/dcvz) | [Twitter](https://twitter.com/dchavezlive)
-- @guichaguri: [Twitter](https://twitter.com/Guichaguri)
+- [Support via Patreon](https://patreon.com/dcvz)
+- [Support via Paypal](https://paypal.me/dcvz)

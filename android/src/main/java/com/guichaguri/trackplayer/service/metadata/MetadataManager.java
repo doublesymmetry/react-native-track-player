@@ -3,7 +3,6 @@ package com.guichaguri.trackplayer.service.metadata;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -22,7 +21,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
 import com.guichaguri.trackplayer.R;
 import com.guichaguri.trackplayer.service.MusicManager;
@@ -65,12 +63,6 @@ public class MetadataManager {
         Context context = service.getApplicationContext();
         String packageName = context.getPackageName();
         Intent openApp = context.getPackageManager().getLaunchIntentForPackage(packageName);
-
-        if (openApp == null) {
-            openApp = new Intent();
-            openApp.setPackage(packageName);
-            openApp.addCategory(Intent.CATEGORY_LAUNCHER);
-        }
 
         // Prevent the app from launching a new instance
         openApp.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -138,16 +130,16 @@ public class MetadataManager {
         }
 
         // Update the color
-        builder.setColor(Utils.getInt(options, "color", NotificationCompat.COLOR_DEFAULT));
+        builder.setColor(options.getInt("color", NotificationCompat.COLOR_DEFAULT));
 
         // Update the icon
         builder.setSmallIcon(getIcon(options, "icon", R.drawable.play));
 
         // Update the jump interval
-        jumpInterval = Utils.getInt(options, "jumpInterval", 15);
+        jumpInterval = options.getInt("jumpInterval", 15);
 
         // Update the rating type
-        ratingType = Utils.getInt(options, "ratingType", RatingCompat.RATING_NONE);
+        ratingType = options.getInt("ratingType", RatingCompat.RATING_NONE);
         session.setRatingType(ratingType);
 
         updateNotification();

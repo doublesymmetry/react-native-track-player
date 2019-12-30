@@ -132,7 +132,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
         player.setAudioAttributes(new com.google.android.exoplayer2.audio.AudioAttributes.Builder()
                 .setContentType(C.CONTENT_TYPE_MUSIC).setUsage(C.USAGE_MEDIA).build());
 
-        return new LocalPlayback(service, this, player, cacheMaxSize);
+        return new LocalPlayback(service, service.getApplicationContext(), this, player, cacheMaxSize);
     }
 
     @SuppressLint("WakelockTimeout")

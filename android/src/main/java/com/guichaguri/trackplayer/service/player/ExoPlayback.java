@@ -62,9 +62,22 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
 
     public abstract void add(Collection<Track> tracks, int index, Promise promise);
 
+    public abstract void updateTrackObject(Track track, int index, Promise promise);
+
     public abstract void remove(List<Integer> indexes, Promise promise);
 
+    public abstract void move(int index, int newIndex, Promise promise);
+
     public abstract void removeUpcomingTracks();
+
+    public abstract void shuffle(final Promise promise);
+
+    public abstract void shuffleFromIndex(final int index,  Promise promise);
+
+    public abstract void setRepeatMode(int repeatMode);
+
+    public abstract int getRepeatMode();
+
 
     public void updateTrack(int index, Track track) {
         int currentIndex = player.getCurrentWindowIndex();
@@ -73,6 +86,11 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
 
         if(currentIndex == index)
             manager.getMetadata().updateMetadata(track);
+    }
+
+    public Integer getCurrentTrackIndex() {
+        int index = player.getCurrentWindowIndex();
+        return index < 0 || index >= queue.size() ? null : index;
     }
 
     public Track getCurrentTrack() {
@@ -98,6 +116,19 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
         }
 
         promise.reject("track_not_in_queue", "Given track ID was not found in queue");
+    }
+
+    public void skipByIndex(int index, Promise promise) {
+        if(index < 0 || index >= queue.size()) {
+            promise.reject("index_out_of_bounds", "The index is out of bounds");
+            return;
+        }
+
+        lastKnownWindow = player.getCurrentWindowIndex();
+        lastKnownPosition = player.getCurrentPosition();
+
+        player.seekToDefaultPosition(index);
+        promise.resolve(null);
     }
 
     public void skipToPrevious(Promise promise) {
@@ -144,7 +175,7 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
 
         player.stop(false);
         player.setPlayWhenReady(false);
-        player.seekTo(lastKnownWindow,0);
+        player.seekTo(0,0);
     }
 
     public void reset() {

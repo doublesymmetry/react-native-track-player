@@ -9,6 +9,8 @@ import android.os.IBinder;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.media.session.MediaButtonReceiver;
+import android.app.NotificationManager;
+import android.content.Context;
 
 import com.facebook.react.HeadlessJsTaskService;
 import com.facebook.react.ReactInstanceManager;
@@ -19,13 +21,26 @@ import com.guichaguri.trackplayer.service.Utils;
 import javax.annotation.Nullable;
 
 /**
- * @author Guichaguri
+ * @author Drazail
  */
 public class MusicService extends HeadlessJsTaskService {
 
     MusicManager manager;
     Handler handler;
 
+    @Override
+    public void onCreate(){
+        super.onCreate();
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel channel = new NotificationChannel(Utils.NOTIFICATION_CHANNEL,"MusicService",
+                    NotificationManager.IMPORTANCE_LOW);
+            channel.setShowBadge(false);
+            channel.setSound(null, null);
+            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+        }
+    }
+    
     @Nullable
     @Override
     protected HeadlessJsTaskConfig getTaskConfig(Intent intent) {
@@ -72,6 +87,7 @@ public class MusicService extends HeadlessJsTaskService {
 
             // Checks whether there is a React activity
             if(reactContext == null || !reactContext.hasCurrentActivity()) {
+
                 String channel = Utils.getNotificationChannel((Context) this);
 
                 // Sets the service to foreground with an empty notification
@@ -109,7 +125,7 @@ public class MusicService extends HeadlessJsTaskService {
         handler = new Handler();
 
         super.onStartCommand(intent, flags, startId);
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     @Override
@@ -124,6 +140,8 @@ public class MusicService extends HeadlessJsTaskService {
         super.onTaskRemoved(rootIntent);
 
         if (manager == null || manager.shouldStopWithApp()) {
+            manager.getPlayback().stop();
+            destroy();
             stopSelf();
         }
     }
