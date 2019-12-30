@@ -160,6 +160,9 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @ReactMethod
     public void destroy() {
+        // Ignore if it was already destroyed
+        if (binder == null && !connecting) return;
+
         try {
             if(binder != null) {
                 binder.destroy();

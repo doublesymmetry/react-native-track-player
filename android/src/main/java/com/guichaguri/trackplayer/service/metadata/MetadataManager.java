@@ -55,16 +55,8 @@ public class MetadataManager {
         this.service = service;
         this.manager = manager;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(Utils.NOTIFICATION_CHANNEL, "Playback", NotificationManager.IMPORTANCE_DEFAULT);
-            channel.setShowBadge(false);
-            channel.setSound(null, null);
-
-            NotificationManager not = (NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE);
-            not.createNotificationChannel(channel);
-        }
-
-        this.builder = new NotificationCompat.Builder(service, Utils.NOTIFICATION_CHANNEL);
+        String channel = Utils.getNotificationChannel((Context) service);
+        this.builder = new NotificationCompat.Builder(service, channel);
         this.session = new MediaSessionCompat(service, "TrackPlayer", null, null);
 
         session.setFlags(MediaSessionCompat.FLAG_HANDLES_QUEUE_COMMANDS);
