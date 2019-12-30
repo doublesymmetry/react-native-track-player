@@ -1,6 +1,6 @@
 package com.guichaguri.trackplayer.service;
 
-import android.app.NotificationChannel;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,6 +17,7 @@ import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.jstasks.HeadlessJsTaskConfig;
+import com.guichaguri.trackplayer.service.Utils;
 import javax.annotation.Nullable;
 
 /**
@@ -86,11 +87,8 @@ public class MusicService extends HeadlessJsTaskService {
 
             // Checks whether there is a React activity
             if(reactContext == null || !reactContext.hasCurrentActivity()) {
-                String channel = null;
 
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    channel = Utils.NOTIFICATION_CHANNEL;
-                }
+                String channel = Utils.getNotificationChannel((Context) this);
 
                 // Sets the service to foreground with an empty notification
                 startForeground(1, new NotificationCompat.Builder(this, channel).build());
