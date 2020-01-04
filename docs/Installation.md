@@ -172,5 +172,9 @@ You have to either upgrade everything to AndroidX or downgrade everything to the
 
 You can also use [jetifier](https://github.com/mikehardy/jetifier#usage-for-source-files) to convert all of the native code to use only one of them.
 
+#### Android: Cleartext HTTP traffic not permitted
+
+Since API 28, Android disables traffic without TLS. To fix the issue you have to use `https` or [enable clear text traffic](https://stackoverflow.com/a/50834600).
+
 ## Next
 You can choose the build preferences for your app using `track-player.json`. See more [here](https://react-native-kit.github.io/react-native-track-player/build-preferences/).

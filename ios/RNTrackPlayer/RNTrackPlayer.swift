@@ -19,6 +19,11 @@ public class RNTrackPlayer: RCTEventEmitter {
     private lazy var player: QueuedAudioPlayer = {
         let player = QueuedAudioPlayer()
         player.bufferDuration = 1
+
+        // disable auto advance, so that we can control the order of
+        // operations in order to send accurate event data
+        player.automaticallyPlayNextSong = false
+
         return player
     }()
     
@@ -193,6 +198,7 @@ public class RNTrackPlayer: RCTEventEmitter {
                 // playbackEnd is called twice at the end of a track;
                 // we ignore .skippedToNext and only fire an event
                 // for .playedUntilEnd
+                // nextTrack might be nil if there are no more, but still send the event for consistency
                 self.sendEvent(withName: "playback-track-changed", body: [
                     "track": (self.player.currentItem as? Track)?.id,
                     "position": self.player.currentTime,
@@ -200,10 +206,16 @@ public class RNTrackPlayer: RCTEventEmitter {
                     ])
                 
                 if self.player.nextItems.count == 0 {
+                    // fire an event for the queue ending
                     self.sendEvent(withName: "playback-queue-ended", body: [
                         "track": (self.player.currentItem as? Track)?.id,
                         "position": self.player.currentTime,
                         ])
+                } else {
+                    // we are not using automaticallyPlayNextSong on the player in order
+                    // to be in control of specifically when the above events are sent
+                    // so, attempt to go to the next track now
+                    try? self.player.next() 
                 }
             }
 
