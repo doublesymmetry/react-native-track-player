@@ -117,6 +117,11 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
             } else {
                 source.removeMediaSource(index);
             }
+
+            // Fix the window index
+            if (index < lastKnownWindow) {
+                lastKnownWindow--;
+            }
         }
     }
 
