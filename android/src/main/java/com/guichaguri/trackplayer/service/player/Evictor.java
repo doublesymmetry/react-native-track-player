@@ -2,21 +2,15 @@ package com.guichaguri.trackplayer.service.player;
 
 
 import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.cache.CacheEvictor;
 import com.google.android.exoplayer2.upstream.cache.Cache;
-import com.google.android.exoplayer2.upstream.cache.CacheKeyFactory;
 import com.google.android.exoplayer2.upstream.cache.CacheSpan;
-import com.google.android.exoplayer2.upstream.cache.CacheUtil;
 import com.guichaguri.trackplayer.module.MusicEvents;
 import com.guichaguri.trackplayer.service.MusicService;
 import com.guichaguri.trackplayer.service.Utils;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-
-import android.util.Pair;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;

@@ -1,5 +1,7 @@
 package com.guichaguri.trackplayer.service;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -9,15 +11,12 @@ import android.os.IBinder;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.media.session.MediaButtonReceiver;
-import android.app.NotificationManager;
-import android.content.Context;
 
 import com.facebook.react.HeadlessJsTaskService;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.jstasks.HeadlessJsTaskConfig;
-import com.guichaguri.trackplayer.service.Utils;
 import javax.annotation.Nullable;
 
 /**

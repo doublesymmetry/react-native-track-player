@@ -10,9 +10,21 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
+
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
+import com.google.android.exoplayer2.upstream.DataSpec;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.upstream.RawResourceDataSource;
+import com.google.android.exoplayer2.upstream.cache.Cache;
+import com.google.android.exoplayer2.upstream.cache.CacheDataSource;
+import com.google.android.exoplayer2.util.Util;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.Buffer;
 
 /**
  * @author Guichaguri
@@ -173,4 +185,40 @@ public class Utils {
         }
         return Utils.NOTIFICATION_CHANNEL;
     }
+
+    public static long checkCachedStatus(String key, Cache cache, long length ) {
+
+       // Long cachedBytes = Long.valueOf(0);
+       // NavigableSet<CacheSpan> cahcedSpans = cache.getCachedSpans(key);
+        //for (CacheSpan cachedSpan : cahcedSpans){
+        //    cachedBytes += cachedSpan.length;
+        //}
+        long cachedBytes = cache.getCachedLength(key,0,length);
+        Log.d(Utils.LOG, "cache cachePair : Cache: total cached bytes: "+cachedBytes+" for Key: "+key+"//");
+        return cachedBytes;
+    }
+
+    public static void saveToFile(Context ctx, Cache cache, String key, Uri uri, long length, String path){
+        String userAgent = Util.getUserAgent(ctx, "react-native-track-player");
+        CacheDataSource  dataSource;
+        DefaultHttpDataSource ds = new DefaultHttpDataSource(userAgent);
+        dataSource = new CacheDataSource(cache, ds);
+        try {
+            byte[] buffer = new byte[(int)length];
+            dataSource.open(new DataSpec(uri,0,length,key));
+            dataSource.read(buffer,0,(int)length);
+            File file = new File(path);
+            if (!file.exists()) {
+                FileOutputStream stream = new FileOutputStream(path);
+                stream.write(buffer);
+                dataSource.close();
+            }else{
+                throw new IOException("file exists");
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

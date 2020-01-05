@@ -76,6 +76,10 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
 
     public abstract void setRepeatMode(int repeatMode);
 
+    public abstract long checkCachedStatus(String key, long length);
+
+    public abstract void cacheRange(String key, long position, long length);
+
     public abstract int getRepeatMode();
 
 

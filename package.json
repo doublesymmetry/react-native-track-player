@@ -93,5 +93,8 @@
     "version": "yarn format && git add -A src"
   },
   "types": "lib/index.d.ts",
-  "version": "1.2.0"
+  "version": "1.2.0",
+  "dependencies": {
+    "react-native": "^0.61.5"
+  }
 }

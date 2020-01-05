@@ -12,7 +12,6 @@ import com.google.android.exoplayer2.database.ExoDatabaseProvider;
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.cache.CacheDataSource;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor;
 import com.google.android.exoplayer2.upstream.cache.NoOpCacheEvictor;
@@ -34,7 +33,6 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     private SimpleCache cache;
     private ConcatenatingMediaSource source;
     private boolean prepared = false;
-    
     private final MusicService service;
 
     public LocalPlayback(MusicService service, Context context, MusicManager manager, SimpleExoPlayer player, long maxCacheSize) {
@@ -303,6 +301,16 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
                 Log.w(Utils.LOG, "Couldn't release the cache properly", ex);
             }
         }
+    }
+
+    @Override
+    public long checkCachedStatus(String key, long length){
+        return Utils.checkCachedStatus(key, cache, length);
+    }
+
+    @Override
+    public void cacheRange (String key, long position, long length){
+
     }
 
 }
