@@ -218,7 +218,6 @@ public class RNTrackPlayer: RCTEventEmitter {
                     try? self.player.next() 
                 }
             }
-
         }
         
         player.remoteCommandController.handleChangePlaybackPositionCommand = { [weak self] event in
