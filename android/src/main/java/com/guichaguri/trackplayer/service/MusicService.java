@@ -26,19 +26,6 @@ public class MusicService extends HeadlessJsTaskService {
 
     MusicManager manager;
     Handler handler;
-
-    @Override
-    public void onCreate(){
-        super.onCreate();
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            NotificationChannel channel = new NotificationChannel(Utils.NOTIFICATION_CHANNEL,"MusicService",
-                    NotificationManager.IMPORTANCE_LOW);
-            channel.setShowBadge(false);
-            channel.setSound(null, null);
-            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
-        }
-    }
     
     @Nullable
     @Override
