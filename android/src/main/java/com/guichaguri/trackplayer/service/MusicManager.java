@@ -208,10 +208,11 @@ public class MusicManager implements OnAudioFocusChangeListener {
         Log.d(Utils.LOG, "onTrackUpdate");
 
         if(next != null) metadata.updateMetadata(next);
-        playback.checkCachedStatus(previous.key, 0);
+        Long chachedBytes = playback.checkCachedStatus(previous.key, 0);
         Bundle bundle = new Bundle();
         bundle.putString("track", previous != null ? previous.id : null);
         bundle.putDouble("position", Utils.toSeconds(prevPos));
+        bundle.putString("cachedBytes", chachedBytes.toString());
         bundle.putString("nextTrack", next != null ? next.id : null);
         service.emit(MusicEvents.PLAYBACK_TRACK_CHANGED, bundle);
     }
