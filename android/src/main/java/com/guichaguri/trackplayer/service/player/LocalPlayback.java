@@ -1,6 +1,7 @@
 package com.guichaguri.trackplayer.service.player;
 
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 import com.facebook.react.bridge.Promise;
 import com.google.android.exoplayer2.C;
@@ -21,6 +22,7 @@ import com.guichaguri.trackplayer.service.MusicService;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.models.Track;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -312,6 +314,12 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     public long checkCachedStatus(String key, long length){
         return Utils.checkCachedStatus(key, cache, length);
     }
+
+    @Override
+    public String saveToFile (String key, Uri url, Long length, String path, Boolean forceOverWrite) throws IOException {
+        return Utils.saveToFile(context, cache, key, url, length, path, forceOverWrite);
+    }
+
 
     @Override
     public void cacheRange (String key, long position, long length){

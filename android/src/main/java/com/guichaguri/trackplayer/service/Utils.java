@@ -203,27 +203,32 @@ public class Utils {
         return cachedBytes;
     }
 
-    public static void saveToFile(Context ctx, Cache cache, String key, Uri uri, long length, String path){
+    public static String saveToFile(Context ctx, Cache cache, String key, Uri uri, long length, String path, boolean ForceOverWrite) throws IOException {
         String userAgent = Util.getUserAgent(ctx, "react-native-track-player");
         CacheDataSource  dataSource;
         DefaultHttpDataSource ds = new DefaultHttpDataSource(userAgent);
         dataSource = new CacheDataSource(cache, ds);
-        try {
-            byte[] buffer = new byte[(int)length];
-            dataSource.open(new DataSpec(uri,0,length,key));
-            dataSource.read(buffer,0,(int)length);
-            File file = new File(path);
-            if (!file.exists()) {
-                FileOutputStream stream = new FileOutputStream(path);
+        byte[] buffer = new byte[(int)length];
+        dataSource.open(new DataSpec(uri,0,length,key));
+        dataSource.read(buffer,0,(int)length);
+        File file = new File(path);
+        if (!file.exists()) {
+            FileOutputStream stream = new FileOutputStream(path);
+            stream.write(buffer);
+            dataSource.close();
+            return path;
+        }else{
+            if(ForceOverWrite){
+                FileOutputStream stream = new FileOutputStream(path, false);
                 stream.write(buffer);
                 dataSource.close();
-            }else{
+                return path;
+            } else {
                 throw new IOException("file exists");
             }
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+
+
     }
 
 }

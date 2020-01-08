@@ -1,6 +1,7 @@
 package com.guichaguri.trackplayer.service.player;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import com.facebook.react.bridge.Promise;
@@ -19,6 +20,8 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.guichaguri.trackplayer.service.MusicManager;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.models.Track;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -77,6 +80,8 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
     public abstract void setRepeatMode(int repeatMode);
 
     public abstract long checkCachedStatus(String key, long length);
+
+    public abstract String saveToFile (String key, Uri url, Long length, String path, Boolean forceOverWrite) throws IOException;
 
     public abstract void cacheRange(String key, long position, long length);
 

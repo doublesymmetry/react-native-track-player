@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.media.RatingCompat;
@@ -23,6 +24,8 @@ import com.guichaguri.trackplayer.service.player.LocalPlayback;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -651,6 +654,17 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     @ReactMethod
     public void getCachedStatus (String key, long length, final Promise callback) {
         waitForConnection(() -> callback.resolve(binder.getPlayback().checkCachedStatus(key, length)));
+    }
+
+    @ReactMethod
+    public void download (String key, Uri url, long length, String path, Boolean forceOverWrite, final Promise callback) {
+        waitForConnection(() -> {
+            try {
+                callback.resolve(binder.getPlayback().saveToFile(key,url,length,path,forceOverWrite));
+            } catch (IOException e) {
+                callback.reject(e);
+            }
+        });
     }
 
 
