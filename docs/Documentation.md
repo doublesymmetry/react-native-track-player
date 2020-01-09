@@ -556,7 +556,7 @@ A hook alternative to the the deprecated Progress Component.
 | State            | Type     | Description                      |
 | ---------------- | -------- | -------------------------------- |
 | position         | `number` | The current position in seconds  |
-| buffered.        | `number` | The buffered position in seconds |
+| buffered         | `number` | The buffered position in seconds |
 | duration         | `number` | The duration in seconds          |
 
 `useProgress` accepts an interval to set the rate (in miliseconds) to poll the track player's progress. The default value is `1000` or every second.
