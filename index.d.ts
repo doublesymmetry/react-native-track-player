@@ -152,6 +152,7 @@ declare namespace RNTrackPlayer {
   export function getState(): Promise<State>;
   export function getRate(): Promise<number>;
   export function getCachedStatus(key: string, length: number): Promise<number>;
+  export function download(key: string, length: number, path: string, forceOverWrite: boolean): Promise<number>;
 
   // Components
 

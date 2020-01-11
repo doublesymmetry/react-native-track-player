@@ -79,11 +79,11 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
 
     public abstract void setRepeatMode(int repeatMode);
 
-    public abstract long checkCachedStatus(String key, long length);
+    public abstract long checkCachedStatus(String key, int length);
 
-    public abstract String saveToFile (String key, Uri url, Long length, String path, Boolean forceOverWrite) throws IOException;
+    public abstract String saveToFile (String key, Uri url, int length, String path, Boolean forceOverWrite);
 
-    public abstract void cacheRange(String key, long position, long length);
+    public abstract void cacheRange(String key, int position, int length);
 
     public abstract int getRepeatMode();
 

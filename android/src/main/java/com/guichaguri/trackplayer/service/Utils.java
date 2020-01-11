@@ -21,10 +21,14 @@ import com.google.android.exoplayer2.upstream.cache.CacheDataSource;
 import com.google.android.exoplayer2.upstream.cache.CacheSpan;
 import com.google.android.exoplayer2.util.Util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.Buffer;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Arrays;
 import java.util.NavigableSet;
 
 /**
@@ -187,8 +191,8 @@ public class Utils {
         return Utils.NOTIFICATION_CHANNEL;
     }
 
-    public static long checkCachedStatus(String key, Cache cache, long length ) {
-        Long cachedBytes = Long.valueOf(0);
+    public static int checkCachedStatus(String key, Cache cache, int length ) {
+        int cachedBytes = 0;
         if (length == 0){
 
             NavigableSet<CacheSpan> cahcedSpans = cache.getCachedSpans(key);
@@ -196,39 +200,75 @@ public class Utils {
                 cachedBytes += cachedSpan.length;
             }
         }else{
-            cachedBytes = cache.getCachedLength(key,0,length);
+            cachedBytes = (int) cache.getCachedLength(key,0,length);
         }
 
         Log.d(Utils.LOG, "cache cachePair : Cache: total cached bytes: "+cachedBytes+" for Key: "+key+"//");
         return cachedBytes;
     }
 
-    public static String saveToFile(Context ctx, Cache cache, String key, Uri uri, long length, String path, boolean ForceOverWrite) throws IOException {
+    public static String saveToFile(Context ctx, Cache cache, String key, Uri uri, int length, String path, boolean ForceOverWrite) {
+
+
+        new DownloadTask().execute(new TaskParams( ctx,  cache,  key,  uri,  length,  path, ForceOverWrite));
+
+        return path;
+        /*
         String userAgent = Util.getUserAgent(ctx, "react-native-track-player");
+
+        // the buffer which hosts bytes read from cachedDatasource
+        byte[] buffer = new byte[length];
+        // the buffer which should host all the data
+        byte[] fullBuffer;
+
         CacheDataSource  dataSource;
         DefaultHttpDataSource ds = new DefaultHttpDataSource(userAgent);
         dataSource = new CacheDataSource(cache, ds);
-        byte[] buffer = new byte[(int)length];
         dataSource.open(new DataSpec(uri,0,length,key));
-        dataSource.read(buffer,0,(int)length);
+
+        // the length returned by read sometimes doesn't match the full length of the file
+        // copying the filled portion of the buffer into a new byteArray to check for integrity against length received from server
+        int bufferLength = dataSource.read(buffer,0,length);
+        byte[] splitBuffer = Arrays.copyOfRange(buffer,0,bufferLength);
+        dataSource.close();
+        Log.d(Utils.LOG, "cache - download, splitBuffer size: "+ splitBuffer.length);
+        fullBuffer = Arrays.copyOf(splitBuffer,length);
+
+        // if the buffer doesn't contain all the data, manually making a HTTP request
+        if( length != splitBuffer.length){
+            Log.d(Utils.LOG, "cache - download, file incomplete by : "+ (splitBuffer.length - length));
+            HttpURLConnection  connection = (HttpURLConnection) new URL(uri.toString()).openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type",
+                    "application/json");
+            connection.setRequestProperty("Range", "bytes=" + bufferLength + "-" + length + "");
+            InputStream is = connection.getInputStream();
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            byte[] networkBuff = new byte[length - bufferLength];
+            is.read(networkBuff, 0, networkBuff.length);
+            Log.d(Utils.LOG, "cache - download, networkBuffer size : "+ (networkBuff.length));
+            System.arraycopy(networkBuff, 0, fullBuffer, bufferLength, length - bufferLength);
+            is.close();
+            os.close();
+        }
         File file = new File(path);
         if (!file.exists()) {
-            FileOutputStream stream = new FileOutputStream(path);
-            stream.write(buffer);
-            dataSource.close();
-            return path;
+                FileOutputStream stream = new FileOutputStream(path);
+                stream.write(fullBuffer);
+                return file.getAbsolutePath();
         }else{
             if(ForceOverWrite){
-                FileOutputStream stream = new FileOutputStream(path, false);
-                stream.write(buffer);
-                dataSource.close();
-                return path;
+                    FileOutputStream stream = new FileOutputStream(path, false);
+                    stream.write(fullBuffer);
+                    return file.getAbsolutePath();
             } else {
                 throw new IOException("file exists");
             }
         }
 
 
+
+         */
     }
 
 }

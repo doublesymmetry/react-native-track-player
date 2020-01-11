@@ -188,6 +188,8 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
         }
     }
 
+
+
     @ReactMethod
     public void updateOptions(ReadableMap data, final Promise callback) {
         // keep options as we may need them for correct MetadataManager reinitialization later
@@ -652,20 +654,12 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void getCachedStatus (String key, long length, final Promise callback) {
+    public void getCachedStatus (String key, int length, final Promise callback) {
         waitForConnection(() -> callback.resolve(binder.getPlayback().checkCachedStatus(key, length)));
     }
 
     @ReactMethod
-    public void download (String key, Uri url, long length, String path, Boolean forceOverWrite, final Promise callback) {
-        waitForConnection(() -> {
-            try {
-                callback.resolve(binder.getPlayback().saveToFile(key,url,length,path,forceOverWrite));
-            } catch (IOException e) {
-                callback.reject(e);
-            }
-        });
+    public void download (String key, String url, int length, String path, Boolean forceOverWrite, final Promise callback) {
+        waitForConnection(() -> callback.resolve(binder.getPlayback().saveToFile(key,Uri.parse(url), length,path,forceOverWrite)));
     }
-
-
 }

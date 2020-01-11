@@ -45,7 +45,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
 
     @Override
     public void initialize() {
-
+        Log.d(Utils.LOG, "cache: init");
         if(cacheMaxSize > 0) {
             File cacheDir = new File(context.getCacheDir(), "TrackPlayer");
             DatabaseProvider db = new ExoDatabaseProvider(context);
@@ -166,6 +166,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
         queue.add(newIndex, queue.remove(index));
         source.moveMediaSource(index, newIndex, manager.getHandler(), Utils.toRunnable(promise));
     }
+
 
     @Override
     public void shuffle(final Promise promise) {
@@ -311,18 +312,17 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     }
 
     @Override
-    public long checkCachedStatus(String key, long length){
+    public long checkCachedStatus(String key, int length){
         return Utils.checkCachedStatus(key, cache, length);
     }
 
     @Override
-    public String saveToFile (String key, Uri url, Long length, String path, Boolean forceOverWrite) throws IOException {
+    public String saveToFile (String key, Uri url, int length, String path, Boolean forceOverWrite) {
         return Utils.saveToFile(context, cache, key, url, length, path, forceOverWrite);
     }
 
-
     @Override
-    public void cacheRange (String key, long position, long length){
+    public void cacheRange (String key, int position, int length){
 
     }
 

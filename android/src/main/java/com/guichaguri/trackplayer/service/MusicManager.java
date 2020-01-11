@@ -207,10 +207,8 @@ public class MusicManager implements OnAudioFocusChangeListener {
     public void onTrackUpdate(Track previous, long prevPos, Track next) {
         Log.d(Utils.LOG, "onTrackUpdate");
         Long cachedBytes  = (long)0;
-
         if(next != null) metadata.updateMetadata(next);
         if (previous != null && previous.key != null) cachedBytes = playback.checkCachedStatus(previous.key, 0);
-
         Bundle bundle = new Bundle();
         bundle.putString("track", previous != null ? previous.id : null);
         bundle.putDouble("position", Utils.toSeconds(prevPos));
@@ -233,7 +231,6 @@ public class MusicManager implements OnAudioFocusChangeListener {
         bundle.putDouble("position", Utils.toSeconds(prevPos));
         service.emit(MusicEvents.PLAYBACK_QUEUE_ENDED, bundle);
     }
-
 
     public void onMetadataReceived(String source, String title, String url, String artist, String album, String date, String genre) {
         Log.d(Utils.LOG, "onMetadataReceived: " + source);
