@@ -318,7 +318,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
 
     @Override
     public String saveToFile (String key, Uri url, int length, String path, Boolean forceOverWrite) {
-        return Utils.saveToFile(context, cache, key, url, length, path, forceOverWrite);
+        return Utils.saveToFile(context, service, cache, key, url, length, path, forceOverWrite);
     }
 
     @Override
