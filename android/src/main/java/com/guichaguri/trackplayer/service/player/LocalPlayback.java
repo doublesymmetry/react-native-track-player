@@ -3,6 +3,7 @@ package com.guichaguri.trackplayer.service.player;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
+
 import com.facebook.react.bridge.Promise;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -21,9 +22,13 @@ import com.guichaguri.trackplayer.service.MusicManager;
 import com.guichaguri.trackplayer.service.MusicService;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.models.Track;
+
 import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 /**
  * @author Drazail
@@ -46,7 +51,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     @Override
     public void initialize() {
         Log.d(Utils.LOG, "cache: init");
-        if(cacheMaxSize > 0) {
+        if (cacheMaxSize > 0) {
             File cacheDir = new File(context.getCacheDir(), "TrackPlayer");
             DatabaseProvider db = new ExoDatabaseProvider(context);
             cache = new SimpleCache(cacheDir, new LeastRecentlyUsedCacheEvictor(cacheMaxSize), db);
@@ -60,7 +65,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
         } else if (cacheMaxSize < 0) {
             File cacheDir = new File(context.getFilesDir(), "TrackPlayerCustomEvictor");
             DatabaseProvider db = new ExoDatabaseProvider(context);
-            cache = new SimpleCache(cacheDir, new Evictor(service, -cacheMaxSize),db);
+            cache = new SimpleCache(cacheDir, new Evictor(service, -cacheMaxSize), db);
             Log.d(Utils.LOG, "cache: Evictor");
 
         } else {
@@ -70,16 +75,16 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
         super.initialize();
 
         resetQueue();
-    } 
+    }
 
     public DataSource.Factory enableCaching(DataSource.Factory ds) {
-        if(cache == null ) return ds;
+        if (cache == null) return ds;
 
         return new CacheDataSourceFactory(cache, ds);
     }
 
     private void prepare() {
-        if(!prepared) {
+        if (!prepared) {
             Log.d(Utils.LOG, "Preparing the media source...");
             player.prepare(source, false, false);
             prepared = true;
@@ -96,30 +101,30 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     }
 
     @Override
-    public void updateTrackObject (Track track, int index, Promise promise){
+    public void updateTrackObject(Track track, int index, Promise promise) {
         try {
             int currentIndex = player.getCurrentWindowIndex();
             if (index < 0 || index > queue.size()) {
                 promise.resolve(null);
             } else {
-    
+
                 queue.set(index, track);
                 MediaSource trackSource = track.toMediaSource(context, this);
                 source.removeMediaSource(index);
                 source.addMediaSource(index, trackSource, manager.getHandler(), Utils.toRunnable(promise));
-    
+
                 prepare();
-                }
-            }catch(Exception ex) {
-            Log.w(Utils.LOG, "Couldnt update Track", ex);
             }
+        } catch (Exception ex) {
+            Log.w(Utils.LOG, "Couldnt update Track", ex);
         }
+    }
 
     @Override
     public void add(Collection<Track> tracks, int index, Promise promise) {
         List<MediaSource> trackList = new ArrayList<>();
 
-        for(Track track : tracks) {
+        for (Track track : tracks) {
             trackList.add(track.toMediaSource(context, this));
         }
 
@@ -136,19 +141,19 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
         // Sort the list so we can loop through sequentially
         Collections.sort(indexes);
 
-        for(int i = indexes.size() - 1; i >= 0; i--) {
+        for (int i = indexes.size() - 1; i >= 0; i--) {
             int index = indexes.get(i);
 
             // Skip indexes that are the current track or are out of bounds
-            if(index == currentIndex || index < 0 || index >= queue.size()) {
+            if (index == currentIndex || index < 0 || index >= queue.size()) {
                 // Resolve the promise when the last index is invalid
-                if(i == 0) promise.resolve(null);
+                if (i == 0) promise.resolve(null);
                 continue;
             }
 
             queue.remove(index);
 
-            if(i == 0) {
+            if (i == 0) {
                 source.removeMediaSource(index, manager.getHandler(), Utils.toRunnable(promise));
             } else {
                 source.removeMediaSource(index);
@@ -189,14 +194,14 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     }
 
     @Override
-    public void shuffleFromIndex(final int index,  Promise promise) {
+    public void shuffleFromIndex(final int index, Promise promise) {
         Random rand = new Random();
         int length = queue.size();
 
         // Fisher-Yates shuffle
-        for (int i = index+1; i < length; i++) {
+        for (int i = index + 1; i < length; i++) {
 
-            int swapIndex = rand.nextInt(length - i)+i;
+            int swapIndex = rand.nextInt(length - i) + i;
             queue.add(swapIndex, queue.remove(i));
 
             if (length - 1 == i) {
@@ -212,7 +217,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     public void setRepeatMode(int repeatMode) {
         player.setRepeatMode(repeatMode);
     }
-    
+
     @Override
     public int getRepeatMode() {
         return player.getRepeatMode();
@@ -284,7 +289,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        if(playbackState == Player.STATE_ENDED) {
+        if (playbackState == Player.STATE_ENDED) {
             prepared = false;
         }
 
@@ -301,28 +306,28 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     public void destroy() {
         super.destroy();
 
-        if(cache != null) {
+        if (cache != null) {
             try {
                 cache.release();
                 cache = null;
-            } catch(Exception ex) {
+            } catch (Exception ex) {
                 Log.w(Utils.LOG, "Couldn't release the cache properly", ex);
             }
         }
     }
 
     @Override
-    public long checkCachedStatus(String key, int length){
+    public long checkCachedStatus(String key, int length) {
         return Utils.checkCachedStatus(key, cache, length);
     }
 
     @Override
-    public String saveToFile (String key, Uri url, int length, String path, Boolean forceOverWrite) {
-        return Utils.saveToFile(context, cache, key, url, length, path, forceOverWrite);
+    public void saveToFile(String key, Uri url, int length, String path, Boolean forceOverWrite, Promise callback) {
+        Utils.saveToFile(context, service, cache, key, url, length, path, forceOverWrite, callback);
     }
 
     @Override
-    public void cacheRange (String key, int position, int length){
+    public void cacheRange(String key, int position, int length) {
 
     }
 

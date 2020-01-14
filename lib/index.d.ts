@@ -33,7 +33,7 @@ declare function getRate(): Promise<number>;
 declare function getTrack(trackId: string): Promise<Track>;
 declare function getTrackByIndex(index: number): Promise<Track>;
 declare function getCachedStatus(key: string, length: number): Promise<number>;
-declare function download(key: string, url :string , length: number, path: string, forceOverWrite: boolean): Promise<number>;
+declare function download(key: string, url :string , length: number, path: string, forceOverWrite: boolean): Promise<string>;
 declare function getQueue(): Promise<Track[]>;
 declare function getCurrentTrack(): Promise<string>;
 declare function getDuration(): Promise<number>;

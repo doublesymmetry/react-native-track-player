@@ -9,9 +9,7 @@ import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat.QueueItem;
 import android.util.Log;
 
-import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.extractor.mp3.Mp3Extractor;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
@@ -19,7 +17,13 @@ import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
-import com.google.android.exoplayer2.upstream.*;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DataSpec;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
+import com.google.android.exoplayer2.upstream.RawResourceDataSource;
+import com.google.android.exoplayer2.upstream.TransferListener;
 import com.google.android.exoplayer2.util.Util;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.player.LocalPlayback;
@@ -30,7 +34,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static android.support.v4.media.MediaMetadataCompat.*;
+import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_ALBUM;
+import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_ARTIST;
+import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_ART_URI;
+import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_DATE;
+import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_DURATION;
+import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_GENRE;
+import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID;
+import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_URI;
+import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_RATING;
+import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_TITLE;
 
 /**
  * @author Guichaguri
@@ -40,9 +53,9 @@ public class Track {
     public static List<Track> createTracks(Context context, List objects, int ratingType) {
         List<Track> tracks = new ArrayList<>();
 
-        for(Object o : objects) {
-            if(o instanceof Bundle) {
-                tracks.add(new Track(context, (Bundle)o, ratingType));
+        for (Object o : objects) {
+            if (o instanceof Bundle) {
+                tracks.add(new Track(context, (Bundle) o, ratingType));
             } else {
                 return null;
             }
@@ -84,7 +97,7 @@ public class Track {
 
         resourceId = Utils.getRawResourceId(context, bundle, "url");
 
-        if(resourceId == 0) {
+        if (resourceId == 0) {
             uri = Utils.getUri(context, bundle, "url");
         } else {
             uri = RawResourceDataSource.buildRawResourceUri(resourceId);
@@ -92,8 +105,8 @@ public class Track {
 
         String trackType = bundle.getString("type", "default");
 
-        for(TrackType t : TrackType.values()) {
-            if(t.name.equalsIgnoreCase(trackType)) {
+        for (TrackType t : TrackType.values()) {
+            if (t.name.equalsIgnoreCase(trackType)) {
                 type = t;
                 break;
             }
@@ -104,9 +117,9 @@ public class Track {
         key = bundle.getString("key");
 
         Bundle httpHeaders = bundle.getBundle("headers");
-        if(httpHeaders != null) {
+        if (httpHeaders != null) {
             headers = new HashMap<>();
-            for(String header : httpHeaders.keySet()) {
+            for (String header : httpHeaders.keySet()) {
                 headers.put(header, httpHeaders.getString(header));
             }
         }
@@ -173,27 +186,27 @@ public class Track {
     public MediaSource toMediaSource(Context ctx, LocalPlayback playback) {
         // Updates the user agent if not set
 
-        if(userAgent == null || userAgent.isEmpty())
+        if (userAgent == null || userAgent.isEmpty())
             userAgent = Util.getUserAgent(ctx, "react-native-track-player");
 
         DataSource.Factory ds;
 
-        if(resourceId != 0) {
+        if (resourceId != 0) {
 
             try {
                 RawResourceDataSource raw = new RawResourceDataSource(ctx);
                 DataSpec dataSpec;
 
-                    dataSpec = new DataSpec(uri);
+                dataSpec = new DataSpec(uri);
 
                 raw.open(dataSpec);
                 ds = () -> raw;
-            } catch(IOException ex) {
+            } catch (IOException ex) {
                 // Should never happen
                 throw new RuntimeException(ex);
             }
 
-        } else if(Utils.isLocal(uri)) {
+        } else if (Utils.isLocal(uri)) {
 
             // Creates a local source factory
             ds = new DefaultDataSourceFactory(ctx, userAgent);
@@ -209,7 +222,7 @@ public class Track {
                     true
             );
 
-            if(headers != null) {
+            if (headers != null) {
                 factory.getDefaultRequestProperties().set(headers);
             }
 
@@ -218,7 +231,7 @@ public class Track {
 
         }
 
-        switch(type) {
+        switch (type) {
             case DASH:
                 return new DashMediaSource.Factory(new DefaultDashChunkSource.Factory(ds), ds)
                         .createMediaSource(uri);
@@ -229,12 +242,12 @@ public class Track {
                 return new SsMediaSource.Factory(new DefaultSsChunkSource.Factory(ds), ds)
                         .createMediaSource(uri);
             default:
-                if(key != null){
-                return new ProgressiveMediaSource.Factory(ds, new DefaultExtractorsFactory()
-                        .setConstantBitrateSeekingEnabled(true))
-                        .setCustomCacheKey(key)
-                        .createMediaSource(uri);
-                }else{
+                if (key != null) {
+                    return new ProgressiveMediaSource.Factory(ds, new DefaultExtractorsFactory()
+                            .setConstantBitrateSeekingEnabled(true))
+                            .setCustomCacheKey(key)
+                            .createMediaSource(uri);
+                } else {
                     return new ProgressiveMediaSource.Factory(ds, new DefaultExtractorsFactory()
                             .setConstantBitrateSeekingEnabled(true))
                             .createMediaSource(uri);
@@ -245,12 +258,12 @@ public class Track {
     private TransferListener HttpFactoryListener = new TransferListener() {
         @Override
         public void onTransferInitializing(DataSource source, DataSpec dataSpec, boolean isNetwork) {
-            Log.d(Utils.LOG, "cache onTransferInitializing : source:"+source+" source:"+dataSpec+" source"+isNetwork+"//");
+            Log.d(Utils.LOG, "cache onTransferInitializing : source:" + source + " source:" + dataSpec + " source" + isNetwork + "//");
         }
 
         @Override
         public void onTransferStart(DataSource source, DataSpec dataSpec, boolean isNetwork) {
-            Log.d(Utils.LOG, "cache onTransferStart : source:"+source+" source:"+dataSpec+" source"+isNetwork+"//");
+            Log.d(Utils.LOG, "cache onTransferStart : source:" + source + " source:" + dataSpec + " source" + isNetwork + "//");
         }
 
         @Override
@@ -260,7 +273,7 @@ public class Track {
 
         @Override
         public void onTransferEnd(DataSource source, DataSpec dataSpec, boolean isNetwork) {
-            Log.d(Utils.LOG, "cache onTransferEnd : source:"+source+" source:"+dataSpec+" source"+isNetwork+"//");
+            Log.d(Utils.LOG, "cache onTransferEnd : source:" + source + " source:" + dataSpec + " source" + isNetwork + "//");
         }
     };
 }
