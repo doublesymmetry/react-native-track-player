@@ -40,11 +40,13 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
     protected long lastKnownPosition = C.POSITION_UNSET;
     protected int previousState = PlaybackStateCompat.STATE_NONE;
     protected float volumeMultiplier = 1.0F;
+    protected boolean autoUpdateMetadata;
 
-    public ExoPlayback(Context context, MusicManager manager, T player) {
+    public ExoPlayback(Context context, MusicManager manager, T player, boolean autoUpdateMetadata) {
         this.context = context;
         this.manager = manager;
         this.player = player;
+        this.autoUpdateMetadata = autoUpdateMetadata;
 
         Player.MetadataComponent component = player.getMetadataComponent();
         if(component != null) component.addMetadataOutput(this);
@@ -144,7 +146,7 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
 
         player.stop(false);
         player.setPlayWhenReady(false);
-        player.seekTo(0,0);
+        player.seekTo(lastKnownWindow,0);
     }
 
     public void reset() {
@@ -157,6 +159,10 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
 
     public boolean isRemote() {
         return false;
+    }
+
+    public boolean shouldAutoUpdateMetadata() {
+        return autoUpdateMetadata;
     }
 
     public long getPosition() {
@@ -243,7 +249,7 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
         Log.d(Utils.LOG, "onPositionDiscontinuity: " + reason);
 
         if(lastKnownWindow != player.getCurrentWindowIndex()) {
-            Track previous = lastKnownWindow == C.INDEX_UNSET ? null : queue.get(lastKnownWindow);
+            Track previous = lastKnownWindow == C.INDEX_UNSET || lastKnownWindow >= queue.size() ? null : queue.get(lastKnownWindow);
             Track next = getCurrentTrack();
 
             // Track changed because it ended

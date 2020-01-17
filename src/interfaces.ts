@@ -49,7 +49,7 @@ export interface PlayerOptions {
    * Indicates whether the player should automatically update now playing metadata data in control center / notification.
    * Defaults to `true`.
    */
-  automaticallyUpdateNowPlayingInfo?: boolean
+  autoUpdateMetadata?: boolean
 }
 
 export enum RatingType {
@@ -164,9 +164,6 @@ interface TrackMetadataBase {
   artist?: string
   duration?: number
   artwork?: string | ResourceObject
-}
-
-export interface TrackMetadata extends TrackMetadataBase {
   description?: string
   genre?: string
   date?: string
@@ -177,7 +174,7 @@ export interface NowPlayingMetadata extends TrackMetadataBase {
   elapsedTime?: number
 }
 
-export interface Track extends TrackMetadata {
+export interface Track extends TrackMetadataBase {
   id: string
   url: string | ResourceObject
   type?: TrackType
