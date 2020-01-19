@@ -17,7 +17,14 @@ import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
 import com.google.android.exoplayer2.upstream.RawResourceDataSource;
 import com.google.android.exoplayer2.upstream.cache.Cache;
 import com.google.android.exoplayer2.upstream.cache.CacheSpan;
+import com.guichaguri.trackplayer.service.Tasks.CacheTasks.DropCacheParams;
+import com.guichaguri.trackplayer.service.Tasks.CacheTasks.EvictCacheParams;
+import com.guichaguri.trackplayer.service.Tasks.CacheTasks.EvictCacheTask;
+import com.guichaguri.trackplayer.service.Tasks.DownloadTasks.DownloadTask;
+import com.guichaguri.trackplayer.service.Tasks.CacheTasks.DropCacheTask;
+import com.guichaguri.trackplayer.service.Tasks.DownloadTasks.TaskParams;
 
+import java.util.Iterator;
 import java.util.NavigableSet;
 
 /**
@@ -200,4 +207,15 @@ public class Utils {
 
         new DownloadTask().execute(new TaskParams(ctx, service, cache, key, uri, length, path, ForceOverWrite, callback));
     }
+
+    public static void evictSpans(Cache cache, String key, Promise callback) {
+        Log.d(Utils.LOG, "cache evictSpans for : Cache:"+cache+"/ key: "+key+"//");
+       new EvictCacheTask().execute(new EvictCacheParams(cache, key,callback));
+
+    }
+
+    public static void releaseCache (Cache cache, Promise callback){
+        new DropCacheTask().execute(new DropCacheParams(cache, callback));
+    }
+
 }

@@ -14,6 +14,7 @@ import com.google.android.exoplayer2.database.ExoDatabaseProvider;
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.cache.Cache;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor;
 import com.google.android.exoplayer2.upstream.cache.NoOpCacheEvictor;
@@ -329,6 +330,16 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     @Override
     public void cacheRange(String key, int position, int length) {
 
+    }
+
+    @Override
+    public void releaseCache (Promise callback){
+        Utils.releaseCache(cache, callback);
+    }
+
+    @Override
+    public void evictCacheSpansForKey(String key, Promise callback ) {
+        Utils.evictSpans(cache, key, callback);
     }
 
 }

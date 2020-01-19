@@ -671,4 +671,14 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     public void download(String key, String url, int length, String path, boolean forceOverWrite, final Promise callback) {
         waitForConnection(() -> binder.getPlayback().saveToFile(key, Uri.parse(url), length, path, forceOverWrite, callback));
     }
+
+    @ReactMethod
+    public void dropCache (Promise callback){
+        waitForConnection(()->binder.getPlayback().releaseCache(callback));
+    }
+
+    @ReactMethod
+    public void removeSpans (String key, Promise callback){
+        waitForConnection(()->binder.getPlayback().evictCacheSpansForKey(key, callback));
+    }
 }

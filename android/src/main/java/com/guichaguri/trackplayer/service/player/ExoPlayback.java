@@ -88,6 +88,10 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
 
     public abstract void saveToFile(String key, Uri url, int length, String path, Boolean forceOverWrite, Promise callback);
 
+    public abstract void releaseCache (Promise callback);
+
+    public abstract void evictCacheSpansForKey(String key, Promise callback );
+
     public abstract void cacheRange(String key, int position, int length);
 
     public abstract int getRepeatMode();

@@ -106,19 +106,6 @@ public final class Evictor implements CacheEvictor, Comparator<CacheSpan> {
         }
     }
 
-    private void evictSpans(Cache cache, String key) {
-        Log.d(Utils.LOG, "cache evictSpans for : Cache:"+cache+"/ key: "+key+"//");
-        NavigableSet<CacheSpan> spansToRemove = cache.getCachedSpans(key);
-        Iterator<CacheSpan> itr = spansToRemove.iterator();
-
-            try {
-                while (itr.hasNext()) {
-                    cache.removeSpan(itr.next());
-                }
-            } catch (Cache.CacheException e) {
-                // do nothing.
-            }
-    }
 
 
     private void checkCachedStatus(CacheSpan span, Cache cache) {
@@ -150,33 +137,4 @@ public final class Evictor implements CacheEvictor, Comparator<CacheSpan> {
 
         Log.d(Utils.LOG, "cache cachePair : Cache:"+span.isCached+" total cached bytes: "+cachedBytes+" for Key: "+span.key+"//");
     }
-
-    private long getFileSize(String uri) {
-        URL url;
-        long fileSize = 0;
-        try {
-            url = new URL(uri);
-            URLConnection conn = null;
-            try {
-                conn = url.openConnection();
-                if(conn instanceof HttpURLConnection) {
-                    ((HttpURLConnection)conn).setRequestMethod("GET");
-                    fileSize = conn.getContentLength();
-                    Log.d(Utils.LOG, "cache HeaderFields : "+conn.getHeaderFields()+" for Key: "+uri+"//");
-
-                }
-            } catch (IOException e) {
-                Log.d(Utils.LOG, "cache IOException : "+e+" for Key: "+uri+"//");
-            } finally {
-                if(conn instanceof HttpURLConnection) {
-                    ((HttpURLConnection)conn).disconnect();
-                }
-            }
-        } catch (MalformedURLException e) {
-            Log.d(Utils.LOG, "cache MalformedURLException : "+e+" for Key: "+uri+"//");
-        }
-        Log.d(Utils.LOG, "cache fileSize : "+fileSize+" for Key: "+uri+"//");
-        return fileSize;
-    }
-
 }

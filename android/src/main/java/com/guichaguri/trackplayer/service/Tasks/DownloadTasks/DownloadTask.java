@@ -1,4 +1,4 @@
-package com.guichaguri.trackplayer.service;
+package com.guichaguri.trackplayer.service.Tasks.DownloadTasks;
 
 import android.content.Context;
 import android.net.Uri;
@@ -13,34 +13,14 @@ import com.google.android.exoplayer2.upstream.cache.Cache;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource;
 import com.google.android.exoplayer2.util.Util;
 import com.guichaguri.trackplayer.module.MusicEvents;
+import com.guichaguri.trackplayer.service.MusicService;
+import com.guichaguri.trackplayer.service.Utils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-class TaskParams {
-    Context ctx;
-    MusicService service;
-    Cache cache;
-    String key;
-    Uri uri;
-    int length;
-    String path;
-    boolean ForceOverWrite;
-    Promise callback;
 
-    TaskParams(Context ctx, MusicService service, Cache cache, String key, Uri uri, int length, String path, boolean ForceOverWrite, Promise callback) {
-        this.ctx = ctx;
-        this.service = service;
-        this.cache = cache;
-        this.key = key;
-        this.uri = uri;
-        this.length = length;
-        this.path = path;
-        this.ForceOverWrite = ForceOverWrite;
-        this.callback = callback;
-    }
-}
 
 public class DownloadTask extends AsyncTask<TaskParams, Integer, String> {
 
