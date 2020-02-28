@@ -1,7 +1,7 @@
 import { Platform, AppRegistry, DeviceEventEmitter, NativeEventEmitter, NativeModules } from 'react-native'
 // @ts-ignore
 import * as resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource'
-import { MetadataOptions, PlayerOptions, Event, Track, State, TrackMetadata, NowPlayingMetadata } from './interfaces'
+import { MetadataOptions, PlayerOptions, Event, Track, State, NowPlayingMetadata } from './interfaces'
 
 const { TrackPlayerModule: TrackPlayer } = NativeModules
 const emitter = Platform.OS !== 'android' ? new NativeEventEmitter(TrackPlayer) : DeviceEventEmitter
@@ -105,7 +105,7 @@ async function updateOptions(options: MetadataOptions = {}): Promise<void> {
   return TrackPlayer.updateOptions(options)
 }
 
-async function updateMetadataForTrack(trackId: string, metadata: TrackMetadata): Promise<void> {
+async function updateMetadataForTrack(trackId: string, metadata: Track): Promise<void> {
   return TrackPlayer.updateMetadataForTrack(trackId, metadata)
 }
 
