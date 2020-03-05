@@ -62,4 +62,3 @@ example/ios/Pods
 /ios/RNTrackPlayer.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
 ios/RNTrackPlayer/Vendor/
 !ios/RNTrackPlayer/Vendor/SwiftAudio
-
