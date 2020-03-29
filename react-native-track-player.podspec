@@ -7,13 +7,14 @@ Pod::Spec.new do |s|
   s.version      = package["version"]
   s.summary      = package['description']
   s.license      = package['license']
-  
+
   s.author       = "David Chavez"
   s.homepage     = package['repository']['url']
   s.platform     = :ios, "10.0"
 
   s.source       = { :git => package['repository']['url'], :tag => "v#{s.version}" }
   s.source_files  = "ios/**/*.{h,m,swift}"
+  s.exclude_files = ["ios/RNTrackPlayer/Vendor/AudioPlayer/Example"]
 
   s.dependency "React"
 end
