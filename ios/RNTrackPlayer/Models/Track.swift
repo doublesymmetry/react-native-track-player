@@ -100,7 +100,7 @@ class Track: NSObject, AudioItem, TimePitching, AssetOptionsProviding {
     
     func getArtwork(_ handler: @escaping (UIImage?) -> Void) {
         if let artworkURL = artworkURL?.value {
-            if(artworkURL.absoluteString.starts(with: "/")){
+            if(self.artworkURL?.isLocal ?? false){
                 let image = UIImage.init(contentsOfFile: artworkURL.path);
                 handler(image);
             } else {
