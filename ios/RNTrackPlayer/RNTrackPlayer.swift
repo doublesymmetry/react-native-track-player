@@ -572,5 +572,6 @@ public class RNTrackPlayer: RCTEventEmitter {
                 }
             }
         }
+        resolve(NSNull())
     }
 }
