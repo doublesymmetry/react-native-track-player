@@ -37,9 +37,12 @@ public class NowPlayingInfoController: NowPlayingInfoControllerProtocol {
         self._infoCenter.nowPlayingInfo = _info
     }
     
+    // https://github.com/react-native-kit/react-native-track-player/issues/652#issuecomment-587426577
     public func set(keyValue: NowPlayingInfoKeyValue) {
-        _info[keyValue.getKey()] = keyValue.getValue()
-        self._infoCenter.nowPlayingInfo = _info
+        DispatchQueue.main.async { [weak self] in
+            self!._info[keyValue.getKey()] = keyValue.getValue()
+            self!._infoCenter.nowPlayingInfo = self!._info
+        }
     }
     
     public func clear() {
