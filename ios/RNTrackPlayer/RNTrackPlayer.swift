@@ -563,6 +563,7 @@ public class RNTrackPlayer: RCTEventEmitter {
         if (player.currentItem as! Track).id == track.id {
             Metadata.update(for: player, with: metadata)
         }
+        resolve(NSNull())
     }
     
     @objc(clearNowPlayingMetadata:rejecter:)

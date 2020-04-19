@@ -19,6 +19,8 @@ android/captures/
 android/local.properties
 gradle.properties
 android/*.iml
+android/gradlew
+android/gradlew.bat
 
 # Windows
 
