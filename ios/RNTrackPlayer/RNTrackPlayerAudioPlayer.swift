@@ -47,6 +47,47 @@ public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer {
 		super.init()
     }
 
+	// MARK: - Player Actions
+    
+	// Override the load method so that we can control if enableRemoteCommands is called.
+
+    /**
+     Load an AudioItem into the manager.
+     
+     - parameter item: The AudioItem to load. The info given in this item is the one used for the InfoCenter.
+     - parameter playWhenReady: Immediately start playback when the item is ready. Default is `true`. If you disable this you have to call play() or togglePlay() when the `state` switches to `ready`.
+     */
+    public func load(item: AudioItem, playWhenReady: Bool = true) throws {
+        let url: URL
+        switch item.getSourceType() {
+        case .stream:
+            if let itemUrl = URL(string: item.getSourceUrl()) {
+                url = itemUrl
+            }
+            else {
+                throw APError.LoadError.invalidSourceUrl(item.getSourceUrl())
+            }
+        case .file:
+            url = URL(fileURLWithPath: item.getSourceUrl())
+        }
+        
+        wrapper.load(from: url,
+                     playWhenReady: playWhenReady,
+                     initialTime: (item as? InitialTiming)?.getInitialTime(),
+                     options:(item as? AssetOptionsProviding)?.getAssetOptions())
+        
+        self._currentItem = item
+        
+        if (automaticallyUpdateNowPlayingInfo) {
+            self.loadNowPlayingMetaValues()
+        }
+
+		// This is the only change from the original AudioPlayer
+        if (item is RemoteCommandable) {
+            enableRemoteCommands(forItem: item)
+        }
+    }
+
 	// MARK: - AVPlayerWrapperDelegate
     
     override func AVWrapper(didChangeState state: AVPlayerWrapperState) {

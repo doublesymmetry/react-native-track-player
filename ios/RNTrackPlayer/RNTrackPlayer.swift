@@ -276,7 +276,13 @@ public class RNTrackPlayer: RCTEventEmitter {
 
         // SwiftAudio AudioPlayer re-enables the commands on track load.
         // Update player.remoteCommands, so that the correct commands will be re-enabled.
-        player.remoteCommands = remoteCommands
+        // player.remoteCommands = remoteCommands
+
+        // SwiftAudio AudioPlayer re-enables the commands on track load.
+        // However RNTP doesn't need this feature.
+        // Instead, enable them directly only when they are updated.
+        // RNTrackPlayerAudioPlayer will NOT re-enable them on track load.
+        player.enableRemoteCommands(remoteCommands)
         
         resolve(NSNull())
     }
