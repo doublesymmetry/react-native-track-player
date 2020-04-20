@@ -318,7 +318,7 @@ public class RNTrackPlayer: RCTEventEmitter {
                                           bookmarkOptions: options["bookmarkOptions"] as? [String: Any])
         }
 
-        player.enableRemoteCommands(remoteCommands)
+        player.remoteCommands = remoteCommands
         
         resolve(NSNull())
     }
