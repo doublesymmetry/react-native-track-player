@@ -8,6 +8,7 @@
 
 import Foundation
 import MediaPlayer
+import SwiftAudio
 
 @objc(RNTrackPlayer)
 public class RNTrackPlayer: RCTEventEmitter {
