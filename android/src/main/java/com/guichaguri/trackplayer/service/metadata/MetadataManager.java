@@ -3,30 +3,30 @@ package com.guichaguri.trackplayer.service.metadata;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationCompat.Action;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
-import androidx.media.app.NotificationCompat.MediaStyle;
-import androidx.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationCompat.Action;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.media.app.NotificationCompat.MediaStyle;
+import androidx.media.session.MediaButtonReceiver;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
 import com.guichaguri.trackplayer.R;
 import com.guichaguri.trackplayer.service.MusicManager;
-import com.guichaguri.trackplayer.service.MusicService;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.models.Track;
 import com.guichaguri.trackplayer.service.models.TrackMetadata;
@@ -39,33 +39,46 @@ import java.util.List;
  */
 public class MetadataManager {
 
-    private final MusicService service;
+    private final Context context;
     private final MusicManager manager;
     private final MediaSessionCompat session;
+    private final NotificationCompat.Builder builder;
+    private final ButtonReceiver receiver;
 
     private int ratingType = RatingCompat.RATING_NONE;
     private int jumpInterval = 15;
     private long actions = 0;
     private long compactActions = 0;
     private SimpleTarget<Bitmap> artworkTarget;
-    private NotificationCompat.Builder builder;
+    private boolean receiverRegistered = false;
 
     private Action previousAction, rewindAction, playAction, pauseAction, stopAction, forwardAction, nextAction;
 
-    public MetadataManager(MusicService service, MusicManager manager) {
-        this.service = service;
+    public MetadataManager(Context context, MusicManager manager) {
+        this.context = context;
         this.manager = manager;
 
-        String channel = Utils.getNotificationChannel((Context) service);
-        this.builder = new NotificationCompat.Builder(service, channel);
-        this.session = new MediaSessionCompat(service, "TrackPlayer", null, null);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    Utils.NOTIFICATION_CHANNEL,
+                    "TrackPlayer",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            channel.setShowBadge(false);
+            channel.setSound(null, null);
+            context.getSystemService(NotificationManager.class).createNotificationChannel(channel);
+        }
+
+        this.builder = new NotificationCompat.Builder(context, Utils.NOTIFICATION_CHANNEL);
+        this.session = new MediaSessionCompat(context, "TrackPlayer", null, null);
+        this.receiver = new ButtonReceiver(this);
 
         session.setFlags(MediaSessionCompat.FLAG_HANDLES_QUEUE_COMMANDS);
-        session.setCallback(new ButtonEvents(service, manager));
+        session.setCallback(new ButtonEvents(manager));
 
-        Context context = service.getApplicationContext();
-        String packageName = context.getPackageName();
-        Intent openApp = context.getPackageManager().getLaunchIntentForPackage(packageName);
+        Context appContext = context.getApplicationContext();
+        String packageName = appContext.getPackageName();
+        Intent openApp = appContext.getPackageManager().getLaunchIntentForPackage(packageName);
 
         if (openApp == null) {
             openApp = new Intent();
@@ -80,13 +93,13 @@ public class MetadataManager {
         openApp.setAction(Intent.ACTION_VIEW);
         openApp.setData(Uri.parse("trackplayer://notification.click"));
 
-        builder.setContentIntent(PendingIntent.getActivity(context, 0, openApp, PendingIntent.FLAG_CANCEL_CURRENT));
+        builder.setContentIntent(PendingIntent.getActivity(appContext, 0, openApp, PendingIntent.FLAG_CANCEL_CURRENT));
 
         builder.setSmallIcon(R.drawable.play);
         builder.setCategory(NotificationCompat.CATEGORY_TRANSPORT);
 
         // Stops the playback when the notification is swiped away
-        builder.setDeleteIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(service, PlaybackStateCompat.ACTION_STOP));
+        builder.setDeleteIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_STOP));
 
         // Make it visible in the lockscreen
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
@@ -100,10 +113,10 @@ public class MetadataManager {
      * Updates the metadata options
      * @param options The options
      */
-    public void updateOptions(Bundle options) {
-        List<Integer> capabilities = options.getIntegerArrayList("capabilities");
-        List<Integer> notification = options.getIntegerArrayList("notificationCapabilities");
-        List<Integer> compact = options.getIntegerArrayList("compactCapabilities");
+    public void updateOptions(ReadableMap options) {
+        List<Integer> capabilities = Utils.getIntegerList(options, "capabilities", null);
+        List<Integer> notification = Utils.getIntegerList(options, "notificationCapabilities", capabilities);
+        List<Integer> compact = Utils.getIntegerList(options, "compactCapabilities", null);
 
         actions = 0;
         compactActions = 0;
@@ -111,9 +124,6 @@ public class MetadataManager {
         if(capabilities != null) {
             // Create the actions mask
             for(int cap : capabilities) actions |= cap;
-
-            // If there is no notification capabilities defined, we'll show all capabilities available
-            if(notification == null) notification = capabilities;
 
             // Initialize all actions based on the options
 
@@ -164,8 +174,7 @@ public class MetadataManager {
 
     public void removeNotifications() {
         String ns = Context.NOTIFICATION_SERVICE;
-        Context context = service.getApplicationContext();
-        NotificationManager manager = (NotificationManager) context.getSystemService(ns);
+        NotificationManager manager = (NotificationManager) context.getApplicationContext().getSystemService(ns);
         manager.cancelAll();
     }
 
@@ -193,7 +202,7 @@ public class MetadataManager {
     public void updateMetadata(TrackMetadata track) {
         MediaMetadataCompat.Builder metadata = track.toMediaMetadata();
 
-        RequestManager rm = Glide.with(service.getApplicationContext());
+        RequestManager rm = Glide.with(context.getApplicationContext());
         if(artworkTarget != null) rm.clear(artworkTarget);
 
         if(track.artwork != null) {
@@ -228,6 +237,8 @@ public class MetadataManager {
         int state = playback.getState();
         boolean playing = Utils.isPlaying(state);
         List<Integer> compact = new ArrayList<>();
+
+        builder.setOngoing(playing);
         builder.mActions.clear();
 
         // Adds the media buttons to the notification
@@ -255,7 +266,7 @@ public class MetadataManager {
             } else {
                 // Shows the cancel button on pre-lollipop versions due to a bug
                 style.setShowCancelButton(true);
-                style.setCancelButtonIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(service,
+                style.setCancelButtonIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(context,
                         PlaybackStateCompat.ACTION_STOP));
             }
 
@@ -288,32 +299,43 @@ public class MetadataManager {
     public void setActive(boolean active) {
         this.session.setActive(active);
 
+        if (active) {
+            if (!receiverRegistered) {
+                context.registerReceiver(receiver, new IntentFilter(Intent.ACTION_MEDIA_BUTTON));
+                receiverRegistered = true;
+            }
+        } else {
+            if (receiverRegistered) {
+                context.unregisterReceiver(receiver);
+                receiverRegistered = false;
+            }
+        }
+
         updateNotification();
     }
 
     public void destroy() {
-        service.stopForeground(true);
+        NotificationManagerCompat.from(context).cancel(Utils.NOTIFICATION_ID);
 
         session.setActive(false);
         session.release();
     }
 
     private void updateNotification() {
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+
         if(session.isActive()) {
-            service.startForeground(1, builder.build());
+            notificationManager.notify(Utils.NOTIFICATION_ID, builder.build());
         } else {
-            service.stopForeground(true);
+            notificationManager.cancel(Utils.NOTIFICATION_ID);
         }
     }
 
-    private int getIcon(Bundle options, String propertyName, int defaultIcon) {
-        if(!options.containsKey(propertyName)) return defaultIcon;
-
-        Bundle bundle = options.getBundle(propertyName);
-        if(bundle == null) return defaultIcon;
+    private int getIcon(ReadableMap options, String key, int defaultIcon) {
+        if(!options.hasKey(key) || options.getType(key) != ReadableType.Map) return defaultIcon;
 
         ResourceDrawableIdHelper helper = ResourceDrawableIdHelper.getInstance();
-        int icon = helper.getResourceDrawableId(service, bundle.getString("uri"));
+        int icon = helper.getResourceDrawableId(context, options.getMap(key).getString("uri"));
         if(icon == 0) return defaultIcon;
 
         return icon;
@@ -322,7 +344,7 @@ public class MetadataManager {
     private Action createAction(List<Integer> caps, long action, String title, int icon) {
         if(!caps.contains((int)action)) return null;
 
-        return new Action(icon, title, MediaButtonReceiver.buildMediaButtonPendingIntent(service, action));
+        return new Action(icon, title, MediaButtonReceiver.buildMediaButtonPendingIntent(context, action));
     }
 
     private void addAction(Action action, long id, List<Integer> compact) {

@@ -10,18 +10,20 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.*;
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
 import com.google.android.exoplayer2.upstream.RawResourceDataSource;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Guichaguri
  */
 public class Utils {
 
-    public static final String EVENT_INTENT = "com.guichaguri.trackplayer.event";
-    public static final String CONNECT_INTENT = "com.guichaguri.trackplayer.connect";
     public static final String NOTIFICATION_CHANNEL = "com.guichaguri.trackplayer";
+    public static final int NOTIFICATION_ID = 103;
     public static final String LOG = "RNTrackPlayer";
 
     public static Runnable toRunnable(Promise promise) {
@@ -54,22 +56,24 @@ public class Utils {
                 host.equals("[::1]");
     }
 
-    public static Uri getUri(Context context, Bundle data, String key) {
-        if(!data.containsKey(key)) return null;
-        Object obj = data.get(key);
+    public static Uri getUri(Context context, ReadableMap data, String key) {
+        if (!data.hasKey(key)) return null;
+        ReadableType type = data.getType(key);
 
-        if(obj instanceof String) {
+        if (type == ReadableType.String) {
             // Remote or Local Uri
 
-            if(((String)obj).trim().isEmpty())
+            String uri = data.getString(key);
+
+            if(uri.trim().isEmpty())
                 throw new RuntimeException("The URL cannot be empty");
 
-            return Uri.parse((String)obj);
+            return Uri.parse(uri);
 
-        } else if(obj instanceof Bundle) {
+        } else if (type == ReadableType.Map) {
             // require/import
 
-            String uri = ((Bundle)obj).getString("uri");
+            String uri = data.getMap(key).getString("uri");
 
             ResourceDrawableIdHelper helper = ResourceDrawableIdHelper.getInstance();
             int id = helper.getResourceDrawableId(context, uri);
@@ -94,12 +98,11 @@ public class Utils {
         return null;
     }
 
-    public static int getRawResourceId(Context context, Bundle data, String key) {
-        if(!data.containsKey(key)) return 0;
-        Object obj = data.get(key);
+    public static int getRawResourceId(Context context, ReadableMap data, String key) {
+        if(!data.hasKey(key)) return 0;
 
-        if(!(obj instanceof Bundle)) return 0;
-        String name = ((Bundle)obj).getString("uri");
+        if(data.getType(key) != ReadableType.Map) return 0;
+        String name = data.getMap(key).getString("uri");
 
         if(name == null || name.isEmpty()) return 0;
         name = name.toLowerCase().replace("-", "_");
@@ -123,21 +126,21 @@ public class Utils {
         return state == PlaybackStateCompat.STATE_NONE || state == PlaybackStateCompat.STATE_STOPPED;
     }
 
-    public static RatingCompat getRating(Bundle data, String key, int ratingType) {
-        if(!data.containsKey(key) || ratingType == RatingCompat.RATING_NONE) {
+    public static RatingCompat getRating(ReadableMap data, String key, int ratingType) {
+        if (!data.hasKey(key) || ratingType == RatingCompat.RATING_NONE) {
             return RatingCompat.newUnratedRating(ratingType);
-        } else if(ratingType == RatingCompat.RATING_HEART) {
-            return RatingCompat.newHeartRating(data.getBoolean(key, true));
-        } else if(ratingType == RatingCompat.RATING_THUMB_UP_DOWN) {
-            return RatingCompat.newThumbRating(data.getBoolean(key, true));
-        } else if(ratingType == RatingCompat.RATING_PERCENTAGE) {
-            return RatingCompat.newPercentageRating(data.getFloat(key, 0));
+        } else if (ratingType == RatingCompat.RATING_HEART) {
+            return RatingCompat.newHeartRating(getBoolean(data, key, true));
+        } else if (ratingType == RatingCompat.RATING_THUMB_UP_DOWN) {
+            return RatingCompat.newThumbRating(getBoolean(data, key, true));
+        } else if (ratingType == RatingCompat.RATING_PERCENTAGE) {
+            return RatingCompat.newPercentageRating((float) getDouble(data, key, 0));
         } else {
-            return RatingCompat.newStarRating(ratingType, data.getFloat(key, 0));
+            return RatingCompat.newStarRating(ratingType, (float) getDouble(data, key, 0));
         }
     }
 
-    public static void setRating(Bundle data, String key, RatingCompat rating) {
+    public static void setRating(WritableMap data, String key, RatingCompat rating) {
         if(!rating.isRated()) return;
         int ratingType = rating.getRatingStyle();
 
@@ -152,25 +155,56 @@ public class Utils {
         }
     }
 
-    public static int getInt(Bundle data, String key, int defaultValue) {
-        Object value = data.get(key);
-        if (value instanceof Number) {
-            return ((Number) value).intValue();
+    public static int getInt(ReadableMap data, String key, int defaultValue) {
+        if (!data.hasKey(key) || data.getType(key) != ReadableType.Number) {
+            return defaultValue;
+        } else {
+            return data.getInt(key);
         }
-        return defaultValue;
+    }
+
+    public static double getDouble(ReadableMap data, String key, double defaultValue) {
+        if (!data.hasKey(key) || data.getType(key) != ReadableType.Number) {
+            return defaultValue;
+        } else {
+            return data.getDouble(key);
+        }
+    }
+
+    public static boolean getBoolean(ReadableMap data, String key, boolean defaultValue) {
+        if (!data.hasKey(key) || data.getType(key) != ReadableType.Boolean) {
+            return defaultValue;
+        } else {
+            return data.getBoolean(key);
+        }
+    }
+
+    public static String getString(ReadableMap data, String key, String defaultValue) {
+        if (!data.hasKey(key) || data.getType(key) != ReadableType.String) {
+            return defaultValue;
+        } else {
+            return data.getString(key);
+        }
+    }
+
+    public static List<Integer> getIntegerList(ReadableMap data, String key, List<Integer> defaultValue) {
+        if (!data.hasKey(key) || data.getType(key) != ReadableType.Array) {
+            return defaultValue;
+        }
+
+        ReadableArray array = data.getArray(key);
+        List<Integer> list = new ArrayList<>();
+
+        for(int i = 0; i < array.size(); i++) {
+            if (array.getType(i) == ReadableType.Number)
+                list.add(array.getInt(i));
+        }
+
+        return list;
     }
 
     public static String getNotificationChannel(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(
-                Utils.NOTIFICATION_CHANNEL,
-                "MusicService",
-                NotificationManager.IMPORTANCE_DEFAULT
-            );
-            channel.setShowBadge(false);
-            channel.setSound(null, null);
-            ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
-        }
+
         return Utils.NOTIFICATION_CHANNEL;
     }
 }

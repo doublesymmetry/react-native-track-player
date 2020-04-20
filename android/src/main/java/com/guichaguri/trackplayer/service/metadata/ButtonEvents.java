@@ -5,9 +5,10 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.WritableMap;
 import com.guichaguri.trackplayer.module.MusicEvents;
 import com.guichaguri.trackplayer.service.MusicManager;
-import com.guichaguri.trackplayer.service.MusicService;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.models.Track;
 import java.util.List;
@@ -17,42 +18,40 @@ import java.util.List;
  */
 public class ButtonEvents extends MediaSessionCompat.Callback {
 
-    private final MusicService service;
     private final MusicManager manager;
 
-    public ButtonEvents(MusicService service, MusicManager manager) {
-        this.service = service;
+    public ButtonEvents(MusicManager manager) {
         this.manager = manager;
     }
 
     @Override
     public void onPlay() {
-        service.emit(MusicEvents.BUTTON_PLAY, null);
+        manager.emitEvent(MusicEvents.BUTTON_PLAY, null);
     }
 
     @Override
     public void onPause() {
-        service.emit(MusicEvents.BUTTON_PAUSE, null);
+        manager.emitEvent(MusicEvents.BUTTON_PAUSE, null);
     }
 
     @Override
     public void onStop() {
-        service.emit(MusicEvents.BUTTON_STOP, null);
+        manager.emitEvent(MusicEvents.BUTTON_STOP, null);
     }
 
 
     @Override
     public void onPlayFromMediaId(String mediaId, Bundle extras) {
-        Bundle bundle = new Bundle();
-        bundle.putString("id", mediaId);
-        service.emit(MusicEvents.BUTTON_PLAY_FROM_ID, bundle);
+        WritableMap map = Arguments.createMap();
+        map.putString("id", mediaId);
+        manager.emitEvent(MusicEvents.BUTTON_PLAY_FROM_ID, map);
     }
 
     @SuppressLint("InlinedApi")
     @Override
     public void onPlayFromSearch(String query, Bundle extras) {
-        Bundle bundle = new Bundle();
-        bundle.putString("query", query);
+        WritableMap map = Arguments.createMap();
+        map.putString("query", query);
 
         if(extras.containsKey(MediaStore.EXTRA_MEDIA_FOCUS)) {
             String focus = extras.getString(MediaStore.EXTRA_MEDIA_FOCUS);
@@ -69,21 +68,21 @@ public class ButtonEvents extends MediaSessionCompat.Callback {
                 focus = "title";
             }
 
-            bundle.putString("focus", focus);
+            map.putString("focus", focus);
         }
 
         if(extras.containsKey(MediaStore.EXTRA_MEDIA_TITLE))
-            bundle.putString("title", extras.getString(MediaStore.EXTRA_MEDIA_TITLE));
+            map.putString("title", extras.getString(MediaStore.EXTRA_MEDIA_TITLE));
         if(extras.containsKey(MediaStore.EXTRA_MEDIA_ARTIST))
-            bundle.putString("artist", extras.getString(MediaStore.EXTRA_MEDIA_ARTIST));
+            map.putString("artist", extras.getString(MediaStore.EXTRA_MEDIA_ARTIST));
         if(extras.containsKey(MediaStore.EXTRA_MEDIA_ALBUM))
-            bundle.putString("album", extras.getString(MediaStore.EXTRA_MEDIA_ALBUM));
+            map.putString("album", extras.getString(MediaStore.EXTRA_MEDIA_ALBUM));
         if(extras.containsKey(MediaStore.EXTRA_MEDIA_GENRE))
-            bundle.putString("genre", extras.getString(MediaStore.EXTRA_MEDIA_GENRE));
+            map.putString("genre", extras.getString(MediaStore.EXTRA_MEDIA_GENRE));
         if(extras.containsKey(MediaStore.EXTRA_MEDIA_PLAYLIST))
-            bundle.putString("playlist", extras.getString(MediaStore.EXTRA_MEDIA_PLAYLIST));
+            map.putString("playlist", extras.getString(MediaStore.EXTRA_MEDIA_PLAYLIST));
 
-        service.emit(MusicEvents.BUTTON_PLAY_FROM_SEARCH, bundle);
+        manager.emitEvent(MusicEvents.BUTTON_PLAY_FROM_SEARCH, map);
     }
 
     @Override
@@ -93,48 +92,48 @@ public class ButtonEvents extends MediaSessionCompat.Callback {
         for(Track track : tracks) {
             if(track.queueId != id) continue;
 
-            Bundle bundle = new Bundle();
-            bundle.putString("id", track.id);
-            service.emit(MusicEvents.BUTTON_SKIP, bundle);
+            WritableMap map = Arguments.createMap();
+            map.putString("id", track.id);
+            manager.emitEvent(MusicEvents.BUTTON_SKIP, map);
             break;
         }
     }
 
     @Override
     public void onSkipToPrevious() {
-        service.emit(MusicEvents.BUTTON_SKIP_PREVIOUS, null);
+        manager.emitEvent(MusicEvents.BUTTON_SKIP_PREVIOUS, null);
     }
 
     @Override
     public void onSkipToNext() {
-        service.emit(MusicEvents.BUTTON_SKIP_NEXT, null);
+        manager.emitEvent(MusicEvents.BUTTON_SKIP_NEXT, null);
     }
 
     @Override
     public void onRewind() {
-        Bundle bundle = new Bundle();
-        bundle.putInt("interval", manager.getMetadata().getJumpInterval());
-        service.emit(MusicEvents.BUTTON_JUMP_BACKWARD, bundle);
+        WritableMap map = Arguments.createMap();
+        map.putInt("interval", manager.getMetadata().getJumpInterval());
+        manager.emitEvent(MusicEvents.BUTTON_JUMP_BACKWARD, map);
     }
 
     @Override
     public void onFastForward() {
-        Bundle bundle = new Bundle();
-        bundle.putInt("interval", manager.getMetadata().getJumpInterval());
-        service.emit(MusicEvents.BUTTON_JUMP_FORWARD, bundle);
+        WritableMap map = Arguments.createMap();
+        map.putInt("interval", manager.getMetadata().getJumpInterval());
+        manager.emitEvent(MusicEvents.BUTTON_JUMP_FORWARD, map);
     }
 
     @Override
     public void onSeekTo(long pos) {
-        Bundle bundle = new Bundle();
-        bundle.putDouble("position", Utils.toSeconds(pos));
-        service.emit(MusicEvents.BUTTON_SEEK_TO, bundle);
+        WritableMap map = Arguments.createMap();
+        map.putDouble("position", Utils.toSeconds(pos));
+        manager.emitEvent(MusicEvents.BUTTON_SEEK_TO, map);
     }
 
     @Override
     public void onSetRating(RatingCompat rating) {
-        Bundle bundle = new Bundle();
-        Utils.setRating(bundle, "rating", rating);
-        service.emit(MusicEvents.BUTTON_SET_RATING, bundle);
+        WritableMap map = Arguments.createMap();
+        Utils.setRating(map, "rating", rating);
+        manager.emitEvent(MusicEvents.BUTTON_SET_RATING, map);
     }
 }

@@ -1,21 +1,22 @@
 package com.guichaguri.trackplayer.service.models;
 
 import android.content.Context;
-import android.os.Bundle;
+import com.facebook.react.bridge.ReadableMap;
+import com.guichaguri.trackplayer.service.Utils;
 
 public class NowPlayingMetadata extends TrackMetadata {
 
     public double elapsedTime;
 
-    public NowPlayingMetadata(Context context, Bundle bundle, int ratingType) {
-        setMetadata(context, bundle, ratingType);
+    public NowPlayingMetadata(Context context, ReadableMap data, int ratingType) {
+        setMetadata(context, data, ratingType);
     }
 
     @Override
-    public void setMetadata(Context context, Bundle bundle, int ratingType) {
-        super.setMetadata(context, bundle, ratingType);
+    public void setMetadata(Context context, ReadableMap data, int ratingType) {
+        super.setMetadata(context, data, ratingType);
 
-        elapsedTime = bundle.getDouble("elapsedTime", 0);
+        elapsedTime = Utils.getDouble(data, "elapsedTime", 0);
     }
     
 }

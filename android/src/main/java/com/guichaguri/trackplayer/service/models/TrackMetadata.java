@@ -2,13 +2,12 @@ package com.guichaguri.trackplayer.service.models;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.Bundle;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
+import com.facebook.react.bridge.ReadableMap;
 import com.guichaguri.trackplayer.service.Utils;
 
 import static android.support.v4.media.MediaMetadataCompat.*;
-import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_RATING;
 
 public abstract class TrackMetadata {
     public Uri artwork;
@@ -22,17 +21,17 @@ public abstract class TrackMetadata {
 
     public RatingCompat rating;
 
-    public void setMetadata(Context context, Bundle bundle, int ratingType) {
-        artwork = Utils.getUri(context, bundle, "artwork");
+    public void setMetadata(Context context, ReadableMap data, int ratingType) {
+        artwork = Utils.getUri(context, data, "artwork");
 
-        title = bundle.getString("title");
-        artist = bundle.getString("artist");
-        album = bundle.getString("album");
-        date = bundle.getString("date");
-        genre = bundle.getString("genre");
-        duration = Utils.toMillis(bundle.getDouble("duration", 0));
+        title = data.getString("title");
+        artist = data.getString("artist");
+        album = data.getString("album");
+        date = data.getString("date");
+        genre = data.getString("genre");
+        duration = Utils.toMillis(Utils.getDouble(data, "duration", 0));
 
-        rating = Utils.getRating(bundle, "rating", ratingType);
+        rating = Utils.getRating(data, "rating", ratingType);
     }
 
     public MediaMetadataCompat.Builder toMediaMetadata() {

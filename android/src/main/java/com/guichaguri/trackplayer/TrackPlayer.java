@@ -1,5 +1,6 @@
 package com.guichaguri.trackplayer;
 
+import androidx.annotation.NonNull;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -16,12 +17,14 @@ import java.util.List;
 public class TrackPlayer implements ReactPackage {
 
     @Override
-    public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
+    @NonNull
+    public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
         return Collections.singletonList(new MusicModule(reactContext));
     }
 
     @Override
-    public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
+    @NonNull
+    public List<ViewManager> createViewManagers(@NonNull ReactApplicationContext reactContext) {
         return Collections.emptyList();
     }
 

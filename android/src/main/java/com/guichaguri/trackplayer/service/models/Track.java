@@ -2,11 +2,10 @@ package com.guichaguri.trackplayer.service.models;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.Bundle;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
-import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat.QueueItem;
+import com.facebook.react.bridge.*;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
@@ -26,22 +25,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static android.support.v4.media.MediaMetadataCompat.*;
+import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID;
+import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_URI;
 
 /**
  * @author Guichaguri
  */
 public class Track extends TrackMetadata {
 
-    public static List<Track> createTracks(Context context, List objects, int ratingType) {
+    public static List<Track> createTracks(Context context, ReadableArray objects, int ratingType) {
         List<Track> tracks = new ArrayList<>();
 
-        for(Object o : objects) {
-            if(o instanceof Bundle) {
-                tracks.add(new Track(context, (Bundle)o, ratingType));
-            } else {
-                return null;
+        for (int i = 0; i < objects.size(); i++) {
+            if (objects.getType(i) != ReadableType.Map) {
+                throw new IllegalArgumentException("Expected the track to be an object");
             }
+            tracks.add(new Track(context, objects.getMap(i), ratingType));
         }
 
         return tracks;
@@ -56,24 +55,24 @@ public class Track extends TrackMetadata {
     public String contentType;
     public String userAgent;
 
-    public Bundle originalItem;
+    public WritableMap originalItem;
 
     public Map<String, String> headers;
 
     public final long queueId;
 
-    public Track(Context context, Bundle bundle, int ratingType) {
-        id = bundle.getString("id");
+    public Track(Context context, ReadableMap map, int ratingType) {
+        id = map.getString("id");
 
-        resourceId = Utils.getRawResourceId(context, bundle, "url");
+        resourceId = Utils.getRawResourceId(context, map, "url");
 
         if(resourceId == 0) {
-            uri = Utils.getUri(context, bundle, "url");
+            uri = Utils.getUri(context, map, "url");
         } else {
             uri = RawResourceDataSource.buildRawResourceUri(resourceId);
         }
 
-        String trackType = bundle.getString("type", "default");
+        String trackType = Utils.getString(map, "type", "default");
 
         for(TrackType t : TrackType.values()) {
             if(t.name.equalsIgnoreCase(trackType)) {
@@ -82,29 +81,32 @@ public class Track extends TrackMetadata {
             }
         }
 
-        contentType = bundle.getString("contentType");
-        userAgent = bundle.getString("userAgent");
+        contentType = map.getString("contentType");
+        userAgent = map.getString("userAgent");
 
-        Bundle httpHeaders = bundle.getBundle("headers");
-        if(httpHeaders != null) {
+        if (map.hasKey("headers")) {
+            ReadableMap httpHeaders = map.getMap("headers");
+            ReadableMapKeySetIterator iterator = httpHeaders.keySetIterator();
             headers = new HashMap<>();
-            for(String header : httpHeaders.keySet()) {
-                headers.put(header, httpHeaders.getString(header));
+            while (iterator.hasNextKey()) {
+                String key = iterator.nextKey();
+                headers.put(key, httpHeaders.getString(key));
             }
         }
 
-        setMetadata(context, bundle, ratingType);
+        setMetadata(context, map, ratingType);
 
         queueId = System.currentTimeMillis();
-        originalItem = bundle;
+        originalItem = new JavaOnlyMap();
+        originalItem.merge(map);
     }
 
     @Override
-    public void setMetadata(Context context, Bundle bundle, int ratingType) {
-        super.setMetadata(context, bundle, ratingType);
+    public void setMetadata(Context context, ReadableMap data, int ratingType) {
+        super.setMetadata(context, data, ratingType);
 
-        if (originalItem != null && originalItem != bundle)
-            originalItem.putAll(bundle);
+        if (originalItem != null && originalItem != data)
+            originalItem.merge(data);
     }
 
     @Override
