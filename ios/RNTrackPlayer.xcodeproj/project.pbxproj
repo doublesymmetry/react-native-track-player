@@ -333,7 +333,7 @@
 				DEVELOPMENT_TEAM = B82TF96752;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PODS_ROOT)/Headers/Public/React",
+					"$(PODS_ROOT)/Headers/Public/React-Core",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = (
@@ -359,7 +359,7 @@
 				DEVELOPMENT_TEAM = B82TF96752;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PODS_ROOT)/Headers/Public/React",
+					"$(PODS_ROOT)/Headers/Public/React-Core",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = (
