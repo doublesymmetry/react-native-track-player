@@ -6,7 +6,7 @@ import Player from "../components/Player";
 import playlistData from "../data/playlist.json";
 import localTrack from "../resources/pure.m4a";
 
-export default function LandingScreen() {
+export default function PlaylistScreen() {
   const playbackState = usePlaybackState();
 
   useEffect(() => {
@@ -67,7 +67,7 @@ export default function LandingScreen() {
   );
 }
 
-LandingScreen.navigationOptions = {
+PlaylistScreen.navigationOptions = {
   title: "Playlist Example"
 };
 
