@@ -1,6 +1,6 @@
 {
   "name": "react-native-track-player",
-  "version": "1.2.2",
+  "version": "2.0.0",
   "description": "A fully fledged audio module created for music apps",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -9,7 +9,7 @@
     "lint": "eslint \"src/**/*.ts\"",
     "format": "prettier --write \"src/**/*.ts\"",
     "prepare": "yarn build",
-    "prepublishOnly": "git submodule update --init --recursive && yarn lint",
+    "prepublishOnly": "yarn lint",
     "preversion": "yarn lint",
     "version": "yarn format && git add -A src",
     "postversion": "git push && git push --tags"
