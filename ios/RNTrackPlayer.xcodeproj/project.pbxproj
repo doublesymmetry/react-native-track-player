@@ -12,10 +12,10 @@
 		9B0E282F1F07D76F00B71D2A /* RNTrackPlayerBridge.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B0E282C1F07D76F00B71D2A /* RNTrackPlayerBridge.h */; };
 		9B18C2FA226356560019375A /* SessionCategories.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B18C2F9226356560019375A /* SessionCategories.swift */; };
 		9B58DF3B1F40C0F000C2105E /* RNTrackPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B58DF3A1F40C0F000C2105E /* RNTrackPlayer.swift */; };
-		9B70466522BFFDEE00065A77 /* Metadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B70466422BFFDEE00065A77 /* Metadata.swift */; };
 		9B78A2461F3F12BC002B5E3C /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B78A2451F3F12BC002B5E3C /* Track.swift */; };
 		9B78A2481F3F12C9002B5E3C /* MediaURL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B78A2471F3F12C9002B5E3C /* MediaURL.swift */; };
 		9BFC1FDD1F61A8E8008795BF /* Capabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC1FDC1F61A8E8008795BF /* Capabilities.swift */; };
+		BF227390244F344D00A9893D /* Metadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B70466422BFFDEE00065A77 /* Metadata.swift */; };
 		E325282D94FF82CFA2EB0010 /* libPods-RNTrackPlayer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1246438900A0B75E980792EE /* libPods-RNTrackPlayer.a */; };
 /* End PBXBuildFile section */
 
@@ -113,20 +113,20 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		9BFBA4D31F3DFA4B00453D3A /* Support */ = {
-			isa = PBXGroup;
-			children = (
-				9BFBA4D01F3DFA3F00453D3A /* RNTrackPlayer-Bridging-Header.h */,
-			);
-			path = Support;
-			sourceTree = "<group>";
-		};
 		9B70466322BFFDDD00065A77 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
 				9B70466422BFFDEE00065A77 /* Metadata.swift */,
 			);
 			path = Utils;
+			sourceTree = "<group>";
+		};
+		9BFBA4D31F3DFA4B00453D3A /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				9BFBA4D01F3DFA3F00453D3A /* RNTrackPlayer-Bridging-Header.h */,
+			);
+			path = Support;
 			sourceTree = "<group>";
 		};
 		BCE4275E67DE4E2572FF8FBC /* Frameworks */ = {
@@ -222,6 +222,7 @@
 			files = (
 				9B0E282E1F07D76F00B71D2A /* RNTrackPlayerBridge.m in Sources */,
 				9B18C2FA226356560019375A /* SessionCategories.swift in Sources */,
+				BF227390244F344D00A9893D /* Metadata.swift in Sources */,
 				9B78A2481F3F12C9002B5E3C /* MediaURL.swift in Sources */,
 				9BFC1FDD1F61A8E8008795BF /* Capabilities.swift in Sources */,
 				9B78A2461F3F12BC002B5E3C /* Track.swift in Sources */,
