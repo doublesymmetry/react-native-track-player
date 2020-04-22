@@ -73,7 +73,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     public void add(Track track, int index, Promise promise) {
         queue.add(index, track);
         MediaSource trackSource = track.toMediaSource(context, this);
-        source.addMediaSource(index, trackSource, manager.getHandler(), Utils.toRunnable(promise));
+        source.addMediaSource(index, trackSource, manager.getHandler(), () -> promise.resolve(index));
 
         prepare();
     }
@@ -87,7 +87,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
         }
 
         queue.addAll(index, tracks);
-        source.addMediaSources(index, trackList, manager.getHandler(), Utils.toRunnable(promise));
+        source.addMediaSources(index, trackList, manager.getHandler(), () -> promise.resolve(index));
 
         prepare();
     }
