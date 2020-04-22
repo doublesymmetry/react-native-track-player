@@ -202,9 +202,5 @@ public class Utils {
 
         return list;
     }
-
-    public static String getNotificationChannel(Context context) {
-
-        return Utils.NOTIFICATION_CHANNEL;
-    }
+    
 }
