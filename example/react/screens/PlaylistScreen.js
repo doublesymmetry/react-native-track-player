@@ -1,13 +1,13 @@
 import React, { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import TrackPlayer from "react-native-track-player";
+import TrackPlayer, { usePlaybackState } from "react-native-track-player";
 
 import Player from "../components/Player";
 import playlistData from "../data/playlist.json";
 import localTrack from "../resources/pure.m4a";
 
 export default function PlaylistScreen() {
-  const playbackState = TrackPlayer.usePlaybackState();
+  const playbackState = usePlaybackState();
 
   useEffect(() => {
     TrackPlayer.setupPlayer();

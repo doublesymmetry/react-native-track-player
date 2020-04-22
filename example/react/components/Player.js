@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import TrackPlayer from "react-native-track-player";
+import TrackPlayer, {
+  useTrackPlayerProgress,
+  usePlaybackState,
+  useTrackPlayerEvents
+} from "react-native-track-player";
 import {
   Image,
   StyleSheet,
@@ -11,7 +15,7 @@ import {
 } from "react-native";
 
 function ProgressBar() {
-  const progress = TrackPlayer.useTrackPlayerProgress();
+  const progress = useTrackPlayerProgress();
 
   return (
     <View style={styles.progress}>
@@ -40,11 +44,11 @@ ControlButton.propTypes = {
 };
 
 export default function Player(props) {
-  const playbackState = TrackPlayer.usePlaybackState();
+  const playbackState = usePlaybackState();
   const [trackTitle, setTrackTitle] = useState("");
   const [trackArtwork, setTrackArtwork] = useState("");
   const [trackArtist, setTrackArtist] = useState("");
-  TrackPlayer.useTrackPlayerEvents(["playback-track-changed"], async event => {
+  useTrackPlayerEvents(["playback-track-changed"], async event => {
     if (event.type === TrackPlayer.TrackPlayerEvents.PLAYBACK_TRACK_CHANGED) {
       const track = await TrackPlayer.getTrack(event.nextTrack);
       setTrackTitle(track.title);
