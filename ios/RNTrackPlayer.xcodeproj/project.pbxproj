@@ -15,7 +15,6 @@
 		9B78A2461F3F12BC002B5E3C /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B78A2451F3F12BC002B5E3C /* Track.swift */; };
 		9B78A2481F3F12C9002B5E3C /* MediaURL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B78A2471F3F12C9002B5E3C /* MediaURL.swift */; };
 		9BFC1FDD1F61A8E8008795BF /* Capabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC1FDC1F61A8E8008795BF /* Capabilities.swift */; };
-		E325282D94FF82CFA2EB0010 /* libPods-RNTrackPlayer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1246438900A0B75E980792EE /* libPods-RNTrackPlayer.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -32,9 +31,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		03B3437D66957B9917A39072 /* Pods-RNTrackPlayer.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RNTrackPlayer.release.xcconfig"; path = "Target Support Files/Pods-RNTrackPlayer/Pods-RNTrackPlayer.release.xcconfig"; sourceTree = "<group>"; };
-		1246438900A0B75E980792EE /* libPods-RNTrackPlayer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RNTrackPlayer.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		4603E9FF75656768F20C7764 /* Pods-RNTrackPlayer.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RNTrackPlayer.debug.xcconfig"; path = "Target Support Files/Pods-RNTrackPlayer/Pods-RNTrackPlayer.debug.xcconfig"; sourceTree = "<group>"; };
 		9A0CF10D2046E5AC0093A5DF /* PitchAlgorithms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PitchAlgorithms.swift; sourceTree = "<group>"; };
 		9B0E28291F07D76F00B71D2A /* libRNTrackPlayer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNTrackPlayer.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B0E282C1F07D76F00B71D2A /* RNTrackPlayerBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNTrackPlayerBridge.h; sourceTree = "<group>"; };
@@ -52,29 +48,17 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E325282D94FF82CFA2EB0010 /* libPods-RNTrackPlayer.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		7B2222592AF0E6DEBEB89AEE /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				4603E9FF75656768F20C7764 /* Pods-RNTrackPlayer.debug.xcconfig */,
-				03B3437D66957B9917A39072 /* Pods-RNTrackPlayer.release.xcconfig */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
 		9B0E28201F07D76E00B71D2A = {
 			isa = PBXGroup;
 			children = (
 				9B0E282B1F07D76F00B71D2A /* RNTrackPlayer */,
 				9B0E282A1F07D76F00B71D2A /* Products */,
-				7B2222592AF0E6DEBEB89AEE /* Pods */,
-				BCE4275E67DE4E2572FF8FBC /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -118,14 +102,6 @@
 			path = Support;
 			sourceTree = "<group>";
 		};
-		BCE4275E67DE4E2572FF8FBC /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				1246438900A0B75E980792EE /* libPods-RNTrackPlayer.a */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -133,7 +109,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9B0E28321F07D76F00B71D2A /* Build configuration list for PBXNativeTarget "RNTrackPlayer" */;
 			buildPhases = (
-				FEFFC058D3AC81656989691D /* [CP] Check Pods Manifest.lock */,
 				9B0E28251F07D76F00B71D2A /* Sources */,
 				9B0E28261F07D76F00B71D2A /* Frameworks */,
 				9B0E28271F07D76F00B71D2A /* CopyFiles */,
@@ -178,31 +153,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		FEFFC058D3AC81656989691D /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-RNTrackPlayer-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		9B0E28251F07D76F00B71D2A /* Sources */ = {
@@ -326,21 +276,16 @@
 		};
 		9B0E28331F07D76F00B71D2A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4603E9FF75656768F20C7764 /* Pods-RNTrackPlayer.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = B82TF96752;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PODS_ROOT)/Headers/Public/React-Core",
-				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 				);
-				PODS_ROOT = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "RNTrackPlayer/Support/RNTrackPlayer-Bridging-Header.h";
@@ -352,21 +297,16 @@
 		};
 		9B0E28341F07D76F00B71D2A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 03B3437D66957B9917A39072 /* Pods-RNTrackPlayer.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = B82TF96752;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PODS_ROOT)/Headers/Public/React-Core",
-				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 				);
-				PODS_ROOT = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "RNTrackPlayer/Support/RNTrackPlayer-Bridging-Header.h";
