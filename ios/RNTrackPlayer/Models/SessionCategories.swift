@@ -9,7 +9,6 @@
 import Foundation
 import MediaPlayer
 import AVFoundation
-import SwiftAudio
 
 enum SessionCategory : String {
     
