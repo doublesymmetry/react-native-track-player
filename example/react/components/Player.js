@@ -46,7 +46,7 @@ ControlButton.propTypes = {
 export default function Player(props) {
   const playbackState = usePlaybackState();
   const [trackTitle, setTrackTitle] = useState("");
-  const [trackArtwork, setTrackArtwork] = useState("");
+  const [trackArtwork, setTrackArtwork] = useState();
   const [trackArtist, setTrackArtist] = useState("");
   useTrackPlayerEvents(["playback-track-changed"], async event => {
     if (event.type === TrackPlayer.TrackPlayerEvents.PLAYBACK_TRACK_CHANGED) {
