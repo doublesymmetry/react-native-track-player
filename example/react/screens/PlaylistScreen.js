@@ -37,7 +37,8 @@ export default function PlaylistScreen() {
         url: localTrack,
         title: "Pure (Demo)",
         artist: "David Chavez",
-        artwork: "https://picsum.photos/200"
+        artwork: "https://picsum.photos/200",
+        duration: 28
       });
       await TrackPlayer.play();
     } else {
