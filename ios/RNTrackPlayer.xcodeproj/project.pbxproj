@@ -40,6 +40,7 @@
 		BF1CBBC22450E5C5007C339D /* AVPlayerWrapperProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBBA72450E5C5007C339D /* AVPlayerWrapperProtocol.swift */; };
 		BF1CBBC32450E5C5007C339D /* AVPlayerWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBBA82450E5C5007C339D /* AVPlayerWrapper.swift */; };
 		BF1CBBC42450E5C5007C339D /* AVPlayerWrapperDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBBA92450E5C5007C339D /* AVPlayerWrapperDelegate.swift */; };
+		BF1CBE4A24535109007C339D /* RNTrackPlayerAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBE4924535108007C339D /* RNTrackPlayerAudioPlayer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -92,6 +93,7 @@
 		BF1CBBA82450E5C5007C339D /* AVPlayerWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVPlayerWrapper.swift; sourceTree = "<group>"; };
 		BF1CBBA92450E5C5007C339D /* AVPlayerWrapperDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVPlayerWrapperDelegate.swift; sourceTree = "<group>"; };
 		BF1CBBAB2450E5C5007C339D /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		BF1CBE4924535108007C339D /* RNTrackPlayerAudioPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNTrackPlayerAudioPlayer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,6 +131,7 @@
 				9B0E282C1F07D76F00B71D2A /* RNTrackPlayerBridge.h */,
 				9B0E282D1F07D76F00B71D2A /* RNTrackPlayerBridge.m */,
 				9B58DF3A1F40C0F000C2105E /* RNTrackPlayer.swift */,
+				BF1CBE4924535108007C339D /* RNTrackPlayerAudioPlayer.swift */,
 				BF1CBB892450E5C5007C339D /* Vendor */,
 			);
 			path = RNTrackPlayer;
@@ -316,6 +319,7 @@
 				BF1CBBAD2450E5C5007C339D /* Event.swift in Sources */,
 				9B18C2FA226356560019375A /* SessionCategories.swift in Sources */,
 				BF1CBBBA2450E5C5007C339D /* MediaItemProperty.swift in Sources */,
+				BF1CBE4A24535109007C339D /* RNTrackPlayerAudioPlayer.swift in Sources */,
 				9B78A2481F3F12C9002B5E3C /* MediaURL.swift in Sources */,
 				BF1CBBBB2450E5C5007C339D /* NowPlayingInfoController.swift in Sources */,
 				BF1CBBBE2450E5C5007C339D /* NowPlayingInfoProperty.swift in Sources */,
