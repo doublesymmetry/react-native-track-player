@@ -17,7 +17,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     private var hasInitialized = false
 
     private lazy var player: RNTrackPlayerAudioPlayer = {
-        let player = RNTrackPlayerAudioPlayer()
+        let player = RNTrackPlayerAudioPlayer(reactEventEmitter: self)
         player.bufferDuration = 1
         return player
     }()
@@ -174,39 +174,6 @@ public class RNTrackPlayer: RCTEventEmitter {
         
         
         // setup event listeners
-        player.event.stateChange.addListener(self) { [weak self] state in
-            self?.sendEvent(withName: "playback-state", body: ["state": state.rawValue])
-        }
-        
-        player.event.fail.addListener(self) { [weak self] error in
-            self?.sendEvent(withName: "playback-error", body: ["error": error?.localizedDescription])
-        }
-        
-        player.event.playbackEnd.addListener(self) { [weak self] reason in
-            guard let `self` = self else { return }
-
-            if reason == .playedUntilEnd {
-                // playbackEnd is called twice at the end of a track;
-                // we ignore .skippedToNext and only fire an event
-                // for .playedUntilEnd
-                // nextTrack might be nil if there are no more, but still send the event for consistency
-                self.sendEvent(withName: "playback-track-changed", body: [
-                    "track": (self.player.currentItem as? Track)?.id,
-                    "position": self.player.currentTime,
-                    "nextTrack": (self.player.nextItems.first as? Track)?.id,
-                    ])
-                
-                if self.player.nextItems.count == 0 {
-                    // fire an event for the queue ending
-                    self.sendEvent(withName: "playback-queue-ended", body: [
-                        "track": (self.player.currentItem as? Track)?.id,
-                        "position": self.player.currentTime,
-                        ])
-                }
-            }
-
-        }
-        
         player.remoteCommandController.handleChangePlaybackPositionCommand = { [weak self] event in
             if let event = event as? MPChangePlaybackPositionCommandEvent {
                 self?.sendEvent(withName: "remote-seek", body: ["position": event.positionTime])
@@ -339,14 +306,6 @@ public class RNTrackPlayer: RCTEventEmitter {
             
             try? player.add(items: tracks, at: insertIndex)
         } else {
-            if (player.currentItem == nil && tracks.count > 0) {
-                sendEvent(withName: "playback-track-changed", body: [
-                    "track": nil,
-                    "position": 0,
-                    "nextTrack": tracks.first!.id
-                ])
-            }
-            
             try? player.add(items: tracks, playWhenReady: false)
         }
         
@@ -387,12 +346,6 @@ public class RNTrackPlayer: RCTEventEmitter {
             return
         }
         
-        sendEvent(withName: "playback-track-changed", body: [
-            "track": (player.currentItem as? Track)?.id,
-            "position": player.currentTime,
-            "nextTrack": trackId,
-        ])
-        
         print("Skipping to track:", trackId)
         try? player.jumpToItem(atIndex: trackIndex, playWhenReady: player.playerState == .playing)
         resolve(NSNull())
@@ -402,11 +355,6 @@ public class RNTrackPlayer: RCTEventEmitter {
     public func skipToNext(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Skipping to next track")
         do {
-            sendEvent(withName: "playback-track-changed", body: [
-                "track": (player.currentItem as? Track)?.id,
-                "position": player.currentTime,
-                "nextTrack": (player.nextItems.first as? Track)?.id,
-            ])
             try player.next()
             resolve(NSNull())
         } catch (_) {
@@ -418,11 +366,6 @@ public class RNTrackPlayer: RCTEventEmitter {
     public func skipToPrevious(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Skipping to next track")
         do {
-            sendEvent(withName: "playback-track-changed", body: [
-                "track": (player.currentItem as? Track)?.id,
-                "position": player.currentTime,
-                "nextTrack": (player.previousItems.last as? Track)?.id,
-            ])
             try player.previous()
             resolve(NSNull())
         } catch (_) {
