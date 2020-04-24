@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import TrackPlayer, {
   State,
   Event,
-  useTrackPlayerProgress,
+  useProgress,
   usePlaybackState,
   useTrackPlayerEvents
 } from "react-native-track-player";
@@ -17,7 +17,7 @@ import {
 } from "react-native";
 
 function ProgressBar() {
-  const progress = useTrackPlayerProgress();
+  const progress = useProgress();
 
   return (
     <View style={styles.progress}>
