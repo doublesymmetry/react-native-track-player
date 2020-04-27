@@ -10,8 +10,12 @@ export default function PlaylistScreen() {
   const playbackState = usePlaybackState();
 
   useEffect(() => {
-    TrackPlayer.setupPlayer();
-    TrackPlayer.updateOptions({
+    setup();
+  }, []);
+
+  async function setup() {
+    await TrackPlayer.setupPlayer({});
+    await TrackPlayer.updateOptions({
       stopWithApp: true,
       capabilities: [
         TrackPlayer.CAPABILITY_PLAY,
@@ -25,7 +29,7 @@ export default function PlaylistScreen() {
         TrackPlayer.CAPABILITY_PAUSE
       ]
     });
-  }, []);
+  }
 
   async function togglePlayback() {
     const currentTrack = await TrackPlayer.getCurrentTrack();
