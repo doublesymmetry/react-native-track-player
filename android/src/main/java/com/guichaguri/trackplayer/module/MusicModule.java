@@ -336,6 +336,29 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
             callback.resolve(null);
         });
     }
+    
+    @ReactMethod
+    public void repeat(final int repeatMode, final Promise callback) {
+        waitForConnection(() -> {
+            binder.getPlayback().repeat(repeatMode);
+            callback.resolve(null);
+        });
+    }
+
+    @ReactMethod
+    public void setShuffle(final boolean shuffleModeEnabled, final Promise callback) {
+        waitForConnection(() -> {
+            binder.getPlayback().setShuffle(shuffleModeEnabled);
+            callback.resolve(null);
+        });
+    }
+
+    @ReactMethod
+    public void getShuffle(final Promise callback) {
+        waitForConnection(() -> {
+            callback.resolve(binder.getPlayback().getShuffle());
+        });
+    }
 
     @ReactMethod
     public void seekTo(final float seconds, final Promise callback) {
