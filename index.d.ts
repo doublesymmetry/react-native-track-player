@@ -207,6 +207,6 @@ declare namespace RNTrackPlayer {
   export function useInterval(callback: ()=> void, delay: number): void;
   export function useWhenPlaybackStateChanges(callback: ()=> void): void;
   export function usePlaybackStateIs(...states: string[]): boolean;
-  export function useTrackPlayerProgress(interval: number): ProgressComponentState;
+  export function useTrackPlayerProgress(interval?: number): ProgressComponentState;
 
 }
