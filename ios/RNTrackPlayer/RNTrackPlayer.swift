@@ -315,19 +315,20 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(remove:resolver:rejecter:)
     public func remove(tracks ids: [String], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Removing tracks:", ids)
-        var indexesToRemove: [Int] = []
         
-        for id in ids {
-            if let index = player.items.firstIndex(where: { ($0 as! Track).id == id }) {
-                if index == player.currentIndex { return }
-                indexesToRemove.append(index)
+        // Look through queue for tracks that match one of the provided ids.
+        // Do this in reverse order so that as they are removed, 
+        // it will not affect other indices that will be removed.
+        for (index, element) in player.items.enumerated().reversed() {
+            // skip the current index
+            if index == player.currentIndex { continue }
+            
+            let track = element as! Track
+            if ids.contains(track.id) {
+                try? player.removeItem(at: index)
             }
         }
-        
-        for index in indexesToRemove {
-            try? player.removeItem(at: index)
-        }
-        
+
         resolve(NSNull())
     }
     
