@@ -1,7 +1,13 @@
 ---
 title: Background Mode
+description: "Enable background playback"
+nav_order: 4
 permalink: /background/
+redirect_from:
+  - /background-mode/
 ---
+
+# Background Mode
 
 ## Android
 The background support works right out of the box, and it will keep playing even after the app is closed. If that is not the desired behavior and you only want to play when the app is open, you can disable it with the `stopWithApp` property in `updateOptions`:

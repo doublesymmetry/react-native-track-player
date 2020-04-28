@@ -1,7 +1,10 @@
 ---
 title: Platform Support
+nav_order: 6
 permalink: /platform-support/
 ---
+
+# Platform Support
 
 ## Audio Sources
 

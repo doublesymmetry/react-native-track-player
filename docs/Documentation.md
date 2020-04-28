@@ -1,7 +1,13 @@
 ---
-title: Documentation
+title: API Documentation
+description: "The API documentation for react-native-track-player"
+nav_order: 3
 permalink: /documentation/
+redirect_from:
+  - /docs/
 ---
+
+# API Documentation
 
 ## Summary
 
@@ -513,7 +519,7 @@ For more information about Resource Objects, read the [Images](https://facebook.
 
 React v16.8 introduced [hooks](https://reactjs.org/docs/hooks-intro.html). If you are using a version of React Native that is before [v0.59.0](https://facebook.github.io/react-native/blog/2019/03/12/releasing-react-native-059), your React Native version does not support hooks. 
 
-#### useTrackPlayerEvents
+#### `useTrackPlayerEvents`
 Register an event listener for one or more of the [events](#events) emitted by the TrackPlayer. The subscription is removed when the component unmounts.
 
 Check out the [events section](#events) for a full list of supported events.
@@ -551,7 +557,7 @@ const MyComponent = () => {
 };
 ```
 
-#### useTrackPlayerProgress
+#### `useTrackPlayerProgress`
 A hook alternative to the [Progress Component](#progresscomponent).
 
 | State            | Type     | Description                      |

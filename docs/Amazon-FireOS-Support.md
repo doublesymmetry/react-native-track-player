@@ -1,7 +1,10 @@
 ---
 title: Amazon FireOS Support
+nav_order: 7
 permalink: /amazon-fireos-support/
 ---
+
+# Amazon FireOS Support
 
 Support for Android in `react-native-track-player` is built on top of the [ExoPlayer](https://github.com/google/ExoPlayer) media player library provided by Google. ExoPlayer does not officially support Amazon's FireOS fork of Android, because it does not pass [Android CTS](https://source.android.com/compatibility/cts). ExoPlayer seems to work decently on FireOS 5, but it hardly works at all on FireOS 4.
 
