@@ -100,3 +100,4 @@ permalink: /platform-support/
 | `playback-track-changed` | ✓ | ✓ | ✓ |
 | `playback-queue-ended` | ✓ | ✓ | ✓ |
 | `playback-error` | ✓ | ✓ | ✓ |
+| `playback-metadata-received` | ✓ | ✗ | ✗ |

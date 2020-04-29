@@ -9,6 +9,7 @@ declare namespace RNTrackPlayer {
     | "playback-error"
     | "playback-queue-ended"
     | "playback-track-changed"
+    | "playback-metadata-received"
     | "remote-play"
     | "remote-play-id"
     | "remote-play-search"
@@ -202,6 +203,30 @@ declare namespace RNTrackPlayer {
   export const PITCH_ALGORITHM_MUSIC: PitchAlgorithm;
   export const PITCH_ALGORITHM_VOICE: PitchAlgorithm;
   
+  export const TrackPlayerEvents: {
+    REMOTE_PLAY: EventType;
+    REMOTE_PLAY_ID: EventType;
+    REMOTE_PLAY_SEARCH: EventType;
+    REMOTE_PAUSE: EventType;
+    REMOTE_STOP: EventType;
+    REMOTE_SKIP: EventType;
+    REMOTE_NEXT: EventType;
+    REMOTE_PREVIOUS: EventType;
+    REMOTE_SEEK: EventType;
+    REMOTE_SET_RATING: EventType;
+    REMOTE_JUMP_FORWARD: EventType;
+    REMOTE_JUMP_BACKWARD: EventType;
+    REMOTE_DUCK: EventType;
+    REMOTE_LIKE: EventType;
+    REMOTE_DISLIKE: EventType;
+    REMOTE_BOOKMARK: EventType;
+    PLAYBACK_STATE: EventType;
+    PLAYBACK_TRACK_CHANGED: EventType;
+    PLAYBACK_QUEUE_ENDED: EventType;
+    PLAYBACK_ERROR: EventType;
+    PLAYBACK_METADATA_RECEIVED: EventType;
+  };
+
   // Hooks
   export function usePlaybackState(): State;
   export function useTrackPlayerEvents(events: string[], handler: (event: any) => void): void;
