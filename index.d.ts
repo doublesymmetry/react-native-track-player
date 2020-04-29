@@ -74,6 +74,7 @@ declare namespace RNTrackPlayer {
     minBuffer?: number;
     maxBuffer?: number;
     playBuffer?: number;
+    backBuffer?: number;
     maxCacheSize?: number;
     iosCategory?: 'playback' | 'playAndRecord' | 'multiRoute' | 'ambient' | 'soloAmbient' | 'record';
     iosCategoryMode?: 'default' | 'gameChat' | 'measurement' | 'moviePlayback' | 'spokenAudio' | 'videoChat' | 'videoRecording' | 'voiceChat' | 'voicePrompt';
