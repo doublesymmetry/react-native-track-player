@@ -129,7 +129,7 @@ declare namespace RNTrackPlayer {
   export function removeUpcomingTracks(): Promise<void>;
 
   // Control Center / Notification Metadata Commands
-  export function updateOptions(options: MetadataOptions): void;
+  export function updateOptions(options: MetadataOptions): Promise<void>;
   export function updateMetadataForTrack(id: string, metadata: TrackMetadata) : Promise<void>;
 
   // Player Playback Commands
