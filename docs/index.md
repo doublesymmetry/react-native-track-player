@@ -7,7 +7,7 @@ permalink: /
 ---
 
 [![downloads](https://img.shields.io/npm/dw/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player)
-[![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player) 
+[![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player)
 [![discord](https://img.shields.io/discord/567636850513018880.svg)](https://discordapp.com/invite/ya2XDCR)
 
 # react-native-track-player
@@ -33,8 +33,8 @@ A fully fledged audio module created for music apps. Provides audio playback, ex
 
 ## Example
 
-If you want to get started with this module, check the [Getting Started](./API.md) page.
-If you want detailed information about the API, check the [Documentation](./Documentation.md).
+If you want to get started with this module, check the [Getting Started](https://react-native-kit.github.io/react-native-track-player/api/) page.
+If you want detailed information about the API, check the [Documentation](https://react-native-kit.github.io/react-native-track-player/documentation/).
 You can also look at our example project [here](https://github.com/react-native-kit/react-native-track-player/tree/master/example).
 
 ```javascript
