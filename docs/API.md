@@ -29,7 +29,7 @@ TrackPlayer.registerPlaybackService(() => require('./service'));
 // service.js
 module.exports = async function() {
     // This service needs to be registered for the module to work
-	// but it will be used later in the "Receiving Events" section
+    // but it will be used later in the "Receiving Events" section
 }
 ```
 
@@ -68,7 +68,7 @@ await TrackPlayer.add([track1, track2]);
 
 ```javascript
 const state = await TrackPlayer.getState();
-if(state === TrackPlayer.STATE_PLAYING) {
+if (state === TrackPlayer.STATE_PLAYING) {
     console.log('The player is playing');
 };
 
@@ -120,32 +120,38 @@ You can subscribe to [playback events](https://react-native-kit.github.io/react-
 
 #### Example
 ```jsx
-class PlayerInfo extends Component {
+const PlayerInfo = () => {
+    const [trackTitle, setTrackTitle] = useState();
+    useEffect(() => {
+        let mounted = true;
 
-    componentDidMount() {
-        // Add an event handler for the playback-track-changed event
-        this.onTrackChange = TrackPlayer.addEventListener(
+        // Set the initial track title:
+        (async() => {
+            const trackId = await TrackPlayer.getCurrentTrack();
+            if (!mounted || !trackId) return;
+            const track = await TrackPlayer.getTrack(trackId);
+            if (!mounted) return;
+            setTrackTitle(track.title);
+        })();
+
+        // Set the track title whenever the track changes:
+        const listener = TrackPlayer.addEventListener(
             'playback-track-changed',
             async (data) => {
                 const track = await TrackPlayer.getTrack(data.nextTrack);
-                this.setState({
-                    trackTitle: track.title
-                });
+                if (!mounted) return;
+                setTrackTitle(track.title);
             }
         );
-    }
+        return () => {
+            mounted = false;
+            listener.remove();
+        }
+    }, []);
 
-    componentWillUnmount() {
-        // Remove the event handler again when the component unmounts:
-        this.onTrackChange.remove();
-    }
-
-    render() {
-        return (
-            <Text>{this.state.trackTitle}</Text>
-        );
-    }
-
+    return (
+        <Text>{trackTitle}</Text>
+    );
 }
 ```
 
