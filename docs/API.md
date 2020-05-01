@@ -43,25 +43,34 @@ First of all, you need to create a [track object](https://react-native-kit.githu
 ```javascript
 const track1 = {
     id: 'avaritia', // Must be a string, required
-    url: 'http://example.com/avaritia.mp3', // Load media through the network
+    url: 'http://example.com/avaritia.mp3', // Load media from the network
     title: 'Avaritia',
     artist: 'deadmau5',
     album: 'while(1<2)',
     genre: 'Progressive House, Electro House',
     date: '2014-05-20T07:00:00+00:00', // RFC 3339
-    artwork: 'http://example.com/avaritia.png' // Load artwork from the network
+    artwork: 'http://example.com/cover.png' // Load artwork from the network
 };
 
 const track2 = {
     id: 'coelacanth',
-    url: require('./avaritia.ogg'), // Load media from the app bundle
+    url: require('./coelacanth.ogg'), // Load media from the app bundle
     title: 'Coelacanth I',
     artist: 'deadmau5',
-    artwork: require('./avaritia.jpg') // Load artwork from the app bundle
+    artwork: require('./cover.jpg') // Load artwork from the app bundle
+};
+
+const track3 = {
+    id: 'ice_age',
+    url: 'file:///storage/sdcard0/Downloads/artwork.png', // Load media from the file system
+    title: 'Ice Age',
+    artist: 'deadmau5',
+     // Load artwork from the file system:
+    artwork: 'file:///storage/sdcard0/Downloads/cover.png'
 };
 
 // Add the tracks to the queue:
-await TrackPlayer.add([track1, track2]);
+await TrackPlayer.add([track1, track2, track3]);
 ```
 
 ### Player Information
