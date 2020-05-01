@@ -12,7 +12,7 @@ redirect_from:
 React Native Track Player supports playing audio while your app is in the background on all supported platforms.
 
 ## Android
-Background audio playback works right out of the box. By default, the audio will keep playing even after the app is closed. If that is not the desired behavior and you want the audio to stop playing when the app is closed, you can disable it with the `stopWithApp` property in `updateOptions`:
+Background audio playback works right out of the box. By default, the audio will continue to play, not only when the app is suspended in the background, but also after the app is closed by the user. If that is not the desired behavior and you want the audio to stop playing when the app is closed, you can disable it with the `stopWithApp` property in `updateOptions`. In this case, the audio will still play while the app is open in the background.:
 
 ```js
 TrackPlayer.updateOptions({
