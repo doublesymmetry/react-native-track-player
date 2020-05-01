@@ -49,7 +49,8 @@ const track1 = {
     album: 'while(1<2)',
     genre: 'Progressive House, Electro House',
     date: '2014-05-20T07:00:00+00:00', // RFC 3339
-    artwork: 'http://example.com/cover.png' // Load artwork from the network
+    artwork: 'http://example.com/cover.png', // Load artwork from the network
+    duration: 402 // Duration in seconds
 };
 
 const track2 = {
@@ -57,7 +58,8 @@ const track2 = {
     url: require('./coelacanth.ogg'), // Load media from the app bundle
     title: 'Coelacanth I',
     artist: 'deadmau5',
-    artwork: require('./cover.jpg') // Load artwork from the app bundle
+    artwork: require('./cover.jpg'), // Load artwork from the app bundle
+    duration: 166
 };
 
 const track3 = {
@@ -66,7 +68,8 @@ const track3 = {
     title: 'Ice Age',
     artist: 'deadmau5',
      // Load artwork from the file system:
-    artwork: 'file:///storage/sdcard0/Downloads/cover.png'
+    artwork: 'file:///storage/sdcard0/Downloads/cover.png',
+    duration: 411
 };
 
 // Add the tracks to the queue:
@@ -226,8 +229,6 @@ Track Player can be configured using a number of options. Some of these options 
 
 You can change options multiple times. You do not need to specify all the options, just the ones you want to change.
 
-It is recommended to set the options right before using any other function (other than `setupPlayer`)
-
 For more information about the properties you can set, [check the documentation](https://react-native-kit.github.io/react-native-track-player/documentation/#updateoptionsdata).
 
 #### Example
@@ -260,4 +261,4 @@ TrackPlayer.updateOptions({
 ```
 
 ### Notes
-* Because you can not stop the player service by swiping the Android notification, we highly recommend you to have a stop button in the notification. The button should `destroy()` the player.
+* In order to keep playing audio in the background, the Android player service requires a notification in order to be in the "foreground" state (allowing it to use more system resources without being killed) which is forced to be "ongoing" (not swipable). Because you can not stop the player service by swiping the Android notification, we highly recommend you to have a stop button in the notification. The button should `destroy()` the player.
