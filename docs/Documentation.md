@@ -551,29 +551,29 @@ const MyComponent = () => {
 };
 ```
 
-#### useTrackPlayerProgress
-A hook alternative to the [Progress Component](#progresscomponent).
+#### useProgress
+A hook alternative to the the deprecated [Progress Component](#progresscomponent).
 
 | State            | Type     | Description                      |
 | ---------------- | -------- | -------------------------------- |
 | position         | `number` | The current position in seconds  |
-| bufferedPosition | `number` | The buffered position in seconds |
+| buffered         | `number` | The buffered position in seconds |
 | duration         | `number` | The duration in seconds          |
 
-`useTrackPlayerProgress` accepts an interval to set the rate (in miliseconds) to poll the track player's progress. The default value is `1000` or every second.
+`useProgress` accepts an interval to set the rate (in miliseconds) to poll the track player's progress. The default value is `1000` or every second.
 
 ```jsx
 import React from 'react';
 import { Text, View } from 'react-native';
-import { useTrackPlayerProgress } from 'react-native-track-player';
+import { useProgress } from 'react-native-track-player';
 
 const MyComponent = () => {
-  const { position, bufferedPosition, duration } = useTrackPlayerProgress()
+  const { position, buffered, duration } = useProgress()
 
   return (
     <View>
       <Text>Track progress: {position} seconds out of {duration} total</Text>
-      <Text>Buffered progress: {bufferedPosition} seconds buffered out of {duration} total</Text>
+      <Text>Buffered progress: {buffered} seconds buffered out of {duration} total</Text>
     </View>
   )
 }
