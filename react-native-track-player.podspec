@@ -18,5 +18,4 @@ Pod::Spec.new do |s|
   s.swift_version = "5.0"
 
   s.dependency "React"
-  s.dependency "SwiftAudio", "~> 0.11.0"
 end

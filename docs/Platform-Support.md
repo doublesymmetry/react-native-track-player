@@ -1,7 +1,10 @@
 ---
 title: Platform Support
+nav_order: 6
 permalink: /platform-support/
 ---
+
+# Platform Support
 
 ## Audio Sources
 
@@ -97,3 +100,4 @@ permalink: /platform-support/
 | `playback-track-changed` | ✓ | ✓ | ✓ |
 | `playback-queue-ended` | ✓ | ✓ | ✓ |
 | `playback-error` | ✓ | ✓ | ✓ |
+| `playback-metadata-received` | ✓ | ✗ | ✗ |

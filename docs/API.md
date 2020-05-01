@@ -1,7 +1,13 @@
 ---
 title: Getting Started
-permalink: /api/
+description: "Instructions to get started with react-native-track-player"
+nav_order: 3
+permalink: /getting-started/
+redirect_from:
+  - /api/
 ---
+
+# Getting Started
 
 ## Starting off
 First of all, you need to initialize the player.

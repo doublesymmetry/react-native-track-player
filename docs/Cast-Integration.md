@@ -1,5 +1,6 @@
 ---
 title: Cast Integration
+nav_exclude: true # excluded until we get the feature back
 permalink: /cast/
 ---
 

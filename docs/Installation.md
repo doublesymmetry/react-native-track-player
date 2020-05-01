@@ -1,7 +1,13 @@
 ---
 title: Installation
+description: "Instructions to set up react-native-track-player"
+nav_order: 2
 permalink: /install/
+redirect_from:
+  - /installation/
 ---
+
+# Installation
 
 ## Installing the packages
 **1. Install the module from npm or yarn**
@@ -135,15 +141,15 @@ Note: You don't need to link the module after updating it.
 
 ## Troubleshooting
 
-#### Expo and Expokit support
+### Expo and Expokit support
 Currently react-native-track-player does not support projects with Expo or Expokit.
 
-#### iOS: (Enable Swift) `library not found for -lswiftCoreAudio for architecture x86_64`
+### iOS: (Enable Swift) `library not found for -lswiftCoreAudio for architecture x86_64`
 Because the iOS module uses Swift, if the user is using a standard react-native application they'll need to add support for Swift in the project. This can be easily by adding a swift file to the Xcode project -- could be called `dummy.swift` and saying yes when prompted if you'd like to generate a bridging header.
 
 ![Importing Swift](https://i.imgur.com/CBqBcWs.png)
 
-#### Android: `CIRCULAR REFERENCE:com.android.tools.r8.ApiLevelException: Default interface methods are only supported starting with Android N (--min-api 24)`
+### Android: `CIRCULAR REFERENCE:com.android.tools.r8.ApiLevelException: Default interface methods are only supported starting with Android N (--min-api 24)`
 Since version 1.0.0, we began using a few Java 8 features in the project to reduce the code size.
 
 To fix the issue, add the following options to your `android/app/build.gradle` file:
@@ -158,10 +164,10 @@ android {
 }
 ```
 
-#### Android: `com.facebook.react.common.JavascriptException: No task registered for key TrackPlayer`
+### Android: `com.facebook.react.common.JavascriptException: No task registered for key TrackPlayer`
 The playback service requires a headless task to be registered. You have to register it with `registerPlaybackService`.
 
-#### Android: `Error: Attribute XXX from [androidx.core:core:XXX] is also present at [com.android.support:support-compat:XXX]`
+### Android: `Error: Attribute XXX from [androidx.core:core:XXX] is also present at [com.android.support:support-compat:XXX]`
 This error occurs when you're mixing both AndroidX and the Support Library in the same project.
 
 You have to either upgrade everything to AndroidX or downgrade everything to the support library.
@@ -172,9 +178,9 @@ You have to either upgrade everything to AndroidX or downgrade everything to the
 
 You can also use [jetifier](https://github.com/mikehardy/jetifier#usage-for-source-files) to convert all of the native code to use only one of them.
 
-#### Android: Cleartext HTTP traffic not permitted
+### Android: Cleartext HTTP traffic not permitted
 
 Since API 28, Android disables traffic without TLS. To fix the issue you have to use `https` or [enable clear text traffic](https://stackoverflow.com/a/50834600).
 
 ## Next
-You can choose the build preferences for your app using `track-player.json`. See more [here](https://react-native-kit.github.io/react-native-track-player/build-preferences/).
+You can choose the build preferences for your app using `track-player.json`. See more [here](Build-Preferences.md).
