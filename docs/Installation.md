@@ -81,6 +81,8 @@ public class MainApplication extends Application implements ReactApplication {
 ```
 
 ### iOS
+Make sure the iOS platform target is set to 10.0 or higher in your app's podfile (`your-app/ios/podfile`): `platform :ios, '10.0'`
+
 In Xcode:
 1. Add RNTrackPlayer.xcodeproj to Libraries.
 2. Add libRNTrackPlayer.a to Link Binary With Libraries under Build Phases.
