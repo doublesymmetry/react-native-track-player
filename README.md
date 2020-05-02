@@ -55,15 +55,23 @@ All audio modules (like `react-native-sound`) don't play in a separated service 
 
 `react-native-google-cast` works pretty well and also supports custom receivers, but it has fewer player controls, it's harder to integrate and still uses the Cast SDK v2
 
+## First Steps
+
+If you want to get started with this module, check the [Getting Started](./API.md) page.
+If you want detailed information about the API, check the [Documentation](./Documentation.md). You can also look at our example project [here](https://github.com/react-native-kit/react-native-track-player/tree/dev/example).
+
 ## Example
+
 A basic example of how to play a track:
+
 ```javascript
 import TrackPlayer from 'react-native-track-player';
 
-// Creates the player
-TrackPlayer.setupPlayer().then(async () => {
+const start = async () => {
+    // Set up the player
+    await TrackPlayer.setupPlayer();
 
-    // Adds a track to the queue
+    // Add a track to the queue
     await TrackPlayer.add({
         id: 'trackId',
         url: require('track.mp3'),
@@ -72,10 +80,10 @@ TrackPlayer.setupPlayer().then(async () => {
         artwork: require('track.png')
     });
 
-    // Starts playing it
-    TrackPlayer.play();
-
-});
+    // Start playing it
+    await TrackPlayer.play();
+};
+start();
 ```
 
 If you want to get started with this module, check the [API](https://react-native-kit.github.io/react-native-track-player/api/) page.
