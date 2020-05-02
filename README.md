@@ -62,6 +62,8 @@ If you want detailed information about the API, check the [Documentation](./Docu
 
 ## Example
 
+A basic example of how to play a track:
+
 ```javascript
 import TrackPlayer from 'react-native-track-player';
 
@@ -83,6 +85,18 @@ const start = async () => {
 };
 start();
 ```
+
+If you want to get started with this module, check the [API](https://react-native-kit.github.io/react-native-track-player/api/) page.
+If you want detailed information about the API, check the [Documentation](https://react-native-kit.github.io/react-native-track-player/documentation/).
+
+## Example App
+You can look at our example project [here](https://github.com/react-native-kit/react-native-track-player/tree/dev/example).
+
+### iOS Screenshots
+<img src="example/screenshots/ios-app.png" width="300" /> <img src="example/screenshots/ios-lockscreen.png" width="300" />
+
+### Android Screenshots
+<img src="example/screenshots/android-app.png" width="300" /> <img src="example/screenshots/android-lockscreen.png" width="300" /> <img src="example/screenshots/android-notification.png" width="300" />
 
 ## Maintainers
 [Guilherme Chaguri](https://github.com/Guichaguri), [Dustin Bahr](https://github.com/curiousdustin) and [David Chavez](https://github.com/dcvz)

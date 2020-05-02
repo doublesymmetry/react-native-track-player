@@ -527,7 +527,7 @@ Check out the [events section](#events) for a full list of supported events.
 ```jsx
 import React, { useState } from 'react';
 import { Text, View } from 'react-native';
-import { useTrackPlayerEvent, TrackPlayerEvents, STATE_PLAYING } from 'react-native-track-player';
+import { useTrackPlayerEvents, TrackPlayerEvents, STATE_PLAYING } from 'react-native-track-player';
 
 // Subscribing to the following events inside MyComponent
 const events = [
@@ -536,14 +536,14 @@ const events = [
 ];
 
 const MyComponent = () => {
-  const [playerState, setState] = useState(null)
+  const [playerState, setPlayerState] = useState(null)
 
   useTrackPlayerEvents(events, (event) => {
     if (event.type === TrackPlayerEvents.PLAYBACK_ERROR) {
-      console.warn('An error occurred while playing the current track.');
+      console.warn('An error occured while playing the current track.');
     }
     if (event.type === TrackPlayerEvents.PLAYBACK_STATE) {
-      setState(playbackState)
+      setPlayerState(event.state);
     }
   });
 
