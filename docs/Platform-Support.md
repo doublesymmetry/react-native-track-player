@@ -24,7 +24,7 @@ permalink: /platform-support/
 | ------- | :-----: | :-: | :-----: |
 | Regular Streams | ✓ | ✓ | ✓ |
 | DASH | ✓ | ✗ | ✓ |
-| HLS | ✓ | ✗ | ✓ |
+| HLS | ✓ | ✓ | ✓ |
 | SmoothStreaming | ✓ | ✗ | ✗ |
 
 ## Casting
