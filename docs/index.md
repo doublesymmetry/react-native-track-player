@@ -1,6 +1,6 @@
 ---
 title: Overview
-description: "A fully fledged audio module created for music apps. Provides audio playback, external media controls, chromecast support, background mode and more!"
+description: "A fully fledged audio module created for music apps. Provides audio playback, external media controls, background mode and more!"
 nav_order: 1
 nav_exclude: true
 permalink: /
@@ -12,7 +12,7 @@ permalink: /
 
 # react-native-track-player
 
-A fully fledged audio module created for music apps. Provides audio playback, external media controls, chromecast support, background mode and more!
+A fully fledged audio module created for music apps. Provides audio playback, external media controls, background mode and more!
 
 [Getting Started](./API.md){: .btn .btn-blue }
 [API Documentation](./Documentation.md){: .btn }
@@ -24,12 +24,12 @@ A fully fledged audio module created for music apps. Provides audio playback, ex
 * **Multi-platform** - Supports Android, iOS and Windows
 * **Media Controls support** - Provides events for controlling the app from a bluetooth device, the lockscreen, a notification, a smartwatch or even a car
 * **Local or network, files or streams** - It doesn't matter where the media belongs, we've got you covered
-* **[Casting support](https://github.com/react-native-kit/react-native-track-casting)** - Seamlessly switch to any Google Cast compatible device, supporting custom media receivers
 * **Adaptive bitrate streaming support** - Support for DASH, HLS or SmoothStreaming
 * **Caching support** - Cache media files to play them again without an internet connection
 * **Background support** - Keep playing audio even after the app is in background
 * **Fully Customizable** - Even the notification icons are customizable!
 * **Supports React Hooks 🎣** - Includes React Hooks for common use-cases so you don't have to write them
+* **Casting support** - Use in combination with [react-native-track-casting (WIP)](https://github.com/react-native-kit/react-native-track-casting) to seamlessly switch to any Google Cast compatible device that supports custom media receivers
 
 ## Example
 
