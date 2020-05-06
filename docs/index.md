@@ -59,4 +59,5 @@ TrackPlayer.setupPlayer().then(async () => {
 ```
 
 ## Maintainers
+
 [Guilherme Chaguri](https://github.com/Guichaguri), [Dustin Bahr](https://github.com/curiousdustin) and [David Chavez](https://github.com/dcvz)
