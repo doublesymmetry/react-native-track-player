@@ -50,7 +50,10 @@ function addEventListener(event: Event, listener: (data: any) => void) {
 // MARK: - Queue API
 
 async function add(tracks: Track | Track[], insertBeforeId?: string): Promise<void> {
-  if (!Array.isArray(tracks)) {
+  // Clone the array before modifying it
+  if (Array.isArray(tracks)) {
+    tracks = [...tracks]
+  } else {
     tracks = [tracks]
   }
 
