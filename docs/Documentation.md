@@ -444,11 +444,11 @@ Fired when the queue reaches the end.
 | position | `number` | The previous track position in seconds    |
 
 #### `playback-metadata-received`
-Fired when the current track receives metadata encoded in. (e.g. ID3 tags or Icy Metadata).
+Fired when the current track receives metadata encoded in. (e.g. ID3 tags, Icy Metadata, Vorbis Comments or QuickTime metadata).
 
 | Param    | Type     | Description                                         |
 | -------- | -------- | --------------------------------------------------- |
-| source   | `string` | The metadata source (`id3`, `icy` or `icy-headers`) |
+| source   | `string` | The metadata source (`id3`, `icy`, `icy-headers`, `vorbis-comment`, `quicktime`) |
 | title    | `string` | The track title. Might be null                      |
 | url      | `string` | The track url. Might be null                        |
 | artist   | `string` | The track artist. Might be null                     |

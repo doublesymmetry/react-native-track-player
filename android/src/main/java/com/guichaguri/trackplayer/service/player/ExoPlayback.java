@@ -8,18 +8,23 @@ import com.facebook.react.bridge.Promise;
 import com.google.android.exoplayer2.*;
 import com.google.android.exoplayer2.Player.EventListener;
 import com.google.android.exoplayer2.Timeline.Window;
+import com.google.android.exoplayer2.extractor.mp4.MdtaMetadataEntry;
 import com.google.android.exoplayer2.metadata.Metadata;
 import com.google.android.exoplayer2.metadata.MetadataOutput;
+import com.google.android.exoplayer2.metadata.flac.VorbisComment;
 import com.google.android.exoplayer2.metadata.icy.IcyHeaders;
 import com.google.android.exoplayer2.metadata.icy.IcyInfo;
 import com.google.android.exoplayer2.metadata.id3.TextInformationFrame;
 import com.google.android.exoplayer2.metadata.id3.UrlLinkFrame;
 import com.google.android.exoplayer2.source.TrackGroup;
 import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.source.hls.HlsTrackMetadataEntry;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.guichaguri.trackplayer.service.MusicManager;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.models.Track;
+
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -349,80 +354,8 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
         // Finished seeking
     }
 
-    private void handleId3Metadata(Metadata metadata) {
-        String title = null, url = null, artist = null, album = null, date = null, genre = null;
-
-        for(int i = 0; i < metadata.length(); i++) {
-            Metadata.Entry entry = metadata.get(i);
-
-            if (entry instanceof TextInformationFrame) {
-                // ID3 text tag
-                TextInformationFrame id3 = (TextInformationFrame) entry;
-                String id = id3.id.toUpperCase();
-
-                if (id.equals("TIT2") || id.equals("TT2")) {
-                    title = id3.value;
-                } else if (id.equals("TALB") || id.equals("TOAL") || id.equals("TAL")) {
-                    album = id3.value;
-                } else if (id.equals("TOPE") || id.equals("TPE1") || id.equals("TP1")) {
-                    artist = id3.value;
-                } else if (id.equals("TDRC") || id.equals("TOR")) {
-                    date = id3.value;
-                } else if (id.equals("TCON") || id.equals("TCO")) {
-                    genre = id3.value;
-                }
-
-            } else if (entry instanceof UrlLinkFrame) {
-                // ID3 URL tag
-                UrlLinkFrame id3 = (UrlLinkFrame) entry;
-                String id = id3.id.toUpperCase();
-
-                if (id.equals("WOAS") || id.equals("WOAF") || id.equals("WOAR") || id.equals("WAR")) {
-                    url = id3.url;
-                }
-
-            }
-        }
-
-        if (title != null || url != null || artist != null || album != null || date != null || genre != null) {
-            manager.onMetadataReceived("id3", title, url, artist, album, date, genre);
-        }
-    }
-
-    private void handleIcyMetadata(Metadata metadata) {
-        for (int i = 0; i < metadata.length(); i++) {
-            Metadata.Entry entry = metadata.get(i);
-
-            if(entry instanceof IcyHeaders) {
-                // ICY headers
-                IcyHeaders icy = (IcyHeaders)entry;
-
-                manager.onMetadataReceived("icy-headers", icy.name, icy.url, null, null, null, icy.genre);
-
-            } else if(entry instanceof IcyInfo) {
-                // ICY data
-                IcyInfo icy = (IcyInfo)entry;
-
-                String artist, title;
-                int index = icy.title == null ? -1 : icy.title.indexOf(" - ");
-
-                if (index != -1) {
-                    artist = icy.title.substring(0, index);
-                    title = icy.title.substring(index + 3);
-                } else {
-                    artist = null;
-                    title = icy.title;
-                }
-
-                manager.onMetadataReceived("icy", title, icy.url, artist, null, null, null);
-
-            }
-        }
-    }
-
     @Override
     public void onMetadata(@NonNull Metadata metadata) {
-        handleId3Metadata(metadata);
-        handleIcyMetadata(metadata);
+        SourceMetadata.handleMetadata(manager, metadata);
     }
 }
