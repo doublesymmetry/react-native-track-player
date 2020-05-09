@@ -261,11 +261,14 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
         waitForConnection(() -> {
             ExoPlayback playback = binder.getPlayback();
             int size = playback.getQueue().size();
+            Integer currentIndex = playback.getCurrentTrackIndex();
 
             if (index < 0 || index >= size) {
                 callback.reject("index_out_of_bounds", "The track index is out of bounds");
             } else if (newIndex < 0 || newIndex >= size) {
                 callback.reject("index_out_of_bounds", "The new index is out of bounds");
+            } else if (index == currentIndex || newIndex == currentIndex) {
+                callback.reject("not_movable", "The current track cannot be moved");
             } else {
                 playback.move(index, newIndex, callback);
             }
