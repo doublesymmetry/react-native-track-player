@@ -144,13 +144,20 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     @Override
     public void shuffle(final Promise promise) {
         Random rand = new Random();
+        int startIndex = player.getCurrentWindowIndex();
         int length = queue.size();
 
-        // Fisher-Yates shuffle
-        for (int i = 0; i < length; i++) {
-            int swapIndex = rand.nextInt(i + 1);
+        if (startIndex == C.INDEX_UNSET) {
+            startIndex = 0;
+        } else {
+            startIndex++;
+        }
 
-            queue.add(swapIndex, queue.remove(i));
+        // Fisher-Yates shuffle
+        for (int i = startIndex; i < length; i++) {
+            int swapIndex = rand.nextInt(i + 1 - startIndex) + startIndex;
+
+            Collections.swap(queue, i, swapIndex);
 
             if (length - 1 == i) {
                 // Resolve the promise after the last move command
