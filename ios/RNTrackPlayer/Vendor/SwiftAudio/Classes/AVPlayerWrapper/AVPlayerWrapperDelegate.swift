@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import MediaPlayer
 
 protocol AVPlayerWrapperDelegate: class {
     
@@ -15,6 +15,7 @@ protocol AVPlayerWrapperDelegate: class {
     func AVWrapper(failedWithError error: Error?)
     func AVWrapper(seekTo seconds: Int, didFinish: Bool)
     func AVWrapper(didUpdateDuration duration: Double)
+    func AVWrapper(didReceiveMetadata metadata: [AVMetadataItem])
     func AVWrapperItemDidPlayToEndTime()
     func AVWrapperDidRecreateAVPlayer()
     

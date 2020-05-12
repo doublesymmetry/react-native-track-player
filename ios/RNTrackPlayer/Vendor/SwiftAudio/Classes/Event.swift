@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import MediaPlayer
 
 extension AudioPlayer {
     
@@ -15,6 +16,7 @@ extension AudioPlayer {
     public typealias FailEventData = (Error?)
     public typealias SeekEventData = (seconds: Int, didFinish: Bool)
     public typealias UpdateDurationEventData = (Double)
+    public typealias MetadataEventData = ([AVMetadataItem])
     public typealias DidRecreateAVPlayerEventData = ()
     
     public struct EventHolder {
@@ -55,7 +57,13 @@ extension AudioPlayer {
          - Important: Remember to dispatch to the main queue if any UI is updated in the event handler.
          */
         public let updateDuration: AudioPlayer.Event<UpdateDurationEventData> = AudioPlayer.Event()
-        
+
+        /**
+         Emitted when the player receives metadata.
+          - Important: Remember to dispatch to the main queue if any UI is updated in the event handler.
+         */
+        public let receiveMetadata: AudioPlayer.Event<MetadataEventData> = AudioPlayer.Event()
+
         /**
          Emitted when the underlying AVPlayer instance is recreated. Recreation happens if the current player fails.
          - Important: Remember to dispatch to the main queue if any UI is updated in the event handler.

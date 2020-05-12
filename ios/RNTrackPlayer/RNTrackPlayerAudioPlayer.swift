@@ -79,7 +79,53 @@ public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer {
 
 		self.reactEventEmitter.sendEvent(withName: "playback-state", body: ["state": state.rawValue])
     }
-    
+
+    override func AVWrapper(didReceiveMetadata metadata: [AVMetadataItem]) {
+        func getMetadataItem(forIdentifier:AVMetadataIdentifier) -> String? {
+            let data: String = AVMetadataItem.metadataItems(from: metadata, filteredByIdentifier: forIdentifier).first?.stringValue ?? ""
+            return data.isEmpty ? nil : data
+        }
+        
+        super.AVWrapper(didReceiveMetadata: metadata)
+        var data : Dictionary<String, Optional<String>> = [
+            "source": nil,
+            "title": nil,
+            "url": nil,
+            "artist": nil,
+            "album": nil,
+            "date": nil,
+            "genre": nil,
+        ]
+        var source: String? {
+            switch metadata.first?.keySpace {
+            case AVMetadataKeySpace.id3:
+                return "id3"
+            case AVMetadataKeySpace.icy:
+                return "icy-headers"
+            case AVMetadataKeySpace.quickTimeMetadata:
+                return "quicktime"
+            case AVMetadataKeySpace.common:
+                return "common"
+            default: return "other"
+            }
+        }
+        
+        if (source == "icy-headers") {
+            data["title"] = getMetadataItem(forIdentifier: .icyMetadataStreamTitle)
+            data["url"] = getMetadataItem(forIdentifier: .icyMetadataStreamURL)
+        } else {
+            data["title"] = getMetadataItem(forIdentifier: .commonIdentifierTitle)
+            data["artist"] = getMetadataItem(forIdentifier: .commonIdentifierArtist)
+            data["album"] = getMetadataItem(forIdentifier: .commonIdentifierAlbumName)
+            data["date"] = getMetadataItem(forIdentifier: .id3MetadataDate)
+        }
+
+        if (data.values.contains { $0 != nil }) {
+            data["source"] = source
+            self.reactEventEmitter.sendEvent(withName: "playback-metadata-received", body: data)
+        }
+    }
+
     override func AVWrapper(failedWithError error: Error?) {
         super.AVWrapper(failedWithError: error)
         self.reactEventEmitter.sendEvent(withName: "playback-error", body: ["error": error?.localizedDescription])
