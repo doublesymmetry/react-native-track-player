@@ -66,10 +66,10 @@ public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer {
     }
 
 	// MARK: - AVPlayerWrapperDelegate
-    
+
     override func AVWrapper(didChangeState state: AVPlayerWrapperState) {
         super.AVWrapper(didChangeState: state)
-		
+
 		// When a track starts playing, reset the rate to the stored rate
 		switch state {
 		case .playing:
@@ -81,11 +81,12 @@ public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer {
     }
 
     override func AVWrapper(didReceiveMetadata metadata: [AVMetadataItem]) {
+      print(metadata);
         func getMetadataItem(forIdentifier:AVMetadataIdentifier) -> String? {
             let data: String = AVMetadataItem.metadataItems(from: metadata, filteredByIdentifier: forIdentifier).first?.stringValue ?? ""
             return data.isEmpty ? nil : data
         }
-        
+
         super.AVWrapper(didReceiveMetadata: metadata)
         var data : Dictionary<String, Optional<String>> = [
             "source": nil,
@@ -109,15 +110,29 @@ public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer {
             default: return "other"
             }
         }
-        
+
+        data["title"] = getMetadataItem(forIdentifier: .commonIdentifierTitle)
+        data["artist"] = getMetadataItem(forIdentifier: .commonIdentifierArtist)
+        data["album"] = getMetadataItem(forIdentifier: .commonIdentifierAlbumName)
+        data["date"] = getMetadataItem(forIdentifier: .commonIdentifierCreationDate);
+
         if (source == "icy-headers") {
             data["title"] = getMetadataItem(forIdentifier: .icyMetadataStreamTitle)
             data["url"] = getMetadataItem(forIdentifier: .icyMetadataStreamURL)
-        } else {
-            data["title"] = getMetadataItem(forIdentifier: .commonIdentifierTitle)
-            data["artist"] = getMetadataItem(forIdentifier: .commonIdentifierArtist)
-            data["album"] = getMetadataItem(forIdentifier: .commonIdentifierAlbumName)
-            data["date"] = getMetadataItem(forIdentifier: .id3MetadataDate)
+        } else if (source == "id3") {
+            if (data["date"] == nil) {
+              data["date"] = getMetadataItem(forIdentifier: .id3MetadataDate)
+            }
+            data["genre"] = getMetadataItem(forIdentifier: .id3MetadataContentType)
+            data["url"] = getMetadataItem(forIdentifier: .id3MetadataOfficialAudioSourceWebpage)
+            if (data["url"] == nil) {
+              data["url"] = getMetadataItem(forIdentifier: .id3MetadataOfficialAudioFileWebpage)
+            }
+            if (data["url"] == nil) {
+              data["url"] = getMetadataItem(forIdentifier: .id3MetadataOfficialArtistWebpage)
+            }
+        } else if (source == "quicktime") {
+            data["genre"] = getMetadataItem(forIdentifier: .quickTimeMetadataGenre)
         }
 
         if (data.values.contains { $0 != nil }) {
