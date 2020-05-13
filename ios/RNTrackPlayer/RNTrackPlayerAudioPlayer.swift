@@ -105,8 +105,8 @@ public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer {
             case AVMetadataKeySpace.quickTimeMetadata:
                 return "quicktime"
             case AVMetadataKeySpace.common:
-                return "common"
-            default: return "other"
+                return "unknown"
+            default: return "unknown"
             }
         }
 
