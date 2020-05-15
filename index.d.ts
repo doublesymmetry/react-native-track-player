@@ -131,7 +131,7 @@ declare namespace RNTrackPlayer {
 
   // Control Center / Notification Metadata Commands
   export function updateOptions(options: MetadataOptions): Promise<void>;
-  export function updateMetadataForTrack(id: string, metadata: TrackMetadata) : Promise<void>;
+  export function updateMetadataForTrack(id: string, metadata: Partial<TrackMetadata>) : Promise<void>;
 
   // Player Playback Commands
 
