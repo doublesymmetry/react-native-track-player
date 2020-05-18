@@ -251,15 +251,17 @@ Some parameters are unused depending on platform.
 | options.capabilities | `array` of [Capability Constants](#capability) | The media controls that will be enabled | ✓ | ✓ | ✓ |
 | options.notificationCapabilities | `array` of [Capability Constants](#capability) | The buttons that it will show in the notification. Defaults to `data.capabilities`  | ✓ | ✗ | ✗ |
 | options.compactCapabilities | `array` of [Capability Constants](#capability) | The buttons that it will show in the compact notification | ✓ | ✗ | ✗ |
-| options.icon | [Resource Object](#resource-object) | The notification icon | ✓ | ✗ | ✗ |
-| options.playIcon | [Resource Object](#resource-object) | The play icon | ✓ | ✗ | ✗ |
-| options.pauseIcon | [Resource Object](#resource-object) | The pause icon | ✓ | ✗ | ✗ |
-| options.stopIcon | [Resource Object](#resource-object) | The stop icon | ✓ | ✗ | ✗ |
-| options.previousIcon | [Resource Object](#resource-object) | The previous icon | ✓ | ✗ | ✗ |
-| options.nextIcon | [Resource Object](#resource-object) | The next icon | ✓ | ✗ | ✗ |
-| options.rewindIcon | [Resource Object](#resource-object) | The jump backward icon | ✓ | ✗ | ✗ |
-| options.forwardIcon | [Resource Object](#resource-object) | The jump forward icon | ✓ | ✗ | ✗ |
+| options.icon | [Resource Object](#resource-object) | The notification icon¹ | ✓ | ✗ | ✗ |
+| options.playIcon | [Resource Object](#resource-object) | The play icon¹ | ✓ | ✗ | ✗ |
+| options.pauseIcon | [Resource Object](#resource-object) | The pause icon¹ | ✓ | ✗ | ✗ |
+| options.stopIcon | [Resource Object](#resource-object) | The stop icon¹ | ✓ | ✗ | ✗ |
+| options.previousIcon | [Resource Object](#resource-object) | The previous icon¹ | ✓ | ✗ | ✗ |
+| options.nextIcon | [Resource Object](#resource-object) | The next icon¹ | ✓ | ✗ | ✗ |
+| options.rewindIcon | [Resource Object](#resource-object) | The jump backward icon¹ | ✓ | ✗ | ✗ |
+| options.forwardIcon | [Resource Object](#resource-object) | The jump forward icon¹ | ✓ | ✗ | ✗ |
 | options.color | `number` | The notification color in an ARGB hex | ✓ | ✗ | ✗ |
+
+*¹ - The custom icons will only work in release builds*
 
 #### `play()`
 Plays or resumes the current track.
