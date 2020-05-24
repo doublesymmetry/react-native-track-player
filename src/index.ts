@@ -74,7 +74,7 @@ async function add(tracks: Track | Track[], insertBeforeId?: string): Promise<vo
   return TrackPlayer.add(tracks, insertBeforeId)
 }
 
-async function remove(tracks: Track | Track[]): Promise<void> {
+async function remove(tracks: string | string[]): Promise<void> {
   if (!Array.isArray(tracks)) {
     tracks = [tracks]
   }
