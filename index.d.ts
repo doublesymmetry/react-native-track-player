@@ -45,7 +45,11 @@ declare namespace RNTrackPlayer {
     | typeof STATE_READY;
   type RatingType = string | number;
   type Capability = string | number;
-  type PitchAlgorithm = string | number;
+  type PitchAlgorithm =
+    | typeof PITCH_ALGORITHM_LINEAR_IOS
+    | typeof PITCH_ALGORITHM_MUSIC_IOS
+    | typeof PITCH_ALGORITHM_VOICE_IOS
+    | typeof PITCH_ALGORITHM_ANDROID;
 
   type EventHandler = (type: EventType, ...args: any[]) => void;
   export function registerEventHandler(handler: EventHandler): void;
@@ -242,10 +246,16 @@ declare namespace RNTrackPlayer {
   export const CAPABILITY_DISLIKE: Capability;
   export const CAPABILITY_BOOKMARK: Capability;
 
-  export const PITCH_ALGORITHM_LINEAR: PitchAlgorithm;
-  export const PITCH_ALGORITHM_MUSIC: PitchAlgorithm;
-  export const PITCH_ALGORITHM_VOICE: PitchAlgorithm;
-  
+  export const PITCH_ALGORITHM_LINEAR: typeof PITCH_ALGORITHM_LINEAR_IOS | typeof PITCH_ALGORITHM_ANDROID;
+  export const PITCH_ALGORITHM_MUSIC: typeof PITCH_ALGORITHM_MUSIC_IOS | typeof PITCH_ALGORITHM_ANDROID;
+  export const PITCH_ALGORITHM_VOICE: typeof PITCH_ALGORITHM_VOICE_IOS | typeof PITCH_ALGORITHM_ANDROID;
+
+  export const PITCH_ALGORITHM_LINEAR_IOS: "linear";
+  export const PITCH_ALGORITHM_MUSIC_IOS: "music";
+  export const PITCH_ALGORITHM_VOICE_IOS: "voice";
+
+  export const PITCH_ALGORITHM_ANDROID: undefined;
+
   export const TrackPlayerEvents: {
     REMOTE_PLAY: EventType;
     REMOTE_PLAY_ID: EventType;
