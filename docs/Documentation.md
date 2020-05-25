@@ -567,14 +567,17 @@ A hook alternative to the [Progress Component](#progresscomponent).
 | bufferedPosition | `number` | The buffered position in seconds |
 | duration         | `number` | The duration in seconds          |
 
-`useTrackPlayerProgress` accepts two arguments:
+`useTrackPlayerProgress` accepts two arguments
 
-1. `interval`: An interval to set the rate (in miliseconds) to poll the track player's progress (default value is `1000` or every second)
-2. `pollTrackPlayerStates`: An optional whitelist of playback states at which the track player's progress is polled.
+| Param                 | Type      | Description                            |
+| --------------------- | --------- | -------------------------------------- |
+| interval              | `number`  | An interval to set the rate (in miliseconds) to poll the track player's progress (default value is `1000` or every second)  |
+| pollTrackPlayerStates | `State[]` | An optional whitelist of playback states at which the track player's progress is polled.  |
 
-  Provide `null` in case you want really poll at the `interval`'s rate, no matter the playback state the player is in.
+More information concerning the `pollTrackPlayerStates` argument:
 
-  By default the hook will only poll while a track is playing or buffering, i.e. the default value for the second argument is:
+- Provide `null` in case you want really poll at the `interval`'s rate, no matter the playback state the player is in.
+- By default the hook will only poll while a track is playing or buffering, i.e. the default value for the second argument is:
 
   ```js
   [
