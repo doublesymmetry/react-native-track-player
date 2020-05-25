@@ -35,7 +35,14 @@ declare namespace RNTrackPlayer {
 
   type ResourceObject = any;
 
-  type State = string | number;
+  type State =
+    | typeof STATE_NONE
+    | typeof STATE_PLAYING
+    | typeof STATE_PAUSED
+    | typeof STATE_STOPPED
+    | typeof STATE_CONNECTING
+    | typeof STATE_BUFFERING
+    | typeof STATE_READY;
   type RatingType = string | number;
   type Capability = string | number;
   type PitchAlgorithm = string | number;
@@ -169,13 +176,48 @@ declare namespace RNTrackPlayer {
   }
 
   // Constants
+  export const STATE_NONE: typeof STATE_ANDROID_NONE | typeof STATE_IOS_NONE;
+  export const STATE_PLAYING:
+    | typeof STATE_ANDROID_PLAYING
+    | typeof STATE_IOS_PLAYING;
+  export const STATE_PAUSED:
+    | typeof STATE_ANDROID_PAUSED
+    | typeof STATE_IOS_PAUSED;
+  export const STATE_STOPPED:
+    | typeof STATE_ANDROID_STOPPED
+    | typeof STATE_IOS_STOPPED;
+  export const STATE_CONNECTING:
+    | typeof STATE_ANDROID_CONNECTING
+    | typeof STATE_IOS_CONNECTING;
+  export const STATE_BUFFERING:
+    | typeof STATE_ANDROID_BUFFERING
+    | typeof STATE_IOS_BUFFERING;
+  export const STATE_READY:
+    | typeof STATE_ANDROID_PAUSED
+    | typeof STATE_IOS_READY;
 
-  export const STATE_NONE: State;
-  export const STATE_PLAYING: State;
-  export const STATE_PAUSED: State;
-  export const STATE_STOPPED: State;
-  export const STATE_BUFFERING: State;
-  export const STATE_READY: State;
+  // Android states: See https://developer.android.com/reference/kotlin/android/support/v4/media/session/PlaybackStateCompat#STATE_CONNECTING:kotlin.Int
+  export const STATE_ANDROID_NONE: 0;
+  export const STATE_ANDROID_STOPPED: 1;
+  export const STATE_ANDROID_PAUSED: 2;
+  export const STATE_ANDROID_PLAYING: 3;
+  export const STATE_ANDROID_FAST_FORWARDING: 4;
+  export const STATE_ANDROID_REWINDING: 5;
+  export const STATE_ANDROID_BUFFERING: 6;
+  export const STATE_ANDROID_ERROR: 7;
+  export const STATE_ANDROID_CONNECTING: 8;
+  export const STATE_ANDROID_SKIPPING_TO_PREVIOUS: 9;
+  export const STATE_ANDROID_SKIPPING_TO_NEXT: 10;
+  export const STATE_ANDROID_SKIPPING_TO_QUEUE_ITEM: 11;
+
+  // iOS states
+  export const STATE_IOS_NONE: "idle";
+  export const STATE_IOS_PLAYING: "playing";
+  export const STATE_IOS_PAUSED: "paused";
+  export const STATE_IOS_STOPPED: "idle";
+  export const STATE_IOS_CONNECTING: undefined;
+  export const STATE_IOS_BUFFERING: "loading";
+  export const STATE_IOS_READY: "ready";
 
   export const RATING_HEART: RatingType;
   export const RATING_THUMBS_UP_DOWN: RatingType;
@@ -230,10 +272,14 @@ declare namespace RNTrackPlayer {
 
   // Hooks
   export function usePlaybackState(): State;
-  export function useTrackPlayerEvents(events: string[], handler: (event: any) => void): void;
-  export function useInterval(callback: ()=> void, delay: number): void;
-  export function useWhenPlaybackStateChanges(callback: ()=> void): void;
-  export function usePlaybackStateIs(...states: string[]): boolean;
-  export function useTrackPlayerProgress(interval?: number): ProgressComponentState;
-
+  export function useTrackPlayerEvents(
+    events: string[],
+    handler: (event: any) => void
+  ): void;
+  export function useInterval(callback: () => void, delay: number): void;
+  export function useWhenPlaybackStateChanges(callback: () => void): void;
+  export function usePlaybackStateIs(...states: State[]): boolean;
+  export function useTrackPlayerProgress(
+    interval?: number
+  ): ProgressComponentState;
 }
