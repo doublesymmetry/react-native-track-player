@@ -21,8 +21,6 @@ public class NowPlayingInfoController: NowPlayingInfoControllerProtocol {
         return _info
     }
 
-
-
     public required init() {
         self._infoCenter = MPNowPlayingInfoCenter.default()
     }
