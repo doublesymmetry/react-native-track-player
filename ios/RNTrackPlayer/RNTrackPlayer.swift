@@ -267,7 +267,6 @@ public class RNTrackPlayer: RCTEventEmitter {
 
         var capabilitiesStr = options["capabilities"] as? [String] ?? []
         if (capabilitiesStr.contains("play") && capabilitiesStr.contains("pause")) {
-            capabilitiesStr = capabilitiesStr.filter { $0 != "play" && $0 != "pause" }
             capabilitiesStr.append("togglePlayPause");
         }
         let capabilities = capabilitiesStr.compactMap { Capability(rawValue: $0) }
