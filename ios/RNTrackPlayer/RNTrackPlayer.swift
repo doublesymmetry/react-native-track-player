@@ -496,13 +496,14 @@ public class RNTrackPlayer: RCTEventEmitter {
                 MediaItemProperty.title(track.title),
                 MediaItemProperty.albumTitle(track.album),
             ])
-            
+            player.updateNowPlayingPlaybackValues();
             track.getArtwork { [weak self] image in
                 if let image = image {
                     let artwork = MPMediaItemArtwork(boundsSize: image.size, requestHandler: { (size) -> UIImage in
                         return image
                     })
                     self?.player.nowPlayingInfoController.set(keyValue: MediaItemProperty.artwork(artwork))
+                    self?.player.updateNowPlayingPlaybackValues();
                 }
             }
         }
