@@ -109,7 +109,7 @@ If the player is already initialized, the promise will resolve instantly.
 
 | Param                | Type     | Description   | Default   | Android | iOS | Windows |
 | -------------------- | -------- | ------------- | --------- | :-----: | :-: | :-----: |
-| options              | `object` | The options   | 
+| options              | `object` | The options   |
 | options.minBuffer    | `number` | Minimum time in seconds that needs to be buffered | 15 | ✓ | ✗ | ✗ |
 | options.maxBuffer    | `number` | Maximum time in seconds that needs to be buffered | 50 | ✓ | ✗ | ✗ |
 | options.playBuffer   | `number` | Minimum time in seconds that needs to be buffered to start playing | 2.5 | ✓ | ✗ | ✗ |
@@ -519,9 +519,10 @@ For more information about Resource Objects, read the [Images](https://facebook.
 
 ## React Hooks
 
-React v16.8 introduced [hooks](https://reactjs.org/docs/hooks-intro.html). If you are using a version of React Native that is before [v0.59.0](https://facebook.github.io/react-native/blog/2019/03/12/releasing-react-native-059), your React Native version does not support hooks. 
+React v16.8 introduced [hooks](https://reactjs.org/docs/hooks-intro.html). If you are using a version of React Native that is before [v0.59.0](https://facebook.github.io/react-native/blog/2019/03/12/releasing-react-native-059), your React Native version does not support hooks.
 
 #### `useTrackPlayerEvents`
+
 Register an event listener for one or more of the [events](#events) emitted by the TrackPlayer. The subscription is removed when the component unmounts.
 
 Check out the [events section](#events) for a full list of supported events.
@@ -555,11 +556,11 @@ const MyComponent = () => {
     <View>
       <Text>The TrackPlayer is {isPlaying ? 'playing' : 'not playing'}</Text>
     </View>
-  ); 
+  );
 };
 ```
 
-#### `useTrackPlayerProgress`
+#### `useTrackPlayerProgress(interval, pollTrackPlayerStates)`
 A hook alternative to the [Progress Component](#progresscomponent).
 
 | State            | Type     | Description                      |
@@ -568,7 +569,25 @@ A hook alternative to the [Progress Component](#progresscomponent).
 | bufferedPosition | `number` | The buffered position in seconds |
 | duration         | `number` | The duration in seconds          |
 
-`useTrackPlayerProgress` accepts an interval to set the rate (in miliseconds) to poll the track player's progress. The default value is `1000` or every second.
+`useTrackPlayerProgress` accepts two arguments
+
+| Param                 | Type      | Description                            |
+| --------------------- | --------- | -------------------------------------- |
+| interval              | `number`  | An interval to set the rate (in miliseconds) to poll the track player's progress (default value is `1000` or every second)  |
+| pollTrackPlayerStates | `State[]` | An optional whitelist of playback states at which the track player's progress is polled.  |
+
+More information concerning the `pollTrackPlayerStates` argument:
+
+- Provide `null` in case you want really poll at the `interval`'s rate, no matter the playback state the player is in.
+- By default the hook will only poll while a track is playing or buffering, i.e. the default value for the second argument is:
+
+  ```js
+  [
+    TrackPlayer.STATE_PLAYING,
+    TrackPlayer.STATE_BUFFERING,
+  ]
+  ```
+
 
 ```jsx
 import React from 'react';
@@ -576,7 +595,7 @@ import { Text, View } from 'react-native';
 import { useTrackPlayerProgress } from 'react-native-track-player';
 
 const MyComponent = () => {
-  const { position, bufferedPosition, duration } = useTrackPlayerProgress()
+  const { position, bufferedPosition, duration } = useTrackPlayerProgress(1000, null)
 
   return (
     <View>
