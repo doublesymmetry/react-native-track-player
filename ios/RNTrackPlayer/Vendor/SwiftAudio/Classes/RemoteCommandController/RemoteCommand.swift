@@ -103,7 +103,7 @@ public struct FeedbackCommand: RemoteCommandProtocol {
     }
 }
 
-public enum RemoteCommand {
+public enum RemoteCommand : Equatable {
 
     case play
     
