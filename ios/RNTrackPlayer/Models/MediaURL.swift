@@ -17,32 +17,21 @@ struct MediaURL {
         guard let object = object else { return nil }
         originalObject = object
         
+        // This is based on logic found in RCTConvert NSURLRequest, 
+        // and uses RCTConvert NSURL to create a valid URL from various formats
         if let localObject = object as? [String: Any] {
-            let uri = localObject["uri"] as! String
-            isLocal = uri.contains("http") ? false : true
-            let encodedURI = uri.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
-            value = URL(string: encodedURI.replacingOccurrences(of: "file://", with: ""))!
+            var url = localObject["uri"] as? String ?? localObject["url"] as! String
+            
+            if let bundleName = localObject["bundle"] as? String {
+                url = String(format: "%@.bundle/%@", bundleName, url)
+            }
+            
+            isLocal = url.lowercased().contains("http") ? false : true
+            value = RCTConvert.nsurl(url)
         } else {
             let url = object as! String
             isLocal = url.lowercased().hasPrefix("file://")
-            if isLocal {
-                // When the provided url is local,
-                // remove the file:// prefix,
-                // and attempt to remove any existing encoding.
-                // Both of these can both cause URL(fileURLWithPath: string) to fail
-                var path = url.replacingOccurrences(of: "file://", with: "")
-                path = path.removingPercentEncoding ?? path
-                value = URL(fileURLWithPath: path)
-            } else {
-                // When the provided url is not local, attempt to use it without any modifications
-                if let urlValue = URL(string: url) {
-                    value = urlValue
-                } else {
-                    // If url could not be initialized, try encoding it
-                    print("Warning: The provided url could not be parsed. Attempting to encode url instead.")
-                    value = URL(string: url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
-                }
-            }
+            value = RCTConvert.nsurl(url)
         }
     }
 }
