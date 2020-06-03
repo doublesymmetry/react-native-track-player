@@ -26,7 +26,7 @@ struct MediaURL {
                 url = String(format: "%@.bundle/%@", bundleName, url)
             }
             
-            isLocal = url.lowercased().contains("http") ? false : true
+            isLocal = url.lowercased().hasPrefix("http") ? false : true
             value = RCTConvert.nsurl(url)
         } else {
             let url = object as! String
