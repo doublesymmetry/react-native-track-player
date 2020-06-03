@@ -264,8 +264,12 @@ public class RNTrackPlayer: RCTEventEmitter {
     
     @objc(updateOptions:resolver:rejecter:)
     public func update(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        let capabilitiesStr = options["capabilities"] as? [String]
-        let capabilities = capabilitiesStr?.compactMap { Capability(rawValue: $0) } ?? []
+
+        var capabilitiesStr = options["capabilities"] as? [String] ?? []
+        if (capabilitiesStr.contains("play") && capabilitiesStr.contains("pause")) {
+            capabilitiesStr.append("togglePlayPause");
+        }
+        let capabilities = capabilitiesStr.compactMap { Capability(rawValue: $0) }
         
         let remoteCommands = capabilities.map { capability in
             capability.mapToPlayerCommand(jumpInterval: options["jumpInterval"] as? NSNumber,
@@ -496,13 +500,14 @@ public class RNTrackPlayer: RCTEventEmitter {
                 MediaItemProperty.title(track.title),
                 MediaItemProperty.albumTitle(track.album),
             ])
-            
+            player.updateNowPlayingPlaybackValues();
             track.getArtwork { [weak self] image in
                 if let image = image {
                     let artwork = MPMediaItemArtwork(boundsSize: image.size, requestHandler: { (size) -> UIImage in
                         return image
                     })
                     self?.player.nowPlayingInfoController.set(keyValue: MediaItemProperty.artwork(artwork))
+                    self?.player.updateNowPlayingPlaybackValues();
                 }
             }
         }
