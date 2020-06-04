@@ -17,15 +17,21 @@ struct MediaURL {
         guard let object = object else { return nil }
         originalObject = object
         
+        // This is based on logic found in RCTConvert NSURLRequest, 
+        // and uses RCTConvert NSURL to create a valid URL from various formats
         if let localObject = object as? [String: Any] {
-            let uri = localObject["uri"] as! String
-            isLocal = uri.contains("http") ? false : true
-            let encodedURI = uri.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
-            value = URL(string: encodedURI.replacingOccurrences(of: "file://", with: ""))!
+            var url = localObject["uri"] as? String ?? localObject["url"] as! String
+            
+            if let bundleName = localObject["bundle"] as? String {
+                url = String(format: "%@.bundle/%@", bundleName, url)
+            }
+            
+            isLocal = url.lowercased().hasPrefix("http") ? false : true
+            value = RCTConvert.nsurl(url)
         } else {
             let url = object as! String
             isLocal = url.lowercased().hasPrefix("file://")
-            value = URL(string: url.replacingOccurrences(of: "file://", with: ""))!
+            value = RCTConvert.nsurl(url)
         }
     }
 }
