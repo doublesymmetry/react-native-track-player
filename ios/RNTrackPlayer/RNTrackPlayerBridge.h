@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "RCTConvert.h"
 
 @interface RNTrackPlayerBridge: NSObject
 @end
