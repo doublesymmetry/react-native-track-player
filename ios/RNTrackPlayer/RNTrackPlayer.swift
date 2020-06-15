@@ -18,7 +18,6 @@ public class RNTrackPlayer: RCTEventEmitter {
 
     private lazy var player: RNTrackPlayerAudioPlayer = {
         let player = RNTrackPlayerAudioPlayer(reactEventEmitter: self)
-        player.bufferDuration = 1
         return player
     }()
     
@@ -148,6 +147,10 @@ public class RNTrackPlayer: RCTEventEmitter {
         // configure if player waits to play
         let autoWait: Bool = config["waitForBuffer"] as? Bool ?? false
         player.automaticallyWaitsToMinimizeStalling = autoWait
+        
+        // configure buffer size
+        let minBuffer: TimeInterval = config["minBuffer"] as? TimeInterval ?? 0
+        player.bufferDuration = minBuffer
         
         // configure audio session - category, options & mode
         var sessionCategory: AVAudioSession.Category = .playback
