@@ -374,10 +374,15 @@ public class RNTrackPlayer: RCTEventEmitter {
     }
     
     @objc(reset:rejecter:)
-    public func reset(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+    public func reset(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Resetting player.")
         player.stop()
         resolve(NSNull())
+        
+        let deactivate = options["deactivate"] as? [Bool]
+        if deactivate {
+            try? AVAudioSession.sharedInstance().setActive(false)
+        }
         DispatchQueue.main.async {
             UIApplication.shared.endReceivingRemoteControlEvents();
         }
@@ -392,18 +397,26 @@ public class RNTrackPlayer: RCTEventEmitter {
     }
     
     @objc(pause:rejecter:)
-    public func pause(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+    public func pause(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Pausing playback")
         player.pause()
-        try? AVAudioSession.sharedInstance().setActive(false)
+        
+        let deactivate = options["deactivate"] as? [Bool]
+        if deactivate {
+            try? AVAudioSession.sharedInstance().setActive(false)
+        }
         resolve(NSNull())
     }
     
     @objc(stop:rejecter:)
-    public func stop(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+    public func stop(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Stopping playback")
         player.stop()
-        try? AVAudioSession.sharedInstance().setActive(false)
+        
+        let deactivate = options["deactivate"] as? [Bool]
+        if deactivate {
+            try? AVAudioSession.sharedInstance().setActive(false)
+        }
         resolve(NSNull())
     }
     

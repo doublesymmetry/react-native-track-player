@@ -80,6 +80,13 @@ declare namespace RNTrackPlayer {
     iosCategoryOptions?: Array<'mixWithOthers' | 'duckOthers' | 'interruptSpokenAudioAndMixWithOthers' | 'allowBluetooth' | 'allowBluetoothA2DP' | 'allowAirPlay' | 'defaultToSpeaker'>;
     waitForBuffer?: boolean;
   }
+  
+  export type PauseOptions = {
+    deactivate?: boolean;
+  }
+  
+  export type StopOptions = PauseOptions;
+  export type Resetoptions = StopOptions;
 
   interface FeedbackOptions {
     /** Marks wether the option should be marked as active or "done" */
@@ -132,10 +139,10 @@ declare namespace RNTrackPlayer {
 
   // Player Playback Commands
 
-  export function reset(): Promise<void>;
+  export function reset(options?: ResetOptions): Promise<void>;
   export function play(): Promise<void>;
-  export function pause(): Promise<void>;
-  export function stop(): Promise<void>;
+  export function pause(options?: PauseOptions): Promise<void>;
+  export function stop(options?: StopOptions): Promise<void>;
   export function seekTo(seconds: number): Promise<void>;
   export function setVolume(level: number): Promise<void>;
   export function setRate(rate: number): Promise<void>;
