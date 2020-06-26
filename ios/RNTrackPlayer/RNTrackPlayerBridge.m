@@ -43,16 +43,19 @@ RCT_EXTERN_METHOD(skipToNext:(RCTPromiseResolveBlock)resolve
 RCT_EXTERN_METHOD(skipToPrevious:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(reset:(RCTPromiseResolveBlock)resolve
+RCT_EXTERN_METHOD(reset:(NSDictionary *)options
+                  resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(play:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(pause:(RCTPromiseResolveBlock)resolve
+RCT_EXTERN_METHOD(pause:(NSDictionary *)options
+                  resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(stop:(RCTPromiseResolveBlock)resolve
+RCT_EXTERN_METHOD(stop:(NSDictionary *)options
+                  resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(seekTo:(double)time

@@ -84,9 +84,8 @@ declare namespace RNTrackPlayer {
   export type PauseOptions = {
     deactivate?: boolean;
   }
-  
   export type StopOptions = PauseOptions;
-  export type Resetoptions = StopOptions;
+  export type ResetOptions = StopOptions;
 
   interface FeedbackOptions {
     /** Marks wether the option should be marked as active or "done" */
