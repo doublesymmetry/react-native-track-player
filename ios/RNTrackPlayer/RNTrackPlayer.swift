@@ -25,7 +25,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     // MARK: - Lifecycle Methods
     
     deinit {
-        reset(resolve: { _ in }, reject: { _, _, _  in })
+        reset(options: ["deactivate": true], resolve: { _ in }, reject: { _, _, _  in })
     }
     
     // MARK: - RCTEventEmitter
@@ -379,7 +379,7 @@ public class RNTrackPlayer: RCTEventEmitter {
         player.stop()
         resolve(NSNull())
         
-        let deactivate = options["deactivate"] as? [Bool]
+        let deactivate = options["deactivate"] as! Bool
         if deactivate {
             try? AVAudioSession.sharedInstance().setActive(false)
         }
@@ -401,7 +401,7 @@ public class RNTrackPlayer: RCTEventEmitter {
         print("Pausing playback")
         player.pause()
         
-        let deactivate = options["deactivate"] as? [Bool]
+        let deactivate = options["deactivate"] as! Bool
         if deactivate {
             try? AVAudioSession.sharedInstance().setActive(false)
         }
@@ -413,7 +413,7 @@ public class RNTrackPlayer: RCTEventEmitter {
         print("Stopping playback")
         player.stop()
         
-        let deactivate = options["deactivate"] as? [Bool]
+        let deactivate = options["deactivate"] as! Bool
         if deactivate {
             try? AVAudioSession.sharedInstance().setActive(false)
         }
