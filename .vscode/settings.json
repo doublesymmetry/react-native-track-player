@@ -1,0 +1,7 @@
+{
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": false
+  },
+  "editor.trimAutoWhitespace": false
+}

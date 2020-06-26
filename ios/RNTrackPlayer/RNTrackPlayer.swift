@@ -395,6 +395,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     public func pause(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Pausing playback")
         player.pause()
+        try? AVAudioSession.sharedInstance().setActive(false)
         resolve(NSNull())
     }
     
@@ -402,6 +403,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     public func stop(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Stopping playback")
         player.stop()
+        try? AVAudioSession.sharedInstance().setActive(false)
         resolve(NSNull())
     }
     
