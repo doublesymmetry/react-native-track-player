@@ -373,7 +373,7 @@ public class RNTrackPlayer: RCTEventEmitter {
         }
     }
     
-    @objc(reset:rejecter:)
+    @objc(reset:resolver:rejecter:)
     public func reset(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Resetting player.")
         player.stop()
@@ -396,7 +396,7 @@ public class RNTrackPlayer: RCTEventEmitter {
         resolve(NSNull())
     }
     
-    @objc(pause:rejecter:)
+    @objc(pause:resolver:rejecter:)
     public func pause(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Pausing playback")
         player.pause()
@@ -408,7 +408,7 @@ public class RNTrackPlayer: RCTEventEmitter {
         resolve(NSNull())
     }
     
-    @objc(stop:rejecter:)
+    @objc(stop:resolver:rejecter:)
     public func stop(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Stopping playback")
         player.stop()
