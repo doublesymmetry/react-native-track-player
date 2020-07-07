@@ -3,7 +3,7 @@
 [![discord](https://img.shields.io/discord/567636850513018880.svg)](https://discordapp.com/invite/ya2XDCR)
 # react-native-track-player
 
-A fully fledged audio module created for music apps. Provides audio playback, external media controls, chromecast support, background mode and more!
+A fully fledged audio module created for music apps. Provides audio playback, external media controls, background mode and more!
 
 ---
 
@@ -21,12 +21,12 @@ A fully fledged audio module created for music apps. Provides audio playback, ex
 * **Multi-platform** - Supports Android, iOS and Windows
 * **Media Controls support** - Provides events for controlling the app from a bluetooth device, the lockscreen, a notification, a smartwatch or even a car
 * **Local or network, files or streams** - It doesn't matter where the media belongs, we've got you covered
-* **[Casting support](https://github.com/react-native-kit/react-native-track-casting)** - Seamlessly switch to any Google Cast compatible device, supporting custom media receivers
 * **Adaptive bitrate streaming support** - Support for DASH, HLS or SmoothStreaming
 * **Caching support** - Cache media files to play them again without an internet connection
 * **Background support** - Keep playing audio even after the app is in background
 * **Fully Customizable** - Even the notification icons are customizable!
 * **Supports React Hooks 🎣** - Includes React Hooks for common use-cases so you don't have to write them
+* **Casting support** - Use in combination with [react-native-track-casting (WIP)](https://github.com/react-native-kit/react-native-track-casting) to seamlessly switch to any Google Cast compatible device that supports custom media receivers
 
 ## Platform Support
 
@@ -42,7 +42,7 @@ A fully fledged audio module created for music apps. Provides audio playback, ex
 | Caching | ✓ | ✗ | ✗ |
 | Events | ✓ | ✓ | ✓ |
 | Background Mode | ✓ | ✓ | ✓ |
-| [Casting](https://github.com/react-native-kit/react-native-track-casting) | ✓ | ✗ | ✗ |
+| [Casting (WIP)](https://github.com/react-native-kit/react-native-track-casting) | ✓ | ✗ | ✗ |
 
 Check [Platform Support](https://react-native-kit.github.io/react-native-track-player/platform-support/) for more information.
 
@@ -55,18 +55,23 @@ All audio modules (like `react-native-sound`) don't play in a separated service 
 
 `react-native-google-cast` works pretty well and also supports custom receivers, but it has fewer player controls, it's harder to integrate and still uses the Cast SDK v2
 
+## First Steps
+
+If you want to get started with this module, check the [Getting Started](https://react-native-track-player.js.org/getting-started/) page.
+If you want detailed information about the API, check the [Documentation](https://react-native-track-player.js.org/documentation/). You can also look at our example project [here](https://github.com/react-native-kit/react-native-track-player/tree/dev/example).
+
 ## Example
 
-If you want to get started with this module, check the [API](https://react-native-kit.github.io/react-native-track-player/api/) page.
-If you want detailed information about the API, check the [Documentation](https://react-native-kit.github.io/react-native-track-player/documentation/).
-You can also look at our example project [here](https://github.com/react-native-kit/react-native-track-player/tree/dev/example).
+A basic example of how to play a track:
+
 ```javascript
 import TrackPlayer from 'react-native-track-player';
 
-// Creates the player
-TrackPlayer.setupPlayer().then(async () => {
+const start = async () => {
+    // Set up the player
+    await TrackPlayer.setupPlayer();
 
-    // Adds a track to the queue
+    // Add a track to the queue
     await TrackPlayer.add({
         id: 'trackId',
         url: require('track.mp3'),
@@ -75,14 +80,26 @@ TrackPlayer.setupPlayer().then(async () => {
         artwork: require('track.png')
     });
 
-    // Starts playing it
-    TrackPlayer.play();
-
-});
+    // Start playing it
+    await TrackPlayer.play();
+};
+start();
 ```
 
+If you want to get started with this module, check the [API](https://react-native-kit.github.io/react-native-track-player/api/) page.
+If you want detailed information about the API, check the [Documentation](https://react-native-kit.github.io/react-native-track-player/documentation/).
+
+## Example App
+You can look at our example project [here](https://github.com/react-native-kit/react-native-track-player/tree/dev/example).
+
+### iOS Screenshots
+<img src="example/screenshots/ios-app.png" width="300" /> <img src="example/screenshots/ios-lockscreen.png" width="300" />
+
+### Android Screenshots
+<img src="example/screenshots/android-app.png" width="300" /> <img src="example/screenshots/android-lockscreen.png" width="300" /> <img src="example/screenshots/android-notification.png" width="300" />
+
 ## Maintainers
-[David Chavez](https://github.com/dcvz) & [Guilherme Chaguri](https://github.com/Guichaguri)
+[Guilherme Chaguri](https://github.com/Guichaguri), [Dustin Bahr](https://github.com/curiousdustin) and [David Chavez](https://github.com/dcvz)
 
 ## Community
 You can find us as part of the [React Native Folks](https://discordapp.com/invite/ya2XDCR) Discord in the `#react-native-track-player` channel.

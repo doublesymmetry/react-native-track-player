@@ -10,7 +10,7 @@ import Foundation
 import MediaPlayer
 import AVFoundation
 
-class Track: NSObject, AudioItem, TimePitching, Authorizing {
+class Track: NSObject, AudioItem, TimePitching, AssetOptionsProviding {
     let id: String
     let url: MediaURL
     
@@ -79,7 +79,7 @@ class Track: NSObject, AudioItem, TimePitching, Authorizing {
     // MARK: - AudioItem Protocol
     
     func getSourceUrl() -> String {
-        return url.value.absoluteString
+        return url.isLocal ? url.value.path : url.value.absoluteString
     }
     
     func getArtist() -> String? {
@@ -100,20 +100,25 @@ class Track: NSObject, AudioItem, TimePitching, Authorizing {
     
     func getArtwork(_ handler: @escaping (UIImage?) -> Void) {
         if let artworkURL = artworkURL?.value {
-            URLSession.shared.dataTask(with: artworkURL, completionHandler: { (data, _, error) in
-                if let data = data, let artwork = UIImage(data: data), error == nil {
-                    handler(artwork)
-                }
-                
-                handler(nil)
-            }).resume()
+            if(self.artworkURL?.isLocal ?? false){
+                let image = UIImage.init(contentsOfFile: artworkURL.path);
+                handler(image);
+            } else {
+                URLSession.shared.dataTask(with: artworkURL, completionHandler: { (data, _, error) in
+                    if let data = data, let artwork = UIImage(data: data), error == nil {
+                        handler(artwork)
+                    }
+                    
+                    handler(nil)
+                }).resume()
+            }
         }
         
         handler(nil)
     }
-
+    
     // MARK: - TimePitching Protocol
-
+    
     func getPitchAlgorithmType() -> AVAudioTimePitchAlgorithm {
         if let pitchAlgorithm = pitchAlgorithm {
             switch pitchAlgorithm {
@@ -133,8 +138,12 @@ class Track: NSObject, AudioItem, TimePitching, Authorizing {
     
     // MARK: - Authorizing Protocol
     
-    func getHeaders() -> [String : Any] {
-        return headers ?? [:]
+    func getAssetOptions() -> [String: Any] {
+        if let headers = headers {
+            return ["AVURLAssetHTTPHeaderFieldsKey": headers]
+        }
+        
+        return [:]
     }
     
 }

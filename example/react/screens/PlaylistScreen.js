@@ -6,12 +6,16 @@ import Player from "../components/Player";
 import playlistData from "../data/playlist.json";
 import localTrack from "../resources/pure.m4a";
 
-export default function LandingScreen() {
+export default function PlaylistScreen() {
   const playbackState = usePlaybackState();
 
   useEffect(() => {
-    TrackPlayer.setupPlayer();
-    TrackPlayer.updateOptions({
+    setup();
+  }, []);
+
+  async function setup() {
+    await TrackPlayer.setupPlayer({});
+    await TrackPlayer.updateOptions({
       stopWithApp: true,
       capabilities: [
         TrackPlayer.CAPABILITY_PLAY,
@@ -25,7 +29,7 @@ export default function LandingScreen() {
         TrackPlayer.CAPABILITY_PAUSE
       ]
     });
-  }, []);
+  }
 
   async function togglePlayback() {
     const currentTrack = await TrackPlayer.getCurrentTrack();
@@ -37,7 +41,8 @@ export default function LandingScreen() {
         url: localTrack,
         title: "Pure (Demo)",
         artist: "David Chavez",
-        artwork: "https://picsum.photos/200"
+        artwork: "https://i.picsum.photos/id/500/200/200.jpg",
+        duration: 28
       });
       await TrackPlayer.play();
     } else {
@@ -67,7 +72,7 @@ export default function LandingScreen() {
   );
 }
 
-LandingScreen.navigationOptions = {
+PlaylistScreen.navigationOptions = {
   title: "Playlist Example"
 };
 

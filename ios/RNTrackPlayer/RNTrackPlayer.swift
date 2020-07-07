@@ -16,8 +16,8 @@ public class RNTrackPlayer: RCTEventEmitter {
     
     private var hasInitialized = false
 
-    private lazy var player: QueuedAudioPlayer = {
-        let player = QueuedAudioPlayer()
+    private lazy var player: RNTrackPlayerAudioPlayer = {
+        let player = RNTrackPlayerAudioPlayer(reactEventEmitter: self)
         player.bufferDuration = 1
         return player
     }()
@@ -174,31 +174,6 @@ public class RNTrackPlayer: RCTEventEmitter {
         
         
         // setup event listeners
-        player.event.stateChange.addListener(self) { [weak self] state in
-            self?.sendEvent(withName: "playback-state", body: ["state": state.rawValue])
-        }
-        
-        player.event.fail.addListener(self) { [weak self] error in
-            self?.sendEvent(withName: "playback-error", body: ["error": error?.localizedDescription])
-        }
-        
-        player.event.playbackEnd.addListener(self) { [weak self] reason in
-            guard let `self` = self else { return }
-
-            if reason == .playedUntilEnd && self.player.nextItems.count == 0 {
-                self.sendEvent(withName: "playback-queue-ended", body: [
-                    "track": (self.player.currentItem as? Track)?.id,
-                    "position": self.player.currentTime,
-                    ])
-            } else if reason == .playedUntilEnd {
-               self.sendEvent(withName: "playback-track-changed", body: [
-                    "track": (self.player.currentItem as? Track)?.id,
-                    "position": self.player.currentTime,
-                    "nextTrack": (self.player.nextItems.first as? Track)?.id,
-                    ])
-            }
-        }
-        
         player.remoteCommandController.handleChangePlaybackPositionCommand = { [weak self] event in
             if let event = event as? MPChangePlaybackPositionCommandEvent {
                 self?.sendEvent(withName: "remote-seek", body: ["position": event.positionTime])
@@ -289,8 +264,12 @@ public class RNTrackPlayer: RCTEventEmitter {
     
     @objc(updateOptions:resolver:rejecter:)
     public func update(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        let capabilitiesStr = options["capabilities"] as? [String]
-        let capabilities = capabilitiesStr?.compactMap { Capability(rawValue: $0) } ?? []
+
+        var capabilitiesStr = options["capabilities"] as? [String] ?? []
+        if (capabilitiesStr.contains("play") && capabilitiesStr.contains("pause")) {
+            capabilitiesStr.append("togglePlayPause");
+        }
+        let capabilities = capabilitiesStr.compactMap { Capability(rawValue: $0) }
         
         let remoteCommands = capabilities.map { capability in
             capability.mapToPlayerCommand(jumpInterval: options["jumpInterval"] as? NSNumber,
@@ -323,7 +302,7 @@ public class RNTrackPlayer: RCTEventEmitter {
         print("Adding tracks:", tracks)
         
         if let trackId = trackId {
-            guard let insertIndex = player.queueManager.items.firstIndex(where: { ($0 as! Track).id == trackId })
+            guard let insertIndex = player.items.firstIndex(where: { ($0 as! Track).id == trackId })
             else {
                 reject("track_not_in_queue", "Given track ID was not found in queue", nil)
                 return
@@ -331,14 +310,6 @@ public class RNTrackPlayer: RCTEventEmitter {
             
             try? player.add(items: tracks, at: insertIndex)
         } else {
-            if (player.currentItem == nil && tracks.count > 0) {
-                sendEvent(withName: "playback-track-changed", body: [
-                    "track": nil,
-                    "position": 0,
-                    "nextTrack": tracks.first!.id
-                ])
-            }
-            
             try? player.add(items: tracks, playWhenReady: false)
         }
         
@@ -348,19 +319,20 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(remove:resolver:rejecter:)
     public func remove(tracks ids: [String], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Removing tracks:", ids)
-        var indexesToRemove: [Int] = []
         
-        for id in ids {
-            if let index = player.queueManager.items.firstIndex(where: { ($0 as! Track).id == id }) {
-                if index == player.queueManager.currentIndex { return }
-                indexesToRemove.append(index)
+        // Look through queue for tracks that match one of the provided ids.
+        // Do this in reverse order so that as they are removed, 
+        // it will not affect other indices that will be removed.
+        for (index, element) in player.items.enumerated().reversed() {
+            // skip the current index
+            if index == player.currentIndex { continue }
+            
+            let track = element as! Track
+            if ids.contains(track.id) {
+                try? player.removeItem(at: index)
             }
         }
-        
-        for index in indexesToRemove {
-            try? player.removeItem(at: index)
-        }
-        
+
         resolve(NSNull())
     }
     
@@ -373,17 +345,11 @@ public class RNTrackPlayer: RCTEventEmitter {
     
     @objc(skip:resolver:rejecter:)
     public func skip(to trackId: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        guard let trackIndex = player.queueManager.items.firstIndex(where: { ($0 as! Track).id == trackId })
+        guard let trackIndex = player.items.firstIndex(where: { ($0 as! Track).id == trackId })
         else {
             reject("track_not_in_queue", "Given track ID was not found in queue", nil)
             return
         }
-        
-        sendEvent(withName: "playback-track-changed", body: [
-            "track": (player.currentItem as? Track)?.id,
-            "position": player.currentTime,
-            "nextTrack": trackId,
-        ])
         
         print("Skipping to track:", trackId)
         try? player.jumpToItem(atIndex: trackIndex, playWhenReady: player.playerState == .playing)
@@ -394,11 +360,6 @@ public class RNTrackPlayer: RCTEventEmitter {
     public func skipToNext(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Skipping to next track")
         do {
-            sendEvent(withName: "playback-track-changed", body: [
-                "track": (player.currentItem as? Track)?.id,
-                "position": player.currentTime,
-                "nextTrack": (player.nextItems.first as? Track)?.id,
-            ])
             try player.next()
             resolve(NSNull())
         } catch (_) {
@@ -410,11 +371,6 @@ public class RNTrackPlayer: RCTEventEmitter {
     public func skipToPrevious(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Skipping to next track")
         do {
-            sendEvent(withName: "playback-track-changed", body: [
-                "track": (player.currentItem as? Track)?.id,
-                "position": player.currentTime,
-                "nextTrack": (player.previousItems.last as? Track)?.id,
-            ])
             try player.previous()
             resolve(NSNull())
         } catch (_) {
@@ -489,7 +445,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     
     @objc(getTrack:resolver:rejecter:)
     public func getTrack(id: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        guard let track = player.queueManager.items.first(where: { ($0 as! Track).id == id })
+        guard let track = player.items.first(where: { ($0 as! Track).id == id })
         else {
             reject("track_not_in_queue", "Given track ID was not found in queue", nil)
             return
@@ -500,7 +456,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     
     @objc(getQueue:rejecter:)
     public func getQueue(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        let serializedQueue = player.queueManager.items.map { ($0 as! Track).toObject() }
+        let serializedQueue = player.items.map { ($0 as! Track).toObject() }
         resolve(serializedQueue)
     }
     
@@ -531,7 +487,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     
     @objc(updateMetadataForTrack:properties:resolver:rejecter:)
     public func updateMetadata(for trackId: String, properties: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        guard let track = player.queueManager.items.first(where: { ($0 as! Track).id == trackId }) as? Track
+        guard let track = player.items.first(where: { ($0 as! Track).id == trackId }) as? Track
             else {
                 reject("track_not_in_queue", "Given track ID was not found in queue", nil)
                 return
@@ -544,15 +500,17 @@ public class RNTrackPlayer: RCTEventEmitter {
                 MediaItemProperty.title(track.title),
                 MediaItemProperty.albumTitle(track.album),
             ])
-            
+            player.updateNowPlayingPlaybackValues();
             track.getArtwork { [weak self] image in
                 if let image = image {
                     let artwork = MPMediaItemArtwork(boundsSize: image.size, requestHandler: { (size) -> UIImage in
                         return image
                     })
                     self?.player.nowPlayingInfoController.set(keyValue: MediaItemProperty.artwork(artwork))
+                    self?.player.updateNowPlayingPlaybackValues();
                 }
             }
         }
+        resolve(NSNull())
     }
 }

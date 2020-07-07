@@ -147,8 +147,8 @@ public class MusicManager implements OnAudioFocusChangeListener {
             requestFocus();
 
             if(!receivingNoisyEvents) {
-                service.registerReceiver(noisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
                 receivingNoisyEvents = true;
+                service.registerReceiver(noisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
             }
 
             if(!wakeLock.isHeld()) wakeLock.acquire();
@@ -180,6 +180,12 @@ public class MusicManager implements OnAudioFocusChangeListener {
     public void onStop() {
         Log.d(Utils.LOG, "onStop");
 
+        // Unregisters the noisy receiver
+        if(receivingNoisyEvents) {
+            service.unregisterReceiver(noisyReceiver);
+            receivingNoisyEvents = false;
+        }
+
         // Release the wake and the wifi locks
         if(wakeLock.isHeld()) wakeLock.release();
         if(wifiLock.isHeld()) wifiLock.release();
@@ -201,7 +207,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
     public void onTrackUpdate(Track previous, long prevPos, Track next) {
         Log.d(Utils.LOG, "onTrackUpdate");
 
-        if(next != null) metadata.updateMetadata(next);
+        if(next != null) metadata.updateMetadata(playback, next);
 
         Bundle bundle = new Bundle();
         bundle.putString("track", previous != null ? previous.id : null);

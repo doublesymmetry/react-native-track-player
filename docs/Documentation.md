@@ -1,7 +1,13 @@
 ---
-title: Documentation
+title: API Documentation
+description: "The API documentation for react-native-track-player"
+nav_order: 3
 permalink: /documentation/
+redirect_from:
+  - /docs/
 ---
+
+# API Documentation
 
 ## Summary
 
@@ -103,7 +109,7 @@ If the player is already initialized, the promise will resolve instantly.
 
 | Param                | Type     | Description   | Default   | Android | iOS | Windows |
 | -------------------- | -------- | ------------- | --------- | :-----: | :-: | :-----: |
-| options              | `object` | The options   | 
+| options              | `object` | The options   |
 | options.minBuffer    | `number` | Minimum time in seconds that needs to be buffered | 15 | ✓ | ✗ | ✗ |
 | options.maxBuffer    | `number` | Maximum time in seconds that needs to be buffered | 50 | ✓ | ✗ | ✗ |
 | options.playBuffer   | `number` | Minimum time in seconds that needs to be buffered to start playing | 2.5 | ✓ | ✗ | ✗ |
@@ -245,15 +251,17 @@ Some parameters are unused depending on platform.
 | options.capabilities | `array` of [Capability Constants](#capability) | The media controls that will be enabled | ✓ | ✓ | ✓ |
 | options.notificationCapabilities | `array` of [Capability Constants](#capability) | The buttons that it will show in the notification. Defaults to `data.capabilities`  | ✓ | ✗ | ✗ |
 | options.compactCapabilities | `array` of [Capability Constants](#capability) | The buttons that it will show in the compact notification | ✓ | ✗ | ✗ |
-| options.icon | [Resource Object](#resource-object) | The notification icon | ✓ | ✗ | ✗ |
-| options.playIcon | [Resource Object](#resource-object) | The play icon | ✓ | ✗ | ✗ |
-| options.pauseIcon | [Resource Object](#resource-object) | The pause icon | ✓ | ✗ | ✗ |
-| options.stopIcon | [Resource Object](#resource-object) | The stop icon | ✓ | ✗ | ✗ |
-| options.previousIcon | [Resource Object](#resource-object) | The previous icon | ✓ | ✗ | ✗ |
-| options.nextIcon | [Resource Object](#resource-object) | The next icon | ✓ | ✗ | ✗ |
-| options.rewindIcon | [Resource Object](#resource-object) | The jump backward icon | ✓ | ✗ | ✗ |
-| options.forwardIcon | [Resource Object](#resource-object) | The jump forward icon | ✓ | ✗ | ✗ |
+| options.icon | [Resource Object](#resource-object) | The notification icon¹ | ✓ | ✗ | ✗ |
+| options.playIcon | [Resource Object](#resource-object) | The play icon¹ | ✓ | ✗ | ✗ |
+| options.pauseIcon | [Resource Object](#resource-object) | The pause icon¹ | ✓ | ✗ | ✗ |
+| options.stopIcon | [Resource Object](#resource-object) | The stop icon¹ | ✓ | ✗ | ✗ |
+| options.previousIcon | [Resource Object](#resource-object) | The previous icon¹ | ✓ | ✗ | ✗ |
+| options.nextIcon | [Resource Object](#resource-object) | The next icon¹ | ✓ | ✗ | ✗ |
+| options.rewindIcon | [Resource Object](#resource-object) | The jump backward icon¹ | ✓ | ✗ | ✗ |
+| options.forwardIcon | [Resource Object](#resource-object) | The jump forward icon¹ | ✓ | ✗ | ✗ |
 | options.color | `number` | The notification color in an ARGB hex | ✓ | ✗ | ✗ |
+
+*¹ - The custom icons will only work in release builds*
 
 #### `play()`
 Plays or resumes the current track.
@@ -300,7 +308,8 @@ Gets the duration of the current track in seconds.
 
 Note: `react-native-track-player` is a streaming library, which means it slowly buffers the track and doesn't know exactly when it ends.
 The duration returned by this function is determined through various tricks and *may not be exact or may not be available at all*.
-We highly recommend you to retrieve the duration from a database and feed it to the `duration` parameter in the [Track Object](#track-object).
+
+You should only trust the result of this function if you included the `duration` property in the [Track Object](#track-object).
 
 **Returns:** `Promise<number>`
 
@@ -510,9 +519,10 @@ For more information about Resource Objects, read the [Images](https://facebook.
 
 ## React Hooks
 
-React v16.8 introduced [hooks](https://reactjs.org/docs/hooks-intro.html). If you are using a version of React Native that is before [v0.59.0](https://facebook.github.io/react-native/blog/2019/03/12/releasing-react-native-059), your React Native version does not support hooks. 
+React v16.8 introduced [hooks](https://reactjs.org/docs/hooks-intro.html). If you are using a version of React Native that is before [v0.59.0](https://facebook.github.io/react-native/blog/2019/03/12/releasing-react-native-059), your React Native version does not support hooks.
 
-#### useTrackPlayerEvents
+#### `useTrackPlayerEvents`
+
 Register an event listener for one or more of the [events](#events) emitted by the TrackPlayer. The subscription is removed when the component unmounts.
 
 Check out the [events section](#events) for a full list of supported events.
@@ -520,7 +530,7 @@ Check out the [events section](#events) for a full list of supported events.
 ```jsx
 import React, { useState } from 'react';
 import { Text, View } from 'react-native';
-import { useTrackPlayerEvent, TrackPlayerEvents, STATE_PLAYING } from 'react-native-track-player';
+import { useTrackPlayerEvents, TrackPlayerEvents, STATE_PLAYING } from 'react-native-track-player';
 
 // Subscribing to the following events inside MyComponent
 const events = [
@@ -529,14 +539,14 @@ const events = [
 ];
 
 const MyComponent = () => {
-  const [playerState, setState] = useState(null)
+  const [playerState, setPlayerState] = useState(null)
 
   useTrackPlayerEvents(events, (event) => {
     if (event.type === TrackPlayerEvents.PLAYBACK_ERROR) {
-      console.warn('An error occurred while playing the current track.');
+      console.warn('An error occured while playing the current track.');
     }
     if (event.type === TrackPlayerEvents.PLAYBACK_STATE) {
-      setState(playbackState)
+      setPlayerState(event.state);
     }
   });
 
@@ -546,11 +556,11 @@ const MyComponent = () => {
     <View>
       <Text>The TrackPlayer is {isPlaying ? 'playing' : 'not playing'}</Text>
     </View>
-  ); 
+  );
 };
 ```
 
-#### useTrackPlayerProgress
+#### `useTrackPlayerProgress(interval, pollTrackPlayerStates)`
 A hook alternative to the [Progress Component](#progresscomponent).
 
 | State            | Type     | Description                      |
@@ -559,7 +569,25 @@ A hook alternative to the [Progress Component](#progresscomponent).
 | bufferedPosition | `number` | The buffered position in seconds |
 | duration         | `number` | The duration in seconds          |
 
-`useTrackPlayerProgress` accepts an interval to set the rate (in miliseconds) to poll the track player's progress. The default value is `1000` or every second.
+`useTrackPlayerProgress` accepts two arguments
+
+| Param                 | Type      | Description                            |
+| --------------------- | --------- | -------------------------------------- |
+| interval              | `number`  | An interval to set the rate (in miliseconds) to poll the track player's progress (default value is `1000` or every second)  |
+| pollTrackPlayerStates | `State[]` | An optional whitelist of playback states at which the track player's progress is polled.  |
+
+More information concerning the `pollTrackPlayerStates` argument:
+
+- Provide `null` in case you want really poll at the `interval`'s rate, no matter the playback state the player is in.
+- By default the hook will only poll while a track is playing or buffering, i.e. the default value for the second argument is:
+
+  ```js
+  [
+    TrackPlayer.STATE_PLAYING,
+    TrackPlayer.STATE_BUFFERING,
+  ]
+  ```
+
 
 ```jsx
 import React from 'react';
@@ -567,7 +595,7 @@ import { Text, View } from 'react-native';
 import { useTrackPlayerProgress } from 'react-native-track-player';
 
 const MyComponent = () => {
-  const { position, bufferedPosition, duration } = useTrackPlayerProgress()
+  const { position, bufferedPosition, duration } = useTrackPlayerProgress(1000, null)
 
   return (
     <View>

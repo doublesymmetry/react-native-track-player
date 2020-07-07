@@ -72,7 +72,7 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
         queue.set(index, track);
 
         if(currentIndex == index)
-            manager.getMetadata().updateMetadata(track);
+            manager.getMetadata().updateMetadata(this, track);
     }
 
     public Track getCurrentTrack() {
@@ -243,7 +243,7 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
         Log.d(Utils.LOG, "onPositionDiscontinuity: " + reason);
 
         if(lastKnownWindow != player.getCurrentWindowIndex()) {
-            Track previous = lastKnownWindow == C.INDEX_UNSET ? null : queue.get(lastKnownWindow);
+            Track previous = lastKnownWindow == C.INDEX_UNSET || lastKnownWindow >= queue.size() ? null : queue.get(lastKnownWindow);
             Track next = getCurrentTrack();
 
             // Track changed because it ended
@@ -302,7 +302,10 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
             previousState = state;
 
             if(state == PlaybackStateCompat.STATE_STOPPED) {
-                manager.onEnd(getCurrentTrack(), getPosition());
+                Track previous = getCurrentTrack();
+                long position = getPosition();
+                manager.onTrackUpdate(previous, position, null);
+                manager.onEnd(previous, position);
             }
         }
     }

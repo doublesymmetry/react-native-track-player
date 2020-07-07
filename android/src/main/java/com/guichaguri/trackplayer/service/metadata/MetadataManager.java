@@ -55,16 +55,8 @@ public class MetadataManager {
         this.service = service;
         this.manager = manager;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(Utils.NOTIFICATION_CHANNEL, "Playback", NotificationManager.IMPORTANCE_DEFAULT);
-            channel.setShowBadge(false);
-            channel.setSound(null, null);
-
-            NotificationManager not = (NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE);
-            not.createNotificationChannel(channel);
-        }
-
-        this.builder = new NotificationCompat.Builder(service, Utils.NOTIFICATION_CHANNEL);
+        String channel = Utils.getNotificationChannel((Context) service);
+        this.builder = new NotificationCompat.Builder(service, channel);
         this.session = new MediaSessionCompat(service, "TrackPlayer", null, null);
 
         session.setFlags(MediaSessionCompat.FLAG_HANDLES_QUEUE_COMMANDS);
@@ -197,7 +189,7 @@ public class MetadataManager {
      * Updates the current track
      * @param track The new track
      */
-    public void updateMetadata(Track track) {
+    public void updateMetadata(ExoPlayback playback, Track track) {
         MediaMetadataCompat.Builder metadata = track.toMediaMetadata();
 
         RequestManager rm = Glide.with(service.getApplicationContext());
@@ -224,11 +216,13 @@ public class MetadataManager {
         builder.setSubText(track.album);
 
         session.setMetadata(metadata.build());
+
+        updatePlaybackState(playback);
         updateNotification();
     }
 
     /**
-     * Updates the playback state
+     * Updates the playback state and notification buttons
      * @param playback The player
      */
     public void updatePlayback(ExoPlayback playback) {
@@ -282,14 +276,22 @@ public class MetadataManager {
 
         }
 
+        updatePlaybackState(playback);
+        updateNotification();
+    }
+
+    /**
+     * Updates the playback state
+     * @param playback The player
+     */
+    private void updatePlaybackState(ExoPlayback playback) {
         // Updates the media session state
         PlaybackStateCompat.Builder pb = new PlaybackStateCompat.Builder();
         pb.setActions(actions);
-        pb.setState(state, playback.getPosition(), playback.getRate());
+        pb.setState(playback.getState(), playback.getPosition(), playback.getRate());
         pb.setBufferedPosition(playback.getBufferedPosition());
 
         session.setPlaybackState(pb.build());
-        updateNotification();
     }
 
     public void setActive(boolean active) {

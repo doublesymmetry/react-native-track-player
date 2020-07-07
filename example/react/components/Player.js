@@ -46,14 +46,15 @@ ControlButton.propTypes = {
 export default function Player(props) {
   const playbackState = usePlaybackState();
   const [trackTitle, setTrackTitle] = useState("");
-  const [trackArtwork, setTrackArtwork] = useState("");
+  const [trackArtwork, setTrackArtwork] = useState();
   const [trackArtist, setTrackArtist] = useState("");
   useTrackPlayerEvents(["playback-track-changed"], async event => {
     if (event.type === TrackPlayer.TrackPlayerEvents.PLAYBACK_TRACK_CHANGED) {
       const track = await TrackPlayer.getTrack(event.nextTrack);
-      setTrackTitle(track.title);
-      setTrackArtist(track.artist);
-      setTrackArtwork(track.artwork);
+      const { title, artist, artwork } = track || {};
+      setTrackTitle(title);
+      setTrackArtist(artist);
+      setTrackArtwork(artwork);
     }
   });
 
