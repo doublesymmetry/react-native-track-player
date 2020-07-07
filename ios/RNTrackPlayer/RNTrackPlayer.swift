@@ -141,17 +141,17 @@ public class RNTrackPlayer: RCTEventEmitter {
         var sessionCategoryMode: AVAudioSession.Mode = .default
 
         if
-            let sessionCategoryStr = config["iosCategory"] as? String,
+            let sessionCategoryStr = configs["iosCategory"] as? String,
             let mappedCategory = SessionCategory(rawValue: sessionCategoryStr) {
                 sessionCategory = mappedCategory.mapConfigToAVAudioSessionCategory()
         }
         
-        let sessionCategoryOptsStr = config["iosCategoryOptions"] as? [String]
+        let sessionCategoryOptsStr = configs["iosCategoryOptions"] as? [String]
         let mappedCategoryOpts = sessionCategoryOptsStr?.compactMap { SessionCategoryOptions(rawValue: $0)?.mapConfigToAVAudioSessionCategoryOptions() } ?? []
         sessionCategoryOptions = AVAudioSession.CategoryOptions(mappedCategoryOpts)
         
         if
-            let sessionCategoryModeStr = config["iosCategoryMode"] as? String,
+            let sessionCategoryModeStr = configs["iosCategoryMode"] as? String,
             let mappedCategoryMode = SessionCategoryMode(rawValue: sessionCategoryModeStr) {
                 sessionCategoryMode = mappedCategoryMode.mapConfigToAVAudioSessionCategoryMode()
         }
@@ -172,7 +172,7 @@ public class RNTrackPlayer: RCTEventEmitter {
         }
         
         setupInterruptionHandling();
-setupPlayer
+
         // configure if player waits to play
         let autoWait: Bool = config["waitForBuffer"] as? Bool ?? false
         player.automaticallyWaitsToMinimizeStalling = autoWait
@@ -395,7 +395,9 @@ setupPlayer
     @objc(play:rejecter:)
     public func play(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Starting/Resuming playback")
-        try? AVAudioSession.sharedInstance().setActive(true)
+        DispatchQueue.main.async {
+            try? AVAudioSession.sharedInstance().setActive(true)
+        }
         player.play()
         resolve(NSNull())
     }
@@ -403,7 +405,9 @@ setupPlayer
     @objc(pause:rejecter:)
     public func pause(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Pausing playback")
-        try? AVAudioSession.sharedInstance().setActive(false)
+        DispatchQueue.main.async {
+            try? AVAudioSession.sharedInstance().setActive(false)
+        }
         player.pause()
         resolve(NSNull())
     }
@@ -411,7 +415,9 @@ setupPlayer
     @objc(stop:rejecter:)
     public func stop(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Stopping playback")
-        try? AVAudioSession.sharedInstance().setActive(false)
+        DispatchQueue.main.async {
+            try? AVAudioSession.sharedInstance().setActive(false)
+        }
         player.stop()
         resolve(NSNull())
     }
