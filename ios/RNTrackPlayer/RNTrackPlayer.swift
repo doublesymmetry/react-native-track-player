@@ -173,6 +173,10 @@ public class RNTrackPlayer: RCTEventEmitter {
         
         setupInterruptionHandling();
         
+        // configure if player waits to play
+        let autoWait: Bool = config["waitForBuffer"] as? Bool ?? false
+        player.automaticallyWaitsToMinimizeStalling = autoWait
+        
         // setup event listeners
         player.remoteCommandController.handleChangePlaybackPositionCommand = { [weak self] event in
             if let event = event as? MPChangePlaybackPositionCommandEvent {
