@@ -70,14 +70,17 @@ declare namespace RNTrackPlayer {
     [key: string]: any;
   }
 
-  export interface PlayerOptions {
+  export interface AudioSessionCategoryOptions {
+    iosCategory?: 'playback' | 'playAndRecord' | 'multiRoute' | 'ambient' | 'soloAmbient' | 'record';
+    iosCategoryMode?: 'default' | 'gameChat' | 'measurement' | 'moviePlayback' | 'spokenAudio' | 'videoChat' | 'videoRecording' | 'voiceChat' | 'voicePrompt';
+    iosCategoryOptions?: Array<'mixWithOthers' | 'duckOthers' | 'interruptSpokenAudioAndMixWithOthers' | 'allowBluetooth' | 'allowBluetoothA2DP' | 'allowAirPlay' | 'defaultToSpeaker'>;
+  }
+
+  export interface PlayerOptions extends AudioSessionCategoryOptions {
     minBuffer?: number;
     maxBuffer?: number;
     playBuffer?: number;
     maxCacheSize?: number;
-    iosCategory?: 'playback' | 'playAndRecord' | 'multiRoute' | 'ambient' | 'soloAmbient' | 'record';
-    iosCategoryMode?: 'default' | 'gameChat' | 'measurement' | 'moviePlayback' | 'spokenAudio' | 'videoChat' | 'videoRecording' | 'voiceChat' | 'voicePrompt';
-    iosCategoryOptions?: Array<'mixWithOthers' | 'duckOthers' | 'interruptSpokenAudioAndMixWithOthers' | 'allowBluetooth' | 'allowBluetoothA2DP' | 'allowAirPlay' | 'defaultToSpeaker'>;
     waitForBuffer?: boolean;
   }
 
@@ -115,6 +118,7 @@ declare namespace RNTrackPlayer {
   // General
 
   export function setupPlayer(options?: PlayerOptions): Promise<void>;
+  export function configAudioSessionCategory(options?: AudioSessionCategoryOptions): Promise<void>;
   export function destroy(): void;
 
   // Player Queue Commands
