@@ -49,6 +49,7 @@ permalink: /platform-support/
 | Function | Android | iOS | Windows |
 | ------- | :-----: | :-: | :-----: |
 | `setupPlayer` | ✓ | ✓ | ✓ |
+| `configAudioSessionCategory` | ✗ | ✓ | ✗ |
 | `updateOptions` | ✓ | ✓ | ✓ |
 | `registerPlaybackService` | ✓ | ✓ | ✓ |
 | `addEventListener` | ✓ | ✓ | ✓ |

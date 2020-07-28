@@ -165,6 +165,11 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
+    public void configAudioSessionCategory(ReadableMap data, final Promise promise) {
+        promise.resolve(null);
+    }
+
+    @ReactMethod
     public void destroy() {
         try {
             synchronized(this) {

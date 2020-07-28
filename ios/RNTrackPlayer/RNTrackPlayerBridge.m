@@ -15,6 +15,10 @@ RCT_EXTERN_METHOD(setupPlayer:(NSDictionary *)data
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
+RCT_EXTERN_METHOD(configAudioSessionCategory:(NSDictionary *)data
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject);
+
 RCT_EXTERN_METHOD(destroy);
 
 RCT_EXTERN_METHOD(updateOptions:(NSDictionary *)options
