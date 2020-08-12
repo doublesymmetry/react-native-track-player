@@ -3,6 +3,11 @@ import { Component } from 'react';
 export = RNTrackPlayer;
 
 declare namespace RNTrackPlayer {
+  
+  export type Event = {
+    type: EventType;
+    state: State;
+  }
 
   export type EventType =
     | "playback-state"
@@ -40,7 +45,7 @@ declare namespace RNTrackPlayer {
   type Capability = string | number;
   type PitchAlgorithm = string | number;
 
-  type EventHandler = (type: EventType, ...args: any[]) => void;
+  type EventHandler = (event: Event, ...args: any[]) => void;
   export function registerEventHandler(handler: EventHandler): void;
 
   type ServiceHandler = () => Promise<void>;
