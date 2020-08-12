@@ -4,12 +4,12 @@ export = RNTrackPlayer;
 
 declare namespace RNTrackPlayer {
 
-  export type EventType =
+  export type EventType = {
+    type:
     | "playback-state"
     | "playback-error"
     | "playback-queue-ended"
     | "playback-track-changed"
-    | "playback-metadata-received"
     | "remote-play"
     | "remote-play-id"
     | "remote-play-search"
@@ -26,6 +26,8 @@ declare namespace RNTrackPlayer {
     | "remote-like"
     | "remote-dislike"
     | "remote-bookmark";
+    state: State
+  }
 
   export type TrackType =
     | "default"
