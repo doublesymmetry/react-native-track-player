@@ -140,7 +140,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
 
     @SuppressLint("WakelockTimeout")
     public void onPlay() {
-        Log.d(Utils.LOG, "onPlay");
+//        Log.d(Utils.LOG, "onPlay");
         if(playback == null) return;
 
         Track track = playback.getCurrentTrack();
@@ -166,7 +166,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
     }
 
     public void onPause() {
-        Log.d(Utils.LOG, "onPause");
+//        Log.d(Utils.LOG, "onPause");
 
         // Unregisters the noisy receiver
         if(receivingNoisyEvents) {
@@ -183,7 +183,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
     }
 
     public void onStop() {
-        Log.d(Utils.LOG, "onStop");
+//        Log.d(Utils.LOG, "onStop");
 
         // Unregisters the noisy receiver
         if(receivingNoisyEvents) {
@@ -202,18 +202,18 @@ public class MusicManager implements OnAudioFocusChangeListener {
     }
 
     public void onStateChange(int state) {
-        Log.d(Utils.LOG, "onStateChange");
+//        Log.d(Utils.LOG, "onStateChange");
 
         Bundle bundle = new Bundle();
         bundle.putInt("state", state);
         service.emit(MusicEvents.PLAYBACK_STATE, bundle);
 
-        if (playback.shouldAutoUpdateMetadata())
-            metadata.updatePlayback(playback);
+//        if (playback.shouldAutoUpdateMetadata())
+//            metadata.updatePlayback(playback);
     }
 
     public void onTrackUpdate(Track previous, long prevPos, Track next) {
-        Log.d(Utils.LOG, "onTrackUpdate");
+//        Log.d(Utils.LOG, "onTrackUpdate");
 
         if(playback.shouldAutoUpdateMetadata() && next != null)
             metadata.updateMetadata(next);
@@ -230,7 +230,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
     }
 
     public void onEnd(Track previous, long prevPos) {
-        Log.d(Utils.LOG, "onEnd");
+//        Log.d(Utils.LOG, "onEnd");
 
         Bundle bundle = new Bundle();
         bundle.putString("track", previous != null ? previous.id : null);
@@ -239,7 +239,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
     }
 
     public void onMetadataReceived(String source, String title, String url, String artist, String album, String date, String genre) {
-        Log.d(Utils.LOG, "onMetadataReceived: " + source);
+//        Log.d(Utils.LOG, "onMetadataReceived: " + source);
 
         Bundle bundle = new Bundle();
         bundle.putString("source", source);
@@ -264,7 +264,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
 
     @Override
     public void onAudioFocusChange(int focus) {
-        Log.d(Utils.LOG, "onDuck");
+//        Log.d(Utils.LOG, "onDuck");
 
         boolean permanent = false;
         boolean paused = false;
@@ -303,7 +303,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
 
     private void requestFocus() {
         if(hasAudioFocus) return;
-        Log.d(Utils.LOG, "Requesting audio focus...");
+//        Log.d(Utils.LOG, "Requesting audio focus...");
 
         AudioManager manager = (AudioManager)service.getSystemService(Context.AUDIO_SERVICE);
         int r;
@@ -331,7 +331,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
 
     private void abandonFocus() {
         if(!hasAudioFocus) return;
-        Log.d(Utils.LOG, "Abandoning audio focus...");
+//        Log.d(Utils.LOG, "Abandoning audio focus...");
 
         AudioManager manager = (AudioManager)service.getSystemService(Context.AUDIO_SERVICE);
         int r;
@@ -349,7 +349,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
     }
 
     public void destroy() {
-        Log.d(Utils.LOG, "Releasing service resources...");
+//        Log.d(Utils.LOG, "Releasing service resources...");
 
         // Disable audio focus
         abandonFocus();

@@ -243,7 +243,7 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
 
     @Override
     public void onTimelineChanged(@NonNull Timeline timeline, int reason) {
-        Log.d(Utils.LOG, "onTimelineChanged: " + reason);
+//        Log.d(Utils.LOG, "onTimelineChanged: " + reason);
 
         if((reason == Player.TIMELINE_CHANGE_REASON_PREPARED || reason == Player.TIMELINE_CHANGE_REASON_DYNAMIC) && !timeline.isEmpty()) {
             onPositionDiscontinuity(Player.DISCONTINUITY_REASON_INTERNAL);
@@ -252,7 +252,7 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
 
     @Override
     public void onPositionDiscontinuity(int reason) {
-        Log.d(Utils.LOG, "onPositionDiscontinuity: " + reason);
+//        Log.d(Utils.LOG, "onPositionDiscontinuity: " + reason);
 
         if(lastKnownWindow != player.getCurrentWindowIndex()) {
             Track previous = lastKnownWindow == C.INDEX_UNSET || lastKnownWindow >= queue.size() ? null : queue.get(lastKnownWindow);
@@ -300,17 +300,19 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
         int state = getState();
+        Log.d(Utils.LOG, "onPlayerStateChanged -> ExoPlayback.java:303" + state);
 
         if(state != previousState) {
             if(Utils.isPlaying(state) && !Utils.isPlaying(previousState)) {
                 manager.onPlay();
+                manager.onStateChange(state);
             } else if(Utils.isPaused(state) && !Utils.isPaused(previousState)) {
                 manager.onPause();
+                manager.onStateChange(state);
             } else if(Utils.isStopped(state) && !Utils.isStopped(previousState)) {
                 manager.onStop();
+                manager.onStateChange(state);
             }
-
-            manager.onStateChange(state);
             previousState = state;
 
             if(state == PlaybackStateCompat.STATE_STOPPED) {

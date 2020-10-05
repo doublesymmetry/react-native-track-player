@@ -65,7 +65,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
 
     private void prepare() {
         if(!prepared) {
-            Log.d(Utils.LOG, "Preparing the media source...");
+//            Log.d(Utils.LOG, "Preparing the media source...");
             player.prepare(source, false, false);
             prepared = true;
         }
