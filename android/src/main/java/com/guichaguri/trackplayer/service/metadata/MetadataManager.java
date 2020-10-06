@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.app.Service.STOP_FOREGROUND_DETACH;
+import static android.media.session.PlaybackState.STATE_PAUSED;
 
 /**
  * @author Guichaguri
@@ -275,7 +276,7 @@ public class MetadataManager {
         pb.setBufferedPosition(playback.getBufferedPosition());
 
         session.setPlaybackState(pb.build());
-        updateNotification();
+        updateNotification(state == STATE_PAUSED);
     }
 
     public void setActive(boolean active, boolean isPaused) {
