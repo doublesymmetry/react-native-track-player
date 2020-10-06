@@ -31,6 +31,8 @@ import com.guichaguri.trackplayer.service.player.ExoPlayback;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.app.Service.STOP_FOREGROUND_DETACH;
+
 /**
  * @author Guichaguri
  */
@@ -276,10 +278,10 @@ public class MetadataManager {
         updateNotification();
     }
 
-    public void setActive(boolean active) {
+    public void setActive(boolean active, boolean isPaused) {
         this.session.setActive(active);
 
-        updateNotification();
+        updateNotification(isPaused);
     }
 
     public void destroy() {
@@ -290,6 +292,19 @@ public class MetadataManager {
     }
 
     private void updateNotification() {
+        updateNotification(false);
+    }
+
+    private void updateNotification(boolean isPaused) {
+        if (isPaused) {
+            service.startForeground(1, builder.build());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                service.stopForeground(STOP_FOREGROUND_DETACH);
+            } else {
+                service.stopForeground(false);
+            }
+            return;
+        }
         if(session.isActive()) {
             service.startForeground(1, builder.build());
         } else {
