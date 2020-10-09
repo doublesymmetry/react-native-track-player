@@ -121,7 +121,7 @@ public class RNTrackPlayer: RCTEventEmitter {
                 userInfo[AVAudioSessionInterruptionOptionKey] as? UInt else {
                     return
             }
-            let options = AVAudioSessionInterruptionOptions(rawValue: optionsValue)
+            let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
             if options.contains(.shouldResume) {
                 // Interruption Ended - playback should resume
                 self.sendEvent(withName: "remote-duck", body: [
