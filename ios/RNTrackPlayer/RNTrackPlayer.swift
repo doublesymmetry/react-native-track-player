@@ -111,25 +111,28 @@ public class RNTrackPlayer: RCTEventEmitter {
                 return
         }
         if type == .began {
-            // Interruption began, take appropriate actions
+            // Interruption began, take appropriate actions (save state, update user interface)
             self.sendEvent(withName: "remote-duck", body: [
                 "paused": true
                 ])
         }
         else if type == .ended {
-            if let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
-                let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
-                if options.contains(.shouldResume) {
-                    // Interruption Ended - playback should resume
-                    self.sendEvent(withName: "remote-duck", body: [
-                        "paused": false
-                        ])
-                } else {
-                    // Interruption Ended - playback should NOT resume
-                    self.sendEvent(withName: "remote-duck", body: [
-                        "permanent": true
-                        ])
-                }
+            guard let optionsValue =
+                userInfo[AVAudioSessionInterruptionOptionKey] as? UInt else {
+                    return
+            }
+            let options = AVAudioSessionInterruptionOptions(rawValue: optionsValue)
+            if options.contains(.shouldResume) {
+                // Interruption Ended - playback should resume
+                self.sendEvent(withName: "remote-duck", body: [
+                    "paused": false
+                ])
+            } else {
+                // Interruption Ended - playback should NOT resume
+                self.sendEvent(withName: "remote-duck", body: [
+                    "paused": true,
+                    "permanent": true
+                ])
             }
         }
     }
