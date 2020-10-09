@@ -412,19 +412,19 @@ Fired when the user presses the jump backward button. Only fired if the `CAPABIL
 | interval | `number` | The number of seconds to jump backward. It's usually the `jumpInterval` set in the options. |
 
 #### `remote-duck`
-Fired when the device needs the player to pause for a interruption.
+Subscribing to this event to handle interruptions ensures that your app’s audio continues behaving gracefully when a phone call arrives, a clock or calendar alarm sounds, or another app plays audio.
 
-The volume may also be lowered on an transient interruption without triggering this event.
-If you want to receive those interruptions, set the `alwaysPauseOnInterruption` option to true.
+On Android, this event is fired when the device needs the player to pause or stop for an interruption and again when the interruption has passed and playback may resume. On iOS this event is fired after playback was already interrupted (meaning pausing playback is unnecessary) and again when playback may resume or to notify that the interruption was permanent.
 
-- When the event is triggered with `permanent` set to true, you should stop the playback.
-- When the event is triggered with `paused` set to true, you should pause the playback. It will also be set to true when `permanent` is true.
-- When the event is triggered and none of them are set to true, you should resume the track.
+On Android, the volume may also be lowered on an transient interruption without triggering this event. If you want to receive those interruptions, set the `alwaysPauseOnInterruption` option to `true`.
+
+- When the event is triggered with `paused` set to `true`, on Android the player should pause playback. When `permanent` is also set to `true`, on Android the player should stop playback.
+- When the event is triggered and `paused` is not set to `true`, the player may resume playback.
 
 | Param     | Type      | Description                                  |
 | --------- | --------- | -------------------------------------------- |
-| paused    | `boolean` | Whether the player should pause the playback |
-| permanent | `boolean` | Whether the player should stop the playback  |
+| paused    | `boolean` | On Android when `true` the player should pause playback, when `false` the player may resume playback. On iOS when `true` the playback was paused and when `false` the player may resume playback. |
+| permanent | `boolean` | Whether the interruption is permanent. On Android the player should stop playback.  |
 
 ### Player
 #### `playback-state`
