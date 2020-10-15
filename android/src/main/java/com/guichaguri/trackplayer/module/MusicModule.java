@@ -90,7 +90,9 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
         }
         // Pixel系の端末で、再生中にアプリが強制終了した場合に、プロセスが残り続けてしまうので、
         // MusicServiceが強制終了されたタイミングで、プロセスを強制的にキルする #4132
-        android.os.Process.killProcess(android.os.Process.myPid());
+        if (getReactApplicationContext() != null && !getReactApplicationContext().hasCurrentActivity()) {
+            android.os.Process.killProcess(android.os.Process.myPid());
+        }
     }
 
     /**
