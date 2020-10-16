@@ -1,11 +1,10 @@
-using Newtonsoft.Json.Linq;
 using System;
 using System.Diagnostics;
-using ReactNative.Bridge;
 using Windows.Media;
 using Windows.Media.Playback;
 using Windows.Media.Core;
 using TrackPlayer.Logic;
+using Microsoft.ReactNative.Managed;
 
 namespace TrackPlayer.Players
 {
@@ -13,13 +12,13 @@ namespace TrackPlayer.Players
     {
         private MediaPlayer player;
 
-        private IPromise loadCallback;
+        private ReactPromise<JSValue> loadCallback;
 
         private bool started = false;
         private bool ended = false;
         private double startPos = 0;
 
-        public LocalPlayback(MediaManager manager, JObject options) : base(manager)
+        public LocalPlayback(MediaManager manager, JSValueObject options) : base(manager)
         {
             player = new MediaPlayer();
             player.AutoPlay = false;
@@ -37,7 +36,7 @@ namespace TrackPlayer.Players
             return player.SystemMediaTransportControls;
         }
 
-        protected override void Load(Track track, IPromise promise)
+        protected override void Load(Track track, ReactPromise<JSValue> promise)
         {
             started = false;
             ended = false;
@@ -167,7 +166,7 @@ namespace TrackPlayer.Players
 
         private void OnError(MediaPlayer sender, MediaPlayerFailedEventArgs args)
         {
-            loadCallback?.Reject("error", args.ErrorMessage);
+            loadCallback?.Reject(new ReactError { Code = "error", Message = args.ErrorMessage });
             loadCallback = null;
 
             Debug.WriteLine(args.Error);
@@ -195,7 +194,7 @@ namespace TrackPlayer.Players
 
             if (started) Play();
 
-            loadCallback?.Resolve(null);
+            loadCallback?.Resolve(JSValue.Null);
             loadCallback = null;
         }
     }

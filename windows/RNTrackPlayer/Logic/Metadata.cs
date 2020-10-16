@@ -1,4 +1,6 @@
-using Newtonsoft.Json.Linq;
+using Microsoft.ReactNative.Managed;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using Windows.Media;
 using Windows.Storage.Streams;
@@ -8,13 +10,15 @@ namespace TrackPlayer.Logic
     public class Metadata
     {
         private MediaManager manager;
+        private TrackPlayerModule module;
         private SystemMediaTransportControls controls;
         private double jumpInterval = 15;
         private bool play, pause, stop, previous, next, jumpForward, jumpBackward, seek;
 
-        public Metadata(MediaManager manager)
+        public Metadata(MediaManager manager, TrackPlayerModule module)
         {
             this.manager = manager;
+            this.module = module;
         }
 
         public void SetTransportControls(SystemMediaTransportControls transportControls)
@@ -55,18 +59,18 @@ namespace TrackPlayer.Logic
             controls.IsRecordEnabled = false;
         }
 
-        public void UpdateOptions(JObject data)
+        public void UpdateOptions(JSValue data)
         {
             Debug.WriteLine("Updating options...");
 
-            if (data.TryGetValue("jumpInterval", out var ji))
+            if (data["jumpInterval"].TryGetDouble(out double ji))
             {
-                jumpInterval = (double)ji;
+                jumpInterval = ji;
             }
 
-            if (data.TryGetValue("capabilities", out var caps))
+            if (data["capabilities"].TryGetObject(out var caps))
             {
-                JArray capabilities = (JArray) caps;
+                var capabilities = (JSValueArray) caps;
 
                 play = Utils.ContainsInt(capabilities, (int) Capability.Play);
                 pause = Utils.ContainsInt(capabilities, (int) Capability.Pause);
@@ -84,15 +88,20 @@ namespace TrackPlayer.Logic
         public void UpdateMetadata(Track track)
         {
             var display = controls.DisplayUpdater;
-            var properties = display.MusicProperties;
+            if (track != null) {
+                var properties = display.MusicProperties;
 
-            display.AppMediaId = track.Id;
-            display.Thumbnail = RandomAccessStreamReference.CreateFromUri(track.Artwork);
-            display.Type = MediaPlaybackType.Music;
+                display.AppMediaId = track.Id;
+                display.Thumbnail = RandomAccessStreamReference.CreateFromUri(track.Artwork);
+                display.Type = MediaPlaybackType.Music;
 
-            properties.Title = track.Title;
-            properties.Artist = track.Artist;
-            properties.AlbumTitle = track.Album;
+                properties.Title = track.Title;
+                properties.Artist = track.Artist;
+                properties.AlbumTitle = track.Album;
+            } else {
+                display.ClearAll();
+            }
+
         }
 
         public void Dispose()
@@ -107,50 +116,41 @@ namespace TrackPlayer.Logic
         {
             if (!seek) return;
 
-            JObject obj = new JObject();
-            obj.Add("position", args.RequestedPlaybackPosition.TotalSeconds);
-            manager.SendEvent(Events.ButtonSeekTo, obj);
+            var jv = new JSValueObject {{ "position", args.RequestedPlaybackPosition.TotalSeconds }};
+            module.ButtonSeekTo(jv);
         }
 
         private void OnButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
         {
-            string eventType = null;
-            JObject data = null;
-
-            switch(args.Button)
+            switch (args.Button)
             {
                 case SystemMediaTransportControlsButton.Play:
-                    eventType = Events.ButtonPlay;
+                    module.ButtonPlay(JSValue.Null);
                     break;
                 case SystemMediaTransportControlsButton.Pause:
-                    eventType = Events.ButtonPause;
+                    module.ButtonPause(JSValue.Null);
                     break;
                 case SystemMediaTransportControlsButton.Stop:
-                    eventType = Events.ButtonStop;
+                    module.ButtonStop(JSValue.Null);
                     break;
                 case SystemMediaTransportControlsButton.Previous:
-                    eventType = Events.ButtonSkipPrevious;
+                    module.ButtonSkipPrevious(JSValue.Null);
                     break;
                 case SystemMediaTransportControlsButton.Next:
-                    eventType = Events.ButtonSkipNext;
+                    module.ButtonSkipNext(JSValue.Null);
                     break;
                 case SystemMediaTransportControlsButton.FastForward:
-                    eventType = Events.ButtonJumpForward;
-                    data = new JObject();
-                    data["interval"] = jumpInterval;
+                    var data = new JSValueObject {{ "interval", jumpInterval }};
+                    module.ButtonJumpForward(data);
                     break;
                 case SystemMediaTransportControlsButton.Rewind:
-                    eventType = Events.ButtonJumpBackward;
-                    data = new JObject();
-                    data["interval"] = jumpInterval;
+                    data = new JSValueObject { { "interval", jumpInterval } };
+                    module.ButtonJumpBackward(data);
                     break;
                 default:
                     return;
             }
-
-            manager.SendEvent(eventType, data);
         }
-
     }
 
     enum Capability {

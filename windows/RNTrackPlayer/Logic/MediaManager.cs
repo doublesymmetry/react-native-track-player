@@ -1,6 +1,6 @@
-using Newtonsoft.Json.Linq;
-using ReactNative.Bridge;
-using ReactNative.Modules.Core;
+using Microsoft.ReactNative.Managed;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using TrackPlayer.Players;
 
@@ -8,21 +8,16 @@ namespace TrackPlayer.Logic
 {
     public class MediaManager
     {
-        private ReactContext context;
+        private TrackPlayerModule module;
+
         private Metadata metadata;
-        
+
         private Playback player;
 
-        public MediaManager(ReactContext context)
+        public MediaManager(TrackPlayerModule module)
         {
-            this.context = context;
-            
-            this.metadata = new Metadata(this);
-        }
-
-        public void SendEvent(string eventName, object data)
-        {
-            context.GetJavaScriptModule<RCTDeviceEventEmitter>().emit(eventName, data);
+            this.module = module;
+            this.metadata = new Metadata(this, module);
         }
 
         public void SwitchPlayback(Playback pb)
@@ -37,12 +32,12 @@ namespace TrackPlayer.Logic
             metadata.SetTransportControls(pb?.GetTransportControls());
         }
 
-        public LocalPlayback CreateLocalPlayback(JObject options)
+        public LocalPlayback CreateLocalPlayback(JSValueObject options)
         {
             return new LocalPlayback(this, options);
         }
 
-        public void UpdateOptions(JObject options)
+        public void UpdateOptions(JSValue options)
         {
             metadata.UpdateOptions(options);
         }
@@ -59,52 +54,38 @@ namespace TrackPlayer.Logic
 
         public void OnEnd(Track previous, double prevPos)
         {
-            Debug.WriteLine("OnEnd");
-
-            JObject obj = new JObject();
-            obj.Add("track", previous?.Id);
-            obj.Add("position", prevPos);
-            SendEvent(Events.PlaybackQueueEnded, obj);
+            module.PlaybackQueueEnded(new JSValueObject{ {"track", previous?.Id },
+                                                         {"position", prevPos } });
         }
 
         public void OnStateChange(PlaybackState state)
         {
-            Debug.WriteLine("OnStateChange");
-
-            JObject obj = new JObject();
-            obj.Add("state", (int) state);
-            SendEvent(Events.PlaybackState, obj);
+            module.PlaybackStateAction(new JSValueObject { { "state", (int)state } });
         }
 
         public void OnTrackUpdate(Track previous, double prevPos, Track next, bool changed)
         {
-            Debug.WriteLine("OnTrackUpdate");
-
             metadata.UpdateMetadata(next);
 
-            if(changed)
+            if (changed)
             {
-                JObject obj = new JObject();
-                obj.Add("track", previous?.Id);
-                obj.Add("position", prevPos);
-                obj.Add("nextTrack", next?.Id);
-                SendEvent(Events.PlaybackTrackChanged, obj);
+                var jvo = new JSValueObject{{ "track", previous?.Id },
+                                            { "position", prevPos },
+                                            { "nextTrack", next?.Id } };
+                module.PlaybackTrackChanged(jvo);
             }
         }
 
         public void OnError(string code, string error)
         {
-            Debug.WriteLine("OnError: " + error);
-
-            JObject obj = new JObject();
-            obj.Add("code", code);
-            obj.Add("message", error);
-            SendEvent(Events.PlaybackError, obj);
+            JSValueObject jvo = new JSValueObject{{ "code", code },
+                                                  { "message", error } };
+            module.PlaybackError(jvo);
         }
 
         public void Dispose()
         {
-            if(player != null)
+            if (player != null)
             {
                 player.Dispose();
                 player = null;
@@ -112,6 +93,5 @@ namespace TrackPlayer.Logic
 
             metadata.Dispose();
         }
-
     }
 }

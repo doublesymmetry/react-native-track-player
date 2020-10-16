@@ -1,8 +1,8 @@
-using ReactNative.Bridge;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Windows.Media;
 using TrackPlayer.Logic;
+using Microsoft.ReactNative.Managed;
 
 namespace TrackPlayer.Players
 {
@@ -27,12 +27,12 @@ namespace TrackPlayer.Players
             prevState = state;
         }
 
-        protected void UpdateCurrentTrack(int index, IPromise promise)
+        protected void UpdateCurrentTrack(int index, ReactPromise<JSValue> promise)
         {
             if (queue.Count == 0)
             {
                 Reset();
-                promise?.Reject("queue_exhausted", "The queue is empty");
+                promise?.Reject(new ReactError { Code = "queue_exhausted", Message = "The queue is empty" });
                 return;
             }
             else if (index < 0)
@@ -78,7 +78,7 @@ namespace TrackPlayer.Players
             return queue;
         }
 
-        public void Add(List<Track> tracks, string insertBeforeId, IPromise promise)
+        public void Add(List<Track> tracks, string insertBeforeId, ReactPromise<JSValue> promise)
         {
             if (insertBeforeId == null)
             {
@@ -99,10 +99,10 @@ namespace TrackPlayer.Players
                     currentTrack += tracks.Count;
             }
 
-            promise?.Resolve(null);
+            promise?.Resolve(JSValue.Null);
         }
 
-        public void Remove(List<string> ids, IPromise promise)
+        public void Remove(List<string> ids, ReactPromise<JSValue> promise)
         {
             int currTrack = currentTrack;
 
@@ -117,7 +117,7 @@ namespace TrackPlayer.Players
             if (currTrack != currentTrack)
                 UpdateCurrentTrack(currTrack, null);
 
-            promise?.Resolve(null);
+            promise?.Resolve(JSValue.Null);
         }
 
         public void UpdateTrack(int index, Track track)
@@ -130,7 +130,7 @@ namespace TrackPlayer.Players
 
         public abstract SystemMediaTransportControls GetTransportControls();
 
-        protected abstract void Load(Track track, IPromise promise);
+        protected abstract void Load(Track track, ReactPromise<JSValue> promise);
 
         public abstract void Play();
 
@@ -159,14 +159,14 @@ namespace TrackPlayer.Players
             }
         }
 
-        public void Skip(string id, IPromise promise)
+        public void Skip(string id, ReactPromise<JSValue> promise)
         {
             int index = queue.FindIndex(track => track.Id == id);
 
             if (index >= 0)
                 UpdateCurrentTrack(index, promise);
             else
-                promise?.Reject("track_not_in_queue", "Given track ID was not found in queue");
+                promise?.Reject(new ReactError { Code = "track_not_in_queue", Message = "Given track ID was not found in queue" });
         }
 
         protected bool HasNext()
@@ -174,20 +174,20 @@ namespace TrackPlayer.Players
             return currentTrack < queue.Count - 1;
         }
 
-        public void SkipToNext(IPromise promise)
+        public void SkipToNext(ReactPromise<JSValue> promise)
         {
             if (HasNext())
                 UpdateCurrentTrack(currentTrack + 1, promise);
             else
-                promise?.Reject("queue_exhausted", "There is no tracks left to play");
+                promise?.Reject(new ReactError { Code = "queue_exhausted", Message = "There is no tracks left to play" });
         }
 
-        public void SkipToPrevious(IPromise promise)
+        public void SkipToPrevious(ReactPromise<JSValue> promise)
         {
             if (currentTrack > 0)
                 UpdateCurrentTrack(currentTrack - 1, promise);
             else
-                promise?.Reject("no_previous_track", "There is no previous tracks");
+                promise?.Reject(new ReactError { Code = "no_previous_track", Message = "There is no previous tracks" });
         }
 
         public abstract void SetVolume(double volume);
