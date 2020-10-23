@@ -1,6 +1,4 @@
 using Microsoft.ReactNative.Managed;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using Windows.Media;
 using Windows.Storage.Streams;

@@ -1,7 +1,4 @@
 using Microsoft.ReactNative.Managed;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using TrackPlayer.Players;
 
 namespace TrackPlayer.Logic
