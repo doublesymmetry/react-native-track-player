@@ -36,7 +36,7 @@ namespace TrackPlayer.Logic
                     return def;
                 }
             }
-            catch (Exception e)
+            catch
             {
                 return def;
             }
