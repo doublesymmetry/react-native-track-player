@@ -3,7 +3,7 @@ using System.Diagnostics;
 using Windows.Media;
 using Windows.Storage.Streams;
 
-namespace TrackPlayer.Logic
+namespace RNTrackPlayer.Logic
 {
     public class Metadata
     {

@@ -10,8 +10,8 @@
     <ProjectGuid>{E292F490-9FB8-11E7-B023-0F938699DB28}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TrackPlayer</RootNamespace>
-    <AssemblyName>TrackPlayer</AssemblyName>
+    <RootNamespace>RNTrackPlayer</RootNamespace>
+    <AssemblyName>RNTrackPlayer</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion>10.0.18362.0</TargetPlatformVersion>

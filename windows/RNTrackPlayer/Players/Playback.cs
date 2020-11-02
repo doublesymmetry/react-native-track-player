@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Windows.Media;
-using TrackPlayer.Logic;
+using RNTrackPlayer.Logic;
 using Microsoft.ReactNative.Managed;
 
-namespace TrackPlayer.Players
+namespace RNTrackPlayer.Players
 {
     public abstract class Playback
     {

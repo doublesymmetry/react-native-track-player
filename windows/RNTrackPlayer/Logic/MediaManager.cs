@@ -1,7 +1,7 @@
 using Microsoft.ReactNative.Managed;
-using TrackPlayer.Players;
+using RNTrackPlayer.Players;
 
-namespace TrackPlayer.Logic
+namespace RNTrackPlayer.Logic
 {
     public class MediaManager
     {

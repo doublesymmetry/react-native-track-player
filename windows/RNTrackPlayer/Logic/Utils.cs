@@ -1,8 +1,8 @@
 using Microsoft.ReactNative.Managed;
 using System;
-using TrackPlayer.Players;
+using RNTrackPlayer.Players;
 
-namespace TrackPlayer.Logic
+namespace RNTrackPlayer.Logic
 {
     internal static class Utils
     {

@@ -1,4 +1,4 @@
-﻿namespace TrackPlayer.Players
+﻿namespace RNTrackPlayer.Players
 {
 
     class CastPlayback {

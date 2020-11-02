@@ -3,10 +3,10 @@ using System.Diagnostics;
 using Windows.Media;
 using Windows.Media.Playback;
 using Windows.Media.Core;
-using TrackPlayer.Logic;
+using RNTrackPlayer.Logic;
 using Microsoft.ReactNative.Managed;
 
-namespace TrackPlayer.Players
+namespace RNTrackPlayer.Players
 {
     public class LocalPlayback : Playback
     {

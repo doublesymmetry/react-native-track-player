@@ -1,6 +1,6 @@
 ﻿using Microsoft.ReactNative;
 
-namespace TrackPlayer
+namespace RNTrackPlayer
 {
     public partial class ReactPackageProvider : IReactPackageProvider
     {

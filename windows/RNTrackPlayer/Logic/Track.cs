@@ -2,7 +2,7 @@ using Microsoft.ReactNative.Managed;
 using System;
 using System.Diagnostics;
 
-namespace TrackPlayer.Logic
+namespace RNTrackPlayer.Logic
 {
     public class Track
     {

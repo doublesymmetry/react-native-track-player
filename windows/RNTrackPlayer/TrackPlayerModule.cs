@@ -1,10 +1,10 @@
 using System;
 using Microsoft.ReactNative.Managed;
 using System.Collections.Generic;
-using TrackPlayer.Logic;
-using TrackPlayer.Players;
+using RNTrackPlayer.Logic;
+using RNTrackPlayer.Players;
 
-namespace TrackPlayer
+namespace RNTrackPlayer
 {
     [ReactModule("TrackPlayerModule")]
     public class TrackPlayerModule
