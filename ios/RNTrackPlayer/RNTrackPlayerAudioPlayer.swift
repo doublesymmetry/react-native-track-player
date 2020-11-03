@@ -91,7 +91,7 @@ public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer {
             case AVMetadataKeySpace.id3:
                 return "id3"
             case AVMetadataKeySpace.icy:
-                return "icy-headers"
+                return "icy"
             case AVMetadataKeySpace.quickTimeMetadata:
                 return "quicktime"
             case AVMetadataKeySpace.common:
@@ -106,8 +106,7 @@ public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer {
         var date = getMetadataItem(forIdentifier: .commonIdentifierCreationDate)
         var url = "";
         var genre = "";
-        if (source == "icy-headers") {
-            title = getMetadataItem(forIdentifier: .icyMetadataStreamTitle)
+        if (source == "icy") {
             url = getMetadataItem(forIdentifier: .icyMetadataStreamURL)
         } else if (source == "id3") {
             if (date.isEmpty) {
@@ -123,17 +122,16 @@ public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer {
             }
         } else if (source == "quicktime") {
             genre = getMetadataItem(forIdentifier: .quickTimeMetadataGenre)
-        } else if (source == "unknown") {
-            // Detect ICY metadata by:
-            // - having "unknown" source
-            // - having title metadata
-            // - but no artist metadata
-            if (!title.isEmpty && artist.isEmpty) {
-                if let index = title.range(of: " - ")?.lowerBound {
-                    artist = String(title.prefix(upTo: index));
-                    title = String(title.suffix(from: title.index(index, offsetBy: 3)));
-                }
-          }
+        }
+
+        // Detect ICY metadata and split title into artist & title:
+        // - source should be either "unknown" (pre iOS 14) or "icy" (iOS 14 and above)
+        // - we have a title, but no artist
+        if ((source == "unknown" || source == "icy") && !title.isEmpty && artist.isEmpty) {
+            if let index = title.range(of: " - ")?.lowerBound {
+                artist = String(title.prefix(upTo: index));
+                title = String(title.suffix(from: title.index(index, offsetBy: 3)));
+            }
         }
         var data : [String : String?] = [
             "title": title.isEmpty ? nil : title,
