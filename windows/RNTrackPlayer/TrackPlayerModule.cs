@@ -182,7 +182,7 @@ namespace RNTrackPlayer
                 var player = manager?.GetPlayer();
                 if (Utils.CheckPlayback(player, promise)) return;
 
-                List<Track> tracks = new List<Track>(array.Count);
+                List<Track> tracks = new List<Track>();
 
                 foreach (JSValue obj in array)
                 {
@@ -249,14 +249,13 @@ namespace RNTrackPlayer
             if (Utils.CheckPlayback(player, promise)) return;
 
             var queue = player.GetQueue();
-            var array = new JSValueArray();
+            var array = new List<JSValue>(queue.Count);
 
             foreach (var track in queue)
             {
                 array.Add(track.ToObject());
             }
-
-            promise.Resolve(array);
+            promise.Resolve(JSValueArray.CopyFrom(array.AsReadOnly()));
         }
 
         [ReactMethod]
