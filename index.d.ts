@@ -68,6 +68,7 @@ declare namespace RNTrackPlayer {
     userAgent?: string;
     contentType?: string;
     pitchAlgorithm?: PitchAlgorithm;
+    preferPreciseDuration?: boolean;
     [key: string]: any;
   }
 
@@ -204,7 +205,7 @@ declare namespace RNTrackPlayer {
   export const PITCH_ALGORITHM_LINEAR: PitchAlgorithm;
   export const PITCH_ALGORITHM_MUSIC: PitchAlgorithm;
   export const PITCH_ALGORITHM_VOICE: PitchAlgorithm;
-  
+
   export const TrackPlayerEvents: {
     REMOTE_PLAY: EventType;
     REMOTE_PLAY_ID: EventType;

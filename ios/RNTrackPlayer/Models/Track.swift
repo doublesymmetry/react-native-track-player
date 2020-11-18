@@ -25,6 +25,7 @@ class Track: NSObject, AudioItem, TimePitching, AssetOptionsProviding {
     var artworkURL: MediaURL?
     let headers: [String: Any]?
     let pitchAlgorithm: String?
+    var preferPreciseDuration: Bool?
     
     @objc var album: String?
     @objc var artwork: MPMediaItemArtwork?
@@ -33,10 +34,10 @@ class Track: NSObject, AudioItem, TimePitching, AssetOptionsProviding {
     
     init?(dictionary: [String: Any]) {
         guard let id = dictionary["id"] as? String,
-            let title = dictionary["title"] as? String,
-            let artist = dictionary["artist"] as? String,
-            let url = MediaURL(object: dictionary["url"])
-            else { return nil }
+              let title = dictionary["title"] as? String,
+              let artist = dictionary["artist"] as? String,
+              let url = MediaURL(object: dictionary["url"])
+        else { return nil }
         
         self.id = id
         self.url = url
@@ -51,6 +52,8 @@ class Track: NSObject, AudioItem, TimePitching, AssetOptionsProviding {
         self.headers = dictionary["headers"] as? [String: Any]
         self.artworkURL = MediaURL(object: dictionary["artwork"])
         self.pitchAlgorithm = dictionary["pitchAlgorithm"] as? String
+        
+        self.preferPreciseDuration = dictionary["preferPreciseDuration"] as? Bool
         
         self.originalObject = dictionary
     }
@@ -139,6 +142,10 @@ class Track: NSObject, AudioItem, TimePitching, AssetOptionsProviding {
     // MARK: - Authorizing Protocol
     
     func getAssetOptions() -> [String: Any] {
+        if preferPreciseDuration == true {
+            return [AVURLAssetPreferPreciseDurationAndTimingKey: true]
+        }
+        
         if let headers = headers {
             return ["AVURLAssetHTTPHeaderFieldsKey": headers]
         }
