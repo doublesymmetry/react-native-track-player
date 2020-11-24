@@ -51,15 +51,15 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
 
             @Override
             public void onHostDestroy() {
+                reactContext.removeLifecycleEventListener(this);
+
                 // 一時停止中で時間が経過し、クライアントが破棄された際に通知が残り続けてしまうのでここで通知を削除する
                 removeNotification();
-
                 // Pixel系の端末で、再生中にアプリが強制終了した場合に、プロセスが残り続けてしまうので、
                 // MusicServiceが強制終了されたタイミングで、プロセスを強制的にキルする #4132
                 if (getReactApplicationContext() != null) {
                     android.os.Process.killProcess(android.os.Process.myPid());
                 }
-                reactContext.removeLifecycleEventListener(this);
             }
         });
     }
