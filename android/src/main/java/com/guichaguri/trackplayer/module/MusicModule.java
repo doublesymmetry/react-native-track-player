@@ -53,8 +53,12 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
             public void onHostDestroy() {
                 reactContext.removeLifecycleEventListener(this);
 
-                // 一時停止中で時間が経過し、クライアントが破棄された際に通知が残り続けてしまうのでここで通知を削除する
-                removeNotification();
+                // 一時停止中で時間が経過し、クライアントが破棄された際に通知が残り続けてしまうので念のためここで通知を削除する
+                NotificationManager nManager = ((NotificationManager) getReactApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE));
+                if (nManager != null) {
+                    nManager.cancel(1);
+                }
+
                 // Pixel系の端末で、再生中にアプリが強制終了した場合に、プロセスが残り続けてしまうので、
                 // MusicServiceが強制終了されたタイミングで、プロセスを強制的にキルする #4132
                 if (getReactApplicationContext() != null) {
@@ -498,14 +502,5 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     @ReactMethod
     public void getState(final Promise callback) {
         waitForConnection(() -> callback.resolve(binder.getPlayback().getState()));
-    }
-
-    // Pixel系の端末で、再生中にアプリが強制終了した場合に、プロセスが残り続けてしまうので、
-    // MusicServiceが強制終了されたタイミングで、プロセスを強制的にキルする #4132
-    private void removeNotification() {
-        NotificationManager nManager = ((NotificationManager) getReactApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE));
-        if (nManager != null) {
-            nManager.cancel(1);
-        }
     }
 }
