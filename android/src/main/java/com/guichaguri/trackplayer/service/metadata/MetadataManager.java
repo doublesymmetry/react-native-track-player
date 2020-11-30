@@ -81,6 +81,8 @@ public class MetadataManager {
 
         // Make it visible in the lockscreen
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+
+        builder.setPriority(NotificationCompat.PRIORITY_LOW);
     }
 
     public MediaSessionCompat getSession() {

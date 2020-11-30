@@ -157,7 +157,7 @@ public class Utils {
             NotificationChannel channel = new NotificationChannel(
                 Utils.NOTIFICATION_CHANNEL,
                 "MusicService",
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_LOW
             );
             channel.setShowBadge(false);
             channel.setSound(null, null);
