@@ -18,6 +18,10 @@ TrackPlayer.setupPlayer().then(() => {
     // The player is ready to be used
 });
 ```
+_Note:_ On iOS if you notice that network media immediately pauses after it buffers, you may need to setup the player with the `waitForBuffer` option:
+```javascript
+TrackPlayer.setupPlayer({waitForBuffer:true})
+```
 
 You also need to register a [playback service](#playback-service) right after registering the main component of your app:
 ```javascript
