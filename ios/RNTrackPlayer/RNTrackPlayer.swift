@@ -104,6 +104,31 @@ public class RNTrackPlayer: RCTEventEmitter {
                                        object: nil)
     }
     
+    func configAudioSessionCategory(_ config: [String: Any]) {
+        // configure audio session - category, options & mode
+        var sessionCategory: AVAudioSession.Category = .playback
+        var sessionCategoryOptions: AVAudioSession.CategoryOptions = []
+        var sessionCategoryMode: AVAudioSession.Mode = .default
+
+        if
+            let sessionCategoryStr = config["iosCategory"] as? String,
+            let mappedCategory = SessionCategory(rawValue: sessionCategoryStr) {
+                sessionCategory = mappedCategory.mapConfigToAVAudioSessionCategory()
+        }
+        
+        let sessionCategoryOptsStr = config["iosCategoryOptions"] as? [String]
+        let mappedCategoryOpts = sessionCategoryOptsStr?.compactMap { SessionCategoryOptions(rawValue: $0)?.mapConfigToAVAudioSessionCategoryOptions() } ?? []
+        sessionCategoryOptions = AVAudioSession.CategoryOptions(mappedCategoryOpts)
+        
+        if
+            let sessionCategoryModeStr = config["iosCategoryMode"] as? String,
+            let mappedCategoryMode = SessionCategoryMode(rawValue: sessionCategoryModeStr) {
+                sessionCategoryMode = mappedCategoryMode.mapConfigToAVAudioSessionCategoryMode()
+        }
+        
+        try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, options: sessionCategoryOptions)
+    }
+    
     @objc func handleInterruption(notification: Notification) {
         guard let userInfo = notification.userInfo,
             let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
@@ -148,31 +173,13 @@ public class RNTrackPlayer: RCTEventEmitter {
         // configure if player waits to play
         let autoWait: Bool = config["waitForBuffer"] as? Bool ?? false
         player.automaticallyWaitsToMinimizeStalling = autoWait
-        
-        // configure audio session - category, options & mode
-        var sessionCategory: AVAudioSession.Category = .playback
-        var sessionCategoryOptions: AVAudioSession.CategoryOptions = []
-        var sessionCategoryMode: AVAudioSession.Mode = .default
 
-        if
-            let sessionCategoryStr = config["iosCategory"] as? String,
-            let mappedCategory = SessionCategory(rawValue: sessionCategoryStr) {
-                sessionCategory = mappedCategory.mapConfigToAVAudioSessionCategory()
-        }
-        
-        let sessionCategoryOptsStr = config["iosCategoryOptions"] as? [String]
-        let mappedCategoryOpts = sessionCategoryOptsStr?.compactMap { SessionCategoryOptions(rawValue: $0)?.mapConfigToAVAudioSessionCategoryOptions() } ?? []
-        sessionCategoryOptions = AVAudioSession.CategoryOptions(mappedCategoryOpts)
-        
-        if
-            let sessionCategoryModeStr = config["iosCategoryMode"] as? String,
-            let mappedCategoryMode = SessionCategoryMode(rawValue: sessionCategoryModeStr) {
-                sessionCategoryMode = mappedCategoryMode.mapConfigToAVAudioSessionCategoryMode()
-        }
-        
-        try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, options: sessionCategoryOptions)
-        
-        
+        configAudioSessionCategory([
+            "iosCategory": config["iosCategory"],
+            "iosCategoryOptions": config["iosCategoryOptions"],
+            "iosCategoryMode": config["iosCategoryMode"],
+        ])
+
         // setup event listeners
         player.remoteCommandController.handleChangePlaybackPositionCommand = { [weak self] event in
             if let event = event as? MPChangePlaybackPositionCommandEvent {
@@ -254,6 +261,12 @@ public class RNTrackPlayer: RCTEventEmitter {
         }
         
         hasInitialized = true
+        resolve(NSNull())
+    }
+    
+    @objc(configAudioSessionCategory:resolver:rejecter:)
+    public func configAudioSessionCategory(config: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        configAudioSessionCategory(config)
         resolve(NSNull())
     }
     

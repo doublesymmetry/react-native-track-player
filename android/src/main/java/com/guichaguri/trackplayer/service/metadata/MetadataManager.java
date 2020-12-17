@@ -33,6 +33,9 @@ import com.guichaguri.trackplayer.service.player.ExoPlayback;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.app.Service.STOP_FOREGROUND_DETACH;
+import static android.media.session.PlaybackState.STATE_PAUSED;
+
 /**
  * @author Guichaguri
  */
@@ -84,11 +87,10 @@ public class MetadataManager {
         builder.setSmallIcon(R.drawable.play);
         builder.setCategory(NotificationCompat.CATEGORY_TRANSPORT);
 
-        // Stops the playback when the notification is swiped away
-        builder.setDeleteIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(service, PlaybackStateCompat.ACTION_STOP));
-
         // Make it visible in the lockscreen
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+
+        builder.setPriority(NotificationCompat.PRIORITY_LOW);
     }
 
     public MediaSessionCompat getSession() {
@@ -281,13 +283,13 @@ public class MetadataManager {
         pb.setBufferedPosition(playback.getBufferedPosition());
 
         session.setPlaybackState(pb.build());
-        updateNotification();
+        updateNotification(state == STATE_PAUSED);
     }
 
-    public void setActive(boolean active) {
+    public void setActive(boolean active, boolean isPaused) {
         this.session.setActive(active);
 
-        updateNotification();
+        updateNotification(isPaused);
     }
 
     public void destroy() {
@@ -298,6 +300,19 @@ public class MetadataManager {
     }
 
     private void updateNotification() {
+        updateNotification(false);
+    }
+
+    private void updateNotification(boolean isPaused) {
+        if (isPaused) {
+            service.startForeground(1, builder.build());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                service.stopForeground(STOP_FOREGROUND_DETACH);
+            } else {
+                service.stopForeground(false);
+            }
+            return;
+        }
         if(session.isActive()) {
             service.startForeground(1, builder.build());
         } else {

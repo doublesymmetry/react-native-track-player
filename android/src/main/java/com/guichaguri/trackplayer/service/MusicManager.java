@@ -158,7 +158,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
             }
         }
 
-        metadata.setActive(true);
+        metadata.setActive(true, false);
     }
 
     public void onPause() {
@@ -174,7 +174,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
         if(wakeLock.isHeld()) wakeLock.release();
         if(wifiLock.isHeld()) wifiLock.release();
 
-        metadata.setActive(true);
+        metadata.setActive(true, true);
     }
 
     public void onStop() {
@@ -192,7 +192,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
 
         abandonFocus();
 
-        metadata.setActive(false);
+        metadata.setActive(false, false);
     }
 
     public void onStateChange(int state) {

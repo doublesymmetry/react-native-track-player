@@ -1,9 +1,12 @@
 package com.guichaguri.trackplayer.module;
 
+import android.app.NotificationManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.media.RatingCompat;
@@ -35,6 +38,34 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
 
     public MusicModule(ReactApplicationContext reactContext) {
         super(reactContext);
+        reactContext.addLifecycleEventListener(new LifecycleEventListener() {
+            @Override
+            public void onHostResume() {
+                // nothing to do
+            }
+
+            @Override
+            public void onHostPause() {
+                // nothing to do
+            }
+
+            @Override
+            public void onHostDestroy() {
+                reactContext.removeLifecycleEventListener(this);
+
+                // 一時停止中で時間が経過し、クライアントが破棄された際に通知が残り続けてしまうので念のためここで通知を削除する
+                NotificationManager nManager = ((NotificationManager) getReactApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE));
+                if (nManager != null) {
+                    nManager.cancel(1);
+                }
+
+                // Pixel系の端末で、再生中にアプリが強制終了した場合に、プロセスが残り続けてしまうので、
+                // MusicServiceが強制終了されたタイミングで、プロセスを強制的にキルする #4132
+                if (getReactApplicationContext() != null) {
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                }
+            }
+        });
     }
 
     @Override
@@ -66,35 +97,41 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
-        binder = (MusicBinder)service;
-        connecting = false;
+        synchronized(this) {
+            binder = (MusicBinder)service;
+            connecting = false;
 
-        // Reapply options that user set before with updateOptions
-        if (options != null) {
-            binder.updateOptions(options);
-        }
+            // Reapply options that user set before with updateOptions
+            if (options != null) {
+                binder.updateOptions(options);
+            }
 
-        // Triggers all callbacks
-        while(!initCallbacks.isEmpty()) {
-            binder.post(initCallbacks.remove());
+            // Triggers all callbacks
+            while(!initCallbacks.isEmpty()) {
+                binder.post(initCallbacks.remove());
+            }
         }
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
-        binder = null;
-        connecting = false;
+        synchronized(this) {
+            binder = null;
+            connecting = false;
+        }
     }
 
     /**
      * Waits for a connection to the service and/or runs the {@link Runnable} in the player thread
      */
     private void waitForConnection(Runnable r) {
-        if(binder != null) {
-            binder.post(r);
-            return;
-        } else {
-            initCallbacks.add(r);
+        synchronized(this) {
+          if(binder != null) {
+              binder.post(r);
+              return;
+          } else {
+              initCallbacks.add(r);
+          }
         }
 
         if(connecting) return;
@@ -103,9 +140,13 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
 
         // Binds the service to get a MediaWrapper instance
         Intent intent = new Intent(context, MusicService.class);
-        context.startService(intent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(intent);
+        } else {
+            context.startService(intent);
+        }
         intent.setAction(Utils.CONNECT_INTENT);
-        context.bindService(intent, this, 0);
+        context.bindService(intent, this, Context.BIND_AUTO_CREATE);
 
         connecting = true;
     }
@@ -159,14 +200,21 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
+    public void configAudioSessionCategory(ReadableMap data, final Promise promise) {
+        promise.resolve(null);
+    }
+
+    @ReactMethod
     public void destroy() {
         // Ignore if it was already destroyed
         if (binder == null && !connecting) return;
 
         try {
-            if(binder != null) {
-                binder.destroy();
-                binder = null;
+            synchronized(this) {
+                if(binder != null) {
+                    binder.destroy();
+                    binder = null;
+                }
             }
 
             ReactContext context = getReactApplicationContext();
