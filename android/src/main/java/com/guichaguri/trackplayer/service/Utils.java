@@ -152,6 +152,14 @@ public class Utils {
         }
     }
 
+    public static int getInt(Bundle data, String key, int defaultValue) {
+        Object value = data.get(key);
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        return defaultValue;
+    }
+
     public static String getNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(

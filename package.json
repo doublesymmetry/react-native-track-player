@@ -1,6 +1,6 @@
 {
   "name": "react-native-track-player",
-  "version": "1.2.0",
+  "version": "1.2.3",
   "description": "A fully fledged audio module created for music apps",
   "contributors": [
     {
@@ -12,6 +12,10 @@
       "name": "Guilherme Chaguri",
       "email": "guichaguri@gmail.com",
       "url": "http://guichaguri.com"
+    },
+    {
+      "name": "Dustin Bahr",
+      "email": "dustin@curiousmedia.com"
     }
   ],
   "keywords": [

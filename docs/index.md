@@ -1,7 +1,9 @@
 ---
 ---
 
-[![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player) [![Chat](https://badges.gitter.im/react-native-track-player/gitter.png)](https://gitter.im/react-native-track-player/Support)
+[![downloads](https://img.shields.io/npm/dw/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player)
+[![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player) 
+[![discord](https://img.shields.io/discord/567636850513018880.svg)](https://discordapp.com/invite/ya2XDCR)
 
 A fully fledged audio module created for music apps. Provides audio playback, external media controls, chromecast support, background mode and more!
 
@@ -53,4 +55,4 @@ TrackPlayer.setupPlayer().then(async () => {
 ```
 
 ## Maintainers
-[David Chavez](https://github.com/dcvz) & [Guilherme Chaguri](https://github.com/Guichaguri)
+[Guilherme Chaguri](https://github.com/Guichaguri), [Dustin Bahr](https://github.com/curiousdustin) and [David Chavez](https://github.com/dcvz)

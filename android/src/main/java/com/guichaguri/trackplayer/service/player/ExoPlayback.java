@@ -144,7 +144,7 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
 
         player.stop(false);
         player.setPlayWhenReady(false);
-        player.seekTo(0,0);
+        player.seekTo(lastKnownWindow,0);
     }
 
     public void reset() {
@@ -302,7 +302,10 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
             previousState = state;
 
             if(state == PlaybackStateCompat.STATE_STOPPED) {
-                manager.onEnd(getCurrentTrack(), getPosition());
+                Track previous = getCurrentTrack();
+                long position = getPosition();
+                manager.onTrackUpdate(previous, position, null);
+                manager.onEnd(previous, position);
             }
         }
     }
