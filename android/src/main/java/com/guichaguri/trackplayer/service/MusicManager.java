@@ -260,6 +260,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
                 permanent = true;
                 abandonFocus();
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+            case AudioManager.AUDIOFOCUS_GAIN:  // 一時的に音声フォーカスが失われたあと、復帰した際に勝手に再生されてしまうため #5146
                 paused = true;
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
