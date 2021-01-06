@@ -17,6 +17,8 @@ import android.os.Handler;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import androidx.annotation.RequiresApi;
+
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -253,6 +255,8 @@ public class MusicManager implements OnAudioFocusChangeListener {
         service.emit(MusicEvents.PLAYBACK_ERROR, bundle);
     }
 
+    private boolean wasPlaying = false;
+
     @Override
     public void onAudioFocusChange(int focus) {
         Log.d(Utils.LOG, "onDuck");
@@ -274,9 +278,14 @@ public class MusicManager implements OnAudioFocusChangeListener {
                 else
                     ducking = true;
                 break;
+            // 一時的に音声フォーカスが失われたのち、復帰するとに勝手に音声が再生されてしまうため、再生中のときのみRestartさせる #5146
+            case AudioManager.AUDIOFOCUS_GAIN:
+                paused = !wasPlaying;
             default:
                 break;
         }
+
+        wasPlaying = playback.getState() == PlaybackStateCompat.STATE_PLAYING;
 
         if (ducking) {
             playback.setVolumeMultiplier(0.5F);
