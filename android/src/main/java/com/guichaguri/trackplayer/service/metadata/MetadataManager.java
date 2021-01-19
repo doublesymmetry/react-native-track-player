@@ -91,6 +91,9 @@ public class MetadataManager {
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
         builder.setPriority(NotificationCompat.PRIORITY_LOW);
+
+        // AndroidにてFCM通知がグループ化された際に、通知アイコンがプレイヤーのものが使われてしまうため #5351
+        builder.setGroup("co.newn.standfm.NOTIFICATION_GROUP_PLAYER");
     }
 
     public MediaSessionCompat getSession() {
