@@ -10,7 +10,7 @@ import Foundation
 import MediaPlayer
 import AVFoundation
 
-class Track: NSObject, AudioItem, TimePitching, AssetOptionsProviding {
+class Track: NSObject, AudioItem, TimePitching, AssetOptionsProviding, InitialTiming {
     let id: String
     let url: MediaURL
     
@@ -25,6 +25,7 @@ class Track: NSObject, AudioItem, TimePitching, AssetOptionsProviding {
     var artworkURL: MediaURL?
     let headers: [String: Any]?
     let pitchAlgorithm: String?
+    var initialTime: TimeInterval = 0.0
     
     @objc var album: String?
     @objc var artwork: MPMediaItemArtwork?
@@ -50,6 +51,10 @@ class Track: NSObject, AudioItem, TimePitching, AssetOptionsProviding {
         self.duration = dictionary["duration"] as? Double
         self.headers = dictionary["headers"] as? [String: Any]
         self.artworkURL = MediaURL(object: dictionary["artwork"])
+        let initialTime = dictionary["iosInitialTime"] as? Double
+	if let x = initialTime {
+            self.initialTime = x
+	}
         self.pitchAlgorithm = dictionary["pitchAlgorithm"] as? String
         
         self.originalObject = dictionary
@@ -135,7 +140,7 @@ class Track: NSObject, AudioItem, TimePitching, AssetOptionsProviding {
         
         return .lowQualityZeroLatency
     }
-    
+
     // MARK: - Authorizing Protocol
     
     func getAssetOptions() -> [String: Any] {
@@ -146,4 +151,8 @@ class Track: NSObject, AudioItem, TimePitching, AssetOptionsProviding {
         return [:]
     }
     
+    // MARK: - InitialTiming Protocol
+    func getInitialTime() -> TimeInterval {
+        return initialTime
+    }
 }
