@@ -1,6 +1,6 @@
 {
-  "name": "react-native-track-player",
-  "version": "1.2.3",
+  "name": "react-native-track-playah",
+  "version": "1.2.3-1.0",
   "description": "A fully fledged audio module created for music apps",
   "contributors": [
     {
@@ -34,17 +34,15 @@
     "hooks"
   ],
   "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/react-native-kit/react-native-track-player.git"
-  },
+  "repository": "https://github.com/badiozam/react-native-track-playah.git",
   "bugs": {
     "url": "https://github.com/react-native-kit/react-native-track-player/issues"
   },
-  "scripts": {
-  },
+  "scripts": {},
   "peerDependencies": {
     "react": ">=16.8.6",
     "react-native": ">=0.60.0-rc.2"
-  }
+  },
+  "main": "index.js",
+  "author": "Hamid Badiozamani <badiozam@yahoo.com>"
 }
