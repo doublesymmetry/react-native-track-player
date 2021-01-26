@@ -64,6 +64,7 @@ public class Track {
     public String date;
     public String genre;
     public long duration;
+    public long initialTime;
     public Bundle originalItem;
 
     public RatingCompat rating;
@@ -84,6 +85,7 @@ public class Track {
         }
 
         String trackType = bundle.getString("type", "default");
+	initialTime = Utils.getInt(bundle,"initialTime", 0);
 
         for(TrackType t : TrackType.values()) {
             if(t.name.equalsIgnoreCase(trackType)) {
