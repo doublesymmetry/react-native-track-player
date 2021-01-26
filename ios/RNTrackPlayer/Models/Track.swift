@@ -10,7 +10,7 @@ import Foundation
 import MediaPlayer
 import AVFoundation
 
-class Track: NSObject, AudioItem, InitialTiming, TimePitching, Authorizing {
+class Track: NSObject, AudioItem, InitialTiming, TimePitching {
     let id: String
     let url: MediaURL
     
