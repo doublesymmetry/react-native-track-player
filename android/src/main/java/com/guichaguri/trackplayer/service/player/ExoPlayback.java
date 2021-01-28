@@ -1,6 +1,7 @@
 package com.guichaguri.trackplayer.service.player;
 
 import android.content.Context;
+import android.os.Looper;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import androidx.annotation.NonNull;
@@ -93,6 +94,11 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
                 lastKnownPosition = player.getCurrentPosition();
 
                 player.seekToDefaultPosition(i);
+
+		if (queue.get(i).initialTime != 0) {
+                    player.seekTo(queue.get(i).initialTime * 1000);
+                }
+
                 promise.resolve(null);
                 return;
             }
@@ -154,6 +160,7 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
 
         player.stop(true);
         player.setPlayWhenReady(false);
+	queue.clear();
     }
 
     public boolean isRemote() {
