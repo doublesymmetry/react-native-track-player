@@ -1,7 +1,6 @@
 package com.guichaguri.trackplayer.service.player;
 
 import android.content.Context;
-import android.os.Looper;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import androidx.annotation.NonNull;
