@@ -64,6 +64,7 @@ public class Track {
     public String date;
     public String genre;
     public long duration;
+    public String queryParams
     public Bundle originalItem;
 
     public RatingCompat rating;
@@ -94,6 +95,7 @@ public class Track {
 
         contentType = bundle.getString("contentType");
         userAgent = bundle.getString("userAgent");
+        queryParams = bundle.getString("queryParams");
 
         Bundle httpHeaders = bundle.getBundle("headers");
         if(httpHeaders != null) {
@@ -229,13 +231,23 @@ public class Track {
     }
 
     private MediaSource createHlsSource(DataSource.Factory factory) {
-        return new HlsMediaSource.Factory(factory)
+        return new HlsMediaSource.Factory(getResolvingFactory(factory))
                 .createMediaSource(uri);
     }
 
     private MediaSource createSsSource(DataSource.Factory factory) {
         return new SsMediaSource.Factory(new DefaultSsChunkSource.Factory(factory), factory)
                 .createMediaSource(uri);
+    }
+
+    private Uri resolveUri(Uri uri) {
+        String resultPath = queryParams == null ? uri.toString() : String.format("%s%s", uri.toString(), queryParams);
+        return Uri.parse(resultPath);
+    }
+
+    private ResolvingDataSource.Factory getResolvingFactory(DataSource.Factory factory) {
+        return new ResolvingDataSource.Factory(factory,
+                (DataSpec dataSpec) -> dataSpec.withUri(resolveUri(dataSpec.uri)));
     }
 
 }
