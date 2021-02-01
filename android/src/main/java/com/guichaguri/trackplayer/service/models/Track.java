@@ -64,7 +64,7 @@ public class Track {
     public String date;
     public String genre;
     public long duration;
-    public String queryParams
+    public String queryParams;
     public Bundle originalItem;
 
     public RatingCompat rating;
