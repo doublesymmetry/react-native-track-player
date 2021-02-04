@@ -86,6 +86,14 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
             return;
         }
 
+        // ExoPlayerのqueueのサイズがWindowCountより大きくなってしまう場合があり、
+        // その際に、IllegalSeekPositionExceptionをthrowしてしまうため対応 #2292
+        if (!player.getCurrentTimeline().isEmpty() &&
+                queue.size() > player.getCurrentTimeline().getWindowCount()) {
+            promise.reject("invalid_state", "The queue size is larger than Timeline's window count.");
+            return;
+        }
+
         for(int i = 0; i < queue.size(); i++) {
             if(id.equals(queue.get(i).id)) {
                 lastKnownWindow = player.getCurrentWindowIndex();
