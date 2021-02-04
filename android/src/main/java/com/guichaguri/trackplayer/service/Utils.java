@@ -164,7 +164,7 @@ public class Utils {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                 Utils.NOTIFICATION_CHANNEL,
-                "MusicService",
+                "プレイヤー通知",
                 NotificationManager.IMPORTANCE_LOW
             );
             channel.setShowBadge(false);
