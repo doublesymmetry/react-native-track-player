@@ -124,6 +124,7 @@ public class MusicService extends HeadlessJsTaskService {
         super.onDestroy();
 
         destroy();
+        stopForeground(true);
     }
 
     @Override
