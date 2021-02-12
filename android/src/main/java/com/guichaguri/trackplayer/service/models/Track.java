@@ -119,6 +119,7 @@ public class Track {
         album = bundle.getString("album");
         date = bundle.getString("date");
         genre = bundle.getString("genre");
+        queryParams = bundle.getString("queryParams");
         duration = Utils.toMillis(bundle.getDouble("duration", 0));
 
         rating = Utils.getRating(bundle, "rating", ratingType);
