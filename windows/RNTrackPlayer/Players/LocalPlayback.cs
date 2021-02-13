@@ -54,9 +54,10 @@ namespace RNTrackPlayer.Players
                 {
                     client.DefaultRequestHeaders.Add(entry.Key, entry.Value);
                 }
-                
-                HttpMediaStream stream = HttpMediaStream.CreateAsync(client, track.Url).GetAwaiter().GetResult();
-                player.Source = MediaSource.CreateFromStream(stream, stream.ContentType);
+
+                var stream = HttpMediaStream.CreateAsync(client, track.Url).AsTask();
+                stream.Wait();
+                player.Source = MediaSource.CreateFromStream(stream.Result, stream.Result.ContentType);
             } else
             {
                 player.Source = MediaSource.CreateFromUri(track.Url);

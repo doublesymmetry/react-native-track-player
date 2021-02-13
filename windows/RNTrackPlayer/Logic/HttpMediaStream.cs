@@ -14,12 +14,12 @@ namespace RNTrackPlayer.Logic
 {
     class HttpMediaStream : IRandomAccessStreamWithContentType
     {
-        private HttpClient client;
+        private readonly HttpClient client;
         private IInputStream inputStream;
         private ulong size;
         private string etagHeader;
         private string lastModifiedHeader;
-        private Uri requestedUri;
+        private readonly Uri requestedUri;
         private string contentType = string.Empty;
         private ulong requestedPosition;
 
@@ -51,9 +51,7 @@ namespace RNTrackPlayer.Logic
         private async Task SendRequestAsync()
         {
             Debug.Assert(inputStream == null);
-
-            HttpRequestMessage request = null;
-            request = new HttpRequestMessage(HttpMethod.Get, requestedUri);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestedUri);
 
             request.Headers.Add("Range", String.Format("bytes={0}-", requestedPosition));
 
