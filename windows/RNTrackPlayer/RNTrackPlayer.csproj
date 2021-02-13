@@ -127,6 +127,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Logic\HttpMediaStream.cs" />
     <Compile Include="Logic\Track.cs" />
     <Compile Include="Logic\Metadata.cs" />
     <Compile Include="Logic\MediaManager.cs" />
@@ -140,8 +141,11 @@
     <EmbeddedResource Include="Properties\RNTrackPlayer.rd.xml" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Espresso3389.HttpStream">
+      <Version>2.0.52.3</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.1.9</Version>
+      <Version>6.2.12</Version>
     </PackageReference>
     <PackageReference Include="System.Collections">
       <Version>4.3.0</Version>

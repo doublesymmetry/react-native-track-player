@@ -1,5 +1,6 @@
 using Microsoft.ReactNative.Managed;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace RNTrackPlayer.Logic
@@ -14,8 +15,9 @@ namespace RNTrackPlayer.Logic
         public string Artist { get; set; }
         public string Album { get; set; }
         public Uri Artwork { get; set; }
+        public Dictionary<string, string> Headers { get; set; }
 
-        private JSValueObject _originalObj;
+        private readonly JSValueObject _originalObj;
 
         public Track(JSValueObject data)
         {
@@ -34,6 +36,8 @@ namespace RNTrackPlayer.Logic
             Artist = Utils.GetValue<string>(data, "artist", null);
             Album = Utils.GetValue<string>(data, "album", null);
             Artwork = Utils.GetUri(data, "artwork", null);
+            Headers = Utils.GetValue<Dictionary<string, string>>(data, "headers", null);
+
             Debug.WriteLine("Track.cs - implement merge of orig object");
         }
 

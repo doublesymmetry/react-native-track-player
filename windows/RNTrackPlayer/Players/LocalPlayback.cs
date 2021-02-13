@@ -5,6 +5,8 @@ using Windows.Media.Playback;
 using Windows.Media.Core;
 using RNTrackPlayer.Logic;
 using Microsoft.ReactNative.Managed;
+using Windows.Web.Http;
+using System.Collections.Generic;
 
 namespace RNTrackPlayer.Players
 {
@@ -20,9 +22,11 @@ namespace RNTrackPlayer.Players
 
         public LocalPlayback(MediaManager manager, JSValueObject options) : base(manager)
         {
-            player = new MediaPlayer();
-            player.AutoPlay = false;
-            player.AudioCategory = MediaPlayerAudioCategory.Media;
+            player = new MediaPlayer
+            {
+                AutoPlay = false,
+                AudioCategory = MediaPlayerAudioCategory.Media
+            };
             player.CommandManager.IsEnabled = false;
 
             player.MediaOpened += OnLoad;
@@ -43,7 +47,20 @@ namespace RNTrackPlayer.Players
             startPos = 0;
             loadCallback = promise;
 
-            player.Source = MediaSource.CreateFromUri(track.Url);
+            if(track.Headers != null)
+            {
+                HttpClient client = new HttpClient();
+                foreach (KeyValuePair<string, string> entry in track.Headers)
+                {
+                    client.DefaultRequestHeaders.Add(entry.Key, entry.Value);
+                }
+                
+                HttpMediaStream stream = HttpMediaStream.CreateAsync(client, track.Url).GetAwaiter().GetResult();
+                player.Source = MediaSource.CreateFromStream(stream, stream.ContentType);
+            } else
+            {
+                player.Source = MediaSource.CreateFromUri(track.Url);
+            }
         }
 
         public override void Play()
