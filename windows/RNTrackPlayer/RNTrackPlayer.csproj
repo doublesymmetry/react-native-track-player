@@ -141,8 +141,8 @@
     <EmbeddedResource Include="Properties\RNTrackPlayer.rd.xml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Espresso3389.HttpStream">
-      <Version>2.0.52.3</Version>
+    <PackageReference Include="Microsoft.NETCore.Portable.Compatibility">
+      <Version>1.0.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.12</Version>
