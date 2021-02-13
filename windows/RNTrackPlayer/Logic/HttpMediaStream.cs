@@ -48,7 +48,7 @@ namespace RNTrackPlayer.Logic
             requestedPosition = 0;
         }
 
-        private async Task SendRequesAsync()
+        private async Task SendRequestAsync()
         {
             Debug.Assert(inputStream == null);
 
@@ -113,7 +113,7 @@ namespace RNTrackPlayer.Logic
 
             return AsyncInfo.Run<HttpMediaStream>(async (cancellationToken) =>
             {
-                await randomStream.SendRequesAsync().ConfigureAwait(false);
+                await randomStream.SendRequestAsync().ConfigureAwait(false);
                 return randomStream;
             });
         }
@@ -158,7 +158,7 @@ namespace RNTrackPlayer.Logic
                 {
                     if (inputStream == null)
                     {
-                        await SendRequesAsync().ConfigureAwait(false);
+                        await SendRequestAsync().ConfigureAwait(false);
                     }
                 }
                 catch (Exception ex)
