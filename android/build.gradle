@@ -61,7 +61,7 @@ dependencies {
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'
 
-    def exoPlayerVersion = safeExtGet("exoPlayerVersion", '2.11.4')
+    def exoPlayerVersion = safeExtGet("exoPlayerVersion", '2.13.1')
 
     // ExoPlayer Core
     implementation "com.google.android.exoplayer:exoplayer-core:${exoPlayerVersion}"
