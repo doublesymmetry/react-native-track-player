@@ -31,23 +31,26 @@ public class NowPlayingInfoController: NowPlayingInfoControllerProtocol {
     }
     
     public func set(keyValues: [NowPlayingInfoKeyValue]) {
-        keyValues.forEach { (keyValue) in
-            _info[keyValue.getKey()] = keyValue.getValue()
+        DispatchQueue.main.async {
+            keyValues.forEach { (keyValue) in
+                self._info[keyValue.getKey()] = keyValue.getValue()
+            }
+            self._infoCenter.nowPlayingInfo = self._info
         }
-        self._infoCenter.nowPlayingInfo = _info
     }
     
-    // https://github.com/newn-team/react-native-track-player/pull/6
     public func set(keyValue: NowPlayingInfoKeyValue) {
-        DispatchQueue.main.async { [weak self] in
-            self!._info[keyValue.getKey()] = keyValue.getValue()
-            self!._infoCenter.nowPlayingInfo = self!._info
+        DispatchQueue.main.async {
+            self._info[keyValue.getKey()] = keyValue.getValue()
+            self._infoCenter.nowPlayingInfo = self._info
         }
     }
     
     public func clear() {
-        self._info = [:]
-        self._infoCenter.nowPlayingInfo = _info
+        DispatchQueue.main.async {
+            self._info = [:]
+            self._infoCenter.nowPlayingInfo = self._info
+        }
     }
     
 }
