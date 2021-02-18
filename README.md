@@ -13,3 +13,4 @@ A few of my own fixes:
 
 - Fixed a bug where the very first track would not honor initialTime on Android side
 - Fixed a react component state update on an unmounted component in useTrackPlayerProgress
+- Streamlined event emission and upgraded to use ExoPlayer 2.13.1
