@@ -27,6 +27,7 @@ windows/ARM/
 windows/RNTrackPlayer/bin/
 windows/RNTrackPlayer/obj/
 windows/RNTrackPlayer/project.lock.json
+windows/packages/
 
 # iOS
 

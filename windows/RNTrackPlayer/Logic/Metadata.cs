@@ -87,11 +87,12 @@ namespace RNTrackPlayer.Logic
         {
             var display = controls.DisplayUpdater;
             if (track != null) {
-                var properties = display.MusicProperties;
-
+                
                 display.AppMediaId = track.Id;
                 display.Thumbnail = RandomAccessStreamReference.CreateFromUri(track.Artwork);
                 display.Type = MediaPlaybackType.Music;
+
+                var properties = display.MusicProperties; // Must come after setting type
 
                 properties.Title = track.Title;
                 properties.Artist = track.Artist;

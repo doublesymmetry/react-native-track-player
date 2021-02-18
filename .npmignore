@@ -3,6 +3,7 @@
 example/
 docs/
 _Pods.xcodeproj
+.git/
 
 # General
 
