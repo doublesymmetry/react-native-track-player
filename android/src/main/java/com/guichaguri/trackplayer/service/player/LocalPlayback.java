@@ -65,7 +65,8 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     private void prepare() {
         if(!prepared) {
             Log.d(Utils.LOG, "Preparing the media source...");
-            player.prepare(source, false, false);
+	    player.setMediaSource(source, false);
+            player.prepare();
             prepared = true;
         }
     }
@@ -73,10 +74,11 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     @Override
     public void add(Track track, int index, Promise promise) {
         queue.add(index, track);
+
         MediaSource trackSource = track.toMediaSource(context, this);
         source.addMediaSource(index, trackSource, manager.getHandler(), Utils.toRunnable(promise));
 
-        prepare();
+	prepared = false;
     }
 
     @Override
@@ -90,7 +92,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
         queue.addAll(index, tracks);
         source.addMediaSources(index, trackList, manager.getHandler(), Utils.toRunnable(promise));
 
-        prepare();
+	prepared = false;
     }
 
     @Override
@@ -140,7 +142,8 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
         queue.clear();
 
         source = new ConcatenatingMediaSource();
-        player.prepare(source, true, true);
+        // player.prepare(source, true, true);
+        player.setMediaSource(source, true);
         prepared = false; // We set it to false as the queue is now empty
 
         lastKnownWindow = C.INDEX_UNSET;
@@ -169,13 +172,8 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
 
     @Override
     public void reset() {
-        Track track = getCurrentTrack();
-        long position = player.getCurrentPosition();
-
         super.reset();
         resetQueue();
-
-        manager.onTrackUpdate(track, position, null);
     }
 
     @Override
