@@ -82,6 +82,7 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
+	Log.d(Utils.LOG, "Service disconnected: " + name);
         binder = null;
         connecting = false;
     }
@@ -89,12 +90,13 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     /**
      * Waits for a connection to the service and/or runs the {@link Runnable} in the player thread
      */
-    private void waitForConnection(Runnable r) {
+    private void waitForConnection(Runnable resolve) {
+        Log.d(Utils.LOG, "Binder is " + binder + " in " + Thread.currentThread());
         if(binder != null) {
-            binder.post(r);
+            binder.post(resolve);
             return;
         } else {
-            initCallbacks.add(r);
+           initCallbacks.add(resolve);
         }
 
         if(connecting) return;
@@ -166,12 +168,19 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     @ReactMethod
     public void destroy() {
         // Ignore if it was already destroyed
-        if (binder == null && !connecting) return;
+        if (binder == null && !connecting) {
+            Log.d(Utils.LOG, "Already destroyed, ignoring");
+            return;
+        }
+        else {
+            Log.d(Utils.LOG, "Destroying in " + Thread.currentThread(), new Throwable());
+        }
 
         try {
             if(binder != null) {
                 binder.destroy();
                 binder = null;
+                Log.d(Utils.LOG, "Destruction complete, binder is now null");
             }
 
             ReactContext context = getReactApplicationContext();

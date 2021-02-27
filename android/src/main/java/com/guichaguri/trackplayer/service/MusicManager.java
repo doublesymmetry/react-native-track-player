@@ -11,6 +11,7 @@ import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
+import android.os.Looper;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -127,6 +128,8 @@ public class MusicManager implements OnAudioFocusChangeListener {
                 .setBackBuffer(backBuffer, false)
                 .createDefaultLoadControl();
 
+        Log.d(Utils.LOG, "Creating player in " + Thread.currentThread(), new Throwable());
+
         SimpleExoPlayer player = new SimpleExoPlayer.Builder(service)
                 .setLoadControl(control)
                 .build();
@@ -198,7 +201,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
     }
 
     public void onStateChange(int state) {
-        Log.d(Utils.LOG, "onStateChange");
+        Log.d(Utils.LOG, "onStateChange: " + state);
 
         Bundle bundle = new Bundle();
         bundle.putInt("state", state);

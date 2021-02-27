@@ -4,6 +4,7 @@ import android.os.Binder;
 import android.os.Bundle;
 import com.facebook.react.bridge.Promise;
 import com.guichaguri.trackplayer.service.player.ExoPlayback;
+import android.util.Log;
 
 /**
  * @author Guichaguri
@@ -14,24 +15,19 @@ public class MusicBinder extends Binder {
     private final MusicManager manager;
 
     public MusicBinder(MusicService service, MusicManager manager) {
+	Log.d(Utils.LOG, "Binder constructing with service " + service + " and manager " + manager, new Throwable());
         this.service = service;
         this.manager = manager;
     }
 
     public void post(Runnable r) {
+	Log.d(Utils.LOG, "Service = " + service.handler);
+	Log.d(Utils.LOG, "Service handler = " + service.handler);
         service.handler.post(r);
     }
 
     public ExoPlayback getPlayback() {
-        ExoPlayback playback = manager.getPlayback();
-
-        // TODO remove?
-        if(playback == null) {
-            playback = manager.createLocalPlayback(new Bundle());
-            manager.switchPlayback(playback);
-        }
-
-        return playback;
+        return manager.getPlayback();
     }
 
     public void setupPlayer(Bundle bundle, Promise promise) {
@@ -50,8 +46,10 @@ public class MusicBinder extends Binder {
     }
 
     public void destroy() {
-        service.destroy();
-        service.stopSelf();
+        service.handler.post(() -> {
+                Log.d(Utils.LOG, "Destroying called from " + Thread.currentThread(), new Throwable());
+                service.destroy();
+                service.stopSelf();
+	});
     }
-
 }

@@ -51,6 +51,10 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
         if(component != null) component.addMetadataOutput(this);
     }
 
+    public Player getPlayer() {
+	    return player;
+    }
+
     public void initialize() {
         player.addListener(this);
     }
