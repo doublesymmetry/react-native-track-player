@@ -7,7 +7,10 @@ import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat.QueueItem;
+import android.util.Log;
+import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.offline.Download;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
@@ -19,6 +22,8 @@ import com.google.android.exoplayer2.upstream.*;
 import com.google.android.exoplayer2.util.Util;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.player.LocalPlayback;
+import za.co.digitalwaterfall.reactnativemediasuite.mediadownloader.downloader.DownloadTracker;
+import za.co.digitalwaterfall.reactnativemediasuite.mediadownloader.downloader.DownloadUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,6 +37,8 @@ import static android.support.v4.media.MediaMetadataCompat.*;
  * @author Guichaguri
  */
 public class Track {
+
+    private static final String TAG = "Track";
 
     public static List<Track> createTracks(Context context, List objects, int ratingType) {
         List<Track> tracks = new ArrayList<>();
@@ -65,6 +72,9 @@ public class Track {
     public String genre;
     public long duration;
     public String queryParams;
+    public String gid;
+    private MediaItem mediaItem;
+    DownloadTracker downloadTracker;
     public Bundle originalItem;
 
     public RatingCompat rating;
@@ -75,6 +85,7 @@ public class Track {
 
     public Track(Context context, Bundle bundle, int ratingType) {
         id = bundle.getString("id");
+        gid = bundle.getString("gid");
 
         resourceId = Utils.getRawResourceId(context, bundle, "url");
 
@@ -83,6 +94,9 @@ public class Track {
         } else {
             uri = RawResourceDataSource.buildRawResourceUri(resourceId);
         }
+
+        mediaItem = MediaItem.fromUri(uri);
+        downloadTracker = DownloadUtil.getDownloadTracker(context);
 
         String trackType = bundle.getString("type", "default");
 
@@ -168,6 +182,10 @@ public class Track {
 
     public MediaSource toMediaSource(Context ctx, LocalPlayback playback) {
         // Updates the user agent if not set
+
+
+        Log.i(TAG, gid);
+
         if(userAgent == null || userAgent.isEmpty())
             userAgent = Util.getUserAgent(ctx, "react-native-track-player");
 
@@ -194,7 +212,17 @@ public class Track {
             // Creates a local source factory
             ds = new DefaultDataSourceFactory(ctx, userAgent);
 
-        } else {
+        } else if (downloadTracker.isDownloaded(gid)) {
+            Log.i(TAG, "Playing downloaded content");
+            Download download = downloadTracker.getDownload(gid);
+            mediaItem = download.request.toMediaItem();
+
+            ds = DownloadUtil.getDataSourceFactory(ctx);
+        }
+
+        else {
+
+            Log.i(TAG, "Playing http content");
 
             // Creates a default http source factory, enabling cross protocol redirects
             DefaultHttpDataSourceFactory factory = new DefaultHttpDataSourceFactory(
@@ -222,23 +250,23 @@ public class Track {
             default:
                 return new ProgressiveMediaSource.Factory(ds, new DefaultExtractorsFactory()
                         .setConstantBitrateSeekingEnabled(true))
-                        .createMediaSource(uri);
+                        .createMediaSource(MediaItem.fromUri(uri));
         }
     }
 
     private MediaSource createDashSource(DataSource.Factory factory) {
         return new DashMediaSource.Factory(new DefaultDashChunkSource.Factory(factory), factory)
-                .createMediaSource(uri);
+                .createMediaSource(mediaItem);
     }
 
     private MediaSource createHlsSource(DataSource.Factory factory) {
         return new HlsMediaSource.Factory(getResolvingFactory(factory))
-                .createMediaSource(uri);
+                .createMediaSource(mediaItem);
     }
 
     private MediaSource createSsSource(DataSource.Factory factory) {
         return new SsMediaSource.Factory(new DefaultSsChunkSource.Factory(factory), factory)
-                .createMediaSource(uri);
+                .createMediaSource(mediaItem);
     }
 
     private Uri resolveUri(Uri uri) {
@@ -246,7 +274,10 @@ public class Track {
         return Uri.parse(resultPath);
     }
 
-    private ResolvingDataSource.Factory getResolvingFactory(DataSource.Factory factory) {
+    private DataSource.Factory getResolvingFactory(DataSource.Factory factory) {
+        if (downloadTracker.isDownloaded(gid)) {
+            return factory;
+        }
         return new ResolvingDataSource.Factory(factory,
                 (DataSpec dataSpec) -> dataSpec.withUri(resolveUri(dataSpec.uri)));
     }
