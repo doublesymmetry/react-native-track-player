@@ -573,7 +573,7 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void updateDownloadCreds(String downloadID, String queryParam, String cookie) {
-        downloadTracker.setDownloadCred(downloadID, queryParam, cookie);
+    public void updateDownloadCreds(String downloadID, String queryParam) {
+        downloadTracker.setDownloadCred(downloadID, queryParam);
     }
 }

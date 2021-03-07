@@ -36,7 +36,7 @@ public class DownloadTracker {
     private final HashMap<String, Download> downloads;
     private final HashMap<String, DownloadCred> downloadCreds;
     private final DownloadIndex downloadIndex;
-    @Nullable private StartDownloadHelper startDownloadHelper;
+
 
     public DownloadTracker(ReactApplicationContext context, HttpDataSource.Factory httpDataSourceFactory, DownloadManager downloadManager) {
         this.context = context;
@@ -55,8 +55,8 @@ public class DownloadTracker {
         listeners.add(listener);
     }
 
-    public void setDownloadCred(String downloadID, String queryParam, String cookie) {
-        downloadCreds.put(downloadID, new DownloadCred(queryParam, cookie));
+    public void setDownloadCred(String downloadID, String queryParam) {
+        downloadCreds.put(downloadID, new DownloadCred(queryParam));
     }
 
     public DownloadCred getDownloadCred(String downloadID) {
@@ -151,15 +151,14 @@ public class DownloadTracker {
 
     public void toggleDownload(String downloadId, Uri uri) {
         @Nullable Download download = downloads.get(uri);
+
+        Log.i(TAG, Integer.toString(DownloadUtil.getDownloadManager(context).getCurrentDownloads().size()));
         if(download != null && download.state != Download.STATE_FAILED){
 
         } else {
-            if(startDownloadHelper != null) {
-                startDownloadHelper.release();
-            }
             String queryParams = downloadCreds.get(downloadId).queryParams;
             DownloadHelper downloadHelper = getDownloadHelper(uri, queryParams);
-            startDownloadHelper = new StartDownloadHelper(downloadHelper, downloadId);
+            new StartDownloadHelper(downloadHelper, downloadId);
         }
     }
 
@@ -265,7 +264,6 @@ public class DownloadTracker {
 
         @Override
         public void onPrepared(DownloadHelper helper) {
-
             startDownload();
             release();
         }
