@@ -3,7 +3,7 @@
 [![discord](https://img.shields.io/discord/567636850513018880.svg)](https://discordapp.com/invite/ya2XDCR)
 # react-native-track-player
 
-A fully fledged audio module created for music apps. Provides audio playback, external media controls, background mode and more!
+A fully-fledged audio module created for music apps. Provides audio playback, external media controls, background mode and more!
 
 ---
 
@@ -19,7 +19,7 @@ A fully fledged audio module created for music apps. Provides audio playback, ex
 * **Lightweight** - Optimized to use the least amount of resources according to your needs
 * **Feels native** - As everything is built together, it follows the same design principles as real music apps do
 * **Multi-platform** - Supports Android, iOS and Windows
-* **Media Controls support** - Provides events for controlling the app from a bluetooth device, the lockscreen, a notification, a smartwatch or even a car
+* **Media Controls support** - Provides events for controlling the app from a Bluetooth device, the lock screen, a notification, a smartwatch or even a car
 * **Local or network, files or streams** - It doesn't matter where the media belongs, we've got you covered
 * **Adaptive bitrate streaming support** - Support for DASH, HLS or SmoothStreaming
 * **Caching support** - Cache media files to play them again without an internet connection
@@ -47,13 +47,13 @@ A fully fledged audio module created for music apps. Provides audio playback, ex
 Check [Platform Support](https://react-native-kit.github.io/react-native-track-player/platform-support/) for more information.
 
 ## Why another music module?
-After trying to team up modules like `react-native-sound`, `react-native-music-controls` and `react-native-google-cast`, I've noticed that their structure and the way should be tied together can cause a lot problems (mainly on Android). Those can heavily affect the app stability and user experience.
+After trying to team up modules like `react-native-sound`, `react-native-music-controls` and `react-native-google-cast`, I've noticed, that their structure and the way should be tied together can cause a lot of problems (mainly on Android). Those can heavily affect the app stability and user experience.
 
-All audio modules (like `react-native-sound`) don't play in a separated service on Android, which should **only** be used for simple audio tracks in foreground (such as sound effects, voice messages, etc)
+All audio modules (like `react-native-sound`) don't play in a separated service on Android, which should **only** be used for simple audio tracks in the foreground (such as sound effects, voice messages, etc.)
 
-`react-native-music-controls` is meant for apps using those audio modules, although it has a few problems due to how the audio is not directly tied to the controls, it can be pretty useful for casting (such as Chromecast)
+`react-native-music-controls` is meant for apps using those audio modules, but it has a few problems: the audio isn't tied directly to the controls. It can be pretty useful for casting (such as Chromecast).
 
-`react-native-google-cast` works pretty well and also supports custom receivers, but it has fewer player controls, it's harder to integrate and still uses the Cast SDK v2
+`react-native-google-cast` works pretty well and also supports custom receivers, but it has fewer player controls, it's harder to integrate and still uses the Cast SDK v2.
 
 ## First Steps
 
