@@ -173,8 +173,15 @@ public class RNTrackPlayer: RCTEventEmitter {
                 sessionCategoryMode = mappedCategoryMode.mapConfigToAVAudioSessionCategoryMode()
         }
         
-        try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, options: sessionCategoryOptions)
-        
+        // Progressively opt into AVAudioSession policies for background audio
+        // and AirPlay 2. 
+        if #available(iOS 13.0, *) {
+            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: .longFormAudio, options: sessionCategoryOptions)
+        } else if #available(iOS 11.0, *) {
+            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: .longForm, options: sessionCategoryOptions)
+        } else {
+            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, options: sessionCategoryOptions)
+        }
         
         // setup event listeners
         player.remoteCommandController.handleChangePlaybackPositionCommand = { [weak self] event in
