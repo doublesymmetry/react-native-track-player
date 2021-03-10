@@ -321,6 +321,14 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
         // Shuffle mode update
     }
 
+    public int getRepeatMode() {
+        return player.getRepeatMode();
+    }
+
+    public void setRepeatMode(int repeatMode){
+        player.setRepeatMode(repeatMode);
+    }
+
     @Override
     public void onPlayerError(ExoPlaybackException error) {
         String code;
