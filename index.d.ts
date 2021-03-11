@@ -48,6 +48,7 @@ declare namespace RNTrackPlayer {
 
   type EmitterSubscription = { remove: () => void; };
   export function addEventListener(type: EventType, listener: (data: any) => void): EmitterSubscription;
+  export function removeEventListener(type: EventType, listener: (data: any) => void): EmitterSubscription;
 
   export interface TrackMetadata {
     duration?: number;
