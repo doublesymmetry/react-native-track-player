@@ -476,6 +476,7 @@ Fired when an error occurs.
 ## Components
 #### `ProgressComponent`
 A component base that updates itself every second with a new position. Your app should extend it with a custom render.
+This component relies on the `componentDidMount` and `componentWillUnmmount` lifecycle methods. If using these methods in your component extending ProgressComponent, add `super.componentDidMount.apply(this)` and `super.componentWillUnmount.apply(this)` to the top of these methods.
 
 | State            | Type     | Description                      |
 | ---------------- | -------- | -------------------------------- |
