@@ -79,6 +79,7 @@ declare namespace RNTrackPlayer {
     maxCacheSize?: number;
     iosCategory?: 'playback' | 'playAndRecord' | 'multiRoute' | 'ambient' | 'soloAmbient' | 'record';
     iosCategoryMode?: 'default' | 'gameChat' | 'measurement' | 'moviePlayback' | 'spokenAudio' | 'videoChat' | 'videoRecording' | 'voiceChat' | 'voicePrompt';
+    iosCategoryPolicy?: 'default' | 'longFormAudio' | 'longFormVideo' | 'independent';
     iosCategoryOptions?: Array<'mixWithOthers' | 'duckOthers' | 'interruptSpokenAudioAndMixWithOthers' | 'allowBluetooth' | 'allowBluetoothA2DP' | 'allowAirPlay' | 'defaultToSpeaker'>;
     waitForBuffer?: boolean;
   }
