@@ -1,12 +1,15 @@
 package za.co.digitalwaterfall.reactnativemediasuite.mediadownloader.downloader;
 
+import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.Log;
 
 import static com.google.android.exoplayer2.util.Assertions.checkNotNull;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.WritableMap;
@@ -15,9 +18,11 @@ import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.offline.*;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
+import com.guichaguri.trackplayer.service.Utils;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -63,40 +68,48 @@ public class DownloadTracker {
         return downloadCreds.get(downloadID);
     }
 
+    private void emit(String event, Bundle data) {
+        Intent intent = new Intent(Utils.EVENT_INTENT);
+        intent.putExtra("event", event);
+        if(data != null) intent.putExtra("data", data);
+
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
     public void onDownloadProgressEvent(String downloadID, float progress){
-        WritableMap params = Arguments.createMap();
+        Bundle params = new Bundle();
         params.putString("downloadID", downloadID);
         params.putDouble("percentComplete", progress);
-        context.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("onDownloadProgress", params);
+        emit("onDownloadProgress", params);
     }
 
     public void onDownloadFinishedEvent(String downloadID, long downloadedBytes){
-        WritableMap params = Arguments.createMap();
+        Bundle params = new Bundle();
         params.putString("downloadID", downloadID);
         params.putDouble("size", downloadedBytes);
         //TODO: Add local path of downloaded file
         params.putString("downloadLocation", "N/A");
-        context.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("onDownloadFinished", params);
+        emit("onDownloadFinished", params);
     }
 
     public void onDownloadCancelledEvent(String downloadID){
-        WritableMap params = Arguments.createMap();
+        Bundle params = new Bundle();
         params.putString("downloadID", downloadID);
-        context.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("onDownloadCancelled", params);
+        emit("onDownloadCancelled", params);
     }
 
     public void onDownloadStartedEvent(String downloadID){
-        WritableMap params = Arguments.createMap();
+        Bundle params = new Bundle();
         params.putString("downloadID", downloadID);
-        context.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("onDownloadStarted", params);
+        emit("onDownloadStarted", params);
     }
 
     public void onDownloadErrorEvent(String downloadID, String errorType, String error){
-        WritableMap params = Arguments.createMap();
+        Bundle params = new Bundle();
         params.putString("error", error);
         params.putString("errorType", errorType);
         params.putString("downloadID", downloadID);
-        context.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("onDownloadError", params);
+        emit("onDownloadError", params);
     }
 
     public Download getCurrentDownload() {
@@ -107,7 +120,6 @@ public class DownloadTracker {
         }
         return null;
     }
-
 
     private void downloadProgressUpdate(){
         new Timer().scheduleAtFixedRate(new TimerTask(){
@@ -122,6 +134,10 @@ public class DownloadTracker {
                 }
             }
         },0,1000);
+    }
+
+    public List<Download> getCurrentDownloads() {
+        return DownloadUtil.getDownloadManager(context).getCurrentDownloads();
     }
 
     public void removeListener(Listener listener) {
@@ -196,18 +212,11 @@ public class DownloadTracker {
                 @Nullable Exception finalException) {
             String downloadID = download.request.id;
 
-            Log.i(TAG, "Download changed");
-
-
             if(context.hasActiveCatalystInstance()){
                 if(download.state == Download.STATE_COMPLETED){
-                    Log.i(TAG, "Download Complete");
-                    Log.i(TAG, Float.toString(download.getPercentDownloaded()));
-                    if(download.getPercentDownloaded() == 100) {
-                        if(downloadID != null){
-                            onDownloadProgressEvent(downloadID, 100);
-                            onDownloadFinishedEvent(downloadID, download.getBytesDownloaded());
-                        }
+                    if(downloadID != null){
+                        onDownloadProgressEvent(downloadID, 100);
+                        onDownloadFinishedEvent(downloadID, download.getBytesDownloaded());
                     }
                 } else if (download.state == Download.STATE_DOWNLOADING){
                     if(downloadID != null) {
@@ -218,7 +227,6 @@ public class DownloadTracker {
                         Log.e(TAG, "failed", finalException);
                         onDownloadErrorEvent(downloadID, "UNEXPECTEDLY_CANCELLED", finalException.toString());
                     }
-
                 }
             }
 

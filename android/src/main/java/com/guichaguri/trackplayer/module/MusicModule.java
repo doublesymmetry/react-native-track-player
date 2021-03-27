@@ -587,6 +587,17 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
+    public void getCurrentDownloadsProgress(final Promise promise) {
+        WritableMap currentDownloads = Arguments.createMap();
+        for(Download download: downloadTracker.getCurrentDownloads()){
+            if(download != null && download.getPercentDownloaded() > 0) {
+                currentDownloads.putDouble(download.request.id, download.getPercentDownloaded());
+            }
+        }
+        promise.resolve(currentDownloads);
+    }
+
+    @ReactMethod
     public void updateDownloadCreds(String downloadID, String queryParam) {
         downloadTracker.setDownloadCred(downloadID, queryParam);
     }

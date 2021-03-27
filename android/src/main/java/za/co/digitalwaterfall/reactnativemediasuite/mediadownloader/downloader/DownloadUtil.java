@@ -61,7 +61,6 @@ public class DownloadUtil {
     public static ResolvingDataSource.Factory getResolvingFactory(DataSource.Factory factory, String queryParams) {
         return new ResolvingDataSource.Factory(factory, (DataSpec dataSpec) -> {
             DataSpec ds = dataSpec;
-
             if(dataSpec.uri.getQuery() == null) {
                 ds = dataSpec.withUri(resolveUri(dataSpec.uri, queryParams));
             }
@@ -141,7 +140,6 @@ public class DownloadUtil {
                         String downloadID = download.request.id;
 
                         if (downloadID != null) {
-                            Log.i(TAG, download.request.id);
                             DownloadCred downloadCred = downloadTracker.getDownloadCred(downloadID);
                             String queryParams = downloadCred.queryParams;
 
@@ -163,10 +161,6 @@ public class DownloadUtil {
                             (ReactApplicationContext) context,
                             ds,
                             downloadManager);
-
-            downloadTracker.addListener(() -> {
-                Log.d(TAG,"onDownloadsChanged");
-            });
 
             downloadManager.resumeDownloads();
         }
