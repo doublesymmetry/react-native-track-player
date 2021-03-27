@@ -598,6 +598,12 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
+    public void getDownloadDirectorySize(final Promise promise) {
+        Long used = downloadTracker.getDowloadDirectorySize();
+        promise.resolve(Long.toString(used));
+    }
+
+    @ReactMethod
     public void updateDownloadCreds(String downloadID, String queryParam) {
         downloadTracker.setDownloadCred(downloadID, queryParam);
     }

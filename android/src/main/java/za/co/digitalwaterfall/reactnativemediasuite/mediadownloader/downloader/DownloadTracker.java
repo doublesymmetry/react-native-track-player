@@ -20,7 +20,10 @@ import com.google.android.exoplayer2.offline.*;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.guichaguri.trackplayer.service.Utils;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
@@ -52,7 +55,6 @@ public class DownloadTracker {
         downloadIndex = downloadManager.getDownloadIndex();
         downloadManager.addListener(new DownloadManagerListener());
         loadDownloads();
-        downloadProgressUpdate();
     }
 
     public void addListener(Listener listener) {
@@ -121,23 +123,30 @@ public class DownloadTracker {
         return null;
     }
 
-    private void downloadProgressUpdate(){
-        new Timer().scheduleAtFixedRate(new TimerTask(){
-            @Override
-            public void run(){
-                if (context.hasActiveCatalystInstance()) {
-                    for (Download download : DownloadUtil.getDownloadManager(context).getCurrentDownloads()) {
-                        if(download != null && download.getPercentDownloaded() > 0) {
-                            onDownloadProgressEvent(download.request.id, download.getPercentDownloaded());
-                        }
-                    }
-                }
-            }
-        },0,1000);
-    }
-
     public List<Download> getCurrentDownloads() {
         return DownloadUtil.getDownloadManager(context).getCurrentDownloads();
+    }
+
+    private long getFolderSize(File folder) {
+        long length = 0;
+        File[] files = folder.listFiles();
+
+        int count = files.length;
+
+        for (int i = 0; i < count; i++) {
+            if (files[i].isFile()) {
+                length += files[i].length();
+            }
+            else {
+                length += getFolderSize(files[i]);
+            }
+        }
+        return length;
+    }
+
+    public long getDowloadDirectorySize() {
+        File folder = DownloadUtil.getDownloadDirectory(context).getAbsoluteFile();
+        return getFolderSize(folder);
     }
 
     public void removeListener(Listener listener) {

@@ -191,7 +191,7 @@ public class DownloadUtil {
     }
 
 
-    private static File getDownloadDirectory(Context context) {
+    public static File getDownloadDirectory(Context context) {
         if (downloadDirectory == null) {
             downloadDirectory = context.getExternalFilesDir(null);
             if (downloadDirectory == null) {
