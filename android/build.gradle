@@ -49,7 +49,7 @@ repositories {
     maven {
         // As RN is not updated in jcenter anymore, we'll have to grab it from npm
         // Make sure you have installed the react-native npm package before compiling
-        url "/Users/husaynarrah/projects/ekoh/EkohOnline/node_modules/react-native/android"
+        url "../node_modules/react-native/android"
     }
 
     jcenter()
@@ -95,12 +95,8 @@ dependencies {
     implementation "androidx.media:media:1.1.0"
     implementation "com.github.bumptech.glide:glide:4.7.1"
 
-
-
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.annotation:annotation:1.0.2'
-
-
 
     compileOnly 'org.checkerframework:checker-qual:3.8.0'
 }
