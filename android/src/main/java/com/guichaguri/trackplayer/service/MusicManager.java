@@ -14,6 +14,7 @@ import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.CountDownTimer;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import androidx.annotation.RequiresApi;
@@ -42,6 +43,10 @@ public class MusicManager implements OnAudioFocusChangeListener {
 
     private MetadataManager metadata;
     private ExoPlayback playback;
+
+    private int streamedCountDurationSeconds;
+    private CountDownTimer countDownTimer;
+    private long timeToLaunch;
 
     @RequiresApi(26)
     private AudioFocusRequest focus = null;
@@ -117,6 +122,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
         int playBuffer = (int)Utils.toMillis(options.getDouble("playBuffer", Utils.toSeconds(DEFAULT_BUFFER_FOR_PLAYBACK_MS)));
         int backBuffer = (int)Utils.toMillis(options.getDouble("backBuffer", Utils.toSeconds(DEFAULT_BACK_BUFFER_DURATION_MS)));
         long cacheMaxSize = (long)(options.getDouble("maxCacheSize", 0) * 1024);
+        streamedCountDurationSeconds = (int)(options.getDouble("streamedCountDurationSeconds") * 1000);
         int multiplier = DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS / DEFAULT_BUFFER_FOR_PLAYBACK_MS;
 
         LoadControl control = new DefaultLoadControl.Builder()
@@ -132,6 +138,36 @@ public class MusicManager implements OnAudioFocusChangeListener {
                 .setContentType(C.CONTENT_TYPE_MUSIC).setUsage(C.USAGE_MEDIA).build(), false);
 
         return new LocalPlayback(service, this, player, cacheMaxSize);
+    }
+
+    private void setCountDownTimer(long timerValue){
+        countDownTimer = new CountDownTimer(timerValue, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                timeToLaunch = millisUntilFinished;
+            }
+
+            @Override
+            public void onFinish() {
+                Bundle bundle = new Bundle();
+                bundle.putLong("timeEllapsed", streamedCountDurationSeconds);
+                service.emit(MusicEvents.STREAM_TIME_ELLAPSED, bundle);
+                timeToLaunch = 0;
+                countDownTimer.cancel();
+            }
+        }.start();
+    }
+
+    public void initCountDownTimer(){
+        setCountDownTimer(streamedCountDurationSeconds);
+    }
+
+    public void cancelCountDownTimer(){
+        countDownTimer.cancel();
+    }
+
+    public void resumeCountDownTimer(){
+        setCountDownTimer(timeToLaunch);
     }
 
     @SuppressLint("WakelockTimeout")
@@ -201,6 +237,17 @@ public class MusicManager implements OnAudioFocusChangeListener {
         bundle.putInt("state", state);
         service.emit(MusicEvents.PLAYBACK_STATE, bundle);
         metadata.updatePlayback(playback);
+        if (streamedCountDurationSeconds > 0) {
+            if (state == 3 && timeToLaunch == 0) {
+                initCountDownTimer();
+            }
+            if (state == 3 && timeToLaunch > 0) {
+                resumeCountDownTimer();
+            }
+            if (state == 2) {
+                cancelCountDownTimer();
+            }
+        }
     }
 
     public void onTrackUpdate(Track previous, long prevPos, Track next) {

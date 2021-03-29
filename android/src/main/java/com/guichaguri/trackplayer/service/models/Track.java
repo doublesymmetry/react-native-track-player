@@ -183,9 +183,6 @@ public class Track {
     public MediaSource toMediaSource(Context ctx, LocalPlayback playback) {
         // Updates the user agent if not set
 
-
-        Log.i(TAG, gid);
-
         if(userAgent == null || userAgent.isEmpty())
             userAgent = Util.getUserAgent(ctx, "react-native-track-player");
 
@@ -213,7 +210,6 @@ public class Track {
             ds = new DefaultDataSourceFactory(ctx, userAgent);
 
         } else if (downloadTracker.isDownloaded(gid)) {
-            Log.i(TAG, "Playing downloaded content");
             Download download = downloadTracker.getDownload(gid);
             mediaItem = download.request.toMediaItem();
 
@@ -221,9 +217,6 @@ public class Track {
         }
 
         else {
-
-            Log.i(TAG, "Playing http content");
-
             // Creates a default http source factory, enabling cross protocol redirects
             DefaultHttpDataSourceFactory factory = new DefaultHttpDataSourceFactory(
                     userAgent, null,

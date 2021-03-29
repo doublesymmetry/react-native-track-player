@@ -204,8 +204,6 @@ public class DownloadTracker {
             while (loadedDownloads.moveToNext()) {
                 Download download = loadedDownloads.getDownload();
                 downloads.put(download.request.id, download);
-                Log.i(TAG, "loading download ...");
-                Log.i(TAG, download.request.id);
             }
         } catch (IOException e) {
             Log.w(TAG, "Failed to query downloads", e);
