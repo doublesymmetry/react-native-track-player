@@ -95,7 +95,7 @@ permalink: /platform-support/
 | `remote-set-rating` | ✓ | ✗ | ✗ |
 | `remote-jump-forward` | ✓ | ✓ | ✓ |
 | `remote-jump-backward` | ✓ | ✓ | ✓ |
-| `remote-duck` | ✓ | ✗ | ✗ |
+| `remote-duck` | ✓ | ✓ | ✗ |
 | `playback-state` | ✓ | ✓ | ✓ |
 | `playback-track-changed` | ✓ | ✓ | ✓ |
 | `playback-queue-ended` | ✓ | ✓ | ✓ |

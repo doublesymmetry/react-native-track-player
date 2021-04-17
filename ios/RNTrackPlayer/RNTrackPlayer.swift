@@ -111,25 +111,28 @@ public class RNTrackPlayer: RCTEventEmitter {
                 return
         }
         if type == .began {
-            // Interruption began, take appropriate actions
+            // Interruption began, take appropriate actions (save state, update user interface)
             self.sendEvent(withName: "remote-duck", body: [
                 "paused": true
                 ])
         }
         else if type == .ended {
-            if let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
-                let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
-                if options.contains(.shouldResume) {
-                    // Interruption Ended - playback should resume
-                    self.sendEvent(withName: "remote-duck", body: [
-                        "paused": false
-                        ])
-                } else {
-                    // Interruption Ended - playback should NOT resume
-                    self.sendEvent(withName: "remote-duck", body: [
-                        "permanent": true
-                        ])
-                }
+            guard let optionsValue =
+                userInfo[AVAudioSessionInterruptionOptionKey] as? UInt else {
+                    return
+            }
+            let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
+            if options.contains(.shouldResume) {
+                // Interruption Ended - playback should resume
+                self.sendEvent(withName: "remote-duck", body: [
+                    "paused": false
+                ])
+            } else {
+                // Interruption Ended - playback should NOT resume
+                self.sendEvent(withName: "remote-duck", body: [
+                    "paused": true,
+                    "permanent": true
+                ])
             }
         }
     }
@@ -157,7 +160,16 @@ public class RNTrackPlayer: RCTEventEmitter {
         }
         
         try? AVAudioSession.sharedInstance().setActive(false)
-        try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, options: sessionCategoryOptions)
+      
+        // Progressively opt into AVAudioSession policies for background audio
+        // and AirPlay 2. 
+        if #available(iOS 13.0, *) {
+            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: .longFormAudio, options: sessionCategoryOptions)
+        } else if #available(iOS 11.0, *) {
+            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: .longForm, options: sessionCategoryOptions)
+        } else {
+            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, options: sessionCategoryOptions)
+        }
     }
 
     // MARK: - Bridged Methods

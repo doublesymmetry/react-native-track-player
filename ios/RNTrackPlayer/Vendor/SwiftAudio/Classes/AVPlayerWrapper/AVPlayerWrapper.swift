@@ -59,6 +59,10 @@ class AVPlayerWrapper: AVPlayerWrapperProtocol {
         self.playerTimeObserver.delegate = self
         self.playerItemNotificationObserver.delegate = self
         self.playerItemObserver.delegate = self
+
+        // Disable external video output, so we can get the audio controls when
+        // using AirPlay.
+        self.avPlayer.allowsExternalPlayback = false;
         
         playerTimeObserver.registerForPeriodicTimeEvents()
     }
