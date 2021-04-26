@@ -8,13 +8,13 @@ namespace winrt::RNTrackPlayer {
     struct LocalPlayback : public Playback {
         winrt::Windows::Media::Playback::MediaPlayer player;
 
-        React::ReactPromise<JSValue>* loadCallback;
+        React::ReactPromise<JSValue>* loadCallback{ nullptr };
 
-        bool started;
-        bool ended;
-        double startPos;
+        bool started{ false };
+        bool ended{false};
+        double startPos{ 0 };
 
-        LocalPlayback(MediaManager* manager, React::JSValueObject& options);
+        LocalPlayback(MediaManager& manager, React::JSValueObject& options);
         virtual winrt::Windows::Media::SystemMediaTransportControls GetTransportControls() override;
         virtual void Load(Track& track, React::ReactPromise<JSValue>* promise) override;
         virtual void Play() override;
