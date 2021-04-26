@@ -18,18 +18,20 @@ namespace winrt::RNTrackPlayer {
     struct Track;
 
     struct Playback {
-        MediaManager* manager;
+    protected:
+        MediaManager& manager;
 
         std::vector<Track> queue;
-        int currentTrack;
-        PlaybackState prevState;
+        int currentTrack{ -1 };
+        PlaybackState prevState{ PlaybackState::None };
 
-        Playback(MediaManager* manager);
+    public:
+        Playback(MediaManager& manager);
         virtual ~Playback();
         void UpdateState(PlaybackState state);
         void UpdateCurrentTrack(size_t index, React::ReactPromise<JSValue>* promise);
         Track* GetCurrentTrack();
-        Track* GetTrack(std::string id);
+        Track* GetTrack(const std::string& id);
         std::vector<Track>& GetQueue();
         void Add(std::vector<Track>& tracks, std::string& insertBeforeId,
             React::ReactPromise<JSValue>& promise);

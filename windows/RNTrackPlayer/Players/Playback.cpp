@@ -5,11 +5,9 @@
 
 using namespace winrt::RNTrackPlayer;
 
-Playback::Playback(MediaManager* manager)
-    : currentTrack(-1)
-    , prevState(PlaybackState::None)
+Playback::Playback(MediaManager& manager)
+    : manager(manager)
 {
-    this->manager = manager;
 }
 
 Playback::~Playback()
@@ -18,9 +16,12 @@ Playback::~Playback()
 
 void Playback::UpdateState(PlaybackState state)
 {
-    if (prevState == state) return;
+    if (prevState == state)
+    {
+        return;
+    }
 
-    manager->OnStateChange(state);
+    manager.OnStateChange(state);
     prevState = state;
 }
 
@@ -48,10 +49,10 @@ void Playback::UpdateCurrentTrack(size_t index, React::ReactPromise<JSValue>* pr
     double position = GetPosition();
     PlaybackState oldState = GetState();
 
-    //OutputDebugString("Updating current track...");
+    VERBOSE_DEBUG("Updating current track...");
 
     Track& track = queue[index];
-    currentTrack = (int)index;
+    currentTrack = static_cast<int>(index);
 
     Load(track, promise);
 
@@ -60,7 +61,7 @@ void Playback::UpdateCurrentTrack(size_t index, React::ReactPromise<JSValue>* pr
     else if (Utils::IsPaused(oldState))
         Pause();
 
-    manager->OnTrackUpdate(previous, position, &track, true);
+    manager.OnTrackUpdate(previous, position, &track, true);
 }
 
 Track* Playback::GetCurrentTrack()
@@ -68,7 +69,7 @@ Track* Playback::GetCurrentTrack()
     return currentTrack >= 0 && currentTrack < queue.size() ? &queue[currentTrack] : nullptr;
 }
 
-Track* Playback::GetTrack(std::string id)
+Track* Playback::GetTrack(const std::string& id)
 {
     auto it = std::find_if(queue.begin(), queue.end(), [&](const Track& t) { return t.Id == id; });
     return it == queue.end() ? nullptr : &(*it);
@@ -101,7 +102,7 @@ void Playback::Add(std::vector<Track>& tracks, std::string& insertBeforeId,
         queue.insert(queue.begin() + index, tracks.begin(), tracks.end());
 
         if (currentTrack >= index)
-            currentTrack += (int)tracks.size();
+            currentTrack += static_cast<int>(tracks.size());
     }
 
     promise.Resolve(nullptr);
@@ -111,14 +112,17 @@ void Playback::Remove(std::vector<std::string>& ids, React::ReactPromise<JSValue
 {
     int currTrack = currentTrack;
 
-    for(std::string& id : ids)
+    for (std::string& id : ids)
     {
         auto it = std::find_if(queue.begin(), queue.end(), [&](const Track& t) { return t.Id == id; });
         auto index = std::distance(queue.begin(), it);
 
         queue.erase(queue.begin() + index);
 
-        if (index == currTrack) currTrack += 1;
+        if (index == currTrack)
+        {
+            currTrack += 1;
+        }
     }
 
     if (currTrack != currentTrack)
@@ -134,7 +138,9 @@ void Playback::UpdateTrack(size_t index, Track& track)
     queue[index] = track;
 
     if (index == currentTrack)
-        manager->GetMetadata()->UpdateMetadata(track);
+    {
+        manager.GetMetadata()->UpdateMetadata(track);
+    }
 }
 
 void Playback::Reset()
@@ -147,12 +153,11 @@ void Playback::Reset()
     currentTrack = -1;
     queue.clear();
 
-    manager->OnTrackUpdate(prev, pos, nullptr, true);
+    manager.OnTrackUpdate(prev, pos, nullptr, true);
 }
 
 void Playback::RemoveUpcomingTracks()
 {
-    // TODO: Check
     queue.erase(queue.begin() + currentTrack, queue.end());
 }
 
@@ -175,7 +180,7 @@ bool Playback::HasNext()
 void Playback::SkipToNext(React::ReactPromise<JSValue>& promise)
 {
     if (HasNext())
-        UpdateCurrentTrack(currentTrack + 1, &promise);
+        UpdateCurrentTrack(static_cast<size_t>(currentTrack) + 1, &promise);
     else
         promise.Reject("There is no tracks left to play");
 }
@@ -183,7 +188,7 @@ void Playback::SkipToNext(React::ReactPromise<JSValue>& promise)
 void Playback::SkipToPrevious(React::ReactPromise<JSValue>& promise)
 {
     if (currentTrack > 0)
-        UpdateCurrentTrack(currentTrack - 1, &promise);
+        UpdateCurrentTrack(static_cast<size_t>(currentTrack) - 1, &promise);
     else
         promise.Reject("There is no previous tracks");
 }

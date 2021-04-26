@@ -5,17 +5,16 @@
 using namespace winrt::RNTrackPlayer;
 
 Track::Track(const React::JSValueObject& data)
-    : Id(data["id"].AsString())
-    , Url(Utils::GetValue(data, "url", ""))
-    , Type(Utils::GetValue(data, "type", TrackType::Default))
+    : Id(data["id"].AsString()),
+      Url(Utils::GetValue(data, "url", "")),
+      Type(Utils::GetValue(data, "type", TrackType::Default))
 {
      SetMetadata(data);
 }
 
 void Track::SetMetadata(const React::JSValueObject& data)
 {
-    Duration = data["duration"].AsDouble();
-
+    Duration = std::chrono::seconds(data["duration"].AsInt64());
     Title = data["title"].AsString();
     Artist = data["artist"].AsString();
     Album = data["album"].AsString();
@@ -30,7 +29,7 @@ React::JSValueObject Track::ToObject()
     obj["url"] = Url;
     obj["type"] = Type;
 
-    obj["duration"] = Duration;
+    obj["duration"] = Duration.count();
 
     obj["title"] = Title;
     obj["artist"] = Artist;
@@ -39,8 +38,3 @@ React::JSValueObject Track::ToObject()
 
     return obj;
 }
-
-const char* TrackType::Default = "default";
-const char* TrackType::Dash = "dash";
-const char* TrackType::Hls = "hls";
-const char* TrackType::SmoothStreaming = "smoothstreaming";

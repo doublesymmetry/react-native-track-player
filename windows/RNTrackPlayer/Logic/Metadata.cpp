@@ -9,13 +9,10 @@ using namespace winrt::RNTrackPlayer;
 using namespace winrt::Windows::Media;
 using namespace winrt::Windows::Storage::Streams;
 
-Metadata::Metadata(MediaManager* manager)
-    : controls(nullptr)
-    , jumpInterval(15)
-    , play(false), pause(false), stop(false), previous(false), next(false)
-    , jumpForward(false), jumpBackward(false), seek(false)
+Metadata::Metadata(MediaManager& manager)
+    : controls(nullptr),
+      manager(manager)
 {
-    this->manager = manager;
 }
 
 Metadata::~Metadata()
@@ -83,16 +80,19 @@ void Metadata::UpdateOptions(React::JSValueObject& data)
     {
         auto& capabilities = data["capabilities"].AsArray();
 
-        play = Utils::ContainsInt(capabilities, (int)Capability::Play);
-        pause = Utils::ContainsInt(capabilities, (int)Capability::Pause);
-        stop = Utils::ContainsInt(capabilities, (int)Capability::Stop);
-        previous = Utils::ContainsInt(capabilities, (int)Capability::Previous);
-        next = Utils::ContainsInt(capabilities, (int)Capability::Next);
-        jumpForward = Utils::ContainsInt(capabilities, (int)Capability::JumpForward);
-        jumpBackward = Utils::ContainsInt(capabilities, (int)Capability::JumpBackward);
-        seek = Utils::ContainsInt(capabilities, (int)Capability::Seek);
+        play = Utils::ContainsInt(capabilities, static_cast<int>(Capability::Play));
+        pause = Utils::ContainsInt(capabilities, static_cast<int>(Capability::Pause));
+        stop = Utils::ContainsInt(capabilities, static_cast<int>(Capability::Stop));
+        previous = Utils::ContainsInt(capabilities, static_cast<int>(Capability::Previous));
+        next = Utils::ContainsInt(capabilities, static_cast<int>(Capability::Next));
+        jumpForward = Utils::ContainsInt(capabilities, static_cast<int>(Capability::JumpForward));
+        jumpBackward = Utils::ContainsInt(capabilities, static_cast<int>(Capability::JumpBackward));
+        seek = Utils::ContainsInt(capabilities, static_cast<int>(Capability::Seek));
 
-        if (controls != nullptr) UpdateCapabilities();
+        if (controls != nullptr)
+        {
+            UpdateCapabilities();
+        }
     }
 }
 
@@ -103,7 +103,6 @@ void Metadata::UpdateMetadata(Track& track)
 
     try
     {
-
         Uri thumbnailUri(winrt::to_hstring(track.Artwork));
         display.Thumbnail(RandomAccessStreamReference::CreateFromUri(thumbnailUri));
     }
@@ -125,12 +124,15 @@ void Metadata::UpdateMetadata(Track& track)
 void Metadata::OnSeekTo(winrt::Windows::Media::SystemMediaTransportControls sender,
     winrt::Windows::Media::PlaybackPositionChangeRequestedEventArgs args)
 {
-    if (!seek) return;
+    if (!seek)
+    {
+        return;
+    }
 
     JSValueObject obj;
     obj["position"] = args.RequestedPlaybackPosition().count();
 
-    manager->SendEvent(Events::ButtonSeekTo, obj);
+    manager.SendEvent(Events::ButtonSeekTo, obj);
 }
 
 void Metadata::OnButtonPressed(winrt::Windows::Media::SystemMediaTransportControls sender,
@@ -168,5 +170,5 @@ void Metadata::OnButtonPressed(winrt::Windows::Media::SystemMediaTransportContro
         return;
     }
 
-    manager->SendEvent(eventType, data);
+    manager.SendEvent(eventType, data);
 }

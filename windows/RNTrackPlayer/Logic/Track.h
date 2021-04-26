@@ -9,7 +9,7 @@ namespace winrt::RNTrackPlayer {
         std::string Id;
         std::string Url;
         std::string Type;
-        double Duration;
+        std::chrono::seconds Duration;
 
         std::string Title;
         std::string Artist;
@@ -22,9 +22,9 @@ namespace winrt::RNTrackPlayer {
     };
 
     struct TrackType {
-        static const char* Default;
-        static const char* Dash;
-        static const char* Hls;
-        static const char* SmoothStreaming;
+        static constexpr const char* Default = "default";
+        static constexpr const char* Dash = "dash";
+        static constexpr const char* Hls = "hls";
+        static constexpr const char* SmoothStreaming = "smoothstreaming";
     };
 }

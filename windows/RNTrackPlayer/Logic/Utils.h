@@ -12,9 +12,9 @@ namespace winrt::RNTrackPlayer {
     struct Utils {
         static bool IsPlaying(PlaybackState state);
         static bool IsPaused(PlaybackState state);
-        static std::string GetValue(const JSValueObject& obj, std::string key, std::string def);
+        static std::string GetValue(const JSValueObject& obj, const std::string& key, const std::string& def);
         static winrt::Windows::Foundation::Uri GetUri(const React::JSValueObject& obj,
-            std::string key, winrt::Windows::Foundation::Uri def);
+            const std::string& key, winrt::Windows::Foundation::Uri def);
         static bool CheckPlayback(Playback* pb, ReactPromise<JSValue>& promise);
         static bool ContainsInt(const React::JSValueArray& array, int val);
     };

@@ -7,12 +7,8 @@ using namespace winrt::RNTrackPlayer;
 using namespace winrt::Windows::Media::Core;
 using namespace winrt::Windows::Media::Playback;
 
-LocalPlayback::LocalPlayback(MediaManager* manager, React::JSValueObject&)
+LocalPlayback::LocalPlayback(MediaManager& manager, React::JSValueObject&)
     : Playback(manager)
-    , loadCallback(nullptr)
-    , started(false)
-    , ended(0)
-    , startPos(0)
 {
     player = MediaPlayer();
     player.AutoPlay(false);
@@ -85,7 +81,7 @@ double LocalPlayback::GetRate()
 void LocalPlayback::SeekTo(double seconds)
 {
     startPos = seconds;
-    player.PlaybackSession().Position(std::chrono::seconds((int)seconds));
+    player.PlaybackSession().Position(std::chrono::seconds(static_cast<int>(seconds)));
 }
 
 double LocalPlayback::GetPosition()
@@ -112,7 +108,8 @@ double LocalPlayback::GetDuration()
     if (duration <= 0)
     {
         Track* track = GetCurrentTrack();
-        duration = track != nullptr && track->Duration > 0 ? track->Duration : 0;
+        duration = track != nullptr && track->Duration.count() > 0 ?
+            static_cast<double>(track->Duration.count()) : 0;
     }
 
     return duration;
@@ -147,12 +144,12 @@ void LocalPlayback::OnEnd(winrt::Windows::Media::Playback::MediaPlayer sender,
 {
     if (HasNext())
     {
-        UpdateCurrentTrack((size_t)currentTrack + 1, nullptr);
+        UpdateCurrentTrack(static_cast<size_t>(currentTrack) + 1, nullptr);
         Play();
     }
     else
     {
-        manager->OnEnd(GetCurrentTrack(), GetPosition());
+        manager.OnEnd(GetCurrentTrack(), GetPosition());
     }
 }
 
@@ -160,7 +157,9 @@ void LocalPlayback::OnError(winrt::Windows::Media::Playback::MediaPlayer sender,
     winrt::Windows::Media::Playback::MediaPlayerFailedEventArgs args)
 {
     if (loadCallback)
+    {
         loadCallback->Reject(winrt::to_string(args.ErrorMessage()).c_str());
+    }
 
     loadCallback = nullptr;
 
@@ -173,11 +172,28 @@ void LocalPlayback::OnError(winrt::Windows::Media::Playback::MediaPlayer sender,
     else if (args.Error() == MediaPlayerError::NetworkError)
         code = "playback-source";
 
-    manager->OnError(code, winrt::to_string(args.ErrorMessage()));
+    manager.OnError(code, winrt::to_string(args.ErrorMessage()));
 }
 
 void LocalPlayback::OnLoad(winrt::Windows::Media::Playback::MediaPlayer sender,
     const winrt::Windows::Foundation::IInspectable&)
 {
+    VERBOSE_DEBUG("OnLoad");
 
+    if (startPos > 0)
+    {
+        player.PlaybackSession().Position(TimeSpan(static_cast<__int64>(startPos)));
+        startPos = 0;
+    }
+
+    if (started)
+    {
+        Play();
+    }
+
+    if (loadCallback)
+    {
+        loadCallback->Resolve(nullptr);
+        loadCallback = nullptr;
+    }
 }

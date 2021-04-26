@@ -20,15 +20,19 @@ namespace winrt::RNTrackPlayer {
     struct Track;
 
     struct Metadata {
-        MediaManager* manager;
+    private:
+        MediaManager& manager;
         winrt::Windows::Media::SystemMediaTransportControls controls;
-        double jumpInterval;
-        bool play, pause, stop, previous, next, jumpForward, jumpBackward, seek;
+        double jumpInterval{ 15 };
+        bool play{ false }, pause{ false }, stop{ false };
+        bool previous{ false }, next{ false };
+        bool jumpForward{ false }, jumpBackward{ false }, seek{ false };
 
         winrt::event_token onSeekToRevoker;
         winrt::event_token onButtonPressedRevoker;
 
-        Metadata(MediaManager* manager);
+    public:
+        Metadata(MediaManager& manager);
         ~Metadata();
         void SetTransportControls(winrt::Windows::Media::SystemMediaTransportControls transportControls);
         void UpdateCapabilities();
@@ -38,6 +42,5 @@ namespace winrt::RNTrackPlayer {
             winrt::Windows::Media::PlaybackPositionChangeRequestedEventArgs args);
         void OnButtonPressed(winrt::Windows::Media::SystemMediaTransportControls sender,
             winrt::Windows::Media::SystemMediaTransportControlsButtonPressedEventArgs args);
-
     };
 }

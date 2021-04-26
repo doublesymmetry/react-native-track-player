@@ -7,13 +7,13 @@ using namespace winrt::RNTrackPlayer;
 using namespace winrt::Windows::UI::Xaml;
 
 MediaManager::MediaManager(React::ReactContext const& context)
-    : player(nullptr)
-    , metadata(this)
+    : player(nullptr),
+      metadata(*this)
 {
     this->context = context;
 }
 
-void MediaManager::SendEvent(std::string eventName, const JSValueObject& data)
+void MediaManager::SendEvent(const std::string& eventName, const JSValueObject& data)
 {
     std::wstring _eventName(eventName.begin(), eventName.end());
     context.EmitJSEvent(L"RCTDeviceEventEmitter", _eventName, data);
@@ -36,7 +36,7 @@ void MediaManager::SwitchPlayback(Playback* pb)
 
 LocalPlayback* MediaManager::CreateLocalPlayback(React::JSValueObject& options)
 {
-    return new LocalPlayback(this, options);
+    return new LocalPlayback(*this, options);
 }
 
 void MediaManager::UpdateOptions(React::JSValueObject& options)
@@ -44,14 +44,14 @@ void MediaManager::UpdateOptions(React::JSValueObject& options)
     metadata.UpdateOptions(options);
 }
 
-Playback* MediaManager::GetPlayer()
+Playback* MediaManager::GetPlayer() const
 {
-    return player;
+    return const_cast<Playback*>(player);
 }
 
-Metadata* MediaManager::GetMetadata()
+Metadata* MediaManager::GetMetadata() const
 {
-    return &metadata;
+    return const_cast<Metadata*>(&metadata);
 }
 
 void MediaManager::OnEnd(Track* previous, double prevPos)
@@ -78,7 +78,9 @@ void MediaManager::OnTrackUpdate(Track* previous, double prevPos, Track* next, b
     VERBOSE_DEBUG("OnTrackUpdate");
 
     if (next)
+    {
         metadata.UpdateMetadata(*next);
+    }
 
     if (changed)
     {
@@ -90,7 +92,7 @@ void MediaManager::OnTrackUpdate(Track* previous, double prevPos, Track* next, b
     }
 }
 
-void MediaManager::OnError(std::string code, std::string error)
+void MediaManager::OnError(const std::string& code, const std::string& error)
 {
     VERBOSE_DEBUG(error);
 
