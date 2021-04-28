@@ -86,7 +86,7 @@ void LocalPlayback::SeekTo(double seconds)
 
 double LocalPlayback::GetPosition()
 {
-    return (double)player.PlaybackSession().Position().count();
+    return (double)player.PlaybackSession().Position().count() / winrt::impl::filetime_period::den;
 }
 
 double LocalPlayback::GetBufferedPosition()
@@ -103,7 +103,8 @@ double LocalPlayback::GetBufferedPosition()
 
 double LocalPlayback::GetDuration()
 {
-    double duration = (double)player.PlaybackSession().NaturalDuration().count();
+    double duration = static_cast<double>(
+        player.PlaybackSession().NaturalDuration().count() / winrt::impl::filetime_period::den);
 
     if (duration <= 0)
     {
