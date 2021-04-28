@@ -8,7 +8,8 @@ using namespace winrt::Windows::Media::Core;
 using namespace winrt::Windows::Media::Playback;
 
 LocalPlayback::LocalPlayback(MediaManager& manager, React::JSValueObject&)
-    : Playback(manager)
+    : Playback(manager),
+      loadCallback(IJSValueWriter(), MethodResultCallback(), MethodResultCallback())
 {
     player = MediaPlayer();
     player.AutoPlay(false);
@@ -31,7 +32,12 @@ void LocalPlayback::Load(Track& track, React::ReactPromise<JSValue>* promise)
     started = false;
     ended = false;
     startPos = 0;
-    loadCallback = promise;
+
+    if (promise)
+    {
+        new(&loadCallback) ReactPromise<JSValue>(*promise);
+        hasLoadCallback = true;
+    }
 
     Uri uri(winrt::to_hstring(track.Url.c_str()));
     player.Source(MediaSource::CreateFromUri(uri));
@@ -157,12 +163,12 @@ void LocalPlayback::OnEnd(winrt::Windows::Media::Playback::MediaPlayer sender,
 void LocalPlayback::OnError(winrt::Windows::Media::Playback::MediaPlayer sender,
     winrt::Windows::Media::Playback::MediaPlayerFailedEventArgs args)
 {
-    if (loadCallback)
+    if (hasLoadCallback)
     {
-        loadCallback->Reject(winrt::to_string(args.ErrorMessage()).c_str());
+        loadCallback.Reject(winrt::to_string(args.ErrorMessage()).c_str());
     }
 
-    loadCallback = nullptr;
+    hasLoadCallback = false;
 
     VERBOSE_DEBUG(args.ErrorMessage().c_str());
 
@@ -192,9 +198,10 @@ void LocalPlayback::OnLoad(winrt::Windows::Media::Playback::MediaPlayer sender,
         Play();
     }
 
-    if (loadCallback)
+    if (hasLoadCallback)
     {
-        loadCallback->Resolve(nullptr);
-        loadCallback = nullptr;
+        loadCallback.Resolve(nullptr);
+        new(&loadCallback) ReactPromise<JSValue>(IJSValueWriter(), MethodResultCallback(), MethodResultCallback());
+        hasLoadCallback = false;
     }
 }
