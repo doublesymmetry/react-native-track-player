@@ -8,7 +8,8 @@ namespace winrt::RNTrackPlayer {
     struct LocalPlayback : public Playback {
         winrt::Windows::Media::Playback::MediaPlayer player;
 
-        React::ReactPromise<JSValue>* loadCallback{ nullptr };
+        React::ReactPromise<JSValue> loadCallback;
+        bool hasLoadCallback{ false };
 
         bool started{ false };
         bool ended{false};

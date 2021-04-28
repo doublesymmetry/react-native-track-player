@@ -25,7 +25,7 @@ void Playback::UpdateState(PlaybackState state)
     prevState = state;
 }
 
-void Playback::UpdateCurrentTrack(size_t index, React::ReactPromise<JSValue>* promise = nullptr)
+void Playback::UpdateCurrentTrack(size_t index, React::ReactPromise<JSValue>* promise)
 {
     if (queue.size() == 0)
     {
