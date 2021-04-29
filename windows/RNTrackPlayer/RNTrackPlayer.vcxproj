@@ -128,7 +128,6 @@
     <ClInclude Include="RNTrackPlayer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Logic\Events.cpp" />
     <ClCompile Include="Logic\MediaManager.cpp" />
     <ClCompile Include="Logic\Metadata.cpp" />
     <ClCompile Include="Logic\Track.cpp" />
