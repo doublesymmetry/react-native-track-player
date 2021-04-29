@@ -17,12 +17,15 @@ Metadata::Metadata(MediaManager& manager)
 
 Metadata::~Metadata()
 {
-    controls.IsEnabled(false);
-    controls.PlaybackPositionChangeRequested(onSeekToRevoker);
-    onSeekToRevoker = winrt::event_token();
-    controls.ButtonPressed(onButtonPressedRevoker);
-    onButtonPressedRevoker = winrt::event_token();
-    controls = nullptr;
+    if (controls)
+    {
+        controls.IsEnabled(false);
+        controls.PlaybackPositionChangeRequested(onSeekToRevoker);
+        onSeekToRevoker = winrt::event_token();
+        controls.ButtonPressed(onButtonPressedRevoker);
+        onButtonPressedRevoker = winrt::event_token();
+        controls = nullptr;
+    }
 }
 
 void Metadata::SetTransportControls(winrt::Windows::Media::SystemMediaTransportControls transportControls)
