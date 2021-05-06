@@ -179,6 +179,11 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
+    public void isServiceRunning(final Promise promise) {
+        promise.resolve(binder != null);
+    }
+
+    @ReactMethod
     public void destroy() {
         // Ignore if it was already destroyed
         if (binder == null && !connecting) return;

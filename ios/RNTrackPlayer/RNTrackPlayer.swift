@@ -259,6 +259,12 @@ public class RNTrackPlayer: RCTEventEmitter {
         hasInitialized = true
         resolve(NSNull())
     }
+
+    @objc(isServiceRunning:rejecter:)
+    public func isServiceRunning(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        // TODO That is probably always true
+        resolve(player != nil)
+    }
     
     @objc(destroy)
     public func destroy() {
