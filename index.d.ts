@@ -175,6 +175,7 @@ declare namespace RNTrackPlayer {
   export const STATE_PAUSED: State;
   export const STATE_STOPPED: State;
   export const STATE_BUFFERING: State;
+  export const STATE_CONNECTING: State;
   export const STATE_READY: State;
 
   export const RATING_HEART: RatingType;
@@ -239,6 +240,6 @@ declare namespace RNTrackPlayer {
   export function usePlaybackStateIs(...states: State[]): boolean;
   export function useTrackPlayerProgress(
     interval?: number,
-    pollTrackPlayerStates?: State[],
+    pollTrackPlayerStates?: State[] | null,
   ): ProgressComponentState;
 }
