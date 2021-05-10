@@ -121,7 +121,6 @@ public class MusicService extends HeadlessJsTaskService {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
             startForeground(1, getNotification());
-            stopSelf();
 
             if(intent != null && Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())) {
                 if(manager != null) {
