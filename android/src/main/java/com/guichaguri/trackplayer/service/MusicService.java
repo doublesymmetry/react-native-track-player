@@ -2,7 +2,6 @@ package com.guichaguri.trackplayer.service;
 
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -19,7 +18,6 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.jstasks.HeadlessJsTaskConfig;
 import com.guichaguri.trackplayer.R;
-import com.guichaguri.trackplayer.service.Utils;
 import javax.annotation.Nullable;
 
 /**
@@ -83,13 +81,28 @@ public class MusicService extends HeadlessJsTaskService {
         return serviceForeground;
     }
 
+    private Notification getNotification(){
+        String channel = Utils.getNotificationChannel((Context) this);
+
+        Notification notification = new NotificationCompat.Builder(this, channel)
+                .setContentTitle("TrackPlayer")
+                .setContentText(
+                        String.format("Service", "TrackPlayer")
+                ).setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setSmallIcon(R.drawable.play).build();
+
+        NotificationManager notificationManager = getApplicationContext().getSystemService(NotificationManager.class);
+        try {
+            notificationManager.notify(Notification_Id, notification);
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
+        }
+        return notification;
+    }
+
     private void onStartForeground() {
         if(!isServiceForeground()) {
-            String channel = Utils.getNotificationChannel((Context) this);
-
-            // Sets the service to foreground with an empty notification
-            startForeground(1, new NotificationCompat.Builder(this, channel).build());
-            // Stops the service right after
+            startForeground(1, getNotification());
             stopSelf();
       }
     }
@@ -100,30 +113,15 @@ public class MusicService extends HeadlessJsTaskService {
         if(Utils.CONNECT_INTENT.equals(intent.getAction())) {
             return new MusicBinder(this, manager);
         }
-
         return super.onBind(intent);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            String channel = Utils.getNotificationChannel((Context) this);
 
-            Notification notification = new NotificationCompat.Builder(this, channel)
-                    .setContentTitle("TrackPlayer")
-                    .setContentText(
-                            String.format("Service", "TrackPlayer")
-                    ).setPriority(NotificationCompat.PRIORITY_HIGH)
-                    .setSmallIcon(R.drawable.play).build();
-
-            NotificationManager notificationManager = getApplicationContext().getSystemService(NotificationManager.class);
-            try {
-                notificationManager.notify(Notification_Id, notification);
-            } catch (NullPointerException npe) {
-                npe.printStackTrace();
-            }
-
-            startForeground(1, notification);
+            startForeground(1, getNotification());
+            stopSelf();
 
             if(intent != null && Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())) {
                 if(manager != null) {
@@ -159,7 +157,6 @@ public class MusicService extends HeadlessJsTaskService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
         destroy();
     }
 
