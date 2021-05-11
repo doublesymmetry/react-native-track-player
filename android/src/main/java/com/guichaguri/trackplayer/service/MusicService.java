@@ -32,9 +32,6 @@ public class MusicService extends HeadlessJsTaskService {
     @Nullable
     @Override
     protected HeadlessJsTaskConfig getTaskConfig(Intent intent) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            return new HeadlessJsTaskConfig("TrackPlayer", Arguments.createMap(), 0, false);
-        }
         return new HeadlessJsTaskConfig("TrackPlayer", Arguments.createMap(), 0, true);
     }
 
