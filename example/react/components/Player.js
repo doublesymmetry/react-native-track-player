@@ -53,9 +53,10 @@ export default function Player(props) {
   useTrackPlayerEvents(["playback-track-changed"], async event => {
     if (event.type === Event.PlaybackTrackChanged) {
       const track = await TrackPlayer.getTrack(event.nextTrack);
-      setTrackTitle(track.title);
-      setTrackArtist(track.artist);
-      setTrackArtwork(track.artwork);
+      const { title, artist, artwork } = track || {};
+      setTrackTitle(title);
+      setTrackArtist(artist);
+      setTrackArtwork(artwork);
     }
   });
 

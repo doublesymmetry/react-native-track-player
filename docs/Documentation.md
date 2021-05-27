@@ -1,7 +1,13 @@
 ---
-title: Documentation
+title: API Documentation
+description: "The API documentation for react-native-track-player"
+nav_order: 3
 permalink: /documentation/
+redirect_from:
+  - /docs/
 ---
+
+# API Documentation
 
 ## Summary
 
@@ -103,7 +109,7 @@ If the player is already initialized, the promise will resolve instantly.
 
 | Param                | Type     | Description   | Default   | Android | iOS | Windows |
 | -------------------- | -------- | ------------- | --------- | :-----: | :-: | :-----: |
-| options              | `object` | The options   | 
+| options              | `object` | The options   |
 | options.minBuffer    | `number` | Minimum time in seconds that needs to be buffered | 15 | ✓ | ✗ | ✗ |
 | options.maxBuffer    | `number` | Maximum time in seconds that needs to be buffered | 50 | ✓ | ✗ | ✗ |
 | options.playBuffer   | `number` | Minimum time in seconds that needs to be buffered to start playing | 2.5 | ✓ | ✗ | ✗ |
@@ -112,6 +118,7 @@ If the player is already initialized, the promise will resolve instantly.
 | options.iosCategory  | `string` | [AVAudioSession.Category](https://developer.apple.com/documentation/avfoundation/avaudiosession/1616615-category) for iOS. Sets on `play()` | `playback` | ✗ | ✓ | ✗ |
 | options.iosCategoryOptions | `array` | [AVAudioSession.CategoryOptions](https://developer.apple.com/documentation/avfoundation/avaudiosession/1616503-categoryoptions) for iOS. Sets on `play()` | `[]` | ✗ | ✓ | ✗ |
 | options.iosCategoryMode  | `string` | [AVAudioSession.Mode](https://developer.apple.com/documentation/avfoundation/avaudiosession/1616508-mode) for iOS. Sets on `play()` | `default` | ✗ | ✓ | ✗ |
+| options.waitForBuffer   | `boolean` | Indicates whether the player should automatically delay playback in order to minimize stalling. If you notice that network media immediately pauses after it buffers, setting this to `true` may help. | false | ✗ | ✓ | ✗ |
 
 #### `destroy()`
 Destroys the player, cleaning up its resources. After executing this function, you won't be able to use the player anymore, unless you call `setupPlayer()` again.
@@ -245,15 +252,17 @@ Some parameters are unused depending on platform.
 | options.capabilities | `array` of [Capability Constants](#capability) | The media controls that will be enabled | ✓ | ✓ | ✓ |
 | options.notificationCapabilities | `array` of [Capability Constants](#capability) | The buttons that it will show in the notification. Defaults to `data.capabilities`  | ✓ | ✗ | ✗ |
 | options.compactCapabilities | `array` of [Capability Constants](#capability) | The buttons that it will show in the compact notification | ✓ | ✗ | ✗ |
-| options.icon | [Resource Object](#resource-object) | The notification icon | ✓ | ✗ | ✗ |
-| options.playIcon | [Resource Object](#resource-object) | The play icon | ✓ | ✗ | ✗ |
-| options.pauseIcon | [Resource Object](#resource-object) | The pause icon | ✓ | ✗ | ✗ |
-| options.stopIcon | [Resource Object](#resource-object) | The stop icon | ✓ | ✗ | ✗ |
-| options.previousIcon | [Resource Object](#resource-object) | The previous icon | ✓ | ✗ | ✗ |
-| options.nextIcon | [Resource Object](#resource-object) | The next icon | ✓ | ✗ | ✗ |
-| options.rewindIcon | [Resource Object](#resource-object) | The jump backward icon | ✓ | ✗ | ✗ |
-| options.forwardIcon | [Resource Object](#resource-object) | The jump forward icon | ✓ | ✗ | ✗ |
+| options.icon | [Resource Object](#resource-object) | The notification icon¹ | ✓ | ✗ | ✗ |
+| options.playIcon | [Resource Object](#resource-object) | The play icon¹ | ✓ | ✗ | ✗ |
+| options.pauseIcon | [Resource Object](#resource-object) | The pause icon¹ | ✓ | ✗ | ✗ |
+| options.stopIcon | [Resource Object](#resource-object) | The stop icon¹ | ✓ | ✗ | ✗ |
+| options.previousIcon | [Resource Object](#resource-object) | The previous icon¹ | ✓ | ✗ | ✗ |
+| options.nextIcon | [Resource Object](#resource-object) | The next icon¹ | ✓ | ✗ | ✗ |
+| options.rewindIcon | [Resource Object](#resource-object) | The jump backward icon¹ | ✓ | ✗ | ✗ |
+| options.forwardIcon | [Resource Object](#resource-object) | The jump forward icon¹ | ✓ | ✗ | ✗ |
 | options.color | `number` | The notification color in an ARGB hex | ✓ | ✗ | ✗ |
+
+*¹ - The custom icons will only work in release builds*
 
 #### `play()`
 Plays or resumes the current track.
@@ -301,7 +310,7 @@ Gets the duration of the current track in seconds.
 Note: `react-native-track-player` is a streaming library, which means it slowly buffers the track and doesn't know exactly when it ends.
 The duration returned by this function is determined through various tricks and *may not be exact or may not be available at all*.
 
-You should **not** trust this function. You should retrieve the duration from a database and feed it to the `duration` parameter in the [Track Object](#track-object).
+You should only trust the result of this function if you included the `duration` property in the [Track Object](#track-object).
 
 **Returns:** `Promise<number>`
 
@@ -404,19 +413,19 @@ Fired when the user presses the jump backward button. Only fired if the `CAPABIL
 | interval | `number` | The number of seconds to jump backward. It's usually the `jumpInterval` set in the options. |
 
 #### `remote-duck`
-Fired when the device needs the player to pause for a interruption.
+Subscribing to this event to handle interruptions ensures that your app’s audio continues behaving gracefully when a phone call arrives, a clock or calendar alarm sounds, or another app plays audio.
 
-The volume may also be lowered on an transient interruption without triggering this event.
-If you want to receive those interruptions, set the `alwaysPauseOnInterruption` option to true.
+On Android, this event is fired when the device needs the player to pause or stop for an interruption and again when the interruption has passed and playback may resume. On iOS this event is fired after playback was already interrupted (meaning pausing playback is unnecessary) and again when playback may resume or to notify that the interruption was permanent.
 
-- When the event is triggered with `permanent` set to true, you should stop the playback.
-- When the event is triggered with `paused` set to true, you should pause the playback. It will also be set to true when `permanent` is true.
-- When the event is triggered and none of them are set to true, you should resume the track.
+On Android, the volume may also be lowered on an transient interruption without triggering this event. If you want to receive those interruptions, set the `alwaysPauseOnInterruption` option to `true`.
+
+- When the event is triggered with `paused` set to `true`, on Android the player should pause playback. When `permanent` is also set to `true`, on Android the player should stop playback.
+- When the event is triggered and `paused` is not set to `true`, the player may resume playback.
 
 | Param     | Type      | Description                                  |
 | --------- | --------- | -------------------------------------------- |
-| paused    | `boolean` | Whether the player should pause the playback |
-| permanent | `boolean` | Whether the player should stop the playback  |
+| paused    | `boolean` | On Android when `true` the player should pause playback, when `false` the player may resume playback. On iOS when `true` the playback was paused and when `false` the player may resume playback. |
+| permanent | `boolean` | Whether the interruption is permanent. On Android the player should stop playback.  |
 
 ### Player
 #### `playback-state`
@@ -511,9 +520,10 @@ For more information about Resource Objects, read the [Images](https://facebook.
 
 ## React Hooks
 
-React v16.8 introduced [hooks](https://reactjs.org/docs/hooks-intro.html). If you are using a version of React Native that is before [v0.59.0](https://facebook.github.io/react-native/blog/2019/03/12/releasing-react-native-059), your React Native version does not support hooks. 
+React v16.8 introduced [hooks](https://reactjs.org/docs/hooks-intro.html). If you are using a version of React Native that is before [v0.59.0](https://facebook.github.io/react-native/blog/2019/03/12/releasing-react-native-059), your React Native version does not support hooks.
 
-#### useTrackPlayerEvents
+#### `useTrackPlayerEvents`
+
 Register an event listener for one or more of the [events](#events) emitted by the TrackPlayer. The subscription is removed when the component unmounts.
 
 Check out the [events section](#events) for a full list of supported events.
@@ -521,7 +531,7 @@ Check out the [events section](#events) for a full list of supported events.
 ```jsx
 import React, { useState } from 'react';
 import { Text, View } from 'react-native';
-import { useTrackPlayerEvent, TrackPlayerEvents, STATE_PLAYING } from 'react-native-track-player';
+import { useTrackPlayerEvents, TrackPlayerEvents, STATE_PLAYING } from 'react-native-track-player';
 
 // Subscribing to the following events inside MyComponent
 const events = [
@@ -530,14 +540,14 @@ const events = [
 ];
 
 const MyComponent = () => {
-  const [playerState, setState] = useState(null)
+  const [playerState, setPlayerState] = useState(null)
 
   useTrackPlayerEvents(events, (event) => {
     if (event.type === TrackPlayerEvents.PLAYBACK_ERROR) {
-      console.warn('An error occurred while playing the current track.');
+      console.warn('An error occured while playing the current track.');
     }
     if (event.type === TrackPlayerEvents.PLAYBACK_STATE) {
-      setState(playbackState)
+      setPlayerState(event.state);
     }
   });
 
@@ -547,7 +557,7 @@ const MyComponent = () => {
     <View>
       <Text>The TrackPlayer is {isPlaying ? 'playing' : 'not playing'}</Text>
     </View>
-  ); 
+  );
 };
 ```
 

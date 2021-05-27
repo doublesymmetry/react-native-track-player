@@ -111,25 +111,28 @@ public class RNTrackPlayer: RCTEventEmitter {
                 return
         }
         if type == .began {
-            // Interruption began, take appropriate actions
+            // Interruption began, take appropriate actions (save state, update user interface)
             self.sendEvent(withName: "remote-duck", body: [
                 "paused": true
                 ])
         }
         else if type == .ended {
-            if let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
-                let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
-                if options.contains(.shouldResume) {
-                    // Interruption Ended - playback should resume
-                    self.sendEvent(withName: "remote-duck", body: [
-                        "paused": false
-                        ])
-                } else {
-                    // Interruption Ended - playback should NOT resume
-                    self.sendEvent(withName: "remote-duck", body: [
-                        "permanent": true
-                        ])
-                }
+            guard let optionsValue =
+                userInfo[AVAudioSessionInterruptionOptionKey] as? UInt else {
+                    return
+            }
+            let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
+            if options.contains(.shouldResume) {
+                // Interruption Ended - playback should resume
+                self.sendEvent(withName: "remote-duck", body: [
+                    "paused": false
+                ])
+            } else {
+                // Interruption Ended - playback should NOT resume
+                self.sendEvent(withName: "remote-duck", body: [
+                    "paused": true,
+                    "permanent": true
+                ])
             }
         }
     }
@@ -174,8 +177,15 @@ public class RNTrackPlayer: RCTEventEmitter {
             sessionCategoryMode = mappedCategoryMode.mapConfigToAVAudioSessionCategoryMode()
         }
         
-        try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, options: sessionCategoryOptions)
-        
+        // Progressively opt into AVAudioSession policies for background audio
+        // and AirPlay 2. 
+        if #available(iOS 13.0, *) {
+            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: .longFormAudio, options: sessionCategoryOptions)
+        } else if #available(iOS 11.0, *) {
+            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: .longForm, options: sessionCategoryOptions)
+        } else {
+            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, options: sessionCategoryOptions)
+        }
         
         // setup event listeners
         player.remoteCommandController.handleChangePlaybackPositionCommand = { [weak self] event in
@@ -268,8 +278,12 @@ public class RNTrackPlayer: RCTEventEmitter {
     
     @objc(updateOptions:resolver:rejecter:)
     public func update(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        let capabilitiesStr = options["capabilities"] as? [String]
-        let capabilities = capabilitiesStr?.compactMap { Capability(rawValue: $0) } ?? []
+
+        var capabilitiesStr = options["capabilities"] as? [String] ?? []
+        if (capabilitiesStr.contains("play") && capabilitiesStr.contains("pause")) {
+            capabilitiesStr.append("togglePlayPause");
+        }
+        let capabilities = capabilitiesStr.compactMap { Capability(rawValue: $0) }
         
         let remoteCommands = capabilities.map { capability in
             capability.mapToPlayerCommand(jumpInterval: options["jumpInterval"] as? NSNumber,
@@ -319,19 +333,20 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(remove:resolver:rejecter:)
     public func remove(tracks ids: [String], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Removing tracks:", ids)
-        var indexesToRemove: [Int] = []
         
-        for id in ids {
-            if let index = player.items.firstIndex(where: { ($0 as! Track).id == id }) {
-                if index == player.currentIndex { return }
-                indexesToRemove.append(index)
+        // Look through queue for tracks that match one of the provided ids.
+        // Do this in reverse order so that as they are removed, 
+        // it will not affect other indices that will be removed.
+        for (index, element) in player.items.enumerated().reversed() {
+            // skip the current index
+            if index == player.currentIndex { continue }
+            
+            let track = element as! Track
+            if ids.contains(track.id) {
+                try? player.removeItem(at: index)
             }
         }
-        
-        for index in indexesToRemove {
-            try? player.removeItem(at: index)
-        }
-        
+
         resolve(NSNull())
     }
     

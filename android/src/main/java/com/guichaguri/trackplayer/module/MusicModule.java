@@ -476,6 +476,10 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @ReactMethod
     public void getState(final Promise callback) {
-        waitForConnection(() -> callback.resolve(binder.getPlayback().getState()));
+        if (binder == null) {
+            callback.resolve(PlaybackStateCompat.STATE_NONE);
+        } else {
+            waitForConnection(() -> callback.resolve(binder.getPlayback().getState()));
+        }
     }
 }

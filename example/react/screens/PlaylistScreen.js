@@ -10,8 +10,12 @@ export default function PlaylistScreen() {
   const playbackState = usePlaybackState();
 
   useEffect(() => {
-    TrackPlayer.setupPlayer();
-    TrackPlayer.updateOptions({
+    setup();
+  }, []);
+
+  async function setup() {
+    await TrackPlayer.setupPlayer({});
+    await TrackPlayer.updateOptions({
       stopWithApp: true,
       capabilities: [
         Capability.Play,
@@ -25,7 +29,7 @@ export default function PlaylistScreen() {
         Capability.Pause
       ]
     });
-  }, []);
+  }
 
   async function togglePlayback() {
     const currentTrack = await TrackPlayer.getCurrentTrack();
@@ -37,7 +41,7 @@ export default function PlaylistScreen() {
         url: localTrack,
         title: "Pure (Demo)",
         artist: "David Chavez",
-        artwork: "https://picsum.photos/200",
+        artwork: "https://i.picsum.photos/id/500/200/200.jpg",
         duration: 28
       });
       await TrackPlayer.play();

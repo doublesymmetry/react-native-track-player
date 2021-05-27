@@ -9,6 +9,7 @@ declare namespace RNTrackPlayer {
     | "playback-error"
     | "playback-queue-ended"
     | "playback-track-changed"
+    | "playback-metadata-received"
     | "remote-play"
     | "remote-play-id"
     | "remote-play-search"
@@ -75,6 +76,7 @@ declare namespace RNTrackPlayer {
     minBuffer?: number;
     maxBuffer?: number;
     playBuffer?: number;
+    backBuffer?: number;
     maxCacheSize?: number;
     iosCategory?: 'playback' | 'playAndRecord' | 'multiRoute' | 'ambient' | 'soloAmbient' | 'record';
     iosCategoryMode?: 'default' | 'gameChat' | 'measurement' | 'moviePlayback' | 'spokenAudio' | 'videoChat' | 'videoRecording' | 'voiceChat' | 'voicePrompt';
@@ -97,6 +99,7 @@ declare namespace RNTrackPlayer {
     dislikeOptions?: FeedbackOptions;
     bookmarkOptions?: FeedbackOptions;
     stopWithApp?: boolean;
+    alwaysPauseOnInterruption?: boolean; // default: false
 
     capabilities?: Capability[];
     notificationCapabilities?: Capability[];
@@ -128,7 +131,7 @@ declare namespace RNTrackPlayer {
   export function removeUpcomingTracks(): Promise<void>;
 
   // Control Center / Notification Metadata Commands
-  export function updateOptions(options: MetadataOptions): void;
+  export function updateOptions(options: MetadataOptions): Promise<void>;
   export function updateMetadataForTrack(id: string, metadata: TrackMetadata) : Promise<void>;
 
   // Player Playback Commands
@@ -201,5 +204,42 @@ declare namespace RNTrackPlayer {
   export const PITCH_ALGORITHM_LINEAR: PitchAlgorithm;
   export const PITCH_ALGORITHM_MUSIC: PitchAlgorithm;
   export const PITCH_ALGORITHM_VOICE: PitchAlgorithm;
+  
+  export const TrackPlayerEvents: {
+    REMOTE_PLAY: EventType;
+    REMOTE_PLAY_ID: EventType;
+    REMOTE_PLAY_SEARCH: EventType;
+    REMOTE_PAUSE: EventType;
+    REMOTE_STOP: EventType;
+    REMOTE_SKIP: EventType;
+    REMOTE_NEXT: EventType;
+    REMOTE_PREVIOUS: EventType;
+    REMOTE_SEEK: EventType;
+    REMOTE_SET_RATING: EventType;
+    REMOTE_JUMP_FORWARD: EventType;
+    REMOTE_JUMP_BACKWARD: EventType;
+    REMOTE_DUCK: EventType;
+    REMOTE_LIKE: EventType;
+    REMOTE_DISLIKE: EventType;
+    REMOTE_BOOKMARK: EventType;
+    PLAYBACK_STATE: EventType;
+    PLAYBACK_TRACK_CHANGED: EventType;
+    PLAYBACK_QUEUE_ENDED: EventType;
+    PLAYBACK_ERROR: EventType;
+    PLAYBACK_METADATA_RECEIVED: EventType;
+  };
 
+  // Hooks
+  export function usePlaybackState(): State;
+  export function useTrackPlayerEvents(
+    events: string[],
+    handler: (event: any) => void
+  ): void;
+  export function useInterval(callback: () => void, delay: number): void;
+  export function useWhenPlaybackStateChanges(callback: () => void): void;
+  export function usePlaybackStateIs(...states: State[]): boolean;
+  export function useTrackPlayerProgress(
+    interval?: number,
+    pollTrackPlayerStates?: State[],
+  ): ProgressComponentState;
 }

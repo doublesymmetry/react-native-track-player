@@ -2,7 +2,7 @@ import groovy.json.JsonSlurper
 
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
         google()
     }
     dependencies {
@@ -35,7 +35,7 @@ android {
 
         versionCode 1
         versionName "1.0"
-        
+
         consumerProguardFiles 'proguard-rules.txt'
     }
 
@@ -52,9 +52,8 @@ repositories {
         url "../node_modules/react-native/android"
     }
 
-    jcenter()
-    google()
     mavenCentral()
+    google()
 }
 
 dependencies {
