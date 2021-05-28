@@ -53,7 +53,7 @@ public class MusicBinder extends Binder {
         MetadataManager metadata = manager.getMetadata();
 
         // TODO elapsedTime
-        metadata.updateMetadata(nowPlaying);
+        metadata.updateMetadata(getPlayback(), nowPlaying);
         metadata.setActive(true);
     }
 
