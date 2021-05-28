@@ -63,7 +63,7 @@ public class Track extends TrackMetadata {
     public final long queueId;
 
     public Track(Context context, Bundle bundle, int ratingType) {
-        id = bundle.getString("id");
+        id = bundle.getString("id", null);
 
         resourceId = Utils.getRawResourceId(context, bundle, "url");
 
@@ -112,7 +112,10 @@ public class Track extends TrackMetadata {
         MediaMetadataCompat.Builder builder = super.toMediaMetadata();
 
         builder.putString(METADATA_KEY_MEDIA_URI, uri.toString());
-        builder.putString(METADATA_KEY_MEDIA_ID, id);
+
+        if (id != null) {
+            builder.putString(METADATA_KEY_MEDIA_ID, id);
+        }
 
         return builder;
     }

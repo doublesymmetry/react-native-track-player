@@ -203,13 +203,13 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
 
     @Override
     public void reset() {
-        Track track = getCurrentTrack();
+        Integer track = getCurrentTrackIndex();
         long position = player.getCurrentPosition();
 
         super.reset();
         resetQueue();
 
-        manager.onTrackUpdate(track, position, null);
+        manager.onTrackUpdate(track, position, null, null);
     }
 
     @Override

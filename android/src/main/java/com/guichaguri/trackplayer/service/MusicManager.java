@@ -212,16 +212,16 @@ public class MusicManager implements OnAudioFocusChangeListener {
             metadata.updatePlayback(playback);
     }
 
-    public void onTrackUpdate(Track previous, long prevPos, Track next) {
+    public void onTrackUpdate(Integer prevIndex, long prevPos, Integer nextIndex, Track next) {
         Log.d(Utils.LOG, "onTrackUpdate");
 
         if(playback.shouldAutoUpdateMetadata() && next != null)
             metadata.updateMetadata(playback, next);
 
         Bundle bundle = new Bundle();
-        bundle.putString("track", previous != null ? previous.id : null);
+        if (prevIndex != null) bundle.putInt("track", prevIndex);
         bundle.putDouble("position", Utils.toSeconds(prevPos));
-        bundle.putString("nextTrack", next != null ? next.id : null);
+        if (nextIndex != null) bundle.putInt("nextTrack", nextIndex);
         service.emit(MusicEvents.PLAYBACK_TRACK_CHANGED, bundle);
     }
 
@@ -229,11 +229,11 @@ public class MusicManager implements OnAudioFocusChangeListener {
         metadata.removeNotifications();
     }
 
-    public void onEnd(Track previous, long prevPos) {
+    public void onEnd(Integer previousIndex, long prevPos) {
         Log.d(Utils.LOG, "onEnd");
 
         Bundle bundle = new Bundle();
-        bundle.putString("track", previous != null ? previous.id : null);
+        if (previousIndex != null) bundle.putInt("track", previousIndex);
         bundle.putDouble("position", Utils.toSeconds(prevPos));
         service.emit(MusicEvents.PLAYBACK_QUEUE_ENDED, bundle);
     }
