@@ -142,6 +142,12 @@ export enum TrackType {
   SmoothStreaming = 'smoothstreaming',
 }
 
+export enum RepeatMode {
+  Off = TrackPlayer.REPEAT_MODE_OFF,
+  Track = TrackPlayer.REPEAT_MODE_TRACK,
+  Queue = TrackPlayer.REPEAT_MODE_QUEUE,
+}
+
 export enum PitchAlgorithm {
   Linear = TrackPlayer.PITCH_ALGORITHM_LINEAR,
   Music = TrackPlayer.PITCH_ALGORITHM_MUSIC,
@@ -175,7 +181,6 @@ export interface NowPlayingMetadata extends TrackMetadataBase {
 }
 
 export interface Track extends TrackMetadataBase {
-  id: string
   url: string | ResourceObject
   type?: TrackType
   userAgent?: string
