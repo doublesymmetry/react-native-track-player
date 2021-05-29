@@ -69,7 +69,8 @@ async function add(tracks: Track | Track[], insertBeforeIndex?: number): Promise
     tracks[i].artwork = resolveImportedPath(tracks[i].artwork)
   }
 
-  return TrackPlayer.add(tracks, insertBeforeIndex)
+  // Note: we must be careful about passing nulls to non nullable parameters on Android.
+  return TrackPlayer.add(tracks, insertBeforeIndex || 0)
 }
 
 async function move(index: number, newIndex: number) {
