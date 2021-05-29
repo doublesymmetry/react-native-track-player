@@ -14,12 +14,9 @@ import MediaPlayer
 public class QueuedAudioPlayer: AudioPlayer {
     
     let queueManager: QueueManager = QueueManager<AudioItem>()
-    
-    /**
-     Set wether the player should automatically play the next song when a song is finished.
-     Default is `true`.
-     */
-    public var automaticallyPlayNextSong: Bool = true
+
+    /// The repeat mode for the queue player.
+    public var repeatMode: RepeatMode = .off
     
     public override var currentItem: AudioItem? {
         return queueManager.current
@@ -185,9 +182,20 @@ public class QueuedAudioPlayer: AudioPlayer {
     
     override func AVWrapperItemDidPlayToEndTime() {
         super.AVWrapperItemDidPlayToEndTime()
-        if automaticallyPlayNextSong {
-            try? self.next()
+
+        switch repeatMode {
+        case .off: try? self.next()
+        case .track:
+            seek(to: 0)
+            play()
+        case .queue:
+            do {
+                try self.next()
+            } catch APError.QueueError.noNextItem {
+                do {
+                    try jumpToItem(atIndex: 0, playWhenReady: true)
+                } catch { /* TODO: handle possible errors from load */ }
+            } catch { /* TODO: handle possible errors from load */ }
         }
     }
-    
 }
