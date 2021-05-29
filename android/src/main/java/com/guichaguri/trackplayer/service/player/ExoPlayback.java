@@ -83,29 +83,27 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
             manager.getMetadata().updateMetadata(this, track);
     }
 
+    public Integer getCurrentTrackIndex() {
+        int index = player.getCurrentWindowIndex();
+        return index < 0 || index >= queue.size() ? null : index;
+    }
+
     public Track getCurrentTrack() {
         int index = player.getCurrentWindowIndex();
         return index < 0 || index >= queue.size() ? null : queue.get(index);
     }
 
-    public void skip(String id, Promise promise) {
-        if(id == null || id.isEmpty()) {
-            promise.reject("invalid_id", "The ID can't be null or empty");
+    public void skip(int index, Promise promise) {
+        if(index < 0 || index >= queue.size()) {
+            promise.reject("index_out_of_bounds", "The index is out of bounds");
             return;
         }
 
-        for(int i = 0; i < queue.size(); i++) {
-            if(id.equals(queue.get(i).id)) {
-                lastKnownWindow = player.getCurrentWindowIndex();
-                lastKnownPosition = player.getCurrentPosition();
+        lastKnownWindow = player.getCurrentWindowIndex();
+        lastKnownPosition = player.getCurrentPosition();
 
-                player.seekToDefaultPosition(i);
-                promise.resolve(null);
-                return;
-            }
-        }
-
-        promise.reject("track_not_in_queue", "Given track ID was not found in queue");
+        player.seekToDefaultPosition(index);
+        promise.resolve(null);
     }
 
     public void skipToPrevious(Promise promise) {
@@ -255,8 +253,9 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
         Log.d(Utils.LOG, "onPositionDiscontinuity: " + reason);
 
         if(lastKnownWindow != player.getCurrentWindowIndex()) {
-            Track previous = lastKnownWindow == C.INDEX_UNSET || lastKnownWindow >= queue.size() ? null : queue.get(lastKnownWindow);
-            Track next = getCurrentTrack();
+            Integer prevIndex = lastKnownWindow == C.INDEX_UNSET ? null : lastKnownWindow;
+            Integer nextIndex = getCurrentTrackIndex();
+            Track next = nextIndex == null ? null : queue.get(nextIndex);
 
             // Track changed because it ended
             // We'll use its duration instead of the last known position
@@ -266,7 +265,7 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
                 if(duration != C.TIME_UNSET) lastKnownPosition = duration;
             }
 
-            manager.onTrackUpdate(previous, lastKnownPosition, next);
+            manager.onTrackUpdate(prevIndex, lastKnownPosition, nextIndex, next);
         }
 
         lastKnownWindow = player.getCurrentWindowIndex();
@@ -314,22 +313,12 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
             previousState = state;
 
             if(state == PlaybackStateCompat.STATE_STOPPED) {
-                Track previous = getCurrentTrack();
+                Integer previous = getCurrentTrackIndex();
                 long position = getPosition();
-                manager.onTrackUpdate(previous, position, null);
-                manager.onEnd(previous, position);
+                manager.onTrackUpdate(previous, position, null, null);
+                manager.onEnd(getCurrentTrackIndex(), getPosition());
             }
         }
-    }
-
-    @Override
-    public void onRepeatModeChanged(int repeatMode) {
-        // Repeat mode update
-    }
-
-    @Override
-    public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
-        // Shuffle mode update
     }
 
     @Override

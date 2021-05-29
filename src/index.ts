@@ -49,7 +49,7 @@ function addEventListener(event: Event, listener: (data: any) => void) {
 
 // MARK: - Queue API
 
-async function add(tracks: Track | Track[], insertBeforeId?: string): Promise<void> {
+async function add(tracks: Track | Track[], insertBeforeIndex?: number): Promise<void> {
   // Clone the array before modifying it
   if (Array.isArray(tracks)) {
     tracks = [...tracks]
@@ -66,15 +66,13 @@ async function add(tracks: Track | Track[], insertBeforeId?: string): Promise<vo
     // Resolve the URLs
     tracks[i].url = resolveImportedPath(tracks[i].url)
     tracks[i].artwork = resolveImportedPath(tracks[i].artwork)
-
-    // Cast ID's into strings
-    tracks[i].id = `${tracks[i].id}`
   }
 
-  return TrackPlayer.add(tracks, insertBeforeId)
+  // Note: we must be careful about passing nulls to non nullable parameters on Android.
+  return TrackPlayer.add(tracks, insertBeforeIndex || -1)
 }
 
-async function remove(tracks: string | string[]): Promise<void> {
+async function remove(tracks: number | number[]): Promise<void> {
   if (!Array.isArray(tracks)) {
     tracks = [tracks]
   }
@@ -86,8 +84,8 @@ async function removeUpcomingTracks(): Promise<void> {
   return TrackPlayer.removeUpcomingTracks()
 }
 
-async function skip(trackId: string): Promise<void> {
-  return TrackPlayer.skip(trackId)
+async function skip(trackIndex: number): Promise<void> {
+  return TrackPlayer.skip(trackIndex)
 }
 
 async function skipToNext(): Promise<void> {
@@ -116,8 +114,8 @@ async function updateOptions(options: MetadataOptions = {}): Promise<void> {
   return TrackPlayer.updateOptions(options)
 }
 
-async function updateMetadataForTrack(trackId: string, metadata: TrackMetadataBase): Promise<void> {
-  return TrackPlayer.updateMetadataForTrack(trackId, metadata)
+async function updateMetadataForTrack(trackIndex: number, metadata: TrackMetadataBase): Promise<void> {
+  return TrackPlayer.updateMetadataForTrack(trackIndex, metadata)
 }
 
 function clearNowPlayingMetadata(): Promise<void> {
@@ -128,7 +126,7 @@ function updateNowPlayingMetadata(metadata: NowPlayingMetadata): Promise<void> {
   return TrackPlayer.updateNowPlayingMetadata(metadata)
 }
 
-// MARK: - Playback API
+// MARK: - Player API
 
 async function reset(): Promise<void> {
   return TrackPlayer.reset()
@@ -168,15 +166,15 @@ async function getRate(): Promise<number> {
   return TrackPlayer.getRate()
 }
 
-async function getTrack(trackId: string): Promise<Track> {
-  return TrackPlayer.getTrack(trackId)
+async function getTrack(trackIndex: number): Promise<Track> {
+  return TrackPlayer.getTrack(trackIndex)
 }
 
 async function getQueue(): Promise<Track[]> {
   return TrackPlayer.getQueue()
 }
 
-async function getCurrentTrack(): Promise<string> {
+async function getCurrentTrack(): Promise<number> {
   return TrackPlayer.getCurrentTrack()
 }
 
@@ -220,7 +218,7 @@ export default {
   clearNowPlayingMetadata,
   updateNowPlayingMetadata,
 
-  // MARK: - Playback API
+  // MARK: - Player API
   reset,
   play,
   pause,

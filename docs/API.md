@@ -41,8 +41,7 @@ You can add a track to the player using a url or by requiring a file in the app 
 First of all, you need to create a [track object](https://react-native-kit.github.io/react-native-track-player/documentation/#track-object), which is a plain javascript object with a number of properties describing the track. Then [add](https://react-native-kit.github.io/react-native-track-player/documentation/#addtracks-insertbeforeid) the track to the queue:
 
 ```javascript
-const track1 = {
-    id: 'avaritia', // Must be a string, required
+var track = {
     url: 'http://example.com/avaritia.mp3', // Load media from the network
     title: 'Avaritia',
     artist: 'deadmau5',
@@ -72,7 +71,7 @@ const track3 = {
     duration: 411
 };
 
-// Add the tracks to the queue:
+// You can then [add](https://react-native-kit.github.io/react-native-track-player/documentation/#addtracks-insertbeforeindex) the items to the queue
 await TrackPlayer.add([track1, track2, track3]);
 ```
 
@@ -84,8 +83,8 @@ if (state === TrackPlayer.STATE_PLAYING) {
     console.log('The player is playing');
 };
 
-const trackId = await TrackPlayer.getCurrentTrack();
-const trackObject = await TrackPlayer.getTrack(trackId);
+let trackIndex = await TrackPlayer.getCurrentTrack();
+let trackObject = await TrackPlayer.getTrack(trackIndex);
 console.log(`Title: ${trackObject.title}`);
 
 const position = await TrackPlayer.getPosition();
@@ -110,8 +109,8 @@ TrackPlayer.setVolume(0.5);
 
 ### Controlling the Queue
 ```javascript
-// Skip to a specific track id:
-await TrackPlayer.skip('the-track-id');
+// Skip to a specific track index:
+await TrackPlayer.skip(trackIndex);
 
 // Skip to the next track in the queue:
 await TrackPlayer.skipToNext();
@@ -120,7 +119,7 @@ await TrackPlayer.skipToNext();
 await TrackPlayer.skipToPrevious();
 
 // Remove two tracks from the queue:
-await TrackPlayer.remove([trackId1, trackId2]);
+await TrackPlayer.remove([trackIndex1, trackIndex2]);
 
 // Retrieve the track objects in the queue:
 const tracks = await TrackPlayer.getQueue();

@@ -298,7 +298,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     }
     
     @objc(add:before:resolver:rejecter:)
-    public func add(trackDicts: [[String: Any]], before trackId: String?, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+    public func add(trackDicts: [[String: Any]], before trackIndex: NSNumber, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             UIApplication.shared.beginReceivingRemoteControlEvents();
         }
@@ -312,39 +312,26 @@ public class RNTrackPlayer: RCTEventEmitter {
             
             tracks.append(track)
         }
-        
-        print("Adding tracks:", tracks)
-        
-        if let trackId = trackId {
-            guard let insertIndex = player.items.firstIndex(where: { ($0 as! Track).id == trackId })
-                else {
-                    reject("track_not_in_queue", "Given track ID was not found in queue", nil)
-                    return
-            }
-            
-            try? player.add(items: tracks, at: insertIndex)
+
+        if (trackIndex.intValue > player.items.count) {
+            reject("index_out_of_bounds", "The track index is out of bounds", nil)
+        } else if trackIndex.intValue == -1 { // -1 means no index was passed and therefore should be inserted at the end.
+            try? player.add(items: tracks)
         } else {
-            try? player.add(items: tracks, playWhenReady: false)
+            try? player.add(items: tracks, at: trackIndex.intValue)
         }
         
         resolve(NSNull())
     }
     
     @objc(remove:resolver:rejecter:)
-    public func remove(tracks ids: [String], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        print("Removing tracks:", ids)
-        
-        // Look through queue for tracks that match one of the provided ids.
-        // Do this in reverse order so that as they are removed, 
-        // it will not affect other indices that will be removed.
-        for (index, element) in player.items.enumerated().reversed() {
-            // skip the current index
+    public func remove(tracks indexes: [Int], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        print("Removing tracks:", indexes)
+
+        for index in indexes {
+            // we do not allow removal of the current item
             if index == player.currentIndex { continue }
-            
-            let track = element as! Track
-            if ids.contains(track.id) {
-                try? player.removeItem(at: index)
-            }
+            try? player.removeItem(at: index)
         }
 
         resolve(NSNull())
@@ -358,15 +345,14 @@ public class RNTrackPlayer: RCTEventEmitter {
     }
     
     @objc(skip:resolver:rejecter:)
-    public func skip(to trackId: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        guard let trackIndex = player.items.firstIndex(where: { ($0 as! Track).id == trackId })
-            else {
-                reject("track_not_in_queue", "Given track ID was not found in queue", nil)
-                return
+    public func skip(to trackIndex: NSNumber, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        if (trackIndex.intValue < 0 || trackIndex.intValue > player.items.count) {
+            reject("index_out_of_bounds", "The track index is out of bounds", nil)
+            return
         }
         
-        print("Skipping to track:", trackId)
-        try? player.jumpToItem(atIndex: trackIndex, playWhenReady: player.playerState == .playing)
+        print("Skipping to track:", trackIndex)
+        try? player.jumpToItem(atIndex: trackIndex.intValue, playWhenReady: player.playerState == .playing)
         resolve(NSNull())
     }
     
@@ -458,13 +444,13 @@ public class RNTrackPlayer: RCTEventEmitter {
     }
     
     @objc(getTrack:resolver:rejecter:)
-    public func getTrack(id: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        guard let track = player.items.first(where: { ($0 as! Track).id == id })
-            else {
-                reject("track_not_in_queue", "Given track ID was not found in queue", nil)
-                return
+    public func getTrack(index: NSNumber, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        if (index.intValue < 0 || index.intValue > player.items.count) {
+            reject("index_out_of_bounds", "The track index is out of bounds", nil)
+            return
         }
-        
+
+        let track = player.items[index.intValue]
         resolve((track as? Track)?.toObject())
     }
     
@@ -476,7 +462,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     
     @objc(getCurrentTrack:rejecter:)
     public func getCurrentTrack(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        resolve((player.currentItem as? Track)?.id)
+        resolve(player.currentIndex)
     }
     
     @objc(getDuration:rejecter:)
@@ -500,17 +486,19 @@ public class RNTrackPlayer: RCTEventEmitter {
     }
     
     @objc(updateMetadataForTrack:metadata:resolver:rejecter:)
-    public func updateMetadata(for trackId: String, metadata: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        guard let track = player.items.first(where: { ($0 as! Track).id == trackId }) as? Track
-            else {
-                reject("track_not_in_queue", "Given track ID was not found in queue", nil)
-                return
+    public func updateMetadata(for trackIndex: NSNumber, metadata: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        if (trackIndex.intValue < 0 || trackIndex.intValue > player.items.count) {
+            reject("index_out_of_bounds", "The track index is out of bounds", nil)
+            return
         }
-        
+
+        let track = player.items[trackIndex.intValue] as! Track
         track.updateMetadata(dictionary: metadata)
-        if (player.currentItem as! Track).id == track.id {
+
+        if (player.currentIndex == trackIndex.intValue) {
             Metadata.update(for: player, with: metadata)
         }
+
         resolve(NSNull())
     }
     

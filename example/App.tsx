@@ -39,7 +39,6 @@ const setup = async () => {
 
   await TrackPlayer.add(playlistData);
   await TrackPlayer.add({
-    id: 'local-track',
     url: localTrack,
     title: 'Pure (Demo)',
     artist: 'David Chavez',
@@ -74,7 +73,7 @@ const App = () => {
   const [trackArtist, setTrackArtist] = useState<string>();
 
   useTrackPlayerEvents([Event.PlaybackTrackChanged], async event => {
-    if (event.type === Event.PlaybackTrackChanged) {
+    if (event.type === Event.PlaybackTrackChanged && event.nextTrack != null) {
       const track = await TrackPlayer.getTrack(event.nextTrack);
       const {title, artist, artwork} = track || {};
       setTrackTitle(title);
@@ -82,6 +81,7 @@ const App = () => {
       setTrackArtwork(artwork);
     }
   });
+
   useEffect(() => {
     setup();
   }, []);

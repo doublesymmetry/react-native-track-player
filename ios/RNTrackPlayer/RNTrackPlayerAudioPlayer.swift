@@ -22,28 +22,13 @@ import MediaPlayer
 * lock screen controls.
 */
 
-public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer {
+public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer, QueueManagerDelegate {
 
 	public var reactEventEmitter: RCTEventEmitter
 
 	// Used to store the rate that is given in TrackPlayer.setRate() so that we
 	// can maintain the same rate in cases when SwiftAudio would not.
 	private var _rate: Float
-
-	// Override _currentItem so that we can send an event when it changes.
-	override var _currentItem: AudioItem? {
-		willSet(newCurrentItem) {
-			if ((newCurrentItem as? Track) === (_currentItem as? Track)) {
-				return
-			}
-
-			self.reactEventEmitter.sendEvent(withName: "playback-track-changed", body: [
-				"track": (_currentItem as? Track)?.id ?? nil,
-				"position": self.currentTime,
-				"nextTrack": (newCurrentItem as? Track)?.id ?? nil,
-				])
-		}
-	}
 
 	// Override rate so that we can maintain the same rate on future tracks.
 	override public var rate: Float {
@@ -63,6 +48,12 @@ public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer {
         self._rate = 1.0
 		self.reactEventEmitter = reactEventEmitter
 		super.init()
+        self.queueManager.delegate = self
+    }
+
+    public override func stop() {
+        super.stop()
+        onTrackUpdate(previousIndex: currentIndex, nextIndex: nil)
     }
 
 	// MARK: - AVPlayerWrapperDelegate
@@ -86,19 +77,12 @@ public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer {
     }
     
     override func AVWrapperItemDidPlayToEndTime() {
+        // fire an event for the queue ending
         if self.nextItems.count == 0 {
-			// For consistency sake, send an event for the track changing to nothing
-			self.reactEventEmitter.sendEvent(withName: "playback-track-changed", body: [
-				"track": (self.currentItem as? Track)?.id ?? nil,
-				"position": self.currentTime,
-				"nextTrack": nil,
-				])
-
-			// fire an event for the queue ending
-			self.reactEventEmitter.sendEvent(withName: "playback-queue-ended", body: [
-				"track": (self.currentItem as? Track)?.id,
-				"position": self.currentTime,
-				])
+            self.reactEventEmitter.sendEvent(withName: "playback-queue-ended", body: [
+                "track": currentIndex,
+                "position": currentTime,
+            ])
 		} 
 		super.AVWrapperItemDidPlayToEndTime()
     }
@@ -125,5 +109,25 @@ public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer {
 			// RNTrackPlayer.updateOptions()
 			// self.enableRemoteCommands(remoteCommands)
         }
+    }
+
+    // MARK: - Private Helpers
+
+    private func onTrackUpdate(previousIndex: Int?, nextIndex: Int?) {
+        reactEventEmitter.sendEvent(withName: "playback-track-changed", body: [
+            "track": previousIndex,
+            "position": currentTime,
+            "nextTrack": nextIndex,
+        ])
+    }
+
+    // MARK: - QueueManagerDelegate
+
+    func onCurrentIndexChanged(oldIndex: Int, newIndex: Int) {
+        onTrackUpdate(previousIndex: oldIndex, nextIndex: newIndex)
+    }
+
+    func onReceivedFirstItem() {
+        onTrackUpdate(previousIndex: nil, nextIndex: 0)
     }
 }
