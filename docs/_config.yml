@@ -5,7 +5,7 @@ logo: "/assets/optimized-logo.svg"
 gh_edit_link: true
 gh_edit_link_text: "Improve this page"
 gh_edit_repository: "https://github.com/react-native-kit/react-native-track-player"
-gh_edit_branch: "dev"
+gh_edit_branch: "main"
 gh_edit_view_mode: "edit"
 
 aux_links:
