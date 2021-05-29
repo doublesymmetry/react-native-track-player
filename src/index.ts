@@ -70,7 +70,7 @@ async function add(tracks: Track | Track[], insertBeforeIndex?: number): Promise
   }
 
   // Note: we must be careful about passing nulls to non nullable parameters on Android.
-  return TrackPlayer.add(tracks, insertBeforeIndex || 0)
+  return TrackPlayer.add(tracks, insertBeforeIndex || -1)
 }
 
 async function move(index: number, newIndex: number) {

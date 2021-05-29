@@ -210,7 +210,8 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
             }
 
             List<Track> queue = binder.getPlayback().getQueue();
-            int index = insertBeforeIndex != null ? insertBeforeIndex : queue.size();
+            // -1 means no index was passed and therefore should be inserted at the end.
+            int index = insertBeforeIndex != -1 ? insertBeforeIndex : queue.size();
 
             if(index < 0 || index > queue.size()) {
                 callback.reject("index_out_of_bounds", "The track index is out of bounds");
@@ -234,6 +235,10 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
 
             for(Object o : trackList) {
                 int index = o instanceof Integer ? (int)o : Integer.parseInt(o.toString());
+
+                // we do not allow removal of the current item
+                int currentIndex = binder.getPlayback().getCurrentTrackIndex();
+                if (index == currentIndex) continue;
 
                 if (index >= 0 && index < queue.size()) {
                     indexes.add(index);
