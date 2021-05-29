@@ -12,6 +12,10 @@ jobs:
           node-version: '12.18.3'
       - name: Install Yarn
         run: npm install --global yarn
+      - name: Install Library Dependencies
+        run: yarn install
+      - name: Build Library
+        run: yarn build
       - name: Install Mobile Dependencies
         run: |-
           cd example
@@ -37,13 +41,25 @@ jobs:
           node-version: '12.18.3'
       - name: Install Yarn
         run: npm install --global yarn
+      - name: Install Library Dependencies
+        run: yarn install
+      - name: Build Library
+        run: yarn build
       - name: Install Mobile Dependencies
         run: |-
           cd example
           yarn install
+      - name: Bundler
+        run: |-
+          cd example/ios
+          bundle install
+      - name: Cococapods
+        run: |-
+          cd example/ios
+          bundle exec pod install
       - name: Build App
         run: |-
           cd example/ios
-          xcodebuild build -scheme example -destination "${destination}"
+          xcodebuild build -workspace example.xcworkspace -scheme example -destination "${destination}"
         env:
           destination: ${{ matrix.destination }}
