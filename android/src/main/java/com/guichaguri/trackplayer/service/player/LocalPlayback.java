@@ -124,12 +124,6 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     }
 
     @Override
-    public void move(int index, int newIndex, Promise promise) {
-        Collections.swap(queue, index, newIndex);
-        source.moveMediaSource(index, newIndex, manager.getHandler(), Utils.toRunnable(promise));
-    }
-
-    @Override
     public void removeUpcomingTracks() {
         int currentIndex = player.getCurrentWindowIndex();
         if (currentIndex == C.INDEX_UNSET) return;

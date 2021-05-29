@@ -177,16 +177,6 @@ Removes one or more tracks from the queue.
 | ------ | -------- | ------------- |
 | tracks | `array` of track indexes or a single one | The tracks that will be removed |
 
-#### `move(index, newIndex)`
-Moves a track to a new position.
-
-**Returns:** `Promise`
-
-| Param    | Type     | Description     |
-| -------- | -------- | --------------- |
-| index    | `number` | The track index |
-| newIndex | `number` | Its new index   |
-
 #### `skip(index)`
 Skips to a track in the queue.
 

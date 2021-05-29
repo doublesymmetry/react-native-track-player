@@ -72,10 +72,6 @@ async function add(tracks: Track | Track[], insertBeforeIndex?: number): Promise
   return TrackPlayer.add(tracks, insertBeforeIndex || -1)
 }
 
-async function move(index: number, newIndex: number) {
-  return TrackPlayer.move(index, newIndex)
-}
-
 async function remove(tracks: number | number[]): Promise<void> {
   if (!Array.isArray(tracks)) {
     tracks = [tracks]
@@ -210,7 +206,6 @@ export default {
 
   // MARK: - Queue API
   add,
-  move,
   remove,
   removeUpcomingTracks,
   skip,

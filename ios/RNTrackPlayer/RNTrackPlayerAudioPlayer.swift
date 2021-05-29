@@ -51,6 +51,11 @@ public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer, QueueManagerDelegate {
         self.queueManager.delegate = self
     }
 
+    public override func stop() {
+        super.stop()
+        onTrackUpdate(previousIndex: currentIndex, nextIndex: nil)
+    }
+
 	// MARK: - AVPlayerWrapperDelegate
     
     override func AVWrapper(didChangeState state: AVPlayerWrapperState) {
