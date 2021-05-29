@@ -1,0 +1,65 @@
+name: platform-validation
+on: [push]
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12.18.3'
+      - name: Install Yarn
+        run: npm install --global yarn
+      - name: Install Library Dependencies
+        run: yarn install
+      - name: Build Library
+        run: yarn build
+      - name: Install Mobile Dependencies
+        run: |-
+          cd example
+          yarn install
+      - name: Build App
+        run: |-
+          cd example/android
+          ./gradlew :app:assembleDebug
+  build-ios:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        destination:
+          [
+            'platform=iOS Simulator,name=iPhone 12 Pro',
+          ]
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12.18.3'
+      - name: Install Yarn
+        run: npm install --global yarn
+      - name: Install Library Dependencies
+        run: yarn install
+      - name: Build Library
+        run: yarn build
+      - name: Install Mobile Dependencies
+        run: |-
+          cd example
+          yarn install
+      - name: Bundler
+        run: |-
+          cd example/ios
+          bundle install
+      - name: Cococapods
+        run: |-
+          cd example/ios
+          bundle exec pod install
+      - name: Build App
+        run: |-
+          cd example/ios
+          xcodebuild build -workspace example.xcworkspace -scheme example -destination "${destination}"
+        env:
+          destination: ${{ matrix.destination }}
