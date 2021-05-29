@@ -70,10 +70,9 @@ public class RNTrackPlayer: RCTEventEmitter {
             "CAPABILITY_DISLIKE": Capability.dislike.rawValue,
             "CAPABILITY_BOOKMARK": Capability.bookmark.rawValue,
 
-            // TODO: Tie this to actual values on the audio player.
-            "REPEAT_OFF": 0,
-            "REPEAT_TRACK": 1,
-            "REPEAT_QUEUE": 2,
+            "REPEAT_OFF": RepeatMode.off.rawValue,
+            "REPEAT_TRACK": RepeatMode.track.rawValue,
+            "REPEAT_QUEUE": RepeatMode.queue.rawValue,
         ]
     }
     
@@ -420,6 +419,18 @@ public class RNTrackPlayer: RCTEventEmitter {
         print("Seeking to \(time) seconds")
         player.seek(to: time)
         resolve(NSNull())
+    }
+
+    @objc(setRepeatMode:resolver:rejecter:)
+    public func setRepeatMode(repeatMode: NSNumber, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        player.repeatMode = RepeatMode(rawValue: repeatMode.intValue) ?? .off
+        resolve(NSNull())
+    }
+
+    @objc(getRepeatMode:rejecter:)
+    public func getRepeatMode(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        print("Getting current repeatMode")
+        resolve(player.repeatMode.rawValue)
     }
     
     @objc(setVolume:resolver:rejecter:)

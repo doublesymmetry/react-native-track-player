@@ -143,9 +143,9 @@ export enum TrackType {
 }
 
 export enum RepeatMode {
-  Off = TrackPlayer.REPEAT_MODE_OFF,
-  Track = TrackPlayer.REPEAT_MODE_TRACK,
-  Queue = TrackPlayer.REPEAT_MODE_QUEUE,
+  Off = TrackPlayer.REPEAT_OFF,
+  Track = TrackPlayer.REPEAT_TRACK,
+  Queue = TrackPlayer.REPEAT_QUEUE,
 }
 
 export enum PitchAlgorithm {
