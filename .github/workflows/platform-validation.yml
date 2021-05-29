@@ -12,10 +12,6 @@ jobs:
           node-version: '12.18.3'
       - name: Install Yarn
         run: npm install --global yarn
-      - name: Install Library Dependencies
-        run: yarn install
-      - name: Build Library
-        run: yarn build
       - name: Install Mobile Dependencies
         run: |-
           cd example
@@ -41,10 +37,6 @@ jobs:
           node-version: '12.18.3'
       - name: Install Yarn
         run: npm install --global yarn
-      - name: Install Library Dependencies
-        run: yarn install
-      - name: Build Library
-        run: yarn build
       - name: Install Mobile Dependencies
         run: |-
           cd example
