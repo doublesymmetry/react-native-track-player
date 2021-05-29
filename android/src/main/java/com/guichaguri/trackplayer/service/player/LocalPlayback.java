@@ -11,7 +11,6 @@ import com.google.android.exoplayer2.database.DatabaseProvider;
 import com.google.android.exoplayer2.database.ExoDatabaseProvider;
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.ShuffleOrder;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
@@ -139,42 +138,6 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
             queue.remove(i);
             source.removeMediaSource(i);
         }
-    }
-
-    @Override
-    public void shuffle(final Promise promise) {
-        Random rand = new Random();
-        int startIndex = player.getCurrentWindowIndex();
-        int length = queue.size();
-
-        if (startIndex == C.INDEX_UNSET) {
-            startIndex = 0;
-        } else {
-            startIndex++;
-        }
-
-        // Fisher-Yates shuffle
-        for (int i = startIndex; i < length; i++) {
-            int swapIndex = rand.nextInt(i + 1 - startIndex) + startIndex;
-
-            Collections.swap(queue, i, swapIndex);
-
-            if (length - 1 == i) {
-                // Resolve the promise after the last move command
-                source.moveMediaSource(i, swapIndex, manager.getHandler(), Utils.toRunnable(promise));
-            } else {
-                source.moveMediaSource(i, swapIndex);
-            }
-        }
-    }
-
-    @Override
-    public void setRepeatMode(int repeatMode) {
-        player.setRepeatMode(repeatMode);
-    }
-
-    public int getRepeatMode() {
-        return player.getRepeatMode();
     }
 
     private void resetQueue() {

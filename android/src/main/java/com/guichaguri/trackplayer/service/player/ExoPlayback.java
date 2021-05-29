@@ -76,12 +76,6 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
 
     public abstract void removeUpcomingTracks();
 
-    public abstract void shuffle(final Promise promise);
-
-    public abstract void setRepeatMode(int repeatMode);
-
-    public abstract int getRepeatMode();
-
     public void updateTrack(int index, Track track) {
         int currentIndex = player.getCurrentWindowIndex();
 
@@ -327,16 +321,6 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
                 manager.onEnd(getCurrentTrackIndex(), getPosition());
             }
         }
-    }
-
-    @Override
-    public void onRepeatModeChanged(int repeatMode) {
-        // Repeat mode update
-    }
-
-    @Override
-    public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
-        // Shuffle mode update
     }
 
     @Override

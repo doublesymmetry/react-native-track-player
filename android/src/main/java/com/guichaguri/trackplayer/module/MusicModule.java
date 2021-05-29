@@ -150,11 +150,6 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
         constants.put("RATING_5_STARS", RatingCompat.RATING_5_STARS);
         constants.put("RATING_PERCENTAGE", RatingCompat.RATING_PERCENTAGE);
 
-        // Repeat Modes
-        constants.put("REPEAT_OFF", Player.REPEAT_MODE_OFF);
-        constants.put("REPEAT_TRACK", Player.REPEAT_MODE_ONE);
-        constants.put("REPEAT_QUEUE", Player.REPEAT_MODE_ALL);
-
         return constants;
     }
 
@@ -250,14 +245,6 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
             } else {
                 callback.resolve(null);
             }
-        });
-    }
-
-    @ReactMethod
-    public void shuffle(final Promise callback) {
-        waitForConnection(() -> {
-            binder.getPlayback().shuffle(callback);
-            callback.resolve(null);
         });
     }
 
@@ -404,19 +391,6 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     @ReactMethod
     public void getRate(final Promise callback) {
         waitForConnection(() -> callback.resolve(binder.getPlayback().getRate()));
-    }
-
-    @ReactMethod
-    public void setRepeatMode(int mode, final Promise callback) {
-        waitForConnection(() -> {
-            binder.getPlayback().setRepeatMode(mode);
-            callback.resolve(null);
-        });
-    }
-
-    @ReactMethod
-    public void getRepeatMode(int mode, final Promise callback) {
-        waitForConnection(() -> callback.resolve(binder.getPlayback().getRepeatMode()));
     }
 
     @ReactMethod
