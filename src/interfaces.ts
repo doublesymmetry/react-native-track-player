@@ -142,7 +142,6 @@ export enum TrackType {
   SmoothStreaming = 'smoothstreaming',
 }
 
-
 export enum PitchAlgorithm {
   Linear = TrackPlayer.PITCH_ALGORITHM_LINEAR,
   Music = TrackPlayer.PITCH_ALGORITHM_MUSIC,
