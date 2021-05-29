@@ -69,6 +69,10 @@ public class RNTrackPlayer: RCTEventEmitter {
             "CAPABILITY_LIKE": Capability.like.rawValue,
             "CAPABILITY_DISLIKE": Capability.dislike.rawValue,
             "CAPABILITY_BOOKMARK": Capability.bookmark.rawValue,
+
+            "REPEAT_OFF": RepeatMode.off.rawValue,
+            "REPEAT_TRACK": RepeatMode.track.rawValue,
+            "REPEAT_QUEUE": RepeatMode.queue.rawValue,
         ]
     }
 
@@ -419,6 +423,18 @@ public class RNTrackPlayer: RCTEventEmitter {
         resolve(NSNull())
     }
 
+    @objc(setRepeatMode:resolver:rejecter:)
+    public func setRepeatMode(repeatMode: NSNumber, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        player.repeatMode = RepeatMode(rawValue: repeatMode.intValue) ?? .off
+        resolve(NSNull())
+    }
+
+    @objc(getRepeatMode:rejecter:)
+    public func getRepeatMode(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        print("Getting current repeatMode")
+        resolve(player.repeatMode.rawValue)
+    }
+    
     @objc(setVolume:resolver:rejecter:)
     public func setVolume(level: Float, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Setting volume to \(level)")

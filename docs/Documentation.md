@@ -15,6 +15,7 @@ redirect_from:
   * [State](#state)
   * [Rating](#rating)
   * [Capability](#capability)
+  * [Repeat Mode](#repeat-mode)
   * [Pitch Algorithm](#pitch-algorithm)
 * [Functions](#functions)
   * [Lifecycle](#lifecycle-functions)
@@ -85,6 +86,14 @@ Capability indicating the ability to set the rating value based on the rating ty
 Capability indicating the ability to jump forward by the amount of seconds specified in the options
 #### `CAPABILITY_JUMP_BACKWARD`
 Capability indicating the ability to jump backward by the amount of seconds specified in the options
+
+### Repeat Mode
+#### `REPEAT_OFF`
+Doesn't repeat.
+#### `REPEAT_TRACK`
+Loops the current track.
+#### `REPEAT_QUEUE`
+Repeats the whole queue.
 
 ### Pitch Algorithm
 #### `PITCH_ALGORITHM_LINEAR`
@@ -231,6 +240,19 @@ If the current track is updated, the notification and the Now Playing Center wil
 | -------- | ---------- | ------------- |
 | index    | `number`   | The track index  |
 | metadata | `object`   | A subset of the [Track Object](#track-object) with only the `artwork`, `title`, `artist`, `album`, `description`, `genre`, `date`, `rating` and `duration` properties. |
+
+#### `setRepeatMode(mode)`
+Sets the repeat mode.
+
+| Param    | Type       | Description     |
+| -------- | ---------- | --------------- |
+| mode     | [Repeat Mode](#repeat-mode) | The repeat mode |
+
+#### `getRepeatMode()`
+Gets the repeat mode.
+
+**Returns:** [Repeat Mode](#repeat-mode)
+
 
 ### Player Functions
 #### `updateOptions(options)`
