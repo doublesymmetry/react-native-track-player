@@ -7,10 +7,22 @@
 
 import Foundation
 
+protocol QueueManagerDelegate: class {
+    func onReceivedFirstItem()
+    func onCurrentIndexChanged(oldIndex: Int, newIndex: Int)
+}
 
 class QueueManager<T> {
-    
-    private var _items: [T] = []
+
+    weak var delegate: QueueManagerDelegate? = nil
+
+    private var _items: [T] = [] {
+        didSet {
+            if oldValue.count == 0 && _items.count > 0 && _currentIndex == 0 {
+                delegate?.onReceivedFirstItem()
+            }
+        }
+    }
     
     /**
      All items held by the queue.
@@ -33,7 +45,11 @@ class QueueManager<T> {
         return Array(_items[0..<_currentIndex])
     }
     
-    private var _currentIndex: Int = 0
+    private var _currentIndex: Int = 0 {
+        didSet {
+            delegate?.onCurrentIndexChanged(oldIndex: oldValue, newIndex: _currentIndex)
+        }
+    }
     
     /**
      The index of the current item.
