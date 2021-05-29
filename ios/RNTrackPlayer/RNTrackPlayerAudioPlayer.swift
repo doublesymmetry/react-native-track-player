@@ -70,6 +70,73 @@ public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer, QueueManagerDelegate {
 
 		self.reactEventEmitter.sendEvent(withName: "playback-state", body: ["state": state.rawValue])
     }
+
+    override func AVWrapper(didReceiveMetadata metadata: [AVMetadataItem]) {
+        func getMetadataItem(forIdentifier:AVMetadataIdentifier) -> String {
+            return AVMetadataItem.metadataItems(from: metadata, filteredByIdentifier: forIdentifier).first?.stringValue ?? ""
+        }
+
+        super.AVWrapper(didReceiveMetadata: metadata)
+        var source: String {
+            switch metadata.first?.keySpace {
+            case AVMetadataKeySpace.id3:
+                return "id3"
+            case AVMetadataKeySpace.icy:
+                return "icy"
+            case AVMetadataKeySpace.quickTimeMetadata:
+                return "quicktime"
+            case AVMetadataKeySpace.common:
+                return "unknown"
+            default: return "unknown"
+            }
+        }
+
+        let album = getMetadataItem(forIdentifier: .commonIdentifierAlbumName)
+        var artist = getMetadataItem(forIdentifier: .commonIdentifierArtist)
+        var title = getMetadataItem(forIdentifier: .commonIdentifierTitle)
+        var date = getMetadataItem(forIdentifier: .commonIdentifierCreationDate)
+        var url = "";
+        var genre = "";
+        if (source == "icy") {
+            url = getMetadataItem(forIdentifier: .icyMetadataStreamURL)
+        } else if (source == "id3") {
+            if (date.isEmpty) {
+                date = getMetadataItem(forIdentifier: .id3MetadataDate)
+            }
+            genre = getMetadataItem(forIdentifier: .id3MetadataContentType)
+            url = getMetadataItem(forIdentifier: .id3MetadataOfficialAudioSourceWebpage)
+            if (url.isEmpty) {
+                url = getMetadataItem(forIdentifier: .id3MetadataOfficialAudioFileWebpage)
+            }
+            if (url.isEmpty) {
+                url = getMetadataItem(forIdentifier: .id3MetadataOfficialArtistWebpage)
+            }
+        } else if (source == "quicktime") {
+            genre = getMetadataItem(forIdentifier: .quickTimeMetadataGenre)
+        }
+
+        // Detect ICY metadata and split title into artist & title:
+        // - source should be either "unknown" (pre iOS 14) or "icy" (iOS 14 and above)
+        // - we have a title, but no artist
+        if ((source == "unknown" || source == "icy") && !title.isEmpty && artist.isEmpty) {
+            if let index = title.range(of: " - ")?.lowerBound {
+                artist = String(title.prefix(upTo: index));
+                title = String(title.suffix(from: title.index(index, offsetBy: 3)));
+            }
+        }
+        var data : [String : String?] = [
+            "title": title.isEmpty ? nil : title,
+            "url": url.isEmpty ? nil : url,
+            "artist": artist.isEmpty ? nil : artist,
+            "album": album.isEmpty ? nil : album,
+            "date": date.isEmpty ? nil : date,
+            "genre": genre.isEmpty ? nil : genre
+        ]
+        if (data.values.contains { $0 != nil }) {
+            data["source"] = source
+            self.reactEventEmitter.sendEvent(withName: "playback-metadata-received", body: data)
+        }
+    }
     
     override func AVWrapper(failedWithError error: Error?) {
         super.AVWrapper(failedWithError: error)
