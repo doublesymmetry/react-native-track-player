@@ -47,7 +47,6 @@ public class Track extends TrackMetadata {
         return tracks;
     }
 
-    public String id;
     public Uri uri;
     public int resourceId;
 
@@ -63,8 +62,6 @@ public class Track extends TrackMetadata {
     public final long queueId;
 
     public Track(Context context, Bundle bundle, int ratingType) {
-        id = bundle.getString("id", null);
-
         resourceId = Utils.getRawResourceId(context, bundle, "url");
 
         if(resourceId == 0) {
@@ -113,10 +110,6 @@ public class Track extends TrackMetadata {
 
         builder.putString(METADATA_KEY_MEDIA_URI, uri.toString());
 
-        if (id != null) {
-            builder.putString(METADATA_KEY_MEDIA_ID, id);
-        }
-
         return builder;
     }
 
@@ -124,7 +117,6 @@ public class Track extends TrackMetadata {
         MediaDescriptionCompat descr = new MediaDescriptionCompat.Builder()
                 .setTitle(title)
                 .setSubtitle(artist)
-                .setMediaId(id)
                 .setMediaUri(uri)
                 .setIconUri(artwork)
                 .build();
