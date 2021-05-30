@@ -91,7 +91,8 @@ export type ResourceObject = number
 
 export interface MetadataOptions {
   ratingType?: RatingType
-  jumpInterval?: number
+  forwardJumpInterval?: number
+  backwardJumpInterval?: number
   likeOptions?: FeedbackOptions
   dislikeOptions?: FeedbackOptions
   bookmarkOptions?: FeedbackOptions
