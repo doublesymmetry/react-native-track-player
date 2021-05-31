@@ -145,12 +145,24 @@ public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer, QueueManagerDelegate {
     
     override func AVWrapperItemDidPlayToEndTime() {
         // fire an event for the queue ending
-        if self.nextItems.count == 0 {
-            self.reactEventEmitter.sendEvent(withName: "playback-queue-ended", body: [
+        if nextItems.count == 0 {
+            reactEventEmitter.sendEvent(withName: "playback-queue-ended", body: [
                 "track": currentIndex,
                 "position": currentTime,
             ])
-		} 
+		}
+
+        // fire an event for the same track starting again
+        switch repeatMode {
+        case .track:
+            reactEventEmitter.sendEvent(withName: "playback-track-changed", body: [
+                "track": currentIndex,
+                "position": currentTime,
+                "nextTrack": currentIndex,
+            ])
+        default: break
+        }
+
 		super.AVWrapperItemDidPlayToEndTime()
     }
 
