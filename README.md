@@ -79,9 +79,6 @@ const start = async () => {
 start();
 ```
 
-If you want to get started with this module, check the [API](https://react-native-kit.github.io/react-native-track-player/api/) page.
-If you want detailed information about the API, check the [Documentation](https://react-native-kit.github.io/react-native-track-player/documentation/).
-
 ## Core Team ✨
 
 <table>
