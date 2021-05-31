@@ -155,11 +155,7 @@ public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer, QueueManagerDelegate {
         // fire an event for the same track starting again
         switch repeatMode {
         case .track:
-            reactEventEmitter.sendEvent(withName: "playback-track-changed", body: [
-                "track": currentIndex,
-                "position": currentTime,
-                "nextTrack": currentIndex,
-            ])
+            onTrackUpdate(previousIndex: currentIndex, nextIndex: currentIndex)
         default: break
         }
 
