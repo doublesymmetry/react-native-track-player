@@ -9,6 +9,7 @@ import {
   State,
   TrackMetadataBase,
   NowPlayingMetadata,
+  RepeatMode,
 } from './interfaces'
 
 const { TrackPlayerModule: TrackPlayer } = NativeModules
@@ -156,6 +157,10 @@ async function setRate(rate: number): Promise<void> {
   return TrackPlayer.setRate(rate)
 }
 
+async function setRepeatMode(mode: RepeatMode): Promise<RepeatMode> {
+  return TrackPlayer.setRepeatMode(mode)
+}
+
 // MARK: - Getters
 
 async function getVolume(): Promise<number> {
@@ -194,6 +199,10 @@ async function getState(): Promise<State> {
   return TrackPlayer.getState()
 }
 
+async function getRepeatMode(): Promise<RepeatMode> {
+  return TrackPlayer.getRepeatMode()
+}
+
 export * from './hooks'
 export * from './interfaces'
 
@@ -226,6 +235,7 @@ export default {
   seekTo,
   setVolume,
   setRate,
+  setRepeatMode,
 
   // MARK: - Getters
   getVolume,
@@ -237,4 +247,5 @@ export default {
   getBufferedPosition,
   getPosition,
   getState,
+  getRepeatMode,
 }

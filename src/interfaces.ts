@@ -144,6 +144,12 @@ export enum TrackType {
   SmoothStreaming = 'smoothstreaming',
 }
 
+export enum RepeatMode {
+  Off = TrackPlayer.REPEAT_OFF,
+  Track = TrackPlayer.REPEAT_TRACK,
+  Queue = TrackPlayer.REPEAT_QUEUE,
+}
+
 export enum PitchAlgorithm {
   Linear = TrackPlayer.PITCH_ALGORITHM_LINEAR,
   Music = TrackPlayer.PITCH_ALGORITHM_MUSIC,

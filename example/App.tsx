@@ -12,6 +12,7 @@ import Slider from '@react-native-community/slider';
 import TrackPlayer, {
   Capability,
   Event,
+  RepeatMode,
   State,
   usePlaybackState,
   useProgress,
@@ -45,6 +46,8 @@ const setup = async () => {
     artwork: 'https://i.scdn.co/image/e5c7b168be89098eb686e02152aaee9d3a24e5b6',
     duration: 28,
   });
+
+  TrackPlayer.setRepeatMode(RepeatMode.Queue);
 
   // Workaround because there's no way to just load the queue content into player without playing.
   await TrackPlayer.play();
