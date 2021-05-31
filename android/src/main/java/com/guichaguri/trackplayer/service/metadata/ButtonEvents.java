@@ -113,14 +113,14 @@ public class ButtonEvents extends MediaSessionCompat.Callback {
     @Override
     public void onRewind() {
         Bundle bundle = new Bundle();
-        bundle.putInt("interval", manager.getMetadata().getJumpInterval());
+        bundle.putInt("interval", manager.getMetadata().getBackwardJumpInterval());
         service.emit(MusicEvents.BUTTON_JUMP_BACKWARD, bundle);
     }
 
     @Override
     public void onFastForward() {
         Bundle bundle = new Bundle();
-        bundle.putInt("interval", manager.getMetadata().getJumpInterval());
+        bundle.putInt("interval", manager.getMetadata().getForwardJumpInterval());
         service.emit(MusicEvents.BUTTON_JUMP_FORWARD, bundle);
     }
 

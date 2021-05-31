@@ -246,7 +246,8 @@ Some parameters are unused depending on platform.
 | --------- | ---------- | -------------------- | :-----: | :-: | :-----: |
 | options      | `object`   | The options |
 | options.ratingType | [Rating Constant](#rating) | The rating type | ✓ | ✗ | ✗ |
-| options.jumpInterval | `number` | The interval in seconds for the jump forward/backward buttons | ✓ | ✓ | ✓ |
+| options.forwardJumpInterval | `number` | The interval in seconds for the jump forward buttons (if only one is given then we use that value for both) | ✓ | ✓ | ✗ |
+| options.backwardJumpInterval | `number` | The interval in seconds for the jump backward buttons (if only one is given then we use that value for both) | ✓ | ✓ | ✓ |
 | options.stopWithApp | `boolean` | Whether the player will be destroyed when the app closes | ✓ | ✗ | ✗ |
 | options.alwaysPauseOnInterruption | `boolean` | Whether the `remote-duck` event will be triggered on every interruption | ✓ | ✗ | ✗ |
 | options.capabilities | `array` of [Capability Constants](#capability) | The media controls that will be enabled | ✓ | ✓ | ✓ |
@@ -403,14 +404,14 @@ Fired when the user presses the jump forward button. Only fired if the `CAPABILI
 
 | Param    | Type     | Description   |
 | -------- | -------- | ------------- |
-| interval | `number` | The number of seconds to jump forward. It's usually the `jumpInterval` set in the options. |
+| interval | `number` | The number of seconds to jump forward. It's usually the `forwardJumpInterval` set in the options. |
 
 #### `remote-jump-backward`
 Fired when the user presses the jump backward button. Only fired if the `CAPABILITY_JUMP_BACKWARD` is allowed.
 
 | Param    | Type     | Description   |
 | -------- | -------- | ------------- |
-| interval | `number` | The number of seconds to jump backward. It's usually the `jumpInterval` set in the options. |
+| interval | `number` | The number of seconds to jump backward. It's usually the `backwardJumpInterval` set in the options. |
 
 #### `remote-duck`
 Subscribing to this event to handle interruptions ensures that your app’s audio continues behaving gracefully when a phone call arrives, a clock or calendar alarm sounds, or another app plays audio.
