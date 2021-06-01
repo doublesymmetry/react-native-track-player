@@ -63,3 +63,30 @@ jobs:
           xcodebuild build -workspace example.xcworkspace -scheme example -destination "${destination}"
         env:
           destination: ${{ matrix.destination }}
+  build-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        architecture: [ARM, ARM64]
+        configuration: [Debug, Release]
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+      - name: Install Library Dependencies
+        run: yarn install
+      - name: Build Library
+        run: yarn build
+      - name: Install Windows Example Dependencies
+        run: |-
+          cd example
+          yarn install
+      - name: Build ${{ matrix.architecture }} Debug
+        if: ${{ matrix.configuration == 'Debug' }}
+        run: |-
+          cd example
+          npx react-native run-windows --no-deploy --no-launch --no-packager --logging --arch ${{ matrix.architecture }}
+      - name: Build ${{ matrix.architecture }} Release
+        if: ${{ matrix.configuration == 'Release' }}
+        run: |-
+          cd example
+          npx react-native run-windows --no-deploy --no-launch --no-packager --logging --release --arch ${{ matrix.architecture }}
