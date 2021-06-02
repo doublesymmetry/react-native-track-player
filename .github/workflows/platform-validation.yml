@@ -40,12 +40,6 @@ jobs:
           ./gradlew assembleDebug --no-daemon
   build-ios:
     runs-on: macos-latest
-    strategy:
-      matrix:
-        destination:
-          [
-            'platform=iOS Simulator,name=iPhone 12 Pro',
-          ]
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
@@ -83,15 +77,9 @@ jobs:
       - name: Build App
         run: |-
           cd example/ios
-          xcodebuild build -workspace example.xcworkspace -scheme example -destination "${destination}"
-        env:
-          destination: ${{ matrix.destination }}
+          xcodebuild build -workspace example.xcworkspace -scheme example -destination 'platform=iOS Simulator,name=iPhone 12 Pro'
   build-windows:
     runs-on: windows-latest
-    strategy:
-      matrix:
-        architecture: [ARM, ARM64]
-        configuration: [Debug, Release]
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
@@ -109,13 +97,7 @@ jobs:
         run: |-
           cd example
           yarn install
-      - name: Build ${{ matrix.architecture }} Debug
-        if: ${{ matrix.configuration == 'Debug' }}
+      - name: Build App
         run: |-
           cd example
-          yarn windows --no-deploy --no-launch --no-packager --logging --arch ${{ matrix.architecture }}
-      - name: Build ${{ matrix.architecture }} Release
-        if: ${{ matrix.configuration == 'Release' }}
-        run: |-
-          cd example
-          yarn windows --no-deploy --no-launch --no-packager --logging --release --arch ${{ matrix.architecture }}
+          yarn windows --no-deploy --no-launch --no-packager --logging
