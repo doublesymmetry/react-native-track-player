@@ -156,7 +156,7 @@ void LocalPlayback::OnEnd(winrt::Windows::Media::Playback::MediaPlayer sender,
     }
     else
     {
-        manager.OnEnd(GetCurrentTrack(), GetPosition());
+        manager.OnEnd(currentTrack, GetPosition());
     }
 }
 

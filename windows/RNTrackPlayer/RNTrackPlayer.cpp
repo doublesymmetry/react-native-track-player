@@ -101,7 +101,7 @@ void TrackPlayerModule::Reset(ReactPromise<JSValue> promise) noexcept
     promise.Resolve(nullptr);
 }
 
-void TrackPlayerModule::UpdateMetadataForTrack(const std::string& id, JSValueObject metadata,
+void TrackPlayerModule::UpdateMetadataForTrack(const int index, JSValueObject metadata,
     ReactPromise<JSValue> promise) noexcept
 {
     auto player = manager ? manager->GetPlayer() : nullptr;
@@ -110,20 +110,14 @@ void TrackPlayerModule::UpdateMetadataForTrack(const std::string& id, JSValueObj
 
     auto& queue = player->GetQueue();
 
-    auto it = std::find_if(queue.begin(), queue.end(), [&](const Track& t) { return t.Id == id; });
-    auto index = it == queue.end() ? -1 : std::distance(queue.begin(), it);
+    if (index < 0 || index > queue.size() - 1) {
+        promise.Reject("The track index is out of bounds");
+    }
 
-    if (index == -1)
-    {
-        promise.Reject("Track not found");
-    }
-    else
-    {
-        auto track = queue[index];
-        track.SetMetadata(metadata);
-        player->UpdateTrack(index, track);
-        promise.Resolve(nullptr);
-    }
+    auto track = queue[index];
+    track.SetMetadata(metadata);
+    player->UpdateTrack(index, track);
+    promise.Resolve(nullptr);
 }
 
 void TrackPlayerModule::RemoveUpcomingTracks(ReactPromise<JSValue> promise) noexcept
@@ -136,7 +130,7 @@ void TrackPlayerModule::RemoveUpcomingTracks(ReactPromise<JSValue> promise) noex
     promise.Resolve(nullptr);
 }
 
-void TrackPlayerModule::Add(JSValueArray arr, std::string insertBeforeId,
+void TrackPlayerModule::Add(JSValueArray arr, int insertBeoreIndex,
     ReactPromise<JSValue> promise) noexcept
 {
     auto player = manager ? manager->GetPlayer() : nullptr;
@@ -151,7 +145,7 @@ void TrackPlayerModule::Add(JSValueArray arr, std::string insertBeforeId,
         tracks.push_back(Track(obj.AsObject()));
     }
 
-    player->Add(tracks, insertBeforeId, promise);
+    player->Add(tracks, insertBeoreIndex, promise);
 }
 
 void TrackPlayerModule::Remove(JSValueArray arr, ReactPromise<JSValue> promise) noexcept
@@ -160,24 +154,24 @@ void TrackPlayerModule::Remove(JSValueArray arr, ReactPromise<JSValue> promise) 
     if (Utils::CheckPlayback(player, promise))
         return;
 
-    std::vector<std::string> tracks;
+    std::vector<int> tracks;
     tracks.reserve(arr.size());
 
     for (const JSValue& id : arr)
     {
-        tracks.push_back(id.AsString());
+        tracks.push_back(static_cast<int>(id));
     }
 
     player->Remove(tracks, promise);
 }
 
-void TrackPlayerModule::Skip(const std::string& track, ReactPromise<JSValue> promise) noexcept
+void TrackPlayerModule::Skip(const int trackId, ReactPromise<JSValue> promise) noexcept
 {
     auto player = manager ? manager->GetPlayer() : nullptr;
     if (Utils::CheckPlayback(player, promise))
         return;
 
-    player->Skip(track, promise);
+    player->Skip(trackId, promise);
 }
 
 void TrackPlayerModule::SkipToNext(ReactPromise<JSValue> promise) noexcept
@@ -222,18 +216,24 @@ void TrackPlayerModule::GetCurrentTrack(ReactPromise<JSValue> promise) noexcept
     if (Utils::CheckPlayback(player, promise))
         return;
 
-    auto track = player->GetCurrentTrack();
-    promise.Resolve(track ? track->Id.c_str() : JSValue());
+    auto track = player->currentTrack;
+    promise.Resolve(track != -1 ? track : JSValue());
 }
 
-void TrackPlayerModule::GetTrack(const std::string& id, ReactPromise<JSValue> promise) noexcept
+void TrackPlayerModule::GetTrack(const int index, ReactPromise<JSValue> promise) noexcept
 {
     auto player = manager ? manager->GetPlayer() : nullptr;
     if (Utils::CheckPlayback(player, promise))
         return;
 
-    auto track = player->GetTrack(id);
-    promise.Resolve(track ? track->ToObject() : JSValueObject());
+    auto& queue = player->GetQueue();
+
+    if (index < 0 || index > queue.size() - 1) {
+        promise.Reject("The track index is out of bounds");
+    }
+
+    auto track = queue[index];
+    promise.Resolve(track.ToObject());
 }
 
 void TrackPlayerModule::GetVolume(ReactPromise<JSValue> promise) noexcept

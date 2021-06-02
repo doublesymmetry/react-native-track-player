@@ -102,7 +102,6 @@ void Metadata::UpdateOptions(React::JSValueObject& data)
 void Metadata::UpdateMetadata(Track& track)
 {
     auto display = controls.DisplayUpdater();
-    display.AppMediaId(winrt::to_hstring(track.Id));
 
     try
     {

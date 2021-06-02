@@ -23,9 +23,9 @@ namespace winrt::RNTrackPlayer {
         void UpdateOptions(React::JSValueObject& options);
         Playback* GetPlayer() const;
         Metadata* GetMetadata() const;
-        void OnEnd(Track* previous, double prevPos);
+        void OnEnd(int previous, double prevPos);
         void OnStateChange(PlaybackState state);
-        void OnTrackUpdate(Track* previous, double prevPos, Track* next, bool changed);
+        void OnTrackUpdate(int previousIndex, double prevPos, int nextIndex, Track* next);
         void OnError(const std::string& code, const std::string& error);
     };
 }

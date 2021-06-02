@@ -54,12 +54,14 @@ Metadata* MediaManager::GetMetadata() const
     return const_cast<Metadata*>(&metadata);
 }
 
-void MediaManager::OnEnd(Track* previous, double prevPos)
+void MediaManager::OnEnd(int previous, double prevPos)
 {
     VERBOSE_DEBUG("OnEnd");
 
     JSValueObject obj;
-    obj["track"] = previous ? previous->Id : "";
+    if (previous != -1) {
+        obj["track"] = previous;
+    }
     obj["position"] = prevPos;
     SendEvent(Events::PlaybackQueueEnded, obj);
 }
@@ -73,7 +75,7 @@ void MediaManager::OnStateChange(PlaybackState state)
     SendEvent(Events::PlaybackState, obj);
 }
 
-void MediaManager::OnTrackUpdate(Track* previous, double prevPos, Track* next, bool changed)
+void MediaManager::OnTrackUpdate(int previousIndex, double prevPos, int nextIndex, Track* next)
 {
     VERBOSE_DEBUG("OnTrackUpdate");
 
@@ -82,14 +84,15 @@ void MediaManager::OnTrackUpdate(Track* previous, double prevPos, Track* next, b
         metadata.UpdateMetadata(*next);
     }
 
-    if (changed)
-    {
-        JSValueObject obj;
-        obj["track"] = previous ? previous->Id : "";
-        obj["position"] = prevPos;
-        obj["nextTrack"] = next ? next->Id : "";
-        SendEvent(Events::PlaybackTrackChanged, obj);
+    JSValueObject obj;
+    if (previousIndex != -1) {
+        obj["track"] = previousIndex;
     }
+    obj["position"] = prevPos;
+    if (nextIndex != -1) {
+        obj["nextTrack"] = nextIndex;
+    }
+    SendEvent(Events::PlaybackTrackChanged, obj);
 }
 
 void MediaManager::OnError(const std::string& code, const std::string& error)

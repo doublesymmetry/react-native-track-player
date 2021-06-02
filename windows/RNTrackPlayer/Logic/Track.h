@@ -6,7 +6,6 @@
 
 namespace winrt::RNTrackPlayer {
     struct Track {
-        std::string Id;
         std::string Url;
         std::string Type;
         std::chrono::seconds Duration;

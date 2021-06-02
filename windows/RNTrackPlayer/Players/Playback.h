@@ -22,20 +22,19 @@ namespace winrt::RNTrackPlayer {
         MediaManager& manager;
 
         std::vector<Track> queue;
-        int currentTrack{ -1 };
         PlaybackState prevState{ PlaybackState::None };
 
     public:
+        int currentTrack{ -1 };
         Playback(MediaManager& manager);
         virtual ~Playback();
         void UpdateState(PlaybackState state);
         void UpdateCurrentTrack(size_t index, React::ReactPromise<JSValue>* promise);
         Track* GetCurrentTrack();
-        Track* GetTrack(const std::string& id);
         std::vector<Track>& GetQueue();
-        void Add(std::vector<Track>& tracks, std::string& insertBeforeId,
+        void Add(std::vector<Track>& tracks, int insertBeforeIndex,
             React::ReactPromise<JSValue>& promise);
-        void Remove(std::vector<std::string>& ids, React::ReactPromise<JSValue>& promise);
+        void Remove(std::vector<int> indexes, React::ReactPromise<JSValue>& promise);
         void UpdateTrack(size_t index, Track& track);
         virtual winrt::Windows::Media::SystemMediaTransportControls GetTransportControls() = 0;
         virtual void Load(Track& track, React::ReactPromise<JSValue>* promise) = 0;
@@ -44,7 +43,7 @@ namespace winrt::RNTrackPlayer {
         virtual void Stop() = 0;
         void Reset();
         void RemoveUpcomingTracks();
-        void Skip(std::string id, React::ReactPromise<JSValue>& promise);
+        void Skip(int index, React::ReactPromise<JSValue>& promise);
         bool HasNext();
         void SkipToNext(React::ReactPromise<JSValue>& promise);
         void SkipToPrevious(React::ReactPromise<JSValue>& promise);

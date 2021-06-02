@@ -5,8 +5,7 @@
 using namespace winrt::RNTrackPlayer;
 
 Track::Track(const React::JSValueObject& data)
-    : Id(data["id"].AsString()),
-      Url(Utils::GetValue(data, "url", "")),
+    : Url(Utils::GetValue(data, "url", "")),
       Type(Utils::GetValue(data, "type", TrackType::Default))
 {
      SetMetadata(data);
@@ -25,7 +24,6 @@ React::JSValueObject Track::ToObject()
 {
     React::JSValueObject obj;
 
-    obj["id"] = Id;
     obj["url"] = Url;
     obj["type"] = Type;
 

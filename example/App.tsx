@@ -47,7 +47,7 @@ const setup = async () => {
   //   duration: 28,
   // });
 
-  TrackPlayer.setRepeatMode(RepeatMode.Queue);
+  // TrackPlayer.setRepeatMode(RepeatMode.Queue);
 
   // Workaround because there's no way to just load the queue content into player without playing.
   await TrackPlayer.play();

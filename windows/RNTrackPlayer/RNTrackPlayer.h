@@ -41,21 +41,21 @@ namespace winrt::RNTrackPlayer {
     void Reset(ReactPromise<JSValue> promise) noexcept;
 
     REACT_METHOD(UpdateMetadataForTrack, L"updateMetadataForTrack")
-    void UpdateMetadataForTrack(const std::string& id, JSValueObject metadata,
+    void UpdateMetadataForTrack(const int index, JSValueObject metadata,
         ReactPromise<JSValue> promise) noexcept;
 
     REACT_METHOD(RemoveUpcomingTracks, L"removeUpcomingTracks")
     void RemoveUpcomingTracks(ReactPromise<JSValue> promise) noexcept;
 
     REACT_METHOD(Add, L"add")
-    void Add(JSValueArray arr, std::string insertBeforeId, 
+    void Add(JSValueArray arr, int insertBeoreIndex,
         ReactPromise<JSValue> promise) noexcept;
 
     REACT_METHOD(Remove, L"remove")
     void Remove(JSValueArray arr, ReactPromise<JSValue> promise) noexcept;
 
     REACT_METHOD(Skip, L"skip")
-    void Skip(const std::string& track, ReactPromise<JSValue> promise) noexcept;
+    void Skip(const int trackId, ReactPromise<JSValue> promise) noexcept;
 
     REACT_METHOD(SkipToNext, L"skipToNext")
     void SkipToNext(ReactPromise<JSValue> promise) noexcept;
@@ -70,7 +70,7 @@ namespace winrt::RNTrackPlayer {
     void GetCurrentTrack(ReactPromise<JSValue> promise) noexcept;
 
     REACT_METHOD(GetTrack, L"getTrack")
-    void GetTrack(const std::string& id, ReactPromise<JSValue> promise) noexcept;
+    void GetTrack(const int index, ReactPromise<JSValue> promise) noexcept;
 
     REACT_METHOD(GetVolume, L"getVolume")
     void GetVolume(ReactPromise<JSValue> promise) noexcept;
