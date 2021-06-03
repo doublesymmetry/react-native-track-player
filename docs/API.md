@@ -238,9 +238,9 @@ TrackPlayer.updateOptions({
     capabilities: [
         TrackPlayer.CAPABILITY_PLAY,
         TrackPlayer.CAPABILITY_PAUSE,
-        TrackPlayer.CAPABILITY_STOP,
-        TrackPlayer.CAPABILITY_NEXT,
-        TrackPlayer.CAPABILITY_PREVIOUS,
+		TrackPlayer.CAPABILITY_STOP,
+        TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
+		TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
     ],
 
     // Capabilities that will show up when the notification is in the compact form on Android
