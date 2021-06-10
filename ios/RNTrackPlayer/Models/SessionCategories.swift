@@ -87,3 +87,30 @@ enum SessionCategoryMode : String {
     }
 }
 
+enum SessionCategoryPolicy : String {
+    
+    case `default`, longFormAudio, longFormVideo, independent
+    
+    func mapConfigToAVAudioSessionCategoryPolicy() -> AVAudioSession.RouteSharingPolicy {
+        switch self {
+        case .default:
+            return .default
+        case .longFormAudio:
+            if #available(iOS 13.0, *) {
+                return .longFormAudio
+            } else if #available(iOS 11.0, *) {
+                return .longForm
+            } else {
+                return .default
+            }
+        case .longFormVideo:
+            if #available(iOS 13.0, *) {
+                return .longFormVideo
+            } else {
+                return .default
+            }
+        case .independent:
+            return .independent
+        }
+    }
+}

@@ -3,14 +3,18 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "postinstall": "npx jetify",
     "start": "node node_modules/react-native/local-cli/cli.js start",
-    "test": "jest"
+    "test": "jest",
+    "android:menu": "adb shell input keyevent 82",
+    "android:reload": "adb shell input keyevent 82 && adb shell input keyevent 66 && adb shell input keyevent 66"
   },
   "dependencies": {
+    "jetifier": "^1.6.5",
     "react": "16.8.3",
     "react-native": "0.59.9",
-    "react-native-screens": "^1.0.0-alpha",
     "react-native-gesture-handler": "~1.3.0",
+    "react-native-screens": "^1.0.0-alpha",
     "react-native-track-player": "file:..",
     "react-navigation": "^3.11.0"
   },

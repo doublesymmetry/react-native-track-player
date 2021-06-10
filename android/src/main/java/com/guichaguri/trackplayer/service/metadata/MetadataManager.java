@@ -194,7 +194,7 @@ public class MetadataManager {
      * Updates the current track
      * @param track The new track
      */
-    public void updateMetadata(Track track) {
+    public void updateMetadata(ExoPlayback playback, Track track) {
         MediaMetadataCompat.Builder metadata = track.toMediaMetadata();
 
         RequestManager rm = Glide.with(service.getApplicationContext());
@@ -221,11 +221,13 @@ public class MetadataManager {
         builder.setSubText(track.album);
 
         session.setMetadata(metadata.build());
+
+        updatePlaybackState(playback);
         updateNotification();
     }
 
     /**
-     * Updates the playback state
+     * Updates the playback state and notification buttons
      * @param playback The player
      */
     public void updatePlayback(ExoPlayback playback) {
@@ -279,10 +281,19 @@ public class MetadataManager {
 
         }
 
+        updatePlaybackState(playback);
+        updateNotification();
+    }
+
+    /**
+     * Updates the playback state
+     * @param playback The player
+     */
+    private void updatePlaybackState(ExoPlayback playback) {
         // Updates the media session state
         PlaybackStateCompat.Builder pb = new PlaybackStateCompat.Builder();
         pb.setActions(actions);
-        pb.setState(state, playback.getPosition(), playback.getRate());
+        pb.setState(playback.getState(), playback.getPosition(), playback.getRate());
         pb.setBufferedPosition(playback.getBufferedPosition());
 
         session.setPlaybackState(pb.build());

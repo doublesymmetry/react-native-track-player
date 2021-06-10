@@ -26,6 +26,10 @@ public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer {
 
 	public var reactEventEmitter: RCTEventEmitter
 
+	// Used to store the rate that is given in TrackPlayer.setRate() so that we
+	// can maintain the same rate in cases when SwiftAudio would not.
+	private var _rate: Float
+
 	// Override _currentItem so that we can send an event when it changes.
 	override var _currentItem: AudioItem? {
 		willSet(newCurrentItem) {
@@ -41,9 +45,23 @@ public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer {
 		}
 	}
 
+	// Override rate so that we can maintain the same rate on future tracks.
+	override public var rate: Float {
+        get { return _rate }
+        set { 
+			_rate = newValue
+
+			// Only set the rate on the wrapper if it is already playing.
+			if wrapper.rate > 0 {
+				wrapper.rate = newValue
+			}
+		}
+    }
+
 	// Override init to include a reference to the React Event Emitter.
 	public init(reactEventEmitter: RCTEventEmitter) {
-        self.reactEventEmitter = reactEventEmitter
+        self._rate = 1.0
+		self.reactEventEmitter = reactEventEmitter
 		super.init()
     }
 
@@ -51,6 +69,14 @@ public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer {
     
     override func AVWrapper(didChangeState state: AVPlayerWrapperState) {
         super.AVWrapper(didChangeState: state)
+		
+		// When a track starts playing, reset the rate to the stored rate
+		switch state {
+		case .playing:
+			self.rate = _rate;
+		default: break
+		}
+
 		self.reactEventEmitter.sendEvent(withName: "playback-state", body: ["state": state.rawValue])
     }
     
