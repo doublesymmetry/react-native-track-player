@@ -199,6 +199,9 @@ public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer, QueueManagerDelegate {
     // MARK: - QueueManagerDelegate
 
     func onCurrentIndexChanged(oldIndex: Int, newIndex: Int) {
+        // if _currentItem is nil, then this was triggered by a reset. ignore.
+        if _currentItem == nil { return }
+
         onTrackUpdate(previousIndex: oldIndex, nextIndex: newIndex)
     }
 

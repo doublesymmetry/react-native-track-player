@@ -37,6 +37,7 @@ public class QueuedAudioPlayer: AudioPlayer {
     }
     
     override func reset() {
+        super.reset()
         queueManager.clearQueue()
     }
     
