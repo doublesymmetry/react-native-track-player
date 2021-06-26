@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Image,
   SafeAreaView,
@@ -16,7 +16,9 @@ import TrackPlayer, {
   State,
   usePlaybackState,
   useProgress,
+  RatingType,
   useTrackPlayerEvents,
+  PitchAlgorithm
 } from 'react-native-track-player';
 
 // @ts-ignore
@@ -75,6 +77,8 @@ const App = () => {
   const [trackTitle, setTrackTitle] = useState<string>();
   const [trackArtist, setTrackArtist] = useState<string>();
 
+  console.log('YOOOO', PitchAlgorithm.Linear);
+
   useTrackPlayerEvents([Event.PlaybackTrackChanged], async event => {
     if (event.type === Event.PlaybackTrackChanged && event.nextTrack != null) {
       const track = await TrackPlayer.getTrack(event.nextTrack);
@@ -128,11 +132,17 @@ const App = () => {
         <TouchableWithoutFeedback onPress={() => TrackPlayer.skipToPrevious()}>
           <Text style={styles.secondaryActionButton}>Prev</Text>
         </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback onPress={() => togglePlayback(playbackState)}>
-          <Text style={styles.primaryActionButton}>
-            {playbackState === State.Playing ? 'Pause' : 'Play'}
-          </Text>
-        </TouchableWithoutFeedback>
+        <View>
+          <TouchableWithoutFeedback
+            onPress={() => togglePlayback(playbackState)}>
+            <Text style={styles.primaryActionButton}>
+              {playbackState === State.Playing ? 'Pause' : 'Play'}
+            </Text>
+          </TouchableWithoutFeedback>
+          <TouchableWithoutFeedback onPress={() => TrackPlayer.reset()}>
+            <Text style={styles.primaryActionButton}>{'Reset'}</Text>
+          </TouchableWithoutFeedback>
+        </View>
         <TouchableWithoutFeedback onPress={() => TrackPlayer.skipToNext()}>
           <Text style={styles.secondaryActionButton}>Next</Text>
         </TouchableWithoutFeedback>

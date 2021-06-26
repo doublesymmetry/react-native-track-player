@@ -32,80 +32,86 @@ redirect_from:
 
 ## Constants
 ### State
-#### `STATE_NONE`
+#### `State.None`
 State indicating that no media is currently loaded
-#### `STATE_READY`
+#### `State.Ready`
 State indicating that the player is ready to start playing
-#### `STATE_PLAYING`
+#### `State.Playing`
 State indicating that the player is currently playing
-#### `STATE_PAUSED`
+#### `State.Paused`
 State indicating that the player is currently paused
-#### `STATE_STOPPED`
+#### `State.Stopped`
 State indicating that the player is currently stopped
-#### `STATE_BUFFERING`
+#### `State.Buffering`
 State indicating that the player is currently buffering (in "play" state)
-#### `STATE_CONNECTING`
+#### `State.Connecting`
 State indicating that the player is currently buffering (in "pause" state)
 
 ### Rating
-#### `RATING_HEART`
+#### `RatingType.Heart`
 Rating type indicating "with heart" or "without heart", its value is a `boolean`.
-#### `RATING_THUMBS_UP_DOWN`
+#### `RatingType.ThumbsUpDown`
 Rating type indicating "thumbs up" or "thumbs down", its value is a `boolean`.
-#### `RATING_3_STARS`
+#### `RatingType.ThreeStars`
 Rating type indicating 0 to 3 stars, its value is a `number` of stars.
-#### `RATING_4_STARS`
+#### `RatingType.FourStars`
 Rating type indicating 0 to 4 stars, its value is a `number` of stars.
-#### `RATING_5_STARS`
+#### `RatingType.FiveStars`
 Rating type indicating 0 to 5 stars, its value is a `number` of stars.
-#### `RATING_PERCENTAGE`
+#### `RatingType.Percentage`
 Rating type indicating percentage, its value is a `number`.
 
 ### Capability
-#### `CAPABILITY_PLAY`
+#### `Capability.Play`
 Capability indicating the ability to play
-#### `CAPABILITY_PLAY_FROM_ID`
+#### `Capability.PlayFromId`
 Capability indicating the ability to play from a track id (Required for Android Auto)
-#### `CAPABILITY_PLAY_FROM_SEARCH`
+#### `Capability.PlayFromSearch`
 Capability indicating the ability to play from a text/voice search (Required for Android Auto)
-#### `CAPABILITY_PAUSE`
+#### `Capability.Pause`
 Capability indicating the ability to pause
-#### `CAPABILITY_STOP`
+#### `Capability.Stop`
 Capability indicating the ability to stop
-#### `CAPABILITY_SEEK_TO`
+#### `Capability.SeekTo`
 Capability indicating the ability to seek to a position in the timeline
-#### `CAPABILITY_SKIP`
+#### `Capability.Skip`
 Capability indicating the ability to skip to any song in the queue
-#### `CAPABILITY_SKIP_TO_NEXT`
+#### `Capability.SkipToNext`
 Capability indicating the ability to skip to the next track
-#### `CAPABILITY_SKIP_TO_PREVIOUS`
+#### `Capability.SkipToPrevious`
 Capability indicating the ability to skip to the previous track
-#### `CAPABILITY_SET_RATING`
+#### `Capability.SetRating`
 Capability indicating the ability to set the rating value based on the rating type
-#### `CAPABILITY_JUMP_FORWARD`
+#### `Capability.JumpForward`
 Capability indicating the ability to jump forward by the amount of seconds specified in the options
-#### `CAPABILITY_JUMP_BACKWARD`
+#### `Capability.JumpBackward`
 Capability indicating the ability to jump backward by the amount of seconds specified in the options
+#### `Capability.Like`
+(ios-only) Capability indicating the ability to like from control center
+#### `Capability.Dislike`
+(ios-only) Capability indicating the ability to dislike from control center
+#### `Capability.Bookmark`
+(ios-only) Capability indicating the ability to bookmark from control center
 
 ### Repeat Mode
-#### `REPEAT_OFF`
+#### `RepeatMode.Off`
 Doesn't repeat.
-#### `REPEAT_TRACK`
+#### `RepeatMode.Track`
 Loops the current track.
-#### `REPEAT_QUEUE`
+#### `RepeatMode.Queue`
 Repeats the whole queue.
 
-### Pitch Algorithm
-#### `PITCH_ALGORITHM_LINEAR`
+### Pitch Algorithm (ios-only)
+#### `PitchAlgorithm.Linear`
 An algorithm suitable for general use.
-#### `PITCH_ALGORITHM_MUSIC`
+#### `PitchAlgorithm.Music`
 An algorithm suitable for music.
-#### `PITCH_ALGORITHM_VOICE`
+#### `PitchAlgorithm.Voice`
 An algorithm suitable for voice.
 
 ## Functions
 ### Lifecycle Functions
-#### `setupPlayer(options)`
+#### `setupPlayer(options: PlayerOptions)`
 Initializes the player with the specified options. These options do not apply to all platforms, see chart below.
 
 These options are different than the ones set using `updateOptions()`. Options other than those listed below will not be applied.
@@ -118,16 +124,17 @@ If the player is already initialized, the promise will resolve instantly.
 
 | Param                | Type     | Description   | Default   | Android | iOS | Windows |
 | -------------------- | -------- | ------------- | --------- | :-----: | :-: | :-----: |
-| options              | `object` | The options   |
+| options              | `PlayerOptions` | The options   |
 | options.minBuffer    | `number` | Minimum time in seconds that needs to be buffered | 15 | ✓ | ✗ | ✗ |
 | options.maxBuffer    | `number` | Maximum time in seconds that needs to be buffered | 50 | ✓ | ✗ | ✗ |
 | options.playBuffer   | `number` | Minimum time in seconds that needs to be buffered to start playing | 2.5 | ✓ | ✗ | ✗ |
 | options.backBuffer   | `number` | Time in seconds that should be kept in the buffer behind the current playhead time. | 0 | ✓ | ✗ | ✗ |
 | options.maxCacheSize | `number` | Maximum cache size in kilobytes | 0 | ✓ | ✗ | ✗ |
-| options.iosCategory  | `string` | [AVAudioSession.Category](https://developer.apple.com/documentation/avfoundation/avaudiosession/1616615-category) for iOS. Sets on `play()` | `playback` | ✗ | ✓ | ✗ |
-| options.iosCategoryOptions | `array` | [AVAudioSession.CategoryOptions](https://developer.apple.com/documentation/avfoundation/avaudiosession/1616503-categoryoptions) for iOS. Sets on `play()` | `[]` | ✗ | ✓ | ✗ |
-| options.iosCategoryMode  | `string` | [AVAudioSession.Mode](https://developer.apple.com/documentation/avfoundation/avaudiosession/1616508-mode) for iOS. Sets on `play()` | `default` | ✗ | ✓ | ✗ |
+| options.iosCategory  | `IOSCategory` | [AVAudioSession.Category](https://developer.apple.com/documentation/avfoundation/avaudiosession/1616615-category) for iOS. Sets on `play()` | `playback` | ✗ | ✓ | ✗ |
+| options.iosCategoryOptions | `IOSCategoryOptions[]` | [AVAudioSession.CategoryOptions](https://developer.apple.com/documentation/avfoundation/avaudiosession/1616503-categoryoptions) for iOS. Sets on `play()` | `[]` | ✗ | ✓ | ✗ |
+| options.iosCategoryMode  | `IOSCategoryMode` | [AVAudioSession.Mode](https://developer.apple.com/documentation/avfoundation/avaudiosession/1616508-mode) for iOS. Sets on `play()` | `default` | ✗ | ✓ | ✗ |
 | options.waitForBuffer   | `boolean` | Indicates whether the player should automatically delay playback in order to minimize stalling. If you notice that network media immediately pauses after it buffers, setting this to `true` may help. | false | ✗ | ✓ | ✗ |
+| options.autoUpdateMetadata   | `boolean` | Indicates whether the player should automatically update now playing metadata data in control center / notification. | true | ✓ | ✗ | ✗ |
 
 #### `destroy()`
 Destroys the player, cleaning up its resources. After executing this function, you won't be able to use the player anymore, unless you call `setupPlayer()` again.
@@ -143,28 +150,10 @@ You should use the playback service to register the event handlers that must be 
 | ------- | -------- | ------------- |
 | serviceProvider | `function` | The function that must return an async service function. |
 
-#### `addEventListener(event, listener)`
-Adds a new event listener.
+#### `useTrackPlayerEvents(events: Event[], handler: Handler)`
+Hook that fires on the specified events.
 
 You can find a list of events in the [events section](#events).
-
-This function returns an event subscription instance that can be stored and removed after by executing `remove()`.
-
-**Returns:** `EmitterSubscription`
-
-| Param    | Type     | Description   |
-| -------- | -------- | ------------- |
-| event    | `string` | The event name |
-| listener | `function(data)` | The listener function |
-
-#### `registerEventHandler(handler)`
-**DEPRECATED**: Use registerPlaybackService and addEventListener instead.
-
-Registers an event handler. This function should only be called once, and should be registered right after registering your React application with `AppRegistry`.
-
-| Param   | Type     | Description   |
-| ------- | -------- | ------------- |
-| handler | `function` | The function that acts as an event handler |
 
 ### Queue Functions
 #### `add(tracks, insertBeforeIndex)`
@@ -266,15 +255,18 @@ Some parameters are unused depending on platform.
 
 | Param     | Type       | Description          | Android | iOS | Windows |
 | --------- | ---------- | -------------------- | :-----: | :-: | :-----: |
-| options      | `object`   | The options |
-| options.ratingType | [Rating Constant](#rating) | The rating type | ✓ | ✗ | ✗ |
+| options      | `MetadataOptions`   | The options |
+| options.ratingType | [RatingType](#rating) | The rating type | ✓ | ✗ | ✗ |
 | options.forwardJumpInterval | `number` | The interval in seconds for the jump forward buttons (if only one is given then we use that value for both) | ✓ | ✓ | ✗ |
 | options.backwardJumpInterval | `number` | The interval in seconds for the jump backward buttons (if only one is given then we use that value for both) | ✓ | ✓ | ✓ |
 | options.stopWithApp | `boolean` | Whether the player will be destroyed when the app closes | ✓ | ✗ | ✗ |
 | options.alwaysPauseOnInterruption | `boolean` | Whether the `remote-duck` event will be triggered on every interruption | ✓ | ✗ | ✗ |
-| options.capabilities | `array` of [Capability Constants](#capability) | The media controls that will be enabled | ✓ | ✓ | ✓ |
-| options.notificationCapabilities | `array` of [Capability Constants](#capability) | The buttons that it will show in the notification. Defaults to `data.capabilities`  | ✓ | ✗ | ✗ |
-| options.compactCapabilities | `array` of [Capability Constants](#capability) | The buttons that it will show in the compact notification | ✓ | ✗ | ✗ |
+| options.likeOptions | [FeedbackOptions](#feedback-object) | The media controls that will be enabled | ✗ | ✓ | ✗ |
+| options.dislikeOptions | [FeedbackOptions](#feedback-object) | The media controls that will be enabled | ✗ | ✓ | ✗ |
+| options.bookmarkOptions | [FeedbackOptions](#feedback-object) | The media controls that will be enabled | ✗ | ✓ | ✗ |
+| options.capabilities | [Capability[]](#capability) | The media controls that will be enabled | ✓ | ✓ | ✓ |
+| options.notificationCapabilities | [Capability[]](#capability) | The buttons that it will show in the notification. Defaults to `data.capabilities`  | ✓ | ✗ | ✗ |
+| options.compactCapabilities | [Capability[]](#capability) | The buttons that it will show in the compact notification | ✓ | ✗ | ✗ |
 | options.icon | [Resource Object](#resource-object) | The notification icon¹ | ✓ | ✗ | ✗ |
 | options.playIcon | [Resource Object](#resource-object) | The play icon¹ | ✓ | ✗ | ✗ |
 | options.pauseIcon | [Resource Object](#resource-object) | The pause icon¹ | ✓ | ✗ | ✗ |
@@ -535,6 +527,16 @@ Only the `url`, `title` and `artist` properties are required for basic playback
 | artwork        | `string` or [Resource Object](#resource-object) | The artwork url |
 | pitchAlgorithm | [Pitch Algorithm](#pitch-algorithm) | The pitch algorithm |
 | headers        | `object`                    | An object containing all the headers to use in the HTTP request |
+
+### Feedback Object
+Controls the rendering of the control center item.
+
+| Param          | Type                        | Description  |
+| -------------- | --------------------------- | ------------ |
+| isActive       | `boolean`                    | Marks wether the option should be marked as active or "done" |
+| title          | `boolean`                    | The title to give the action (relevant for iOS) |
+
+
 
 ### Resource Object
 Resource objects are the result of `require`/`import` for files.

@@ -19,123 +19,14 @@ npm install --save react-native-track-player
 yarn add react-native-track-player
 ```
 
-**2. (Optional) Install react-native-swift**
+**2. (iOS) Enable Swift Modules**
 
-If you are not already using any other swift based modules in your app, install and run react-native-swift to configure your iOS project to support swift.
+Because the iOS module uses Swift, if the user is using a standard react-native application they'll need to add support for Swift in the project. This can be easily by adding a swift file to the Xcode project -- could be called `dummy.swift` and saying yes when prompted if you'd like to generate a bridging header.
 
-### Install react-native-swift
-
-```
-npm install --save react-native-swift
-```
-
-```
-yarn add react-native-swift
-```
-
-After installing it, you will need to link it. **Requires project to use Swift 4.2**
-
-### Run react-native-swift
-
-```
-react-native swiftify
-```
+![Importing Swift](https://i.imgur.com/CBqBcWs.png)
 
 ## Automatic Link
-Run the command below and the module will be automatically linked
-```
-react-native link
-```
-
-This is the easiest way to link it, but if it doesn't work, follow the manual instructions below
-
-## Manual Link
-### Android
-Edit the following files:
-
-**android/app/build.gradle**
-```diff
-dependencies {
-    ...
-    compile "com.facebook.react:react-native:+"  // From node_modules
-+   compile project(':react-native-track-player')
-}
-```
-
-**android/settings.gradle**
-```diff
-...
-include ':app'
-+include ':react-native-track-player'
-+project(':react-native-track-player').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-track-player/android')
-```
-
-**android/app/src/main/java/** *your app's package* **/MainApplication.java**
-```diff
-// ...
-
-+import com.guichaguri.trackplayer.TrackPlayer;
-
-public class MainApplication extends Application implements ReactApplication {
-    // ...
-
-    @Override
-    protected List<ReactPackage> getPackages() {
-        return Arrays.<ReactPackage>asList(
-+           new TrackPlayer(),
-            new MainReactPackage()
-        );
-    }
-
-    // ...
-  }
-```
-
-### iOS
-Make sure the iOS platform target is set to 10.0 or higher in your app's podfile (`your-app/ios/podfile`): `platform :ios, '10.0'`
-
-In Xcode:
-1. Add RNTrackPlayer.xcodeproj to Libraries.
-2. Add libRNTrackPlayer.a to Link Binary With Libraries under Build Phases.
-3. Enable swift in the project following [these instructions](#troubleshooting)
-
-For more details (and screenshots), follow the [official linking guide](http://facebook.github.io/react-native/docs/linking-libraries-ios.html#content).
-
-
-### Windows
-
-1. Open your app in Visual Studio
-2. Add `node_modules/react-native-track-player/windows/RNTrackPlayer/RNTrackPlayer.csproj` as an "existing project" in Visual Studio
-3. Add it as a reference in your app
-4. Update `MainPage.cs` with the following additions:
-
-```diff
-// ...
-+using TrackPlayer;
-
-// ...
-    class MainPage : ReactPage
-    {
-        // ...
-
-        public override List<IReactPackage> Packages
-        {
-            get
-            {
-                return new List<IReactPackage>
-                {
-                    new MainReactPackage(),
-+                   new TrackPlayerPackage(),
-                };
-            }
-        }
-
-        // ...
-    }
-}
-```
-
-For more details (and screenshots), follow the [official linking guide](https://github.com/Microsoft/react-native-windows/blob/master/docs/LinkingLibrariesWindows.md).
+Since `react-native-track-player` only support RN 0.60 and above, the module should be autolinked :tada:
 
 ## Unstable
 If you want to try the latest features, you can install the module directly from GitHub using:
@@ -149,8 +40,6 @@ yarn add react-native-kit/react-native-track-player#dev
 ```
 
 To update it, run the same command again.
-
-Note: You don't need to link the module after updating it.
 
 ## Troubleshooting
 

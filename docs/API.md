@@ -11,21 +11,20 @@ redirect_from:
 
 ## Starting off
 First of all, you need to set up the player. This usually takes less than a second:
-```javascript
+```typescript
 import TrackPlayer from 'react-native-track-player';
 
-TrackPlayer.setupPlayer().then(() => {
-    // The player is ready to be used
-});
+await TrackPlayer.setupPlayer({})
+// The player is ready to be used
 ```
 
 You also need to register a [playback service](#playback-service) right after registering the main component of your app:
-```javascript
+```typescript
 // AppRegistry.registerComponent(...);
 TrackPlayer.registerPlaybackService(() => require('./service'));
 ```
 
-```javascript
+```typescript
 // service.js
 module.exports = async function() {
     // This service needs to be registered for the module to work
@@ -40,7 +39,7 @@ You can add a track to the player using a url or by requiring a file in the app 
 
 First of all, you need to create a [track object](https://react-native-kit.github.io/react-native-track-player/documentation/#track-object), which is a plain javascript object with a number of properties describing the track. Then [add](https://react-native-kit.github.io/react-native-track-player/documentation/#addtracks-insertbeforeid) the track to the queue:
 
-```javascript
+```typescript
 var track = {
     url: 'http://example.com/avaritia.mp3', // Load media from the network
     title: 'Avaritia',
@@ -53,7 +52,6 @@ var track = {
 };
 
 const track2 = {
-    id: 'coelacanth',
     url: require('./coelacanth.ogg'), // Load media from the app bundle
     title: 'Coelacanth I',
     artist: 'deadmau5',
@@ -62,7 +60,6 @@ const track2 = {
 };
 
 const track3 = {
-    id: 'ice_age',
     url: 'file:///storage/sdcard0/Downloads/artwork.png', // Load media from the file system
     title: 'Ice Age',
     artist: 'deadmau5',
@@ -77,9 +74,12 @@ await TrackPlayer.add([track1, track2, track3]);
 
 ### Player Information
 
-```javascript
+```typescript
+
+import TrackPlayer, { State } from 'react-native-track-player';
+
 const state = await TrackPlayer.getState();
-if (state === TrackPlayer.STATE_PLAYING) {
+if (state === State.Playing) {
     console.log('The player is playing');
 };
 
@@ -94,7 +94,7 @@ console.log(`${duration - position} seconds left.`);
 
 ### Changing Playback State
 
-```javascript
+```typescript
 TrackPlayer.play();
 TrackPlayer.pause();
 TrackPlayer.stop();
@@ -108,7 +108,7 @@ TrackPlayer.setVolume(0.5);
 ```
 
 ### Controlling the Queue
-```javascript
+```typescript
 // Skip to a specific track index:
 await TrackPlayer.skip(trackIndex);
 
@@ -127,38 +127,24 @@ console.log(`First title: ${tracks[0].title}`);
 ```
 #### Playback Events
 
-You can subscribe to [playback events](https://react-native-kit.github.io/react-native-track-player/documentation/#player), which describe the changing nature of the playback state. For example, subscribe to the `playback-track-changed` event to be notified when the track has changed or subscribe to the `playback-state` event to be notified when the player buffers, plays, pauses and stops.
+You can subscribe to [player events](https://react-native-kit.github.io/react-native-track-player/documentation/#player), which describe the changing nature of the playback state. For example, subscribe to the `Event.PlaybackTrackChanged` event to be notified when the track has changed or subscribe to the `Event.PlaybackState` event to be notified when the player buffers, plays, pauses and stops.
 
 #### Example
-```jsx
+```tsx
+import TrackPlayer, { Event } from 'react-native-track-player';
+
 const PlayerInfo = () => {
-    const [trackTitle, setTrackTitle] = useState();
-    useEffect(() => {
-        let mounted = true;
+    const [trackTitle, setTrackTitle] = useState<string>();
 
-        // Set the initial track title:
-        (async() => {
-            const trackId = await TrackPlayer.getCurrentTrack();
-            if (!mounted || !trackId) return;
-            const track = await TrackPlayer.getTrack(trackId);
-            if (!mounted) return;
-            setTrackTitle(track.title);
-        })();
+    // do initial setup, set initial trackTitle..
 
-        // Set the track title whenever the track changes:
-        const listener = TrackPlayer.addEventListener(
-            'playback-track-changed',
-            async (data) => {
-                const track = await TrackPlayer.getTrack(data.nextTrack);
-                if (!mounted) return;
-                setTrackTitle(track.title);
-            }
-        );
-        return () => {
-            mounted = false;
-            listener.remove();
+    useTrackPlayerEvents([Event.PlaybackTrackChanged], async event => {
+        if (event.type === Event.PlaybackTrackChanged && event.nextTrack != null) {
+            const track = await TrackPlayer.getTrack(event.nextTrack);
+            const {title} = track || {};
+            setTrackTitle(title);
         }
-    }, []);
+    });
 
     return (
         <Text>{trackTitle}</Text>
@@ -177,7 +163,7 @@ The playback service keeps running even when the app is in the background. It wi
 If you create a listener to a remote event like `remote-pause` in the context of a React component, there is a chance the UI will be unmounted automatically when the app is in the background, causing it to be missed. For this reason it is best to place remote listeners in the playback service, since it will keep running even when the app is in the background.
 
 #### Example
-```javascript
+```typescript
 // This needs to go right after you register the main component of your app
 // AppRegistry.registerComponent(...)
 TrackPlayer.registerPlaybackService(() => require('./service'));
@@ -198,26 +184,27 @@ module.exports = async function() {
 };
 ```
 
-## Progress Component
-Music apps often need an automated way to show the progress of a playing track. For this purpose, we created [ProgressComponent](https://react-native-kit.github.io/react-native-track-player/documentation/#progresscomponent) which updates itself automatically. You can build your own player bar on top of it. Be careful, as the component will be re-rendered every progress update!
+## Progress Updates
+Music apps often need an automated way to show the progress of a playing track. For this purpose, we created the hook: `useProgress` which updates itself automatically.
 
 #### Example
 
-```jsx
-class MyPlayerBar extends TrackPlayer.ProgressComponent {
+```tsx
+import TrackPlayer, { useProgress } from 'react-native-track-player';
 
-    render() {
-        return (
+const MyPlayerBar = () => {
+    const progress = useProgress();
+
+    return (
             // Note: formatTime and ProgressBar are just examples:
             <View>
-                <Text>{formatTime(this.state.position)}</Text>
+                <Text>{formatTime(progress.position)}</Text>
                 <ProgressBar
-                    progress={this.getProgress()}
-                    buffered={this.getBufferedProgress()}
+                    progress={progress.position}
+                    buffered={progress.buffered}
                 />
             </View>
         );
-    }
 
 }
 ```
@@ -232,22 +219,21 @@ For more information about the properties you can set, [check the documentation]
 
 #### Example
 
-```javascript
+```typescript
+import TrackPlayer, { Capability } from 'react-native-track-player';
+
 TrackPlayer.updateOptions({
     // Media controls capabilities
     capabilities: [
-        TrackPlayer.CAPABILITY_PLAY,
-        TrackPlayer.CAPABILITY_PAUSE,
-        TrackPlayer.CAPABILITY_STOP,
-        TrackPlayer.CAPABILITY_NEXT,
-        TrackPlayer.CAPABILITY_PREVIOUS,
+        Capability.Play,
+        Capability.Pause,
+        Capability.SkipToNext,
+        Capability.SkipToPrevious,
+        Capability.Stop,
     ],
 
     // Capabilities that will show up when the notification is in the compact form on Android
-    compactCapabilities: [
-        TrackPlayer.CAPABILITY_PLAY,
-        TrackPlayer.CAPABILITY_PAUSE
-    ]
+    compactCapabilities: [Capability.Play, Capability.Pause],
 
     // Icons for the notification on Android (if you don't like the default ones)
     playIcon: require('./play-icon.png'),

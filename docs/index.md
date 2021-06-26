@@ -38,26 +38,27 @@ If you want detailed information about the API, check the [Documentation](https:
 You can also look at our example project [here](https://github.com/react-native-kit/react-native-track-player/tree/master/example).
 
 ```javascript
-import TrackPlayer from 'react-native-track-player';
+import TrackPlayer, { RepeatMode } from 'react-native-track-player';
 
 // Creates the player
-TrackPlayer.setupPlayer().then(async () => {
+const setup = async () => {
+  await TrackPlayer.setupPlayer({});
 
-    // Adds a track to the queue
-    await TrackPlayer.add({
-        id: 'trackId',
-        url: require('track.mp3'),
-        title: 'Track Title',
-        artist: 'Track Artist',
-        artwork: require('track.png')
-    });
+  await TrackPlayer.add({
+    url: require('track.mp3'),
+    title: 'Track Title',
+    artist: 'Track Artist',
+    artwork: require('track.png')
+  });
 
-    // Starts playing it
-    TrackPlayer.play();
-
-});
+  TrackPlayer.setRepeatMode(RepeatMode.Queue);
+};
 ```
 
 ## Maintainers
 
-[Guilherme Chaguri](https://github.com/Guichaguri), [Dustin Bahr](https://github.com/curiousdustin) and [David Chavez](https://github.com/dcvz)
+[David Chavez](https://github.com/dcvz) under [Double Symmetry](https://doublesymmetry.com)
+
+## Other/Previous Maintainers
+
+[Guilherme Chaguri](https://github.com/Guichaguri), [Dustin Bahr](https://github.com/curiousdustin)
