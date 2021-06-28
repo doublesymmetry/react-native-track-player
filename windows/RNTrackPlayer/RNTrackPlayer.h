@@ -48,7 +48,7 @@ namespace winrt::RNTrackPlayer {
     void RemoveUpcomingTracks(ReactPromise<JSValue> promise) noexcept;
 
     REACT_METHOD(Add, L"add")
-    void Add(JSValueArray arr, int insertBeoreIndex,
+    void Add(JSValueArray arr, int insertBeforeIndex,
         ReactPromise<JSValue> promise) noexcept;
 
     REACT_METHOD(Remove, L"remove")

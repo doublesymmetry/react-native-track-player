@@ -110,7 +110,8 @@ void TrackPlayerModule::UpdateMetadataForTrack(const int index, JSValueObject me
 
     auto& queue = player->GetQueue();
 
-    if (index < 0 || index > queue.size() - 1) {
+    if (index < 0 || index > queue.size() - 1)
+    {
         promise.Reject("The track index is out of bounds");
     }
 
@@ -130,7 +131,7 @@ void TrackPlayerModule::RemoveUpcomingTracks(ReactPromise<JSValue> promise) noex
     promise.Resolve(nullptr);
 }
 
-void TrackPlayerModule::Add(JSValueArray arr, int insertBeoreIndex,
+void TrackPlayerModule::Add(JSValueArray arr, int insertBeforeIndex,
     ReactPromise<JSValue> promise) noexcept
 {
     auto player = manager ? manager->GetPlayer() : nullptr;
@@ -145,7 +146,7 @@ void TrackPlayerModule::Add(JSValueArray arr, int insertBeoreIndex,
         tracks.push_back(Track(obj.AsObject()));
     }
 
-    player->Add(tracks, insertBeoreIndex, promise);
+    player->Add(tracks, insertBeforeIndex, promise);
 }
 
 void TrackPlayerModule::Remove(JSValueArray arr, ReactPromise<JSValue> promise) noexcept
@@ -159,7 +160,7 @@ void TrackPlayerModule::Remove(JSValueArray arr, ReactPromise<JSValue> promise) 
 
     for (const JSValue& id : arr)
     {
-        tracks.push_back(static_cast<int>(id));
+        tracks.push_back(id.AsInt32());
     }
 
     player->Remove(tracks, promise);
@@ -314,8 +315,11 @@ void TrackPlayerModule::GetDuration(ReactPromise<JSValue> promise) noexcept
 void TrackPlayerModule::GetState(ReactPromise<JSValue> promise) noexcept
 {
     auto player = manager ? manager->GetPlayer() : nullptr;
-    if (Utils::CheckPlayback(player, promise))
+    if (player == nullptr)
+    {
+        promise.Resolve((int)PlaybackState::None);
         return;
+    }
 
     promise.Resolve((int)player->GetState());
 }
