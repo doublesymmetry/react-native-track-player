@@ -77,10 +77,12 @@ std::vector<Track>& Playback::GetQueue()
 void Playback::Add(std::vector<Track>& tracks, int insertBeforeIndex,
     React::ReactPromise<JSValue>& promise)
 {
-    if (insertBeforeIndex > queue.size()) {
+    if (insertBeforeIndex > 0 && insertBeforeIndex > queue.size())
+    {
         promise.Reject("The track index is out of bounds");
     }
-    else if (insertBeforeIndex == -1) {
+    else if (insertBeforeIndex == -1)
+    {
         bool empty = queue.size() == 0;
         for (auto& track : tracks)
             queue.push_back(track);
@@ -89,7 +91,8 @@ void Playback::Add(std::vector<Track>& tracks, int insertBeforeIndex,
         if (empty)
             UpdateCurrentTrack(0, nullptr);
     }
-    else {
+    else
+    {
         queue.insert(queue.begin() + insertBeforeIndex, tracks.begin(), tracks.end());
 
         if (currentTrack >= insertBeforeIndex)
@@ -167,7 +170,7 @@ void Playback::SkipToNext(React::ReactPromise<JSValue>& promise)
     if (HasNext())
         UpdateCurrentTrack(static_cast<size_t>(currentTrack) + 1, &promise);
     else
-        promise.Reject("There is no tracks left to play");
+        promise.Reject("There are no tracks left to play");
 }
 
 void Playback::SkipToPrevious(React::ReactPromise<JSValue>& promise)
@@ -175,5 +178,5 @@ void Playback::SkipToPrevious(React::ReactPromise<JSValue>& promise)
     if (currentTrack > 0)
         UpdateCurrentTrack(static_cast<size_t>(currentTrack) - 1, &promise);
     else
-        promise.Reject("There is no previous tracks");
+        promise.Reject("There are no previous tracks");
 }

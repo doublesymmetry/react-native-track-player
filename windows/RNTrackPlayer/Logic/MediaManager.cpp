@@ -59,7 +59,8 @@ void MediaManager::OnEnd(int previous, double prevPos)
     VERBOSE_DEBUG("OnEnd");
 
     JSValueObject obj;
-    if (previous != -1) {
+    if (previous != -1)
+    {
         obj["track"] = previous;
     }
     obj["position"] = prevPos;
@@ -85,13 +86,16 @@ void MediaManager::OnTrackUpdate(int previousIndex, double prevPos, int nextInde
     }
 
     JSValueObject obj;
-    if (previousIndex != -1) {
+    if (previousIndex != -1)
+    {
         obj["track"] = previousIndex;
     }
     obj["position"] = prevPos;
-    if (nextIndex != -1) {
+    if (nextIndex != -1)
+    {
         obj["nextTrack"] = nextIndex;
     }
+
     SendEvent(Events::PlaybackTrackChanged, obj);
 }
 
