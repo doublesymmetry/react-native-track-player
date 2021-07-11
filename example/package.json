@@ -5,16 +5,18 @@
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
+    "windows": "react-native run-windows",
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
-    "@react-native-community/slider": "^3.0.3",
+    "@react-native-community/slider": "4.0.0-rc.3",
     "react": "17.0.1",
     "react-native": "0.64.1",
     "react-native-swift": "^1.2.3",
-    "react-native-track-player": "file:.."
+    "react-native-track-player": "file:..",
+    "react-native-windows": "^0.64.0-0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

@@ -39,15 +39,15 @@ const setup = async () => {
   });
 
   await TrackPlayer.add(playlistData);
-  await TrackPlayer.add({
-    url: localTrack,
-    title: 'Pure (Demo)',
-    artist: 'David Chavez',
-    artwork: 'https://i.scdn.co/image/e5c7b168be89098eb686e02152aaee9d3a24e5b6',
-    duration: 28,
-  });
+  // await TrackPlayer.add({
+  //   url: localTrack,
+  //   title: 'Pure (Demo)',
+  //   artist: 'David Chavez',
+  //   artwork: 'https://i.scdn.co/image/e5c7b168be89098eb686e02152aaee9d3a24e5b6',
+  //   duration: 28,
+  // });
 
-  TrackPlayer.setRepeatMode(RepeatMode.Queue);
+  // TrackPlayer.setRepeatMode(RepeatMode.Queue);
 
   // Workaround because there's no way to just load the queue content into player without playing.
   await TrackPlayer.play();

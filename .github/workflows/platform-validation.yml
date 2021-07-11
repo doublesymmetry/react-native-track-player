@@ -10,6 +10,8 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '12.18.3'
+      - name: Cache JS Dependencies
+        uses: c-hive/gha-yarn-cache@v1
       - name: Install Yarn
         run: npm install --global yarn
       - name: Install Library Dependencies
@@ -20,18 +22,24 @@ jobs:
         run: |-
           cd example
           yarn install
+      - name: Cache Gradle Wrapper
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('example/android/gradle/wrapper/gradle-wrapper.properties') }}
+      - name: Cache Gradle Dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-caches-${{ hashFiles('example/android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-caches-
       - name: Build App
         run: |-
           cd example/android
-          ./gradlew :app:assembleDebug
+          ./gradlew assembleDebug --no-daemon
   build-ios:
     runs-on: macos-latest
-    strategy:
-      matrix:
-        destination:
-          [
-            'platform=iOS Simulator,name=iPhone 12 Pro',
-          ]
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
@@ -39,6 +47,8 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '12.18.3'
+      - name: Cache JS Dependencies
+        uses: c-hive/gha-yarn-cache@v1
       - name: Install Yarn
         run: npm install --global yarn
       - name: Install Library Dependencies
@@ -53,6 +63,13 @@ jobs:
         run: |-
           cd example/ios
           bundle install
+      - name: Cache Cocoapods Dependencies
+        uses: actions/cache@v2
+        with:
+          path: example/ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('example/ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
       - name: Cococapods
         run: |-
           cd example/ios
@@ -60,6 +77,27 @@ jobs:
       - name: Build App
         run: |-
           cd example/ios
-          xcodebuild build -workspace example.xcworkspace -scheme example -destination "${destination}"
-        env:
-          destination: ${{ matrix.destination }}
+          xcodebuild build -workspace example.xcworkspace -scheme example -destination 'platform=iOS Simulator,name=iPhone 12 Pro'
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12.18.3'
+      - name: Cache JS Dependencies
+        uses: c-hive/gha-yarn-cache@v1
+      - name: Install Library Dependencies
+        run: yarn install
+      - name: Build Library
+        run: yarn build
+      - name: Install Windows Example Dependencies
+        run: |-
+          cd example
+          yarn install
+      - name: Build App
+        run: |-
+          cd example
+          yarn windows --no-deploy --no-launch --no-packager --logging
