@@ -322,7 +322,7 @@ public class RNTrackPlayer: RCTEventEmitter {
         if (trackIndex.intValue > player.items.count) {
             reject("index_out_of_bounds", "The track index is out of bounds", nil)
         } else if trackIndex.intValue == -1 { // -1 means no index was passed and therefore should be inserted at the end.
-            try? player.add(items: tracks)
+            try? player.add(items: tracks, playWhenReady: false)
         } else {
             try? player.add(items: tracks, at: trackIndex.intValue)
         }
@@ -434,7 +434,7 @@ public class RNTrackPlayer: RCTEventEmitter {
         print("Getting current repeatMode")
         resolve(player.repeatMode.rawValue)
     }
-    
+
     @objc(setVolume:resolver:rejecter:)
     public func setVolume(level: Float, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Setting volume to \(level)")
