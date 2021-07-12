@@ -189,11 +189,12 @@ public class RNTrackPlayerAudioPlayer: QueuedAudioPlayer, QueueManagerDelegate {
     // MARK: - Private Helpers
 
     private func onTrackUpdate(previousIndex: Int?, nextIndex: Int?) {
-        reactEventEmitter.sendEvent(withName: "playback-track-changed", body: [
-            "track": previousIndex,
-            "position": currentTime,
-            "nextTrack": nextIndex,
-        ])
+        var dictionary: [String: Any] = [ "position": currentTime ]
+
+        if let previousIndex = previousIndex { dictionary["track"] = previousIndex }
+        if let nextIndex = nextIndex { dictionary["nextTrack"] = nextIndex }
+
+        reactEventEmitter.sendEvent(withName: "playback-track-changed", body: dictionary)
     }
 
     // MARK: - QueueManagerDelegate

@@ -76,7 +76,10 @@ const App = () => {
   const [trackArtist, setTrackArtist] = useState<string>();
 
   useTrackPlayerEvents([Event.PlaybackTrackChanged], async event => {
-    if (event.type === Event.PlaybackTrackChanged && event.nextTrack != null) {
+    if (
+      event.type === Event.PlaybackTrackChanged &&
+      event.nextTrack !== undefined
+    ) {
       const track = await TrackPlayer.getTrack(event.nextTrack);
       const {title, artist, artwork} = track || {};
       setTrackTitle(title);
