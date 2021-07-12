@@ -24,8 +24,6 @@ redirect_from:
 * [Events](#events)
   * [Media Controls](#media-controls)
   * [Player](#player)
-* [Components](#components)
-  * [ProgressComponent](#progresscomponent)
 * [Objects](#objects)
   * [Track Object](#track-object)
   * [Resource Object](#resource-object)
@@ -487,21 +485,6 @@ Fired when an error occurs.
 | ------- | -------- | ----------------- |
 | code    | `string` | The error code    |
 | message | `string` | The error message |
-
-## Components
-#### `ProgressComponent`
-A component base that updates itself every second with a new position. Your app should extend it with a custom render.
-
-| State            | Type     | Description                      |
-| ---------------- | -------- | -------------------------------- |
-| position         | `number` | The current position in seconds  |
-| bufferedPosition | `number` | The buffered position in seconds |
-| duration         | `number` | The duration in seconds          |
-
-| Functions           | Return Type | Description                                     |
-| ------------------- | ----------- | ----------------------------------------------- |
-| getProgress         | `number`    | The current progress expressed between 0 and 1  |
-| getBufferedProgress | `number`    | The buffered progress expressed between 0 and 1 |
 
 ## Objects
 ### Track Object
