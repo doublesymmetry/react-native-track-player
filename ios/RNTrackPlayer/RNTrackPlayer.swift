@@ -157,7 +157,7 @@ public class RNTrackPlayer: RCTEventEmitter {
         player.automaticallyWaitsToMinimizeStalling = autoWait
 
         // configure buffer size
-        let minBuffer: TimeInterval = config["minBuffer"] as? TimeInterval ?? 15
+        let minBuffer: TimeInterval = config["minBuffer"] as? TimeInterval ?? 0
         player.bufferDuration = minBuffer
 
         // configure if control center metdata should auto update
