@@ -274,6 +274,9 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(destroy)
     public func destroy() {
         print("Destroying player")
+        self.player.stop()
+        self.player.nowPlayingInfoController.clear()
+        try? AVAudioSession.sharedInstance().setActive(false)
     }
     
     @objc(updateOptions:resolver:rejecter:)
