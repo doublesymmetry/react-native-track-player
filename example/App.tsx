@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import React, { useEffect, useState } from 'react';
 import {
   Image,
@@ -10,32 +11,37 @@ import {
 } from 'react-native';
 import Slider from '@react-native-community/slider';
 import TrackPlayer, {
-  Capability,
-  Event,
-  RepeatMode,
+  // Capability,
+  // Event,
+  // RepeatMode,
   State,
   usePlaybackState,
-  useProgress,
+  useTrackPlayerProgress,
   useTrackPlayerEvents,
 } from 'react-native-track-player';
+import { PLAYBACK_TRACK_CHANGED } from 'react-native-track-player/lib/eventTypes';
+
 
 // @ts-ignore
 import playlistData from './react/data/playlist.json';
 // @ts-ignore
-import localTrack from './react/resources/pure.m4a';
+// import localTrack from './react/resources/pure.m4a';
 
 const setup = async () => {
   await TrackPlayer.setupPlayer({});
   await TrackPlayer.updateOptions({
     stopWithApp: true,
     capabilities: [
-      Capability.Play,
-      Capability.Pause,
-      Capability.SkipToNext,
-      Capability.SkipToPrevious,
-      Capability.Stop,
+      TrackPlayer.CAPABILITY_PLAY,
+      TrackPlayer.CAPABILITY_PAUSE,
+      TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
+      TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
+      TrackPlayer.CAPABILITY_STOP,
     ],
-    compactCapabilities: [Capability.Play, Capability.Pause],
+    compactCapabilities: [
+      TrackPlayer.CAPABILITY_PLAY,
+      TrackPlayer.CAPABILITY_PAUSE,
+    ],
   });
 
   await TrackPlayer.add(playlistData);
@@ -59,7 +65,7 @@ const togglePlayback = async (playbackState: State) => {
   if (currentTrack == null) {
     // TODO: Perhaps present an error or restart the playlist?
   } else {
-    if (playbackState === State.Paused) {
+    if (playbackState === TrackPlayer.STATE_PAUSED) {
       await TrackPlayer.play();
     } else {
       await TrackPlayer.pause();
@@ -69,19 +75,19 @@ const togglePlayback = async (playbackState: State) => {
 
 const App = () => {
   const playbackState = usePlaybackState();
-  const progress = useProgress();
+  const progress = useTrackPlayerProgress();
 
   const [trackArtwork, setTrackArtwork] = useState<string | number>();
   const [trackTitle, setTrackTitle] = useState<string>();
   const [trackArtist, setTrackArtist] = useState<string>();
 
-  useTrackPlayerEvents([Event.PlaybackTrackChanged], async event => {
+  useTrackPlayerEvents([PLAYBACK_TRACK_CHANGED], async event => {
     if (
-      event.type === Event.PlaybackTrackChanged &&
+      event.type === PLAYBACK_TRACK_CHANGED &&
       event.nextTrack !== undefined
     ) {
       const track = await TrackPlayer.getTrack(event.nextTrack);
-      const {title, artist, artwork} = track || {};
+      const { title, artist, artwork } = track || {};
       setTrackTitle(title);
       setTrackArtist(artist);
       setTrackArtwork(artwork);
@@ -101,7 +107,7 @@ const App = () => {
             <Text style={styles.queueButton}>Queue</Text>
           </TouchableWithoutFeedback>
         </View>
-        <Image style={styles.artwork} source={{uri: `${trackArtwork}`}} />
+        <Image style={styles.artwork} source={{ uri: `${trackArtwork}` }} />
         <Text style={styles.titleText}>{trackTitle}</Text>
         <Text style={styles.artistText}>{trackArtist}</Text>
         <Slider
@@ -133,7 +139,7 @@ const App = () => {
         </TouchableWithoutFeedback>
         <TouchableWithoutFeedback onPress={() => togglePlayback(playbackState)}>
           <Text style={styles.primaryActionButton}>
-            {playbackState === State.Playing ? 'Pause' : 'Play'}
+            {playbackState === TrackPlayer.STATE_PLAYING ? 'Pause' : 'Play'}
           </Text>
         </TouchableWithoutFeedback>
         <TouchableWithoutFeedback onPress={() => TrackPlayer.skipToNext()}>
