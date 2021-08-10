@@ -45,7 +45,7 @@ permalink: /platform-support/
 | Caching | ✓ | ✗ | ✗ |
 | Background Mode¹ | ✓ | ✓ | ✓ |
 
-¹: Read more in [Background Mode](https://react-native-kit.github.io/react-native-track-player/background/)
+¹: Read more in [Background Mode](https://react-native-track-player.js.org/react-native-track-player/background/)
 
 ## Functions
 
