@@ -217,8 +217,10 @@ void TrackPlayerModule::GetCurrentTrack(ReactPromise<JSValue> promise) noexcept
     if (Utils::CheckPlayback(player, promise))
         return;
 
-    auto track = player->currentTrack;
-    promise.Resolve(track != -1 ? track : JSValue());
+    auto index = player->currentTrack;
+    auto adjustedIndex = index < 0 || index >= queue.size() ? nullptr : index;
+
+    promise.Resolve(adjustedIndex);
 }
 
 void TrackPlayerModule::GetTrack(const int index, ReactPromise<JSValue> promise) noexcept
@@ -229,12 +231,12 @@ void TrackPlayerModule::GetTrack(const int index, ReactPromise<JSValue> promise)
 
     auto& queue = player->GetQueue();
 
-    if (index < 0 || index > queue.size() - 1) {
-        promise.Reject("The track index is out of bounds");
+    if (index >= 0 && index < queue.size()) {
+        auto track = queue[index];
+        promise.Resolve(track.ToObject());
+    } else {
+        promise.Resolve(nullptr);
     }
-
-    auto track = queue[index];
-    promise.Resolve(track.ToObject());
 }
 
 void TrackPlayerModule::GetVolume(ReactPromise<JSValue> promise) noexcept

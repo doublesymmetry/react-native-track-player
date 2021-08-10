@@ -153,7 +153,7 @@ void Playback::RemoveUpcomingTracks()
 
 void Playback::Skip(int index, React::ReactPromise<JSValue>& promise)
 {
-    if (index < 0 || index > queue.size() - 1) {
+    if (index < 0 || index >= queue.size()) {
         promise.Reject("The track index is out of bounds");
     }
     else
