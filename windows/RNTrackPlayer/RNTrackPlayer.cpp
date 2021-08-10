@@ -218,9 +218,7 @@ void TrackPlayerModule::GetCurrentTrack(ReactPromise<JSValue> promise) noexcept
         return;
 
     auto index = player->currentTrack;
-    auto adjustedIndex = index < 0 || index >= queue.size() ? nullptr : index;
-
-    promise.Resolve(adjustedIndex);
+    promise.Resolve(index < 0 || index >= queue.size() ? nullptr : index);
 }
 
 void TrackPlayerModule::GetTrack(const int index, ReactPromise<JSValue> promise) noexcept
