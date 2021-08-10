@@ -355,7 +355,7 @@ public class RNTrackPlayer: RCTEventEmitter {
 
     @objc(skip:resolver:rejecter:)
     public func skip(to trackIndex: NSNumber, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if (trackIndex.intValue < 0 || trackIndex.intValue > player.items.count) {
+        if (trackIndex.intValue < 0 || trackIndex.intValue >= player.items.count) {
             reject("index_out_of_bounds", "The track index is out of bounds", nil)
             return
         }
@@ -510,7 +510,7 @@ public class RNTrackPlayer: RCTEventEmitter {
 
     @objc(updateMetadataForTrack:metadata:resolver:rejecter:)
     public func updateMetadata(for trackIndex: NSNumber, metadata: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if (trackIndex.intValue < 0 || trackIndex.intValue > player.items.count) {
+        if (trackIndex.intValue < 0 || trackIndex.intValue >= player.items.count) {
             reject("index_out_of_bounds", "The track index is out of bounds", nil)
             return
         }
