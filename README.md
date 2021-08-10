@@ -8,14 +8,6 @@ A fully-fledged audio module created for music apps. Provides audio playback, ex
 
 ---
 
-## ⚠️ V2
-
-**WARNING: You're currently looking at our `v2` branch which is still in progress.**
-
-We are currently hard at work trying to release `2.0`. We have a `2.0.0-rc18` prerelease out and we're hoping to finalize this release soon (you can track the progress [here](https://github.com/DoubleSymmetry/react-native-track-player/issues/662)). We do not have a changelog yet we will wrap that up once the release is more stable.
-
-> If you're looking for the readme & examples for `react-native-track-player v1.2.7` - find it on [github](https://github.com/DoubleSymmetry/react-native-track-player/tree/v1.2.7).
-
 ## Features
 
 * **Lightweight** - Optimized to use the least amount of resources according to your needs
