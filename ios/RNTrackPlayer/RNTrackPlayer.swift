@@ -466,13 +466,12 @@ public class RNTrackPlayer: RCTEventEmitter {
 
     @objc(getTrack:resolver:rejecter:)
     public func getTrack(index: NSNumber, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if (index.intValue < 0 || index.intValue > player.items.count) {
-            reject("index_out_of_bounds", "The track index is out of bounds", nil)
-            return
+        if (index.intValue >= 0 && index.intValue < player.items.count) {
+            let track = player.items[index.intValue]
+            resolve((track as? Track)?.toObject())
+        } else {
+            resolve(nil)
         }
-
-        let track = player.items[index.intValue]
-        resolve((track as? Track)?.toObject())
     }
 
     @objc(getQueue:rejecter:)
