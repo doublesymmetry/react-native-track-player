@@ -110,20 +110,20 @@ public class RNTrackPlayer: RCTEventEmitter {
 
     @objc func handleInterruption(notification: Notification) {
         guard let userInfo = notification.userInfo,
-            let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
-            let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
-                return
+              let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
+              let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
+            return
         }
         if type == .began {
             // Interruption began, take appropriate actions (save state, update user interface)
             self.sendEvent(withName: "remote-duck", body: [
                 "paused": true
-                ])
+            ])
         }
         else if type == .ended {
             guard let optionsValue =
-                userInfo[AVAudioSessionInterruptionOptionKey] as? UInt else {
-                    return
+                    userInfo[AVAudioSessionInterruptionOptionKey] as? UInt else {
+                return
             }
             let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
             if options.contains(.shouldResume) {
@@ -227,7 +227,7 @@ public class RNTrackPlayer: RCTEventEmitter {
 
         player.remoteCommandController.handleSkipBackwardCommand = { [weak self] event in
             if let command = event.command as? MPSkipIntervalCommand,
-                let interval = command.preferredIntervals.first {
+               let interval = command.preferredIntervals.first {
                 self?.sendEvent(withName: "remote-jump-backward", body: ["interval": interval])
                 return MPRemoteCommandHandlerStatus.success
             }
@@ -237,7 +237,7 @@ public class RNTrackPlayer: RCTEventEmitter {
 
         player.remoteCommandController.handleSkipForwardCommand = { [weak self] event in
             if let command = event.command as? MPSkipIntervalCommand,
-                let interval = command.preferredIntervals.first {
+               let interval = command.preferredIntervals.first {
                 self?.sendEvent(withName: "remote-jump-forward", body: ["interval": interval])
                 return MPRemoteCommandHandlerStatus.success
             }
@@ -282,6 +282,9 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(destroy)
     public func destroy() {
         print("Destroying player")
+        self.player.stop()
+        self.player.nowPlayingInfoController.clear()
+        try? AVAudioSession.sharedInstance().setActive(false)
     }
 
     @objc(updateOptions:resolver:rejecter:)
