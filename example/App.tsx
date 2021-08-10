@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Image,
   SafeAreaView,
@@ -75,18 +75,25 @@ const App = () => {
   const [trackTitle, setTrackTitle] = useState<string>();
   const [trackArtist, setTrackArtist] = useState<string>();
 
-  useTrackPlayerEvents([Event.PlaybackTrackChanged], async event => {
-    if (
-      event.type === Event.PlaybackTrackChanged &&
-      event.nextTrack !== undefined
-    ) {
-      const track = await TrackPlayer.getTrack(event.nextTrack);
-      const {title, artist, artwork} = track || {};
-      setTrackTitle(title);
-      setTrackArtist(artist);
-      setTrackArtwork(artwork);
-    }
-  });
+  useTrackPlayerEvents(
+    [Event.PlaybackTrackChanged, Event.RemotePlay, Event.RemotePause],
+    async event => {
+      if (
+        event.type === Event.PlaybackTrackChanged &&
+        event.nextTrack !== undefined
+      ) {
+        const track = await TrackPlayer.getTrack(event.nextTrack);
+        const {title, artist, artwork} = track || {};
+        setTrackTitle(title);
+        setTrackArtist(artist);
+        setTrackArtwork(artwork);
+      } else if (event.type === Event.RemotePause) {
+        TrackPlayer.pause();
+      } else if (event.type === Event.RemotePlay) {
+        TrackPlayer.play();
+      }
+    },
+  );
 
   useEffect(() => {
     setup();
