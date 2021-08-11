@@ -119,7 +119,7 @@ async function updateMetadataForTrack(trackIndex: number, metadata: TrackMetadat
   // Clone the object before modifying it
   metadata = Object.assign({}, metadata)
 
-  // Resolve the artowork URL
+  // Resolve the artwork URL
   metadata.artwork = resolveImportedPath(metadata.artwork)
 
   return TrackPlayer.updateMetadataForTrack(trackIndex, metadata)
@@ -133,7 +133,7 @@ function updateNowPlayingMetadata(metadata: NowPlayingMetadata): Promise<void> {
   // Clone the object before modifying it
   metadata = Object.assign({}, metadata)
 
-  // Resolve the artowork URL
+  // Resolve the artwork URL
   metadata.artwork = resolveImportedPath(metadata.artwork)
 
   return TrackPlayer.updateNowPlayingMetadata(metadata)
