@@ -22,3 +22,6 @@ To install release candidates run `yarn add react-native-track-player@next`
 * Fix compilation of Windows module.
   [dcvz](https://github.com/dcvz)
 
+* Fix regression in updating artwork on `updateMetadata` and `updateNowPlayingMetadata`
+  [dcvz](https://github.com/dcvz)
+  [#662](https://github.com/DoubleSymmetry/react-native-track-player/issues/662#issuecomment-896370375)
