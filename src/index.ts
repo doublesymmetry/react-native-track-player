@@ -116,6 +116,12 @@ async function updateOptions(options: MetadataOptions = {}): Promise<void> {
 }
 
 async function updateMetadataForTrack(trackIndex: number, metadata: TrackMetadataBase): Promise<void> {
+  // Clone the object before modifying it
+  metadata = Object.assign({}, metadata)
+
+  // Resolve the artwork URL
+  metadata.artwork = resolveImportedPath(metadata.artwork)
+
   return TrackPlayer.updateMetadataForTrack(trackIndex, metadata)
 }
 
@@ -124,6 +130,12 @@ function clearNowPlayingMetadata(): Promise<void> {
 }
 
 function updateNowPlayingMetadata(metadata: NowPlayingMetadata): Promise<void> {
+  // Clone the object before modifying it
+  metadata = Object.assign({}, metadata)
+
+  // Resolve the artwork URL
+  metadata.artwork = resolveImportedPath(metadata.artwork)
+
   return TrackPlayer.updateNowPlayingMetadata(metadata)
 }
 
