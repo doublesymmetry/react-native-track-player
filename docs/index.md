@@ -81,10 +81,10 @@ When migrating from v1 to v2, the following methods have changed:
 + async function getCurrentTrack(): Promise<number> {
 ```
 
-## Maintainers
+## Core Team
 
 [David Chavez](https://github.com/dcvz) under [Double Symmetry](https://doublesymmetry.com)
 
-## Other/Previous Maintainers
+## Special Thanks
 
 [Guilherme Chaguri](https://github.com/Guichaguri), [Dustin Bahr](https://github.com/curiousdustin)
