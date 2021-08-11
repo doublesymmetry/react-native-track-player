@@ -8,6 +8,7 @@
 
 import Foundation
 import MediaPlayer
+import SwiftAudioEx
 
 @objc(RNTrackPlayer)
 public class RNTrackPlayer: RCTEventEmitter {
@@ -15,13 +16,19 @@ public class RNTrackPlayer: RCTEventEmitter {
     // MARK: - Attributes
 
     private var hasInitialized = false
-
-    private lazy var player: RNTrackPlayerAudioPlayer = {
-        let player = RNTrackPlayerAudioPlayer(reactEventEmitter: self)
-        return player
-    }()
+    private let player = QueuedAudioPlayer()
 
     // MARK: - Lifecycle Methods
+
+    public override init() {
+        super.init()
+
+        player.event.playbackEnd.addListener(self, handleAudioPlayerPlaybackEnded)
+        player.event.receiveMetadata.addListener(self, handleAudioPlayerMetadataReceived)
+        player.event.stateChange.addListener(self, handleAudioPlayerStateChange)
+        player.event.fail.addListener(self, handleAudioPlayerFailed)
+        player.event.queueIndex.addListener(self, handleAudioPlayerQueueIndexChange)
+    }
 
     deinit {
         reset(resolve: { _ in }, reject: { _, _, _  in })
@@ -296,15 +303,13 @@ public class RNTrackPlayer: RCTEventEmitter {
         }
         let capabilities = capabilitiesStr.compactMap { Capability(rawValue: $0) }
 
-        let remoteCommands = capabilities.map { capability in
+        player.remoteCommands = capabilities.map { capability in
             capability.mapToPlayerCommand(forwardJumpInterval: options["forwardJumpInterval"] as? NSNumber,
                                           backwardJumpInterval: options["backwardJumpInterval"] as? NSNumber,
                                           likeOptions: options["likeOptions"] as? [String: Any],
                                           dislikeOptions: options["dislikeOptions"] as? [String: Any],
                                           bookmarkOptions: options["bookmarkOptions"] as? [String: Any])
         }
-
-        player.enableRemoteCommands(remoteCommands)
 
         resolve(NSNull())
     }
@@ -431,7 +436,7 @@ public class RNTrackPlayer: RCTEventEmitter {
 
     @objc(setRepeatMode:resolver:rejecter:)
     public func setRepeatMode(repeatMode: NSNumber, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        player.repeatMode = RepeatMode(rawValue: repeatMode.intValue) ?? .off
+        player.repeatMode = SwiftAudioEx.RepeatMode(rawValue: repeatMode.intValue) ?? .off
         resolve(NSNull())
     }
 
@@ -536,5 +541,107 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(updateNowPlayingMetadata:resolver:rejecter:)
     public func updateNowPlayingMetadata(metadata: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         Metadata.update(for: player, with: metadata)
+    }
+
+    // MARK: - QueuedAudioPlayer Event Handlers
+
+    func handleAudioPlayerStateChange(state: AVPlayerWrapperState) {
+        sendEvent(withName: "playback-state", body: ["state": state.rawValue])
+    }
+
+    func handleAudioPlayerMetadataReceived(metadata: [AVMetadataItem]) {
+        func getMetadataItem(forIdentifier: AVMetadataIdentifier) -> String {
+            return AVMetadataItem.metadataItems(from: metadata, filteredByIdentifier: forIdentifier).first?.stringValue ?? ""
+        }
+
+        var source: String {
+            switch metadata.first?.keySpace {
+            case AVMetadataKeySpace.id3:
+                return "id3"
+            case AVMetadataKeySpace.icy:
+                return "icy"
+            case AVMetadataKeySpace.quickTimeMetadata:
+                return "quicktime"
+            case AVMetadataKeySpace.common:
+                return "unknown"
+            default: return "unknown"
+            }
+        }
+
+        let album = getMetadataItem(forIdentifier: .commonIdentifierAlbumName)
+        var artist = getMetadataItem(forIdentifier: .commonIdentifierArtist)
+        var title = getMetadataItem(forIdentifier: .commonIdentifierTitle)
+        var date = getMetadataItem(forIdentifier: .commonIdentifierCreationDate)
+        var url = "";
+        var genre = "";
+        if (source == "icy") {
+            url = getMetadataItem(forIdentifier: .icyMetadataStreamURL)
+        } else if (source == "id3") {
+            if (date.isEmpty) {
+                date = getMetadataItem(forIdentifier: .id3MetadataDate)
+            }
+            genre = getMetadataItem(forIdentifier: .id3MetadataContentType)
+            url = getMetadataItem(forIdentifier: .id3MetadataOfficialAudioSourceWebpage)
+            if (url.isEmpty) {
+                url = getMetadataItem(forIdentifier: .id3MetadataOfficialAudioFileWebpage)
+            }
+            if (url.isEmpty) {
+                url = getMetadataItem(forIdentifier: .id3MetadataOfficialArtistWebpage)
+            }
+        } else if (source == "quicktime") {
+            genre = getMetadataItem(forIdentifier: .quickTimeMetadataGenre)
+        }
+
+        // Detect ICY metadata and split title into artist & title:
+        // - source should be either "unknown" (pre iOS 14) or "icy" (iOS 14 and above)
+        // - we have a title, but no artist
+        if ((source == "unknown" || source == "icy") && !title.isEmpty && artist.isEmpty) {
+            if let index = title.range(of: " - ")?.lowerBound {
+                artist = String(title.prefix(upTo: index));
+                title = String(title.suffix(from: title.index(index, offsetBy: 3)));
+            }
+        }
+        var data : [String : String?] = [
+            "title": title.isEmpty ? nil : title,
+            "url": url.isEmpty ? nil : url,
+            "artist": artist.isEmpty ? nil : artist,
+            "album": album.isEmpty ? nil : album,
+            "date": date.isEmpty ? nil : date,
+            "genre": genre.isEmpty ? nil : genre
+        ]
+        if (data.values.contains { $0 != nil }) {
+            data["source"] = source
+            sendEvent(withName: "playback-metadata-received", body: data)
+        }
+    }
+
+    func handleAudioPlayerFailed(error: Error?) {
+        sendEvent(withName: "playback-error", body: ["error": error?.localizedDescription])
+    }
+
+    func handleAudioPlayerPlaybackEnded(reason: PlaybackEndedReason) {
+        // fire an event for the queue ending
+        if player.nextItems.count == 0 {
+            sendEvent(withName: "playback-queue-ended", body: [
+                "track": player.currentIndex,
+                "position": player.currentTime,
+            ])
+        }
+
+        // fire an event for the same track starting again
+        switch player.repeatMode {
+        case .track:
+            handleAudioPlayerQueueIndexChange(previousIndex: player.currentIndex, nextIndex: player.currentIndex)
+        default: break
+        }
+    }
+
+    func handleAudioPlayerQueueIndexChange(previousIndex: Int?, nextIndex: Int?) {
+        var dictionary: [String: Any] = [ "position": player.currentTime ]
+
+        if let previousIndex = previousIndex { dictionary["track"] = previousIndex }
+        if let nextIndex = nextIndex { dictionary["nextTrack"] = nextIndex }
+
+        sendEvent(withName: "playback-track-changed", body: dictionary)
     }
 }

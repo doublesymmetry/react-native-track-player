@@ -8,6 +8,7 @@
 
 import Foundation
 import MediaPlayer
+import SwiftAudioEx
 
 struct Metadata {
     private static var currentImageTask: URLSessionDataTask?
