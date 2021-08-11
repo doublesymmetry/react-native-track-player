@@ -55,6 +55,32 @@ const setup = async () => {
 };
 ```
 
+## ⚠️ V2 Migration Guide
+
+All queue methods have been updating to work on indexes instead of id's. We want this library to support all kinds of apps -- and moving to be index based will allow us to better support applications who have long/endless queues and in the future to allow us to build a performant API around queue management.
+
+When migrating from v1 to v2, the following methods have changed:
+
+```diff
+- async function add(tracks: Track | Track[], insertBeforeId?: string): Promise<void> {
++ async function add(tracks: Track | Track[], insertBeforeIndex?: number): Promise<void> {
+
+- async function remove(tracks: string | string[]): Promise<void> {
++ async function remove(tracks: number | number[]): Promise<void> {
+
+- async function skip(trackId: string): Promise<void> {
++ function skip(trackIndex: number): Promise<void> {
+
+- async function updateMetadataForTrack(trackId: string, metadata: TrackMetadataBase): Promise<void> {
++ async function updateMetadataForTrack(trackIndex: number, metadata: TrackMetadataBase): Promise<void> {
+
+- async function getTrack(trackId: string): Promise<Track> {
++ async function getTrack(trackIndex: number): Promise<Track> {
+
+- async function getCurrentTrack(): Promise<string> {
++ async function getCurrentTrack(): Promise<number> {
+```
+
 ## Maintainers
 
 [David Chavez](https://github.com/dcvz) under [Double Symmetry](https://doublesymmetry.com)
