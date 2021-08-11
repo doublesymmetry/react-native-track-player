@@ -3,12 +3,16 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "postinstall": "rm -rf node_modules/react-native-track-player/{example,node_modules}",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "windows": "react-native run-windows",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "sync:ios": "yarn rimraf ../ios && yarn cpx 'node_modules/react-native-track-player/ios/**' ../ios",
+    "sync:android": "yarn rimraf ../android && yarn cpx 'node_modules/react-native-track-player/android/**' ../android",
+    "sync": "yarn sync:ios && yarn sync:android"
   },
   "dependencies": {
     "@react-native-community/slider": "4.0.0-rc.3",
@@ -26,10 +30,12 @@
     "@types/react-native": "^0.64.5",
     "@types/react-test-renderer": "^16.9.2",
     "babel-jest": "^26.6.3",
+    "cpx": "^1.5.0",
     "eslint": "^7.14.0",
     "jest": "^26.6.3",
     "metro-react-native-babel-preset": "^0.64.0",
     "react-test-renderer": "17.0.1",
+    "rimraf": "^3.0.2",
     "typescript": "^3.8.3"
   },
   "resolutions": {
