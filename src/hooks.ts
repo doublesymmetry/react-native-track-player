@@ -17,9 +17,7 @@ export const usePlaybackState = () => {
       setState(data.state)
     })
 
-    return () => {
-      sub.remove()
-    }
+    return () => sub.remove()
   }, [])
 
   return state
@@ -59,20 +57,8 @@ export const useTrackPlayerEvents = (events: Event[], handler: Handler) => {
       TrackPlayer.addEventListener(event, payload => savedHandler.current!({ ...payload, type: event })),
     )
 
-    return () => {
-      subs.forEach(sub => sub.remove())
-    }
+    return () => subs.forEach(sub => sub.remove())
   }, events)
-}
-
-function usePrevious(value: any) {
-  const ref = useRef()
-
-  useEffect(() => {
-    ref.current = value
-  })
-
-  return ref.current
 }
 
 export interface ProgressState {
@@ -115,6 +101,8 @@ export function useProgress(updateInterval?: number) {
       setState({ position: 0, duration: 0, buffered: 0 })
       return
     }
+
+    getProgress()
 
     const poll = setInterval(getProgress, updateInterval || 1000)
     return () => clearInterval(poll)
