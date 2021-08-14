@@ -8,11 +8,13 @@ To install release candidates run `yarn add react-native-track-player@next`
 
 ##### Enhancements
 
-* None.  
+* Import SwiftAudioEx through podspec
+  [dcvz](https://github.com/dcvz)
 
 ##### Bug Fixes
 
-* None.  
+* `useProgress` hook should update while paused
+  [dcvz](https://github.com/dcvz)
 
 
 ## 2.0.1 (11.08.21)

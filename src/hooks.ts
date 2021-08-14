@@ -65,13 +65,30 @@ export const useTrackPlayerEvents = (events: Event[], handler: Handler) => {
   }, events)
 }
 
+function usePrevious(value: any) {
+  const ref = useRef()
+
+  useEffect(() => {
+    ref.current = value
+  })
+
+  return ref.current
+}
+
+export interface ProgressState {
+  position: number
+  duration: number
+  buffered: number
+}
+
 /**
  * Poll for track progress for the given interval (in miliseconds)
  * @param interval - ms interval
  */
 export function useProgress(updateInterval?: number) {
-  const [state, setState] = useState({ position: 0, duration: 0, buffered: 0 })
+  const [state, setState] = useState<ProgressState>({ position: 0, duration: 0, buffered: 0 })
   const playerState = usePlaybackState()
+  const stateRef = useRef(state)
 
   const getProgress = async () => {
     const [position, duration, buffered] = await Promise.all([
@@ -79,15 +96,26 @@ export function useProgress(updateInterval?: number) {
       TrackPlayer.getDuration(),
       TrackPlayer.getBufferedPosition(),
     ])
-    setState({ position, duration, buffered })
+
+    if (
+      position === stateRef.current.position &&
+      duration === stateRef.current.duration &&
+      buffered === stateRef.current.buffered
+    )
+      return
+
+    const state = { position, duration, buffered }
+    // @ts-ignore
+    stateRef.current = state
+    setState(state)
   }
 
   useEffect(() => {
-    if (playerState === State.Stopped) {
+    if (playerState === State.None) {
       setState({ position: 0, duration: 0, buffered: 0 })
       return
     }
-    if (playerState !== State.Playing && playerState !== State.Buffering) return
+
     const poll = setInterval(getProgress, updateInterval || 1000)
     return () => clearInterval(poll)
   }, [playerState])
