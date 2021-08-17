@@ -75,6 +75,13 @@ export function useProgress(updateInterval?: number) {
   const [state, setState] = useState<ProgressState>({ position: 0, duration: 0, buffered: 0 })
   const playerState = usePlaybackState()
   const stateRef = useRef(state)
+  const isUnmountedRef = useRef(true)
+  useEffect(() => {
+    isUnmountedRef.current = false
+    return () => {
+      isUnmountedRef.current = true
+    }
+  }, [])
 
   const getProgress = async () => {
     const [position, duration, buffered] = await Promise.all([
@@ -82,6 +89,8 @@ export function useProgress(updateInterval?: number) {
       TrackPlayer.getDuration(),
       TrackPlayer.getBufferedPosition(),
     ])
+    // After the asynchronous code is executed, if the component has been uninstalled, do not update the status
+    if (isUnmountedRef.current) return
 
     if (
       position === stateRef.current.position &&
