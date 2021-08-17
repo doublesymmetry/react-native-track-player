@@ -58,7 +58,7 @@ export const useTrackPlayerEvents = (events: Event[], handler: Handler) => {
     )
 
     return () => subs.forEach(sub => sub.remove())
-  }, events)
+  }, [events])
 }
 
 export interface ProgressState {
@@ -106,7 +106,7 @@ export function useProgress(updateInterval?: number) {
 
     const poll = setInterval(getProgress, updateInterval || 1000)
     return () => clearInterval(poll)
-  }, [playerState])
+  }, [playerState, updateInterval])
 
   return state
 }
