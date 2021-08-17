@@ -8,7 +8,7 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.SimpleExoPlayer
 import java.util.concurrent.TimeUnit
 
-class AudioPlayer(context: Context) {
+class AudioPlayer(private val context: Context) {
     private lateinit var exoPlayer: SimpleExoPlayer
 
     private val handler = Handler(Looper.getMainLooper())
@@ -23,6 +23,10 @@ class AudioPlayer(context: Context) {
         val mediaItem = MediaItem.fromUri(item.audioUrl)
         exoPlayer.addMediaItem(mediaItem)
         exoPlayer.prepare()
+
+        val manager = PlaybackNotificationManager(context, item)
+        val notification = manager.createNotification()
+        manager.refreshNotification(notification)
     }
 
     fun togglePlaying() {
