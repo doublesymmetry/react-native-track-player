@@ -26,7 +26,12 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
 
-        val item = DefaultAudioItem("https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3", SourceType.FILE)
+        val item = DefaultAudioItem(
+            "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3", SourceType.FILE,
+            title = "Dirty Computer",
+            artwork = "https://upload.wikimedia.org/wikipedia/en/0/0b/DirtyComputer.png",
+            artist = "Janelle Monáe"
+        )
         val player = AudioPlayer(this)
         player.load(item)
     }

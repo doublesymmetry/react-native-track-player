@@ -66,7 +66,7 @@ class PlaybackNotificationManager(private val context: Context, private val audi
             it.setMediaSession(mediaSessionCompat.sessionToken)
         }
 
-        val boldTitle = SpannableString(audioItem.title ?: context.getString(R.string.no_track))
+        val boldTitle = SpannableString(audioItem.title ?: context.getString(R.string.unnamed_track))
         boldTitle.setSpan(StyleSpan(Typeface.BOLD), 0, boldTitle.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
         return NotificationCompat.Builder(context, channelId)

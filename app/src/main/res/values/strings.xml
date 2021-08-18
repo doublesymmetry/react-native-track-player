@@ -77,4 +77,5 @@
     <string name="skip_track">Don\'t like the track? Vote to skip it! \nA song can be skipped if enough listeners vote.</string>
     <string name="skip">Skip</string>
     <string name="unlike">Unlike</string>
+    <string name="unnamed_track">Unnamed track</string>
 </resources>
