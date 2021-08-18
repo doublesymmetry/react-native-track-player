@@ -3,12 +3,11 @@ package com.doublesymmetry.kotlinaudio
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.doublesymmetry.kotlinaudio.databinding.ActivityMainBinding
-import com.doublesymmetry.kotlinaudio.models.DefaultAudioItem
-import com.doublesymmetry.kotlinaudio.models.SourceType
 
 class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -22,18 +21,12 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbar)
 
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
+        val navController = navHostFragment.navController
+
+//        val navController = findNavController(R.id.nav_host_fragment_content_main)
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
-
-        val item = DefaultAudioItem(
-            "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3", SourceType.FILE,
-            title = "Dirty Computer",
-            artwork = "https://upload.wikimedia.org/wikipedia/en/0/0b/DirtyComputer.png",
-            artist = "Janelle Monáe"
-        )
-        val player = AudioPlayer(this)
-        player.load(item)
     }
 
     override fun onSupportNavigateUp(): Boolean {

@@ -8,16 +8,12 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.SimpleExoPlayer
 import java.util.concurrent.TimeUnit
 
-class AudioPlayer(private val context: Context) {
-    private lateinit var exoPlayer: SimpleExoPlayer
+open class AudioPlayer(private val context: Context) {
+    protected val exoPlayer: SimpleExoPlayer = SimpleExoPlayer.Builder(context).build()
 
     private val handler = Handler(Looper.getMainLooper())
 
-    init {
-        exoPlayer = SimpleExoPlayer.Builder(context).build()
-    }
-
-    fun load(item: AudioItem, playWhenReady: Boolean = true) {
+    open fun load(item: AudioItem, playWhenReady: Boolean = true) {
         exoPlayer.playWhenReady = playWhenReady
 
         val mediaItem = MediaItem.fromUri(item.audioUrl)
@@ -38,6 +34,7 @@ class AudioPlayer(private val context: Context) {
     }
 
     fun play() {
+        exoPlayer.prepare()
         exoPlayer.play()
     }
 
@@ -45,7 +42,7 @@ class AudioPlayer(private val context: Context) {
         exoPlayer.pause()
     }
 
-    fun stop() {
+    open fun stop() {
         exoPlayer.release()
         seek(23, TimeUnit.MINUTES)
     }
