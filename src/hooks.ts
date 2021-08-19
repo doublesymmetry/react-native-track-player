@@ -8,7 +8,9 @@ export const usePlaybackState = () => {
 
   useEffect(() => {
     isUnmountedRef.current = false
-    return () => { isUnmountedRef.current = true }
+    return () => {
+      isUnmountedRef.current = true
+    }
   }, [])
 
   useEffect(() => {
@@ -90,7 +92,9 @@ export function useProgress(updateInterval?: number) {
 
   useEffect(() => {
     isUnmountedRef.current = false
-    return () => { isUnmountedRef.current = true }
+    return () => {
+      isUnmountedRef.current = true
+    }
   }, [])
 
   const getProgress = async () => {
