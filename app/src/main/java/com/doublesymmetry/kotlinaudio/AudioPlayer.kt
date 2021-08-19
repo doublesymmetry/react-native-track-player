@@ -34,10 +34,12 @@ open class AudioPlayer(private val context: Context) {
             ""
         }
 
-//        mediaSessionConnector.setPlayer(exoPlayer)
+        mediaSessionConnector.setPlayer(exoPlayer)
+
         val builder = PlayerNotificationManager.Builder(context, NOTIFICATION_ID, channelId)
         playerNotificationManager = builder.build()
         playerNotificationManager.setPlayer(exoPlayer)
+        playerNotificationManager.setMediaSessionToken(mediaSession.sessionToken)
     }
 
 
