@@ -7,9 +7,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
-import android.media.MediaMetadata
 import android.os.Build
-import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.text.Spannable
 import android.text.SpannableString
@@ -17,15 +15,16 @@ import android.text.style.StyleSpan
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.media.app.NotificationCompat.MediaStyle
 import coil.imageLoader
 import coil.request.ImageRequest
 import com.doublesymmetry.kotlinaudio.models.AudioItem
 
 //@InternalCoroutinesApi
 //@SuppressLint("UnspecifiedImmutableFlag")
-class PlaybackNotificationManager(private val context: Context, private val audioItem: AudioItem) {
+class PlaybackNotificationManager(private val context: Context) {
 
-//    private val context: Context by inject()
+    //    private val context: Context by inject()
 //    private val sessionManager: SessionManager by inject()
 //    private val likedTracksManager: LikedTracksManager by inject()
 //
@@ -34,12 +33,12 @@ class PlaybackNotificationManager(private val context: Context, private val audi
     private var artworkBitmap: Bitmap? = null
 //    private var artworkRequestDisposable: Disposable? = null
 
-    private val mediaSessionCompat = MediaSessionCompat(context, MEDIA_SESSION_TAG)
+//    private val mediaSessionCompat = MediaSessionCompat(context, MEDIA_SESSION_TAG)
 
     init {
         // Remove seekbar
-        val mediaMetadata = MediaMetadata.Builder().putLong(MediaMetadata.METADATA_KEY_DURATION, NO_DURATION).build()
-        mediaSessionCompat.setMetadata(MediaMetadataCompat.fromMediaMetadata(mediaMetadata))
+//        val mediaMetadata = MediaMetadata.Builder().putLong(MediaMetadata.METADATA_KEY_DURATION, NO_DURATION).build()
+//        mediaSessionCompat.setMetadata(MediaMetadataCompat.fromMediaMetadata(mediaMetadata))
 
         channelId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel()
@@ -48,8 +47,14 @@ class PlaybackNotificationManager(private val context: Context, private val audi
         }
     }
 
-    fun createNotification(): Notification {
-        return initBaseNotificationBuilder()
+    fun createNotification(mediaSession: MediaSessionCompat, item: AudioItem): Notification {
+//        val token = mediaSession.sessionToken
+//        val mediaStyle = Notification.MediaStyle().setMediaSession(token)
+//        val mediaStyle = NotificationCompat.
+        val mediaStyle = MediaStyle().setMediaSession(mediaSession.sessionToken)
+
+        return initBaseNotificationBuilder(item)
+            .setStyle(mediaStyle)
             .setWhen(System.currentTimeMillis() - 50) // TODO: Set playtime
             .build()
     }
@@ -60,21 +65,21 @@ class PlaybackNotificationManager(private val context: Context, private val audi
         }
     }
 
-    private fun initBaseNotificationBuilder(): NotificationCompat.Builder {
-        val mediaStyle = androidx.media.app.NotificationCompat.MediaStyle().also {
-            it.setShowActionsInCompactView(0)
-            it.setMediaSession(mediaSessionCompat.sessionToken)
-        }
+    private fun initBaseNotificationBuilder(item: AudioItem): NotificationCompat.Builder {
+//        val mediaStyle = MediaStyle().also {
+//            it.setShowActionsInCompactView(0)
+//            it.setMediaSession(mediaSessionCompat.sessionToken)
+//        }
 
-        val boldTitle = SpannableString(audioItem.title ?: context.getString(R.string.unnamed_track))
+        val boldTitle = SpannableString(item.title ?: context.getString(R.string.unnamed_track))
         boldTitle.setSpan(StyleSpan(Typeface.BOLD), 0, boldTitle.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
         return NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.exo_icon_play) //TODO: Custom icon
             .setContentTitle(boldTitle)
-            .setContentText(audioItem.artist)
-            .setLargeIcon(getLargeIcon())
-            .setStyle(mediaStyle)
+            .setContentText(item.artist)
+            .setLargeIcon(getLargeIcon(item))
+//            .setStyle(mediaStyle)
             .setOngoing(true)
             .setUsesChronometer(true)
 //            .addAction(createMuteUnmuteAction())
@@ -97,14 +102,14 @@ class PlaybackNotificationManager(private val context: Context, private val audi
         return channelId
     }
 
-    private fun getLargeIcon(): Bitmap? {
+    private fun getLargeIcon(item: AudioItem): Bitmap? {
 //        if (socketTrack == null) {
 //            artworkBitmap = null
 //        }
 
         val imageLoader = context.imageLoader
         val request = ImageRequest.Builder(context)
-            .data(audioItem.artwork)
+            .data(item.artwork)
             .target { artworkBitmap = (it as BitmapDrawable).bitmap }
             .build()
 
