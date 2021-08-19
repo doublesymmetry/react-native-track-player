@@ -12,6 +12,16 @@ To install release candidates run `yarn add react-native-track-player@next`
 
 ##### Bug Fixes
 
+* None.
+
+## 2.0.3 (19.08.21)
+
+##### Enhancements
+
+* None.
+
+##### Bug Fixes
+
 * Fix `Event.PlaybackQueueEnded` firing on initialization on Android
   [dcvz](https://github.com/dcvz)
   [#1229](https://github.com/DoubleSymmetry/react-native-track-player/issues/1229)
