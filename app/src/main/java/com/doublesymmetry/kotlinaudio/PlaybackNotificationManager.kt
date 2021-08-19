@@ -157,7 +157,7 @@ class PlaybackNotificationManager(private val context: Context) {
     companion object {
         private const val MEDIA_SESSION_TAG = "one_beat_media_session"
         private const val NO_DURATION = -1L
-        private const val CHANNEL_ID = "onebeat_playback"
+        const val CHANNEL_ID = "onebeat_playback"
         const val NOTIFICATION_ID = 1
     }
 }

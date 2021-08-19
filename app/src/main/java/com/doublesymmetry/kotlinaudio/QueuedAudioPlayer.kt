@@ -7,7 +7,7 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player.*
 import java.util.*
 
-class QueuedAudioPlayer(context: Context) : AudioPlayer(context) {
+class QueuedAudioPlayer(private val context: Context) : AudioPlayer(context) {
     private val queue = LinkedList<MediaItem>()
 
     val currentIndex
@@ -60,8 +60,8 @@ class QueuedAudioPlayer(context: Context) : AudioPlayer(context) {
         queue.add(mediaItem)
         exoPlayer.addMediaItem(mediaItem)
 
-        val notification = manager.createNotification(mediaSession, item)
-        manager.refreshNotification(notification)
+//        val notification = manager.createNotification(mediaSession, item)
+//        manager.refreshNotification(notification)
     }
 
     fun add(items: List<AudioItem>, playWhenReady: Boolean = true) {
