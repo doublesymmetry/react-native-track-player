@@ -311,6 +311,7 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
         int state = getState();
+        Log.d(Utils.LOG, "onPlayerStateChanged: " + state + ", " + previousState);
 
         if(state != previousState) {
             if(Utils.isPlaying(state) && !Utils.isPlaying(previousState)) {
@@ -322,14 +323,15 @@ public abstract class ExoPlayback<T extends Player> implements EventListener, Me
             }
 
             manager.onStateChange(state);
-            previousState = state;
 
-            if(state == PlaybackStateCompat.STATE_STOPPED) {
+            if(previousState != PlaybackStateCompat.STATE_CONNECTING && state == PlaybackStateCompat.STATE_STOPPED) {
                 Integer previous = getCurrentTrackIndex();
                 long position = getPosition();
                 manager.onTrackUpdate(previous, position, null, null);
                 manager.onEnd(getCurrentTrackIndex(), getPosition());
             }
+
+            previousState = state;
         }
     }
 

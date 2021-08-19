@@ -48,10 +48,6 @@ const setup = async () => {
   });
 
   TrackPlayer.setRepeatMode(RepeatMode.Queue);
-
-  // Workaround because there's no way to just load the queue content into player without playing.
-  await TrackPlayer.play();
-  await TrackPlayer.pause();
 };
 
 const togglePlayback = async (playbackState: State) => {
@@ -76,7 +72,12 @@ const App = () => {
   const [trackArtist, setTrackArtist] = useState<string>();
 
   useTrackPlayerEvents(
-    [Event.PlaybackTrackChanged, Event.RemotePlay, Event.RemotePause],
+    [
+      Event.PlaybackQueueEnded,
+      Event.PlaybackTrackChanged,
+      Event.RemotePlay,
+      Event.RemotePause,
+    ],
     async event => {
       if (
         event.type === Event.PlaybackTrackChanged &&
@@ -91,6 +92,8 @@ const App = () => {
         TrackPlayer.pause();
       } else if (event.type === Event.RemotePlay) {
         TrackPlayer.play();
+      } else if (event.type === Event.PlaybackQueueEnded) {
+        console.log('Event.PlaybackQueueEnded fired.');
       }
     },
   );
