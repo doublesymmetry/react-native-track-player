@@ -4,13 +4,24 @@ import TrackPlayer, { State, Event } from './index'
 /** Get current playback state and subsequent updatates  */
 export const usePlaybackState = () => {
   const [state, setState] = useState(State.None)
+  const isUnmountedRef = useRef(true)
+
+  useEffect(() => {
+    isUnmountedRef.current = false
+    return () => { isUnmountedRef.current = true }
+  }, [])
 
   useEffect(() => {
     async function setPlayerState() {
       const playerState = await TrackPlayer.getState()
+
+      // If the component has been unmounted, exit
+      if (isUnmountedRef.current) return
+
       setState(playerState)
     }
 
+    // Set initial state
     setPlayerState()
 
     const sub = TrackPlayer.addEventListener(Event.PlaybackState, data => {
@@ -76,11 +87,10 @@ export function useProgress(updateInterval?: number) {
   const playerState = usePlaybackState()
   const stateRef = useRef(state)
   const isUnmountedRef = useRef(true)
+
   useEffect(() => {
     isUnmountedRef.current = false
-    return () => {
-      isUnmountedRef.current = true
-    }
+    return () => { isUnmountedRef.current = true }
   }, [])
 
   const getProgress = async () => {
@@ -89,9 +99,11 @@ export function useProgress(updateInterval?: number) {
       TrackPlayer.getDuration(),
       TrackPlayer.getBufferedPosition(),
     ])
-    // After the asynchronous code is executed, if the component has been uninstalled, do not update the status
+
+    // If the component has been unmounted, exit
     if (isUnmountedRef.current) return
 
+    // If there is no change in properties, exit
     if (
       position === stateRef.current.position &&
       duration === stateRef.current.duration &&
@@ -100,7 +112,6 @@ export function useProgress(updateInterval?: number) {
       return
 
     const state = { position, duration, buffered }
-    // @ts-ignore
     stateRef.current = state
     setState(state)
   }
@@ -111,8 +122,10 @@ export function useProgress(updateInterval?: number) {
       return
     }
 
+    // Set initial state
     getProgress()
 
+    // Create interval to update state periodically
     const poll = setInterval(getProgress, updateInterval || 1000)
     return () => clearInterval(poll)
   }, [playerState, updateInterval])

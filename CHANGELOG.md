@@ -19,6 +19,9 @@ To install release candidates run `yarn add react-native-track-player@next`
 * Make `useProgress` unmount aware.
   [lyswhut](https://github.com/lyswhut)
 
+* Make `usePlaybackState` unmount aware.
+  [dcvz](https://github.com/dcvz)
+
 ## 2.0.2 (15.08.21)
 
 ##### Enhancements
