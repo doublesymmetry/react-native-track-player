@@ -12,9 +12,13 @@ A fully-fledged audio module created for music apps. Provides audio playback, ex
 
 All queue methods have been updating to work on indexes instead of id's. We want this library to support all kinds of apps -- and moving to be index based will allow us to better support applications who have long/endless queues and in the future to allow us to build a performant API around queue management.
 
-When migrating from v1 to v2, the following methods have changed:
+We recommend using Typescript to have the system alert you of issues.
+
+When migrating from v1 to v2, the following has changed:
 
 ```diff
+// Methods
+
 - async function add(tracks: Track | Track[], insertBeforeId?: string): Promise<void> {
 + async function add(tracks: Track | Track[], insertBeforeIndex?: number): Promise<void> {
 
@@ -32,6 +36,33 @@ When migrating from v1 to v2, the following methods have changed:
 
 - async function getCurrentTrack(): Promise<string> {
 + async function getCurrentTrack(): Promise<number> {
+
+// Imports
+
+import TrackPlayer, {
+-  STATE_XXX,
+-  CAPABILITY_XXX,
+-  PITCH_ALGORITHM_XXX,
+-  RATING_XXX,
++  State,
++  Capability,
++  PitchAlgorithm,
++  RatingType,
++  Event,
++  RepeatMode
+} from 'react-native-track-player'
+
+// Hooks
+
+- useTrackPlayerProgress
++ useProgress
+
+// Event Listeners
+// Refrain from using: TrackPlayer.addEventListener() and instead use the provided hooks
+
++ usePlaybackState
++ useTrackPlayerEvents
++ useProgress
 ```
 
 ## Features
