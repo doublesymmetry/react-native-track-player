@@ -59,9 +59,6 @@ class QueuedAudioPlayer(private val context: Context) : AudioPlayer(context) {
         val mediaItem = MediaItem.fromUri(item.audioUrl)
         queue.add(mediaItem)
         exoPlayer.addMediaItem(mediaItem)
-
-//        val notification = manager.createNotification(mediaSession, item)
-//        manager.refreshNotification(notification)
     }
 
     fun add(items: List<AudioItem>, playWhenReady: Boolean = true) {

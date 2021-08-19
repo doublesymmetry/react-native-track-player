@@ -4,8 +4,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.annotation.RequiresApi
 import com.doublesymmetry.kotlinaudio.models.AudioItem
@@ -18,12 +16,8 @@ import java.util.concurrent.TimeUnit
 open class AudioPlayer(private val context: Context) {
     protected val exoPlayer: SimpleExoPlayer = SimpleExoPlayer.Builder(context).build()
 
-    private val handler = Handler(Looper.getMainLooper())
-
-    protected val mediaSession: MediaSessionCompat = MediaSessionCompat(context, "AudioPlayerSession")
+    private val mediaSession: MediaSessionCompat = MediaSessionCompat(context, "AudioPlayerSession")
     private val mediaSessionConnector: MediaSessionConnector = MediaSessionConnector(mediaSession)
-
-    protected val manager = PlaybackNotificationManager(context)
 
     private val playerNotificationManager: PlayerNotificationManager
 
@@ -37,17 +31,20 @@ open class AudioPlayer(private val context: Context) {
         mediaSessionConnector.setPlayer(exoPlayer)
 
         val builder = PlayerNotificationManager.Builder(context, NOTIFICATION_ID, channelId)
-        playerNotificationManager = builder.build()
-        playerNotificationManager.setPlayer(exoPlayer)
-        playerNotificationManager.setMediaSessionToken(mediaSession.sessionToken)
-    }
 
+        playerNotificationManager = builder.build()
+        playerNotificationManager.apply {
+            setPlayer(exoPlayer)
+            setMediaSessionToken(mediaSession.sessionToken)
+            setUseNextActionInCompactView(true)
+            setUsePreviousActionInCompactView(true)
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(): String {
-        val channelId = PlaybackNotificationManager.CHANNEL_ID
-        val channelName = context
-            .getString(R.string.playback_channel_name)
+        val channelId = CHANNEL_ID
+        val channelName = context.getString(R.string.playback_channel_name)
         val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW)
         channel.description = "Used when playing music"
         channel.setSound(null, null)
@@ -57,26 +54,12 @@ open class AudioPlayer(private val context: Context) {
         return channelId
     }
 
-
-    companion object {
-        private const val MEDIA_SESSION_TAG = "one_beat_media_session"
-        private const val NO_DURATION = -1L
-        private const val CHANNEL_ID = "onebeat_playback"
-        const val NOTIFICATION_ID = 1
-    }
-
-
     open fun load(item: AudioItem, playWhenReady: Boolean = true) {
         exoPlayer.playWhenReady = playWhenReady
 
         val mediaItem = MediaItem.fromUri(item.audioUrl)
         exoPlayer.addMediaItem(mediaItem)
         exoPlayer.prepare()
-
-
-//        val manager = PlaybackNotificationManager(context)
-//        val notification = manager.createNotification(mediaSession, item)
-//        manager.refreshNotification(notification)
     }
 
     fun togglePlaying() {
@@ -100,11 +83,16 @@ open class AudioPlayer(private val context: Context) {
 
     open fun stop() {
         exoPlayer.release()
-        seek(23, TimeUnit.MINUTES)
+//        seek(23, TimeUnit.MINUTES)
     }
 
     fun seek(duration: Long, unit: TimeUnit) {
         val millis = TimeUnit.MILLISECONDS.convert(duration, unit)
         exoPlayer.seekTo(millis)
+    }
+
+    companion object {
+        const val NOTIFICATION_ID = 1
+        const val CHANNEL_ID = "kotlin_audio_player"
     }
 }
