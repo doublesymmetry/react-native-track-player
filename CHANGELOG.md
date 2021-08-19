@@ -16,6 +16,9 @@ To install release candidates run `yarn add react-native-track-player@next`
   [dcvz](https://github.com/dcvz)
   [#1229](https://github.com/DoubleSymmetry/react-native-track-player/issues/1229)
 
+* Make `useProgress` unmount aware.
+  [lyswhut](https://github.com/lyswhut)
+
 ## 2.0.2 (15.08.21)
 
 ##### Enhancements
