@@ -347,22 +347,22 @@ Gets the state of the player.
 All event types are made available through the named export `TrackPlayerEvents`:
 
 ```js
-import { TrackPlayerEvents } from 'react-native-track-player';
+import { Event } from 'react-native-track-player';
 ```
 
 ### Media Controls
 
-#### `remote-play`
+#### `Event.RemotePlay`
 Fired when the user presses the play button. Only fired if the `CAPABILITY_PLAY` is allowed.
 
-#### `remote-play-id`
+#### `Event.RemotePlayId`
 Fired when the user selects a track from an external device. Required for Android Auto support. Only fired if the `CAPABILITY_PLAY_FROM_ID` is allowed.
 
 | Param | Type     | Description   |
 | ----- | -------- | ------------- |
 | id    | `string` | The track id  |
 
-#### `remote-play-search`
+#### `Event.RemotePlaySearch`
 Fired when the user searches for a track (usually voice search). Required for Android Auto support. Only fired if the `CAPABILITY_PLAY_FROM_SEARCH` is allowed.
 
 Every parameter except `query` is optional and may not be provided.
@@ -378,54 +378,54 @@ In the case where `query` is empty, feel free to select any track to play.
 | genre    | `string` | The track genre |
 | playlist | `string` | The track playlist |
 
-#### `remote-pause`
+#### `Event.RemotePause`
 Fired when the user presses the pause button. Only fired if the `CAPABILITY_PAUSE` is allowed or if there's a change in outputs (e.g.: headphone disconnected).
 
-#### `remote-stop`
+#### `Event.RemoteStop`
 Fired when the user presses the stop button. Only fired if the `CAPABILITY_STOP` is allowed.
 
-#### `remote-skip`
+#### `Event.RemoteSkip`
 Fired when the user skips to a track in the queue. Only fired if the `CAPABILITY_SKIP` is allowed.
 
 | Param | Type     | Description   |
 | ----- | -------- | ------------- |
 | index | `number` | The track index  |
 
-#### `remote-next`
+#### `Event.RemoteNext`
 Fired when the user presses the next track button. Only fired if the `CAPABILITY_SKIP_TO_NEXT` is allowed.
 
-#### `remote-previous`
+#### `Event.RemotePrevious`
 Fired when the user presses the previous track button. Only fired if the `CAPABILITY_SKIP_TO_PREVIOUS` is allowed.
 
-#### `remote-seek`
+#### `Event.RemoteSeek`
 Fired when the user changes the position of the timeline. Only fired if the `CAPABILITY_SEEK_TO` is allowed.
 
 | Param    | Type     | Description   |
 | -------- | -------- | ------------- |
 | position | `number` | The position in seconds |
 
-#### `remote-set-rating`
+#### `Event.RemoteSetRating`
 Fired when the user changes the rating for the track. Only fired if the `CAPABILITY_SET_RATING` is allowed.
 
 | Param  | Type     | Description   |
 | ------ | -------- | ------------- |
 | rating | Depends on the [Rating Type](#rating) | The rating that was set |
 
-#### `remote-jump-forward`
+#### `Event.RemoteJumpForward`
 Fired when the user presses the jump forward button. Only fired if the `CAPABILITY_JUMP_FORWARD` is allowed.
 
 | Param    | Type     | Description   |
 | -------- | -------- | ------------- |
 | interval | `number` | The number of seconds to jump forward. It's usually the `forwardJumpInterval` set in the options. |
 
-#### `remote-jump-backward`
+#### `Event.RemoteJumpBackward`
 Fired when the user presses the jump backward button. Only fired if the `CAPABILITY_JUMP_BACKWARD` is allowed.
 
 | Param    | Type     | Description   |
 | -------- | -------- | ------------- |
 | interval | `number` | The number of seconds to jump backward. It's usually the `backwardJumpInterval` set in the options. |
 
-#### `remote-duck`
+#### `Event.RemoteDuck`
 Subscribing to this event to handle interruptions ensures that your app’s audio continues behaving gracefully when a phone call arrives, a clock or calendar alarm sounds, or another app plays audio.
 
 On Android, this event is fired when the device needs the player to pause or stop for an interruption and again when the interruption has passed and playback may resume. On iOS this event is fired after playback was already interrupted (meaning pausing playback is unnecessary) and again when playback may resume or to notify that the interruption was permanent.
@@ -441,14 +441,14 @@ On Android, the volume may also be lowered on an transient interruption without 
 | permanent | `boolean` | Whether the interruption is permanent. On Android the player should stop playback.  |
 
 ### Player
-#### `playback-state`
+#### `Event.PlaybackState`
 Fired when the state of the player changes.
 
 | Param | Type     | Description   |
 | ----- | -------- | ------------- |
 | state | [State Constant](#state) | The new state |
 
-#### `playback-track-changed`
+#### `Event.PlaybackTrackChanged`
 Fired when a track is changed.
 
 | Param     | Type     | Description                            |
@@ -457,7 +457,7 @@ Fired when a track is changed.
 | position  | `number` | The previous track position in seconds |
 | nextTrack | `number` | The next track index. Might be null       |
 
-#### `playback-queue-ended`
+#### `Event.PlaybackQueueEnded`
 Fired when the queue reaches the end.
 
 | Param    | Type     | Description                               |
@@ -465,7 +465,7 @@ Fired when the queue reaches the end.
 | track    | `number` | The previous track index. Might be null      |
 | position | `number` | The previous track position in seconds    |
 
-#### `playback-metadata-received`
+#### `Event.PlaybackMetadataReceived`
 Fired when the current track receives metadata encoded in. (e.g. ID3 tags, Icy Metadata, Vorbis Comments or QuickTime metadata).
 
 | Param    | Type     | Description                                         |
@@ -478,7 +478,7 @@ Fired when the current track receives metadata encoded in. (e.g. ID3 tags, Icy M
 | date     | `string` | The track date. Might be null                       |
 | genre    | `string` | The track genre. Might be null                      |
 
-#### `playback-error`
+#### `Event.PlaybackError`
 Fired when an error occurs.
 
 | Param   | Type     | Description       |
