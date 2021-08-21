@@ -432,7 +432,7 @@ Fired when the user presses the like button in the now playing center. Only fire
 Fired when the user presses the dislike button in the now playing center. Only fired if the `dislikeOptions` is set in `updateOptions`.
 
 #### `Event.RemoteBookmark` (iOS only)
-Fired when the user presses the dislike button in the now playing center. Only fired if the `bookmarkOptions` is set in `updateOptions`.
+Fired when the user presses the bookmark button in the now playing center. Only fired if the `bookmarkOptions` is set in `updateOptions`.
 
 #### `Event.RemoteDuck`
 Subscribing to this event to handle interruptions ensures that your app’s audio continues behaving gracefully when a phone call arrives, a clock or calendar alarm sounds, or another app plays audio.
