@@ -425,6 +425,15 @@ Fired when the user presses the jump backward button. Only fired if the `CAPABIL
 | -------- | -------- | ------------- |
 | interval | `number` | The number of seconds to jump backward. It's usually the `backwardJumpInterval` set in the options. |
 
+#### `Event.RemoteLike` (iOS only)
+Fired when the user presses the like button in the now playing center. Only fired if the `likeOptions` is set in `updateOptions`.
+
+#### `Event.RemoteDislike` (iOS only)
+Fired when the user presses the dislike button in the now playing center. Only fired if the `dislikeOptions` is set in `updateOptions`.
+
+#### `Event.RemoteBookmark` (iOS only)
+Fired when the user presses the dislike button in the now playing center. Only fired if the `bookmarkOptions` is set in `updateOptions`.
+
 #### `Event.RemoteDuck`
 Subscribing to this event to handle interruptions ensures that your app’s audio continues behaving gracefully when a phone call arrives, a clock or calendar alarm sounds, or another app plays audio.
 
