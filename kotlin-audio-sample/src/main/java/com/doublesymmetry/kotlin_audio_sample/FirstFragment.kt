@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import com.doublesymmetry.kotlin_audio_sample.databinding.FragmentFirstBinding
 import com.doublesymmetry.kotlinaudio.firstItem
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
-import com.doublesymmetry.kotlinaudio.secondItem
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -40,8 +39,20 @@ class FirstFragment : Fragment() {
         player.removeUpcomingItems()
         player.play()
 
-        binding.buttonFirst.setOnClickListener {
-            player.load(secondItem)
+        binding.buttonNext.setOnClickListener {
+            player.nextItems
+        }
+
+        binding.buttonPrevious.setOnClickListener {
+            player.previous()
+        }
+
+        binding.buttonPlay.setOnClickListener {
+            player.play()
+        }
+
+        binding.buttonPause.setOnClickListener {
+            player.pause()
         }
     }
 
