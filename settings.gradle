@@ -7,5 +7,5 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "KotlinAudio"
-include ':app'
+include ':kotlin-audio'
 include ':kotlin-audio-sample'
