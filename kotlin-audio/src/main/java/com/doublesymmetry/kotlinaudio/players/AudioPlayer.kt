@@ -88,6 +88,9 @@ open class AudioPlayer(private val context: Context) {
         exoPlayer.pause()
     }
 
+    /**
+     * Stops and resets the player, as well as clears the queue. Only call this when you are finished using the player, otherwise use [pause].
+     */
     open fun stop() {
         exoPlayer.release()
     }

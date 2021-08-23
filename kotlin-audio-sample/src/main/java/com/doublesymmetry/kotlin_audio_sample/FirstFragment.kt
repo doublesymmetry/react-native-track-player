@@ -37,6 +37,7 @@ class FirstFragment : Fragment() {
         val player = QueuedAudioPlayer(requireActivity())
         player.add(firstItem)
         player.add(firstItem)
+        player.removeUpcomingItems()
         player.play()
 
         binding.buttonFirst.setOnClickListener {
