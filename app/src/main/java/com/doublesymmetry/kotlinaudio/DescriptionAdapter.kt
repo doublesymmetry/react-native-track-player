@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import coil.imageLoader
+import coil.request.Disposable
 import coil.request.ImageRequest
 import com.doublesymmetry.kotlinaudio.models.AudioItem
 import com.google.android.exoplayer2.MediaMetadata
@@ -16,6 +17,11 @@ import com.google.android.exoplayer2.ui.PlayerNotificationManager
  * Provides content assets of the media currently playing. If certain data is missing from [AudioItem], data from the media's metadata is used instead.
  */
 class DescriptionAdapter(private val context: Context, private val pendingIntent: PendingIntent?): PlayerNotificationManager.MediaDescriptionAdapter {
+//    private val bitmapJob = Job()
+//    private val coroutineScope = CoroutineScope(Dispatchers.IO + bitmapJob)
+
+    private var disposable: Disposable? = null
+
     override fun getCurrentContentTitle(player: Player): CharSequence {
         val audioItem = player.currentMediaItem?.playbackProperties?.tag as AudioItem?
         return audioItem?.title ?: player.mediaMetadata.displayTitle ?: ""
@@ -37,13 +43,19 @@ class DescriptionAdapter(private val context: Context, private val pendingIntent
         val audioItem = player.currentMediaItem?.playbackProperties?.tag as AudioItem?
         var artworkBitmap: Bitmap? = null
 
+        disposable?.dispose()
+
         val imageLoader = context.imageLoader
         val request = ImageRequest.Builder(context)
             .data(getArtworkSource(audioItem, player.mediaMetadata))
-            .target { artworkBitmap = (it as BitmapDrawable).bitmap }
+            .target {
+                artworkBitmap = (it as BitmapDrawable).bitmap
+                callback.onBitmap(it.bitmap)
+            }
             .build()
 
-        imageLoader.enqueue(request)
+        disposable = imageLoader.enqueue(request)
+
         return artworkBitmap
     }
 

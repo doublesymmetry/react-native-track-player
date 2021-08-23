@@ -44,6 +44,8 @@ open class AudioPlayer(private val context: Context) {
             setUseNextActionInCompactView(true)
             setUsePreviousActionInCompactView(true)
         }
+
+        playerNotificationManager
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
