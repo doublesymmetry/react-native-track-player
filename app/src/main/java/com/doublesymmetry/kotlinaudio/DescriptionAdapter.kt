@@ -17,9 +17,6 @@ import com.google.android.exoplayer2.ui.PlayerNotificationManager
  * Provides content assets of the media currently playing. If certain data is missing from [AudioItem], data from the media's metadata is used instead.
  */
 class DescriptionAdapter(private val context: Context, private val pendingIntent: PendingIntent?): PlayerNotificationManager.MediaDescriptionAdapter {
-//    private val bitmapJob = Job()
-//    private val coroutineScope = CoroutineScope(Dispatchers.IO + bitmapJob)
-
     private var disposable: Disposable? = null
 
     override fun getCurrentContentTitle(player: Player): CharSequence {
@@ -54,6 +51,7 @@ class DescriptionAdapter(private val context: Context, private val pendingIntent
             }
             .build()
 
+        //TODO: This should be disposed somewhere as a final step
         disposable = imageLoader.enqueue(request)
 
         return artworkBitmap
