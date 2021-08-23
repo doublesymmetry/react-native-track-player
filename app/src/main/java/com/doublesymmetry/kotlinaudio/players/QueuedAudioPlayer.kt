@@ -1,7 +1,6 @@
-package com.doublesymmetry.kotlinaudio
+package com.doublesymmetry.kotlinaudio.players
 
 import android.content.Context
-import android.util.Log
 import com.doublesymmetry.kotlinaudio.models.AudioItem
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player.*
@@ -13,15 +12,17 @@ class QueuedAudioPlayer(private val context: Context) : AudioPlayer(context) {
     val currentIndex
         get() = exoPlayer.currentWindowIndex
 
-    val items
-        get() = queue.toList()
+    val items: List<MediaItem>
+        get() = queue
 
-    val previousItems
-        get() = queue.subList(0, exoPlayer.currentWindowIndex)
+    val previousItems: List<MediaItem>
+        get() {
+            return if (queue.isEmpty()) emptyList()
+            else queue.subList(0, exoPlayer.currentWindowIndex)
+        }
 
     val nextItems: List<MediaItem>
         get() {
-            Log.d("TEST", queue.size.toString())
             return if (queue.isEmpty()) emptyList()
             else queue.subList(exoPlayer.currentWindowIndex, queue.lastIndex)
         }
@@ -45,28 +46,50 @@ class QueuedAudioPlayer(private val context: Context) : AudioPlayer(context) {
             }
     }
 
+    /**
+     * Will replace the current item with a new one and load it into the player.
+     * @param item The [AudioItem] to replace the current one
+     * @param playWhenReady If this is `true` it will automatically start playback. Default is `true`.
+     */
     override fun load(item: AudioItem, playWhenReady: Boolean) {
-//        val mediaItem = MediaItem.fromUri(item.audioUrl)
-//        queue.add(mediaItem)
+        exoPlayer.playWhenReady = playWhenReady
 
-//        super.load(item, playWhenReady)
+        val currentIndex = exoPlayer.currentWindowIndex
+        val mediaItem = getMediaItemFromAudioItem(item)
 
-        //TODO: Replace current item
+        queue[currentIndex] = mediaItem
+        exoPlayer.removeMediaItem(currentIndex)
+        exoPlayer.addMediaItem(currentIndex, mediaItem)
+
+        previous()
     }
 
+    /**
+     * Add a single item to the queue
+     * @param item The [AudioItem] to add
+     * @param playWhenReady If this is `true` it will automatically start playback. Default is `true`.
+     */
     fun add(item: AudioItem, playWhenReady: Boolean = true) {
-        Log.d("test", "wtf " + queue.size)
-        val mediaItem = MediaItem.fromUri(item.audioUrl)
+        val mediaItem = getMediaItemFromAudioItem(item)
         queue.add(mediaItem)
         exoPlayer.addMediaItem(mediaItem)
     }
 
+    /**
+     * Add multiple items to the queue
+     * @param items The [AudioItem]s to add
+     * @param playWhenReady If this is `true` it will automatically start playback. Default is `true`.
+     */
     fun add(items: List<AudioItem>, playWhenReady: Boolean = true) {
-        val mediaItems = items.map { MediaItem.fromUri(it.audioUrl) }
+        val mediaItems = items.map { getMediaItemFromAudioItem(it) }
         queue.addAll(mediaItems)
         exoPlayer.addMediaItems(mediaItems)
     }
 
+    /**
+     * Remove an item from the queue
+     * @param item The [AudioItem] to remove, if it exists in the queue
+     */
     fun remove(item: AudioItem) {
         val mediaItem = MediaItem.fromUri(item.audioUrl)
         val index = queue.indexOf(mediaItem)

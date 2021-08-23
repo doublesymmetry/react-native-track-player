@@ -1,4 +1,4 @@
-package com.doublesymmetry.kotlinaudio
+package com.doublesymmetry.kotlinaudio.players
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -6,6 +6,8 @@ import android.content.Context
 import android.os.Build
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.annotation.RequiresApi
+import com.doublesymmetry.kotlinaudio.DescriptionAdapter
+import com.doublesymmetry.kotlinaudio.R
 import com.doublesymmetry.kotlinaudio.models.AudioItem
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -32,7 +34,10 @@ open class AudioPlayer(private val context: Context) {
 
         val builder = PlayerNotificationManager.Builder(context, NOTIFICATION_ID, channelId)
 
-        playerNotificationManager = builder.build()
+        playerNotificationManager = builder
+            .setMediaDescriptionAdapter(DescriptionAdapter(context, null))
+            .build()
+
         playerNotificationManager.apply {
             setPlayer(exoPlayer)
             setMediaSessionToken(mediaSession.sessionToken)
@@ -57,7 +62,7 @@ open class AudioPlayer(private val context: Context) {
     open fun load(item: AudioItem, playWhenReady: Boolean = true) {
         exoPlayer.playWhenReady = playWhenReady
 
-        val mediaItem = MediaItem.fromUri(item.audioUrl)
+        val mediaItem = getMediaItemFromAudioItem(item)
         exoPlayer.addMediaItem(mediaItem)
         exoPlayer.prepare()
     }
@@ -83,12 +88,15 @@ open class AudioPlayer(private val context: Context) {
 
     open fun stop() {
         exoPlayer.release()
-//        seek(23, TimeUnit.MINUTES)
     }
 
     fun seek(duration: Long, unit: TimeUnit) {
         val millis = TimeUnit.MILLISECONDS.convert(duration, unit)
         exoPlayer.seekTo(millis)
+    }
+
+    protected fun getMediaItemFromAudioItem(audioItem: AudioItem): MediaItem {
+        return MediaItem.Builder().setUri(audioItem.audioUrl).setTag(audioItem).build()
     }
 
     companion object {
