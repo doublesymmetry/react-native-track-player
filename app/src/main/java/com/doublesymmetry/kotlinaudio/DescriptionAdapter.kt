@@ -14,7 +14,7 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 
 /**
- * Provides content assets of the media currently playing. If certain data is missing from [AudioItem], data from the media's metadata is used instead.
+ * Provides content assets of the media currently playing. If certain data is missing from [AudioItem], data from the media file's metadata is used instead.
  */
 class DescriptionAdapter(private val context: Context, private val pendingIntent: PendingIntent?): PlayerNotificationManager.MediaDescriptionAdapter {
     private var disposable: Disposable? = null
