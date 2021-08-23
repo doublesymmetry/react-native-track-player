@@ -1,12 +1,14 @@
-package com.doublesymmetry.kotlinaudio
+package com.doublesymmetry.kotlin_audio_sample
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.doublesymmetry.kotlinaudio.databinding.FragmentFirstBinding
+import com.doublesymmetry.kotlin_audio_sample.databinding.FragmentFirstBinding
+import com.doublesymmetry.kotlinaudio.firstItem
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
+import com.doublesymmetry.kotlinaudio.secondItem
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
