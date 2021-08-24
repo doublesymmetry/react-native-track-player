@@ -8,29 +8,35 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player.*
 import java.util.*
 
-class QueuedAudioPlayer(private val context: Context) : AudioPlayer(context) {
+class QueuedAudioPlayer(context: Context) : AudioPlayer(context) {
     private val queue = LinkedList<MediaItem>()
 
     val currentIndex
         get() = exoPlayer.currentWindowIndex
 
-    val items: List<MediaItem>
-        get() = queue
+    val items: List<AudioItem>
+        get() = queue.map { it.playbackProperties?.tag as AudioItem }
 
-    val previousItems: List<MediaItem>
+    val previousItems: List<AudioItem>
         get() {
             return if (queue.isEmpty()) emptyList()
-            else queue.subList(0, exoPlayer.currentWindowIndex)
+            else queue
+                .subList(0, exoPlayer.currentWindowIndex)
+                .map { it.playbackProperties?.tag as AudioItem }
         }
 
-    val nextItems: List<MediaItem>
+    val nextItems: List<AudioItem>
         get() {
             return if (queue.isEmpty()) emptyList()
-            else queue.subList(exoPlayer.currentWindowIndex, queue.lastIndex)
+            else queue
+                .subList(exoPlayer.currentWindowIndex, queue.lastIndex)
+                .map { it.playbackProperties?.tag as AudioItem }
         }
 
-    val currentItem
-        get() = exoPlayer.currentMediaItem
+    val currentItem: AudioItem
+        get() {
+            return exoPlayer.currentMediaItem?.playbackProperties?.tag as AudioItem
+        }
 
     var repeatMode: RepeatMode
         get() {
@@ -46,7 +52,7 @@ class QueuedAudioPlayer(private val context: Context) : AudioPlayer(context) {
                 RepeatMode.ONE -> exoPlayer.repeatMode = REPEAT_MODE_ONE
                 RepeatMode.OFF -> exoPlayer.repeatMode = REPEAT_MODE_OFF
             }
-    }
+        }
 
     /**
      * Will replace the current item with a new one and load it into the player.
@@ -152,6 +158,9 @@ class QueuedAudioPlayer(private val context: Context) : AudioPlayer(context) {
         queue.subList(0, currentIndex).clear()
     }
 
+    /**
+     * Stops and resets the player, as well as clears the queue. Only call this when you are finished using the player, otherwise use [pause].
+     */
     override fun stop() {
         queue.clear()
         super.stop()

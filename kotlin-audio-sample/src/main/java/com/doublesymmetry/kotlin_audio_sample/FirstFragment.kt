@@ -1,5 +1,6 @@
 package com.doublesymmetry.kotlin_audio_sample
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,31 +14,31 @@ import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
 class FirstFragment : Fragment() {
-
     private var _binding: FragmentFirstBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
         return binding.root
 
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val player = QueuedAudioPlayer(requireActivity())
         player.add(firstItem)
         player.add(firstItem)
-        player.removeUpcomingItems()
         player.play()
+
+        binding.textviewTitle.text = player.currentItem.title
+        binding.textviewArtist.text = player.currentItem.artist
+        binding.textviewQueue.text = "${player.currentIndex + 1} / ${player.items.size}"
 
         binding.buttonNext.setOnClickListener {
             player.nextItems

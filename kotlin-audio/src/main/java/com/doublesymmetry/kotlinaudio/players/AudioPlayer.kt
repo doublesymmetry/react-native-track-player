@@ -22,6 +22,7 @@ open class AudioPlayer(private val context: Context) {
     private val mediaSessionConnector: MediaSessionConnector = MediaSessionConnector(mediaSession)
 
     private val playerNotificationManager: PlayerNotificationManager
+    private val descriptionAdapter = DescriptionAdapter(context, null)
 
     init {
         val channelId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -35,7 +36,7 @@ open class AudioPlayer(private val context: Context) {
         val builder = PlayerNotificationManager.Builder(context, NOTIFICATION_ID, channelId)
 
         playerNotificationManager = builder
-            .setMediaDescriptionAdapter(DescriptionAdapter(context, null))
+            .setMediaDescriptionAdapter(descriptionAdapter)
             .build()
 
         playerNotificationManager.apply {
@@ -89,9 +90,10 @@ open class AudioPlayer(private val context: Context) {
     }
 
     /**
-     * Stops and resets the player, as well as clears the queue. Only call this when you are finished using the player, otherwise use [pause].
+     * Stops and resets the player. Only call this when you are finished using the player, otherwise use [pause].
      */
     open fun stop() {
+        descriptionAdapter.release()
         exoPlayer.release()
     }
 

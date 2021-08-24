@@ -51,7 +51,6 @@ class DescriptionAdapter(private val context: Context, private val pendingIntent
             }
             .build()
 
-        //TODO: This should be disposed somewhere as a final step
         disposable = imageLoader.enqueue(request)
 
         return artworkBitmap
@@ -66,5 +65,9 @@ class DescriptionAdapter(private val context: Context, private val pendingIntent
             data != null -> BitmapFactory.decodeByteArray(data, 0, data.size)
             else -> null
         }
+    }
+
+    fun release() {
+        disposable?.dispose()
     }
 }
