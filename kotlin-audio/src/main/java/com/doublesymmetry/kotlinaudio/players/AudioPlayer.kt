@@ -5,11 +5,14 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.support.v4.media.session.MediaSessionCompat
+import androidx.annotation.CallSuper
 import androidx.annotation.RequiresApi
 import com.doublesymmetry.kotlinaudio.DescriptionAdapter
 import com.doublesymmetry.kotlinaudio.R
 import com.doublesymmetry.kotlinaudio.models.AudioItem
+import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
@@ -23,6 +26,8 @@ open class AudioPlayer(private val context: Context) {
 
     private val playerNotificationManager: PlayerNotificationManager
     private val descriptionAdapter = DescriptionAdapter(context, null)
+
+    val event = EventHolder()
 
     init {
         val channelId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -45,15 +50,14 @@ open class AudioPlayer(private val context: Context) {
             setUseNextActionInCompactView(true)
             setUsePreviousActionInCompactView(true)
         }
-
-        playerNotificationManager
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(): String {
         val channelId = CHANNEL_ID
         val channelName = context.getString(R.string.playback_channel_name)
-        val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW)
+        val channel =
+            NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW)
         channel.description = "Used when playing music"
         channel.setSound(null, null)
 
@@ -92,6 +96,7 @@ open class AudioPlayer(private val context: Context) {
     /**
      * Stops and resets the player. Only call this when you are finished using the player, otherwise use [pause].
      */
+    @CallSuper
     open fun stop() {
         descriptionAdapter.release()
         exoPlayer.release()
@@ -104,6 +109,33 @@ open class AudioPlayer(private val context: Context) {
 
     protected fun getMediaItemFromAudioItem(audioItem: AudioItem): MediaItem {
         return MediaItem.Builder().setUri(audioItem.audioUrl).setTag(audioItem).build()
+    }
+
+    private fun addPlayerListener() {
+        exoPlayer.addListener(object: Player.Listener {
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                when (playbackState) {
+                    Player.STATE_BUFFERING -> event.updateAudioPlayerState(AudioPlayerState.BUFFERING)
+                    Player.STATE_IDLE -> event.updateAudioPlayerState(AudioPlayerState.IDLE)
+                    Player.STATE_READY -> event.updateAudioPlayerState(AudioPlayerState.READY)
+                    Player.STATE_ENDED -> {
+                        TODO()
+                    }
+                }
+            }
+
+            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            }
+
+            override fun onIsLoadingChanged(isLoading: Boolean) {
+                if (isLoading) event.updateAudioPlayerState(AudioPlayerState.LOADING)
+            }
+
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                if (isPlaying) event.updateAudioPlayerState(AudioPlayerState.PLAYING)
+                else event.updateAudioPlayerState(AudioPlayerState.PAUSED)
+            }
+        })
     }
 
     companion object {

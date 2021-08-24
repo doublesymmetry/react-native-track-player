@@ -8,7 +8,7 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player.*
 import java.util.*
 
-class QueuedAudioPlayer(context: Context) : AudioPlayer(context) {
+open class QueuedAudioPlayer(context: Context) : AudioPlayer(context) {
     private val queue = LinkedList<MediaItem>()
 
     val currentIndex
