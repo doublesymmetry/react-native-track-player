@@ -41,7 +41,7 @@ class FirstFragment : Fragment() {
         binding.textviewQueue.text = "${player.currentIndex + 1} / ${player.items.size}"
 
         binding.buttonNext.setOnClickListener {
-            player.nextItems
+            player.next()
         }
 
         binding.buttonPrevious.setOnClickListener {
