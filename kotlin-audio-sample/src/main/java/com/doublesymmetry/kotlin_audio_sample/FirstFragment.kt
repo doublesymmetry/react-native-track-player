@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import com.doublesymmetry.kotlin_audio_sample.databinding.FragmentFirstBinding
 import com.doublesymmetry.kotlinaudio.firstItem
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
+import com.doublesymmetry.kotlinaudio.secondItem
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -33,7 +34,7 @@ class FirstFragment : Fragment() {
 
         val player = QueuedAudioPlayer(requireActivity())
         player.add(firstItem)
-        player.add(firstItem)
+        player.add(secondItem)
         player.play()
 
         binding.textviewTitle.text = player.currentItem.title
@@ -41,7 +42,7 @@ class FirstFragment : Fragment() {
         binding.textviewQueue.text = "${player.currentIndex + 1} / ${player.items.size}"
 
         binding.buttonNext.setOnClickListener {
-            player.next()
+            player.nextItems
         }
 
         binding.buttonPrevious.setOnClickListener {

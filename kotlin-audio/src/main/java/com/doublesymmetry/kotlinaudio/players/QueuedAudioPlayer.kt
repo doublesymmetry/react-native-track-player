@@ -129,14 +129,14 @@ open class QueuedAudioPlayer(context: Context) : AudioPlayer(context) {
     }
 
     /**
-     * Jump to an item in the queue
+     * Jump to an item in the queue.
      */
     fun jumpToItem(index: Int, playWhenReady: Boolean = true) {
         exoPlayer.playWhenReady = playWhenReady
         try {
             exoPlayer.seekTo(index, C.INDEX_UNSET.toLong())
         } catch (e: IllegalSeekPositionException) {
-            throw Error("This item index does not exist. The size of the queue is ${queue.size} items")
+            throw Error("This item index does not exist. The size of the queue is ${queue.size} items.")
         }
     }
 
