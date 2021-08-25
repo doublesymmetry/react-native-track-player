@@ -1,4 +1,4 @@
-package com.doublesymmetry.kotlinaudio
+package com.doublesymmetry.kotlin_audio_sample
 
 import com.doublesymmetry.kotlinaudio.models.DefaultAudioItem
 import com.doublesymmetry.kotlinaudio.models.SourceType
