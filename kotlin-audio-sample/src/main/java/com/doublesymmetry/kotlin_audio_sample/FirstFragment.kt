@@ -6,10 +6,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.doublesymmetry.kotlin_audio_sample.databinding.FragmentFirstBinding
 import com.doublesymmetry.kotlinaudio.firstItem
+import com.doublesymmetry.kotlinaudio.models.AudioPlayerState.PLAYING
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.doublesymmetry.kotlinaudio.secondItem
+import com.orhanobut.logger.Logger
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -41,8 +46,33 @@ class FirstFragment : Fragment() {
         binding.textviewArtist.text = player.currentItem.artist
         binding.textviewQueue.text = "${player.currentIndex + 1} / ${player.items.size}"
 
+        lifecycleScope.launch {
+            player.event.stateChange.collect {
+                Logger.d(it)
+
+                when (it) {
+                    PLAYING -> {
+                        binding.buttonPlay.isEnabled = false
+                        binding.buttonPause.isEnabled = true
+                    }
+                    else -> {
+                        binding.buttonPlay.isEnabled = true
+                        binding.buttonPause.isEnabled = false
+                    }
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            player.event.audioItemTransition.collect {
+                binding.textviewTitle.text = player.currentItem.title
+                binding.textviewArtist.text = player.currentItem.artist
+                binding.textviewQueue.text = "${player.currentIndex + 1} / ${player.items.size}"
+            }
+        }
+
         binding.buttonNext.setOnClickListener {
-            player.nextItems
+            player.next()
         }
 
         binding.buttonPrevious.setOnClickListener {

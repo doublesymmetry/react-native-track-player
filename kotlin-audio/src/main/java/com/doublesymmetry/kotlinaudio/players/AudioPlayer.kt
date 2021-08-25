@@ -10,9 +10,10 @@ import androidx.annotation.RequiresApi
 import com.doublesymmetry.kotlinaudio.DescriptionAdapter
 import com.doublesymmetry.kotlinaudio.R
 import com.doublesymmetry.kotlinaudio.models.AudioItem
+import com.doublesymmetry.kotlinaudio.models.AudioItemTransitionReason
 import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
 import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.Player.*
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
@@ -50,6 +51,8 @@ open class AudioPlayer(private val context: Context) {
             setUseNextActionInCompactView(true)
             setUsePreviousActionInCompactView(true)
         }
+
+        addPlayerListener()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -112,19 +115,25 @@ open class AudioPlayer(private val context: Context) {
     }
 
     private fun addPlayerListener() {
-        exoPlayer.addListener(object: Player.Listener {
+        exoPlayer.addListener(object: Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
                 when (playbackState) {
-                    Player.STATE_BUFFERING -> event.updateAudioPlayerState(AudioPlayerState.BUFFERING)
-                    Player.STATE_IDLE -> event.updateAudioPlayerState(AudioPlayerState.IDLE)
-                    Player.STATE_READY -> event.updateAudioPlayerState(AudioPlayerState.READY)
-                    Player.STATE_ENDED -> {
+                    STATE_BUFFERING -> event.updateAudioPlayerState(AudioPlayerState.BUFFERING)
+                    STATE_IDLE -> event.updateAudioPlayerState(AudioPlayerState.IDLE)
+                    STATE_READY -> event.updateAudioPlayerState(AudioPlayerState.READY)
+                    STATE_ENDED -> {
                         TODO()
                     }
                 }
             }
 
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                when (reason) {
+                    MEDIA_ITEM_TRANSITION_REASON_AUTO -> event.updateAudioItemTransition(AudioItemTransitionReason.AUTO)
+                    MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED -> event.updateAudioItemTransition(AudioItemTransitionReason.QUEUE_CHANGED)
+                    MEDIA_ITEM_TRANSITION_REASON_REPEAT -> event.updateAudioItemTransition(AudioItemTransitionReason.REPEAT)
+                    MEDIA_ITEM_TRANSITION_REASON_SEEK -> event.updateAudioItemTransition(AudioItemTransitionReason.SEEK_TO_ANOTHER_AUDIO_ITEM)
+                }
             }
 
             override fun onIsLoadingChanged(isLoading: Boolean) {
