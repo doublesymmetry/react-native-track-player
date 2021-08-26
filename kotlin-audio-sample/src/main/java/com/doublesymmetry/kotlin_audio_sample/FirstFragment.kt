@@ -40,10 +40,6 @@ class FirstFragment : Fragment() {
         player.add(secondItem)
         player.play()
 
-        binding.textviewTitle.text = player.currentItem.title
-        binding.textviewArtist.text = player.currentItem.artist
-        binding.textviewQueue.text = "${player.currentIndex + 1} / ${player.items.size}"
-
         lifecycleScope.launch {
             player.event.stateChange.collect {
                 Logger.d(it)
@@ -63,8 +59,8 @@ class FirstFragment : Fragment() {
 
         lifecycleScope.launch {
             player.event.audioItemTransition.collect {
-                binding.textviewTitle.text = player.currentItem.title
-                binding.textviewArtist.text = player.currentItem.artist
+                binding.textviewTitle.text = player.currentItem?.title
+                binding.textviewArtist.text = player.currentItem?.artist
                 binding.textviewQueue.text = "${player.currentIndex + 1} / ${player.items.size}"
             }
         }
