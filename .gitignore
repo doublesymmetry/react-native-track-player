@@ -179,10 +179,6 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
-### AndroidStudio Patch ###
-
-!/gradle/wrapper/gradle-wrapper.jar
-
 ### Intellij ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
@@ -333,6 +329,11 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+
+### AndroidStudio Patch ###
+
+!/gradle/wrapper/gradle-wrapper.jar
 
 # End of https://www.gitignore.io/api/java,linux,macos,windows,android,intellij,androidstudio
 .idea/jarRepositories.xml
