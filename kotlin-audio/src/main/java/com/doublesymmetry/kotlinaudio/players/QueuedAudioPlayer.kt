@@ -33,9 +33,9 @@ open class QueuedAudioPlayer(context: Context) : AudioPlayer(context) {
                 .map { it.playbackProperties?.tag as AudioItem }
         }
 
-    val currentItem: AudioItem
+    val currentItem: AudioItem?
         get() {
-            return exoPlayer.currentMediaItem?.playbackProperties?.tag as AudioItem
+            return exoPlayer.currentMediaItem?.playbackProperties?.tag as? AudioItem
         }
 
     var repeatMode: RepeatMode
