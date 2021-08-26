@@ -4,8 +4,10 @@ plugins {
     id 'maven-publish'
 }
 
+def versionNumber = '0.1.7'
+
 group = 'com.github.doublesymmetry'
-version = '0.1.4'
+version = versionNumber
 
 android {
     compileSdk 30
@@ -55,7 +57,7 @@ afterEvaluate {
                 // You can then customize attributes of the publication as shown below.
                 groupId = 'com.github.doublesymmetry'
                 artifactId = 'kotlin-audio'
-                version = '0.1.4'
+                version = versionNumber
             }
             // Creates a Maven publication called “debug”.
             debug(MavenPublication) {
@@ -64,7 +66,7 @@ afterEvaluate {
 
                 groupId = 'com.github.doublesymmetry'
                 artifactId = 'kotlin-audio-debug'
-                version = '0.1.4'
+                version = versionNumber
             }
 
         }
