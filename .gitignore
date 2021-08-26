@@ -335,3 +335,4 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.gitignore.io/api/java,linux,macos,windows,android,intellij,androidstudio
+.idea/jarRepositories.xml
