@@ -33,7 +33,7 @@ A fully fledged audio module created for music apps. Provides audio playback, ex
 
 ## Example
 
-If you want to get started with this module, check the [Getting Started](https://react-native-track-player.js.org/react-native-track-player/api/) page.
+If you want to get started with this module, check the [Getting Started](https://react-native-track-player.js.org/getting-started/) page.
 If you want detailed information about the API, check the [Documentation](https://react-native-track-player.js.org/react-native-track-player/documentation/).
 You can also look at our example project [here](https://github.com/react-native-kit/react-native-track-player/tree/master/example).
 
