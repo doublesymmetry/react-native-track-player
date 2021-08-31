@@ -1,4 +1,4 @@
-package com.guichaguri.trackplayer.service_old.models
+package com.guichaguri.trackplayer.service.models
 
 import android.content.Context
 import android.net.Uri
@@ -33,6 +33,7 @@ class Track(context: Context, bundle: Bundle, ratingType: Int) : TrackMetadata()
     var originalItem: Bundle?
     var headers: MutableMap<String, String>? = null
     val queueId: Long
+
     override fun setMetadata(context: Context, bundle: Bundle?, ratingType: Int) {
         super.setMetadata(context, bundle, ratingType)
         if (originalItem != null && originalItem != bundle) originalItem!!.putAll(bundle)

@@ -23,7 +23,7 @@ import com.guichaguri.trackplayer.R
 import com.guichaguri.trackplayer.service_old.MusicManager
 import com.guichaguri.trackplayer.service_old.MusicService
 import com.guichaguri.trackplayer.service_old.Utils
-import com.guichaguri.trackplayer.service_old.models.TrackMetadata
+import com.guichaguri.trackplayer.service.models.TrackMetadata
 import com.guichaguri.trackplayer.service_old.player.ExoPlayback
 import java.util.*
 

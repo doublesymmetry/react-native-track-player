@@ -11,7 +11,7 @@ import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.guichaguri.trackplayer.service_old.MusicManager
 import com.guichaguri.trackplayer.service_old.Utils
-import com.guichaguri.trackplayer.service_old.models.Track
+import com.guichaguri.trackplayer.service.models.Track
 import java.util.*
 
 /**

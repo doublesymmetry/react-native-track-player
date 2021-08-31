@@ -19,8 +19,8 @@ import com.google.android.exoplayer2.Player
 import com.guichaguri.trackplayer.service_old.MusicBinder
 import com.guichaguri.trackplayer.service_old.MusicService
 import com.guichaguri.trackplayer.service_old.Utils
-import com.guichaguri.trackplayer.service_old.models.NowPlayingMetadata
-import com.guichaguri.trackplayer.service_old.models.Track
+import com.guichaguri.trackplayer.service.models.NowPlayingMetadata
+import com.guichaguri.trackplayer.service.models.Track
 import java.util.*
 import javax.annotation.Nonnull
 

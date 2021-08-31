@@ -18,7 +18,7 @@ import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvicto
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import com.guichaguri.trackplayer.service_old.MusicManager
 import com.guichaguri.trackplayer.service_old.Utils
-import com.guichaguri.trackplayer.service_old.models.Track
+import com.guichaguri.trackplayer.service.models.Track
 import java.io.File
 import java.util.*
 

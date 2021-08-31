@@ -7,11 +7,13 @@ import android.os.IBinder
 import android.support.v4.media.RatingCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.doublesymmetry.kotlinaudio.models.DefaultAudioItem
+import com.doublesymmetry.kotlinaudio.models.SourceType
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.facebook.react.bridge.*
 import com.google.android.exoplayer2.Player
 import com.guichaguri.trackplayer.module_old.MusicEvents
-import com.guichaguri.trackplayer.service_old.MusicBinder
+import com.guichaguri.trackplayer.service.models.Track
 import java.util.*
 import javax.annotation.Nonnull
 
@@ -37,9 +39,9 @@ class MusicModule(reactContext: ReactApplicationContext?) :
         val context: ReactContext = reactApplicationContext
         val manager = LocalBroadcastManager.getInstance(context)
 //
-//        context.runOnUiQueueThread { // TODO: Do this in lib
-//            queuedAudioPlayer = QueuedAudioPlayer(context)
-//        }
+        context.runOnUiQueueThread { // TODO: Do this in lib
+            queuedAudioPlayer = QueuedAudioPlayer(context)
+        }
 //
 //        eventHandler = MusicEvents(context)
 //        manager.registerReceiver(eventHandler!!, IntentFilter(Utils.EVENT_INTENT))
@@ -55,8 +57,8 @@ class MusicModule(reactContext: ReactApplicationContext?) :
     }
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
-//        binder = service as MusicBinder
-//        connecting = false
+        binder = service as MusicBinder
+        connecting = false
 //
 //        // Reapply options that user set before with updateOptions
 //        if (options != null) {
@@ -172,24 +174,24 @@ class MusicModule(reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun add(tracks: ReadableArray?, insertBeforeIndex: Int, callback: Promise) {
-//        val bundleList = Arguments.toList(tracks)
-//        waitForConnection {
-//            val trackList: List<Track> = try {
-//                Track.createTracks(
-//                    reactApplicationContext, bundleList, binder?.ratingType!!
-//                )!!
-//            } catch (ex: Exception) {
-//                callback.reject("invalid_track_object", ex)
-//                return@waitForConnection
-//            }
-//
-//            //TODO: Remove Tracks and stick to just AudioItems
-//
-//            val items = trackList.map {
-//                DefaultAudioItem(it.uri.toString(), SourceType.FILE, it.artist, it.title, it.album, it.artwork.toString())
-//            }
-//
-//            queuedAudioPlayer.add(items)
+        val bundleList = Arguments.toList(tracks)
+        waitForConnection {
+            val trackList: List<Track> = try {
+                Track.createTracks(
+                    reactApplicationContext, bundleList, 0
+                )!!
+            } catch (ex: Exception) {
+                callback.reject("invalid_track_object", ex)
+                return@waitForConnection
+            }
+
+            //TODO: Remove Tracks and stick to just AudioItems
+
+            val items = trackList.map {
+                DefaultAudioItem(it.uri.toString(), SourceType.FILE, it.artist, it.title, it.album, it.artwork.toString())
+            }
+
+            queuedAudioPlayer.add(items)
 //
 ////            val queue = binder?.playback?.queue
 ////            // -1 means no index was passed and therefore should be inserted at the end.
@@ -205,7 +207,7 @@ class MusicModule(reactContext: ReactApplicationContext?) :
 ////                binder?.playback?.add(trackList, index, callback)
 //////                binder?.playback?.add(trackList, index, callback)
 ////            }
-//        }
+        }
     }
 
     @ReactMethod

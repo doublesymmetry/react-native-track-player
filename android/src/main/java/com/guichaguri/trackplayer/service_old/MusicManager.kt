@@ -23,8 +23,8 @@ import com.google.android.exoplayer2.LoadControl
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.guichaguri.trackplayer.module_old.MusicEvents
+import com.guichaguri.trackplayer.service.models.Track
 import com.guichaguri.trackplayer.service_old.metadata.MetadataManager
-import com.guichaguri.trackplayer.service_old.models.Track
 import com.guichaguri.trackplayer.service_old.player.ExoPlayback
 import com.guichaguri.trackplayer.service_old.player.LocalPlayback
 
