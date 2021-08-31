@@ -10,6 +10,9 @@ import android.support.v4.media.RatingCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.doublesymmetry.kotlinaudio.models.DefaultAudioItem
+import com.doublesymmetry.kotlinaudio.models.SourceType
+import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.facebook.react.bridge.*
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.Player
@@ -31,6 +34,9 @@ class MusicModule(reactContext: ReactApplicationContext?) :
     private val initCallbacks = ArrayDeque<Runnable>()
     private var connecting = false
     private var options: Bundle? = null
+
+    lateinit var queuedAudioPlayer: QueuedAudioPlayer
+
     @Nonnull
     override fun getName(): String {
         return "TrackPlayerModule"
@@ -39,6 +45,11 @@ class MusicModule(reactContext: ReactApplicationContext?) :
     override fun initialize() {
         val context: ReactContext = reactApplicationContext
         val manager = LocalBroadcastManager.getInstance(context)
+
+        context.runOnUiQueueThread { // TODO: Do this in lib
+            queuedAudioPlayer = QueuedAudioPlayer(context)
+        }
+
         eventHandler = MusicEvents(context)
         manager.registerReceiver(eventHandler!!, IntentFilter(Utils.EVENT_INTENT))
     }
@@ -180,20 +191,29 @@ class MusicModule(reactContext: ReactApplicationContext?) :
                 callback.reject("invalid_track_object", ex)
                 return@waitForConnection
             }
-            val queue = binder?.playback?.queue
-            // -1 means no index was passed and therefore should be inserted at the end.
-            val index = if (insertBeforeIndex != -1) insertBeforeIndex else queue!!.size
-            if (index < 0 || index > queue!!.size) {
-                callback.reject("index_out_of_bounds", "The track index is out of bounds")
-            } else if (trackList == null || trackList.isEmpty()) {
-                callback.reject("invalid_track_object", "Track is missing a required key")
-            } else if (trackList.size == 1) {
-                binder?.playback?.add(trackList[0], index, callback)
-            } else {
 
-                binder?.playback?.add(trackList, index, callback)
-//                binder?.playback?.add(trackList, index, callback)
+            //TODO: Remove Tracks and stick to just AudioItems
+
+            val items = trackList.map {
+                DefaultAudioItem(it.uri.toString(), SourceType.FILE, it.artist, it.title, it.album, it.artwork.toString())
             }
+
+            queuedAudioPlayer.add(items)
+
+//            val queue = binder?.playback?.queue
+//            // -1 means no index was passed and therefore should be inserted at the end.
+//            val index = if (insertBeforeIndex != -1) insertBeforeIndex else queue!!.size
+//            if (index < 0 || index > queue!!.size) {
+//                callback.reject("index_out_of_bounds", "The track index is out of bounds")
+//            } else if (trackList == null || trackList.isEmpty()) {
+//                callback.reject("invalid_track_object", "Track is missing a required key")
+//            } else if (trackList.size == 1) {
+//                binder?.playback?.add(trackList[0], index, callback)
+//            } else {
+//
+//                binder?.playback?.add(trackList, index, callback)
+////                binder?.playback?.add(trackList, index, callback)
+//            }
         }
     }
 
