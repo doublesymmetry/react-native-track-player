@@ -31,7 +31,7 @@ class Track(context: Context, bundle: Bundle, ratingType: Int) : TrackMetadata()
     var contentType: String?
     var userAgent: String?
     var originalItem: Bundle?
-    var headers: MutableMap<String, String?>? = null
+    var headers: MutableMap<String, String>? = null
     val queueId: Long
     override fun setMetadata(context: Context, bundle: Bundle?, ratingType: Int) {
         super.setMetadata(context, bundle, ratingType)
@@ -62,8 +62,8 @@ class Track(context: Context, bundle: Bundle, ratingType: Int) : TrackMetadata()
         val ds: DataSource.Factory?
         ds = if (resourceId != 0) {
             try {
-                val raw = RawResourceDataSource(ctx)
-                raw.open(DataSpec(uri))
+                val raw = RawResourceDataSource(ctx!!)
+                raw.open(DataSpec(uri!!))
                 DataSource.Factory { raw }
             } catch (ex: IOException) {
                 // Should never happen
@@ -72,7 +72,7 @@ class Track(context: Context, bundle: Bundle, ratingType: Int) : TrackMetadata()
         } else if (Utils.isLocal(uri)) {
 
             // Creates a local source factory
-            DefaultDataSourceFactory(ctx, userAgent)
+            DefaultDataSourceFactory(ctx!!, userAgent)
         } else {
 
             // Creates a default http source factory, enabling cross protocol redirects
@@ -83,7 +83,7 @@ class Track(context: Context, bundle: Bundle, ratingType: Int) : TrackMetadata()
                 true
             )
             if (headers != null) {
-                factory.defaultRequestProperties.set(headers)
+                factory.setDefaultRequestProperties(headers!!.toMap())
             }
             playback.enableCaching(factory)
         }
@@ -95,7 +95,7 @@ class Track(context: Context, bundle: Bundle, ratingType: Int) : TrackMetadata()
                 ds, DefaultExtractorsFactory()
                     .setConstantBitrateSeekingEnabled(true)
             )
-                .createMediaSource(uri)
+                .createMediaSource(uri!!)
         }
     }
 
@@ -148,7 +148,7 @@ class Track(context: Context, bundle: Bundle, ratingType: Int) : TrackMetadata()
         if (httpHeaders != null) {
             headers = HashMap()
             for (header in httpHeaders.keySet()) {
-                headers!![header] = httpHeaders.getString(header)
+                headers!![header] = httpHeaders.getString(header)!!
             }
         }
         setMetadata(context, bundle, ratingType)

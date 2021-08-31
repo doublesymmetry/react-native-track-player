@@ -113,8 +113,10 @@ class MusicManager @SuppressLint("InvalidWakeLockTag") constructor(private val s
         val player = SimpleExoPlayer.Builder(service)
             .setLoadControl(control)
             .build()
-        player.audioAttributes = AudioAttributes.Builder()
+
+        val attributes = AudioAttributes.Builder()
             .setContentType(C.CONTENT_TYPE_MUSIC).setUsage(C.USAGE_MEDIA).build()
+        player.setAudioAttributes(attributes, false)
         return LocalPlayback(service, this, player, cacheMaxSize, autoUpdateMetadata)
     }
 

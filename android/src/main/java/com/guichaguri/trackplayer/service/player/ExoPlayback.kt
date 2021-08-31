@@ -184,9 +184,9 @@ abstract class ExoPlayback<T : Player?>(
 
     override fun onTimelineChanged(timeline: Timeline, reason: Int) {
         Log.d(Utils.LOG, "onTimelineChanged: $reason")
-        if ((reason == Player.TIMELINE_CHANGE_REASON_PREPARED || reason == Player.TIMELINE_CHANGE_REASON_DYNAMIC) && !timeline.isEmpty) {
-            onPositionDiscontinuity(Player.DISCONTINUITY_REASON_INTERNAL)
-        }
+//        if ((reason == Player.TIMELINE_CHANGE_REASON_PREPARED || reason == Player.TIMELINE_CHANGE_REASON_DYNAMIC) && !timeline.isEmpty) {
+//            onPositionDiscontinuity(Player.DISCONTINUITY_REASON_INTERNAL)
+//        }
     }
 
     override fun onPositionDiscontinuity(reason: Int) {
@@ -198,20 +198,21 @@ abstract class ExoPlayback<T : Player?>(
 
             // Track changed because it ended
             // We'll use its duration instead of the last known position
-            if (reason == Player.DISCONTINUITY_REASON_PERIOD_TRANSITION && lastKnownWindow != C.INDEX_UNSET) {
-                if (lastKnownWindow >= player.currentTimeline.windowCount) return
-                val duration =
-                    player.currentTimeline.getWindow(lastKnownWindow, Timeline.Window()).durationMs
-                if (duration != C.TIME_UNSET) lastKnownPosition = duration
-            }
+//            if (reason == Player.DISCONTINUITY_REASON_PERIOD_TRANSITION && lastKnownWindow != C.INDEX_UNSET) {
+//                if (lastKnownWindow >= player.currentTimeline.windowCount) return
+//                val duration =
+//                    player.currentTimeline.getWindow(lastKnownWindow, Timeline.Window()).durationMs
+//                if (duration != C.TIME_UNSET) lastKnownPosition = duration
+//            }
             manager.onTrackUpdate(prevIndex, lastKnownPosition, nextIndex, next)
-        } else if (reason == Player.DISCONTINUITY_REASON_PERIOD_TRANSITION && lastKnownWindow == player.currentWindowIndex) {
-            val nextIndex = currentTrackIndex
-            val next = if (nextIndex == null) null else queue[nextIndex]
-            val duration =
-                player.currentTimeline.getWindow(lastKnownWindow, Timeline.Window()).durationMs
-            if (duration != C.TIME_UNSET) lastKnownPosition = duration
-            manager.onTrackUpdate(nextIndex, lastKnownPosition, nextIndex, next)
+//        } else if (reason == Player.DISCONTINUITY_REASON_PERIOD_TRANSITION && lastKnownWindow == player.currentWindowIndex) {
+//            val nextIndex = currentTrackIndex
+//            val next = if (nextIndex == null) null else queue[nextIndex]
+//            val duration =
+//                player.currentTimeline.getWindow(lastKnownWindow, Timeline.Window()).durationMs
+//            if (duration != C.TIME_UNSET) lastKnownPosition = duration
+//            manager.onTrackUpdate(nextIndex, lastKnownPosition, nextIndex, next)
+//        }
         }
         lastKnownWindow = player.currentWindowIndex
         lastKnownPosition = player.currentPosition
@@ -262,17 +263,16 @@ abstract class ExoPlayback<T : Player?>(
         }
     }
 
-    override fun onPlayerError(error: ExoPlaybackException) {
-        val code: String
-        code = if (error.type == ExoPlaybackException.TYPE_SOURCE) {
-            "playback-source"
-        } else if (error.type == ExoPlaybackException.TYPE_RENDERER) {
-            "playback-renderer"
-        } else {
-            "playback" // Other unexpected errors related to the playback
-        }
-        manager.onError(code, error.cause!!.message)
-    }
+    override fun onPlayerError(error: PlaybackException) {
+        val code: String = "playback"
+//        code = if (error.type == ExoPlaybackException.TYPE_SOURCE) {
+//            "playback-source"
+//        } else if (error.type == ExoPlaybackException.TYPE_RENDERER) {
+//            "playback-renderer"
+//        } else {
+//            "playback" // Other unexpected errors related to the playback
+//        }
+        manager.onError(code, error.cause!!.message)    }
 
     override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
         // Speed or pitch changes
@@ -287,7 +287,7 @@ abstract class ExoPlayback<T : Player?>(
     }
 
     init {
-        val component = player!!.metadataComponent
-        component?.addMetadataOutput(this)
+//        val component = player!!.metadataComponent
+//        component?.addMetadataOutput(this)
     }
 }

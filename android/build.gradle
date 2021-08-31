@@ -58,9 +58,11 @@ repositories {
 }
 
 dependencies {
+    implementation "com.github.DoubleSymmetry:KotlinAudio:v0.1.7"
+
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'
-    
+
     def exoPlayerVersion = safeExtGet("exoPlayerVersion", '2.11.4')
 
     // ExoPlayer Core
