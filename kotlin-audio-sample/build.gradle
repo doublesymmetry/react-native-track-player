@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.doublesymmetry.kotlin_audio_sample"
-        minSdk 23
+        minSdk 21
         targetSdk 30
         versionCode 1
         versionName "1.0"
