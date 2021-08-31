@@ -1,18 +1,19 @@
-package com.guichaguri.trackplayer.service.metadata
+package com.guichaguri.trackplayer.service_old.metadata
 
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.provider.MediaStore
 import android.support.v4.media.RatingCompat
 import android.support.v4.media.session.MediaSessionCompat
-import com.guichaguri.trackplayer.module.MusicEvents
-import com.guichaguri.trackplayer.service.MusicManager
-import com.guichaguri.trackplayer.service.MusicService
-import com.guichaguri.trackplayer.service.Utils
+import com.guichaguri.trackplayer.module_old.MusicEvents
+import com.guichaguri.trackplayer.service_old.MusicManager
+import com.guichaguri.trackplayer.service_old.MusicService
+import com.guichaguri.trackplayer.service_old.Utils
 
 /**
  * @author Guichaguri
  */
+@Deprecated("new module is being built")
 class ButtonEvents(private val service: MusicService, private val manager: MusicManager) :
     MediaSessionCompat.Callback() {
     override fun onPlay() {

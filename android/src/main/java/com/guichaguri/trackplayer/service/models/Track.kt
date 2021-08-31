@@ -1,4 +1,4 @@
-package com.guichaguri.trackplayer.service.models
+package com.guichaguri.trackplayer.service_old.models
 
 import android.content.Context
 import android.net.Uri
@@ -16,8 +16,8 @@ import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
 import com.google.android.exoplayer2.upstream.*
 import com.google.android.exoplayer2.util.Util
-import com.guichaguri.trackplayer.service.Utils
-import com.guichaguri.trackplayer.service.player.LocalPlayback
+import com.guichaguri.trackplayer.service_old.Utils
+import com.guichaguri.trackplayer.service_old.player.LocalPlayback
 import java.io.IOException
 import java.util.*
 

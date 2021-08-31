@@ -1,4 +1,4 @@
-package com.guichaguri.trackplayer.service.player
+package com.guichaguri.trackplayer.service_old.player
 
 import com.google.android.exoplayer2.metadata.Metadata
 import com.google.android.exoplayer2.metadata.flac.VorbisComment
@@ -7,7 +7,7 @@ import com.google.android.exoplayer2.metadata.icy.IcyInfo
 import com.google.android.exoplayer2.metadata.id3.TextInformationFrame
 import com.google.android.exoplayer2.metadata.id3.UrlLinkFrame
 import com.google.android.exoplayer2.metadata.mp4.MdtaMetadataEntry
-import com.guichaguri.trackplayer.service.MusicManager
+import com.guichaguri.trackplayer.service_old.MusicManager
 import java.nio.charset.Charset
 
 object SourceMetadata {

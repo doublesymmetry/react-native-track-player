@@ -1,4 +1,4 @@
-package com.guichaguri.trackplayer.service.player
+package com.guichaguri.trackplayer.service_old.player
 
 import android.content.Context
 import android.support.v4.media.session.PlaybackStateCompat
@@ -9,9 +9,9 @@ import com.google.android.exoplayer2.metadata.Metadata
 import com.google.android.exoplayer2.metadata.MetadataOutput
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
-import com.guichaguri.trackplayer.service.MusicManager
-import com.guichaguri.trackplayer.service.Utils
-import com.guichaguri.trackplayer.service.models.Track
+import com.guichaguri.trackplayer.service_old.MusicManager
+import com.guichaguri.trackplayer.service_old.Utils
+import com.guichaguri.trackplayer.service_old.models.Track
 import java.util.*
 
 /**

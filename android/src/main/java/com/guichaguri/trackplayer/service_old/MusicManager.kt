@@ -1,4 +1,4 @@
-package com.guichaguri.trackplayer.service
+package com.guichaguri.trackplayer.service_old
 
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
@@ -22,15 +22,16 @@ import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.LoadControl
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.audio.AudioAttributes
-import com.guichaguri.trackplayer.module.MusicEvents
-import com.guichaguri.trackplayer.service.metadata.MetadataManager
-import com.guichaguri.trackplayer.service.models.Track
-import com.guichaguri.trackplayer.service.player.ExoPlayback
-import com.guichaguri.trackplayer.service.player.LocalPlayback
+import com.guichaguri.trackplayer.module_old.MusicEvents
+import com.guichaguri.trackplayer.service_old.metadata.MetadataManager
+import com.guichaguri.trackplayer.service_old.models.Track
+import com.guichaguri.trackplayer.service_old.player.ExoPlayback
+import com.guichaguri.trackplayer.service_old.player.LocalPlayback
 
 /**
  * @author Guichaguri
  */
+@Deprecated("new module is being built")
 class MusicManager @SuppressLint("InvalidWakeLockTag") constructor(private val service: MusicService) :
     OnAudioFocusChangeListener {
     private val wakeLock: WakeLock

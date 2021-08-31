@@ -1,4 +1,4 @@
-package com.guichaguri.trackplayer.service
+package com.guichaguri.trackplayer.service_old
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -16,6 +16,7 @@ import com.google.android.exoplayer2.upstream.RawResourceDataSource
 /**
  * @author Guichaguri
  */
+@Deprecated("new module is being built")
 object Utils {
     const val EVENT_INTENT = "com.guichaguri.trackplayer.event"
     const val CONNECT_INTENT = "com.guichaguri.trackplayer.connect"

@@ -1,4 +1,4 @@
-package com.guichaguri.trackplayer.module
+package com.guichaguri.trackplayer.module_old
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -10,6 +10,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEm
 /**
  * @author Guichaguri
  */
+@Deprecated("new module is being built")
 class MusicEvents(private val reactContext: ReactContext) : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val event = intent.getStringExtra("event")

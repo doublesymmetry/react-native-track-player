@@ -1,26 +1,17 @@
 package com.guichaguri.trackplayer.module
 
 import android.content.ComponentName
-import android.content.Intent
-import android.content.IntentFilter
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.RatingCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.doublesymmetry.kotlinaudio.models.DefaultAudioItem
-import com.doublesymmetry.kotlinaudio.models.SourceType
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.facebook.react.bridge.*
-import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.Player
-import com.guichaguri.trackplayer.service.MusicBinder
-import com.guichaguri.trackplayer.service.MusicService
-import com.guichaguri.trackplayer.service.Utils
-import com.guichaguri.trackplayer.service.models.NowPlayingMetadata
-import com.guichaguri.trackplayer.service.models.Track
+import com.guichaguri.trackplayer.module_old.MusicEvents
+import com.guichaguri.trackplayer.service_old.MusicBinder
 import java.util.*
 import javax.annotation.Nonnull
 
@@ -41,17 +32,17 @@ class MusicModule(reactContext: ReactApplicationContext?) :
     override fun getName(): String {
         return "TrackPlayerModule"
     }
-
+//
     override fun initialize() {
         val context: ReactContext = reactApplicationContext
         val manager = LocalBroadcastManager.getInstance(context)
-
-        context.runOnUiQueueThread { // TODO: Do this in lib
-            queuedAudioPlayer = QueuedAudioPlayer(context)
-        }
-
-        eventHandler = MusicEvents(context)
-        manager.registerReceiver(eventHandler!!, IntentFilter(Utils.EVENT_INTENT))
+//
+//        context.runOnUiQueueThread { // TODO: Do this in lib
+//            queuedAudioPlayer = QueuedAudioPlayer(context)
+//        }
+//
+//        eventHandler = MusicEvents(context)
+//        manager.registerReceiver(eventHandler!!, IntentFilter(Utils.EVENT_INTENT))
     }
 
     override fun onCatalystInstanceDestroy() {
@@ -64,44 +55,44 @@ class MusicModule(reactContext: ReactApplicationContext?) :
     }
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
-        binder = service as MusicBinder
-        connecting = false
-
-        // Reapply options that user set before with updateOptions
-        if (options != null) {
-            binder!!.updateOptions(options)
-        }
-
-        // Triggers all callbacks
-        while (!initCallbacks.isEmpty()) {
-            binder!!.post(initCallbacks.remove())
-        }
+//        binder = service as MusicBinder
+//        connecting = false
+//
+//        // Reapply options that user set before with updateOptions
+//        if (options != null) {
+//            binder!!.updateOptions(options)
+//        }
+//
+//        // Triggers all callbacks
+//        while (!initCallbacks.isEmpty()) {
+//            binder!!.post(initCallbacks.remove())
+//        }
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
-        binder = null
-        connecting = false
+//        binder = null
+//        connecting = false
     }
 
     /**
      * Waits for a connection to the service and/or runs the [Runnable] in the player thread
      */
     private fun waitForConnection(r: Runnable) {
-        if (binder != null) {
-            binder!!.post(r)
-            return
-        } else {
-            initCallbacks.add(r)
-        }
-        if (connecting) return
-        val context = reactApplicationContext
-
-        // Binds the service to get a MediaWrapper instance
-        val intent = Intent(context, MusicService::class.java)
-        context.startService(intent)
-        intent.action = Utils.CONNECT_INTENT
-        context.bindService(intent, this, 0)
-        connecting = true
+//        if (binder != null) {
+//            binder!!.post(r)
+//            return
+//        } else {
+//            initCallbacks.add(r)
+//        }
+//        if (connecting) return
+//        val context = reactApplicationContext
+//
+//         Binds the service to get a MediaWrapper instance
+//        val intent = Intent(context, MusicService::class.java)
+//        context.startService(intent)
+//        intent.action = Utils.CONNECT_INTENT
+//        context.bindService(intent, this, 0)
+//        connecting = true
     }
 
     /* ****************************** API ****************************** */
@@ -148,311 +139,311 @@ class MusicModule(reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun setupPlayer(data: ReadableMap?, promise: Promise) {
-        val options = Arguments.toBundle(data)
-        waitForConnection { binder!!.setupPlayer(options, promise) }
+//        val options = Arguments.toBundle(data)
+//        waitForConnection { binder!!.setupPlayer(options, promise) }
     }
 
     @ReactMethod
     fun destroy() {
-        // Ignore if it was already destroyed
-        if (binder == null && !connecting) return
-        try {
-            if (binder != null) {
-                binder!!.destroy()
-                binder = null
-            }
-            val context: ReactContext? = reactApplicationContext
-            context?.unbindService(this)
-        } catch (ex: Exception) {
-            // This method shouldn't be throwing unhandled errors even if something goes wrong.
-            Log.e(Utils.LOG, "An error occurred while destroying the service", ex)
-        }
+//        // Ignore if it was already destroyed
+//        if (binder == null && !connecting) return
+//        try {
+//            if (binder != null) {
+//                binder!!.destroy()
+//                binder = null
+//            }
+//            val context: ReactContext? = reactApplicationContext
+//            context?.unbindService(this)
+//        } catch (ex: Exception) {
+//            // This method shouldn't be throwing unhandled errors even if something goes wrong.
+//            Log.e(Utils.LOG, "An error occurred while destroying the service", ex)
+//        }
     }
 
     @ReactMethod
     fun updateOptions(data: ReadableMap?, callback: Promise) {
-        // keep options as we may need them for correct MetadataManager reinitialization later
-        options = Arguments.toBundle(data)
-        waitForConnection {
-            binder!!.updateOptions(options)
-            callback.resolve(null)
-        }
+//        // keep options as we may need them for correct MetadataManager reinitialization later
+//        options = Arguments.toBundle(data)
+//        waitForConnection {
+//            binder!!.updateOptions(options)
+//            callback.resolve(null)
+//        }
     }
 
     @ReactMethod
     fun add(tracks: ReadableArray?, insertBeforeIndex: Int, callback: Promise) {
-        val bundleList = Arguments.toList(tracks)
-        waitForConnection {
-            val trackList: List<Track> = try {
-                Track.createTracks(
-                    reactApplicationContext, bundleList, binder?.ratingType!!
-                )!!
-            } catch (ex: Exception) {
-                callback.reject("invalid_track_object", ex)
-                return@waitForConnection
-            }
-
-            //TODO: Remove Tracks and stick to just AudioItems
-
-            val items = trackList.map {
-                DefaultAudioItem(it.uri.toString(), SourceType.FILE, it.artist, it.title, it.album, it.artwork.toString())
-            }
-
-            queuedAudioPlayer.add(items)
-
-//            val queue = binder?.playback?.queue
-//            // -1 means no index was passed and therefore should be inserted at the end.
-//            val index = if (insertBeforeIndex != -1) insertBeforeIndex else queue!!.size
-//            if (index < 0 || index > queue!!.size) {
-//                callback.reject("index_out_of_bounds", "The track index is out of bounds")
-//            } else if (trackList == null || trackList.isEmpty()) {
-//                callback.reject("invalid_track_object", "Track is missing a required key")
-//            } else if (trackList.size == 1) {
-//                binder?.playback?.add(trackList[0], index, callback)
-//            } else {
-//
-//                binder?.playback?.add(trackList, index, callback)
-////                binder?.playback?.add(trackList, index, callback)
+//        val bundleList = Arguments.toList(tracks)
+//        waitForConnection {
+//            val trackList: List<Track> = try {
+//                Track.createTracks(
+//                    reactApplicationContext, bundleList, binder?.ratingType!!
+//                )!!
+//            } catch (ex: Exception) {
+//                callback.reject("invalid_track_object", ex)
+//                return@waitForConnection
 //            }
-        }
+//
+//            //TODO: Remove Tracks and stick to just AudioItems
+//
+//            val items = trackList.map {
+//                DefaultAudioItem(it.uri.toString(), SourceType.FILE, it.artist, it.title, it.album, it.artwork.toString())
+//            }
+//
+//            queuedAudioPlayer.add(items)
+//
+////            val queue = binder?.playback?.queue
+////            // -1 means no index was passed and therefore should be inserted at the end.
+////            val index = if (insertBeforeIndex != -1) insertBeforeIndex else queue!!.size
+////            if (index < 0 || index > queue!!.size) {
+////                callback.reject("index_out_of_bounds", "The track index is out of bounds")
+////            } else if (trackList == null || trackList.isEmpty()) {
+////                callback.reject("invalid_track_object", "Track is missing a required key")
+////            } else if (trackList.size == 1) {
+////                binder?.playback?.add(trackList[0], index, callback)
+////            } else {
+////
+////                binder?.playback?.add(trackList, index, callback)
+//////                binder?.playback?.add(trackList, index, callback)
+////            }
+//        }
     }
 
     @ReactMethod
     fun remove(tracks: ReadableArray?, callback: Promise) {
-        val trackList = Arguments.toList(tracks)
-        waitForConnection {
-            val queue = binder?.playback?.queue
-            val indexes: MutableList<Int> = ArrayList()
-            for (o in trackList!!) {
-                val index = if (o is Int) o else o.toString().toInt()
-
-                // we do not allow removal of the current item
-                val currentIndex = binder?.playback?.currentTrackIndex
-                if (index == currentIndex) continue
-                if (index >= 0 && index < queue!!.size) {
-                    indexes.add(index)
-                }
-            }
-            if (!indexes.isEmpty()) {
-                binder?.playback?.remove(indexes, callback)
-            } else {
-                callback.resolve(null)
-            }
-        }
+//        val trackList = Arguments.toList(tracks)
+//        waitForConnection {
+//            val queue = binder?.playback?.queue
+//            val indexes: MutableList<Int> = ArrayList()
+//            for (o in trackList!!) {
+//                val index = if (o is Int) o else o.toString().toInt()
+//
+//                // we do not allow removal of the current item
+//                val currentIndex = binder?.playback?.currentTrackIndex
+//                if (index == currentIndex) continue
+//                if (index >= 0 && index < queue!!.size) {
+//                    indexes.add(index)
+//                }
+//            }
+//            if (!indexes.isEmpty()) {
+//                binder?.playback?.remove(indexes, callback)
+//            } else {
+//                callback.resolve(null)
+//            }
+//        }
     }
 
     @ReactMethod
     fun updateMetadataForTrack(index: Int, map: ReadableMap?, callback: Promise) {
-        waitForConnection {
-            val playback = binder?.playback
-            val queue = playback!!.queue
-            if (index < 0 || index >= queue!!.size) {
-                callback.reject("index_out_of_bounds", "The index is out of bounds")
-            } else {
-                val track = queue[index]
-                track!!.setMetadata(
-                    reactApplicationContext,
-                    Arguments.toBundle(map),
-                    binder?.ratingType!!
-                )
-                playback.updateTrack(index, track)
-                callback.resolve(null)
-            }
-        }
+//        waitForConnection {
+//            val playback = binder?.playback
+//            val queue = playback!!.queue
+//            if (index < 0 || index >= queue!!.size) {
+//                callback.reject("index_out_of_bounds", "The index is out of bounds")
+//            } else {
+//                val track = queue[index]
+//                track!!.setMetadata(
+//                    reactApplicationContext,
+//                    Arguments.toBundle(map),
+//                    binder?.ratingType!!
+//                )
+//                playback.updateTrack(index, track)
+//                callback.resolve(null)
+//            }
+//        }
     }
 
     @ReactMethod
     fun updateNowPlayingMetadata(map: ReadableMap?, callback: Promise) {
-        val data = Arguments.toBundle(map)
-        waitForConnection {
-            val metadata = NowPlayingMetadata(reactApplicationContext, data, binder?.ratingType!!)
-            binder!!.updateNowPlayingMetadata(metadata)
-            callback.resolve(null)
-        }
+//        val data = Arguments.toBundle(map)
+//        waitForConnection {
+//            val metadata = NowPlayingMetadata(reactApplicationContext, data, binder?.ratingType!!)
+//            binder!!.updateNowPlayingMetadata(metadata)
+//            callback.resolve(null)
+//        }
     }
 
     @ReactMethod
     fun clearNowPlayingMetadata(callback: Promise) {
-        waitForConnection {
-            binder!!.clearNowPlayingMetadata()
-            callback.resolve(null)
-        }
+//        waitForConnection {
+//            binder!!.clearNowPlayingMetadata()
+//            callback.resolve(null)
+//        }
     }
 
     @ReactMethod
     fun removeUpcomingTracks(callback: Promise) {
-        waitForConnection {
-            binder?.playback?.removeUpcomingTracks()
-            callback.resolve(null)
-        }
+//        waitForConnection {
+//            binder?.playback?.removeUpcomingTracks()
+//            callback.resolve(null)
+//        }
     }
 
     @ReactMethod
     fun skip(index: Int, callback: Promise?) {
-        waitForConnection { binder?.playback?.skip(index, callback!!) }
+//        waitForConnection { binder?.playback?.skip(index, callback!!) }
     }
 
     @ReactMethod
     fun skipToNext(callback: Promise?) {
-        waitForConnection { binder?.playback?.skipToNext(callback!!) }
+//        waitForConnection { binder?.playback?.skipToNext(callback!!) }
     }
 
     @ReactMethod
     fun skipToPrevious(callback: Promise?) {
-        waitForConnection { binder?.playback?.skipToPrevious(callback!!) }
+//        waitForConnection { binder?.playback?.skipToPrevious(callback!!) }
     }
 
     @ReactMethod
     fun reset(callback: Promise) {
-        waitForConnection {
-            binder?.playback?.reset()
-            callback.resolve(null)
-        }
+//        waitForConnection {
+//            binder?.playback?.reset()
+//            callback.resolve(null)
+//        }
     }
 
     @ReactMethod
     fun play(callback: Promise) {
-        waitForConnection {
-            binder?.playback?.play()
-            callback.resolve(null)
-        }
+//        waitForConnection {
+//            binder?.playback?.play()
+//            callback.resolve(null)
+//        }
     }
 
     @ReactMethod
     fun pause(callback: Promise) {
-        waitForConnection {
-            binder?.playback?.pause()
-            callback.resolve(null)
-        }
+//        waitForConnection {
+//            binder?.playback?.pause()
+//            callback.resolve(null)
+//        }
     }
 
     @ReactMethod
     fun stop(callback: Promise) {
-        waitForConnection {
-            binder?.playback?.stop()
-            callback.resolve(null)
-        }
+//        waitForConnection {
+//            binder?.playback?.stop()
+//            callback.resolve(null)
+//        }
     }
 
     @ReactMethod
     fun seekTo(seconds: Float, callback: Promise) {
-        waitForConnection {
-            val secondsToSkip = Utils.toMillis(seconds.toDouble())
-            binder?.playback?.seekTo(secondsToSkip)
-            callback.resolve(null)
-        }
+//        waitForConnection {
+//            val secondsToSkip = Utils.toMillis(seconds.toDouble())
+//            binder?.playback?.seekTo(secondsToSkip)
+//            callback.resolve(null)
+//        }
     }
 
     @ReactMethod
     fun setVolume(volume: Float, callback: Promise) {
-        waitForConnection {
-            binder?.playback?.volume = volume
-            callback.resolve(null)
-        }
+//        waitForConnection {
+//            binder?.playback?.volume = volume
+//            callback.resolve(null)
+//        }
     }
 
     @ReactMethod
     fun getVolume(callback: Promise) {
-        waitForConnection { callback.resolve(binder?.playback?.volume) }
+//        waitForConnection { callback.resolve(binder?.playback?.volume) }
     }
 
     @ReactMethod
     fun setRate(rate: Float, callback: Promise) {
-        waitForConnection {
-            binder?.playback?.rate = rate
-            callback.resolve(null)
-        }
+//        waitForConnection {
+//            binder?.playback?.rate = rate
+//            callback.resolve(null)
+//        }
     }
 
     @ReactMethod
     fun getRate(callback: Promise) {
-        waitForConnection { callback.resolve(binder?.playback?.rate) }
+//        waitForConnection { callback.resolve(binder?.playback?.rate) }
     }
 
     @ReactMethod
     fun setRepeatMode(mode: Int, callback: Promise) {
-        waitForConnection {
-            binder?.playback?.repeatMode = mode
-            callback.resolve(null)
-        }
+//        waitForConnection {
+//            binder?.playback?.repeatMode = mode
+//            callback.resolve(null)
+//        }
     }
 
     @ReactMethod
     fun getRepeatMode(callback: Promise) {
-        waitForConnection { callback.resolve(binder?.playback?.repeatMode) }
+//        waitForConnection { callback.resolve(binder?.playback?.repeatMode) }
     }
 
     @ReactMethod
     fun getTrack(index: Int, callback: Promise) {
-        waitForConnection {
-            val tracks = binder?.playback?.queue
-            if (index >= 0 && index < tracks!!.size) {
-                callback.resolve(Arguments.fromBundle(tracks[index]!!.originalItem))
-            } else {
-                callback.resolve(null)
-            }
-        }
+//        waitForConnection {
+//            val tracks = binder?.playback?.queue
+//            if (index >= 0 && index < tracks!!.size) {
+//                callback.resolve(Arguments.fromBundle(tracks[index]!!.originalItem))
+//            } else {
+//                callback.resolve(null)
+//            }
+//        }
     }
 
     @ReactMethod
     fun getQueue(callback: Promise) {
-        waitForConnection {
-            val queue = ArrayList<Bundle?>()
-            val tracks = binder?.playback?.queue
-            for (track in tracks!!) {
-                queue.add(track?.originalItem)
-            }
-            callback.resolve(Arguments.fromList(queue))
-        }
+//        waitForConnection {
+//            val queue = ArrayList<Bundle?>()
+//            val tracks = binder?.playback?.queue
+//            for (track in tracks!!) {
+//                queue.add(track?.originalItem)
+//            }
+//            callback.resolve(Arguments.fromList(queue))
+//        }
     }
 
     @ReactMethod
     fun getCurrentTrack(callback: Promise) {
-        waitForConnection { callback.resolve(binder?.playback?.currentTrackIndex) }
+//        waitForConnection { callback.resolve(binder?.playback?.currentTrackIndex) }
     }
 
     @ReactMethod
     fun getDuration(callback: Promise) {
-        waitForConnection {
-            val duration = binder?.playback?.duration
-            if (duration == C.TIME_UNSET) {
-                callback.resolve(Utils.toSeconds(0))
-            } else {
-                callback.resolve(Utils.toSeconds(duration!!))
-            }
-        }
+//        waitForConnection {
+//            val duration = binder?.playback?.duration
+//            if (duration == C.TIME_UNSET) {
+//                callback.resolve(Utils.toSeconds(0))
+//            } else {
+//                callback.resolve(Utils.toSeconds(duration!!))
+//            }
+//        }
     }
 
     @ReactMethod
     fun getBufferedPosition(callback: Promise) {
-        waitForConnection {
-            val position = binder?.playback?.bufferedPosition
-            if (position == C.POSITION_UNSET.toLong()) {
-                callback.resolve(Utils.toSeconds(0))
-            } else {
-                callback.resolve(Utils.toSeconds(position!!))
-            }
-        }
+//        waitForConnection {
+//            val position = binder?.playback?.bufferedPosition
+//            if (position == C.POSITION_UNSET.toLong()) {
+//                callback.resolve(Utils.toSeconds(0))
+//            } else {
+//                callback.resolve(Utils.toSeconds(position!!))
+//            }
+//        }
     }
 
     @ReactMethod
     fun getPosition(callback: Promise) {
-        waitForConnection {
-            val position = binder?.playback?.position
-            if (position == C.POSITION_UNSET.toLong()) {
-                callback.reject("unknown", "Unknown position")
-            } else {
-                callback.resolve(Utils.toSeconds(position!!))
-            }
-        }
+//        waitForConnection {
+//            val position = binder?.playback?.position
+//            if (position == C.POSITION_UNSET.toLong()) {
+//                callback.reject("unknown", "Unknown position")
+//            } else {
+//                callback.resolve(Utils.toSeconds(position!!))
+//            }
+//        }
     }
 
     @ReactMethod
     fun getState(callback: Promise) {
-        if (binder == null) {
-            callback.resolve(PlaybackStateCompat.STATE_NONE)
-        } else {
-            waitForConnection { callback.resolve(binder!!.playback.state) }
-        }
+//        if (binder == null) {
+//            callback.resolve(PlaybackStateCompat.STATE_NONE)
+//        } else {
+//            waitForConnection { callback.resolve(binder!!.playback.state) }
+//        }
     }
 }

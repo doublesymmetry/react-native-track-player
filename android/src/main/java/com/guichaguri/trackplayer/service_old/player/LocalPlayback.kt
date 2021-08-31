@@ -1,4 +1,4 @@
-package com.guichaguri.trackplayer.service.player
+package com.guichaguri.trackplayer.service_old.player
 
 import android.content.Context
 import android.util.Log
@@ -16,9 +16,9 @@ import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
-import com.guichaguri.trackplayer.service.MusicManager
-import com.guichaguri.trackplayer.service.Utils
-import com.guichaguri.trackplayer.service.models.Track
+import com.guichaguri.trackplayer.service_old.MusicManager
+import com.guichaguri.trackplayer.service_old.Utils
+import com.guichaguri.trackplayer.service_old.models.Track
 import java.io.File
 import java.util.*
 

@@ -1,4 +1,4 @@
-package com.guichaguri.trackplayer.service
+package com.guichaguri.trackplayer.service_old
 
 import android.content.Context
 import android.content.Intent
@@ -15,6 +15,7 @@ import com.facebook.react.jstasks.HeadlessJsTaskConfig
 /**
  * @author Guichaguri
  */
+@Deprecated("new module is being built")
 class MusicService : HeadlessJsTaskService() {
     var manager: MusicManager? = null
     var handler: Handler? = null
