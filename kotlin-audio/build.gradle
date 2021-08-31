@@ -59,15 +59,15 @@ afterEvaluate {
                 artifactId = 'kotlin-audio'
                 version = versionNumber
             }
-            // Creates a Maven publication called “debug”.
-            debug(MavenPublication) {
-                // Applies the component for the debug build variant.
-                from components.debug
-
-                groupId = 'com.github.doublesymmetry'
-                artifactId = 'kotlin-audio-debug'
-                version = versionNumber
-            }
+//            // Creates a Maven publication called “debug”.
+//            debug(MavenPublication) {
+//                // Applies the component for the debug build variant.
+//                from components.debug
+//
+//                groupId = 'com.github.doublesymmetry'
+//                artifactId = 'kotlin-audio-debug'
+//                version = versionNumber
+//            }
 
         }
     }
