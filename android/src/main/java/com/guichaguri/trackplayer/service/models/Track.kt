@@ -83,7 +83,7 @@ class Track(context: Context, bundle: Bundle, ratingType: Int) : TrackMetadata()
                 true
             )
             if (headers != null) {
-                factory.setDefaultRequestProperties(headers!!.toMap())
+                factory.defaultRequestProperties.set(headers!!.toMap())
             }
             playback.enableCaching(factory)
         }
