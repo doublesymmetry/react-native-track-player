@@ -74,22 +74,11 @@ open class QueuedAudioPlayer(context: Context, looper: Looper? = null) : AudioPl
     }
 
     /**
-     * Add a single item to the queue.
-     * @param item The [AudioItem] to add.
-     * @param playWhenReady If this is `true` it will automatically start playback. Default is `true`.
-     */
-    fun add(item: AudioItem, playWhenReady: Boolean = true) {
-        val mediaItem = getMediaItemFromAudioItem(item)
-        queue.add(mediaItem)
-        exoPlayer.addMediaItem(mediaItem)
-    }
-
-    /**
-     * Add multiple items to the queue.
+     * Add items to the queue.
      * @param items The [AudioItem]s to add.
      * @param playWhenReady If this is `true` it will automatically start playback. Default is `true`.
      */
-    fun add(items: List<AudioItem>, playWhenReady: Boolean = true) {
+    fun add(vararg items: AudioItem, playWhenReady: Boolean = true) {
         val mediaItems = items.map { getMediaItemFromAudioItem(it) }
         queue.addAll(mediaItems)
         exoPlayer.addMediaItems(mediaItems)
@@ -97,11 +86,13 @@ open class QueuedAudioPlayer(context: Context, looper: Looper? = null) : AudioPl
 
     /**
      * Remove an item from the queue.
-     * @param index The index of the item to remove.
+     * @param indexes The indexes of the items to remove.
      */
-    fun remove(index: Int) {
-        queue.removeAt(index)
-        exoPlayer.removeMediaItem(index)
+    fun remove(vararg indexes: Int) {
+        indexes.forEach {
+            queue.removeAt(it)
+            exoPlayer.removeMediaItem(it)
+        }
     }
 
     /**
