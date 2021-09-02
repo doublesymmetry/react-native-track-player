@@ -199,7 +199,7 @@ class MusicModule(reactContext: ReactApplicationContext?) :
                 DefaultAudioItem(it.uri.toString(), SourceType.FILE, it.artist, it.title, it.album, it.artwork.toString())
             }
 
-            queuedAudioPlayer.add(items)
+            queuedAudioPlayer.add(*items.toTypedArray())
 
 //            val queue = binder?.playback?.queue
 //            // -1 means no index was passed and therefore should be inserted at the end.
