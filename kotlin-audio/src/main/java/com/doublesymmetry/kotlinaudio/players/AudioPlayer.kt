@@ -13,6 +13,7 @@ import com.doublesymmetry.kotlinaudio.R
 import com.doublesymmetry.kotlinaudio.models.AudioItem
 import com.doublesymmetry.kotlinaudio.models.AudioItemTransitionReason
 import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
+import com.doublesymmetry.kotlinaudio.utils.isJUnitTest
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player.*
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -42,6 +43,10 @@ open class AudioPlayer(private val context: Context, looper: Looper? = null) {
             ""
         }
 
+        if (isJUnitTest()) {
+            exoPlayer.setThrowsWhenUsingWrongThread(false)
+        }
+
         mediaSessionConnector.setPlayer(exoPlayer)
 
         val builder = PlayerNotificationManager.Builder(context, NOTIFICATION_ID, channelId)
@@ -50,11 +55,13 @@ open class AudioPlayer(private val context: Context, looper: Looper? = null) {
             .setMediaDescriptionAdapter(descriptionAdapter)
             .build()
 
-        playerNotificationManager.apply {
-            setPlayer(exoPlayer)
-            setMediaSessionToken(mediaSession.sessionToken)
-            setUseNextActionInCompactView(true)
-            setUsePreviousActionInCompactView(true)
+        if (!isJUnitTest()) {
+            playerNotificationManager.apply {
+                setPlayer(exoPlayer)
+                setMediaSessionToken(mediaSession.sessionToken)
+                setUseNextActionInCompactView(true)
+                setUsePreviousActionInCompactView(true)
+            }
         }
 
         addPlayerListener()
