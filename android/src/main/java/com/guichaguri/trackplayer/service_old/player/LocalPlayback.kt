@@ -127,7 +127,7 @@ class LocalPlayback(
         queue.clear()
         source = ConcatenatingMediaSource()
         player!!.prepare(source!!, true, true)
-        prepared = false // We set it to false as the queue is now empty
+        prepared = false // We set it to false as the tracks is now empty
         lastKnownWindow = C.INDEX_UNSET
         lastKnownPosition = C.POSITION_UNSET.toLong()
         manager.onReset()

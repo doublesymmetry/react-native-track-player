@@ -5,22 +5,34 @@ import android.os.Binder
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import com.doublesymmetry.kotlinaudio.models.AudioItem
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
+import com.guichaguri.trackplayer.service.models.Track
+import com.guichaguri.trackplayer.service.models.TrackAudioItem
 import java.util.*
 
 class MusicService : HeadlessJsTaskService() {
     private lateinit var player: QueuedAudioPlayer
     private val handler = Handler(Looper.getMainLooper())
 
-    val queue: List<AudioItem>
-        get() = player.items
+    val tracks: List<Track>
+        get() = player.items.map { (it as TrackAudioItem).track }
 
-    val currentIndex
-        get() = player.currentIndex
+    val currentTrackIndex: Int
+        get() {
+            var result = -1
+
+            handler.post {
+                result = player.currentIndex
+            }
+
+            return result
+        }
+
+    val currentTrack
+        get() = (player.currentItem as TrackAudioItem).track
 
     var repeatMode: QueuedAudioPlayer.RepeatMode
         get() = player.repeatMode
@@ -37,7 +49,8 @@ class MusicService : HeadlessJsTaskService() {
 
     }
 
-    fun add(items: List<AudioItem>, playWhenReady: Boolean = true) {
+    fun add(tracks: List<Track>, playWhenReady: Boolean = true) {
+        val items = tracks.map { it.toAudioItem() }
         handler.post { player.add(items, playWhenReady) }
     }
 
@@ -70,7 +83,7 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     fun skipToPrevious() {
-       handler.post { player.previous() }
+        handler.post { player.previous() }
     }
 
     override fun getTaskConfig(intent: Intent?): HeadlessJsTaskConfig {

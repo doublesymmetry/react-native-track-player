@@ -9,8 +9,6 @@ import android.os.IBinder
 import android.support.v4.media.RatingCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.doublesymmetry.kotlinaudio.models.DefaultAudioItem
-import com.doublesymmetry.kotlinaudio.models.SourceType
 import com.facebook.react.bridge.*
 import com.google.android.exoplayer2.Player
 import com.guichaguri.trackplayer.module_old.MusicEvents
@@ -33,7 +31,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     private var options: Bundle? = null
     private var playerSetUpPromise: Promise? = null
 
-    private var musicService: MusicService? = null
+    private lateinit var musicService: MusicService
 
 //    private lateinit var queuedAudioPlayer: QueuedAudioPlayer
 
@@ -85,8 +83,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
-        musicService?.stop()
-        musicService = null
+        musicService.stop()
+        isServiceBound = false
     }
 
     /**
@@ -208,38 +206,31 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     }
 
     @ReactMethod
-    fun add(tracks: ReadableArray?, insertBeforeIndex: Int, callback: Promise) {
-        val bundleList = Arguments.toList(tracks)
+    fun add(data: ReadableArray?, insertBeforeIndex: Int, callback: Promise) {
+        val bundleList = Arguments.toList(data)
         waitForConnection {
-            val trackList: List<Track> = try {
+            val tracks: List<Track> = try {
                 Track.createTracks(
                     reactApplicationContext, bundleList, RatingCompat.RATING_HEART
                 )!!
+
+
             } catch (ex: Exception) {
                 callback.reject("invalid_track_object", ex)
                 return@waitForConnection
             }
 
-            val items = trackList.map {
-                DefaultAudioItem(it.uri.toString(),
-                    SourceType.FILE,
-                    it.artist,
-                    it.title,
-                    it.album,
-                    it.artwork.toString())
-            }
-
-            musicService?.apply {
-                add(items)
+            musicService.apply {
+                add(tracks)
                 play()
                 callback.resolve(null)
             }
 
 ////
-////            val queue = binder?.playback?.queue
+////            val tracks = binder?.playback?.tracks
 ////            // -1 means no index was passed and therefore should be inserted at the end.
-////            val index = if (insertBeforeIndex != -1) insertBeforeIndex else queue!!.size
-////            if (index < 0 || index > queue!!.size) {
+////            val index = if (insertBeforeIndex != -1) insertBeforeIndex else tracks!!.size
+////            if (index < 0 || index > tracks!!.size) {
 ////                callback.reject("index_out_of_bounds", "The track index is out of bounds")
 ////            } else if (trackList == null || trackList.isEmpty()) {
 ////                callback.reject("invalid_track_object", "Track is missing a required key")
@@ -254,23 +245,23 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     }
 
     @ReactMethod
-    fun remove(tracks: ReadableArray?, callback: Promise) {
-        val trackList = Arguments.toList(tracks)
-        val queue = musicService?.queue
+    fun remove(data: ReadableArray?, callback: Promise) {
+        val trackList = Arguments.toList(data)
+        val queue = musicService.tracks
         val indexes: MutableList<Int> = ArrayList()
         for (o in trackList!!) {
             val index = if (o is Int) o else o.toString().toInt()
 
             // we do not allow removal of the current item
-            val currentIndex = musicService?.currentIndex
+            val currentIndex = musicService.currentTrackIndex
             if (index == currentIndex) continue
-            if (index >= 0 && index < queue!!.size) {
+            if (index >= 0 && index < queue.size) {
                 indexes.add(index)
             }
         }
 
         if (indexes.isNotEmpty())
-            musicService?.remove(indexes)
+            musicService.remove(indexes)
 
         callback.resolve(null)
     }
@@ -279,11 +270,11 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     fun updateMetadataForTrack(index: Int, map: ReadableMap?, callback: Promise) {
 //        waitForConnection {
 //            val playback = binder?.playback
-//            val queue = playback!!.queue
-//            if (index < 0 || index >= queue!!.size) {
+//            val tracks = playback!!.tracks
+//            if (index < 0 || index >= tracks!!.size) {
 //                callback.reject("index_out_of_bounds", "The index is out of bounds")
 //            } else {
-//                val track = queue[index]
+//                val track = tracks[index]
 //                track!!.setMetadata(
 //                    reactApplicationContext,
 //                    Arguments.toBundle(map),
@@ -315,7 +306,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun removeUpcomingTracks(callback: Promise) {
-        musicService?.removeUpcomingTracks()
+        musicService.removeUpcomingTracks()
         callback.resolve(null)
 //        waitForConnection {
 //            binder?.playback?.removeUpcomingTracks()
@@ -330,21 +321,21 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun skipToNext(callback: Promise?) {
-        musicService?.skipToNext()
+        musicService.skipToNext()
         callback?.resolve(null)
 //        waitForConnection { binder?.playback?.skipToNext(callback!!) }
     }
 
     @ReactMethod
     fun skipToPrevious(callback: Promise?) {
-        musicService?.skipToPrevious()
+        musicService.skipToPrevious()
         callback?.resolve(null)
 //        waitForConnection { binder?.playback?.skipToPrevious(callback!!) }
     }
 
     @ReactMethod
     fun reset(callback: Promise) {
-        musicService?.stop()
+        musicService.stop()
         callback.resolve(null)
 //        waitForConnection {
 //            binder?.playback?.reset()
@@ -354,7 +345,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun play(callback: Promise) {
-        musicService?.play()
+        musicService.play()
         callback.resolve(null)
 //        waitForConnection {
 //            binder?.playback?.play()
@@ -364,7 +355,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun pause(callback: Promise) {
-        musicService?.pause()
+        musicService.pause()
         callback.resolve(null)
 //        waitForConnection {
 //            binder?.playback?.pause()
@@ -435,30 +426,31 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     @ReactMethod
     fun getTrack(index: Int, callback: Promise) {
 //        waitForConnection {
-//            val tracks = binder?.playback?.queue
-//            if (index >= 0 && index < tracks!!.size) {
-//                callback.resolve(Arguments.fromBundle(tracks[index]!!.originalItem))
-//            } else {
-//                callback.resolve(null)
-//            }
+//            val tracks = binder?.playback?.tracks
+            if (index >= 0 && index < musicService.tracks.size) {
+                callback.resolve(Arguments.fromBundle(musicService.tracks[index].originalItem))
+            } else {
+                callback.resolve(null)
+            }
 //        }
     }
 
     @ReactMethod
     fun getQueue(callback: Promise) {
 //        waitForConnection {
-//            val queue = ArrayList<Bundle?>()
-//            val tracks = musicService?.queue
+//            val tracks = ArrayList<Bundle?>()
+//            val tracks = musicService?.tracks
 //            for (track in tracks!!) {
-//                queue.add(track?.originalItem)
+//                tracks.add(track?.originalItem)
 //            }
-//            callback.resolve(Arguments.fromList(queue))
+            callback.resolve(Arguments.fromList(musicService.tracks.map { it.originalItem }))
 //        }
     }
 
     @ReactMethod
     fun getCurrentTrack(callback: Promise) {
 //        waitForConnection { callback.resolve(binder?.playback?.currentTrackIndex) }
+        callback.resolve(musicService.currentTrackIndex)
     }
 
     @ReactMethod
@@ -499,6 +491,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun getState(callback: Promise) {
+
+        //TODO: Use player.event
 //        if (binder == null) {
 //            callback.resolve(PlaybackStateCompat.STATE_NONE)
 //        } else {

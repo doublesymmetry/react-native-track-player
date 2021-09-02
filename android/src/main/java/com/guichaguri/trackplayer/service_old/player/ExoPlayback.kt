@@ -207,7 +207,7 @@ abstract class ExoPlayback<T : Player?>(
             manager.onTrackUpdate(prevIndex, lastKnownPosition, nextIndex, next)
 //        } else if (reason == Player.DISCONTINUITY_REASON_PERIOD_TRANSITION && lastKnownWindow == player.currentWindowIndex) {
 //            val nextIndex = currentTrackIndex
-//            val next = if (nextIndex == null) null else queue[nextIndex]
+//            val next = if (nextIndex == null) null else tracks[nextIndex]
 //            val duration =
 //                player.currentTimeline.getWindow(lastKnownWindow, Timeline.Window()).durationMs
 //            if (duration != C.TIME_UNSET) lastKnownPosition = duration
