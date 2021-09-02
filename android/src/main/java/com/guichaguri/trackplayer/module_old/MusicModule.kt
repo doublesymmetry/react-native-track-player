@@ -198,13 +198,11 @@ class MusicModule(reactContext: ReactApplicationContext?) :
             val items = trackList.map {
                 DefaultAudioItem(it.uri.toString(), SourceType.FILE, it.artist, it.title, it.album, it.artwork.toString())
             }
-
-
-
-//            val tracks = binder?.playback?.tracks
+            
+//            val queue = binder?.playback?.queue
 //            // -1 means no index was passed and therefore should be inserted at the end.
-//            val index = if (insertBeforeIndex != -1) insertBeforeIndex else tracks!!.size
-//            if (index < 0 || index > tracks!!.size) {
+//            val index = if (insertBeforeIndex != -1) insertBeforeIndex else queue!!.size
+//            if (index < 0 || index > queue!!.size) {
 //                callback.reject("index_out_of_bounds", "The track index is out of bounds")
 //            } else if (trackList == null || trackList.isEmpty()) {
 //                callback.reject("invalid_track_object", "Track is missing a required key")
