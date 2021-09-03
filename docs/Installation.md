@@ -41,10 +41,21 @@ yarn add react-native-kit/react-native-track-player#dev
 
 To update it, run the same command again.
 
-## Troubleshooting
+## Expo
 
-### Expo and Expokit support
-Currently react-native-track-player does not support projects with Expo or Expokit.
+You can now use React Native Track Player with Expo.
+
+Start by creating a [custom development client](https://docs.expo.dev/clients/getting-started/) for your Expo app and then install React Native Track Player.
+
+Here is the configuration required for audio playback in background:
+
+- iOS: Enable audio playback in background via your app.json https://docs.expo.dev/versions/latest/sdk/audio/#playing-or-recording-audio-in-background-ios
+
+- Android: Stop playback when the app is closed https://react-native-track-player.js.org/background/#android
+
+And don't forget to register a [playback service](https://react-native-track-player.js.org/getting-started/#playback-service).
+
+## Troubleshooting
 
 ### iOS: (Enable Swift) `library not found for -lswiftCoreAudio for architecture x86_64`
 Because the iOS module uses Swift, if the user is using a standard react-native application they'll need to add support for Swift in the project. This can be easily by adding a swift file to the Xcode project -- could be called `dummy.swift` and saying yes when prompted if you'd like to generate a bridging header.
