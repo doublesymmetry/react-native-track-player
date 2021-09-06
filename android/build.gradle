@@ -58,7 +58,7 @@ repositories {
 }
 
 dependencies {
-    implementation "com.github.DoubleSymmetry:KotlinAudio:c148b63310"
+    implementation project(path: ':kotlin-audio')
 
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'
@@ -96,4 +96,5 @@ dependencies {
     implementation "com.github.bumptech.glide:glide:4.7.1"
     implementation "androidx.core:core-ktx:1.6.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2'
 }
