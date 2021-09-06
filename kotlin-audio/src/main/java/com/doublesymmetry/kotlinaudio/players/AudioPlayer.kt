@@ -4,7 +4,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
-import android.os.Looper
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.annotation.CallSuper
 import androidx.annotation.RequiresApi
@@ -21,12 +20,8 @@ import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import java.util.concurrent.TimeUnit
 
-open class AudioPlayer(private val context: Context, looper: Looper? = null) {
-    protected val exoPlayer: SimpleExoPlayer = SimpleExoPlayer.Builder(context).apply {
-        looper?.let {
-            setLooper(it)
-        }
-    }.build()
+open class AudioPlayer(private val context: Context) {
+    protected val exoPlayer: SimpleExoPlayer = SimpleExoPlayer.Builder(context).build()
 
     private val mediaSession: MediaSessionCompat = MediaSessionCompat(context, "AudioPlayerSession")
     private val mediaSessionConnector: MediaSessionConnector = MediaSessionConnector(mediaSession)
@@ -65,6 +60,7 @@ open class AudioPlayer(private val context: Context, looper: Looper? = null) {
         }
 
         addPlayerListener()
+//        exoPlayer.prepare()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -82,10 +78,10 @@ open class AudioPlayer(private val context: Context, looper: Looper? = null) {
     }
 
     open fun load(item: AudioItem, playWhenReady: Boolean = true) {
-        exoPlayer.playWhenReady = playWhenReady
-
         val mediaItem = getMediaItemFromAudioItem(item)
         exoPlayer.addMediaItem(mediaItem)
+
+        exoPlayer.playWhenReady = playWhenReady
         exoPlayer.prepare()
     }
 
@@ -98,7 +94,6 @@ open class AudioPlayer(private val context: Context, looper: Looper? = null) {
     }
 
     fun play() {
-        exoPlayer.prepare()
         exoPlayer.play()
 
         mediaSession.isActive = true

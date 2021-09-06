@@ -1,7 +1,6 @@
 package com.doublesymmetry.kotlinaudio.players
 
 import android.content.Context
-import android.os.Looper
 import com.doublesymmetry.kotlinaudio.models.AudioItem
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.IllegalSeekPositionException
@@ -9,7 +8,7 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player.*
 import java.util.*
 
-open class QueuedAudioPlayer(context: Context, looper: Looper? = null) : AudioPlayer(context, looper) {
+open class QueuedAudioPlayer(context: Context) : AudioPlayer(context) {
     private val queue = LinkedList<MediaItem>()
 
     val currentIndex
@@ -61,14 +60,15 @@ open class QueuedAudioPlayer(context: Context, looper: Looper? = null) : AudioPl
      * @param playWhenReady If this is `true` it will automatically start playback. Default is `true`.
      */
     override fun load(item: AudioItem, playWhenReady: Boolean) {
-        exoPlayer.playWhenReady = playWhenReady
-
         val currentIndex = exoPlayer.currentWindowIndex
         val mediaItem = getMediaItemFromAudioItem(item)
 
         queue[currentIndex] = mediaItem
         exoPlayer.removeMediaItem(currentIndex)
         exoPlayer.addMediaItem(currentIndex, mediaItem)
+
+        exoPlayer.playWhenReady = playWhenReady
+        exoPlayer.prepare()
 
         previous()
     }
@@ -84,7 +84,9 @@ open class QueuedAudioPlayer(context: Context, looper: Looper? = null) : AudioPl
         val mediaItem = getMediaItemFromAudioItem(item)
         queue.add(mediaItem)
         exoPlayer.addMediaItem(mediaItem)
-    }
+
+        exoPlayer.playWhenReady = playWhenReady
+        exoPlayer.prepare()    }
 
     /**
      * Add multiple items to the queue.
@@ -92,11 +94,12 @@ open class QueuedAudioPlayer(context: Context, looper: Looper? = null) : AudioPl
      * @param playWhenReady If this is `true` it will automatically start playback. Default is `true`.
      */
     fun add(items: List<AudioItem>, playWhenReady: Boolean = true) {
-        exoPlayer.playWhenReady = playWhenReady
-
         val mediaItems = items.map { getMediaItemFromAudioItem(it) }
         queue.addAll(mediaItems)
         exoPlayer.addMediaItems(mediaItems)
+
+        exoPlayer.playWhenReady = playWhenReady
+        exoPlayer.prepare()
     }
 
     /**
@@ -107,7 +110,6 @@ open class QueuedAudioPlayer(context: Context, looper: Looper? = null) : AudioPl
         queue.removeAt(index)
         exoPlayer.removeMediaItem(index)
     }
-
 
     /**
      * Remove items from the queue.
