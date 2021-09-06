@@ -292,6 +292,7 @@ public class RNTrackPlayer: RCTEventEmitter {
         self.player.stop()
         self.player.nowPlayingInfoController.clear()
         try? AVAudioSession.sharedInstance().setActive(false)
+        hasInitialized = false
     }
 
     @objc(updateOptions:resolver:rejecter:)
