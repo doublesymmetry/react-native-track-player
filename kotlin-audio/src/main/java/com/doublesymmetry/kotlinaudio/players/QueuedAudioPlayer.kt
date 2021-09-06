@@ -92,9 +92,11 @@ open class QueuedAudioPlayer(context: Context, looper: Looper? = null) : AudioPl
      * @param playWhenReady If this is `true` it will automatically start playback. Default is `true`.
      */
     fun add(items: List<AudioItem>, playWhenReady: Boolean = true) {
-        items.forEach {
-            add(it, playWhenReady)
-        }
+        exoPlayer.playWhenReady = playWhenReady
+
+        val mediaItems = items.map { getMediaItemFromAudioItem(it) }
+        queue.addAll(mediaItems)
+        exoPlayer.addMediaItems(mediaItems)
     }
 
     /**

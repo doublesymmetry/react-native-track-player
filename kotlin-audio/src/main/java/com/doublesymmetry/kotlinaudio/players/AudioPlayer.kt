@@ -131,11 +131,8 @@ open class AudioPlayer(private val context: Context, looper: Looper? = null) {
             override fun onPlaybackStateChanged(playbackState: Int) {
                 when (playbackState) {
                     STATE_BUFFERING -> event.updateAudioPlayerState(AudioPlayerState.BUFFERING)
-                    STATE_IDLE -> event.updateAudioPlayerState(AudioPlayerState.IDLE)
                     STATE_READY -> event.updateAudioPlayerState(AudioPlayerState.READY)
-                    STATE_ENDED -> {
-                        TODO()
-                    }
+                    STATE_IDLE, STATE_ENDED -> event.updateAudioPlayerState(AudioPlayerState.IDLE)
                 }
             }
 
