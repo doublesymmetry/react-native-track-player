@@ -9,11 +9,15 @@ import android.os.IBinder
 import android.support.v4.media.RatingCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
 import com.facebook.react.bridge.*
 import com.google.android.exoplayer2.Player
 import com.guichaguri.trackplayer.module_old.MusicEvents
 import com.guichaguri.trackplayer.service.MusicService
 import com.guichaguri.trackplayer.service.models.Track
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import java.util.*
 import javax.annotation.Nonnull
 
@@ -34,6 +38,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     private lateinit var musicService: MusicService
 
 //    private lateinit var queuedAudioPlayer: QueuedAudioPlayer
+
+    private val mainScope = MainScope()
 
     @Nonnull
     override fun getName(): String {
@@ -208,7 +214,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     @ReactMethod
     fun add(data: ReadableArray?, insertBeforeIndex: Int, callback: Promise) {
         val bundleList = Arguments.toList(data)
-        waitForConnection {
+//        waitForConnection {
             val tracks: List<Track> = try {
                 Track.createTracks(
                     reactApplicationContext, bundleList, RatingCompat.RATING_HEART
@@ -217,7 +223,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
             } catch (ex: Exception) {
                 callback.reject("invalid_track_object", ex)
-                return@waitForConnection
+                return
             }
 
             musicService.apply {
@@ -241,7 +247,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 ////                binder?.playback?.add(trackList, index, callback)
 //////                binder?.playback?.add(trackList, index, callback)
 ////            }
-        }
+//        }
     }
 
     @ReactMethod
@@ -491,8 +497,28 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun getState(callback: Promise) {
+        if (!::musicService.isInitialized) {
+            callback.resolve(PlaybackStateCompat.STATE_NONE)
+//            return
+        } else {
+            mainScope.launch {
+                musicService.event.stateChange.collect {
+                    when (it) {
+                        AudioPlayerState.PLAYING -> {
+                            callback.resolve(PlaybackStateCompat.STATE_PLAYING)
+                        }
+                        else -> {
+                            callback.resolve(PlaybackStateCompat.STATE_PAUSED)
+                        }
+                    }
+                }
+            }
+        }
 
-        //TODO: Use player.event
+
+
+//        callback.resolve(PlaybackStateCompat.STATE_PLAYING)
+
 //        if (binder == null) {
 //            callback.resolve(PlaybackStateCompat.STATE_NONE)
 //        } else {

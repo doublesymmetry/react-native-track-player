@@ -40,6 +40,8 @@ class MusicService : HeadlessJsTaskService() {
             player.repeatMode = value
         }
 
+    val event get() = player.event
+
     override fun onCreate() {
         handler.post { player = QueuedAudioPlayer(this) }
         super.onCreate()
