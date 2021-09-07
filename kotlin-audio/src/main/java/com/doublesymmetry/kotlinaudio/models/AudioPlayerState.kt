@@ -2,11 +2,6 @@ package com.doublesymmetry.kotlinaudio.models
 
 enum class AudioPlayerState {
     /**
-     * An [AudioItem] is being loaded for playback.
-     */
-    LOADING,
-
-    /**
      * The current [AudioItem] is loaded, and the player is ready to start playing.
      */
     READY,

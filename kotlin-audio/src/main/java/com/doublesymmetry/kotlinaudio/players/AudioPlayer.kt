@@ -60,7 +60,6 @@ open class AudioPlayer(private val context: Context) {
         }
 
         addPlayerListener()
-//        exoPlayer.prepare()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -138,10 +137,6 @@ open class AudioPlayer(private val context: Context) {
                     MEDIA_ITEM_TRANSITION_REASON_REPEAT -> event.updateAudioItemTransition(AudioItemTransitionReason.REPEAT)
                     MEDIA_ITEM_TRANSITION_REASON_SEEK -> event.updateAudioItemTransition(AudioItemTransitionReason.SEEK_TO_ANOTHER_AUDIO_ITEM)
                 }
-            }
-
-            override fun onIsLoadingChanged(isLoading: Boolean) {
-                if (isLoading) event.updateAudioPlayerState(AudioPlayerState.LOADING)
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
