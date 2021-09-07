@@ -2,12 +2,7 @@ package com.example
 
 import android.app.Application
 import android.content.Context
-import com.facebook.react.ReactApplication
-import com.facebook.react.ReactNativeHost
-import com.facebook.react.ReactPackage
-import com.facebook.react.PackageList
-import com.example.MainApplication
-import com.facebook.react.ReactInstanceManager
+import com.facebook.react.*
 import com.facebook.soloader.SoLoader
 import java.lang.reflect.InvocationTargetException
 

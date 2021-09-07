@@ -8,10 +8,12 @@ import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
+import com.guichaguri.trackplayer.models.State
+import com.guichaguri.trackplayer.models.Track
+import com.guichaguri.trackplayer.models.TrackAudioItem
 import com.guichaguri.trackplayer.module_old.MusicEvents
 import com.guichaguri.trackplayer.module_old.MusicEvents.Companion.EVENT_INTENT
-import com.guichaguri.trackplayer.service.models.Track
-import com.guichaguri.trackplayer.service.models.TrackAudioItem
+import com.orhanobut.logger.Logger
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -98,31 +100,35 @@ class MusicService : HeadlessJsTaskService() {
     private fun observeEvents() {
         serviceScope.launch {
             event.stateChange.collect {
+                val bundle = Bundle()
+                Logger.d(it)
+
                 when (it) {
                     AudioPlayerState.PLAYING -> {
-                        val bundle = Bundle().apply {
-                            putInt("state", 3)
-                        }
-
+                        bundle.putInt(STATE_KEY, State.Playing.value)
                         emit(MusicEvents.BUTTON_PLAY, null)
-                        emit(MusicEvents.PLAYBACK_STATE, bundle)
                     }
                     AudioPlayerState.PAUSED -> {
-                        val bundle = Bundle().apply {
-                            putInt("state", 4)
-                        }
-
-                        emit(MusicEvents.PLAYBACK_STATE, bundle)
+                        bundle.putInt(STATE_KEY, State.Paused.value)
+                        emit(MusicEvents.BUTTON_PAUSE, null)
+                    }
+                    AudioPlayerState.READY, AudioPlayerState.IDLE -> {
+                        bundle.putInt(STATE_KEY, State.Ready.value)
+                    }
+                    AudioPlayerState.BUFFERING -> {
+                        bundle.putInt(STATE_KEY, State.Buffering.value)
                     }
                 }
+
+                emit(MusicEvents.PLAYBACK_STATE, bundle)
             }
         }
     }
 
     private fun emit(event: String?, data: Bundle?) {
         val intent = Intent(EVENT_INTENT)
-        intent.putExtra("event", event)
-        if (data != null) intent.putExtra("data", data)
+        intent.putExtra(EVENT_KEY, event)
+        if (data != null) intent.putExtra(DATA_KEY, data)
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
@@ -140,5 +146,11 @@ class MusicService : HeadlessJsTaskService() {
 
     inner class MusicBinder : Binder() {
         val service = this@MusicService
+    }
+
+    companion object {
+        const val STATE_KEY = "state"
+        const val EVENT_KEY = "event"
+        const val DATA_KEY = "data"
     }
 }

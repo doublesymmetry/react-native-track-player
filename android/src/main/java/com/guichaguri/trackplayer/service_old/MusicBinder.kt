@@ -4,7 +4,7 @@ import android.os.Binder
 import android.os.Bundle
 import android.support.v4.media.RatingCompat
 import com.facebook.react.bridge.Promise
-import com.guichaguri.trackplayer.service.models.NowPlayingMetadata
+import com.guichaguri.trackplayer.models.NowPlayingMetadata
 import com.guichaguri.trackplayer.service_old.player.ExoPlayback
 
 /**

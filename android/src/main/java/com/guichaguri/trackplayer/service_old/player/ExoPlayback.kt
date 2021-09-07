@@ -9,7 +9,7 @@ import com.google.android.exoplayer2.metadata.Metadata
 import com.google.android.exoplayer2.metadata.MetadataOutput
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
-import com.guichaguri.trackplayer.service.models.Track
+import com.guichaguri.trackplayer.models.Track
 import com.guichaguri.trackplayer.service_old.MusicManager
 import com.guichaguri.trackplayer.service_old.Utils
 import java.util.*

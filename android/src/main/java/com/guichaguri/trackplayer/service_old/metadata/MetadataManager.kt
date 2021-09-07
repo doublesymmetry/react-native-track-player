@@ -20,7 +20,7 @@ import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper
 import com.guichaguri.trackplayer.R
-import com.guichaguri.trackplayer.service.models.TrackMetadata
+import com.guichaguri.trackplayer.models.TrackMetadata
 import com.guichaguri.trackplayer.service_old.MusicManager
 import com.guichaguri.trackplayer.service_old.MusicService
 import com.guichaguri.trackplayer.service_old.Utils

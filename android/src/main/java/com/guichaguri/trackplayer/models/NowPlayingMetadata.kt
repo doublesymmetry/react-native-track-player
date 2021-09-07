@@ -1,4 +1,4 @@
-package com.guichaguri.trackplayer.service.models
+package com.guichaguri.trackplayer.models
 
 import android.content.Context
 import android.os.Bundle

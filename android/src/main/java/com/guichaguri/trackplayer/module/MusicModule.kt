@@ -9,10 +9,12 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
 import com.facebook.react.bridge.*
 import com.google.android.exoplayer2.Player
+import com.guichaguri.trackplayer.models.Track
 import com.guichaguri.trackplayer.module_old.MusicEvents
 import com.guichaguri.trackplayer.module_old.MusicEvents.Companion.EVENT_INTENT
 import com.guichaguri.trackplayer.service.MusicService
-import com.guichaguri.trackplayer.service.models.Track
+import com.orhanobut.logger.AndroidLogAdapter
+import com.orhanobut.logger.Logger
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -48,6 +50,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     override fun initialize() {
         val context: ReactContext = reactApplicationContext
         val manager = LocalBroadcastManager.getInstance(context)
+
+        Logger.addLogAdapter(AndroidLogAdapter())
 
 //        if (!isServiceBound)
 //            context.bindService(Intent(context, MusicService::class.java), this, Context.BIND_AUTO_CREATE)
