@@ -16,8 +16,8 @@ import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.facebook.react.bridge.*
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.Player
-import com.guichaguri.trackplayer.models.NowPlayingMetadata
-import com.guichaguri.trackplayer.models.Track
+import com.guichaguri.trackplayer.model.NowPlayingMetadata
+import com.guichaguri.trackplayer.model.Track
 import com.guichaguri.trackplayer.service_old.MusicBinder
 import com.guichaguri.trackplayer.service_old.MusicService
 import com.guichaguri.trackplayer.service_old.Utils

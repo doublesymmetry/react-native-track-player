@@ -9,7 +9,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
 import com.facebook.react.bridge.*
 import com.google.android.exoplayer2.Player
-import com.guichaguri.trackplayer.models.Track
+import com.guichaguri.trackplayer.model.Track
 import com.guichaguri.trackplayer.module_old.MusicEvents
 import com.guichaguri.trackplayer.module_old.MusicEvents.Companion.EVENT_INTENT
 import com.guichaguri.trackplayer.service.MusicService
@@ -467,6 +467,9 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun getDuration(callback: Promise) {
+        musicService.getDurationInSeconds {
+            callback.resolve(it)
+        }
 //        waitForConnection {
 //            val duration = binder?.playback?.duration
 //            if (duration == C.TIME_UNSET) {
@@ -482,15 +485,20 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 //        waitForConnection {
 //            val position = binder?.playback?.bufferedPosition
 //            if (position == C.POSITION_UNSET.toLong()) {
-//                callback.resolve(Utils.toSeconds(0))
+                musicService.getBufferedPositionInSeconds {
+                    callback.resolve(it)
+                }
 //            } else {
 //                callback.resolve(Utils.toSeconds(position!!))
 //            }
 //        }
     }
-
+ 
     @ReactMethod
     fun getPosition(callback: Promise) {
+        musicService.getPositionInSeconds {
+            callback.resolve(it)
+        }
 //        waitForConnection {
 //            val position = binder?.playback?.position
 //            if (position == C.POSITION_UNSET.toLong()) {
@@ -505,7 +513,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     fun getState(callback: Promise) {
         if (!::musicService.isInitialized) {
             callback.resolve(PlaybackStateCompat.STATE_PAUSED)
-//            return
         } else {
             mainScope.launch {
                 musicService.event.stateChange.collect {
@@ -520,7 +527,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
                 }
             }
         }
-
 
 
 //        callback.resolve(PlaybackStateCompat.STATE_PLAYING)

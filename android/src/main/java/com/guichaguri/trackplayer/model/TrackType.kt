@@ -1,4 +1,4 @@
-package com.guichaguri.trackplayer.models
+package com.guichaguri.trackplayer.model
 
 /**
  * @author Guichaguri

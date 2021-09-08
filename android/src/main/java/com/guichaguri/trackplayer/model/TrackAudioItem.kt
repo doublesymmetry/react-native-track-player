@@ -1,4 +1,4 @@
-package com.guichaguri.trackplayer.models
+package com.guichaguri.trackplayer.model
 
 import com.doublesymmetry.kotlinaudio.models.AudioItem
 import com.doublesymmetry.kotlinaudio.models.SourceType

@@ -8,9 +8,9 @@ import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
-import com.guichaguri.trackplayer.models.State
-import com.guichaguri.trackplayer.models.Track
-import com.guichaguri.trackplayer.models.TrackAudioItem
+import com.guichaguri.trackplayer.model.State
+import com.guichaguri.trackplayer.model.Track
+import com.guichaguri.trackplayer.model.TrackAudioItem
 import com.guichaguri.trackplayer.module_old.MusicEvents
 import com.guichaguri.trackplayer.module_old.MusicEvents.Companion.EVENT_INTENT
 import com.orhanobut.logger.Logger
@@ -18,6 +18,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class MusicService : HeadlessJsTaskService() {
     private lateinit var player: QueuedAudioPlayer
@@ -97,6 +98,26 @@ class MusicService : HeadlessJsTaskService() {
     fun getCurrentTrackIndex(callback: (Int) -> Unit) {
         handler.post {
             callback(player.currentIndex)
+        }
+    }
+
+    fun getDurationInSeconds(callback: (Double) -> Unit) {
+        handler.post {
+            Logger.d(player.duration)
+            callback(TimeUnit.MILLISECONDS.toSeconds(player.duration).toDouble())
+        }
+    }
+
+    fun getPositionInSeconds(callback: (Double) -> Unit) {
+        handler.post {
+            Logger.d(player.position)
+            callback(TimeUnit.MILLISECONDS.toSeconds(player.position).toDouble())
+        }
+    }
+
+    fun getBufferedPositionInSeconds(callback: (Double) -> Unit) {
+        handler.post {
+            callback(TimeUnit.MILLISECONDS.toSeconds(player.bufferedPosition).toDouble())
         }
     }
 

@@ -1,4 +1,4 @@
-package com.guichaguri.trackplayer.models
+package com.guichaguri.trackplayer.model
 
 enum class State(val value: Int) {
     None(1),
