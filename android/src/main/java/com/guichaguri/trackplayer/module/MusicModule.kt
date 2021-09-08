@@ -261,10 +261,12 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
             val index = if (o is Int) o else o.toString().toInt()
 
             // we do not allow removal of the current item
-            val currentIndex = musicService.currentTrackIndex
-            if (index == currentIndex) continue
-            if (index >= 0 && index < queue.size) {
-                indexes.add(index)
+            musicService.getCurrentTrackIndex {
+                val currentIndex = it
+                if (index == currentIndex) return@getCurrentTrackIndex
+                if (index >= 0 && index < queue.size) {
+                    indexes.add(index)
+                }
             }
         }
 
@@ -458,7 +460,9 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     @ReactMethod
     fun getCurrentTrack(callback: Promise) {
 //        waitForConnection { callback.resolve(binder?.playback?.currentTrackIndex) }
-        callback.resolve(musicService.currentTrackIndex)
+        musicService.getCurrentTrackIndex {
+            callback.resolve(it)
+        }
     }
 
     @ReactMethod
@@ -499,8 +503,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun getState(callback: Promise) {
-
-        //TODO: FIgure this out >.<
         if (!::musicService.isInitialized) {
             callback.resolve(PlaybackStateCompat.STATE_PAUSED)
 //            return

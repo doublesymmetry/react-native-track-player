@@ -17,7 +17,6 @@ import com.orhanobut.logger.Logger
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.util.*
 
 class MusicService : HeadlessJsTaskService() {
@@ -29,12 +28,13 @@ class MusicService : HeadlessJsTaskService() {
     val tracks: List<Track>
         get() = player.items.map { (it as TrackAudioItem).track }
 
-    val currentTrackIndex: Int
-        get() {
-            return runBlocking {
-                return@runBlocking player.currentIndex
-            }
-        }
+//    val currentTrackIndex: Int
+//        get() {
+//
+////            return runBlocking() {
+////                return@runBlocking player.currentIndex
+////            }
+//        }
 
     val currentTrack
         get() = (player.currentItem as TrackAudioItem).track
@@ -94,6 +94,12 @@ class MusicService : HeadlessJsTaskService() {
         handler.post { player.previous() }
     }
 
+    fun getCurrentTrackIndex(callback: (Int) -> Unit) {
+        handler.post {
+            callback(player.currentIndex)
+        }
+    }
+
     private fun observeEvents() {
         serviceScope.launch {
             event.stateChange.collect {
@@ -125,10 +131,12 @@ class MusicService : HeadlessJsTaskService() {
             event.audioItemTransition.collect {
                 val bundle = Bundle().apply {
                     putDouble("position", 0.0)
-                    if (player.nextItem != null) putInt("nextTrack", currentTrackIndex)
-                }
 
-                emit(MusicEvents.PLAYBACK_TRACK_CHANGED, bundle)
+                    getCurrentTrackIndex {
+                        if (player.nextItem != null) putInt("nextTrack", it)
+                        emit(MusicEvents.PLAYBACK_TRACK_CHANGED, this)
+                    }
+                }
             }
         }
     }
