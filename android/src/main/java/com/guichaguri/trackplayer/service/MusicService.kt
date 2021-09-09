@@ -142,6 +142,12 @@ class MusicService : HeadlessJsTaskService() {
                     AudioPlayerState.BUFFERING -> {
                         bundle.putInt(STATE_KEY, State.Buffering.value)
                     }
+                    AudioPlayerState.ENDED -> {
+                        if (player.nextItem == null) {
+                            if (player.previousIndex != null) bundle.putInt(TRACK_KEY, player.previousIndex!!)
+                            emit(MusicEvents.PLAYBACK_QUEUE_ENDED, null)
+                        }
+                    }
                 }
 
                 emit(MusicEvents.PLAYBACK_STATE, bundle)
@@ -150,13 +156,14 @@ class MusicService : HeadlessJsTaskService() {
 
         serviceScope.launch {
             event.audioItemTransition.collect {
-                val bundle = Bundle().apply {
-                    putDouble("position", 0.0)
-
-                    getCurrentTrackIndex {
-                        if (player.nextItem != null) putInt("nextTrack", it)
-                        emit(MusicEvents.PLAYBACK_TRACK_CHANGED, this)
+                handler.post {
+                    val bundle = Bundle().apply {
+                        putDouble(POSITION_KEY, 0.0)
                     }
+
+                    bundle.putInt(NEXT_TRACK_KEY, player.currentIndex)
+
+                    emit(MusicEvents.PLAYBACK_TRACK_CHANGED, bundle)
                 }
             }
         }
@@ -170,7 +177,7 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     override fun getTaskConfig(intent: Intent?): HeadlessJsTaskConfig {
-        return HeadlessJsTaskConfig("TrackPlayer", Arguments.createMap(), 0, true)
+        return HeadlessJsTaskConfig(TASK_KEY, Arguments.createMap(), 0, true)
     }
 
     override fun onHeadlessJsTaskFinish(taskId: Int) {
@@ -189,5 +196,10 @@ class MusicService : HeadlessJsTaskService() {
         const val STATE_KEY = "state"
         const val EVENT_KEY = "event"
         const val DATA_KEY = "data"
+        const val TRACK_KEY = "track"
+        const val NEXT_TRACK_KEY = "nextTrack"
+        const val POSITION_KEY = "position"
+
+        const val TASK_KEY = "TrackPlayer"
     }
 }

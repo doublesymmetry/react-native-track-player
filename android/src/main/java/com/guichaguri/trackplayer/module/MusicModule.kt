@@ -216,7 +216,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     @ReactMethod
     fun add(data: ReadableArray?, insertBeforeIndex: Int, callback: Promise) {
         val bundleList = Arguments.toList(data)
-//        waitForConnection {
             val tracks: List<Track> = try {
                 Track.createTracks(
                     reactApplicationContext, bundleList, RatingCompat.RATING_HEART
@@ -230,7 +229,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
             musicService.apply {
                 add(tracks)
-//                play()
                 callback.resolve(null)
             }
 
@@ -493,7 +491,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 //            }
 //        }
     }
- 
+
     @ReactMethod
     fun getPosition(callback: Promise) {
         musicService.getPositionInSeconds {
