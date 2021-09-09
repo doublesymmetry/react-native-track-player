@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
-import com.doublesymmetry.kotlinaudio.models.SourceType
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
@@ -120,7 +119,6 @@ class Track(context: Context, bundle: Bundle, ratingType: Int) : TrackMetadata()
         return TrackAudioItem(
             this,
             uri.toString(),
-            SourceType.FILE,
             artist,
             title,
             album,
