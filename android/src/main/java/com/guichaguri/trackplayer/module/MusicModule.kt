@@ -7,6 +7,8 @@ import android.support.v4.media.RatingCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
+import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
+import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer.RepeatMode.*
 import com.facebook.react.bridge.*
 import com.google.android.exoplayer2.Player
 import com.guichaguri.trackplayer.model.Track
@@ -91,7 +93,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
-        musicService.stop()
+        musicService.destroy()
         isServiceBound = false
     }
 
@@ -209,28 +211,28 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 //        options = Arguments.toBundle(data)
 //        waitForConnection {
 //            binder!!.updateOptions(options)
-            callback.resolve(null)
+        callback.resolve(null)
 //        }
     }
 
     @ReactMethod
     fun add(data: ReadableArray?, insertBeforeIndex: Int, callback: Promise) {
         val bundleList = Arguments.toList(data)
-            val tracks: List<Track> = try {
-                Track.createTracks(
-                    reactApplicationContext, bundleList, RatingCompat.RATING_HEART
-                )!!
+        val tracks: List<Track> = try {
+            Track.createTracks(
+                reactApplicationContext, bundleList, RatingCompat.RATING_HEART
+            )!!
 
 
-            } catch (ex: Exception) {
-                callback.reject("invalid_track_object", ex)
-                return
-            }
+        } catch (ex: Exception) {
+            callback.reject("invalid_track_object", ex)
+            return
+        }
 
-            musicService.apply {
-                add(tracks)
-                callback.resolve(null)
-            }
+        musicService.apply {
+            add(tracks)
+            callback.resolve(null)
+        }
 
 ////
 ////            val tracks = binder?.playback?.tracks
@@ -343,7 +345,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun reset(callback: Promise) {
-        musicService.stop()
+        musicService.destroy()
         callback.resolve(null)
 //        waitForConnection {
 //            binder?.playback?.reset()
@@ -373,7 +375,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun stop(callback: Promise) {
-        musicService?.stop()
+        musicService?.destroy()
         callback.resolve(null)
 
 //        waitForConnection {
@@ -419,7 +421,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun setRepeatMode(mode: Int, callback: Promise) {
-        // TODO: Should use KotlinAudio enum
+        musicService.repeatMode = QueuedAudioPlayer.RepeatMode.fromOrdinal(mode)
+        callback.resolve(null)
 //        waitForConnection {
 //            binder?.playback?.repeatMode = mode
 //            callback.resolve(null)
@@ -428,6 +431,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun getRepeatMode(callback: Promise) {
+        callback.resolve(musicService.repeatMode.ordinal)
 //        waitForConnection { callback.resolve(binder?.playback?.repeatMode) }
     }
 
@@ -435,11 +439,11 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     fun getTrack(index: Int, callback: Promise) {
 //        waitForConnection {
 //            val tracks = binder?.playback?.tracks
-            if (index >= 0 && index < musicService.tracks.size) {
-                callback.resolve(Arguments.fromBundle(musicService.tracks[index].originalItem))
-            } else {
-                callback.resolve(null)
-            }
+        if (index >= 0 && index < musicService.tracks.size) {
+            callback.resolve(Arguments.fromBundle(musicService.tracks[index].originalItem))
+        } else {
+            callback.resolve(null)
+        }
 //        }
     }
 
@@ -451,7 +455,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 //            for (track in tracks!!) {
 //                tracks.add(track?.originalItem)
 //            }
-            callback.resolve(Arguments.fromList(musicService.tracks.map { it.originalItem }))
+        callback.resolve(Arguments.fromList(musicService.tracks.map { it.originalItem }))
 //        }
     }
 
@@ -483,9 +487,9 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 //        waitForConnection {
 //            val position = binder?.playback?.bufferedPosition
 //            if (position == C.POSITION_UNSET.toLong()) {
-                musicService.getBufferedPositionInSeconds {
-                    callback.resolve(it)
-                }
+        musicService.getBufferedPositionInSeconds {
+            callback.resolve(it)
+        }
 //            } else {
 //                callback.resolve(Utils.toSeconds(position!!))
 //            }
@@ -510,7 +514,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     @ReactMethod
     fun getState(callback: Promise) {
         if (!::musicService.isInitialized) {
-            callback.resolve(PlaybackStateCompat.STATE_PAUSED)
+            callback.resolve(PlaybackStateCompat.STATE_NONE)
         } else {
             mainScope.launch {
                 musicService.event.stateChange.collect {

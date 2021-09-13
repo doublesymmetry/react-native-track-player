@@ -29,21 +29,15 @@ class MusicService : HeadlessJsTaskService() {
     val tracks: List<Track>
         get() = player.items.map { (it as TrackAudioItem).track }
 
-//    val currentTrackIndex: Int
-//        get() {
-//
-////            return runBlocking() {
-////                return@runBlocking player.currentIndex
-////            }
-//        }
-
     val currentTrack
         get() = (player.currentItem as TrackAudioItem).track
 
     var repeatMode: QueuedAudioPlayer.RepeatMode
         get() = player.repeatMode
         set(value) {
-            player.repeatMode = value
+            handler.post {
+                player.repeatMode = value
+            }
         }
 
     val event get() = player.event
@@ -75,8 +69,10 @@ class MusicService : HeadlessJsTaskService() {
         handler.post { player.pause() }
     }
 
-    fun stop() {
+    fun destroy() {
         handler.post { player.stop() }
+        handler.removeMessages(0)
+        stopSelf()
     }
 
     fun removeUpcomingTracks() {
@@ -103,14 +99,12 @@ class MusicService : HeadlessJsTaskService() {
 
     fun getDurationInSeconds(callback: (Double) -> Unit) {
         handler.post {
-            Logger.d(player.duration)
             callback(TimeUnit.MILLISECONDS.toSeconds(player.duration).toDouble())
         }
     }
 
     fun getPositionInSeconds(callback: (Double) -> Unit) {
         handler.post {
-            Logger.d(player.position)
             callback(TimeUnit.MILLISECONDS.toSeconds(player.position).toDouble())
         }
     }
