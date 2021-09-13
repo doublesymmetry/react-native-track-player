@@ -24,5 +24,10 @@ enum class AudioPlayerState {
     /**
      * No [AudioItem] is loaded and the player is doing nothing.
      */
-    IDLE
+    IDLE,
+
+    /**
+     * The player has finished playing all the [AudioItem]s. TODO: Add additional info
+     */
+    ENDED
 }

@@ -13,6 +13,7 @@ import com.doublesymmetry.kotlinaudio.models.AudioItem
 import com.doublesymmetry.kotlinaudio.models.AudioItemTransitionReason
 import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
 import com.doublesymmetry.kotlinaudio.utils.isJUnitTest
+import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player.*
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -28,6 +29,36 @@ open class AudioPlayer(private val context: Context) {
 
     private val playerNotificationManager: PlayerNotificationManager
     private val descriptionAdapter = DescriptionAdapter(context, null)
+
+    val duration: Long
+        get() {
+            return if (exoPlayer.duration == C.TIME_UNSET) 0
+            else exoPlayer.duration
+        }
+
+    val position: Long
+        get() {
+            return if (exoPlayer.currentPosition == C.POSITION_UNSET.toLong()) 0
+            else exoPlayer.currentPosition
+        }
+
+    val bufferedPosition: Long
+        get() {
+            return if (exoPlayer.bufferedPosition == C.POSITION_UNSET.toLong()) 0
+            else exoPlayer.bufferedPosition
+        }
+
+    var volume: Float
+        get() = exoPlayer.volume
+        set(value) {
+            exoPlayer.volume = value
+        }
+
+    var rate: Float
+        get() = exoPlayer.playbackParameters.speed
+        set(value) {
+            exoPlayer.setPlaybackSpeed(value)
+        }
 
     val event = EventHolder()
 
@@ -66,8 +97,7 @@ open class AudioPlayer(private val context: Context) {
     private fun createNotificationChannel(): String {
         val channelId = CHANNEL_ID
         val channelName = context.getString(R.string.playback_channel_name)
-        val channel =
-            NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW)
+        val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW)
         channel.description = "Used when playing music"
         channel.setSound(null, null)
 
@@ -113,6 +143,7 @@ open class AudioPlayer(private val context: Context) {
 
     fun seek(duration: Long, unit: TimeUnit) {
         val millis = TimeUnit.MILLISECONDS.convert(duration, unit)
+
         exoPlayer.seekTo(millis)
     }
 
@@ -121,21 +152,26 @@ open class AudioPlayer(private val context: Context) {
     }
 
     private fun addPlayerListener() {
-        exoPlayer.addListener(object: Listener {
+        exoPlayer.addListener(object : Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
                 when (playbackState) {
                     STATE_BUFFERING -> event.updateAudioPlayerState(AudioPlayerState.BUFFERING)
                     STATE_READY -> event.updateAudioPlayerState(AudioPlayerState.READY)
-                    STATE_IDLE, STATE_ENDED -> event.updateAudioPlayerState(AudioPlayerState.IDLE)
+                    STATE_IDLE -> event.updateAudioPlayerState(AudioPlayerState.IDLE)
+                    STATE_ENDED -> event.updateAudioPlayerState(AudioPlayerState.ENDED)
                 }
             }
 
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                 when (reason) {
-                    MEDIA_ITEM_TRANSITION_REASON_AUTO -> event.updateAudioItemTransition(AudioItemTransitionReason.AUTO)
-                    MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED -> event.updateAudioItemTransition(AudioItemTransitionReason.QUEUE_CHANGED)
-                    MEDIA_ITEM_TRANSITION_REASON_REPEAT -> event.updateAudioItemTransition(AudioItemTransitionReason.REPEAT)
-                    MEDIA_ITEM_TRANSITION_REASON_SEEK -> event.updateAudioItemTransition(AudioItemTransitionReason.SEEK_TO_ANOTHER_AUDIO_ITEM)
+                    MEDIA_ITEM_TRANSITION_REASON_AUTO -> event.updateAudioItemTransition(
+                        AudioItemTransitionReason.AUTO)
+                    MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED -> event.updateAudioItemTransition(
+                        AudioItemTransitionReason.QUEUE_CHANGED)
+                    MEDIA_ITEM_TRANSITION_REASON_REPEAT -> event.updateAudioItemTransition(
+                        AudioItemTransitionReason.REPEAT)
+                    MEDIA_ITEM_TRANSITION_REASON_SEEK -> event.updateAudioItemTransition(
+                        AudioItemTransitionReason.SEEK_TO_ANOTHER_AUDIO_ITEM)
                 }
             }
 

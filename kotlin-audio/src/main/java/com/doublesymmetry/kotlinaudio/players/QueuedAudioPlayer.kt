@@ -14,6 +14,28 @@ open class QueuedAudioPlayer(context: Context) : AudioPlayer(context) {
     val currentIndex
         get() = exoPlayer.currentWindowIndex
 
+//    val nextIndex: Int? get() {
+//        return if (currentIndex + 1 > items.size) null
+//        else currentIndex + 1
+//    }
+//
+//    val previousIndex: Int? get() {
+//        return if (currentIndex - 1 < 0) null
+//        else currentIndex - 1
+//    }
+
+    val nextIndex: Int?
+        get() {
+            return if (exoPlayer.nextWindowIndex == C.INDEX_UNSET) null
+            else exoPlayer.nextWindowIndex
+        }
+
+    val previousIndex: Int?
+        get() {
+            return if (exoPlayer.previousWindowIndex == C.INDEX_UNSET) null
+            else exoPlayer.previousWindowIndex
+        }
+
     val items: List<AudioItem>
         get() = queue.map { it.playbackProperties?.tag as AudioItem }
 
@@ -34,9 +56,13 @@ open class QueuedAudioPlayer(context: Context) : AudioPlayer(context) {
         }
 
     val currentItem: AudioItem?
-        get() {
-            return exoPlayer.currentMediaItem?.playbackProperties?.tag as? AudioItem
-        }
+        get() = exoPlayer.currentMediaItem?.playbackProperties?.tag as? AudioItem
+
+    val nextItem: AudioItem?
+        get() = items.getOrNull(currentIndex + 1)
+
+    val previousItem: AudioItem?
+        get() = items.getOrNull(currentIndex - 1)
 
     var repeatMode: RepeatMode
         get() {
@@ -85,8 +111,9 @@ open class QueuedAudioPlayer(context: Context) : AudioPlayer(context) {
         queue.add(mediaItem)
         exoPlayer.addMediaItem(mediaItem)
 
+        exoPlayer.prepare()
         exoPlayer.playWhenReady = playWhenReady
-        exoPlayer.prepare()    }
+    }
 
     /**
      * Add multiple items to the queue.
@@ -98,8 +125,8 @@ open class QueuedAudioPlayer(context: Context) : AudioPlayer(context) {
         queue.addAll(mediaItems)
         exoPlayer.addMediaItems(mediaItems)
 
-        exoPlayer.playWhenReady = playWhenReady
         exoPlayer.prepare()
+        exoPlayer.playWhenReady = playWhenReady
     }
 
     /**
@@ -152,7 +179,7 @@ open class QueuedAudioPlayer(context: Context) : AudioPlayer(context) {
         try {
             exoPlayer.seekTo(index, C.INDEX_UNSET.toLong())
         } catch (e: IllegalSeekPositionException) {
-            throw Error("This item index does not exist. The size of the queue is ${queue.size} items.")
+            throw Error("This item index $index does not exist. The size of the queue is ${queue.size} items.")
         }
     }
 
@@ -183,7 +210,18 @@ open class QueuedAudioPlayer(context: Context) : AudioPlayer(context) {
     }
 
     enum class RepeatMode {
-        ALL, ONE, OFF
+        OFF, ONE, ALL;
+
+        companion object {
+            fun fromOrdinal(ordinal: Int): RepeatMode {
+                return when (ordinal) {
+                    0 -> OFF
+                    1 -> ONE
+                    2 -> ALL
+                    else -> error("Wrong ordinal")
+                }
+            }
+        }
     }
 }
 
