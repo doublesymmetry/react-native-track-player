@@ -40,6 +40,18 @@ class MusicService : HeadlessJsTaskService() {
             }
         }
 
+    var volume: Float
+        get() = player.volume
+        set(value) {
+            player.volume = value
+        }
+
+    var rate: Float
+    get() = player.rate
+    set(value) {
+        player.rate = value
+    }
+
     val event get() = player.event
 
     override fun onCreate() {

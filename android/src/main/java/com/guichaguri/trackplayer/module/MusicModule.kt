@@ -395,6 +395,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun setVolume(volume: Float, callback: Promise) {
+        musicService.volume = volume
+        callback.resolve(null)
 //        waitForConnection {
 //            binder?.playback?.volume = volume
 //            callback.resolve(null)
@@ -403,11 +405,14 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun getVolume(callback: Promise) {
+        callback.resolve(musicService.volume)
 //        waitForConnection { callback.resolve(binder?.playback?.volume) }
     }
 
     @ReactMethod
     fun setRate(rate: Float, callback: Promise) {
+        musicService.rate = rate
+        callback.resolve(null)
 //        waitForConnection {
 //            binder?.playback?.rate = rate
 //            callback.resolve(null)
@@ -416,6 +421,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun getRate(callback: Promise) {
+        callback.resolve(musicService.rate)
 //        waitForConnection { callback.resolve(binder?.playback?.rate) }
     }
 
