@@ -3,6 +3,7 @@ package com.doublesymmetry.kotlinaudio.players
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.net.Uri
 import android.os.Build
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.annotation.CallSuper
@@ -12,13 +13,25 @@ import com.doublesymmetry.kotlinaudio.R
 import com.doublesymmetry.kotlinaudio.models.AudioItem
 import com.doublesymmetry.kotlinaudio.models.AudioItemTransitionReason
 import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
+import com.doublesymmetry.kotlinaudio.models.MediaType
 import com.doublesymmetry.kotlinaudio.utils.isJUnitTest
+import com.doublesymmetry.kotlinaudio.utils.isUriLocal
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player.*
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
+import com.google.android.exoplayer2.source.MediaSource
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.source.dash.DashMediaSource
+import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource
+import com.google.android.exoplayer2.source.hls.HlsMediaSource
+import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource
+import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
+import com.google.android.exoplayer2.upstream.*
+import com.google.android.exoplayer2.util.Util
 import java.util.concurrent.TimeUnit
 
 open class AudioPlayer(private val context: Context) {
@@ -107,9 +120,9 @@ open class AudioPlayer(private val context: Context) {
     }
 
     open fun load(item: AudioItem, playWhenReady: Boolean = true) {
-        val mediaItem = getMediaItemFromAudioItem(item)
-        exoPlayer.addMediaItem(mediaItem)
+        val mediaSource = getMediaSourceFromAudioItem(item)
 
+        exoPlayer.addMediaSource(mediaSource)
         exoPlayer.playWhenReady = playWhenReady
         exoPlayer.prepare()
     }
@@ -151,6 +164,80 @@ open class AudioPlayer(private val context: Context) {
         return MediaItem.Builder().setUri(audioItem.audioUrl).setTag(audioItem).build()
     }
 
+    protected fun getMediaSourceFromAudioItem(audioItem: AudioItem): MediaSource {
+        val factory: DataSource.Factory
+        val uri = Uri.parse(audioItem.audioUrl)
+        val mediaItem = getMediaItemFromAudioItem(audioItem)
+
+        val userAgent = if (audioItem.options == null || audioItem.options!!.userAgent.isNullOrBlank()) {
+            Util.getUserAgent(context, APPLICATION_NAME)
+        } else {
+            audioItem.options!!.userAgent
+        }
+
+        factory = when {
+            audioItem.options?.resourceId != null -> {
+                val raw = RawResourceDataSource(context)
+                raw.open(DataSpec(uri))
+                DataSource.Factory { raw }
+            }
+            isUriLocal(uri) -> {
+                DefaultDataSourceFactory(context, userAgent)
+            }
+            else -> {
+                DefaultHttpDataSource.Factory().apply {
+                    setUserAgent(userAgent)
+                    setAllowCrossProtocolRedirects(true)
+
+                    audioItem.options?.headers?.let {
+                        setDefaultRequestProperties(it.toMap())
+                    }
+                }
+            }
+
+            //TODO: Enable caching
+//        enableCaching()
+        }
+
+        return when (audioItem.type) {
+            MediaType.DASH -> createDashSource(mediaItem, factory)
+            MediaType.HLS -> createHlsSource(mediaItem, factory)
+            MediaType.SMOOTH_STREAMING -> createSsSource(mediaItem, factory)
+            else -> createProgressiveSource(mediaItem, factory)
+        }
+    }
+
+    private fun createDashSource(mediaItem: MediaItem, factory: DataSource.Factory?): MediaSource {
+        return DashMediaSource.Factory(DefaultDashChunkSource.Factory(factory!!), factory)
+            .createMediaSource(mediaItem)
+    }
+
+    private fun createHlsSource(mediaItem: MediaItem, factory: DataSource.Factory?): MediaSource {
+        return HlsMediaSource.Factory(factory!!)
+            .createMediaSource(mediaItem)
+    }
+
+    private fun createSsSource(mediaItem: MediaItem, factory: DataSource.Factory?): MediaSource {
+        return SsMediaSource.Factory(DefaultSsChunkSource.Factory(factory!!), factory)
+            .createMediaSource(mediaItem)
+    }
+
+    private fun createProgressiveSource(mediaItem: MediaItem, factory: DataSource.Factory): ProgressiveMediaSource {
+        return ProgressiveMediaSource.Factory(
+            factory, DefaultExtractorsFactory()
+                .setConstantBitrateSeekingEnabled(true)
+        )
+            .createMediaSource(mediaItem)
+    }
+
+//    fun enableCaching(ds: DataSource.Factory): DataSource.Factory {
+//        return if (cache == null || cacheMaxSize <= 0) ds else CacheDataSourceFactory(
+//            cache!!,
+//            ds,
+//            CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR
+//        )
+//    }
+
     private fun addPlayerListener() {
         exoPlayer.addListener(object : Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
@@ -164,14 +251,10 @@ open class AudioPlayer(private val context: Context) {
 
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                 when (reason) {
-                    MEDIA_ITEM_TRANSITION_REASON_AUTO -> event.updateAudioItemTransition(
-                        AudioItemTransitionReason.AUTO)
-                    MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED -> event.updateAudioItemTransition(
-                        AudioItemTransitionReason.QUEUE_CHANGED)
-                    MEDIA_ITEM_TRANSITION_REASON_REPEAT -> event.updateAudioItemTransition(
-                        AudioItemTransitionReason.REPEAT)
-                    MEDIA_ITEM_TRANSITION_REASON_SEEK -> event.updateAudioItemTransition(
-                        AudioItemTransitionReason.SEEK_TO_ANOTHER_AUDIO_ITEM)
+                    MEDIA_ITEM_TRANSITION_REASON_AUTO -> event.updateAudioItemTransition(AudioItemTransitionReason.AUTO)
+                    MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED -> event.updateAudioItemTransition(AudioItemTransitionReason.QUEUE_CHANGED)
+                    MEDIA_ITEM_TRANSITION_REASON_REPEAT -> event.updateAudioItemTransition(AudioItemTransitionReason.REPEAT)
+                    MEDIA_ITEM_TRANSITION_REASON_SEEK -> event.updateAudioItemTransition(AudioItemTransitionReason.SEEK_TO_ANOTHER_AUDIO_ITEM)
                 }
             }
 
@@ -185,5 +268,6 @@ open class AudioPlayer(private val context: Context) {
     companion object {
         const val NOTIFICATION_ID = 1
         const val CHANNEL_ID = "kotlin_audio_player"
+        const val APPLICATION_NAME = "react-native-track-player"
     }
 }

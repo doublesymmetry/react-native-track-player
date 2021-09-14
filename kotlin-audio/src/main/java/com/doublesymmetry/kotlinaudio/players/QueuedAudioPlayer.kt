@@ -4,12 +4,12 @@ import android.content.Context
 import com.doublesymmetry.kotlinaudio.models.AudioItem
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.IllegalSeekPositionException
-import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player.*
+import com.google.android.exoplayer2.source.MediaSource
 import java.util.*
 
-open class QueuedAudioPlayer(context: Context) : AudioPlayer(context) {
-    private val queue = LinkedList<MediaItem>()
+open class  QueuedAudioPlayer(context: Context) : AudioPlayer(context) {
+    private val queue = LinkedList<MediaSource>()
 
     val currentIndex
         get() = exoPlayer.currentWindowIndex
@@ -37,14 +37,14 @@ open class QueuedAudioPlayer(context: Context) : AudioPlayer(context) {
         }
 
     val items: List<AudioItem>
-        get() = queue.map { it.playbackProperties?.tag as AudioItem }
+        get() = queue.map { it.mediaItem.playbackProperties?.tag as AudioItem }
 
     val previousItems: List<AudioItem>
         get() {
             return if (queue.isEmpty()) emptyList()
             else queue
                 .subList(0, exoPlayer.currentWindowIndex)
-                .map { it.playbackProperties?.tag as AudioItem }
+                .map { it.mediaItem.playbackProperties?.tag as AudioItem }
         }
 
     val nextItems: List<AudioItem>
@@ -52,7 +52,7 @@ open class QueuedAudioPlayer(context: Context) : AudioPlayer(context) {
             return if (queue.isEmpty()) emptyList()
             else queue
                 .subList(exoPlayer.currentWindowIndex, queue.lastIndex)
-                .map { it.playbackProperties?.tag as AudioItem }
+                .map { it.mediaItem.playbackProperties?.tag as AudioItem }
         }
 
     val currentItem: AudioItem?
@@ -87,11 +87,11 @@ open class QueuedAudioPlayer(context: Context) : AudioPlayer(context) {
      */
     override fun load(item: AudioItem, playWhenReady: Boolean) {
         val currentIndex = exoPlayer.currentWindowIndex
-        val mediaItem = getMediaItemFromAudioItem(item)
+        val mediaSource = getMediaSourceFromAudioItem(item)
 
-        queue[currentIndex] = mediaItem
+        queue[currentIndex] = mediaSource
         exoPlayer.removeMediaItem(currentIndex)
-        exoPlayer.addMediaItem(currentIndex, mediaItem)
+        exoPlayer.addMediaSource(currentIndex, mediaSource)
 
         exoPlayer.playWhenReady = playWhenReady
         exoPlayer.prepare()
@@ -107,9 +107,10 @@ open class QueuedAudioPlayer(context: Context) : AudioPlayer(context) {
     fun add(item: AudioItem, playWhenReady: Boolean = true) {
         exoPlayer.playWhenReady = playWhenReady
 
-        val mediaItem = getMediaItemFromAudioItem(item)
-        queue.add(mediaItem)
-        exoPlayer.addMediaItem(mediaItem)
+        val mediaSource = getMediaSourceFromAudioItem(item)
+
+        queue.add(mediaSource)
+        exoPlayer.addMediaSource(mediaSource)
 
         exoPlayer.prepare()
         exoPlayer.playWhenReady = playWhenReady
@@ -121,9 +122,9 @@ open class QueuedAudioPlayer(context: Context) : AudioPlayer(context) {
      * @param playWhenReady If this is `true` it will automatically start playback. Default is `true`.
      */
     fun add(items: List<AudioItem>, playWhenReady: Boolean = true) {
-        val mediaItems = items.map { getMediaItemFromAudioItem(it) }
-        queue.addAll(mediaItems)
-        exoPlayer.addMediaItems(mediaItems)
+        val mediaSources = items.map { getMediaSourceFromAudioItem(it) }
+        queue.addAll(mediaSources)
+        exoPlayer.addMediaSources(mediaSources)
 
         exoPlayer.prepare()
         exoPlayer.playWhenReady = playWhenReady
