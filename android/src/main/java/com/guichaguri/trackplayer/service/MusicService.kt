@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.*
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
+import com.doublesymmetry.kotlinaudio.models.BufferOptions
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
@@ -54,14 +55,17 @@ class MusicService : HeadlessJsTaskService() {
 
     val event get() = player.event
 
-    override fun onCreate() {
-        handler.post { player = QueuedAudioPlayer(this) }
+    fun setupPlayer(playerOptions: Bundle?) {
+        val bufferOptions = BufferOptions(
+            playerOptions?.getDouble(MIN_BUFFER_KEY)?.toInt(),
+            playerOptions?.getDouble(MAX_BUFFER_KEY)?.toInt(),
+            playerOptions?.getDouble(PLAY_BUFFER_KEY)?.toInt(),
+            playerOptions?.getDouble(BACK_BUFFER_KEY)?.toInt()
+        //TODO: Ignored maxCacheSize and autoUpdateMetadata. Do we need them?
+        )
+
+        handler.post { player = QueuedAudioPlayer(this, bufferOptions) }
         observeEvents()
-        super.onCreate()
-    }
-
-    fun setUp() {
-
     }
 
     fun add(tracks: List<Track>, playWhenReady: Boolean = true) {
@@ -95,12 +99,20 @@ class MusicService : HeadlessJsTaskService() {
         handler.post { player.removePreviousItems() }
     }
 
+    fun skip(index: Int) {
+        handler.post { player.jumpToItem(index) }
+    }
+
     fun skipToNext() {
         handler.post { player.next() }
     }
 
     fun skipToPrevious() {
         handler.post { player.previous() }
+    }
+
+    fun seekTo(seconds: Float) {
+        handler.post { player.seek(seconds.toLong(), TimeUnit.SECONDS) }
     }
 
     fun getCurrentTrackIndex(callback: (Int) -> Unit) {
@@ -207,5 +219,10 @@ class MusicService : HeadlessJsTaskService() {
         const val POSITION_KEY = "position"
 
         const val TASK_KEY = "TrackPlayer"
+
+        const val MIN_BUFFER_KEY = "minBuffer"
+        const val MAX_BUFFER_KEY = "maxBuffer"
+        const val PLAY_BUFFER_KEY = "playBuffer"
+        const val BACK_BUFFER_KEY = "backBuffer"
     }
 }

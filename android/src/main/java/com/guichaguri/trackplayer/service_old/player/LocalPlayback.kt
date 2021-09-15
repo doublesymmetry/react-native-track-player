@@ -10,7 +10,6 @@ import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.database.DatabaseProvider
 import com.google.android.exoplayer2.database.ExoDatabaseProvider
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
-import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory
@@ -64,20 +63,20 @@ class LocalPlayback(
     }
 
     override fun add(track: Track, index: Int, promise: Promise) {
-        queue.add(index, track)
-        val trackSource = track.toMediaSource(context, this)
-        source!!.addMediaSource(index, trackSource, manager.handler!!) { promise.resolve(index) }
-        prepare()
+//        queue.add(index, track)
+//        val trackSource = track.toMediaSource(context, this)
+//        source!!.addMediaSource(index, trackSource, manager.handler!!) { promise.resolve(index) }
+//        prepare()
     }
 
     override fun add(tracks: Collection<Track>, index: Int, promise: Promise) {
-        val trackList: MutableList<MediaSource?> = ArrayList()
-        for (track in tracks) {
-            trackList.add(track.toMediaSource(context, this))
-        }
-        queue.addAll(index, tracks)
-//        source!!.addMediaSources(index, trackList, manager.handler!!) { promise.resolve(index) }
-        prepare()
+//        val trackList: MutableList<MediaSource?> = ArrayList()
+//        for (track in tracks) {
+//            trackList.add(track.toMediaSource(context, this))
+//        }
+//        queue.addAll(index, tracks)
+////        source!!.addMediaSources(index, trackList, manager.handler!!) { promise.resolve(index) }
+//        prepare()
     }
 
     override fun remove(indexes: List<Int>, promise: Promise) {

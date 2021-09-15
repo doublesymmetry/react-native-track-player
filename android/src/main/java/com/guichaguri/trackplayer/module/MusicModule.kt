@@ -31,7 +31,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     private var binder: MusicService.MusicBinder? = null
     private var eventHandler: MusicEvents? = null
     private val initCallbacks = ArrayDeque<Runnable>()
-
+    private var playerOptions: Bundle? = null
     //    private var connecting = false
     private var isServiceBound = false
     private var options: Bundle? = null
@@ -78,6 +78,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
         val binder: MusicService.MusicBinder = service as MusicService.MusicBinder
         musicService = binder.service
+        musicService.setupPlayer(playerOptions)
+
         isServiceBound = true
         playerSetUpPromise?.resolve(null)
 //
@@ -95,28 +97,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     override fun onServiceDisconnected(name: ComponentName) {
         musicService.destroy()
         isServiceBound = false
-    }
-
-    /**
-     * Waits for a connection to the service and/or runs the [Runnable] in the player thread
-     */
-    private fun waitForConnection(r: Runnable) {
-        r.run()
-//        if (binder != null) {
-//            binder!!.post(r)
-//            return
-//        } else {
-//            initCallbacks.add(r)
-//        }
-//        if (connecting) return
-//        val context = reactApplicationContext
-//
-//         Binds the service to get a MediaWrapper instance
-//        val intent = Intent(context, MusicService::class.java)
-//        context.startService(intent)
-//        intent.action = Utils.CONNECT_INTENT
-//        context.bindService(intent, this, 0)
-//        connecting = true
     }
 
     /* ****************************** API ****************************** */
@@ -164,32 +144,16 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     @ReactMethod
     fun setupPlayer(data: ReadableMap?, promise: Promise) {
         playerSetUpPromise = promise
+        playerOptions = Arguments.toBundle(data)
 
         if (!isServiceBound)
-            reactContext?.bindService(Intent(reactContext, MusicService::class.java),
-                this,
-                Context.BIND_AUTO_CREATE)
-
-//        val boundServiceConnection = object : ServiceConnection {
-//
-//            override fun onServiceConnected(className: ComponentName, service: IBinder) {
-//                val binder: MusicService.MusicBinder = service as MusicService.MusicBinder
-//                musicService = binder.getService()
-//                mainViewModel.isMusicServiceBound = true
-//            }
-//
-//            override fun onServiceDisconnected(name: ComponentName?) {
-//                TODO("Not yet implemented")
-//            }
-//        }
-
-
-//        val options = Arguments.toBundle(data)
-//        waitForConnection { binder!!.setupPlayer(options, promise) }
+            reactContext?.bindService(Intent(reactContext, MusicService::class.java), this, Context.BIND_AUTO_CREATE)
     }
 
     @ReactMethod
     fun destroy() {
+        musicService.destroy()
+        binder = null
 //        // Ignore if it was already destroyed
 //        if (binder == null && !connecting) return
 //        try {
@@ -326,6 +290,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun skip(index: Int, callback: Promise?) {
+        musicService.skip(index)
+        callback?.resolve(null)
 //        waitForConnection { binder?.playback?.skip(index, callback!!) }
     }
 
@@ -375,7 +341,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun stop(callback: Promise) {
-        musicService?.destroy()
+        musicService.destroy()
         callback.resolve(null)
 
 //        waitForConnection {
@@ -386,6 +352,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun seekTo(seconds: Float, callback: Promise) {
+        musicService.seekTo(seconds)
+        callback.resolve(null)
 //        waitForConnection {
 //            val secondsToSkip = Utils.toMillis(seconds.toDouble())
 //            binder?.playback?.seekTo(secondsToSkip)

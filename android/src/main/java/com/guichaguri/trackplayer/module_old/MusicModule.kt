@@ -11,6 +11,7 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.DefaultAudioItem
+import com.doublesymmetry.kotlinaudio.models.MediaType
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.facebook.react.bridge.*
 import com.google.android.exoplayer2.C
@@ -192,10 +193,8 @@ class MusicModule(reactContext: ReactApplicationContext?) :
                 return@waitForConnection
             }
 
-            //TODO: Remove Tracks and stick to just AudioItems
-
             val items = trackList.map {
-                DefaultAudioItem(it.uri.toString(), it.artist, it.title, it.album, it.artwork.toString())
+                DefaultAudioItem(it.uri.toString(), MediaType.DEFAULT, it.artist, it.title, it.album, it.artwork.toString())
             }
             
 //            val queue = binder?.playback?.queue
