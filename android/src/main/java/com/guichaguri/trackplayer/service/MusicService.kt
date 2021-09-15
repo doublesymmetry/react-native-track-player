@@ -86,8 +86,7 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     fun destroy() {
-        handler.post { player.stop() }
-        handler.removeMessages(0)
+        stopForeground(true)
         stopSelf()
     }
 
@@ -204,6 +203,12 @@ class MusicService : HeadlessJsTaskService() {
 
     override fun onBind(intent: Intent?): IBinder {
         return MusicBinder()
+    }
+
+    override fun onDestroy() {
+        handler.post { player.destroy() }
+        handler.removeMessages(0)
+        super.onDestroy()
     }
 
     inner class MusicBinder : Binder() {

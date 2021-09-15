@@ -39,8 +39,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     private lateinit var musicService: MusicService
 
-//    private lateinit var queuedAudioPlayer: QueuedAudioPlayer
-
     private val mainScope = MainScope()
 
     @Nonnull
@@ -100,7 +98,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     }
 
     /* ****************************** API ****************************** */
-    override fun getConstants(): Map<String, Any>? {
+    override fun getConstants(): Map<String, Any> {
         val constants: MutableMap<String, Any> = HashMap()
 
         // Capabilities
@@ -152,21 +150,13 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun destroy() {
+        if (isServiceBound) {
+            reactApplicationContext.unbindService(this)
+            isServiceBound = false
+        }
+
         musicService.destroy()
         binder = null
-//        // Ignore if it was already destroyed
-//        if (binder == null && !connecting) return
-//        try {
-//            if (binder != null) {
-//                binder!!.destroy()
-//                binder = null
-//            }
-//            val context: ReactContext? = reactApplicationContext
-//            context?.unbindService(this)
-//        } catch (ex: Exception) {
-//            // This method shouldn't be throwing unhandled errors even if something goes wrong.
-//            Log.e(Utils.LOG, "An error occurred while destroying the service", ex)
-//        }
     }
 
     @ReactMethod
@@ -192,28 +182,11 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
             callback.reject("invalid_track_object", ex)
             return
         }
-
+        
         musicService.apply {
             add(tracks)
             callback.resolve(null)
         }
-
-////
-////            val tracks = binder?.playback?.tracks
-////            // -1 means no index was passed and therefore should be inserted at the end.
-////            val index = if (insertBeforeIndex != -1) insertBeforeIndex else tracks!!.size
-////            if (index < 0 || index > tracks!!.size) {
-////                callback.reject("index_out_of_bounds", "The track index is out of bounds")
-////            } else if (trackList == null || trackList.isEmpty()) {
-////                callback.reject("invalid_track_object", "Track is missing a required key")
-////            } else if (trackList.size == 1) {
-////                binder?.playback?.add(trackList[0], index, callback)
-////            } else {
-////
-////                binder?.playback?.add(trackList, index, callback)
-//////                binder?.playback?.add(trackList, index, callback)
-////            }
-//        }
     }
 
     @ReactMethod
@@ -282,41 +255,30 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     fun removeUpcomingTracks(callback: Promise) {
         musicService.removeUpcomingTracks()
         callback.resolve(null)
-//        waitForConnection {
-//            binder?.playback?.removeUpcomingTracks()
-//            callback.resolve(null)
-//        }
     }
 
     @ReactMethod
     fun skip(index: Int, callback: Promise?) {
         musicService.skip(index)
         callback?.resolve(null)
-//        waitForConnection { binder?.playback?.skip(index, callback!!) }
     }
 
     @ReactMethod
     fun skipToNext(callback: Promise?) {
         musicService.skipToNext()
         callback?.resolve(null)
-//        waitForConnection { binder?.playback?.skipToNext(callback!!) }
     }
 
     @ReactMethod
     fun skipToPrevious(callback: Promise?) {
         musicService.skipToPrevious()
         callback?.resolve(null)
-//        waitForConnection { binder?.playback?.skipToPrevious(callback!!) }
     }
 
     @ReactMethod
     fun reset(callback: Promise) {
         musicService.destroy()
         callback.resolve(null)
-//        waitForConnection {
-//            binder?.playback?.reset()
-//            callback.resolve(null)
-//        }
     }
 
     @ReactMethod
@@ -341,7 +303,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun stop(callback: Promise) {
-        musicService.destroy()
+        musicService.pause()
         callback.resolve(null)
 
 //        waitForConnection {
@@ -365,77 +327,51 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     fun setVolume(volume: Float, callback: Promise) {
         musicService.volume = volume
         callback.resolve(null)
-//        waitForConnection {
-//            binder?.playback?.volume = volume
-//            callback.resolve(null)
-//        }
     }
 
     @ReactMethod
     fun getVolume(callback: Promise) {
         callback.resolve(musicService.volume)
-//        waitForConnection { callback.resolve(binder?.playback?.volume) }
     }
 
     @ReactMethod
     fun setRate(rate: Float, callback: Promise) {
         musicService.rate = rate
         callback.resolve(null)
-//        waitForConnection {
-//            binder?.playback?.rate = rate
-//            callback.resolve(null)
-//        }
     }
 
     @ReactMethod
     fun getRate(callback: Promise) {
         callback.resolve(musicService.rate)
-//        waitForConnection { callback.resolve(binder?.playback?.rate) }
     }
 
     @ReactMethod
     fun setRepeatMode(mode: Int, callback: Promise) {
         musicService.repeatMode = QueuedAudioPlayer.RepeatMode.fromOrdinal(mode)
         callback.resolve(null)
-//        waitForConnection {
-//            binder?.playback?.repeatMode = mode
-//            callback.resolve(null)
-//        }
     }
 
     @ReactMethod
     fun getRepeatMode(callback: Promise) {
         callback.resolve(musicService.repeatMode.ordinal)
-//        waitForConnection { callback.resolve(binder?.playback?.repeatMode) }
     }
 
     @ReactMethod
     fun getTrack(index: Int, callback: Promise) {
-//        waitForConnection {
-//            val tracks = binder?.playback?.tracks
         if (index >= 0 && index < musicService.tracks.size) {
             callback.resolve(Arguments.fromBundle(musicService.tracks[index].originalItem))
         } else {
             callback.resolve(null)
         }
-//        }
     }
 
     @ReactMethod
     fun getQueue(callback: Promise) {
-//        waitForConnection {
-//            val tracks = ArrayList<Bundle?>()
-//            val tracks = musicService?.tracks
-//            for (track in tracks!!) {
-//                tracks.add(track?.originalItem)
-//            }
         callback.resolve(Arguments.fromList(musicService.tracks.map { it.originalItem }))
-//        }
     }
 
     @ReactMethod
     fun getCurrentTrack(callback: Promise) {
-//        waitForConnection { callback.resolve(binder?.playback?.currentTrackIndex) }
         musicService.getCurrentTrackIndex {
             callback.resolve(it)
         }
@@ -446,28 +382,13 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
         musicService.getDurationInSeconds {
             callback.resolve(it)
         }
-//        waitForConnection {
-//            val duration = binder?.playback?.duration
-//            if (duration == C.TIME_UNSET) {
-//                callback.resolve(Utils.toSeconds(0))
-//            } else {
-//                callback.resolve(Utils.toSeconds(duration!!))
-//            }
-//        }
     }
 
     @ReactMethod
     fun getBufferedPosition(callback: Promise) {
-//        waitForConnection {
-//            val position = binder?.playback?.bufferedPosition
-//            if (position == C.POSITION_UNSET.toLong()) {
         musicService.getBufferedPositionInSeconds {
             callback.resolve(it)
         }
-//            } else {
-//                callback.resolve(Utils.toSeconds(position!!))
-//            }
-//        }
     }
 
     @ReactMethod
@@ -475,14 +396,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
         musicService.getPositionInSeconds {
             callback.resolve(it)
         }
-//        waitForConnection {
-//            val position = binder?.playback?.position
-//            if (position == C.POSITION_UNSET.toLong()) {
-//                callback.reject("unknown", "Unknown position")
-//            } else {
-//                callback.resolve(Utils.toSeconds(position!!))
-//            }
-//        }
     }
 
     @ReactMethod
@@ -503,14 +416,5 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
                 }
             }
         }
-
-
-//        callback.resolve(PlaybackStateCompat.STATE_PLAYING)
-
-//        if (binder == null) {
-//            callback.resolve(PlaybackStateCompat.STATE_NONE)
-//        } else {
-//            waitForConnection { callback.resolve(binder!!.playback.state) }
-//        }
     }
 }
