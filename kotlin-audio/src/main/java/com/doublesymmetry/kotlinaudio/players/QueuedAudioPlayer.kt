@@ -3,14 +3,15 @@ package com.doublesymmetry.kotlinaudio.players
 import android.content.Context
 import com.doublesymmetry.kotlinaudio.models.AudioItem
 import com.doublesymmetry.kotlinaudio.models.BufferOptions
+import com.doublesymmetry.kotlinaudio.models.QueuePlayerOptionsImpl
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.IllegalSeekPositionException
-import com.google.android.exoplayer2.Player.*
 import com.google.android.exoplayer2.source.MediaSource
 import java.util.*
 
-open class  QueuedAudioPlayer(context: Context, bufferOptions: BufferOptions? = null) : AudioPlayer(context, bufferOptions) {
+class QueuedAudioPlayer(context: Context, bufferOptions: BufferOptions? = null) : AudioPlayer(context, bufferOptions) {
     private val queue = LinkedList<MediaSource>()
+    override val playerOptions = QueuePlayerOptionsImpl(exoPlayer)
 
     val currentIndex
         get() = exoPlayer.currentWindowIndex
@@ -54,22 +55,6 @@ open class  QueuedAudioPlayer(context: Context, bufferOptions: BufferOptions? = 
 
     val previousItem: AudioItem?
         get() = items.getOrNull(currentIndex - 1)
-
-    var repeatMode: RepeatMode
-        get() {
-            return when (exoPlayer.repeatMode) {
-                REPEAT_MODE_ALL -> RepeatMode.ALL
-                REPEAT_MODE_ONE -> RepeatMode.ONE
-                else -> RepeatMode.OFF
-            }
-        }
-        set(value) {
-            when (value) {
-                RepeatMode.ALL -> exoPlayer.repeatMode = REPEAT_MODE_ALL
-                RepeatMode.ONE -> exoPlayer.repeatMode = REPEAT_MODE_ONE
-                RepeatMode.OFF -> exoPlayer.repeatMode = REPEAT_MODE_OFF
-            }
-        }
 
     /**
      * Will replace the current item with a new one and load it into the player.
@@ -199,21 +184,6 @@ open class  QueuedAudioPlayer(context: Context, bufferOptions: BufferOptions? = 
     override fun destroy() {
         queue.clear()
         super.destroy()
-    }
-
-    enum class RepeatMode {
-        OFF, ONE, ALL;
-
-        companion object {
-            fun fromOrdinal(ordinal: Int): RepeatMode {
-                return when (ordinal) {
-                    0 -> OFF
-                    1 -> ONE
-                    2 -> ALL
-                    else -> error("Wrong ordinal")
-                }
-            }
-        }
     }
 }
 

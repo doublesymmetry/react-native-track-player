@@ -42,6 +42,8 @@ open class AudioPlayer(private val context: Context, bufferOptions: BufferOption
     private val playerNotificationManager: PlayerNotificationManager
     private val descriptionAdapter = DescriptionAdapter(context, null)
 
+    open val playerOptions: PlayerOptions = PlayerOptionsImpl()
+
     val duration: Long
         get() {
             return if (exoPlayer.duration == C.TIME_UNSET) 0
