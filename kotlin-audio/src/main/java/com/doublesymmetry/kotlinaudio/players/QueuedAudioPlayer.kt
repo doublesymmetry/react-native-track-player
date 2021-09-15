@@ -2,27 +2,18 @@ package com.doublesymmetry.kotlinaudio.players
 
 import android.content.Context
 import com.doublesymmetry.kotlinaudio.models.AudioItem
+import com.doublesymmetry.kotlinaudio.models.BufferOptions
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.IllegalSeekPositionException
 import com.google.android.exoplayer2.Player.*
 import com.google.android.exoplayer2.source.MediaSource
 import java.util.*
 
-open class  QueuedAudioPlayer(context: Context) : AudioPlayer(context) {
+open class  QueuedAudioPlayer(context: Context, bufferOptions: BufferOptions? = null) : AudioPlayer(context, bufferOptions) {
     private val queue = LinkedList<MediaSource>()
 
     val currentIndex
         get() = exoPlayer.currentWindowIndex
-
-//    val nextIndex: Int? get() {
-//        return if (currentIndex + 1 > items.size) null
-//        else currentIndex + 1
-//    }
-//
-//    val previousIndex: Int? get() {
-//        return if (currentIndex - 1 < 0) null
-//        else currentIndex - 1
-//    }
 
     val nextIndex: Int?
         get() {

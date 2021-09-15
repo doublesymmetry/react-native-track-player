@@ -10,13 +10,12 @@ import androidx.annotation.CallSuper
 import androidx.annotation.RequiresApi
 import com.doublesymmetry.kotlinaudio.DescriptionAdapter
 import com.doublesymmetry.kotlinaudio.R
-import com.doublesymmetry.kotlinaudio.models.AudioItem
-import com.doublesymmetry.kotlinaudio.models.AudioItemTransitionReason
-import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
-import com.doublesymmetry.kotlinaudio.models.MediaType
+import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.utils.isJUnitTest
 import com.doublesymmetry.kotlinaudio.utils.isUriLocal
 import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.DefaultLoadControl
+import com.google.android.exoplayer2.DefaultLoadControl.*
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player.*
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -34,8 +33,8 @@ import com.google.android.exoplayer2.upstream.*
 import com.google.android.exoplayer2.util.Util
 import java.util.concurrent.TimeUnit
 
-open class AudioPlayer(private val context: Context) {
-    protected val exoPlayer: SimpleExoPlayer = SimpleExoPlayer.Builder(context).build()
+open class AudioPlayer(private val context: Context, bufferOptions: BufferOptions? = null) {
+    protected val exoPlayer: SimpleExoPlayer
 
     private val mediaSession: MediaSessionCompat = MediaSessionCompat(context, "AudioPlayerSession")
     private val mediaSessionConnector: MediaSessionConnector = MediaSessionConnector(mediaSession)
@@ -76,6 +75,25 @@ open class AudioPlayer(private val context: Context) {
     val event = EventHolder()
 
     init {
+        val exoPlayerBuilder = SimpleExoPlayer.Builder(context)
+
+        bufferOptions?.let {
+            val multiplier = DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS / DEFAULT_BUFFER_FOR_PLAYBACK_MS
+            val minBuffer = it.minBuffer ?: DEFAULT_MIN_BUFFER_MS
+            val maxBuffer = it.maxBuffer ?: DEFAULT_MAX_BUFFER_MS
+            val playBuffer = it.playBuffer ?: DEFAULT_BUFFER_FOR_PLAYBACK_MS
+            val backBuffer = it.backBuffer ?: DEFAULT_BACK_BUFFER_DURATION_MS
+
+            val loadControl = DefaultLoadControl.Builder()
+                .setBufferDurationsMs(minBuffer, maxBuffer, playBuffer, playBuffer * multiplier)
+                .setBackBuffer(backBuffer, false)
+                .build()
+
+            exoPlayerBuilder.setLoadControl(loadControl)
+        }
+
+        exoPlayer = exoPlayerBuilder.build()
+
         val channelId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel()
         } else {
@@ -185,7 +203,7 @@ open class AudioPlayer(private val context: Context) {
                 DefaultDataSourceFactory(context, userAgent)
             }
             else -> {
-                DefaultHttpDataSource.Factory().apply {
+                val tempFactory = DefaultHttpDataSource.Factory().apply {
                     setUserAgent(userAgent)
                     setAllowCrossProtocolRedirects(true)
 
@@ -193,9 +211,11 @@ open class AudioPlayer(private val context: Context) {
                         setDefaultRequestProperties(it.toMap())
                     }
                 }
+
+                tempFactory
             }
 
-            //TODO: Enable caching
+            //TODO: Do we need this?
 //        enableCaching()
         }
 
@@ -230,10 +250,11 @@ open class AudioPlayer(private val context: Context) {
             .createMediaSource(mediaItem)
     }
 
-//    fun enableCaching(ds: DataSource.Factory): DataSource.Factory {
-//        return if (cache == null || cacheMaxSize <= 0) ds else CacheDataSourceFactory(
+//
+//    fun enableCaching(factory: DataSource.Factory): DataSource.Factory {
+//        return if (cache == null || cacheMaxSize <= 0) factory else CacheDataSourceFactory(
 //            cache!!,
-//            ds,
+//            factory,
 //            CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR
 //        )
 //    }
