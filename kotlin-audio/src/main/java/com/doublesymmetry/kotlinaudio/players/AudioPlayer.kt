@@ -164,10 +164,10 @@ open class AudioPlayer(private val context: Context, bufferOptions: BufferOption
     }
 
     /**
-     * Stops and resets the player. Only call this when you are finished using the player, otherwise use [pause].
+     * Stops and destroys the player. Only call this when you are finished using the player, otherwise use [pause].
      */
     @CallSuper
-    open fun stop() {
+    open fun destroy() {
         descriptionAdapter.release()
         exoPlayer.release()
     }
@@ -178,7 +178,7 @@ open class AudioPlayer(private val context: Context, bufferOptions: BufferOption
         exoPlayer.seekTo(millis)
     }
 
-    protected fun getMediaItemFromAudioItem(audioItem: AudioItem): MediaItem {
+    private fun getMediaItemFromAudioItem(audioItem: AudioItem): MediaItem {
         return MediaItem.Builder().setUri(audioItem.audioUrl).setTag(audioItem).build()
     }
 

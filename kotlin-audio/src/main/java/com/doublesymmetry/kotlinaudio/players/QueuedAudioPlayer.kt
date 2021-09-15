@@ -196,9 +196,9 @@ open class  QueuedAudioPlayer(context: Context, bufferOptions: BufferOptions? = 
     /**
      * Stops and resets the player, as well as clears the queue. Only call this when you are finished using the player, otherwise use [pause].
      */
-    override fun stop() {
+    override fun destroy() {
         queue.clear()
-        super.stop()
+        super.destroy()
     }
 
     enum class RepeatMode {
