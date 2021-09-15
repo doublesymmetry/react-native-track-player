@@ -79,10 +79,10 @@ open class AudioPlayer(private val context: Context, bufferOptions: BufferOption
 
         bufferOptions?.let {
             val multiplier = DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS / DEFAULT_BUFFER_FOR_PLAYBACK_MS
-            val minBuffer = it.minBuffer ?: DEFAULT_MIN_BUFFER_MS
-            val maxBuffer = it.maxBuffer ?: DEFAULT_MAX_BUFFER_MS
-            val playBuffer = it.playBuffer ?: DEFAULT_BUFFER_FOR_PLAYBACK_MS
-            val backBuffer = it.backBuffer ?: DEFAULT_BACK_BUFFER_DURATION_MS
+            val minBuffer = if (it.minBuffer != null && it.minBuffer != 0) it.minBuffer else DEFAULT_MIN_BUFFER_MS
+            val maxBuffer = if (it.maxBuffer != null && it.maxBuffer != 0) it.maxBuffer else DEFAULT_MAX_BUFFER_MS
+            val playBuffer = if (it.playBuffer != null && it.playBuffer != 0) it.playBuffer else DEFAULT_BUFFER_FOR_PLAYBACK_MS
+            val backBuffer = if (it.backBuffer != null && it.playBuffer != 0) it.backBuffer else DEFAULT_BACK_BUFFER_DURATION_MS
 
             val loadControl = DefaultLoadControl.Builder()
                 .setBufferDurationsMs(minBuffer, maxBuffer, playBuffer, playBuffer * multiplier)
