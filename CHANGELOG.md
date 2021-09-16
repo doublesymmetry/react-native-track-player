@@ -14,6 +14,24 @@ To install release candidates run `yarn add react-native-track-player@next`
 
 * None.
 
+## 2.1.0 (16.09.21)
+
+##### Enhancements
+
+* None.
+
+##### Bug Fixes
+
+* Remove Support for iOS 10 & Support Xcode 13
+  [dcvz](https://github.com/dcvz)
+  [#1186](https://github.com/DoubleSymmetry/react-native-track-player/issues/1186)
+
+* Reset initialization on destroy
+  [sreten-bild](https://github.com/sreten-bild)
+
+* Fix `onTaskRemoved` NullPointerException
+  [Markario](https://github.com/Markario)
+
 ## 2.0.3 (19.08.21)
 
 ##### Enhancements
