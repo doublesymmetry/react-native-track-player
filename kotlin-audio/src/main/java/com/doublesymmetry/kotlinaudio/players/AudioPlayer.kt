@@ -190,6 +190,7 @@ open class AudioPlayer(private val context: Context, bufferOptions: BufferOption
      */
     @CallSuper
     open fun destroy() {
+        abandonFocus()
         descriptionAdapter.release()
         exoPlayer.release()
     }
@@ -373,6 +374,7 @@ open class AudioPlayer(private val context: Context, bufferOptions: BufferOption
                     requestAudioFocus()
                     event.updateAudioPlayerState(AudioPlayerState.PLAYING)
                 } else {
+                    abandonFocus()
                     event.updateAudioPlayerState(AudioPlayerState.PAUSED)
                 }
             }
