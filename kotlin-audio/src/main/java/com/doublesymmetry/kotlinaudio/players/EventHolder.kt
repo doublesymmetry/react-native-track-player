@@ -24,6 +24,9 @@ class EventHolder {
     private var _audioItemTransition = MutableSharedFlow<AudioItemTransitionReason?>(1)
     var audioItemTransition = _audioItemTransition.asSharedFlow()
 
+    private var _onAudioFocusChanged = MutableSharedFlow<FocusChangeData>(1)
+    var onAudioFocusChanged = _onAudioFocusChanged.asSharedFlow()
+
     internal fun updateAudioPlayerState(state: AudioPlayerState) {
         coroutineScope.launch {
             _stateChange.emit(state)
@@ -41,4 +44,12 @@ class EventHolder {
             _audioItemTransition.emit(reason)
         }
     }
+
+    internal fun updateOnAudioFocusChanged(isPaused: Boolean, isPermanent: Boolean) {
+        coroutineScope.launch {
+            _onAudioFocusChanged.emit(FocusChangeData(isPaused, isPermanent))
+        }
+    }
+
+    data class FocusChangeData(val isPaused: Boolean, val isFocusLostPermanently: Boolean)
 }

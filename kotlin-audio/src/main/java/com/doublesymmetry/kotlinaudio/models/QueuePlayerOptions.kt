@@ -4,14 +4,14 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 
 interface QueuePlayerOptions : PlayerOptions {
-    override val alwaysPauseOnInterruption: Boolean
-    val repeatMode: RepeatMode
+    override var alwaysPauseOnInterruption: Boolean
+    var repeatMode: RepeatMode
 }
 
 data class QueuePlayerOptionsImpl(
     val exoPlayer: ExoPlayer,
     //TODO: implement this
-    override val alwaysPauseOnInterruption: Boolean = false,
+    override var alwaysPauseOnInterruption: Boolean = false,
 ) : QueuePlayerOptions {
     // Functions in data classes might or might not be a bit of a code smell.
     // I'm using the passed exoPlayer which breaks separation of concerns. But it's also useful.

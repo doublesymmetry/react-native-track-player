@@ -1,9 +1,9 @@
 package com.doublesymmetry.kotlinaudio.models
 
 interface PlayerOptions {
-    val alwaysPauseOnInterruption: Boolean
+    var alwaysPauseOnInterruption: Boolean
 }
 
 data class PlayerOptionsImpl(
-    override val alwaysPauseOnInterruption: Boolean = false,
+    override var alwaysPauseOnInterruption: Boolean = false,
 ) : PlayerOptions

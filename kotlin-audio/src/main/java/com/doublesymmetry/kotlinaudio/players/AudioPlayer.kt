@@ -3,11 +3,20 @@ package com.doublesymmetry.kotlinaudio.players
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.media.AudioManager
+import android.media.AudioManager.AUDIOFOCUS_LOSS
 import android.net.Uri
 import android.os.Build
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.annotation.CallSuper
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
+import androidx.media.AudioAttributesCompat
+import androidx.media.AudioAttributesCompat.CONTENT_TYPE_MUSIC
+import androidx.media.AudioAttributesCompat.USAGE_MEDIA
+import androidx.media.AudioFocusRequestCompat
+import androidx.media.AudioManagerCompat
+import androidx.media.AudioManagerCompat.AUDIOFOCUS_GAIN
 import com.doublesymmetry.kotlinaudio.DescriptionAdapter
 import com.doublesymmetry.kotlinaudio.R
 import com.doublesymmetry.kotlinaudio.models.*
@@ -31,9 +40,10 @@ import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.upstream.*
 import com.google.android.exoplayer2.util.Util
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-open class AudioPlayer(private val context: Context, bufferOptions: BufferOptions? = null) {
+open class AudioPlayer(private val context: Context, bufferOptions: BufferOptions? = null): AudioManager.OnAudioFocusChangeListener {
     protected val exoPlayer: SimpleExoPlayer
 
     private val mediaSession: MediaSessionCompat = MediaSessionCompat(context, "AudioPlayerSession")
@@ -65,7 +75,7 @@ open class AudioPlayer(private val context: Context, bufferOptions: BufferOption
     var volume: Float
         get() = exoPlayer.volume
         set(value) {
-            exoPlayer.volume = value
+            exoPlayer.volume = value * volumeMultiplier
         }
 
     var rate: Float
@@ -74,7 +84,17 @@ open class AudioPlayer(private val context: Context, bufferOptions: BufferOption
             exoPlayer.setPlaybackSpeed(value)
         }
 
+    private var volumeMultiplier = 1f
+    private set(value) {
+        volume = volume
+        field = value
+    }
+
     val event = EventHolder()
+
+    private var focus: AudioFocusRequestCompat? = null
+    private var hasAudioFocus = false
+    private var wasDucking = false
 
     init {
         val exoPlayerBuilder = SimpleExoPlayer.Builder(context)
@@ -261,6 +281,73 @@ open class AudioPlayer(private val context: Context, bufferOptions: BufferOption
 //        )
 //    }
 
+    private fun requestAudioFocus() {
+        if (hasAudioFocus) return
+        Timber.d("Requesting audio focus...")
+
+        val manager = ContextCompat.getSystemService(context, AudioManager::class.java)
+
+        focus = AudioFocusRequestCompat.Builder(AUDIOFOCUS_GAIN)
+                .setOnAudioFocusChangeListener(this)
+                .setAudioAttributes(AudioAttributesCompat.Builder()
+                    .setUsage(USAGE_MEDIA)
+                    .setContentType(CONTENT_TYPE_MUSIC)
+                    .build())
+                .setWillPauseWhenDucked(playerOptions.alwaysPauseOnInterruption)
+                .build()
+
+        val result: Int = if (manager != null && focus != null) {
+            AudioManagerCompat.requestAudioFocus(manager, focus!!)
+        } else {
+            AudioManager.AUDIOFOCUS_REQUEST_FAILED
+        }
+
+        hasAudioFocus = (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
+    }
+
+    private fun abandonFocus() {
+        if (!hasAudioFocus) return
+        Timber.d("Abandoning audio focus...")
+
+        val manager = ContextCompat.getSystemService(context, AudioManager::class.java)
+
+        val result: Int = if (manager != null && focus != null) {
+            AudioManagerCompat.abandonAudioFocusRequest(manager, focus!!)
+        } else {
+            AudioManager.AUDIOFOCUS_REQUEST_FAILED
+        }
+
+        hasAudioFocus = (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
+    }
+
+    override fun onAudioFocusChange(focusChange: Int) {
+        Timber.d("Audio focus changed")
+
+        var isPermanent = false
+        var isPaused = false
+        var isDucking = false
+
+        when (focusChange) {
+            AUDIOFOCUS_LOSS -> {
+                isPermanent = true
+                abandonFocus()
+                isPaused = true
+            }
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> isPaused = true
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> if (playerOptions.alwaysPauseOnInterruption) isPaused = true else isDucking = true
+        }
+
+        if (isDucking) {
+            volumeMultiplier = 0.5f
+            wasDucking = true
+        } else if (wasDucking) {
+            volumeMultiplier = 1f
+            wasDucking = false
+        }
+
+        event.updateOnAudioFocusChanged(isPaused, isPermanent)
+    }
+
     private fun addPlayerListener() {
         exoPlayer.addListener(object : Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
@@ -282,8 +369,12 @@ open class AudioPlayer(private val context: Context, bufferOptions: BufferOption
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
-                if (isPlaying) event.updateAudioPlayerState(AudioPlayerState.PLAYING)
-                else event.updateAudioPlayerState(AudioPlayerState.PAUSED)
+                if (isPlaying) {
+                    requestAudioFocus()
+                    event.updateAudioPlayerState(AudioPlayerState.PLAYING)
+                } else {
+                    event.updateAudioPlayerState(AudioPlayerState.PAUSED)
+                }
             }
         })
     }
