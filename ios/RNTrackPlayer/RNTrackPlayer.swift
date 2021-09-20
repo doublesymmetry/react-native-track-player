@@ -479,7 +479,7 @@ public class RNTrackPlayer: RCTEventEmitter {
             let track = player.items[index.intValue]
             resolve((track as? Track)?.toObject())
         } else {
-            resolve(nil)
+            resolve(NSNull())
         }
     }
 
