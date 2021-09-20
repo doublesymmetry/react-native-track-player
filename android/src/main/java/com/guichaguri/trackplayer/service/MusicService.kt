@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.*
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
-import com.doublesymmetry.kotlinaudio.models.BufferOptions
+import com.doublesymmetry.kotlinaudio.models.BufferConfig
 import com.doublesymmetry.kotlinaudio.models.RepeatMode
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.facebook.react.HeadlessJsTaskService
@@ -58,11 +58,11 @@ class MusicService : HeadlessJsTaskService() {
     val event get() = player.event
 
     fun setupPlayer(playerOptions: Bundle?) {
-        val bufferOptions = BufferOptions(
-            playerOptions?.getDouble(MIN_BUFFER_KEY)?.toInt(),
-            playerOptions?.getDouble(MAX_BUFFER_KEY)?.toInt(),
-            playerOptions?.getDouble(PLAY_BUFFER_KEY)?.toInt(),
-            playerOptions?.getDouble(BACK_BUFFER_KEY)?.toInt()
+        val bufferOptions = BufferConfig(
+            minBuffer = playerOptions?.getDouble(MIN_BUFFER_KEY)?.toInt(),
+            maxBuffer = playerOptions?.getDouble(MAX_BUFFER_KEY)?.toInt(),
+            playBuffer = playerOptions?.getDouble(PLAY_BUFFER_KEY)?.toInt(),
+            backBuffer = playerOptions?.getDouble(BACK_BUFFER_KEY)?.toInt()
             //TODO: Ignored maxCacheSize and autoUpdateMetadata. Do we need them?
         )
 
