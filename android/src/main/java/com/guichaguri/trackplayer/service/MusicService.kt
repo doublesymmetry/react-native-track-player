@@ -5,6 +5,7 @@ import android.os.*
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
 import com.doublesymmetry.kotlinaudio.models.BufferOptions
+import com.doublesymmetry.kotlinaudio.models.RepeatMode
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
@@ -24,6 +25,7 @@ import java.util.concurrent.TimeUnit
 class MusicService : HeadlessJsTaskService() {
     private lateinit var player: QueuedAudioPlayer
     private val handler = Handler(Looper.getMainLooper())
+    private var stopWithApp = false
 
     private val serviceScope = MainScope()
 
@@ -33,11 +35,11 @@ class MusicService : HeadlessJsTaskService() {
     val currentTrack
         get() = (player.currentItem as TrackAudioItem).track
 
-    var repeatMode: QueuedAudioPlayer.RepeatMode
-        get() = player.repeatMode
+    var repeatMode: RepeatMode
+        get() = player.playerOptions.repeatMode
         set(value) {
             handler.post {
-                player.repeatMode = value
+                player.playerOptions.repeatMode = value
             }
         }
 
@@ -48,10 +50,10 @@ class MusicService : HeadlessJsTaskService() {
         }
 
     var rate: Float
-    get() = player.rate
-    set(value) {
-        player.rate = value
-    }
+        get() = player.rate
+        set(value) {
+            player.rate = value
+        }
 
     val event get() = player.event
 
@@ -61,12 +63,18 @@ class MusicService : HeadlessJsTaskService() {
             playerOptions?.getDouble(MAX_BUFFER_KEY)?.toInt(),
             playerOptions?.getDouble(PLAY_BUFFER_KEY)?.toInt(),
             playerOptions?.getDouble(BACK_BUFFER_KEY)?.toInt()
-        //TODO: Ignored maxCacheSize and autoUpdateMetadata. Do we need them?
+            //TODO: Ignored maxCacheSize and autoUpdateMetadata. Do we need them?
         )
 
         handler.post { player = QueuedAudioPlayer(this, bufferOptions) }
         observeEvents()
     }
+
+    fun updateOptions(options: Bundle) {
+        stopWithApp = options.getBoolean(STOP_WITH_APP)
+        player.playerOptions.alwaysPauseOnInterruption = options.getBoolean(PAUSE_ON_INTERRUPTION_KEY)
+    }
+
 
     fun add(tracks: List<Track>, playWhenReady: Boolean = true) {
         val items = tracks.map { it.toAudioItem() }
@@ -174,13 +182,21 @@ class MusicService : HeadlessJsTaskService() {
         serviceScope.launch {
             event.audioItemTransition.collect {
                 handler.post {
-                    val bundle = Bundle().apply {
+                    Bundle().apply {
                         putDouble(POSITION_KEY, 0.0)
+                        putInt(NEXT_TRACK_KEY, player.currentIndex)
+                        emit(MusicEvents.PLAYBACK_TRACK_CHANGED, this)
                     }
+                }
+            }
+        }
 
-                    bundle.putInt(NEXT_TRACK_KEY, player.currentIndex)
-
-                    emit(MusicEvents.PLAYBACK_TRACK_CHANGED, bundle)
+        serviceScope.launch {
+            event.onAudioFocusChanged.collect {
+                Bundle().apply {
+                    putBoolean(IS_FOCUS_LOSS_PERMANENT_KEY, it.isFocusLostPermanently)
+                    putBoolean(IS_PAUSED_KEY, it.isPaused)
+                    emit(MusicEvents.BUTTON_DUCK, this)
                 }
             }
         }
@@ -211,6 +227,11 @@ class MusicService : HeadlessJsTaskService() {
         super.onDestroy()
     }
 
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        if (stopWithApp) destroy()
+        super.onTaskRemoved(rootIntent)
+    }
+
     inner class MusicBinder : Binder() {
         val service = this@MusicService
     }
@@ -229,5 +250,12 @@ class MusicService : HeadlessJsTaskService() {
         const val MAX_BUFFER_KEY = "maxBuffer"
         const val PLAY_BUFFER_KEY = "playBuffer"
         const val BACK_BUFFER_KEY = "backBuffer"
+
+        const val STOP_WITH_APP = "stopWithApp"
+        const val PAUSE_ON_INTERRUPTION_KEY = "alwaysPauseOnInterruption"
+
+        const val IS_FOCUS_LOSS_PERMANENT_KEY = "permanent"
+        const val IS_PAUSED_KEY = "paused"
+
     }
 }

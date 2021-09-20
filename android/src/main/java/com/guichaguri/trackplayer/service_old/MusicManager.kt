@@ -262,8 +262,8 @@ class MusicManager @SuppressLint("InvalidWakeLockTag") constructor(private val s
             wasDucking = false
         }
         val bundle = Bundle()
-        bundle.putBoolean("permanent", permanent)
-        bundle.putBoolean("paused", paused)
+        bundle.putBoolean("isFocusLostPermanently", permanent)
+        bundle.putBoolean("isPaused", paused)
         service.emit(MusicEvents.Companion.BUTTON_DUCK, bundle)
     }
 

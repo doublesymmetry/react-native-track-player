@@ -7,8 +7,7 @@ import android.support.v4.media.RatingCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
-import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
-import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer.RepeatMode.*
+import com.doublesymmetry.kotlinaudio.models.RepeatMode
 import com.facebook.react.bridge.*
 import com.google.android.exoplayer2.Player
 import com.guichaguri.trackplayer.model.Track
@@ -182,7 +181,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
             callback.reject("invalid_track_object", ex)
             return
         }
-        
+
         musicService.apply {
             add(tracks)
             callback.resolve(null)
@@ -347,7 +346,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun setRepeatMode(mode: Int, callback: Promise) {
-        musicService.repeatMode = QueuedAudioPlayer.RepeatMode.fromOrdinal(mode)
+        musicService.repeatMode = RepeatMode.fromOrdinal(mode)
         callback.resolve(null)
     }
 
