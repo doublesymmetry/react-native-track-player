@@ -28,10 +28,10 @@ import localArtwork from './react/resources/artwork.jpg'
 
 const setupIfNecessary = async () => {
   // if app was relaunched and music was already playing, we don't setup again.
-  const currentTrack = await TrackPlayer.getCurrentTrack();
-  if (currentTrack !== null) {
-    return;
-  }
+  // const currentTrack = await TrackPlayer.getCurrentTrack();
+  // if (currentTrack !== null) {
+  //   return;
+  // }
 
   await TrackPlayer.setupPlayer({});
   await TrackPlayer.updateOptions({
