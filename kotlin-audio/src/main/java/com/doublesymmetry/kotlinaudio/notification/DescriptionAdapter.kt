@@ -1,4 +1,4 @@
-package com.doublesymmetry.kotlinaudio
+package com.doublesymmetry.kotlinaudio.notification
 
 import android.app.PendingIntent
 import android.content.Context

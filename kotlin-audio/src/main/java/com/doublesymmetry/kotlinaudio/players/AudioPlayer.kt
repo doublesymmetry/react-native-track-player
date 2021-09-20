@@ -1,15 +1,10 @@
 package com.doublesymmetry.kotlinaudio.players
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
 import android.media.AudioManager
 import android.media.AudioManager.AUDIOFOCUS_LOSS
 import android.net.Uri
-import android.os.Build
-import android.support.v4.media.session.MediaSessionCompat
 import androidx.annotation.CallSuper
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.media.AudioAttributesCompat
 import androidx.media.AudioAttributesCompat.CONTENT_TYPE_MUSIC
@@ -17,9 +12,8 @@ import androidx.media.AudioAttributesCompat.USAGE_MEDIA
 import androidx.media.AudioFocusRequestCompat
 import androidx.media.AudioManagerCompat
 import androidx.media.AudioManagerCompat.AUDIOFOCUS_GAIN
-import com.doublesymmetry.kotlinaudio.DescriptionAdapter
-import com.doublesymmetry.kotlinaudio.R
 import com.doublesymmetry.kotlinaudio.models.*
+import com.doublesymmetry.kotlinaudio.notification.NotificationManager
 import com.doublesymmetry.kotlinaudio.utils.isJUnitTest
 import com.doublesymmetry.kotlinaudio.utils.isUriLocal
 import com.google.android.exoplayer2.C
@@ -28,7 +22,6 @@ import com.google.android.exoplayer2.DefaultLoadControl.*
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player.*
 import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
@@ -37,20 +30,14 @@ import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
-import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.upstream.*
 import com.google.android.exoplayer2.util.Util
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-open class AudioPlayer(private val context: Context, bufferOptions: BufferOptions? = null): AudioManager.OnAudioFocusChangeListener {
+open class AudioPlayer(private val context: Context, bufferConfig: BufferConfig? = null) : AudioManager.OnAudioFocusChangeListener {
     protected val exoPlayer: SimpleExoPlayer
-
-    private val mediaSession: MediaSessionCompat = MediaSessionCompat(context, "AudioPlayerSession")
-    private val mediaSessionConnector: MediaSessionConnector = MediaSessionConnector(mediaSession)
-
-    private val playerNotificationManager: PlayerNotificationManager
-    private val descriptionAdapter = DescriptionAdapter(context, null)
+    private val notificationManager = NotificationManager(context)
 
     open val playerOptions: PlayerOptions = PlayerOptionsImpl()
 
@@ -85,10 +72,10 @@ open class AudioPlayer(private val context: Context, bufferOptions: BufferOption
         }
 
     private var volumeMultiplier = 1f
-    private set(value) {
-        field = value
-        volume = volume
-    }
+        private set(value) {
+            field = value
+            volume = volume
+        }
 
     val event = EventHolder()
 
@@ -99,7 +86,7 @@ open class AudioPlayer(private val context: Context, bufferOptions: BufferOption
     init {
         val exoPlayerBuilder = SimpleExoPlayer.Builder(context)
 
-        bufferOptions?.let {
+        bufferConfig?.let {
             val multiplier = DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS / DEFAULT_BUFFER_FOR_PLAYBACK_MS
             val minBuffer = if (it.minBuffer != null && it.minBuffer != 0) it.minBuffer else DEFAULT_MIN_BUFFER_MS
             val maxBuffer = if (it.maxBuffer != null && it.maxBuffer != 0) it.maxBuffer else DEFAULT_MAX_BUFFER_MS
@@ -116,47 +103,13 @@ open class AudioPlayer(private val context: Context, bufferOptions: BufferOption
 
         exoPlayer = exoPlayerBuilder.build()
 
-        val channelId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createNotificationChannel()
-        } else {
-            ""
-        }
-
         if (isJUnitTest()) {
             exoPlayer.setThrowsWhenUsingWrongThread(false)
         }
 
-        mediaSessionConnector.setPlayer(exoPlayer)
-
-        val builder = PlayerNotificationManager.Builder(context, NOTIFICATION_ID, channelId)
-
-        playerNotificationManager = builder
-            .setMediaDescriptionAdapter(descriptionAdapter)
-            .build()
-
-        if (!isJUnitTest()) {
-            playerNotificationManager.apply {
-                setPlayer(exoPlayer)
-                setMediaSessionToken(mediaSession.sessionToken)
-                setUseNextActionInCompactView(true)
-                setUsePreviousActionInCompactView(true)
-            }
-        }
+        notificationManager.createNotification(exoPlayer)
 
         addPlayerListener()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun createNotificationChannel(): String {
-        val channelId = CHANNEL_ID
-        val channelName = context.getString(R.string.playback_channel_name)
-        val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW)
-        channel.description = "Used when playing music"
-        channel.setSound(null, null)
-
-        val service = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        service.createNotificationChannel(channel)
-        return channelId
     }
 
     open fun load(item: AudioItem, playWhenReady: Boolean = true) {
@@ -177,8 +130,7 @@ open class AudioPlayer(private val context: Context, bufferOptions: BufferOption
 
     fun play() {
         exoPlayer.play()
-
-        mediaSession.isActive = true
+        notificationManager.onPlay()
     }
 
     fun pause() {
@@ -191,7 +143,7 @@ open class AudioPlayer(private val context: Context, bufferOptions: BufferOption
     @CallSuper
     open fun destroy() {
         abandonFocus()
-        descriptionAdapter.release()
+        notificationManager.destroy()
         exoPlayer.release()
     }
 
@@ -289,13 +241,13 @@ open class AudioPlayer(private val context: Context, bufferOptions: BufferOption
         val manager = ContextCompat.getSystemService(context, AudioManager::class.java)
 
         focus = AudioFocusRequestCompat.Builder(AUDIOFOCUS_GAIN)
-                .setOnAudioFocusChangeListener(this)
-                .setAudioAttributes(AudioAttributesCompat.Builder()
-                    .setUsage(USAGE_MEDIA)
-                    .setContentType(CONTENT_TYPE_MUSIC)
-                    .build())
-                .setWillPauseWhenDucked(playerOptions.alwaysPauseOnInterruption)
-                .build()
+            .setOnAudioFocusChangeListener(this)
+            .setAudioAttributes(AudioAttributesCompat.Builder()
+                .setUsage(USAGE_MEDIA)
+                .setContentType(CONTENT_TYPE_MUSIC)
+                .build())
+            .setWillPauseWhenDucked(playerOptions.alwaysPauseOnInterruption)
+            .build()
 
         val result: Int = if (manager != null && focus != null) {
             AudioManagerCompat.requestAudioFocus(manager, focus!!)
@@ -382,8 +334,6 @@ open class AudioPlayer(private val context: Context, bufferOptions: BufferOption
     }
 
     companion object {
-        const val NOTIFICATION_ID = 1
-        const val CHANNEL_ID = "kotlin_audio_player"
         const val APPLICATION_NAME = "react-native-track-player"
     }
 }
