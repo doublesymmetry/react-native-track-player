@@ -1,6 +1,8 @@
 package com.guichaguri.trackplayer.module
 
 import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
@@ -9,10 +11,10 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.DefaultAudioItem
 import com.doublesymmetry.kotlinaudio.models.SourceType
-import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.facebook.react.bridge.*
 import com.google.android.exoplayer2.Player
 import com.guichaguri.trackplayer.module_old.MusicEvents
+import com.guichaguri.trackplayer.service.MusicService
 import com.guichaguri.trackplayer.service.models.Track
 import java.util.*
 import javax.annotation.Nonnull
@@ -20,15 +22,18 @@ import javax.annotation.Nonnull
 /**
  * @author Guichaguri
  */
-class MusicModule(reactContext: ReactApplicationContext?) :
-    ReactContextBaseJavaModule(reactContext), ServiceConnection {
-    private var binder: MusicBinder? = null
+class MusicModule(private val reactContext: ReactApplicationContext?) : ReactContextBaseJavaModule(reactContext), ServiceConnection {
+    private var binder: MusicService.MusicBinder? = null
     private var eventHandler: MusicEvents? = null
     private val initCallbacks = ArrayDeque<Runnable>()
-    private var connecting = false
+//    private var connecting = false
+    private var isServiceBound = false
     private var options: Bundle? = null
+    private var playerSetUpPromise: Promise? = null
 
-    lateinit var queuedAudioPlayer: QueuedAudioPlayer
+    private var musicService: MusicService? = null
+
+//    private lateinit var queuedAudioPlayer: QueuedAudioPlayer
 
     @Nonnull
     override fun getName(): String {
@@ -38,11 +43,14 @@ class MusicModule(reactContext: ReactApplicationContext?) :
     override fun initialize() {
         val context: ReactContext = reactApplicationContext
         val manager = LocalBroadcastManager.getInstance(context)
+
+//        if (!isServiceBound)
+//            context.bindService(Intent(context, MusicService::class.java), this, Context.BIND_AUTO_CREATE)
 //
-        context.runOnUiQueueThread { // TODO: Do this in lib
-            queuedAudioPlayer = QueuedAudioPlayer(context)
-        }
-//
+//        context.runOnUiQueueThread { // TODO: Do this in lib
+//            queuedAudioPlayer = QueuedAudioPlayer(context)
+//        }
+////
 //        eventHandler = MusicEvents(context)
 //        manager.registerReceiver(eventHandler!!, IntentFilter(Utils.EVENT_INTENT))
     }
@@ -57,8 +65,10 @@ class MusicModule(reactContext: ReactApplicationContext?) :
     }
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
-        binder = service as MusicBinder
-        connecting = false
+        val binder: MusicService.MusicBinder = service as MusicService.MusicBinder
+        musicService = binder.service
+        isServiceBound = true
+        playerSetUpPromise?.resolve(null)
 //
 //        // Reapply options that user set before with updateOptions
 //        if (options != null) {
@@ -72,14 +82,15 @@ class MusicModule(reactContext: ReactApplicationContext?) :
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
-//        binder = null
-//        connecting = false
+        musicService?.destroy()
+        musicService = null
     }
 
     /**
      * Waits for a connection to the service and/or runs the [Runnable] in the player thread
      */
     private fun waitForConnection(r: Runnable) {
+        r.run()
 //        if (binder != null) {
 //            binder!!.post(r)
 //            return
@@ -141,6 +152,25 @@ class MusicModule(reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun setupPlayer(data: ReadableMap?, promise: Promise) {
+        playerSetUpPromise = promise
+
+        if (!isServiceBound)
+            reactContext?.bindService(Intent(reactContext, MusicService::class.java), this, Context.BIND_AUTO_CREATE)
+
+//        val boundServiceConnection = object : ServiceConnection {
+//
+//            override fun onServiceConnected(className: ComponentName, service: IBinder) {
+//                val binder: MusicService.MusicBinder = service as MusicService.MusicBinder
+//                musicService = binder.getService()
+//                mainViewModel.isMusicServiceBound = true
+//            }
+//
+//            override fun onServiceDisconnected(name: ComponentName?) {
+//                TODO("Not yet implemented")
+//            }
+//        }
+
+
 //        val options = Arguments.toBundle(data)
 //        waitForConnection { binder!!.setupPlayer(options, promise) }
     }
@@ -178,7 +208,7 @@ class MusicModule(reactContext: ReactApplicationContext?) :
         waitForConnection {
             val trackList: List<Track> = try {
                 Track.createTracks(
-                    reactApplicationContext, bundleList, 0
+                    reactApplicationContext, bundleList, RatingCompat.RATING_HEART
                 )!!
             } catch (ex: Exception) {
                 callback.reject("invalid_track_object", ex)
@@ -191,8 +221,16 @@ class MusicModule(reactContext: ReactApplicationContext?) :
                 DefaultAudioItem(it.uri.toString(), SourceType.FILE, it.artist, it.title, it.album, it.artwork.toString())
             }
 
-            queuedAudioPlayer.add(items)
-//
+            musicService?.apply {
+                add(items)
+                play()
+            }
+
+//            reactApplicationContext.runOnUiQueueThread {
+//                queuedAudioPlayer.add(items)
+//                queuedAudioPlayer.play()
+//            }
+////
 ////            val queue = binder?.playback?.queue
 ////            // -1 means no index was passed and therefore should be inserted at the end.
 ////            val index = if (insertBeforeIndex != -1) insertBeforeIndex else queue!!.size
