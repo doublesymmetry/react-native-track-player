@@ -1,9 +1,6 @@
 package com.guichaguri.trackplayer.module
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
+import android.content.*
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.RatingCompat
@@ -13,6 +10,7 @@ import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
 import com.facebook.react.bridge.*
 import com.google.android.exoplayer2.Player
 import com.guichaguri.trackplayer.module_old.MusicEvents
+import com.guichaguri.trackplayer.module_old.MusicEvents.Companion.EVENT_INTENT
 import com.guichaguri.trackplayer.service.MusicService
 import com.guichaguri.trackplayer.service.models.Track
 import kotlinx.coroutines.MainScope
@@ -58,8 +56,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 //            queuedAudioPlayer = QueuedAudioPlayer(context)
 //        }
 ////
-//        eventHandler = MusicEvents(context)
-//        manager.registerReceiver(eventHandler!!, IntentFilter(Utils.EVENT_INTENT))
+        eventHandler = MusicEvents(context)
+        manager.registerReceiver(eventHandler!!, IntentFilter(EVENT_INTENT))
     }
 
     override fun onCatalystInstanceDestroy() {
@@ -207,7 +205,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 //        options = Arguments.toBundle(data)
 //        waitForConnection {
 //            binder!!.updateOptions(options)
-//            callback.resolve(null)
+            callback.resolve(null)
 //        }
     }
 
@@ -228,7 +226,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
             musicService.apply {
                 add(tracks)
-                play()
+//                play()
                 callback.resolve(null)
             }
 
@@ -497,8 +495,10 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun getState(callback: Promise) {
+
+        //TODO: FIgure this out >.<
         if (!::musicService.isInitialized) {
-            callback.resolve(PlaybackStateCompat.STATE_NONE)
+            callback.resolve(PlaybackStateCompat.STATE_PAUSED)
 //            return
         } else {
             mainScope.launch {

@@ -84,7 +84,7 @@ class MusicModule(reactContext: ReactApplicationContext?) :
         connecting = false
     }
 
-    /**
+    /**c
      * Waits for a connection to the service and/or runs the [Runnable] in the player thread
      */
     private fun waitForConnection(r: Runnable) {

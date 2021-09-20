@@ -10,7 +10,6 @@ import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEm
 /**
  * @author Guichaguri
  */
-@Deprecated("new module is being built")
 class MusicEvents(private val reactContext: ReactContext) : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val event = intent.getStringExtra("event")
@@ -43,5 +42,7 @@ class MusicEvents(private val reactContext: ReactContext) : BroadcastReceiver() 
         const val PLAYBACK_QUEUE_ENDED = "playback-queue-ended"
         const val PLAYBACK_METADATA = "playback-metadata-received"
         const val PLAYBACK_ERROR = "playback-error"
+
+        const val EVENT_INTENT = "com.doublesymmetry.trackplayer.event"
     }
 }
