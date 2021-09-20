@@ -86,8 +86,8 @@ open class AudioPlayer(private val context: Context, bufferOptions: BufferOption
 
     private var volumeMultiplier = 1f
     private set(value) {
-        volume = volume
         field = value
+        volume = volume
     }
 
     val event = EventHolder()
