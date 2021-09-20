@@ -1,10 +1,9 @@
-package com.guichaguri.trackplayer.service.models;
+package com.guichaguri.trackplayer.service.models
 
 /**
  * @author Guichaguri
  */
-public enum TrackType {
-
+enum class TrackType(val value: String) {
     /**
      * The default media type. Should be used for streams over HTTP or files
      */
@@ -24,12 +23,4 @@ public enum TrackType {
      * The SmoothStreaming media type for adaptive streams. Should be used with SmoothStreaming manifests
      */
     SMOOTH_STREAMING("smoothstreaming");
-
-
-    public final String name;
-
-    TrackType(String name) {
-        this.name = name;
-    }
-
 }
