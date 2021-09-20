@@ -492,9 +492,12 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(getCurrentTrack:rejecter:)
     public func getCurrentTrack(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         let index = player.currentIndex
-        let adjustedIndex = index < 0 || index >= player.items.count ? nil : index;
 
-        resolve(adjustedIndex)
+        if index < 0 || index >= player.items.count {
+            resolve(NSNull())
+        } else {
+            resolve(index)
+        }
     }
 
     @objc(getDuration:rejecter:)
