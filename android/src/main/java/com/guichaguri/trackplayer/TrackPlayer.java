@@ -15,6 +15,7 @@ import java.util.List;
  */
 public class TrackPlayer implements ReactPackage {
 
+    // demo comments
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         return Collections.singletonList(new MusicModule(reactContext));
