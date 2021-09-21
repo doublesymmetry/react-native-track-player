@@ -17,8 +17,9 @@ import com.guichaguri.trackplayer.service.MusicService
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.take
 import java.util.*
 import javax.annotation.Nonnull
 
@@ -402,18 +403,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
         if (!::musicService.isInitialized) {
             callback.resolve(PlaybackStateCompat.STATE_NONE)
         } else {
-            mainScope.launch {
-                musicService.event.stateChange.collect {
-                    when (it) {
-                        AudioPlayerState.PLAYING -> {
-                            callback.resolve(PlaybackStateCompat.STATE_PLAYING)
-                        }
-                        else -> {
-                            callback.resolve(PlaybackStateCompat.STATE_PAUSED)
-                        }
-                    }
-                }
-            }
+            callback.resolve(musicService.event.stateChange.value)
         }
     }
 }
