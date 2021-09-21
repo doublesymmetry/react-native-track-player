@@ -13,11 +13,14 @@ import com.facebook.react.jstasks.HeadlessJsTaskConfig
 import com.guichaguri.trackplayer.model.State
 import com.guichaguri.trackplayer.model.Track
 import com.guichaguri.trackplayer.model.TrackAudioItem
+import com.guichaguri.trackplayer.model.asLibState
 import com.guichaguri.trackplayer.module_old.MusicEvents
 import com.guichaguri.trackplayer.module_old.MusicEvents.Companion.EVENT_INTENT
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -147,27 +150,26 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     private fun observeEvents() {
-        serviceScope.launch {
-            event.stateChange.collect {
+        event.stateChange
+            .onEach {
                 val bundle = Bundle()
                 Logger.d(it)
 
                 when (it) {
                     AudioPlayerState.PLAYING -> {
-                        bundle.putInt(STATE_KEY, State.Playing.value)
+                        bundle.putInt(STATE_KEY, it.asLibState.value)
                         emit(MusicEvents.BUTTON_PLAY, null)
                     }
                     AudioPlayerState.PAUSED -> {
-                        bundle.putInt(STATE_KEY, State.Paused.value)
+                        bundle.putInt(STATE_KEY, it.asLibState.value)
                         emit(MusicEvents.BUTTON_PAUSE, null)
                     }
-                    AudioPlayerState.READY, AudioPlayerState.IDLE -> {
-                        bundle.putInt(STATE_KEY, State.Ready.value)
-                    }
-                    AudioPlayerState.BUFFERING -> {
-                        bundle.putInt(STATE_KEY, State.Buffering.value)
+                    AudioPlayerState.READY, AudioPlayerState.IDLE, AudioPlayerState.BUFFERING -> {
+                        bundle.putInt(STATE_KEY, it.asLibState.value)
                     }
                     AudioPlayerState.ENDED -> {
+                        bundle.putInt(STATE_KEY, it.asLibState.value)
+
                         if (player.nextItem == null) {
                             if (player.previousIndex != null) bundle.putInt(TRACK_KEY, player.previousIndex!!)
                             emit(MusicEvents.PLAYBACK_QUEUE_ENDED, null)
@@ -177,7 +179,7 @@ class MusicService : HeadlessJsTaskService() {
 
                 emit(MusicEvents.PLAYBACK_STATE, bundle)
             }
-        }
+            .launchIn(serviceScope)
 
         serviceScope.launch {
             event.audioItemTransition.collect {

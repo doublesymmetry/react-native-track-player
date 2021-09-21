@@ -10,16 +10,15 @@ import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
 import com.doublesymmetry.kotlinaudio.models.RepeatMode
 import com.facebook.react.bridge.*
 import com.google.android.exoplayer2.Player
+import com.guichaguri.trackplayer.model.State
 import com.guichaguri.trackplayer.model.Track
+import com.guichaguri.trackplayer.model.asLibState
 import com.guichaguri.trackplayer.module_old.MusicEvents
 import com.guichaguri.trackplayer.module_old.MusicEvents.Companion.EVENT_INTENT
 import com.guichaguri.trackplayer.service.MusicService
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.take
 import java.util.*
 import javax.annotation.Nonnull
 
@@ -116,13 +115,13 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
         constants["CAPABILITY_JUMP_BACKWARD"] = PlaybackStateCompat.ACTION_REWIND
 
         // States
-        constants["STATE_NONE"] = PlaybackStateCompat.STATE_NONE
-        constants["STATE_READY"] = PlaybackStateCompat.STATE_PAUSED
-        constants["STATE_PLAYING"] = PlaybackStateCompat.STATE_PLAYING
-        constants["STATE_PAUSED"] = PlaybackStateCompat.STATE_PAUSED
-        constants["STATE_STOPPED"] = PlaybackStateCompat.STATE_STOPPED
-        constants["STATE_BUFFERING"] = PlaybackStateCompat.STATE_BUFFERING
-        constants["STATE_CONNECTING"] = PlaybackStateCompat.STATE_CONNECTING
+        constants["STATE_NONE"] = State.None
+        constants["STATE_READY"] = State.Paused
+        constants["STATE_PLAYING"] = State.Playing
+        constants["STATE_PAUSED"] = State.Paused
+        constants["STATE_STOPPED"] = State.Stopped
+        constants["STATE_BUFFERING"] = State.Buffering
+        constants["STATE_CONNECTING"] = State.Connecting
 
         // Rating Types
         constants["RATING_HEART"] = RatingCompat.RATING_HEART
@@ -401,9 +400,9 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     @ReactMethod
     fun getState(callback: Promise) {
         if (!::musicService.isInitialized) {
-            callback.resolve(PlaybackStateCompat.STATE_NONE)
+            callback.resolve(State.None.value)
         } else {
-            callback.resolve(musicService.event.stateChange.value)
+            callback.resolve(musicService.event.stateChange.value.asLibState.value)
         }
     }
 }
