@@ -115,13 +115,13 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
         constants["CAPABILITY_JUMP_BACKWARD"] = PlaybackStateCompat.ACTION_REWIND
 
         // States
-        constants["STATE_NONE"] = State.None
-        constants["STATE_READY"] = State.Paused
-        constants["STATE_PLAYING"] = State.Playing
-        constants["STATE_PAUSED"] = State.Paused
-        constants["STATE_STOPPED"] = State.Stopped
-        constants["STATE_BUFFERING"] = State.Buffering
-        constants["STATE_CONNECTING"] = State.Connecting
+        constants["STATE_NONE"] = State.None.value
+        constants["STATE_READY"] = State.Paused.value
+        constants["STATE_PLAYING"] = State.Playing.value
+        constants["STATE_PAUSED"] = State.Paused.value
+        constants["STATE_STOPPED"] = State.Stopped.value
+        constants["STATE_BUFFERING"] = State.Buffering.value
+        constants["STATE_CONNECTING"] = State.Connecting.value
 
         // Rating Types
         constants["RATING_HEART"] = RatingCompat.RATING_HEART

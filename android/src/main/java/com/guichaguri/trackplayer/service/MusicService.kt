@@ -10,7 +10,6 @@ import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
-import com.guichaguri.trackplayer.model.State
 import com.guichaguri.trackplayer.model.Track
 import com.guichaguri.trackplayer.model.TrackAudioItem
 import com.guichaguri.trackplayer.model.asLibState
