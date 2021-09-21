@@ -4,6 +4,6 @@ interface PlayerOptions {
     var alwaysPauseOnInterruption: Boolean
 }
 
-data class PlayerOptionsImpl(
+class PlayerOptionsImpl(
     override var alwaysPauseOnInterruption: Boolean = false,
 ) : PlayerOptions

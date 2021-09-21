@@ -3,16 +3,20 @@ package com.doublesymmetry.kotlinaudio.notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
 import com.doublesymmetry.kotlinaudio.R
 import com.doublesymmetry.kotlinaudio.utils.isJUnitTest
 import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 
-class NotificationManager(private val context: Context) {
+class NotificationManager(private val context: Context): PlayerNotificationManager.CustomActionReceiver {
     private val playerNotificationManager: PlayerNotificationManager
     private val descriptionAdapter = DescriptionAdapter(context, null)
     private val mediaSession: MediaSessionCompat = MediaSessionCompat(context, "AudioPlayerSession")
@@ -29,6 +33,7 @@ class NotificationManager(private val context: Context) {
 
         playerNotificationManager = builder
             .setMediaDescriptionAdapter(descriptionAdapter)
+            .setCustomActionReceiver(this)
             .build()
     }
 
@@ -45,7 +50,7 @@ class NotificationManager(private val context: Context) {
         return channelId
     }
 
-    fun createNotification(exoPlayer: ExoPlayer) {
+    fun createNotification(exoPlayer: ExoPlayer, options: Bundle) {
         mediaSessionConnector.setPlayer(exoPlayer)
 
         if (!isJUnitTest()) {
@@ -57,6 +62,34 @@ class NotificationManager(private val context: Context) {
             }
         }
     }
+
+//    private fun updateOptions(options: Bundle) {
+//        val capabilities: List<Int>? = options.getIntegerArrayList("capabilities")
+//        val notification: List<Int>? = options.getIntegerArrayList("notificationCapabilities")
+//        val compact: List<Int>? = options.getIntegerArrayList("compactCapabilities")
+//    }
+
+    override fun createCustomActions(context: Context, instanceId: Int): MutableMap<String, NotificationCompat.Action> {
+        return mutableMapOf(
+            "previous" to NotificationCompat.Action("")
+        )
+    }
+
+    override fun getCustomActions(player: Player): MutableList<String> {
+        TODO("Not yet implemented")
+    }
+
+    override fun onCustomAction(player: Player, action: String, intent: Intent) {
+        TODO("Not yet implemented")
+    }
+
+//    private fun getIcon(options: Bundle, propertyName: String, defaultIcon: Int): Int {
+//        if (!options.containsKey(propertyName)) return defaultIcon
+//        val bundle = options.getBundle(propertyName) ?: return defaultIcon
+//        val helper: ResourceDrawableIdHelper = ResourceDrawableIdHelper.getInstance()
+//        val icon: Int = helper.getResourceDrawableId(service, bundle.getString("uri"))
+//        return if (icon == 0) defaultIcon else icon
+//    }
 
     fun onPlay() {
         mediaSession.isActive = true

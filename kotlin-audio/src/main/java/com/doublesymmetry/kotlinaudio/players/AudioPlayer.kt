@@ -40,6 +40,7 @@ open class AudioPlayer(private val context: Context, bufferConfig: BufferConfig?
     private val notificationManager = NotificationManager(context)
 
     open val playerOptions: PlayerOptions = PlayerOptionsImpl()
+    val notificationOptions = NotificationOptions(exoPlayer)
 
     val duration: Long
         get() {

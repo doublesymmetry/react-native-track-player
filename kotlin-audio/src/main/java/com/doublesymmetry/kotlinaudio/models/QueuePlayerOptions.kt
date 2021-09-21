@@ -8,8 +8,8 @@ interface QueuePlayerOptions : PlayerOptions {
     var repeatMode: RepeatMode
 }
 
-data class QueuePlayerOptionsImpl(
-    val exoPlayer: ExoPlayer,
+class QueuePlayerOptionsImpl(
+    private val exoPlayer: ExoPlayer,
     //TODO: implement this
     override var alwaysPauseOnInterruption: Boolean = false,
 ) : QueuePlayerOptions {
