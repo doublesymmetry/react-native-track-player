@@ -149,8 +149,8 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     private fun observeEvents() {
-        event.stateChange
-            .onEach {
+        serviceScope.launch {
+            event.stateChange.collect {
                 val bundle = Bundle()
                 Logger.d(it)
 
@@ -170,7 +170,10 @@ class MusicService : HeadlessJsTaskService() {
                         bundle.putInt(STATE_KEY, it.asLibState.value)
 
                         if (player.nextItem == null) {
-                            if (player.previousIndex != null) bundle.putInt(TRACK_KEY, player.previousIndex!!)
+                            if (player.previousIndex != null) bundle.putInt(
+                                TRACK_KEY,
+                                player.previousIndex!!
+                            )
                             emit(MusicEvents.PLAYBACK_QUEUE_ENDED, null)
                         }
                     }
@@ -178,7 +181,8 @@ class MusicService : HeadlessJsTaskService() {
 
                 emit(MusicEvents.PLAYBACK_STATE, bundle)
             }
-            .launchIn(serviceScope)
+        }
+
 
         serviceScope.launch {
             event.audioItemTransition.collect {
