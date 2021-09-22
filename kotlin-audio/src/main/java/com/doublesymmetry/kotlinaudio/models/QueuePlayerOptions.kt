@@ -10,7 +10,6 @@ interface QueuePlayerOptions : PlayerOptions {
 
 class QueuePlayerOptionsImpl(
     private val exoPlayer: ExoPlayer,
-    //TODO: implement this
     override var alwaysPauseOnInterruption: Boolean = false,
 ) : QueuePlayerOptions {
     // Functions in data classes might or might not be a bit of a code smell.

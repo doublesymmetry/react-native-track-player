@@ -32,6 +32,10 @@ import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
 import com.google.android.exoplayer2.upstream.*
 import com.google.android.exoplayer2.util.Util
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -40,7 +44,9 @@ open class AudioPlayer(private val context: Context, bufferConfig: BufferConfig?
     private val notificationManager = NotificationManager(context)
 
     open val playerOptions: PlayerOptions = PlayerOptionsImpl()
-    val notificationOptions = NotificationOptions(exoPlayer)
+    val notificationOptions: NotificationOptions
+
+    protected val scope = CoroutineScope(Dispatchers.Main)
 
     val duration: Long
         get() {
@@ -103,6 +109,7 @@ open class AudioPlayer(private val context: Context, bufferConfig: BufferConfig?
         }
 
         exoPlayer = exoPlayerBuilder.build()
+        notificationOptions = NotificationOptions(notificationManager)
 
         if (isJUnitTest()) {
             exoPlayer.setThrowsWhenUsingWrongThread(false)
@@ -111,6 +118,7 @@ open class AudioPlayer(private val context: Context, bufferConfig: BufferConfig?
         notificationManager.createNotification(exoPlayer)
 
         addPlayerListener()
+        observeEvents()
     }
 
     open fun load(item: AudioItem, playWhenReady: Boolean = true) {
@@ -332,6 +340,14 @@ open class AudioPlayer(private val context: Context, bufferConfig: BufferConfig?
                 }
             }
         })
+    }
+
+    private fun observeEvents() {
+        scope.launch {
+            notificationManager.onCustomAction.collect {
+                event.updateOnNotificationAction(it)
+            }
+        }
     }
 
     companion object {
