@@ -2,14 +2,23 @@ package com.guichaguri.trackplayer.service
 
 import android.content.Intent
 import android.os.*
+import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
+import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
 import com.doublesymmetry.kotlinaudio.models.BufferConfig
 import com.doublesymmetry.kotlinaudio.models.RepeatMode
+import androidx.media.session.MediaButtonReceiver
+import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.Promise
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
+import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper
+import com.guichaguri.trackplayer.R
+import com.guichaguri.trackplayer.model.State
 import com.guichaguri.trackplayer.model.Track
 import com.guichaguri.trackplayer.model.TrackAudioItem
 import com.guichaguri.trackplayer.model.asLibState
@@ -59,7 +68,7 @@ class MusicService : HeadlessJsTaskService() {
 
     val event get() = player.event
 
-    fun setupPlayer(playerOptions: Bundle?) {
+    fun setupPlayer(playerOptions: Bundle?, promise: Promise?) {
         val bufferOptions = BufferConfig(
             minBuffer = playerOptions?.getDouble(MIN_BUFFER_KEY)?.toInt(),
             maxBuffer = playerOptions?.getDouble(MAX_BUFFER_KEY)?.toInt(),
@@ -68,15 +77,54 @@ class MusicService : HeadlessJsTaskService() {
             //TODO: Ignored maxCacheSize and autoUpdateMetadata. Do we need them?
         )
 
-        handler.post { player = QueuedAudioPlayer(this, bufferOptions) }
-        observeEvents()
+        handler.post {
+            player = QueuedAudioPlayer(this, bufferOptions)
+            observeEvents()
+            promise?.resolve(null)
+        }
     }
 
     fun updateOptions(options: Bundle) {
         stopWithApp = options.getBoolean(STOP_WITH_APP)
         player.playerOptions.alwaysPauseOnInterruption = options.getBoolean(PAUSE_ON_INTERRUPTION_KEY)
+
+        val capabilities: List<Int> = options.getIntegerArrayList("capabilities") ?: emptyList()
+        var notification: List<Int> = options.getIntegerArrayList("notificationCapabilities") ?: emptyList()
+        val compact: List<Int> = options.getIntegerArrayList("compactCapabilities") ?: emptyList()
+
+        if (notification.isEmpty()) notification = capabilities
+
+//        val previousAction = createAction(notification, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS, "Previous",
+//            getIcon(options, "previousIcon", R.drawable.previous))
+//        val rewindAction = createAction(notification, PlaybackStateCompat.ACTION_REWIND, "Rewind",
+//            getIcon(options, "rewindIcon", R.drawable.rewind))
+        val playAction = createAction(notification, PlaybackStateCompat.ACTION_PLAY, "Play",
+            getIcon(options, "playIcon", R.drawable.play), NotificationActionType.ACTION_PLAY)
+//        val pauseAction = createAction(notification, PlaybackStateCompat.ACTION_PAUSE, "Pause",
+//            getIcon(options, "pauseIcon", R.drawable.pause))
+//        val stopAction = createAction(notification, PlaybackStateCompat.ACTION_STOP, "Stop",
+//            getIcon(options, "stopIcon", R.drawable.stop))
+//        val forwardAction = createAction(notification, PlaybackStateCompat.ACTION_FAST_FORWARD, "Forward",
+//            getIcon(options, "forwardIcon", R.drawable.forward))
+        val nextAction = createAction(notification, PlaybackStateCompat.ACTION_SKIP_TO_NEXT, "Next",
+            getIcon(options, "nedxtIcon", android.R.drawable.sym_def_app_icon), NotificationActionType.CUSTOM("test"))
+
+//        player.notificationOptions.actions = listOf(previousAction, rewindAction, playAction, pauseAction, stopAction, forwardAction, nextAction)
+        player.notificationOptions.actions = listOf(playAction, nextAction)
     }
 
+    private fun createAction(capabilities: List<Int>, action: Long, title: String, icon: Int, type: NotificationActionType, isCompact: Boolean = false): NotificationAction {
+        return if (!capabilities.contains(action.toInt())) error("Action $title is not a support capability")
+        else NotificationAction(NotificationCompat.Action(icon, title, MediaButtonReceiver.buildMediaButtonPendingIntent(this, action)), type , isCompact)
+    }
+
+    private fun getIcon(options: Bundle, propertyName: String, defaultIcon: Int): Int {
+        if (!options.containsKey(propertyName)) return defaultIcon
+        val bundle = options.getBundle(propertyName) ?: return defaultIcon
+        val helper = ResourceDrawableIdHelper.getInstance()
+        val icon = helper.getResourceDrawableId(this, bundle.getString("uri"))
+        return if (icon == 0) defaultIcon else icon
+    }
 
     fun add(tracks: List<Track>, playWhenReady: Boolean = true) {
         val items = tracks.map { it.toAudioItem() }
@@ -202,6 +250,16 @@ class MusicService : HeadlessJsTaskService() {
                     putBoolean(IS_FOCUS_LOSS_PERMANENT_KEY, it.isFocusLostPermanently)
                     putBoolean(IS_PAUSED_KEY, it.isPaused)
                     emit(MusicEvents.BUTTON_DUCK, this)
+                }
+            }
+        }
+
+        serviceScope.launch {
+            event.onNotificationAction.collect {
+                when (it) {
+                    NotificationActionType.CUSTOM("test") -> {
+                        Log.d("TEST", "test")
+                    }
                 }
             }
         }

@@ -75,10 +75,10 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
         val binder: MusicService.MusicBinder = service as MusicService.MusicBinder
         musicService = binder.service
-        musicService.setupPlayer(playerOptions)
+        musicService.setupPlayer(playerOptions, playerSetUpPromise)
 
         isServiceBound = true
-        playerSetUpPromise?.resolve(null)
+//        playerSetUpPromise?.resolve(null)
 //
 //        // Reapply options that user set before with updateOptions
 //        if (options != null) {
@@ -160,12 +160,14 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun updateOptions(data: ReadableMap?, callback: Promise) {
-//        // keep options as we may need them for correct MetadataManager reinitialization later
-//        options = Arguments.toBundle(data)
-//        waitForConnection {
-//            binder!!.updateOptions(options)
+        val options = Arguments.toBundle(data)
+
+        options?.let {
+            musicService.updateOptions(it)
+        }
+
         callback.resolve(null)
-//        }
+
     }
 
     @ReactMethod
