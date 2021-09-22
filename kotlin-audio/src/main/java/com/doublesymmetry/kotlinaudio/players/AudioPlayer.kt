@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit
 
 open class AudioPlayer(private val context: Context, bufferConfig: BufferConfig? = null) : AudioManager.OnAudioFocusChangeListener {
     protected val exoPlayer: SimpleExoPlayer
-    private val notificationManager = NotificationManager(context)
+    private val notificationManager: NotificationManager
 
     open val playerOptions: PlayerOptions = PlayerOptionsImpl()
     val notificationOptions: NotificationOptions
@@ -109,13 +109,14 @@ open class AudioPlayer(private val context: Context, bufferConfig: BufferConfig?
         }
 
         exoPlayer = exoPlayerBuilder.build()
+        notificationManager = NotificationManager(context, exoPlayer)
         notificationOptions = NotificationOptions(notificationManager)
 
         if (isJUnitTest()) {
             exoPlayer.setThrowsWhenUsingWrongThread(false)
         }
 
-        notificationManager.createNotification(exoPlayer)
+        notificationManager.createNotification()
 
         addPlayerListener()
         observeEvents()

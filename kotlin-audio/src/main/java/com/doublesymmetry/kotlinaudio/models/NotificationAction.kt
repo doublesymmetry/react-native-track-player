@@ -1,9 +1,11 @@
 package com.doublesymmetry.kotlinaudio.models
 
-import androidx.core.app.NotificationCompat
+import androidx.annotation.DrawableRes
 
 data class NotificationAction(
-    val action: NotificationCompat.Action,
+    val title: String,
+    @DrawableRes val icon: Int,
+//    val action: NotificationCompat.Action,
     val type: NotificationActionType,
     val isCompact: Boolean,
 )
