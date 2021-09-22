@@ -146,8 +146,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
         if (!isServiceBound) {
             val intent = Intent(reactContext, MusicService::class.java)
             reactContext?.startService(intent)
-            intent.action = MusicService.CONNECT
-
             reactContext?.bindService(intent, this, Context.BIND_AUTO_CREATE)
         }
     }

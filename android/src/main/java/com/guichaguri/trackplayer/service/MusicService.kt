@@ -221,11 +221,7 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     override fun onBind(intent: Intent?): IBinder? {
-        if (intent?.action == CONNECT) {
-            return MusicBinder()
-        }
-
-        return super.onBind(intent)
+        return MusicBinder()
     }
 
     override fun onDestroy() {
@@ -244,7 +240,6 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     companion object {
-        const val CONNECT = "com.doublesymmetry.service.connect"
         const val STATE_KEY = "state"
         const val EVENT_KEY = "event"
         const val DATA_KEY = "data"
