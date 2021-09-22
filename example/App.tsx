@@ -24,38 +24,40 @@ import playlistData from './react/data/playlist.json';
 // @ts-ignore
 import localTrack from './react/resources/pure.m4a';
 // @ts-ignore
-import localArtwork from './react/resources/artwork.jpg'
+import localArtwork from './react/resources/artwork.jpg';
 
 const setupIfNecessary = async () => {
-  // if app was relaunched and music was already playing, we don't setup again.
-  // const currentTrack = await TrackPlayer.getCurrentTrack();
-  // if (currentTrack !== null) {
-  //   return;
-  // }
+  try {
+    // this method will only reject if player has not been setup
+    await TrackPlayer.getCurrentTrack();
+    console.log('Player already set up');
+    return;
+  } catch {
+    await TrackPlayer.setupPlayer({});
+    await TrackPlayer.updateOptions({
+      stopWithApp: false,
+      capabilities: [
+        Capability.Play,
+        Capability.Pause,
+        Capability.SkipToNext,
+        Capability.SkipToPrevious,
+        Capability.Stop,
+      ],
+      compactCapabilities: [Capability.Play, Capability.Pause],
+    });
 
-  await TrackPlayer.setupPlayer({});
-  await TrackPlayer.updateOptions({
-    stopWithApp: false,
-    capabilities: [
-      Capability.Play,
-      Capability.Pause,
-      Capability.SkipToNext,
-      Capability.SkipToPrevious,
-      Capability.Stop,
-    ],
-    compactCapabilities: [Capability.Play, Capability.Pause],
-  });
+    // setup queue
+    await TrackPlayer.add(playlistData);
+    await TrackPlayer.add({
+      url: localTrack,
+      title: 'Pure (Demo)',
+      artist: 'David Chavez',
+      artwork: localArtwork,
+      duration: 28,
+    });
 
-  await TrackPlayer.add(playlistData);
-  await TrackPlayer.add({
-    url: localTrack,
-    title: 'Pure (Demo)',
-    artist: 'David Chavez',
-    artwork: localArtwork,
-    duration: 28,
-  });
-
-  TrackPlayer.setRepeatMode(RepeatMode.Queue);
+    await TrackPlayer.setRepeatMode(RepeatMode.Queue);
+  }
 };
 
 const togglePlayback = async (playbackState: State) => {
