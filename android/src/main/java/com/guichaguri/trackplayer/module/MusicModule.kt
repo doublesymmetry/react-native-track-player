@@ -143,8 +143,11 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
         playerSetUpPromise = promise
         playerOptions = Arguments.toBundle(data)
 
-        if (!isServiceBound)
-            reactContext?.bindService(Intent(reactContext, MusicService::class.java), this, Context.BIND_AUTO_CREATE)
+        if (!isServiceBound) {
+            val intent = Intent(reactContext, MusicService::class.java)
+            reactContext?.startService(intent)
+            reactContext?.bindService(intent, this, Context.BIND_AUTO_CREATE)
+        }
     }
 
     @ReactMethod

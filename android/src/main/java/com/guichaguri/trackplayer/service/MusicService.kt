@@ -18,8 +18,6 @@ import com.guichaguri.trackplayer.module_old.MusicEvents.Companion.EVENT_INTENT
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -222,7 +220,7 @@ class MusicService : HeadlessJsTaskService() {
         // Overridden to prevent the service from being terminated
     }
 
-    override fun onBind(intent: Intent?): IBinder {
+    override fun onBind(intent: Intent?): IBinder? {
         return MusicBinder()
     }
 
