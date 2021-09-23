@@ -32,11 +32,11 @@ internal class NotificationManager(private val context: Context, private val exo
 
     private val scope = CoroutineScope(Dispatchers.Main)
 
-    val actions = mutableListOf<NotificationAction>()
+    val actions = mutableListOf<NotificationAction?>()
 
     private val channelId: String
 
-     lateinit var playerNotificationManager: PlayerNotificationManager
+    lateinit var playerNotificationManager: PlayerNotificationManager
 
 //    private val builder by lazy {
 //
@@ -52,6 +52,8 @@ internal class NotificationManager(private val context: Context, private val exo
         } else {
             ""
         }
+
+        mediaSessionConnector.setPlayer(exoPlayer)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -73,8 +75,6 @@ internal class NotificationManager(private val context: Context, private val exo
             .setCustomActionReceiver(this)
             .build()
 
-        mediaSessionConnector.setPlayer(exoPlayer)
-
         if (!isJUnitTest()) {
             playerNotificationManager.apply {
                 setPlayer(exoPlayer)
@@ -91,15 +91,24 @@ internal class NotificationManager(private val context: Context, private val exo
 //        playerNotificationManager.setUseNextAction()
     }
 
-//    @SuppressLint("UnspecifiedImmutableFlag")
+    //    @SuppressLint("UnspecifiedImmutableFlag")
     override fun createCustomActions(context: Context, instanceId: Int): Map<String, NotificationCompat.Action> {
-        return actions.associate {
-            val intent = Intent(it.type.value).setPackage(context.packageName)
-            val action = NotificationCompat.Action(it.icon, it.title, PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT))
-            it.type.value to action
+//        if (actions.isEmpty()) {
+//            val action = NotificationCompat.Action(android.R.drawable.btn_radio, "closeBar", PendingIntent.getBroadcast(context, 123, Intent().setPackage(context.packageName), PendingIntent.FLAG_CANCEL_CURRENT))
+//            val actionMap = mutableMapOf<String, NotificationCompat.Action>()
+////            val actionMap: MutableMap<String, NotificationCompat.Action> = HashMap()
+//            actionMap["test"] = action
+////    actionMap[actions[1].type.value] = action
+//            return actionMap
+//        } else {
+            return actions.filterNotNull().associate {
+                val intent = Intent(it.type.value).setPackage(context.packageName)
+                val action = NotificationCompat.Action(it.icon, it.title, PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT))
+                it.type.value to action
+//            }
         }
 
-    //TODO: Pass a straight map
+        //TODO: Pass a straight map
 
 //    val action = NotificationCompat.Action(android.R.drawable.btn_radio, "closeBar", PendingIntent.getBroadcast(context, 123, Intent().setPackage(context.packageName), PendingIntent.FLAG_CANCEL_CURRENT))
 //        val actionMap = mutableMapOf<String, NotificationCompat.Action>()
@@ -121,7 +130,8 @@ internal class NotificationManager(private val context: Context, private val exo
     }
 
     override fun getCustomActions(player: Player): List<String> {
-        return actions.map { it.type.value }
+//        return listOf("action_play")
+        return actions.filterNotNull().map { it.type.value }
 //        return emptyList()
     }
 

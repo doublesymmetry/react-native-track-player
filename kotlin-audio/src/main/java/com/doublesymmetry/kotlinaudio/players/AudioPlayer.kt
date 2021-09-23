@@ -84,6 +84,9 @@ open class AudioPlayer(private val context: Context, bufferConfig: BufferConfig?
             volume = volume
         }
 
+    val isPlaying
+        get() = exoPlayer.isPlaying
+
     val event = EventHolder()
 
     private var focus: AudioFocusRequestCompat? = null
@@ -116,7 +119,7 @@ open class AudioPlayer(private val context: Context, bufferConfig: BufferConfig?
             exoPlayer.setThrowsWhenUsingWrongThread(false)
         }
 
-        notificationManager.createNotification()
+//        notificationManager.createNotification()
 
         addPlayerListener()
         observeEvents()
