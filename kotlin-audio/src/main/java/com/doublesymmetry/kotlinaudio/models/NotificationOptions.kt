@@ -6,7 +6,7 @@ class NotificationOptions internal constructor(private val notificationManager: 
     var actions: List<NotificationAction> = emptyList()
         set(value) {
             field = value
-            notificationManager.actions = field
+            notificationManager.actions.addAll(field)
             notificationManager.refresh()
         }
 }
