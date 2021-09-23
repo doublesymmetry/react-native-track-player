@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import com.facebook.react.bridge.Promise
 import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.database.DatabaseProvider
@@ -167,11 +166,11 @@ class LocalPlayback(
         }
         super.onPlayerStateChanged(playWhenReady, playbackState)
     }
-
-    override fun onPlayerError(error: PlaybackException) {
-        prepared = false
-        super.onPlayerError(error)
-    }
+//
+//    override fun onPlayerError(error: ExoPlaybackException) {
+//        prepared = false
+//        super.onPlayerError(error)
+//    }
 
     override fun destroy() {
         super.destroy()

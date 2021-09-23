@@ -4,7 +4,10 @@ import android.content.Context
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import com.facebook.react.bridge.Promise
-import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.PlaybackParameters
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.metadata.Metadata
 import com.google.android.exoplayer2.metadata.MetadataOutput
 import com.google.android.exoplayer2.source.TrackGroupArray
@@ -263,16 +266,16 @@ abstract class ExoPlayback<T : Player?>(
         }
     }
 
-    override fun onPlayerError(error: PlaybackException) {
-        val code: String = "playback"
-//        code = if (error.type == ExoPlaybackException.TYPE_SOURCE) {
-//            "playback-source"
-//        } else if (error.type == ExoPlaybackException.TYPE_RENDERER) {
-//            "playback-renderer"
-//        } else {
-//            "playback" // Other unexpected errors related to the playback
-//        }
-        manager.onError(code, error.cause!!.message)    }
+//    override fun onPlayerError(error: ExoPlaybackException) {
+//        val code: String = "playback"
+////        code = if (error.type == ExoPlaybackException.TYPE_SOURCE) {
+////            "playback-source"
+////        } else if (error.type == ExoPlaybackException.TYPE_RENDERER) {
+////            "playback-renderer"
+////        } else {
+////            "playback" // Other unexpected errors related to the playback
+////        }
+//        manager.onError(code, error.cause!!.message)    }
 
     override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
         // Speed or pitch changes

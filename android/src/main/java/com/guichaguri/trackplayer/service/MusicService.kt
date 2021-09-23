@@ -3,13 +3,7 @@ package com.guichaguri.trackplayer.service
 import android.content.Intent
 import android.os.*
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
-import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
-import com.doublesymmetry.kotlinaudio.models.BufferConfig
-import com.doublesymmetry.kotlinaudio.models.RepeatMode
-import androidx.media.session.MediaButtonReceiver
 import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.facebook.react.HeadlessJsTaskService
@@ -21,14 +15,11 @@ import com.guichaguri.trackplayer.R
 import com.guichaguri.trackplayer.model.State
 import com.guichaguri.trackplayer.model.Track
 import com.guichaguri.trackplayer.model.TrackAudioItem
-import com.guichaguri.trackplayer.model.asLibState
 import com.guichaguri.trackplayer.module_old.MusicEvents
 import com.guichaguri.trackplayer.module_old.MusicEvents.Companion.EVENT_INTENT
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -68,12 +59,16 @@ class MusicService : HeadlessJsTaskService() {
 
     val event get() = player.event
 
+    private var capabilities: List<Int> = emptyList()
+    private var notificationCapabilities: List<Int> = emptyList()
+    private var compactCapabilities: List<Int> = emptyList()
+
     fun setupPlayer(playerOptions: Bundle?, promise: Promise?) {
         val bufferOptions = BufferConfig(
-            minBuffer = playerOptions?.getDouble(MIN_BUFFER_KEY)?.toInt(),
-            maxBuffer = playerOptions?.getDouble(MAX_BUFFER_KEY)?.toInt(),
-            playBuffer = playerOptions?.getDouble(PLAY_BUFFER_KEY)?.toInt(),
-            backBuffer = playerOptions?.getDouble(BACK_BUFFER_KEY)?.toInt()
+            playerOptions?.getDouble(MIN_BUFFER_KEY)?.toInt(),
+            playerOptions?.getDouble(MAX_BUFFER_KEY)?.toInt(),
+            playerOptions?.getDouble(PLAY_BUFFER_KEY)?.toInt(),
+            playerOptions?.getDouble(BACK_BUFFER_KEY)?.toInt()
             //TODO: Ignored maxCacheSize and autoUpdateMetadata. Do we need them?
         )
 
@@ -85,37 +80,53 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     fun updateOptions(options: Bundle) {
-        stopWithApp = options.getBoolean(STOP_WITH_APP)
-        player.playerOptions.alwaysPauseOnInterruption = options.getBoolean(PAUSE_ON_INTERRUPTION_KEY)
+        handler.post {
+            stopWithApp = options.getBoolean(STOP_WITH_APP)
+            player.playerOptions.alwaysPauseOnInterruption = options.getBoolean(PAUSE_ON_INTERRUPTION_KEY)
 
-        val capabilities: List<Int> = options.getIntegerArrayList("capabilities") ?: emptyList()
-        var notification: List<Int> = options.getIntegerArrayList("notificationCapabilities") ?: emptyList()
-        val compact: List<Int> = options.getIntegerArrayList("compactCapabilities") ?: emptyList()
+            capabilities = options.getIntegerArrayList("capabilities") ?: emptyList()
+            notificationCapabilities = options.getIntegerArrayList("notificationCapabilities") ?: emptyList()
+            compactCapabilities = options.getIntegerArrayList("compactCapabilities") ?: emptyList()
 
-        if (notification.isEmpty()) notification = capabilities
+            if (notificationCapabilities.isEmpty()) notificationCapabilities = capabilities
 
 //        val previousAction = createAction(notification, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS, "Previous",
 //            getIcon(options, "previousIcon", R.drawable.previous))
 //        val rewindAction = createAction(notification, PlaybackStateCompat.ACTION_REWIND, "Rewind",
 //            getIcon(options, "rewindIcon", R.drawable.rewind))
-        val playAction = createAction(notification, PlaybackStateCompat.ACTION_PLAY, "Play",
-            getIcon(options, "playIcon", R.drawable.play), NotificationActionType.ACTION_PLAY)
-//        val pauseAction = createAction(notification, PlaybackStateCompat.ACTION_PAUSE, "Pause",
-//            getIcon(options, "pauseIcon", R.drawable.pause))
+//            val playPauseAction = if (player.isPlaying) {
+//                createAction(notification, PlaybackStateCompat.ACTION_PLAY, "Play",
+//                    getIcon(options, "playIcon", R.drawable.play), NotificationActionType.ACTION_PLAY)
+//            } else {
+//                createAction(notification, PlaybackStateCompat.ACTION_PAUSE, "Play",
+//                    getIcon(options, "playIcon", R.drawable.pause), NotificationActionType.ACTION_PLAY)
+//            }
+//            val playPauseAction = if (isSupportedCapability(Capability.PLAY)) NotificationAction.createPlayPauseAction(player) else error("Play action is not a supported capability")
+//            val pauseAction = createAction(notification, PlaybackStateCompat.ACTION_PAUSE, "Pause",
+//                getIcon(options, "pauseIcon", R.drawable.pause), NotificationActionType.CUSTOM("asdasd"))
 //        val stopAction = createAction(notification, PlaybackStateCompat.ACTION_STOP, "Stop",
 //            getIcon(options, "stopIcon", R.drawable.stop))
 //        val forwardAction = createAction(notification, PlaybackStateCompat.ACTION_FAST_FORWARD, "Forward",
-//            getIcon(options, "forwardIcon", R.drawable.forward))
-        val nextAction = createAction(notification, PlaybackStateCompat.ACTION_SKIP_TO_NEXT, "Next",
-            getIcon(options, "nedxtIcon", android.R.drawable.sym_def_app_icon), NotificationActionType.CUSTOM("test"))
+//            getIcon(options, "forwardIcon", R.drawable.forward), NotificationActionType.CUSTOM("asdas"))
+            val nextAction = createAction(notificationCapabilities, PlaybackStateCompat.ACTION_SKIP_TO_NEXT, "Next",
+                getIcon(options, "nextIcon", R.drawable.stop), NotificationActionType.CUSTOM("test"))
 
 //        player.notificationOptions.actions = listOf(previousAction, rewindAction, playAction, pauseAction, stopAction, forwardAction, nextAction)
-        player.notificationOptions.actions = listOf(playAction, nextAction)
+//            player.notificationOptions.actions = listOf(playPauseAction)
+        }
     }
+//
+//    private fun isSupportedCapability(capability: Capability): Boolean {
+////        return if (!capabilities.contains(capability.ordinal)) error("Action $capability is not a support capability")
+////        else true
+//
+//        return true
+//    }
 
     private fun createAction(capabilities: List<Int>, action: Long, title: String, icon: Int, type: NotificationActionType, isCompact: Boolean = false): NotificationAction {
         return if (!capabilities.contains(action.toInt())) error("Action $title is not a support capability")
-        else NotificationAction(NotificationCompat.Action(icon, title, MediaButtonReceiver.buildMediaButtonPendingIntent(this, action)), type , isCompact)
+//        else NotificationAction(NotificationCompat.Action(icon, title, MediaButtonReceiver.buildMediaButtonPendingIntent(this, action)), type , isCompact)
+        else NotificationAction(title, icon, type, isCompact)
     }
 
     private fun getIcon(options: Bundle, propertyName: String, defaultIcon: Int): Int {
@@ -204,24 +215,22 @@ class MusicService : HeadlessJsTaskService() {
 
                 when (it) {
                     AudioPlayerState.PLAYING -> {
-                        bundle.putInt(STATE_KEY, it.asLibState.value)
+                        bundle.putInt(STATE_KEY, State.Playing.value)
                         emit(MusicEvents.BUTTON_PLAY, null)
                     }
                     AudioPlayerState.PAUSED -> {
-                        bundle.putInt(STATE_KEY, it.asLibState.value)
+                        bundle.putInt(STATE_KEY, State.Paused.value)
                         emit(MusicEvents.BUTTON_PAUSE, null)
                     }
-                    AudioPlayerState.READY, AudioPlayerState.IDLE, AudioPlayerState.BUFFERING -> {
-                        bundle.putInt(STATE_KEY, it.asLibState.value)
+                    AudioPlayerState.READY, AudioPlayerState.IDLE -> {
+                        bundle.putInt(STATE_KEY, State.Ready.value)
+                    }
+                    AudioPlayerState.BUFFERING -> {
+                        bundle.putInt(STATE_KEY, State.Buffering.value)
                     }
                     AudioPlayerState.ENDED -> {
-                        bundle.putInt(STATE_KEY, it.asLibState.value)
-
                         if (player.nextItem == null) {
-                            if (player.previousIndex != null) bundle.putInt(
-                                TRACK_KEY,
-                                player.previousIndex!!
-                            )
+                            if (player.previousIndex != null) bundle.putInt(TRACK_KEY, player.previousIndex!!)
                             emit(MusicEvents.PLAYBACK_QUEUE_ENDED, null)
                         }
                     }
@@ -230,7 +239,6 @@ class MusicService : HeadlessJsTaskService() {
                 emit(MusicEvents.PLAYBACK_STATE, bundle)
             }
         }
-
 
         serviceScope.launch {
             event.audioItemTransition.collect {
@@ -254,13 +262,36 @@ class MusicService : HeadlessJsTaskService() {
             }
         }
 
+//        serviceScope.launch {
+//            event.onNotificationAction.collect {
+//                when (it) {
+//                    NotificationActionType.CUSTOM("test") -> {
+//                        Log.d("TEST", "test")
+//                    }
+//
+//                    player.notificationOptions.actions = listOf(playAction, nextAction)
+//                }
+//            }
+//        }
+
         serviceScope.launch {
             event.onNotificationAction.collect {
-                when (it) {
-                    NotificationActionType.CUSTOM("test") -> {
-                        Log.d("TEST", "test")
-                    }
-                }
+                val actions = mutableListOf<NotificationAction>()
+//                when (it) {
+//                    NotificationActionType.CUSTOM("test") -> {
+//                        Log.d("TEST", "test")
+//                    }
+//                }
+//                when (it) {
+//                    NotificationActionType.ACTION_PLAY, NotificationActionType.ACTION_PAUSE -> {
+//                        player.togglePlaying()
+//                        actions.add(NotificationAction.createPlayPauseAction(player))
+//                    }
+//                }
+//                val playPauseAction = if (isSupportedCapability(capabilities, Capability.PLAY)) NotificationAction.createPlayPauseAction(player) else null
+
+
+                player.notificationOptions.actions = actions
             }
         }
     }
