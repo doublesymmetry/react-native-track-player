@@ -11,6 +11,14 @@ module.exports = async function setup() {
     TrackPlayer.play();
   });
 
+  TrackPlayer.addEventListener(Event.RemoteNext, () => {
+    TrackPlayer.skipToNext();
+  });
+
+  TrackPlayer.addEventListener(Event.RemotePrevious, () => {
+    TrackPlayer.skipToPrevious();
+  });
+
   TrackPlayer.addEventListener(Event.RemoteDuck, async e => {
     if (e.permanent === true) {
       TrackPlayer.stop();
@@ -27,4 +35,4 @@ module.exports = async function setup() {
       }
     }
   });
-}
+};
