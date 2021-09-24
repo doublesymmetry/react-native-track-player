@@ -20,10 +20,7 @@ import com.guichaguri.trackplayer.service.MusicManager;
 import com.guichaguri.trackplayer.service.Utils;
 import com.guichaguri.trackplayer.service.models.Track;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Guichaguri
@@ -36,8 +33,9 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     private ConcatenatingMediaSource source;
     private boolean prepared = false;
 
-    public LocalPlayback(Context context, MusicManager manager, SimpleExoPlayer player, long maxCacheSize) {
-        super(context, manager, player);
+    public LocalPlayback(Context context, MusicManager manager, SimpleExoPlayer player, long maxCacheSize,
+                         boolean autoUpdateMetadata) {
+        super(context, manager, player, autoUpdateMetadata);
         this.cacheMaxSize = maxCacheSize;
     }
 
@@ -74,7 +72,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
     public void add(Track track, int index, Promise promise) {
         queue.add(index, track);
         MediaSource trackSource = track.toMediaSource(context, this);
-        source.addMediaSource(index, trackSource, manager.getHandler(), Utils.toRunnable(promise));
+        source.addMediaSource(index, trackSource, manager.getHandler(), () -> promise.resolve(index));
 
         prepare();
     }
@@ -88,7 +86,7 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
         }
 
         queue.addAll(index, tracks);
-        source.addMediaSources(index, trackList, manager.getHandler(), Utils.toRunnable(promise));
+        source.addMediaSources(index, trackList, manager.getHandler(), () -> promise.resolve(index));
 
         prepare();
     }
@@ -136,6 +134,15 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
         }
     }
 
+    @Override
+    public void setRepeatMode(int repeatMode) {
+        player.setRepeatMode(repeatMode);
+    }
+
+    public int getRepeatMode() {
+        return player.getRepeatMode();
+    }
+
     private void resetQueue() {
         queue.clear();
 
@@ -169,13 +176,13 @@ public class LocalPlayback extends ExoPlayback<SimpleExoPlayer> {
 
     @Override
     public void reset() {
-        Track track = getCurrentTrack();
+        Integer track = getCurrentTrackIndex();
         long position = player.getCurrentPosition();
 
         super.reset();
         resetQueue();
 
-        manager.onTrackUpdate(track, position, null);
+        manager.onTrackUpdate(track, position, null, null);
     }
 
     @Override

@@ -45,7 +45,7 @@ permalink: /platform-support/
 | Caching | ✓ | ✗ | ✗ |
 | Background Mode¹ | ✓ | ✓ | ✓ |
 
-¹: Read more in [Background Mode](https://react-native-kit.github.io/react-native-track-player/background/)
+¹: Read more in [Background Mode](https://react-native-track-player.js.org/react-native-track-player/background/)
 
 ## Functions
 
@@ -95,9 +95,9 @@ permalink: /platform-support/
 | `remote-set-rating` | ✓ | ✗ | ✗ |
 | `remote-jump-forward` | ✓ | ✓ | ✓ |
 | `remote-jump-backward` | ✓ | ✓ | ✓ |
-| `remote-duck` | ✓ | ✗ | ✗ |
+| `remote-duck` | ✓ | ✓ | ✗ |
 | `playback-state` | ✓ | ✓ | ✓ |
 | `playback-track-changed` | ✓ | ✓ | ✓ |
 | `playback-queue-ended` | ✓ | ✓ | ✓ |
 | `playback-error` | ✓ | ✓ | ✓ |
-| `playback-metadata-received` | ✓ | ✗ | ✗ |
+| `playback-metadata-received` | ✓ | ✓ | ✗ |

@@ -1,35 +1,30 @@
+import TrackPlayer, {Event, State} from 'react-native-track-player';
 
-/**
- * This is the code that will run tied to the player.
- *
- * The code here might keep running in the background.
- *
- * You should put everything here that should be tied to the playback but not the UI
- * such as processing media buttons or analytics
- */
+let wasPausedByDuck = false;
 
-import TrackPlayer from 'react-native-track-player';
-
-module.exports = async function() {
-
-  TrackPlayer.addEventListener('remote-play', () => {
-    TrackPlayer.play()
-  })
-
-  TrackPlayer.addEventListener('remote-pause', () => {
-    TrackPlayer.pause()
+module.exports = async function setup() {
+  TrackPlayer.addEventListener(Event.RemotePause, () => {
+    TrackPlayer.pause();
   });
 
-  TrackPlayer.addEventListener('remote-next', () => {
-    TrackPlayer.skipToNext()
+  TrackPlayer.addEventListener(Event.RemotePlay, () => {
+    TrackPlayer.play();
   });
 
-  TrackPlayer.addEventListener('remote-previous', () => {
-    TrackPlayer.skipToPrevious()
+  TrackPlayer.addEventListener(Event.RemoteDuck, async e => {
+    if (e.permanent === true) {
+      TrackPlayer.stop();
+    } else {
+      if (e.paused === true) {
+        const playerState = await TrackPlayer.getState();
+        wasPausedByDuck = playerState !== State.Paused;
+        TrackPlayer.pause();
+      } else {
+        if (wasPausedByDuck === true) {
+          TrackPlayer.play();
+          wasPausedByDuck = false;
+        }
+      }
+    }
   });
-
-  TrackPlayer.addEventListener('remote-stop', () => {
-    TrackPlayer.destroy()
-  });
-
-};
+}

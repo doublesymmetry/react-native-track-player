@@ -90,11 +90,11 @@ public class ButtonEvents extends MediaSessionCompat.Callback {
     public void onSkipToQueueItem(long id) {
         List<Track> tracks = manager.getPlayback().getQueue();
 
-        for(Track track : tracks) {
-            if(track.queueId != id) continue;
+        for(int i = 0; i < tracks.size(); i++) {
+            if(tracks.get(i).queueId != id) continue;
 
             Bundle bundle = new Bundle();
-            bundle.putString("id", track.id);
+            bundle.putInt("index", i);
             service.emit(MusicEvents.BUTTON_SKIP, bundle);
             break;
         }
@@ -113,14 +113,14 @@ public class ButtonEvents extends MediaSessionCompat.Callback {
     @Override
     public void onRewind() {
         Bundle bundle = new Bundle();
-        bundle.putInt("interval", manager.getMetadata().getJumpInterval());
+        bundle.putInt("interval", manager.getMetadata().getBackwardJumpInterval());
         service.emit(MusicEvents.BUTTON_JUMP_BACKWARD, bundle);
     }
 
     @Override
     public void onFastForward() {
         Bundle bundle = new Bundle();
-        bundle.putInt("interval", manager.getMetadata().getJumpInterval());
+        bundle.putInt("interval", manager.getMetadata().getForwardJumpInterval());
         service.emit(MusicEvents.BUTTON_JUMP_FORWARD, bundle);
     }
 

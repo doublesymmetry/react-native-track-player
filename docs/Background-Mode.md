@@ -20,7 +20,7 @@ TrackPlayer.updateOptions({
 });
 ```
 
-Please note that while your app is in background, your UI might be unmounted by React Native. Event listeners added in the [playback service](https://react-native-kit.github.io/react-native-track-player/api/#playback-service) will continue to receive events.
+Please note that while your app is in background, your UI might be unmounted by React Native. Event listeners added in the [playback service](https://react-native-track-player.js.org/react-native-track-player/api/#playback-service) will continue to receive events.
 
 ### Notification
 The notification will be visible as long as the playback service runs. Your app will be opened when it is clicked. You can implement a custom initialization (e.g.: opening directly the player UI) by using the [Linking API](https://facebook.github.io/react-native/docs/linking) looking for the `trackplayer://notification.click` URI.

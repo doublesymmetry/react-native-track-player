@@ -15,32 +15,7 @@
 		9B78A2461F3F12BC002B5E3C /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B78A2451F3F12BC002B5E3C /* Track.swift */; };
 		9B78A2481F3F12C9002B5E3C /* MediaURL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B78A2471F3F12C9002B5E3C /* MediaURL.swift */; };
 		9BFC1FDD1F61A8E8008795BF /* Capabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC1FDC1F61A8E8008795BF /* Capabilities.swift */; };
-		BF1CBBAC2450E5C5007C339D /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBB8C2450E5C5007C339D /* AudioPlayer.swift */; };
-		BF1CBBAD2450E5C5007C339D /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBB8D2450E5C5007C339D /* Event.swift */; };
-		BF1CBBAE2450E5C5007C339D /* APError.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBB8E2450E5C5007C339D /* APError.swift */; };
-		BF1CBBAF2450E5C5007C339D /* TimeEventFrequency.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBB8F2450E5C5007C339D /* TimeEventFrequency.swift */; };
-		BF1CBBB02450E5C5007C339D /* AVPlayerObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBB912450E5C5007C339D /* AVPlayerObserver.swift */; };
-		BF1CBBB12450E5C5007C339D /* AVPlayerItemNotificationObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBB922450E5C5007C339D /* AVPlayerItemNotificationObserver.swift */; };
-		BF1CBBB22450E5C5007C339D /* AVPlayerItemObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBB932450E5C5007C339D /* AVPlayerItemObserver.swift */; };
-		BF1CBBB32450E5C5007C339D /* AVPlayerTimeObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBB942450E5C5007C339D /* AVPlayerTimeObserver.swift */; };
-		BF1CBBB42450E5C5007C339D /* QueueManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBB952450E5C5007C339D /* QueueManager.swift */; };
-		BF1CBBB52450E5C5007C339D /* AudioSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBB972450E5C5007C339D /* AudioSession.swift */; };
-		BF1CBBB62450E5C5007C339D /* AudioSessionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBB982450E5C5007C339D /* AudioSessionController.swift */; };
-		BF1CBBB72450E5C5007C339D /* AudioItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBB992450E5C5007C339D /* AudioItem.swift */; };
-		BF1CBBB82450E5C5007C339D /* RemoteCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBB9B2450E5C5007C339D /* RemoteCommand.swift */; };
-		BF1CBBB92450E5C5007C339D /* RemoteCommandController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBB9C2450E5C5007C339D /* RemoteCommandController.swift */; };
-		BF1CBBBA2450E5C5007C339D /* MediaItemProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBB9E2450E5C5007C339D /* MediaItemProperty.swift */; };
-		BF1CBBBB2450E5C5007C339D /* NowPlayingInfoController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBB9F2450E5C5007C339D /* NowPlayingInfoController.swift */; };
-		BF1CBBBC2450E5C5007C339D /* NowPlayingInfoKeyValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBBA02450E5C5007C339D /* NowPlayingInfoKeyValue.swift */; };
-		BF1CBBBD2450E5C5007C339D /* NowPlayingInfoControllerProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBBA12450E5C5007C339D /* NowPlayingInfoControllerProtocol.swift */; };
-		BF1CBBBE2450E5C5007C339D /* NowPlayingInfoProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBBA22450E5C5007C339D /* NowPlayingInfoProperty.swift */; };
-		BF1CBBBF2450E5C5007C339D /* NowPlayingInfoCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBBA32450E5C5007C339D /* NowPlayingInfoCenter.swift */; };
-		BF1CBBC02450E5C5007C339D /* QueuedAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBBA42450E5C5007C339D /* QueuedAudioPlayer.swift */; };
-		BF1CBBC12450E5C5007C339D /* AVPlayerWrapperState.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBBA62450E5C5007C339D /* AVPlayerWrapperState.swift */; };
-		BF1CBBC22450E5C5007C339D /* AVPlayerWrapperProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBBA72450E5C5007C339D /* AVPlayerWrapperProtocol.swift */; };
-		BF1CBBC32450E5C5007C339D /* AVPlayerWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBBA82450E5C5007C339D /* AVPlayerWrapper.swift */; };
-		BF1CBBC42450E5C5007C339D /* AVPlayerWrapperDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBBA92450E5C5007C339D /* AVPlayerWrapperDelegate.swift */; };
-		BF1CBE4A24535109007C339D /* RNTrackPlayerAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1CBE4924535108007C339D /* RNTrackPlayerAudioPlayer.swift */; };
+		BF227390244F344D00A9893D /* Metadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B70466422BFFDEE00065A77 /* Metadata.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -63,37 +38,11 @@
 		9B0E282D1F07D76F00B71D2A /* RNTrackPlayerBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNTrackPlayerBridge.m; sourceTree = "<group>"; };
 		9B18C2F9226356560019375A /* SessionCategories.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionCategories.swift; sourceTree = "<group>"; };
 		9B58DF3A1F40C0F000C2105E /* RNTrackPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNTrackPlayer.swift; sourceTree = "<group>"; };
+		9B70466422BFFDEE00065A77 /* Metadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Metadata.swift; sourceTree = "<group>"; };
 		9B78A2451F3F12BC002B5E3C /* Track.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
 		9B78A2471F3F12C9002B5E3C /* MediaURL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaURL.swift; sourceTree = "<group>"; };
 		9BFBA4D01F3DFA3F00453D3A /* RNTrackPlayer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNTrackPlayer-Bridging-Header.h"; sourceTree = "<group>"; };
 		9BFC1FDC1F61A8E8008795BF /* Capabilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Capabilities.swift; sourceTree = "<group>"; };
-		BF1CBB8C2450E5C5007C339D /* AudioPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioPlayer.swift; sourceTree = "<group>"; };
-		BF1CBB8D2450E5C5007C339D /* Event.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
-		BF1CBB8E2450E5C5007C339D /* APError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APError.swift; sourceTree = "<group>"; };
-		BF1CBB8F2450E5C5007C339D /* TimeEventFrequency.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeEventFrequency.swift; sourceTree = "<group>"; };
-		BF1CBB912450E5C5007C339D /* AVPlayerObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVPlayerObserver.swift; sourceTree = "<group>"; };
-		BF1CBB922450E5C5007C339D /* AVPlayerItemNotificationObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVPlayerItemNotificationObserver.swift; sourceTree = "<group>"; };
-		BF1CBB932450E5C5007C339D /* AVPlayerItemObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVPlayerItemObserver.swift; sourceTree = "<group>"; };
-		BF1CBB942450E5C5007C339D /* AVPlayerTimeObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVPlayerTimeObserver.swift; sourceTree = "<group>"; };
-		BF1CBB952450E5C5007C339D /* QueueManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QueueManager.swift; sourceTree = "<group>"; };
-		BF1CBB972450E5C5007C339D /* AudioSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioSession.swift; sourceTree = "<group>"; };
-		BF1CBB982450E5C5007C339D /* AudioSessionController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioSessionController.swift; sourceTree = "<group>"; };
-		BF1CBB992450E5C5007C339D /* AudioItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioItem.swift; sourceTree = "<group>"; };
-		BF1CBB9B2450E5C5007C339D /* RemoteCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteCommand.swift; sourceTree = "<group>"; };
-		BF1CBB9C2450E5C5007C339D /* RemoteCommandController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteCommandController.swift; sourceTree = "<group>"; };
-		BF1CBB9E2450E5C5007C339D /* MediaItemProperty.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaItemProperty.swift; sourceTree = "<group>"; };
-		BF1CBB9F2450E5C5007C339D /* NowPlayingInfoController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NowPlayingInfoController.swift; sourceTree = "<group>"; };
-		BF1CBBA02450E5C5007C339D /* NowPlayingInfoKeyValue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NowPlayingInfoKeyValue.swift; sourceTree = "<group>"; };
-		BF1CBBA12450E5C5007C339D /* NowPlayingInfoControllerProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NowPlayingInfoControllerProtocol.swift; sourceTree = "<group>"; };
-		BF1CBBA22450E5C5007C339D /* NowPlayingInfoProperty.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NowPlayingInfoProperty.swift; sourceTree = "<group>"; };
-		BF1CBBA32450E5C5007C339D /* NowPlayingInfoCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NowPlayingInfoCenter.swift; sourceTree = "<group>"; };
-		BF1CBBA42450E5C5007C339D /* QueuedAudioPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QueuedAudioPlayer.swift; sourceTree = "<group>"; };
-		BF1CBBA62450E5C5007C339D /* AVPlayerWrapperState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVPlayerWrapperState.swift; sourceTree = "<group>"; };
-		BF1CBBA72450E5C5007C339D /* AVPlayerWrapperProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVPlayerWrapperProtocol.swift; sourceTree = "<group>"; };
-		BF1CBBA82450E5C5007C339D /* AVPlayerWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVPlayerWrapper.swift; sourceTree = "<group>"; };
-		BF1CBBA92450E5C5007C339D /* AVPlayerWrapperDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVPlayerWrapperDelegate.swift; sourceTree = "<group>"; };
-		BF1CBBAB2450E5C5007C339D /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		BF1CBE4924535108007C339D /* RNTrackPlayerAudioPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNTrackPlayerAudioPlayer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,13 +75,12 @@
 		9B0E282B1F07D76F00B71D2A /* RNTrackPlayer */ = {
 			isa = PBXGroup;
 			children = (
+				9B70466322BFFDDD00065A77 /* Utils */,
 				9BFBA4D31F3DFA4B00453D3A /* Support */,
 				9B0E287A1F0831A400B71D2A /* Models */,
 				9B0E282C1F07D76F00B71D2A /* RNTrackPlayerBridge.h */,
 				9B0E282D1F07D76F00B71D2A /* RNTrackPlayerBridge.m */,
 				9B58DF3A1F40C0F000C2105E /* RNTrackPlayer.swift */,
-				BF1CBE4924535108007C339D /* RNTrackPlayerAudioPlayer.swift */,
-				BF1CBB892450E5C5007C339D /* Vendor */,
 			);
 			path = RNTrackPlayer;
 			sourceTree = "<group>";
@@ -149,109 +97,20 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		9B70466322BFFDDD00065A77 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				9B70466422BFFDEE00065A77 /* Metadata.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
 		9BFBA4D31F3DFA4B00453D3A /* Support */ = {
 			isa = PBXGroup;
 			children = (
 				9BFBA4D01F3DFA3F00453D3A /* RNTrackPlayer-Bridging-Header.h */,
 			);
 			path = Support;
-			sourceTree = "<group>";
-		};
-		BF1CBB892450E5C5007C339D /* Vendor */ = {
-			isa = PBXGroup;
-			children = (
-				BF1CBB8A2450E5C5007C339D /* SwiftAudio */,
-				BF1CBBAB2450E5C5007C339D /* README.md */,
-			);
-			path = Vendor;
-			sourceTree = "<group>";
-		};
-		BF1CBB8A2450E5C5007C339D /* SwiftAudio */ = {
-			isa = PBXGroup;
-			children = (
-				BF1CBB8B2450E5C5007C339D /* Classes */,
-				BF1CBBAA2450E5C5007C339D /* Assets */,
-			);
-			path = SwiftAudio;
-			sourceTree = "<group>";
-		};
-		BF1CBB8B2450E5C5007C339D /* Classes */ = {
-			isa = PBXGroup;
-			children = (
-				BF1CBB8C2450E5C5007C339D /* AudioPlayer.swift */,
-				BF1CBB8D2450E5C5007C339D /* Event.swift */,
-				BF1CBB8E2450E5C5007C339D /* APError.swift */,
-				BF1CBB8F2450E5C5007C339D /* TimeEventFrequency.swift */,
-				BF1CBB902450E5C5007C339D /* Observer */,
-				BF1CBB952450E5C5007C339D /* QueueManager.swift */,
-				BF1CBB962450E5C5007C339D /* AudioSessionController */,
-				BF1CBB992450E5C5007C339D /* AudioItem.swift */,
-				BF1CBB9A2450E5C5007C339D /* RemoteCommandController */,
-				BF1CBB9D2450E5C5007C339D /* NowPlayingInfoController */,
-				BF1CBBA42450E5C5007C339D /* QueuedAudioPlayer.swift */,
-				BF1CBBA52450E5C5007C339D /* AVPlayerWrapper */,
-			);
-			path = Classes;
-			sourceTree = "<group>";
-		};
-		BF1CBB902450E5C5007C339D /* Observer */ = {
-			isa = PBXGroup;
-			children = (
-				BF1CBB912450E5C5007C339D /* AVPlayerObserver.swift */,
-				BF1CBB922450E5C5007C339D /* AVPlayerItemNotificationObserver.swift */,
-				BF1CBB932450E5C5007C339D /* AVPlayerItemObserver.swift */,
-				BF1CBB942450E5C5007C339D /* AVPlayerTimeObserver.swift */,
-			);
-			path = Observer;
-			sourceTree = "<group>";
-		};
-		BF1CBB962450E5C5007C339D /* AudioSessionController */ = {
-			isa = PBXGroup;
-			children = (
-				BF1CBB972450E5C5007C339D /* AudioSession.swift */,
-				BF1CBB982450E5C5007C339D /* AudioSessionController.swift */,
-			);
-			path = AudioSessionController;
-			sourceTree = "<group>";
-		};
-		BF1CBB9A2450E5C5007C339D /* RemoteCommandController */ = {
-			isa = PBXGroup;
-			children = (
-				BF1CBB9B2450E5C5007C339D /* RemoteCommand.swift */,
-				BF1CBB9C2450E5C5007C339D /* RemoteCommandController.swift */,
-			);
-			path = RemoteCommandController;
-			sourceTree = "<group>";
-		};
-		BF1CBB9D2450E5C5007C339D /* NowPlayingInfoController */ = {
-			isa = PBXGroup;
-			children = (
-				BF1CBB9E2450E5C5007C339D /* MediaItemProperty.swift */,
-				BF1CBB9F2450E5C5007C339D /* NowPlayingInfoController.swift */,
-				BF1CBBA02450E5C5007C339D /* NowPlayingInfoKeyValue.swift */,
-				BF1CBBA12450E5C5007C339D /* NowPlayingInfoControllerProtocol.swift */,
-				BF1CBBA22450E5C5007C339D /* NowPlayingInfoProperty.swift */,
-				BF1CBBA32450E5C5007C339D /* NowPlayingInfoCenter.swift */,
-			);
-			path = NowPlayingInfoController;
-			sourceTree = "<group>";
-		};
-		BF1CBBA52450E5C5007C339D /* AVPlayerWrapper */ = {
-			isa = PBXGroup;
-			children = (
-				BF1CBBA62450E5C5007C339D /* AVPlayerWrapperState.swift */,
-				BF1CBBA72450E5C5007C339D /* AVPlayerWrapperProtocol.swift */,
-				BF1CBBA82450E5C5007C339D /* AVPlayerWrapper.swift */,
-				BF1CBBA92450E5C5007C339D /* AVPlayerWrapperDelegate.swift */,
-			);
-			path = AVPlayerWrapper;
-			sourceTree = "<group>";
-		};
-		BF1CBBAA2450E5C5007C339D /* Assets */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Assets;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -311,39 +170,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BF1CBBC12450E5C5007C339D /* AVPlayerWrapperState.swift in Sources */,
-				BF1CBBB92450E5C5007C339D /* RemoteCommandController.swift in Sources */,
-				BF1CBBBC2450E5C5007C339D /* NowPlayingInfoKeyValue.swift in Sources */,
-				BF1CBBC32450E5C5007C339D /* AVPlayerWrapper.swift in Sources */,
 				9B0E282E1F07D76F00B71D2A /* RNTrackPlayerBridge.m in Sources */,
-				BF1CBBAD2450E5C5007C339D /* Event.swift in Sources */,
 				9B18C2FA226356560019375A /* SessionCategories.swift in Sources */,
-				BF1CBBBA2450E5C5007C339D /* MediaItemProperty.swift in Sources */,
-				BF1CBE4A24535109007C339D /* RNTrackPlayerAudioPlayer.swift in Sources */,
+				BF227390244F344D00A9893D /* Metadata.swift in Sources */,
 				9B78A2481F3F12C9002B5E3C /* MediaURL.swift in Sources */,
-				BF1CBBBB2450E5C5007C339D /* NowPlayingInfoController.swift in Sources */,
-				BF1CBBBE2450E5C5007C339D /* NowPlayingInfoProperty.swift in Sources */,
-				BF1CBBB72450E5C5007C339D /* AudioItem.swift in Sources */,
-				BF1CBBC02450E5C5007C339D /* QueuedAudioPlayer.swift in Sources */,
-				BF1CBBB52450E5C5007C339D /* AudioSession.swift in Sources */,
-				BF1CBBAC2450E5C5007C339D /* AudioPlayer.swift in Sources */,
-				BF1CBBB02450E5C5007C339D /* AVPlayerObserver.swift in Sources */,
-				BF1CBBAE2450E5C5007C339D /* APError.swift in Sources */,
-				BF1CBBAF2450E5C5007C339D /* TimeEventFrequency.swift in Sources */,
 				9BFC1FDD1F61A8E8008795BF /* Capabilities.swift in Sources */,
-				BF1CBBB32450E5C5007C339D /* AVPlayerTimeObserver.swift in Sources */,
 				9B78A2461F3F12BC002B5E3C /* Track.swift in Sources */,
-				BF1CBBBD2450E5C5007C339D /* NowPlayingInfoControllerProtocol.swift in Sources */,
-				BF1CBBB82450E5C5007C339D /* RemoteCommand.swift in Sources */,
 				9A0CF10E2046E5AC0093A5DF /* PitchAlgorithms.swift in Sources */,
-				BF1CBBC42450E5C5007C339D /* AVPlayerWrapperDelegate.swift in Sources */,
-				BF1CBBBF2450E5C5007C339D /* NowPlayingInfoCenter.swift in Sources */,
-				BF1CBBB62450E5C5007C339D /* AudioSessionController.swift in Sources */,
 				9B58DF3B1F40C0F000C2105E /* RNTrackPlayer.swift in Sources */,
-				BF1CBBB42450E5C5007C339D /* QueueManager.swift in Sources */,
-				BF1CBBC22450E5C5007C339D /* AVPlayerWrapperProtocol.swift in Sources */,
-				BF1CBBB22450E5C5007C339D /* AVPlayerItemObserver.swift in Sources */,
-				BF1CBBB12450E5C5007C339D /* AVPlayerItemNotificationObserver.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -400,7 +234,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
 		};
@@ -447,7 +281,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;

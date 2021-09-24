@@ -33,31 +33,58 @@ A fully fledged audio module created for music apps. Provides audio playback, ex
 
 ## Example
 
-If you want to get started with this module, check the [Getting Started](https://react-native-kit.github.io/react-native-track-player/api/) page.
-If you want detailed information about the API, check the [Documentation](https://react-native-kit.github.io/react-native-track-player/documentation/).
+If you want to get started with this module, check the [Getting Started](https://react-native-track-player.js.org/getting-started/) page.
+If you want detailed information about the API, check the [Documentation](https://react-native-track-player.js.org/react-native-track-player/documentation/).
 You can also look at our example project [here](https://github.com/react-native-kit/react-native-track-player/tree/master/example).
 
 ```javascript
-import TrackPlayer from 'react-native-track-player';
+import TrackPlayer, { RepeatMode } from 'react-native-track-player';
 
 // Creates the player
-TrackPlayer.setupPlayer().then(async () => {
+const setup = async () => {
+  await TrackPlayer.setupPlayer({});
 
-    // Adds a track to the queue
-    await TrackPlayer.add({
-        id: 'trackId',
-        url: require('track.mp3'),
-        title: 'Track Title',
-        artist: 'Track Artist',
-        artwork: require('track.png')
-    });
+  await TrackPlayer.add({
+    url: require('track.mp3'),
+    title: 'Track Title',
+    artist: 'Track Artist',
+    artwork: require('track.png')
+  });
 
-    // Starts playing it
-    TrackPlayer.play();
-
-});
+  TrackPlayer.setRepeatMode(RepeatMode.Queue);
+};
 ```
 
-## Maintainers
+## ⚠️ V2 Migration Guide
 
-[Guilherme Chaguri](https://github.com/Guichaguri), [Dustin Bahr](https://github.com/curiousdustin) and [David Chavez](https://github.com/dcvz)
+All queue methods have been updating to work on indexes instead of id's. We want this library to support all kinds of apps -- and moving to be index based will allow us to better support applications who have long/endless queues and in the future to allow us to build a performant API around queue management.
+
+When migrating from v1 to v2, the following methods have changed:
+
+```diff
+- async function add(tracks: Track | Track[], insertBeforeId?: string): Promise<void> {
++ async function add(tracks: Track | Track[], insertBeforeIndex?: number): Promise<void> {
+
+- async function remove(tracks: string | string[]): Promise<void> {
++ async function remove(tracks: number | number[]): Promise<void> {
+
+- async function skip(trackId: string): Promise<void> {
++ function skip(trackIndex: number): Promise<void> {
+
+- async function updateMetadataForTrack(trackId: string, metadata: TrackMetadataBase): Promise<void> {
++ async function updateMetadataForTrack(trackIndex: number, metadata: TrackMetadataBase): Promise<void> {
+
+- async function getTrack(trackId: string): Promise<Track> {
++ async function getTrack(trackIndex: number): Promise<Track> {
+
+- async function getCurrentTrack(): Promise<string> {
++ async function getCurrentTrack(): Promise<number> {
+```
+
+## Core Team
+
+[David Chavez](https://github.com/dcvz) under [Double Symmetry](https://doublesymmetry.com)
+
+## Special Thanks
+
+[Guilherme Chaguri](https://github.com/Guichaguri), [Dustin Bahr](https://github.com/curiousdustin)

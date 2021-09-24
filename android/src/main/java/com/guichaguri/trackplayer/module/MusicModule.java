@@ -13,9 +13,11 @@ import android.util.Log;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.facebook.react.bridge.*;
 import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.Player;
 import com.guichaguri.trackplayer.service.MusicBinder;
 import com.guichaguri.trackplayer.service.MusicService;
 import com.guichaguri.trackplayer.service.Utils;
+import com.guichaguri.trackplayer.service.models.NowPlayingMetadata;
 import com.guichaguri.trackplayer.service.models.Track;
 import com.guichaguri.trackplayer.service.player.ExoPlayback;
 
@@ -156,6 +158,11 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
         constants.put("RATING_5_STARS", RatingCompat.RATING_5_STARS);
         constants.put("RATING_PERCENTAGE", RatingCompat.RATING_PERCENTAGE);
 
+        // Repeat Modes
+        constants.put("REPEAT_OFF", Player.REPEAT_MODE_OFF);
+        constants.put("REPEAT_TRACK", Player.REPEAT_MODE_ONE);
+        constants.put("REPEAT_QUEUE", Player.REPEAT_MODE_ALL);
+
         return constants;
     }
 
@@ -197,7 +204,7 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void add(ReadableArray tracks, final String insertBeforeId, final Promise callback) {
+    public void add(ReadableArray tracks, final Integer insertBeforeIndex, final Promise callback) {
         final ArrayList bundleList = Arguments.toList(tracks);
 
         waitForConnection(() -> {
@@ -211,21 +218,11 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
             }
 
             List<Track> queue = binder.getPlayback().getQueue();
-            int index = -1;
+            // -1 means no index was passed and therefore should be inserted at the end.
+            int index = insertBeforeIndex != -1 ? insertBeforeIndex : queue.size();
 
-            if(insertBeforeId != null) {
-                for(int i = 0; i < queue.size(); i++) {
-                    if(queue.get(i).id.equals(insertBeforeId)) {
-                        index = i;
-                        break;
-                    }
-                }
-            } else {
-                index = queue.size();
-            }
-
-            if(index == -1) {
-                callback.reject("track_not_in_queue", "Given track ID was not found in queue");
+            if(index < 0 || index > queue.size()) {
+                callback.reject("index_out_of_bounds", "The track index is out of bounds");
             } else if(trackList == null || trackList.isEmpty()) {
                 callback.reject("invalid_track_object", "Track is missing a required key");
             } else if(trackList.size() == 1) {
@@ -245,13 +242,14 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
             List<Integer> indexes = new ArrayList<>();
 
             for(Object o : trackList) {
-                String id = o.toString();
+                int index = o instanceof Integer ? (int)o : Integer.parseInt(o.toString());
 
-                for(int i = 0; i < queue.size(); i++) {
-                    if(queue.get(i).id.equals(id)) {
-                        indexes.add(i);
-                        break;
-                    }
+                // we do not allow removal of the current item
+                int currentIndex = binder.getPlayback().getCurrentTrackIndex();
+                if (index == currentIndex) continue;
+
+                if (index >= 0 && index < queue.size()) {
+                    indexes.add(index);
                 }
             }
 
@@ -264,29 +262,38 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void updateMetadataForTrack(String id, ReadableMap map, final Promise callback) {
+    public void updateMetadataForTrack(int index, ReadableMap map, final Promise callback) {
         waitForConnection(() -> {
             ExoPlayback playback = binder.getPlayback();
             List<Track> queue = playback.getQueue();
-            Track track = null;
-            int index = -1;
 
-            for(int i = 0; i < queue.size(); i++) {
-                track = queue.get(i);
-
-                if(track.id.equals(id)) {
-                    index = i;
-                    break;
-                }
-            }
-
-            if(index == -1) {
-                callback.reject("track_not_in_queue", "No track found");
+            if(index < 0 || index >= queue.size()) {
+                callback.reject("index_out_of_bounds", "The index is out of bounds");
             } else {
+                Track track = queue.get(index);
                 track.setMetadata(getReactApplicationContext(), Arguments.toBundle(map), binder.getRatingType());
                 playback.updateTrack(index, track);
                 callback.resolve(null);
             }
+        });
+    }
+
+    @ReactMethod
+    public void updateNowPlayingMetadata(ReadableMap map, final Promise callback) {
+        final Bundle data = Arguments.toBundle(map);
+
+        waitForConnection(() -> {
+            NowPlayingMetadata metadata = new NowPlayingMetadata(getReactApplicationContext(), data, binder.getRatingType());
+            binder.updateNowPlayingMetadata(metadata);
+            callback.resolve(null);
+        });
+    }
+
+    @ReactMethod
+    public void clearNowPlayingMetadata(final Promise callback) {
+        waitForConnection(() -> {
+            binder.clearNowPlayingMetadata();
+            callback.resolve(null);
         });
     }
 
@@ -299,8 +306,8 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void skip(final String track, final Promise callback) {
-        waitForConnection(() -> binder.getPlayback().skip(track, callback));
+    public void skip(final int index, final Promise callback) {
+        waitForConnection(() -> binder.getPlayback().skip(index, callback));
     }
 
     @ReactMethod
@@ -381,18 +388,28 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
     }
 
     @ReactMethod
-    public void getTrack(final String id, final Promise callback) {
+    public void setRepeatMode(int mode, final Promise callback) {
+        waitForConnection(() -> {
+            binder.getPlayback().setRepeatMode(mode);
+            callback.resolve(null);
+        });
+    }
+
+    @ReactMethod
+    public void getRepeatMode(final Promise callback) {
+        waitForConnection(() -> callback.resolve(binder.getPlayback().getRepeatMode()));
+    }
+
+    @ReactMethod
+    public void getTrack(final int index, final Promise callback) {
         waitForConnection(() -> {
             List<Track> tracks = binder.getPlayback().getQueue();
 
-            for(Track track : tracks) {
-                if(track.id.equals(id)) {
-                    callback.resolve(Arguments.fromBundle(track.originalItem));
-                    return;
-                }
+            if (index >= 0 && index < tracks.size()) {
+                callback.resolve(Arguments.fromBundle(tracks.get(index).originalItem));
+            } else {
+                callback.resolve(null);
             }
-
-            callback.resolve(null);
         });
     }
 
@@ -412,15 +429,7 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @ReactMethod
     public void getCurrentTrack(final Promise callback) {
-        waitForConnection(() -> {
-            Track track = binder.getPlayback().getCurrentTrack();
-
-            if(track == null) {
-                callback.resolve(null);
-            } else {
-                callback.resolve(track.id);
-            }
-        });
+        waitForConnection(() -> callback.resolve(binder.getPlayback().getCurrentTrackIndex()));
     }
 
     @ReactMethod
@@ -464,6 +473,10 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
 
     @ReactMethod
     public void getState(final Promise callback) {
-        waitForConnection(() -> callback.resolve(binder.getPlayback().getState()));
+        if (binder == null) {
+            callback.resolve(PlaybackStateCompat.STATE_NONE);
+        } else {
+            waitForConnection(() -> callback.resolve(binder.getPlayback().getState()));
+        }
     }
 }

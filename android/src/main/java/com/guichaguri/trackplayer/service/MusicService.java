@@ -118,7 +118,7 @@ public class MusicService extends HeadlessJsTaskService {
         String channel = Utils.getNotificationChannel((Context) this);
         startForeground(1, new NotificationCompat.Builder(this, channel).build());
     }
-    
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -132,7 +132,7 @@ public class MusicService extends HeadlessJsTaskService {
         super.onTaskRemoved(rootIntent);
 
         if (manager == null || manager.shouldStopWithApp()) {
-            if (manager != null) {
+            if (manager != null && manager.getPlayback() != null) {
                 manager.getPlayback().stop();
             }
             destroy();

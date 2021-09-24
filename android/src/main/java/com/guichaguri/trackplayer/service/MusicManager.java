@@ -115,6 +115,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
     }
 
     public LocalPlayback createLocalPlayback(Bundle options) {
+        boolean autoUpdateMetadata = options.getBoolean("autoUpdateMetadata", true);
         int minBuffer = (int)Utils.toMillis(options.getDouble("minBuffer", Utils.toSeconds(DEFAULT_MIN_BUFFER_MS)));
         int maxBuffer = (int)Utils.toMillis(options.getDouble("maxBuffer", Utils.toSeconds(DEFAULT_MAX_BUFFER_MS)));
         int playBuffer = (int)Utils.toMillis(options.getDouble("playBuffer", Utils.toSeconds(DEFAULT_BUFFER_FOR_PLAYBACK_MS)));
@@ -127,12 +128,14 @@ public class MusicManager implements OnAudioFocusChangeListener {
                 .setBackBuffer(backBuffer, false)
                 .createDefaultLoadControl();
 
-        SimpleExoPlayer player = ExoPlayerFactory.newSimpleInstance(service, new DefaultRenderersFactory(service), new DefaultTrackSelector(), control);
+        SimpleExoPlayer player = new SimpleExoPlayer.Builder(service)
+                .setLoadControl(control)
+                .build();
 
         player.setAudioAttributes(new com.google.android.exoplayer2.audio.AudioAttributes.Builder()
                 .setContentType(C.CONTENT_TYPE_MUSIC).setUsage(C.USAGE_MEDIA).build());
 
-        return new LocalPlayback(service, this, player, cacheMaxSize);
+        return new LocalPlayback(service, this, player, cacheMaxSize, autoUpdateMetadata);
     }
 
     @SuppressLint("WakelockTimeout")
@@ -158,7 +161,8 @@ public class MusicManager implements OnAudioFocusChangeListener {
             }
         }
 
-        metadata.setActive(true);
+        if (playback.shouldAutoUpdateMetadata())
+            metadata.setActive(true);
     }
 
     public void onPause() {
@@ -174,7 +178,8 @@ public class MusicManager implements OnAudioFocusChangeListener {
         if(wakeLock.isHeld()) wakeLock.release();
         if(wifiLock.isHeld()) wifiLock.release();
 
-        metadata.setActive(true);
+        if (playback.shouldAutoUpdateMetadata())
+            metadata.setActive(true);
     }
 
     public void onStop() {
@@ -192,7 +197,8 @@ public class MusicManager implements OnAudioFocusChangeListener {
 
         abandonFocus();
 
-        metadata.setActive(false);
+        if (playback.shouldAutoUpdateMetadata())
+            metadata.setActive(false);
     }
 
     public void onStateChange(int state) {
@@ -201,18 +207,21 @@ public class MusicManager implements OnAudioFocusChangeListener {
         Bundle bundle = new Bundle();
         bundle.putInt("state", state);
         service.emit(MusicEvents.PLAYBACK_STATE, bundle);
-        metadata.updatePlayback(playback);
+
+        if (playback.shouldAutoUpdateMetadata())
+            metadata.updatePlayback(playback);
     }
 
-    public void onTrackUpdate(Track previous, long prevPos, Track next) {
+    public void onTrackUpdate(Integer prevIndex, long prevPos, Integer nextIndex, Track next) {
         Log.d(Utils.LOG, "onTrackUpdate");
 
-        if(next != null) metadata.updateMetadata(playback, next);
+        if(playback.shouldAutoUpdateMetadata() && next != null)
+            metadata.updateMetadata(playback, next);
 
         Bundle bundle = new Bundle();
-        bundle.putString("track", previous != null ? previous.id : null);
+        if (prevIndex != null) bundle.putInt("track", prevIndex);
         bundle.putDouble("position", Utils.toSeconds(prevPos));
-        bundle.putString("nextTrack", next != null ? next.id : null);
+        if (nextIndex != null) bundle.putInt("nextTrack", nextIndex);
         service.emit(MusicEvents.PLAYBACK_TRACK_CHANGED, bundle);
     }
 
@@ -220,11 +229,11 @@ public class MusicManager implements OnAudioFocusChangeListener {
         metadata.removeNotifications();
     }
 
-    public void onEnd(Track previous, long prevPos) {
+    public void onEnd(Integer previousIndex, long prevPos) {
         Log.d(Utils.LOG, "onEnd");
 
         Bundle bundle = new Bundle();
-        bundle.putString("track", previous != null ? previous.id : null);
+        if (previousIndex != null) bundle.putInt("track", previousIndex);
         bundle.putDouble("position", Utils.toSeconds(prevPos));
         service.emit(MusicEvents.PLAYBACK_QUEUE_ENDED, bundle);
     }
