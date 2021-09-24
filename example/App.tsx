@@ -61,7 +61,7 @@ const togglePlayback = async (playbackState: State) => {
   if (currentTrack == null) {
     // TODO: Perhaps present an error or restart the playlist?
   } else {
-    if (playbackState === State.Paused) {
+    if (playbackState !== State.Playing) {
       await TrackPlayer.play();
     } else {
       await TrackPlayer.pause();
