@@ -35,6 +35,8 @@ class NotificationManager(private val context: Context, private val exoPlayer: E
 
     private lateinit var playerNotificationManager: PlayerNotificationManager
 
+    private var isNotificationCreated = false
+
     init {
         channelId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel()
@@ -78,24 +80,50 @@ class NotificationManager(private val context: Context, private val exoPlayer: E
     }
 
     fun createNotification(config: NotificationConfig) {
+        if (isNotificationCreated) error("Cannot recreate notification once it's been created.")
+
         buttons.apply {
             clear()
             addAll(config.buttons)
         }
 
-        val builder = PlayerNotificationManager.Builder(context, NOTIFICATION_ID, channelId).apply {
+        playerNotificationManager = PlayerNotificationManager.Builder(context, NOTIFICATION_ID, channelId).apply {
             setMediaDescriptionAdapter(descriptionAdapter)
 
             if (buttons.isNotEmpty()) {
                 setPrimaryActionReceiver(this@NotificationManager)
-            }
-        }
 
-        playerNotificationManager = builder.build()
+                config.buttons.forEach { button ->
+                    when (button) {
+                        is NotificationButton.PLAY -> button.drawable?.let { setPlayActionIconResourceId(it) }
+                        is NotificationButton.PAUSE -> button.drawable?.let { setPauseActionIconResourceId(it) }
+                        is NotificationButton.STOP -> button.drawable?.let { setStopActionIconResourceId(it) }
+                        is NotificationButton.FORWARD -> button.drawable?.let { setFastForwardActionIconResourceId(it) }
+                        is NotificationButton.REWIND -> button.drawable?.let { setRewindActionIconResourceId(it) }
+                        is NotificationButton.NEXT -> button.drawable?.let { setNextActionIconResourceId(it) }
+                        is NotificationButton.PREVIOUS -> button.drawable?.let { setPreviousActionIconResourceId(it) }
+                    }
+                }
+            }
+        }.build()
+
 
         if (!isJUnitTest()) {
             playerNotificationManager.apply {
                 setPlayer(exoPlayer)
+
+//                config.buttons.forEach { button ->
+//                    when (button) {
+//                        is NotificationButton.PLAY -> button.drawable?.let { setPlayActionIconResourceId(it) }
+//                        is NotificationButton.PAUSE -> button.drawable?.let { setPauseActionIconResourceId(it) }
+//                        is NotificationButton.STOP -> button.drawable?.let { setStopActionIconResourceId(it) }
+//                        is NotificationButton.FORWARD -> button.drawable?.let { setFastForwardActionIconResourceId(it) }
+//                        is NotificationButton.REWIND -> button.drawable?.let { setRewindActionIconResourceId(it) }
+//                        is NotificationButton.NEXT -> button.drawable?.let { setNextActionIconResourceId(it) }
+//                        is NotificationButton.PREVIOUS -> button.drawable?.let { setPreviousActionIconResourceId(it) }
+//                    }
+//                }
+
                 setMediaSessionToken(mediaSession.sessionToken)
                 setUsePlayPauseActions(buttons.any { it is NotificationButton.PLAY || it is NotificationButton.PAUSE })
                 setUseFastForwardAction(buttons.any { it is NotificationButton.FORWARD })
@@ -105,6 +133,10 @@ class NotificationManager(private val context: Context, private val exoPlayer: E
                 setUseStopAction(buttons.any { it is NotificationButton.STOP })
             }
         }
+    }
+
+    fun destroyNotification() {
+
     }
 
     override fun onAction(player: Player, action: String, intent: Intent) {
