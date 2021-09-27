@@ -95,13 +95,13 @@ class NotificationManager(private val context: Context, private val exoPlayer: E
 
                 config.buttons.forEach { button ->
                     when (button) {
-                        is NotificationButton.PLAY -> button.drawable?.let { setPlayActionIconResourceId(it) }
-                        is NotificationButton.PAUSE -> button.drawable?.let { setPauseActionIconResourceId(it) }
-                        is NotificationButton.STOP -> button.drawable?.let { setStopActionIconResourceId(it) }
-                        is NotificationButton.FORWARD -> button.drawable?.let { setFastForwardActionIconResourceId(it) }
-                        is NotificationButton.REWIND -> button.drawable?.let { setRewindActionIconResourceId(it) }
-                        is NotificationButton.NEXT -> button.drawable?.let { setNextActionIconResourceId(it) }
-                        is NotificationButton.PREVIOUS -> button.drawable?.let { setPreviousActionIconResourceId(it) }
+                        is NotificationButton.PLAY -> button.icon?.let { setPlayActionIconResourceId(it) }
+                        is NotificationButton.PAUSE -> button.icon?.let { setPauseActionIconResourceId(it) }
+                        is NotificationButton.STOP -> button.icon?.let { setStopActionIconResourceId(it) }
+                        is NotificationButton.FORWARD -> button.icon?.let { setFastForwardActionIconResourceId(it) }
+                        is NotificationButton.REWIND -> button.icon?.let { setRewindActionIconResourceId(it) }
+                        is NotificationButton.NEXT -> button.icon?.let { setNextActionIconResourceId(it) }
+                        is NotificationButton.PREVIOUS -> button.icon?.let { setPreviousActionIconResourceId(it) }
                     }
                 }
             }
@@ -112,17 +112,28 @@ class NotificationManager(private val context: Context, private val exoPlayer: E
             playerNotificationManager.apply {
                 setPlayer(exoPlayer)
 
-//                config.buttons.forEach { button ->
-//                    when (button) {
-//                        is NotificationButton.PLAY -> button.drawable?.let { setPlayActionIconResourceId(it) }
-//                        is NotificationButton.PAUSE -> button.drawable?.let { setPauseActionIconResourceId(it) }
-//                        is NotificationButton.STOP -> button.drawable?.let { setStopActionIconResourceId(it) }
-//                        is NotificationButton.FORWARD -> button.drawable?.let { setFastForwardActionIconResourceId(it) }
-//                        is NotificationButton.REWIND -> button.drawable?.let { setRewindActionIconResourceId(it) }
-//                        is NotificationButton.NEXT -> button.drawable?.let { setNextActionIconResourceId(it) }
-//                        is NotificationButton.PREVIOUS -> button.drawable?.let { setPreviousActionIconResourceId(it) }
-//                    }
-//                }
+                config.buttons.forEach { button ->
+                    when (button) {
+                        is NotificationButton.PLAY, is NotificationButton.PAUSE -> setUsePlayPauseActions(true)
+                        is NotificationButton.STOP -> setUseStopAction(true)
+                        is NotificationButton.FORWARD -> {
+                            setUseFastForwardAction(true)
+                            setUseFastForwardActionInCompactView(button.isCompact)
+                        }
+                        is NotificationButton.REWIND -> {
+                            setUseRewindAction(true)
+                            setUseRewindActionInCompactView(button.isCompact)
+                        }
+                        is NotificationButton.NEXT -> {
+                            setUseNextAction(true)
+                            setUseNextActionInCompactView(button.isCompact)
+                        }
+                        is NotificationButton.PREVIOUS -> {
+                            setUsePreviousAction(true)
+                            setUsePreviousActionInCompactView(button.isCompact)
+                        }
+                    }
+                }
 
                 setMediaSessionToken(mediaSession.sessionToken)
                 setUsePlayPauseActions(buttons.any { it is NotificationButton.PLAY || it is NotificationButton.PAUSE })
@@ -133,10 +144,6 @@ class NotificationManager(private val context: Context, private val exoPlayer: E
                 setUseStopAction(buttons.any { it is NotificationButton.STOP })
             }
         }
-    }
-
-    fun destroyNotification() {
-
     }
 
     override fun onAction(player: Player, action: String, intent: Intent) {

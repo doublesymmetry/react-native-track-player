@@ -5,14 +5,14 @@ import com.google.android.exoplayer2.ui.PlayerNotificationManager.*
 
 data class NotificationConfig(val buttons: List<NotificationButton>)
 
-sealed class NotificationButton(@DrawableRes val drawable: Int?, val isCompact: Boolean) {
-    class PLAY(@DrawableRes drawable: Int? = null, isCompact: Boolean = false): NotificationButton(drawable, isCompact)
-    class PAUSE(@DrawableRes drawable: Int? = null, isCompact: Boolean = false): NotificationButton(drawable, isCompact)
-    class STOP(@DrawableRes drawable: Int? = null, isCompact: Boolean = false): NotificationButton(drawable, isCompact)
-    class FORWARD(@DrawableRes drawable: Int? = null, isCompact: Boolean = false): NotificationButton(drawable, isCompact)
-    class REWIND(@DrawableRes drawable: Int? = null, isCompact: Boolean = false): NotificationButton(drawable, isCompact)
-    class NEXT(@DrawableRes drawable: Int? = null, isCompact: Boolean = false): NotificationButton(drawable, isCompact)
-    class PREVIOUS(@DrawableRes drawable: Int? = null, isCompact: Boolean = false): NotificationButton(drawable, isCompact)
+sealed class NotificationButton(@DrawableRes val icon: Int?) {
+    class PLAY(@DrawableRes icon: Int? = null): NotificationButton(icon)
+    class PAUSE(@DrawableRes icon: Int? = null): NotificationButton(icon)
+    class STOP(@DrawableRes icon: Int? = null): NotificationButton(icon)
+    class FORWARD(@DrawableRes icon: Int? = null, val isCompact: Boolean = false): NotificationButton(icon)
+    class REWIND(@DrawableRes icon: Int? = null, val isCompact: Boolean = false): NotificationButton(icon)
+    class NEXT(@DrawableRes icon: Int? = null, val isCompact: Boolean = false): NotificationButton(icon)
+    class PREVIOUS(@DrawableRes icon: Int? = null, val isCompact: Boolean = false): NotificationButton(icon)
 
     enum class Action {
         PLAY, PAUSE, STOP, FORWARD, REWIND, NEXT, PREVIOUS
