@@ -89,7 +89,11 @@ class MusicService : HeadlessJsTaskService() {
 
             if (notificationCapabilities.isEmpty()) notificationCapabilities = capabilities
 
-            player.notificationOptions.buttons = listOf(PLAY(), NEXT())
+            val notificationConfig = NotificationConfig(listOf(PLAY(), NEXT()))
+
+//            player.notificationOptions.buttons = listOf(PLAY(), NEXT())
+            player.notificationManager.createNotification(notificationConfig)
+            player.notificationManager
         }
     }
 
