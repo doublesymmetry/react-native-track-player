@@ -14,6 +14,18 @@ To install release candidates run `yarn add react-native-track-player@next`
 
 * None.
 
+## 2.1.1 (25.09.21)
+
+##### Enhancements
+
+* [ios] Fix getCurrentTrack returns undefined instead of null
+* [ios] Fix getTrack returning undefined instead of nil
+* Fix an issue with next/previous in the control center stopping playing on iOS15
+
+##### Bug Fixes
+
+* None.
+
 ## 2.1.0 (16.09.21)
 
 ##### Enhancements
