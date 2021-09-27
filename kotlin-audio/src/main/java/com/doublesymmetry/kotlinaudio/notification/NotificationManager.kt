@@ -45,25 +45,6 @@ class NotificationManager(private val context: Context, private val exoPlayer: E
         }
 
         mediaSessionConnector.setPlayer(exoPlayer)
-
-//
-//        playerNotificationManager = PlayerNotificationManager.Builder(context, NOTIFICATION_ID, channelId)
-//            .setMediaDescriptionAdapter(descriptionAdapter)
-//            .setPrimaryActionReceiver(this)
-//            .build()
-//
-//        if (!isJUnitTest()) {
-//            playerNotificationManager.apply {
-//                setPlayer(exoPlayer)
-//                setMediaSessionToken(mediaSession.sessionToken)
-////                setUsePlayPauseActions(false)
-//                setUseFastForwardAction(false)
-//                setUseNextAction(false)
-//                setUsePreviousAction(false)
-//                setUseStopAction(false)
-//                setUseRewindAction(false)
-//            }
-//        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

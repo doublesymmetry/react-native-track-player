@@ -113,13 +113,10 @@ open class AudioPlayer(private val context: Context, bufferConfig: BufferConfig?
 
         exoPlayer = exoPlayerBuilder.build()
         notificationManager = NotificationManager(context, exoPlayer)
-//        notificationOptions = NotificationConfig(notificationManager)
 
         if (isJUnitTest()) {
             exoPlayer.setThrowsWhenUsingWrongThread(false)
         }
-
-//        notificationManager.createNotification()
 
         addPlayerListener()
         observeEvents()
