@@ -62,13 +62,13 @@ class MetadataManager(private val service: MusicService, private val manager: Mu
         actions = 0
         compactActions = 0
         if (capabilities != null) {
-            // Create the actions mask
+            // Create the buttons mask
             for (cap in capabilities) actions = actions or cap.toLong()
 
             // If there is no notification capabilities defined, we'll show all capabilities available
             if (notification == null) notification = capabilities
 
-            // Initialize all actions based on the options
+            // Initialize all buttons based on the options
             previousAction = createAction(
                 notification, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS, "Previous",
                 getIcon(options, "previousIcon", R.drawable.previous)

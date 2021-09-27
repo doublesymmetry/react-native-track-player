@@ -2,16 +2,15 @@ package com.guichaguri.trackplayer.service
 
 import android.content.Intent
 import android.os.*
-import android.support.v4.media.session.PlaybackStateCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.*
+import com.doublesymmetry.kotlinaudio.models.NotificationButton.*
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper
-import com.guichaguri.trackplayer.R
 import com.guichaguri.trackplayer.model.State
 import com.guichaguri.trackplayer.model.Track
 import com.guichaguri.trackplayer.model.TrackAudioItem
@@ -90,43 +89,8 @@ class MusicService : HeadlessJsTaskService() {
 
             if (notificationCapabilities.isEmpty()) notificationCapabilities = capabilities
 
-//        val previousAction = createAction(notification, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS, "Previous",
-//            getIcon(options, "previousIcon", R.drawable.previous))
-//        val rewindAction = createAction(notification, PlaybackStateCompat.ACTION_REWIND, "Rewind",
-//            getIcon(options, "rewindIcon", R.drawable.rewind))
-//            val playPauseAction = if (player.isPlaying) {
-//                createAction(notification, PlaybackStateCompat.ACTION_PLAY, "Play",
-//                    getIcon(options, "playIcon", R.drawable.play), NotificationActionType.ACTION_PLAY)
-//            } else {
-//                createAction(notification, PlaybackStateCompat.ACTION_PAUSE, "Play",
-//                    getIcon(options, "playIcon", R.drawable.pause), NotificationActionType.ACTION_PLAY)
-//            }
-//            val playPauseAction = if (isSupportedCapability(Capability.PLAY)) NotificationAction.createPlayPauseAction(player) else error("Play action is not a supported capability")
-//            val pauseAction = createAction(notification, PlaybackStateCompat.ACTION_PAUSE, "Pause",
-//                getIcon(options, "pauseIcon", R.drawable.pause), NotificationActionType.CUSTOM("asdasd"))
-//        val stopAction = createAction(notification, PlaybackStateCompat.ACTION_STOP, "Stop",
-//            getIcon(options, "stopIcon", R.drawable.stop))
-//        val forwardAction = createAction(notification, PlaybackStateCompat.ACTION_FAST_FORWARD, "Forward",
-//            getIcon(options, "forwardIcon", R.drawable.forward), NotificationActionType.CUSTOM("asdas"))
-            val nextAction = createAction(notificationCapabilities, PlaybackStateCompat.ACTION_SKIP_TO_NEXT, "Next",
-                getIcon(options, "nextIcon", R.drawable.stop), NotificationActionType.CUSTOM("test"))
-
-//        player.notificationOptions.actions = listOf(previousAction, rewindAction, playAction, pauseAction, stopAction, forwardAction, nextAction)
-//            player.notificationOptions.actions = listOf(playPauseAction)
+            player.notificationOptions.buttons = listOf(PLAY(), NEXT())
         }
-    }
-//
-//    private fun isSupportedCapability(capability: Capability): Boolean {
-////        return if (!capabilities.contains(capability.ordinal)) error("Action $capability is not a support capability")
-////        else true
-//
-//        return true
-//    }
-
-    private fun createAction(capabilities: List<Int>, action: Long, title: String, icon: Int, type: NotificationActionType, isCompact: Boolean = false): NotificationAction {
-        return if (!capabilities.contains(action.toInt())) error("Action $title is not a support capability")
-//        else NotificationAction(NotificationCompat.Action(icon, title, MediaButtonReceiver.buildMediaButtonPendingIntent(this, action)), type , isCompact)
-        else NotificationAction(title, icon, type, isCompact)
     }
 
     private fun getIcon(options: Bundle, propertyName: String, defaultIcon: Int): Int {
@@ -262,41 +226,22 @@ class MusicService : HeadlessJsTaskService() {
             }
         }
 
-//        serviceScope.launch {
-//            event.onNotificationAction.collect {
-//                when (it) {
-//                    NotificationActionType.CUSTOM("test") -> {
-//                        Log.d("TEST", "test")
-//                    }
-//
-//                    player.notificationOptions.actions = listOf(playAction, nextAction)
-//                }
-//            }
-//        }
-
         serviceScope.launch {
             event.onNotificationAction.collect {
-                val actions = mutableListOf<NotificationAction>()
-//                when (it) {
-//                    NotificationActionType.CUSTOM("test") -> {
-//                        Log.d("TEST", "test")
-//                    }
-//                }
-//                when (it) {
-//                    NotificationActionType.ACTION_PLAY, NotificationActionType.ACTION_PAUSE -> {
-//                        player.togglePlaying()
-//                        actions.add(NotificationAction.createPlayPauseAction(player))
-//                    }
-//                }
-//                val playPauseAction = if (isSupportedCapability(capabilities, Capability.PLAY)) NotificationAction.createPlayPauseAction(player) else null
-
-
-                player.notificationOptions.actions = actions
+                when (it) {
+                    Action.PLAY -> emit(MusicEvents.BUTTON_PLAY)
+                    Action.PAUSE -> emit(MusicEvents.BUTTON_PAUSE)
+                    Action.NEXT -> emit(MusicEvents.BUTTON_SKIP_NEXT)
+                    Action.PREVIOUS -> emit(MusicEvents.BUTTON_SKIP_PREVIOUS)
+                    Action.REWIND -> emit(MusicEvents.BUTTON_JUMP_BACKWARD)
+                    Action.FORWARD -> emit(MusicEvents.BUTTON_JUMP_FORWARD)
+                    Action.STOP -> emit(MusicEvents.BUTTON_STOP)
+                }
             }
         }
     }
 
-    private fun emit(event: String?, data: Bundle?) {
+    private fun emit(event: String?, data: Bundle? = null) {
         val intent = Intent(EVENT_INTENT)
         intent.putExtra(EVENT_KEY, event)
         if (data != null) intent.putExtra(DATA_KEY, data)
