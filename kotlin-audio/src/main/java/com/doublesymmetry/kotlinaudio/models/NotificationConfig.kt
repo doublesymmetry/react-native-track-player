@@ -1,21 +1,22 @@
 package com.doublesymmetry.kotlinaudio.models
 
 import androidx.annotation.DrawableRes
-import com.doublesymmetry.kotlinaudio.notification.NotificationManager
 import com.google.android.exoplayer2.ui.PlayerNotificationManager.*
 
-class NotificationOptions internal constructor(private val notificationManager: NotificationManager) {
-    var buttons: List<NotificationButton?> = emptyList()
-        set(value) {
-            field = value
-            notificationManager.apply {
-                buttons.clear()
-                buttons.addAll(field)
+//class NotificationConfig internal constructor(private val notificationManager: NotificationManager) {
+//    var buttons: List<NotificationButton?> = emptyList()
+//        set(value) {
+//            if (notificationManager.isNotificationCreated) error("Buttons cannot be changed once a notification has been created")
+//
+//            field = value
+//            notificationManager.apply {
+//                buttons.clear()
+//                buttons.addAll(field)
+//            }
+//        }
+//}
 
-                refresh()
-            }
-        }
-}
+data class NotificationConfig(val buttons: List<NotificationButton>)
 
 sealed class NotificationButton(@DrawableRes drawable: Int?, isCompact: Boolean) {
     class PLAY(@DrawableRes drawable: Int? = null, isCompact: Boolean = false): NotificationButton(drawable, isCompact)

@@ -9,6 +9,7 @@ import android.support.v4.media.session.MediaSessionCompat
 import androidx.annotation.RequiresApi
 import com.doublesymmetry.kotlinaudio.R
 import com.doublesymmetry.kotlinaudio.models.NotificationButton
+import com.doublesymmetry.kotlinaudio.models.NotificationConfig
 import com.doublesymmetry.kotlinaudio.utils.isJUnitTest
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
@@ -19,13 +20,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
-internal class NotificationManager(private val context: Context, private val exoPlayer: ExoPlayer) : PlayerNotificationManager.PrimaryActionReceiver {
-    //    private var playerNotificationManager: PlayerNotificationManager
+class NotificationManager(private val context: Context, private val exoPlayer: ExoPlayer) : PlayerNotificationManager.PrimaryActionReceiver {
     private val descriptionAdapter = DescriptionAdapter(context, null)
     private val mediaSession: MediaSessionCompat = MediaSessionCompat(context, "AudioPlayerSession")
     private val mediaSessionConnector: MediaSessionConnector = MediaSessionConnector(mediaSession)
 
-    val onNotificationAction = MutableSharedFlow<NotificationButton.Action>()
+    internal val onNotificationAction = MutableSharedFlow<NotificationButton.Action>()
 
     private val scope = CoroutineScope(Dispatchers.Main)
 
@@ -34,14 +34,6 @@ internal class NotificationManager(private val context: Context, private val exo
     private val channelId: String
 
     private lateinit var playerNotificationManager: PlayerNotificationManager
-
-//    private val builder by lazy {
-//
-//
-//        PlayerNotificationManager.Builder(context, NOTIFICATION_ID, channelId)
-//            .setMediaDescriptionAdapter(descriptionAdapter)
-//            .setCustomActionReceiver(this)
-//    }
 
     init {
         channelId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -52,7 +44,6 @@ internal class NotificationManager(private val context: Context, private val exo
 
         mediaSessionConnector.setPlayer(exoPlayer)
 
-        createNotification()
 //
 //        playerNotificationManager = PlayerNotificationManager.Builder(context, NOTIFICATION_ID, channelId)
 //            .setMediaDescriptionAdapter(descriptionAdapter)
@@ -86,7 +77,12 @@ internal class NotificationManager(private val context: Context, private val exo
         return channelId
     }
 
-    private fun createNotification() {
+    fun createNotification(config: NotificationConfig) {
+        buttons.apply {
+            clear()
+            addAll(config.buttons)
+        }
+
         val builder = PlayerNotificationManager.Builder(context, NOTIFICATION_ID, channelId).apply {
             setMediaDescriptionAdapter(descriptionAdapter)
 
@@ -121,20 +117,20 @@ internal class NotificationManager(private val context: Context, private val exo
         mediaSession.isActive = true
     }
 
-    fun refresh() {
-        if (!isJUnitTest()) {
-            playerNotificationManager.apply {
-                setPlayer(exoPlayer)
-                setMediaSessionToken(mediaSession.sessionToken)
-                setUsePlayPauseActions(buttons.any { it is NotificationButton.PLAY || it is NotificationButton.PAUSE })
-                setUseFastForwardAction(buttons.any { it is NotificationButton.FORWARD })
-                setUseRewindAction(buttons.any { it is NotificationButton.REWIND })
-                setUseNextAction(buttons.any { it is NotificationButton.NEXT })
-                setUsePreviousAction(buttons.any { it is NotificationButton.PREVIOUS })
-                setUseStopAction(buttons.any { it is NotificationButton.STOP })
-            }
-        }
-    }
+//    fun refresh() {
+//        if (!isJUnitTest()) {
+//            playerNotificationManager.apply {
+//                setPlayer(exoPlayer)
+//                setMediaSessionToken(mediaSession.sessionToken)
+//                setUsePlayPauseActions(buttons.any { it is NotificationButton.PLAY || it is NotificationButton.PAUSE })
+//                setUseFastForwardAction(buttons.any { it is NotificationButton.FORWARD })
+//                setUseRewindAction(buttons.any { it is NotificationButton.REWIND })
+//                setUseNextAction(buttons.any { it is NotificationButton.NEXT })
+//                setUsePreviousAction(buttons.any { it is NotificationButton.PREVIOUS })
+//                setUseStopAction(buttons.any { it is NotificationButton.STOP })
+//            }
+//        }
+//    }
 
     fun destroy() {
         descriptionAdapter.release()
