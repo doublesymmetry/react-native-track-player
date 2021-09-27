@@ -25,7 +25,7 @@ class EventHolder {
     private var _onAudioFocusChanged = MutableSharedFlow<FocusChangeData>(1)
     var onAudioFocusChanged = _onAudioFocusChanged.asSharedFlow()
 
-    private var _onNotificationAction = MutableSharedFlow<NotificationActionType>()
+    private var _onNotificationAction = MutableSharedFlow<NotificationButton.Action>()
     var onNotificationAction = _onNotificationAction.asSharedFlow()
 
     internal fun updateAudioPlayerState(state: AudioPlayerState) {
@@ -46,7 +46,7 @@ class EventHolder {
         }
     }
 
-    internal fun updateOnNotificationAction(type: NotificationActionType) {
+    internal fun updateOnNotificationAction(type: NotificationButton.Action) {
         coroutineScope.launch {
             _onNotificationAction.emit(type)
         }

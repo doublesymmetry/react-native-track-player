@@ -348,7 +348,7 @@ open class AudioPlayer(private val context: Context, bufferConfig: BufferConfig?
 
     private fun observeEvents() {
         scope.launch {
-            notificationManager.onCustomAction.collect {
+            notificationManager.onNotificationAction.collect {
                 event.updateOnNotificationAction(it)
             }
         }
