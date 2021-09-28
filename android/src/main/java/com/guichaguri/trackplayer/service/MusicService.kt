@@ -50,9 +50,9 @@ class MusicService : HeadlessJsTaskService() {
         }
 
     var rate: Float
-        get() = player.rate
+        get() = player.playbackSpeed
         set(value) {
-            player.rate = value
+            player.playbackSpeed = value
         }
 
     val event get() = player.event
