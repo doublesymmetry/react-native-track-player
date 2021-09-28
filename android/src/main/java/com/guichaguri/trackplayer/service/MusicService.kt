@@ -240,7 +240,6 @@ class MusicService : HeadlessJsTaskService() {
 
         serviceScope.launch {
             event.onNotificationAction.collect {
-                emit(MusicEvents.BUTTON_DUCK)
                 when (it) {
                     Action.PLAY -> emit(MusicEvents.BUTTON_PLAY)
                     Action.PAUSE -> emit(MusicEvents.BUTTON_PAUSE)
