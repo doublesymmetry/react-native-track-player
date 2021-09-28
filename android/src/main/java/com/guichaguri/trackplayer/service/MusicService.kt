@@ -10,7 +10,6 @@ import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
-import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper
 import com.guichaguri.trackplayer.model.State
 import com.guichaguri.trackplayer.model.Track
 import com.guichaguri.trackplayer.model.TrackAudioItem
@@ -89,20 +88,14 @@ class MusicService : HeadlessJsTaskService() {
 
             if (notificationCapabilities.isEmpty()) notificationCapabilities = capabilities
 
-            val notificationConfig = NotificationConfig(listOf(PLAY(), NEXT()))
+            val notificationConfig = NotificationConfig(listOf(
+                PLAY(),
+                PREVIOUS(isCompact = true),
+                NEXT(isCompact = true)
+            ))
 
-//            player.notificationOptions.buttons = listOf(PLAY(), NEXT())
             player.notificationManager.createNotification(notificationConfig)
-            player.notificationManager
         }
-    }
-
-    private fun getIcon(options: Bundle, propertyName: String, defaultIcon: Int): Int {
-        if (!options.containsKey(propertyName)) return defaultIcon
-        val bundle = options.getBundle(propertyName) ?: return defaultIcon
-        val helper = ResourceDrawableIdHelper.getInstance()
-        val icon = helper.getResourceDrawableId(this, bundle.getString("uri"))
-        return if (icon == 0) defaultIcon else icon
     }
 
     fun add(tracks: List<Track>, playWhenReady: Boolean = true) {
@@ -232,15 +225,15 @@ class MusicService : HeadlessJsTaskService() {
 
         serviceScope.launch {
             event.onNotificationAction.collect {
+                emit(MusicEvents.BUTTON_DUCK)
                 when (it) {
                     Action.PLAY -> emit(MusicEvents.BUTTON_PLAY)
                     Action.PAUSE -> emit(MusicEvents.BUTTON_PAUSE)
                     Action.NEXT -> emit(MusicEvents.BUTTON_SKIP_NEXT)
                     Action.PREVIOUS -> emit(MusicEvents.BUTTON_SKIP_PREVIOUS)
-                    Action.REWIND -> emit(MusicEvents.BUTTON_JUMP_BACKWARD)
-                    Action.FORWARD -> emit(MusicEvents.BUTTON_JUMP_FORWARD)
-                    Action.STOP -> emit(MusicEvents.BUTTON_STOP)
+                    else -> return@collect
                 }
+
             }
         }
     }
