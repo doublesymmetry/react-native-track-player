@@ -7,6 +7,7 @@ import android.support.v4.media.RatingCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
+import com.doublesymmetry.kotlinaudio.models.Capability
 import com.doublesymmetry.kotlinaudio.models.RepeatMode
 import com.facebook.react.bridge.*
 import com.google.android.exoplayer2.Player
@@ -29,11 +30,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     ReactContextBaseJavaModule(reactContext), ServiceConnection {
     private var binder: MusicService.MusicBinder? = null
     private var eventHandler: MusicEvents? = null
-    private val initCallbacks = ArrayDeque<Runnable>()
     private var playerOptions: Bundle? = null
-    //    private var connecting = false
     private var isServiceBound = false
-    private var options: Bundle? = null
     private var playerSetUpPromise: Promise? = null
 
     private lateinit var musicService: MusicService
@@ -45,20 +43,12 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
         return "TrackPlayerModule"
     }
 
-    //
     override fun initialize() {
         val context: ReactContext = reactApplicationContext
         val manager = LocalBroadcastManager.getInstance(context)
 
         Logger.addLogAdapter(AndroidLogAdapter())
 
-//        if (!isServiceBound)
-//            context.bindService(Intent(context, MusicService::class.java), this, Context.BIND_AUTO_CREATE)
-//
-//        context.runOnUiQueueThread { // TODO: Do this in lib
-//            queuedAudioPlayer = QueuedAudioPlayer(context)
-//        }
-////
         eventHandler = MusicEvents(context)
         manager.registerReceiver(eventHandler!!, IntentFilter(EVENT_INTENT))
     }
@@ -78,8 +68,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
         musicService.setupPlayer(playerOptions, playerSetUpPromise)
 
         isServiceBound = true
-        playerSetUpPromise?.resolve(null)
-        
+
 //
 //        // Reapply options that user set before with updateOptions
 //        if (options != null) {
@@ -117,18 +106,18 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
         val constants: MutableMap<String, Any> = HashMap()
 
         // Capabilities
-        constants["CAPABILITY_PLAY"] = PlaybackStateCompat.ACTION_PLAY
-        constants["CAPABILITY_PLAY_FROM_ID"] = PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID
-        constants["CAPABILITY_PLAY_FROM_SEARCH"] = PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
-        constants["CAPABILITY_PAUSE"] = PlaybackStateCompat.ACTION_PAUSE
-        constants["CAPABILITY_STOP"] = PlaybackStateCompat.ACTION_STOP
-        constants["CAPABILITY_SEEK_TO"] = PlaybackStateCompat.ACTION_SEEK_TO
-        constants["CAPABILITY_SKIP"] = PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM
-        constants["CAPABILITY_SKIP_TO_NEXT"] = PlaybackStateCompat.ACTION_SKIP_TO_NEXT
-        constants["CAPABILITY_SKIP_TO_PREVIOUS"] = PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
-        constants["CAPABILITY_SET_RATING"] = PlaybackStateCompat.ACTION_SET_RATING
-        constants["CAPABILITY_JUMP_FORWARD"] = PlaybackStateCompat.ACTION_FAST_FORWARD
-        constants["CAPABILITY_JUMP_BACKWARD"] = PlaybackStateCompat.ACTION_REWIND
+        constants["CAPABILITY_PLAY"] = Capability.PLAY.ordinal
+        constants["CAPABILITY_PLAY_FROM_ID"] = Capability.PLAY_FROM_ID.ordinal
+        constants["CAPABILITY_PLAY_FROM_SEARCH"] = Capability.PLAY_FROM_SEARCH.ordinal
+        constants["CAPABILITY_PAUSE"] = Capability.PAUSE.ordinal
+        constants["CAPABILITY_STOP"] = Capability.STOP.ordinal
+        constants["CAPABILITY_SEEK_TO"] = Capability.SEEK_TO.ordinal
+        constants["CAPABILITY_SKIP"] = Capability.SKIP.ordinal
+        constants["CAPABILITY_SKIP_TO_NEXT"] = Capability.SKIP_TO_NEXT.ordinal
+        constants["CAPABILITY_SKIP_TO_PREVIOUS"] = Capability.SKIP_TO_PREVIOUS.ordinal
+        constants["CAPABILITY_SET_RATING"] = Capability.SET_RATING.ordinal
+        constants["CAPABILITY_JUMP_FORWARD"] = Capability.JUMP_FORWARD.ordinal
+        constants["CAPABILITY_JUMP_BACKWARD"] = Capability.JUMP_BACKWARD.ordinal
 
         // States
         constants["STATE_NONE"] = PlaybackStateCompat.STATE_NONE

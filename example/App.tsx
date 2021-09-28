@@ -43,7 +43,7 @@ const setupIfNecessary = async () => {
         Capability.SkipToPrevious,
         Capability.Stop,
       ],
-      compactCapabilities: [Capability.Play, Capability.Pause],
+      compactCapabilities: [Capability.Play, Capability.Pause, Capability.SkipToNext],
     });
 
     // setup queue

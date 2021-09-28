@@ -57,9 +57,9 @@ class MusicService : HeadlessJsTaskService() {
 
     val event get() = player.event
 
-    private var capabilities: List<Int> = emptyList()
-    private var notificationCapabilities: List<Int> = emptyList()
-    private var compactCapabilities: List<Int> = emptyList()
+    private var capabilities: List<Capability> = emptyList()
+    private var notificationCapabilities: List<Capability> = emptyList()
+    private var compactCapabilities: List<Capability> = emptyList()
 
     fun setupPlayer(playerOptions: Bundle?, promise: Promise?) {
         val bufferOptions = BufferConfig(
@@ -82,20 +82,35 @@ class MusicService : HeadlessJsTaskService() {
             stopWithApp = options.getBoolean(STOP_WITH_APP)
             player.playerOptions.alwaysPauseOnInterruption = options.getBoolean(PAUSE_ON_INTERRUPTION_KEY)
 
-            capabilities = options.getIntegerArrayList("capabilities") ?: emptyList()
-            notificationCapabilities = options.getIntegerArrayList("notificationCapabilities") ?: emptyList()
-            compactCapabilities = options.getIntegerArrayList("compactCapabilities") ?: emptyList()
+            capabilities = options.getIntegerArrayList("capabilities")?.map { Capability.values()[it] } ?: emptyList()
+            notificationCapabilities = options.getIntegerArrayList("notificationCapabilities")?.map { Capability.values()[it] } ?: emptyList()
+            compactCapabilities = options.getIntegerArrayList("compactCapabilities")?.map { Capability.values()[it] } ?: emptyList()
 
             if (notificationCapabilities.isEmpty()) notificationCapabilities = capabilities
 
-            val notificationConfig = NotificationConfig(listOf(
-                PLAY(),
-                PREVIOUS(isCompact = true),
-                NEXT(isCompact = true)
-            ))
+            val buttonsList = mutableListOf<NotificationButton>()
+
+            notificationCapabilities.forEach {
+                when (it) {
+                    Capability.PLAY -> buttonsList.add(PLAY())
+                    Capability.PAUSE -> buttonsList.add(PAUSE())
+                    Capability.STOP -> buttonsList.add(STOP())
+                    Capability.SKIP_TO_NEXT -> buttonsList.add(NEXT(isCompact = isCompact(it)))
+                    Capability.SKIP_TO_PREVIOUS -> buttonsList.add(PREVIOUS(isCompact = isCompact(it)))
+                    Capability.JUMP_FORWARD -> buttonsList.add(FORWARD(isCompact = isCompact(it)))
+                    Capability.JUMP_BACKWARD -> buttonsList.add(BACKWARD(isCompact = isCompact(it)))
+                    else -> return@forEach
+                }
+            }
+
+            val notificationConfig = NotificationConfig(buttonsList)
 
             player.notificationManager.createNotification(notificationConfig)
         }
+    }
+
+    private fun isCompact(capability: Capability): Boolean {
+        return compactCapabilities.contains(capability)
     }
 
     fun add(tracks: List<Track>, playWhenReady: Boolean = true) {
