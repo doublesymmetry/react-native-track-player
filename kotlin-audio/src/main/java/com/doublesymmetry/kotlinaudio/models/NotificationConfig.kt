@@ -10,7 +10,7 @@ sealed class NotificationButton(@DrawableRes val icon: Int?) {
     class PAUSE(@DrawableRes icon: Int? = null): NotificationButton(icon)
     class STOP(@DrawableRes icon: Int? = null): NotificationButton(icon)
     class FORWARD(@DrawableRes icon: Int? = null, val isCompact: Boolean = false): NotificationButton(icon)
-    class REWIND(@DrawableRes icon: Int? = null, val isCompact: Boolean = false): NotificationButton(icon)
+    class BACKWARD(@DrawableRes icon: Int? = null, val isCompact: Boolean = false): NotificationButton(icon)
     class NEXT(@DrawableRes icon: Int? = null, val isCompact: Boolean = false): NotificationButton(icon)
     class PREVIOUS(@DrawableRes icon: Int? = null, val isCompact: Boolean = false): NotificationButton(icon)
 

@@ -80,7 +80,7 @@ class NotificationManager(private val context: Context, private val exoPlayer: E
                         is NotificationButton.PAUSE -> button.icon?.let { setPauseActionIconResourceId(it) }
                         is NotificationButton.STOP -> button.icon?.let { setStopActionIconResourceId(it) }
                         is NotificationButton.FORWARD -> button.icon?.let { setFastForwardActionIconResourceId(it) }
-                        is NotificationButton.REWIND -> button.icon?.let { setRewindActionIconResourceId(it) }
+                        is NotificationButton.BACKWARD -> button.icon?.let { setRewindActionIconResourceId(it) }
                         is NotificationButton.NEXT -> button.icon?.let { setNextActionIconResourceId(it) }
                         is NotificationButton.PREVIOUS -> button.icon?.let { setPreviousActionIconResourceId(it) }
                     }
@@ -101,7 +101,7 @@ class NotificationManager(private val context: Context, private val exoPlayer: E
                             setUseFastForwardAction(true)
                             setUseFastForwardActionInCompactView(button.isCompact)
                         }
-                        is NotificationButton.REWIND -> {
+                        is NotificationButton.BACKWARD -> {
                             setUseRewindAction(true)
                             setUseRewindActionInCompactView(button.isCompact)
                         }
@@ -119,7 +119,7 @@ class NotificationManager(private val context: Context, private val exoPlayer: E
                 setMediaSessionToken(mediaSession.sessionToken)
                 setUsePlayPauseActions(buttons.any { it is NotificationButton.PLAY || it is NotificationButton.PAUSE })
                 setUseFastForwardAction(buttons.any { it is NotificationButton.FORWARD })
-                setUseRewindAction(buttons.any { it is NotificationButton.REWIND })
+                setUseRewindAction(buttons.any { it is NotificationButton.BACKWARD })
                 setUseNextAction(buttons.any { it is NotificationButton.NEXT })
                 setUsePreviousAction(buttons.any { it is NotificationButton.PREVIOUS })
                 setUseStopAction(buttons.any { it is NotificationButton.STOP })
