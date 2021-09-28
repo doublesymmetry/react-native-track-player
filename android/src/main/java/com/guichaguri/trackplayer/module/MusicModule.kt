@@ -6,6 +6,7 @@ import android.os.IBinder
 import android.support.v4.media.RatingCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.doublesymmetry.kotlinaudio.models.AudioItem
 import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
 import com.doublesymmetry.kotlinaudio.models.RepeatMode
 import com.facebook.react.bridge.*
@@ -18,6 +19,7 @@ import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.annotation.Nonnull
@@ -78,7 +80,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
         musicService.setupPlayer(playerOptions, playerSetUpPromise)
 
         isServiceBound = true
-//        playerSetUpPromise?.resolve(null)
+        playerSetUpPromise?.resolve(null)
+        
 //
 //        // Reapply options that user set before with updateOptions
 //        if (options != null) {
@@ -94,6 +97,21 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     override fun onServiceDisconnected(name: ComponentName) {
         musicService.destroy()
         isServiceBound = false
+    }
+
+    /**
+     * Checks wither service is bound, or rejects. Returns whether promise was rejected.
+     */
+    private fun verifyServiceBoundOrReject(promise: Promise): Boolean {
+        if (!isServiceBound) {
+            promise.reject(
+                "player_not_initialized",
+                "The player is not initialized. Call setupPlayer first."
+            )
+            return true
+        }
+
+        return false
     }
 
     /* ****************************** API ****************************** */
@@ -140,11 +158,17 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun setupPlayer(data: ReadableMap?, promise: Promise) {
+        if (isServiceBound) {
+            promise.reject("player_already_initialized", "The player has already been initialized via setupPlayer.")
+            return
+        }
+
         playerSetUpPromise = promise
         playerOptions = Arguments.toBundle(data)
 
-        if (!isServiceBound)
-            reactContext?.bindService(Intent(reactContext, MusicService::class.java), this, Context.BIND_AUTO_CREATE)
+        val intent = Intent(reactContext, MusicService::class.java)
+        reactContext?.startService(intent)
+        reactContext?.bindService(intent, this, Context.BIND_AUTO_CREATE)
     }
 
     @ReactMethod
@@ -160,6 +184,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun updateOptions(data: ReadableMap?, callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         val options = Arguments.toBundle(data)
 
         options?.let {
@@ -172,6 +198,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun add(data: ReadableArray?, insertBeforeIndex: Int, callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         val bundleList = Arguments.toList(data)
         val tracks: List<Track> = try {
             Track.createTracks(
@@ -192,6 +220,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun remove(data: ReadableArray?, callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         val trackList = Arguments.toList(data)
         val queue = musicService.tracks
         val indexes: MutableList<Int> = ArrayList()
@@ -216,6 +246,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun updateMetadataForTrack(index: Int, map: ReadableMap?, callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
 //        waitForConnection {
 //            val playback = binder?.playback
 //            val tracks = playback!!.tracks
@@ -236,6 +268,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun updateNowPlayingMetadata(map: ReadableMap?, callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
 //        val data = Arguments.toBundle(map)
 //        waitForConnection {
 //            val metadata = NowPlayingMetadata(reactApplicationContext, data, binder?.ratingType!!)
@@ -246,6 +280,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun clearNowPlayingMetadata(callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
 //        waitForConnection {
 //            binder!!.clearNowPlayingMetadata()
 //            callback.resolve(null)
@@ -254,36 +290,47 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun removeUpcomingTracks(callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         musicService.removeUpcomingTracks()
         callback.resolve(null)
     }
 
     @ReactMethod
-    fun skip(index: Int, callback: Promise?) {
+    fun skip(index: Int, callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         musicService.skip(index)
-        callback?.resolve(null)
+        callback.resolve(null)
     }
 
     @ReactMethod
-    fun skipToNext(callback: Promise?) {
+    fun skipToNext(callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
         musicService.skipToNext()
-        callback?.resolve(null)
+        callback.resolve(null)
     }
 
     @ReactMethod
-    fun skipToPrevious(callback: Promise?) {
+    fun skipToPrevious(callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         musicService.skipToPrevious()
-        callback?.resolve(null)
+        callback.resolve(null)
     }
 
     @ReactMethod
     fun reset(callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         musicService.destroy()
         callback.resolve(null)
     }
 
     @ReactMethod
     fun play(callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         musicService.play()
         callback.resolve(null)
 //        waitForConnection {
@@ -294,6 +341,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun pause(callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         musicService.pause()
         callback.resolve(null)
 //        waitForConnection {
@@ -304,6 +353,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun stop(callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         musicService.pause()
         callback.resolve(null)
 
@@ -315,6 +366,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun seekTo(seconds: Float, callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         musicService.seekTo(seconds)
         callback.resolve(null)
 //        waitForConnection {
@@ -326,39 +379,53 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun setVolume(volume: Float, callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         musicService.volume = volume
         callback.resolve(null)
     }
 
     @ReactMethod
     fun getVolume(callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         callback.resolve(musicService.volume)
     }
 
     @ReactMethod
     fun setRate(rate: Float, callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         musicService.rate = rate
         callback.resolve(null)
     }
 
     @ReactMethod
     fun getRate(callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         callback.resolve(musicService.rate)
     }
 
     @ReactMethod
     fun setRepeatMode(mode: Int, callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         musicService.repeatMode = RepeatMode.fromOrdinal(mode)
         callback.resolve(null)
     }
 
     @ReactMethod
     fun getRepeatMode(callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         callback.resolve(musicService.repeatMode.ordinal)
     }
 
     @ReactMethod
     fun getTrack(index: Int, callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         if (index >= 0 && index < musicService.tracks.size) {
             callback.resolve(Arguments.fromBundle(musicService.tracks[index].originalItem))
         } else {
@@ -368,11 +435,15 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun getQueue(callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         callback.resolve(Arguments.fromList(musicService.tracks.map { it.originalItem }))
     }
 
     @ReactMethod
     fun getCurrentTrack(callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         musicService.getCurrentTrackIndex {
             callback.resolve(it)
         }
@@ -380,6 +451,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun getDuration(callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         musicService.getDurationInSeconds {
             callback.resolve(it)
         }
@@ -387,6 +460,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun getBufferedPosition(callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         musicService.getBufferedPositionInSeconds {
             callback.resolve(it)
         }
@@ -394,6 +469,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun getPosition(callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         musicService.getPositionInSeconds {
             callback.resolve(it)
         }
@@ -401,6 +478,8 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
     @ReactMethod
     fun getState(callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         if (!::musicService.isInitialized) {
             callback.resolve(PlaybackStateCompat.STATE_NONE)
         } else {

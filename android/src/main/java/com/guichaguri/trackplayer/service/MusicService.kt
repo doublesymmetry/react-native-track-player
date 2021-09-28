@@ -260,7 +260,7 @@ class MusicService : HeadlessJsTaskService() {
         // Overridden to prevent the service from being terminated
     }
 
-    override fun onBind(intent: Intent?): IBinder {
+    override fun onBind(intent: Intent?): IBinder? {
         return MusicBinder()
     }
 
