@@ -9,7 +9,7 @@ import com.google.android.exoplayer2.IllegalSeekPositionException
 import com.google.android.exoplayer2.source.MediaSource
 import java.util.*
 
-class QueuedAudioPlayer(context: Context, bufferConfig: BufferConfig? = null) : AudioPlayer(context, bufferConfig) {
+class QueuedAudioPlayer(context: Context, bufferConfig: BufferConfig? = null) : BaseAudioPlayer(context, bufferConfig) {
     private val queue = LinkedList<MediaSource>()
     override val playerOptions = QueuePlayerOptionsImpl(exoPlayer)
 
