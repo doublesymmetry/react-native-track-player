@@ -16,12 +16,9 @@ import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.notification.NotificationManager
 import com.doublesymmetry.kotlinaudio.utils.isJUnitTest
 import com.doublesymmetry.kotlinaudio.utils.isUriLocal
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.DefaultLoadControl
+import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.DefaultLoadControl.*
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player.*
-import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.Player.Listener
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
@@ -44,7 +41,6 @@ open class AudioPlayer(private val context: Context, bufferConfig: BufferConfig?
     val notificationManager: NotificationManager
 
     open val playerOptions: PlayerOptions = PlayerOptionsImpl()
-//    val notificationOptions: NotificationOptions
 
     protected val scope = CoroutineScope(Dispatchers.Main)
 
@@ -72,12 +68,15 @@ open class AudioPlayer(private val context: Context, bufferConfig: BufferConfig?
             exoPlayer.volume = value * volumeMultiplier
         }
 
-    var rate: Float
+    var playbackSpeed: Float
         get() = exoPlayer.playbackParameters.speed
         set(value) {
             exoPlayer.setPlaybackSpeed(value)
         }
 
+    /**
+     * The volume multiplier is added to the
+     */
     private var volumeMultiplier = 1f
         private set(value) {
             field = value
@@ -118,10 +117,15 @@ open class AudioPlayer(private val context: Context, bufferConfig: BufferConfig?
             exoPlayer.setThrowsWhenUsingWrongThread(false)
         }
 
-        addPlayerListener()
+        exoPlayer.addListener(PlayerListener())
         observeEvents()
     }
 
+    /**
+     * Will replace the current item with a new one and load it into the player.
+     * @param item The [AudioItem] to replace the current one.
+     * @param playWhenReady If this is `true` it will automatically start playback. Default is `true`.
+     */
     open fun load(item: AudioItem, playWhenReady: Boolean = true) {
         val mediaSource = getMediaSourceFromAudioItem(item)
 
@@ -152,7 +156,7 @@ open class AudioPlayer(private val context: Context, bufferConfig: BufferConfig?
      */
     @CallSuper
     open fun destroy() {
-        abandonFocus()
+        abandonAudioFocus()
         notificationManager.destroy()
         exoPlayer.release()
     }
@@ -268,7 +272,7 @@ open class AudioPlayer(private val context: Context, bufferConfig: BufferConfig?
         hasAudioFocus = (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
     }
 
-    private fun abandonFocus() {
+    private fun abandonAudioFocus() {
         if (!hasAudioFocus) return
         Timber.d("Abandoning audio focus...")
 
@@ -293,7 +297,7 @@ open class AudioPlayer(private val context: Context, bufferConfig: BufferConfig?
         when (focusChange) {
             AUDIOFOCUS_LOSS -> {
                 isPermanent = true
-                abandonFocus()
+                abandonAudioFocus()
                 isPaused = true
             }
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> isPaused = true
@@ -311,38 +315,6 @@ open class AudioPlayer(private val context: Context, bufferConfig: BufferConfig?
         event.updateOnAudioFocusChanged(isPaused, isPermanent)
     }
 
-    private fun addPlayerListener() {
-        exoPlayer.addListener(object : Listener {
-            override fun onPlaybackStateChanged(playbackState: Int) {
-                when (playbackState) {
-                    STATE_BUFFERING -> event.updateAudioPlayerState(AudioPlayerState.BUFFERING)
-                    STATE_READY -> event.updateAudioPlayerState(AudioPlayerState.READY)
-                    STATE_IDLE -> event.updateAudioPlayerState(AudioPlayerState.IDLE)
-                    STATE_ENDED -> event.updateAudioPlayerState(AudioPlayerState.ENDED)
-                }
-            }
-
-            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-                when (reason) {
-                    MEDIA_ITEM_TRANSITION_REASON_AUTO -> event.updateAudioItemTransition(AudioItemTransitionReason.AUTO)
-                    MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED -> event.updateAudioItemTransition(AudioItemTransitionReason.QUEUE_CHANGED)
-                    MEDIA_ITEM_TRANSITION_REASON_REPEAT -> event.updateAudioItemTransition(AudioItemTransitionReason.REPEAT)
-                    MEDIA_ITEM_TRANSITION_REASON_SEEK -> event.updateAudioItemTransition(AudioItemTransitionReason.SEEK_TO_ANOTHER_AUDIO_ITEM)
-                }
-            }
-
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                if (isPlaying) {
-                    requestAudioFocus()
-                    event.updateAudioPlayerState(AudioPlayerState.PLAYING)
-                } else {
-                    abandonFocus()
-                    event.updateAudioPlayerState(AudioPlayerState.PAUSED)
-                }
-            }
-        })
-    }
-
     private fun observeEvents() {
         scope.launch {
             notificationManager.onNotificationAction.collect {
@@ -353,5 +325,35 @@ open class AudioPlayer(private val context: Context, bufferConfig: BufferConfig?
 
     companion object {
         const val APPLICATION_NAME = "react-native-track-player"
+    }
+
+    inner class PlayerListener: Listener {
+        override fun onPlaybackStateChanged(playbackState: Int) {
+            when (playbackState) {
+                Player.STATE_BUFFERING -> event.updateAudioPlayerState(AudioPlayerState.BUFFERING)
+                Player.STATE_READY -> event.updateAudioPlayerState(AudioPlayerState.READY)
+                Player.STATE_IDLE -> event.updateAudioPlayerState(AudioPlayerState.IDLE)
+                Player.STATE_ENDED -> event.updateAudioPlayerState(AudioPlayerState.ENDED)
+            }
+        }
+
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            when (reason) {
+                Player.MEDIA_ITEM_TRANSITION_REASON_AUTO -> event.updateAudioItemTransition(AudioItemTransitionReason.AUTO)
+                Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED -> event.updateAudioItemTransition(AudioItemTransitionReason.QUEUE_CHANGED)
+                Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT -> event.updateAudioItemTransition(AudioItemTransitionReason.REPEAT)
+                Player.MEDIA_ITEM_TRANSITION_REASON_SEEK -> event.updateAudioItemTransition(AudioItemTransitionReason.SEEK_TO_ANOTHER_AUDIO_ITEM)
+            }
+        }
+
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            if (isPlaying) {
+                requestAudioFocus()
+                event.updateAudioPlayerState(AudioPlayerState.PLAYING)
+            } else {
+                abandonAudioFocus()
+                event.updateAudioPlayerState(AudioPlayerState.PAUSED)
+            }
+        }
     }
 }

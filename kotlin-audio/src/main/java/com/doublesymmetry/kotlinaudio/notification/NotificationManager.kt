@@ -20,7 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
-class NotificationManager(private val context: Context, private val exoPlayer: ExoPlayer) : PlayerNotificationManager.PrimaryActionReceiver {
+class NotificationManager internal constructor(private val context: Context, private val exoPlayer: ExoPlayer) : PlayerNotificationManager.PrimaryActionReceiver {
     private val descriptionAdapter = DescriptionAdapter(context, null)
     private val mediaSession: MediaSessionCompat = MediaSessionCompat(context, "AudioPlayerSession")
     private val mediaSessionConnector: MediaSessionConnector = MediaSessionConnector(mediaSession)
@@ -29,7 +29,7 @@ class NotificationManager(private val context: Context, private val exoPlayer: E
 
     private val scope = CoroutineScope(Dispatchers.Main)
 
-    val buttons = mutableSetOf<NotificationButton?>()
+    private val buttons = mutableSetOf<NotificationButton?>()
 
     private val channelId: String
 
@@ -60,6 +60,11 @@ class NotificationManager(private val context: Context, private val exoPlayer: E
         return channelId
     }
 
+    /**
+     * Create a media player notification that automatically updates.
+     *
+     * **NOTE:** You should only call this once. Subsequent calls will result in an error.
+     */
     fun createNotification(config: NotificationConfig) {
         if (isNotificationCreated) error("Cannot recreate notification once it's been created.")
 
@@ -133,26 +138,11 @@ class NotificationManager(private val context: Context, private val exoPlayer: E
         }
     }
 
-    fun onPlay() {
+    internal fun onPlay() {
         mediaSession.isActive = true
     }
 
-//    fun refresh() {
-//        if (!isJUnitTest()) {
-//            playerNotificationManager.apply {
-//                setPlayer(exoPlayer)
-//                setMediaSessionToken(mediaSession.sessionToken)
-//                setUsePlayPauseActions(buttons.any { it is NotificationButton.PLAY || it is NotificationButton.PAUSE })
-//                setUseFastForwardAction(buttons.any { it is NotificationButton.FORWARD })
-//                setUseRewindAction(buttons.any { it is NotificationButton.REWIND })
-//                setUseNextAction(buttons.any { it is NotificationButton.NEXT })
-//                setUsePreviousAction(buttons.any { it is NotificationButton.PREVIOUS })
-//                setUseStopAction(buttons.any { it is NotificationButton.STOP })
-//            }
-//        }
-//    }
-
-    fun destroy() {
+    internal fun destroy() {
         descriptionAdapter.release()
     }
 

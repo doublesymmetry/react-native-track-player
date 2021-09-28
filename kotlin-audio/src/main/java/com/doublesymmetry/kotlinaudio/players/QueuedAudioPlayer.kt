@@ -56,11 +56,6 @@ class QueuedAudioPlayer(context: Context, bufferConfig: BufferConfig? = null) : 
     val previousItem: AudioItem?
         get() = items.getOrNull(currentIndex - 1)
 
-    /**
-     * Will replace the current item with a new one and load it into the player.
-     * @param item The [AudioItem] to replace the current one.
-     * @param playWhenReady If this is `true` it will automatically start playback. Default is `true`.
-     */
     override fun load(item: AudioItem, playWhenReady: Boolean) {
         val currentIndex = exoPlayer.currentWindowIndex
         val mediaSource = getMediaSourceFromAudioItem(item)
