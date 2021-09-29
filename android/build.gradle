@@ -58,36 +58,10 @@ repositories {
 }
 
 dependencies {
-    implementation project(path: ':kotlin-audio')
+    implementation "com.github.DoubleSymmetry:KotlinAudio:v0.1.8"
 
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'
-
-    def exoPlayerVersion = safeExtGet("exoPlayerVersion", '2.11.4')
-
-    // ExoPlayer Core
-    implementation "com.google.android.exoplayer:exoplayer-core:${exoPlayerVersion}"
-
-    // ExoPlayer DASH
-    if (dash) {
-        implementation "com.google.android.exoplayer:exoplayer-dash:${exoPlayerVersion}"
-    } else {
-        compileOnly "com.google.android.exoplayer:exoplayer-dash:${exoPlayerVersion}"
-    }
-
-    // ExoPlayer HLS
-    if (hls) {
-        implementation "com.google.android.exoplayer:exoplayer-hls:${exoPlayerVersion}"
-    } else {
-        compileOnly "com.google.android.exoplayer:exoplayer-hls:${exoPlayerVersion}"
-    }
-
-    // ExoPlayer SmoothStreaming
-    if (smoothstreaming) {
-        implementation "com.google.android.exoplayer:exoplayer-smoothstreaming:${exoPlayerVersion}"
-    } else {
-        compileOnly "com.google.android.exoplayer:exoplayer-smoothstreaming:${exoPlayerVersion}"
-    }
 
     // Make sure we're using androidx
     implementation "androidx.core:core-ktx:1.7.0-alpha01"
