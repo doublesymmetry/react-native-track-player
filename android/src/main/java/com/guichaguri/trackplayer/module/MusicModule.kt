@@ -118,13 +118,13 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
         constants["CAPABILITY_JUMP_BACKWARD"] = Capability.JUMP_BACKWARD.ordinal
 
         // States
-        constants["STATE_NONE"] = State.None.value
-        constants["STATE_READY"] = State.Paused.value
-        constants["STATE_PLAYING"] = State.Playing.value
-        constants["STATE_PAUSED"] = State.Paused.value
-        constants["STATE_STOPPED"] = State.Stopped.value
-        constants["STATE_BUFFERING"] = State.Buffering.value
-        constants["STATE_CONNECTING"] = State.Connecting.value
+        constants["STATE_NONE"] = State.None.ordinal
+        constants["STATE_READY"] = State.Paused.ordinal
+        constants["STATE_PLAYING"] = State.Playing.ordinal
+        constants["STATE_PAUSED"] = State.Paused.ordinal
+        constants["STATE_STOPPED"] = State.Stopped.ordinal
+        constants["STATE_BUFFERING"] = State.Buffering.ordinal
+        constants["STATE_CONNECTING"] = State.Connecting.ordinal
 
         // Rating Types
         constants["RATING_HEART"] = RatingCompat.RATING_HEART
@@ -466,9 +466,9 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
         if (verifyServiceBoundOrReject(callback)) return
 
         if (!::musicService.isInitialized) {
-            callback.resolve(State.None.value)
+            callback.resolve(State.None.ordinal)
         } else {
-            callback.resolve(musicService.event.stateChange.value.asLibState.value)
+            callback.resolve(musicService.event.stateChange.value.asLibState.ordinal)
         }
     }
 }

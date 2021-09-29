@@ -10,7 +10,6 @@ import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
-import com.guichaguri.trackplayer.model.State
 import com.guichaguri.trackplayer.model.Track
 import com.guichaguri.trackplayer.model.TrackAudioItem
 import com.guichaguri.trackplayer.model.asLibState
@@ -192,18 +191,18 @@ class MusicService : HeadlessJsTaskService() {
 
                 when (it) {
                     AudioPlayerState.PLAYING -> {
-                        bundle.putInt(STATE_KEY, it.asLibState.value)
+                        bundle.putInt(STATE_KEY, it.asLibState.ordinal)
                         emit(MusicEvents.BUTTON_PLAY, null)
                     }
                     AudioPlayerState.PAUSED -> {
-                        bundle.putInt(STATE_KEY, it.asLibState.value)
+                        bundle.putInt(STATE_KEY, it.asLibState.ordinal)
                         emit(MusicEvents.BUTTON_PAUSE, null)
                     }
                     AudioPlayerState.READY, AudioPlayerState.IDLE, AudioPlayerState.BUFFERING -> {
-                        bundle.putInt(STATE_KEY, it.asLibState.value)
+                        bundle.putInt(STATE_KEY, it.asLibState.ordinal)
                     }
                     AudioPlayerState.ENDED -> {
-                        bundle.putInt(STATE_KEY, it.asLibState.value)
+                        bundle.putInt(STATE_KEY, it.asLibState.ordinal)
 
                         if (player.nextItem == null) {
                             if (player.previousIndex != null) bundle.putInt(TRACK_KEY, player.previousIndex!!)
