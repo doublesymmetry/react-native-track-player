@@ -192,28 +192,12 @@ class MusicService : HeadlessJsTaskService() {
         serviceScope.launch {
             event.stateChange.collect {
                 val bundle = Bundle()
-                Logger.d(it)
 
-                when (it) {
-                    AudioPlayerState.PLAYING -> {
-                        bundle.putInt(STATE_KEY, it.asLibState.ordinal)
-                        emit(MusicEvents.BUTTON_PLAY, null)
-                    }
-                    AudioPlayerState.PAUSED -> {
-                        bundle.putInt(STATE_KEY, it.asLibState.ordinal)
-                        emit(MusicEvents.BUTTON_PAUSE, null)
-                    }
-                    AudioPlayerState.READY, AudioPlayerState.IDLE, AudioPlayerState.BUFFERING -> {
-                        bundle.putInt(STATE_KEY, it.asLibState.ordinal)
-                    }
-                    AudioPlayerState.ENDED -> {
-                        bundle.putInt(STATE_KEY, it.asLibState.ordinal)
+                bundle.putInt(STATE_KEY, it.asLibState.ordinal)
 
-                        if (player.nextItem == null) {
-                            if (player.previousIndex != null) bundle.putInt(TRACK_KEY, player.previousIndex!!)
-                            emit(MusicEvents.PLAYBACK_QUEUE_ENDED, null)
-                        }
-                    }
+                if (it == AudioPlayerState.ENDED && player.nextItem == null) {
+                    if (player.previousIndex != null) bundle.putInt(TRACK_KEY, player.previousIndex!!)
+                    emit(MusicEvents.PLAYBACK_QUEUE_ENDED, null)
                 }
 
                 emit(MusicEvents.PLAYBACK_STATE, bundle)

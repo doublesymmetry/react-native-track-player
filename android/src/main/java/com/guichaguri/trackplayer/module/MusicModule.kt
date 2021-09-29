@@ -17,15 +17,13 @@ import com.guichaguri.trackplayer.module_old.MusicEvents.Companion.EVENT_INTENT
 import com.guichaguri.trackplayer.service.MusicService
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
-import kotlinx.coroutines.MainScope
 import java.util.*
 import javax.annotation.Nonnull
 
 /**
  * @author Guichaguri
  */
-class MusicModule(private val reactContext: ReactApplicationContext?) :
-    ReactContextBaseJavaModule(reactContext), ServiceConnection {
+class MusicModule(private val reactContext: ReactApplicationContext?) : ReactContextBaseJavaModule(reactContext), ServiceConnection {
     private var binder: MusicService.MusicBinder? = null
     private var eventHandler: MusicEvents? = null
     private var playerOptions: Bundle? = null
@@ -33,8 +31,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     private var playerSetUpPromise: Promise? = null
 
     private lateinit var musicService: MusicService
-
-    private val mainScope = MainScope()
 
     @Nonnull
     override fun getName(): String {
@@ -66,17 +62,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
         musicService.setupPlayer(playerOptions, playerSetUpPromise)
 
         isServiceBound = true
-
-//
-//        // Reapply options that user set before with updateOptions
-//        if (options != null) {
-//            binder!!.updateOptions(options)
-//        }
-//
-//        // Triggers all callbacks
-//        while (!initCallbacks.isEmpty()) {
-//            binder!!.post(initCallbacks.remove())
-//        }
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
@@ -89,10 +74,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
      */
     private fun verifyServiceBoundOrReject(promise: Promise): Boolean {
         if (!isServiceBound) {
-            promise.reject(
-                "player_not_initialized",
-                "The player is not initialized. Call setupPlayer first."
-            )
+            promise.reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.")
             return true
         }
 
@@ -230,10 +212,9 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
         for (o in trackList!!) {
             val index = if (o is Int) o else o.toString().toInt()
 
-            // we do not allow removal of the current item
+            // We do not allow removal of the current item
             musicService.getCurrentTrackIndex {
-                val currentIndex = it
-                if (index == currentIndex) return@getCurrentTrackIndex
+                if (index == it) return@getCurrentTrackIndex
                 if (index >= 0 && index < queue.size) {
                     indexes.add(index)
                 }
@@ -335,10 +316,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
         musicService.play()
         callback.resolve(null)
-//        waitForConnection {
-//            binder?.playback?.play()
-//            callback.resolve(null)
-//        }
     }
 
     @ReactMethod
@@ -347,10 +324,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
         musicService.pause()
         callback.resolve(null)
-//        waitForConnection {
-//            binder?.playback?.pause()
-//            callback.resolve(null)
-//        }
     }
 
     @ReactMethod
@@ -359,11 +332,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
         musicService.pause()
         callback.resolve(null)
-
-//        waitForConnection {
-//            binder?.playback?.stop()
-//            callback.resolve(null)
-//        }
     }
 
     @ReactMethod
@@ -372,11 +340,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
         musicService.seekTo(seconds)
         callback.resolve(null)
-//        waitForConnection {
-//            val secondsToSkip = Utils.toMillis(seconds.toDouble())
-//            binder?.playback?.seekTo(secondsToSkip)
-//            callback.resolve(null)
-//        }
     }
 
     @ReactMethod
