@@ -1,4 +1,4 @@
-package com.guichaguri.trackplayer.service_old
+package com.doublesymmetry.trackplayer
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -16,11 +16,10 @@ import com.google.android.exoplayer2.upstream.RawResourceDataSource
 /**
  * @author Guichaguri
  */
-@Deprecated("new module is being built")
 object Utils {
-    const val EVENT_INTENT = "com.guichaguri.trackplayer.event"
-    const val CONNECT_INTENT = "com.guichaguri.trackplayer.connect"
-    const val NOTIFICATION_CHANNEL = "com.guichaguri.trackplayer"
+    const val EVENT_INTENT = "com.doublesymmetry.trackplayer.event"
+    const val CONNECT_INTENT = "com.doublesymmetry.trackplayer.connect"
+    const val NOTIFICATION_CHANNEL = "com.doublesymmetry.trackplayer"
     const val LOG = "RNTrackPlayer"
     fun toRunnable(promise: Promise): Runnable {
         return Runnable { promise.resolve(null) }

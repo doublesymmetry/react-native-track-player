@@ -1,4 +1,4 @@
-package com.guichaguri.trackplayer.module_old
+package com.doublesymmetry.trackplayer.module
 
 import android.content.BroadcastReceiver
 import android.content.Context

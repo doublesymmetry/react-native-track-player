@@ -1,4 +1,4 @@
-package com.guichaguri.trackplayer.model
+package com.doublesymmetry.trackplayer.model
 
 /**
  * @author Guichaguri
