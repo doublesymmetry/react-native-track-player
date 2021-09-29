@@ -185,21 +185,38 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     fun add(data: ReadableArray?, insertBeforeIndex: Int, callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
 
+        val tracks: MutableList<Track> = mutableListOf()
         val bundleList = Arguments.toList(data)
-        val tracks: List<Track> = try {
-            Track.createTracks(
-                reactApplicationContext, bundleList, RatingCompat.RATING_HEART
-            )!!
 
-
-        } catch (ex: Exception) {
-            callback.reject("invalid_track_object", ex)
+        if (bundleList == null) {
+            callback.reject("invalid_parameter", "Was not given an array of tracks")
             return
         }
 
-        musicService.apply {
-            add(tracks)
-            callback.resolve(null)
+        bundleList.forEach {
+            if (it is Bundle) {
+                tracks.add(Track(reactApplicationContext, it, RatingCompat.RATING_HEART))
+            } else {
+                callback.reject("invalid_track_object", "Track was not a dictionary type")
+            }
+        }
+
+        when {
+            insertBeforeIndex < -1 || insertBeforeIndex > musicService.tracks.size -> {
+                callback.reject("index_out_of_bounds", "The track index is out of bounds")
+            }
+            insertBeforeIndex == -1 -> {
+                musicService.apply {
+                    add(tracks)
+                    callback.resolve(null)
+                }
+            }
+            else -> {
+                musicService.apply {
+                    add(tracks, insertBeforeIndex)
+                    callback.resolve(null)
+                }
+            }
         }
     }
 

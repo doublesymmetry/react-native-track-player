@@ -184,18 +184,18 @@ class MusicModule(reactContext: ReactApplicationContext?) :
     fun add(tracks: ReadableArray?, insertBeforeIndex: Int, callback: Promise) {
         val bundleList = Arguments.toList(tracks)
         waitForConnection {
-            val trackList: List<Track> = try {
-                Track.createTracks(
-                    reactApplicationContext, bundleList, binder?.ratingType!!
-                )!!
-            } catch (ex: Exception) {
-                callback.reject("invalid_track_object", ex)
-                return@waitForConnection
-            }
-
-            val items = trackList.map {
-                DefaultAudioItem(it.uri.toString(), MediaType.DEFAULT, it.artist, it.title, it.album, it.artwork.toString())
-            }
+//            val trackList: List<Track> = try {
+//                Track.createTracks(
+//                    reactApplicationContext, bundleList, binder?.ratingType!!
+//                )!!
+//            } catch (ex: Exception) {
+//                callback.reject("invalid_track_object", ex)
+//                return@waitForConnection
+//            }
+//
+//            val items = trackList.map {
+//                DefaultAudioItem(it.uri.toString(), MediaType.DEFAULT, it.artist, it.title, it.album, it.artwork.toString())
+//            }
             
 //            val queue = binder?.playback?.queue
 //            // -1 means no index was passed and therefore should be inserted at the end.

@@ -117,20 +117,6 @@ class Track(context: Context, bundle: Bundle, ratingType: Int) : TrackMetadata()
         )
     }
 
-    companion object {
-        fun createTracks(context: Context, objects: List<*>?, ratingType: Int): List<Track>? {
-            val tracks: MutableList<Track> = ArrayList()
-            for (o in objects!!) {
-                if (o is Bundle) {
-                    tracks.add(Track(context, o, ratingType))
-                } else {
-                    return null
-                }
-            }
-            return tracks
-        }
-    }
-
     init {
         resourceId = Utils.getRawResourceId(context, bundle, "url")
         uri = if (resourceId == 0) {

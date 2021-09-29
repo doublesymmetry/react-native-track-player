@@ -113,9 +113,14 @@ class MusicService : HeadlessJsTaskService() {
         return compactCapabilities.contains(capability)
     }
 
-    fun add(tracks: List<Track>, playWhenReady: Boolean = true) {
+    fun add(tracks: List<Track>) {
         val items = tracks.map { it.toAudioItem() }
-        handler.post { player.add(items, playWhenReady) }
+        handler.post { player.add(items, false) }
+    }
+
+    fun add(tracks: List<Track>, atIndex: Int) {
+        val items = tracks.map { it.toAudioItem() }
+        handler.post { player.add(items, atIndex) }
     }
 
     fun remove(indexes: List<Int>) {
