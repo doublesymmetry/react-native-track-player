@@ -187,22 +187,18 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
         val tracks: MutableList<Track> = mutableListOf()
         val bundleList = Arguments.toList(data)
-        if (bundleList != null) {
-            bundleList.forEach { trackBundle ->
-                if (trackBundle is Bundle) {
-                    try {
-                        tracks.add(
-                            Track(reactApplicationContext, trackBundle, RatingCompat.RATING_HEART)
-                        )
-                    } catch(ex: Exception) {
-                        callback.reject("invalid_track_object", ex)
-                    }
-                } else {
-                    callback.reject("invalid_track_object", "Track was not a dictionary type")
-                }
-            }
-        } else {
+
+        if (bundleList == null) {
             callback.reject("invalid_parameter", "Was not given an array of tracks")
+            return
+        }
+
+        bundleList.forEach {
+            if (it is Bundle) {
+                tracks.add(Track(reactApplicationContext, it, RatingCompat.RATING_HEART))
+            } else {
+                callback.reject("invalid_track_object", "Track was not a dictionary type")
+            }
         }
 
         when {
