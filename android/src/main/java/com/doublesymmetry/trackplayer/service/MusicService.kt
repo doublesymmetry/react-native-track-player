@@ -1,4 +1,4 @@
-package com.guichaguri.trackplayer.service
+package com.doublesymmetry.trackplayer.service
 
 import android.content.Intent
 import android.os.*
@@ -6,15 +6,15 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.models.NotificationButton.*
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
+import com.doublesymmetry.trackplayer.model.Track
+import com.doublesymmetry.trackplayer.model.TrackAudioItem
+import com.doublesymmetry.trackplayer.model.asLibState
+import com.doublesymmetry.trackplayer.module.MusicEvents
+import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
 import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
-import com.guichaguri.trackplayer.model.Track
-import com.guichaguri.trackplayer.model.TrackAudioItem
-import com.guichaguri.trackplayer.model.asLibState
-import com.guichaguri.trackplayer.module_old.MusicEvents
-import com.guichaguri.trackplayer.module_old.MusicEvents.Companion.EVENT_INTENT
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collect
