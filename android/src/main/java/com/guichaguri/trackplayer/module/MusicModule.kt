@@ -188,7 +188,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
         val tracks: MutableList<Track> = mutableListOf()
         val bundleList = Arguments.toList(data)
         if (bundleList != null) {
-            for (trackBundle in bundleList) {
+            bundleList.forEach { trackBundle ->
                 if (trackBundle is Bundle) {
                     try {
                         tracks.add(
