@@ -1,4 +1,4 @@
-package com.doublesymmetry.trackplayer.model
+package com.guichaguri.trackplayer.model
 
 import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
 

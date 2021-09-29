@@ -23,7 +23,7 @@
         </activity>
 
         <service
-            android:name="com.doublesymmetry.trackplayer.service.MusicService"
+            android:name="com.guichaguri.trackplayer.service.MusicService"
             android:enabled="true" />
     </application>
 </manifest>

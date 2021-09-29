@@ -1,4 +1,4 @@
-package com.doublesymmetry.trackplayer.model
+package com.guichaguri.trackplayer.model
 
 import android.content.Context
 import android.os.Bundle

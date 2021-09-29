@@ -1,11 +1,11 @@
-package com.doublesymmetry.trackplayer.model
+package com.guichaguri.trackplayer.model
 
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.RatingCompat
-import com.doublesymmetry.trackplayer.Utils
+import com.guichaguri.trackplayer.service_old.Utils
 
 abstract class TrackMetadata {
     var artwork: Uri? = null
@@ -34,19 +34,15 @@ abstract class TrackMetadata {
         builder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, album)
         builder.putString(MediaMetadataCompat.METADATA_KEY_DATE, date)
         builder.putString(MediaMetadataCompat.METADATA_KEY_GENRE, genre)
-
         if (duration > 0) {
             builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration)
         }
-
         if (artwork != null) {
             builder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, artwork.toString())
         }
-
         if (rating != null) {
             builder.putRating(MediaMetadataCompat.METADATA_KEY_RATING, rating)
         }
-
         return builder
     }
 }
