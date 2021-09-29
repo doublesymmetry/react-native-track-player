@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.doublesymmetry.kotlin_audio_sample.databinding.FragmentFirstBinding
+import com.doublesymmetry.kotlin_audio_sample.utils.firstItem
+import com.doublesymmetry.kotlin_audio_sample.utils.secondItem
 import com.doublesymmetry.kotlinaudio.models.AudioPlayerState.PLAYING
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.orhanobut.logger.Logger

@@ -44,7 +44,9 @@ class NotificationManager internal constructor(private val context: Context, pri
             ""
         }
 
-        mediaSessionConnector.setPlayer(exoPlayer)
+        if (!isJUnitTest()) {
+            mediaSessionConnector.setPlayer(exoPlayer)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
