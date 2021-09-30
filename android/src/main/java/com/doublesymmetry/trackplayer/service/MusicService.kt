@@ -244,7 +244,9 @@ class MusicService : HeadlessJsTaskService() {
                     Action.PAUSE -> emit(MusicEvents.BUTTON_PAUSE)
                     Action.NEXT -> emit(MusicEvents.BUTTON_SKIP_NEXT)
                     Action.PREVIOUS -> emit(MusicEvents.BUTTON_SKIP_PREVIOUS)
-                    else -> return@collect
+                    Action.STOP -> emit(MusicEvents.BUTTON_STOP)
+                    Action.FORWARD -> emit(MusicEvents.BUTTON_JUMP_FORWARD)
+                    Action.REWIND -> emit(MusicEvents.BUTTON_JUMP_BACKWARD)
                 }
 
             }

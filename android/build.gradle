@@ -13,14 +13,9 @@ buildscript {
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
-boolean dash = false, hls = false, smoothstreaming = false
-
 File file = file('../../../track-player.json')
 if(file.exists()) {
     def json = new JsonSlurper().parseText(file.text)
-    dash = json.dash ?: dash
-    hls = json.hls ?: hls
-    smoothstreaming = json.smoothstreaming ?: smoothstreaming
 }
 
 def safeExtGet(prop, fallback) {
