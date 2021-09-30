@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
+import com.doublesymmetry.kotlinaudio.models.AudioItemOptions
 import com.doublesymmetry.kotlinaudio.models.MediaType
 import com.google.android.exoplayer2.upstream.RawResourceDataSource
 import com.guichaguri.trackplayer.service_old.Utils
@@ -16,7 +17,7 @@ import java.util.*
  */
 class Track(context: Context, bundle: Bundle, ratingType: Int) : TrackMetadata() {
     var uri: Uri? = null
-    var resourceId: Int
+    var resourceId: Int?
     var type = MediaType.DEFAULT
     var contentType: String?
     var userAgent: String?
@@ -43,16 +44,22 @@ class Track(context: Context, bundle: Bundle, ratingType: Int) : TrackMetadata()
             artist,
             title,
             album,
-            artwork.toString()
+            artwork.toString(),
+            AudioItemOptions(
+                headers,
+                userAgent,
+                resourceId
+            )
         )
     }
 
     init {
         resourceId = Utils.getRawResourceId(context, bundle, "url")
         uri = if (resourceId == 0) {
+            resourceId = null
             Utils.getUri(context, bundle, "url")
         } else {
-            RawResourceDataSource.buildRawResourceUri(resourceId)
+            RawResourceDataSource.buildRawResourceUri(resourceId!!)
         }
         val trackType = bundle.getString("type", "default")
         for (t in MediaType.values()) {
