@@ -17,7 +17,7 @@ import java.util.*
 class Track(context: Context, bundle: Bundle, ratingType: Int) : TrackMetadata() {
     var uri: Uri? = null
     var resourceId: Int
-    var type = TrackType.DEFAULT
+    var type = MediaType.DEFAULT
     var contentType: String?
     var userAgent: String?
     var originalItem: Bundle?
@@ -108,7 +108,7 @@ class Track(context: Context, bundle: Bundle, ratingType: Int) : TrackMetadata()
     fun toAudioItem(): TrackAudioItem {
         return TrackAudioItem(
             this,
-            MediaType.DEFAULT,
+            type,
             uri.toString(),
             artist,
             title,
@@ -125,7 +125,7 @@ class Track(context: Context, bundle: Bundle, ratingType: Int) : TrackMetadata()
             RawResourceDataSource.buildRawResourceUri(resourceId)
         }
         val trackType = bundle.getString("type", "default")
-        for (t in TrackType.values()) {
+        for (t in MediaType.values()) {
             if (t.name.equals(trackType, ignoreCase = true)) {
                 type = t
                 break
