@@ -1,4 +1,4 @@
-package com.guichaguri.trackplayer.module
+package com.doublesymmetry.trackplayer.module
 
 import android.content.*
 import android.os.Bundle
@@ -7,14 +7,13 @@ import android.support.v4.media.RatingCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.Capability
 import com.doublesymmetry.kotlinaudio.models.RepeatMode
+import com.doublesymmetry.trackplayer.model.State
+import com.doublesymmetry.trackplayer.model.Track
+import com.doublesymmetry.trackplayer.model.asLibState
+import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
+import com.doublesymmetry.trackplayer.service.MusicService
 import com.facebook.react.bridge.*
 import com.google.android.exoplayer2.Player
-import com.guichaguri.trackplayer.model.State
-import com.guichaguri.trackplayer.model.Track
-import com.guichaguri.trackplayer.model.asLibState
-import com.guichaguri.trackplayer.module_old.MusicEvents
-import com.guichaguri.trackplayer.module_old.MusicEvents.Companion.EVENT_INTENT
-import com.guichaguri.trackplayer.service.MusicService
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import java.util.*

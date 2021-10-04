@@ -1,4 +1,4 @@
-package com.guichaguri.trackplayer.model
+package com.doublesymmetry.trackplayer.model
 
 import android.content.Context
 import android.net.Uri
@@ -8,8 +8,8 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import com.doublesymmetry.kotlinaudio.models.AudioItemOptions
 import com.doublesymmetry.kotlinaudio.models.MediaType
+import com.doublesymmetry.trackplayer.Utils
 import com.google.android.exoplayer2.upstream.RawResourceDataSource
-import com.guichaguri.trackplayer.service_old.Utils
 import java.util.*
 
 /**

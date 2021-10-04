@@ -21,9 +21,5 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service
-            android:name="com.guichaguri.trackplayer.service.MusicService"
-            android:enabled="true" />
     </application>
 </manifest>
