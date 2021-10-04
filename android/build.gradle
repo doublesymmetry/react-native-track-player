@@ -46,7 +46,7 @@ repositories {
 }
 
 dependencies {
-    implementation project(path: ':kotlin-audio')
+    implementation "com.github.DoubleSymmetry:KotlinAudio:v0.1.8"
 
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'

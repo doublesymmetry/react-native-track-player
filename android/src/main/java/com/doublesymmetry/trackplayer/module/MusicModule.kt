@@ -16,15 +16,13 @@ import com.facebook.react.bridge.*
 import com.google.android.exoplayer2.Player
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
-import kotlinx.coroutines.MainScope
 import java.util.*
 import javax.annotation.Nonnull
 
 /**
  * @author Guichaguri
  */
-class MusicModule(private val reactContext: ReactApplicationContext?) :
-    ReactContextBaseJavaModule(reactContext), ServiceConnection {
+class MusicModule(private val reactContext: ReactApplicationContext?) : ReactContextBaseJavaModule(reactContext), ServiceConnection {
     private var binder: MusicService.MusicBinder? = null
     private var eventHandler: MusicEvents? = null
     private var playerOptions: Bundle? = null
@@ -32,8 +30,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     private var playerSetUpPromise: Promise? = null
 
     private lateinit var musicService: MusicService
-
-    private val mainScope = MainScope()
 
     @Nonnull
     override fun getName(): String {
@@ -65,17 +61,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
         musicService.setupPlayer(playerOptions, playerSetUpPromise)
 
         isServiceBound = true
-
-//
-//        // Reapply options that user set before with updateOptions
-//        if (options != null) {
-//            binder!!.updateOptions(options)
-//        }
-//
-//        // Triggers all callbacks
-//        while (!initCallbacks.isEmpty()) {
-//            binder!!.post(initCallbacks.remove())
-//        }
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
@@ -88,10 +73,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
      */
     private fun verifyServiceBoundOrReject(promise: Promise): Boolean {
         if (!isServiceBound) {
-            promise.reject(
-                "player_not_initialized",
-                "The player is not initialized. Call setupPlayer first."
-            )
+            promise.reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.")
             return true
         }
 
@@ -184,21 +166,38 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
     fun add(data: ReadableArray?, insertBeforeIndex: Int, callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
 
+        val tracks: MutableList<Track> = mutableListOf()
         val bundleList = Arguments.toList(data)
-        val tracks: List<Track> = try {
-            Track.createTracks(
-                reactApplicationContext, bundleList, RatingCompat.RATING_HEART
-            )!!
 
-
-        } catch (ex: Exception) {
-            callback.reject("invalid_track_object", ex)
+        if (bundleList == null) {
+            callback.reject("invalid_parameter", "Was not given an array of tracks")
             return
         }
 
-        musicService.apply {
-            add(tracks)
-            callback.resolve(null)
+        bundleList.forEach {
+            if (it is Bundle) {
+                tracks.add(Track(reactApplicationContext, it, RatingCompat.RATING_HEART))
+            } else {
+                callback.reject("invalid_track_object", "Track was not a dictionary type")
+            }
+        }
+
+        when {
+            insertBeforeIndex < -1 || insertBeforeIndex > musicService.tracks.size -> {
+                callback.reject("index_out_of_bounds", "The track index is out of bounds")
+            }
+            insertBeforeIndex == -1 -> {
+                musicService.apply {
+                    add(tracks)
+                    callback.resolve(null)
+                }
+            }
+            else -> {
+                musicService.apply {
+                    add(tracks, insertBeforeIndex)
+                    callback.resolve(null)
+                }
+            }
         }
     }
 
@@ -212,10 +211,9 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
         for (o in trackList!!) {
             val index = if (o is Int) o else o.toString().toInt()
 
-            // we do not allow removal of the current item
+            // We do not allow removal of the current item
             musicService.getCurrentTrackIndex {
-                val currentIndex = it
-                if (index == currentIndex) return@getCurrentTrackIndex
+                if (index == it) return@getCurrentTrackIndex
                 if (index >= 0 && index < queue.size) {
                     indexes.add(index)
                 }
@@ -317,10 +315,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
         musicService.play()
         callback.resolve(null)
-//        waitForConnection {
-//            binder?.playback?.play()
-//            callback.resolve(null)
-//        }
     }
 
     @ReactMethod
@@ -329,10 +323,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
         musicService.pause()
         callback.resolve(null)
-//        waitForConnection {
-//            binder?.playback?.pause()
-//            callback.resolve(null)
-//        }
     }
 
     @ReactMethod
@@ -341,11 +331,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
         musicService.pause()
         callback.resolve(null)
-
-//        waitForConnection {
-//            binder?.playback?.stop()
-//            callback.resolve(null)
-//        }
     }
 
     @ReactMethod
@@ -354,11 +339,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) :
 
         musicService.seekTo(seconds)
         callback.resolve(null)
-//        waitForConnection {
-//            val secondsToSkip = Utils.toMillis(seconds.toDouble())
-//            binder?.playback?.seekTo(secondsToSkip)
-//            callback.resolve(null)
-//        }
     }
 
     @ReactMethod
