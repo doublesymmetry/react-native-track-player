@@ -74,7 +74,7 @@ object Utils {
         val obj = data[key] as? Bundle ?: return 0
         var name = obj.getString("uri")
         if (name == null || name.isEmpty()) return 0
-        name = name.toLowerCase().replace("-", "_")
+        name = name.lowercase().replace("-", "_")
         return try {
             name.toInt()
         } catch (ex: NumberFormatException) {
