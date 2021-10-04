@@ -15,7 +15,6 @@ import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
-import com.orhanobut.logger.Logger
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -79,7 +78,8 @@ class MusicService : HeadlessJsTaskService() {
 
     fun updateOptions(options: Bundle) {
         handler.post {
-            stopWithApp = options.getBoolean(STOP_WITH_APP)
+            stopWithApp = options.getBoolean(STOP_WITH_APP_KEY)
+
             player.playerOptions.alwaysPauseOnInterruption = options.getBoolean(PAUSE_ON_INTERRUPTION_KEY)
 
             capabilities = options.getIntegerArrayList("capabilities")?.map { Capability.values()[it] } ?: emptyList()
@@ -240,6 +240,15 @@ class MusicService : HeadlessJsTaskService() {
 
             }
         }
+
+        serviceScope.launch {
+            event.notificationStateChange.collect {
+                when(it) {
+                    is NotificationState.POSTED -> startForeground(it.notificationId, it.notification)
+                    is NotificationState.CANCELLED -> stopForeground(true)
+                }
+            }
+        }
     }
 
     private fun emit(event: String?, data: Bundle? = null) {
@@ -268,8 +277,9 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-        if (stopWithApp) destroy()
         super.onTaskRemoved(rootIntent)
+
+        if (stopWithApp) destroy()
     }
 
     inner class MusicBinder : Binder() {
@@ -291,11 +301,10 @@ class MusicService : HeadlessJsTaskService() {
         const val PLAY_BUFFER_KEY = "playBuffer"
         const val BACK_BUFFER_KEY = "backBuffer"
 
-        const val STOP_WITH_APP = "stopWithApp"
+        const val STOP_WITH_APP_KEY = "stopWithApp"
         const val PAUSE_ON_INTERRUPTION_KEY = "alwaysPauseOnInterruption"
 
         const val IS_FOCUS_LOSS_PERMANENT_KEY = "permanent"
         const val IS_PAUSED_KEY = "paused"
-
     }
 }

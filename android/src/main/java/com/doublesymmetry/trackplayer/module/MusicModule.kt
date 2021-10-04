@@ -48,11 +48,14 @@ class MusicModule(private val reactContext: ReactApplicationContext?) : ReactCon
 
     override fun onCatalystInstanceDestroy() {
         val context: ReactContext = reactApplicationContext
+
         if (eventHandler != null) {
             val manager = LocalBroadcastManager.getInstance(context)
             manager.unregisterReceiver(eventHandler!!)
             eventHandler = null
         }
+
+        destroy()
     }
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
