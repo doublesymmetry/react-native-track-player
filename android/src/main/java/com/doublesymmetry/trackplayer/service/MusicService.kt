@@ -135,11 +135,6 @@ class MusicService : HeadlessJsTaskService() {
         handler.post { player.pause() }
     }
 
-    fun destroy() {
-        stopForeground(true)
-        stopSelf()
-    }
-
     fun removeUpcomingTracks() {
         handler.post { player.removeUpcomingItems() }
     }
@@ -243,7 +238,7 @@ class MusicService : HeadlessJsTaskService() {
 
         serviceScope.launch {
             event.notificationStateChange.collect {
-                when(it) {
+                when (it) {
                     is NotificationState.POSTED -> startForeground(it.notificationId, it.notification)
                     is NotificationState.CANCELLED -> stopForeground(true)
                 }
@@ -266,20 +261,25 @@ class MusicService : HeadlessJsTaskService() {
         // Overridden to prevent the service from being terminated
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
+    override fun onBind(intent: Intent?): IBinder {
         return MusicBinder()
     }
 
-    override fun onDestroy() {
-        handler.post { player.destroy() }
-        handler.removeMessages(0)
-        super.onDestroy()
+    fun destroyIfAllowed() {
+        // Player will continue running if this is true, even if the app itself is killed.
+        if (!stopWithApp) return
+
+        stopForeground(true)
+        stopSelf()
     }
 
-    override fun onTaskRemoved(rootIntent: Intent?) {
-        super.onTaskRemoved(rootIntent)
+    override fun onDestroy() {
+        handler.post {
+            player.destroy()
+            handler.removeMessages(0)
+        }
 
-        if (stopWithApp) destroy()
+        super.onDestroy()
     }
 
     inner class MusicBinder : Binder() {

@@ -22,7 +22,7 @@ import javax.annotation.Nonnull
 /**
  * @author Guichaguri
  */
-class MusicModule(private val reactContext: ReactApplicationContext?) : ReactContextBaseJavaModule(reactContext), ServiceConnection {
+class MusicModule(private val reactContext: ReactApplicationContext?) : ReactContextBaseJavaModule(reactContext), ServiceConnection, LifecycleEventListener {
     private var binder: MusicService.MusicBinder? = null
     private var eventHandler: MusicEvents? = null
     private var playerOptions: Bundle? = null
@@ -38,6 +38,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) : ReactCon
 
     override fun initialize() {
         val context: ReactContext = reactApplicationContext
+        context.addLifecycleEventListener(this)
         val manager = LocalBroadcastManager.getInstance(context)
 
         Logger.addLogAdapter(AndroidLogAdapter())
@@ -47,15 +48,18 @@ class MusicModule(private val reactContext: ReactApplicationContext?) : ReactCon
     }
 
     override fun onCatalystInstanceDestroy() {
-        val context: ReactContext = reactApplicationContext
-
-        if (eventHandler != null) {
-            val manager = LocalBroadcastManager.getInstance(context)
-            manager.unregisterReceiver(eventHandler!!)
-            eventHandler = null
-        }
-
         destroy()
+    }
+
+    override fun onHostDestroy() {
+        destroy()
+    }
+
+    override fun onHostPause() {
+    }
+
+    override fun onHostResume() {
+
     }
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
@@ -67,7 +71,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) : ReactCon
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
-        musicService.destroy()
+        musicService.destroyIfAllowed()
         isServiceBound = false
     }
 
@@ -142,12 +146,20 @@ class MusicModule(private val reactContext: ReactApplicationContext?) : ReactCon
 
     @ReactMethod
     fun destroy() {
+        val context: ReactContext = reactApplicationContext
+
+//        if (eventHandler != null) {
+//            val manager = LocalBroadcastManager.getInstance(context)
+//            manager.unregisterReceiver(eventHandler!!)
+//            eventHandler = null
+//        }
+
         if (isServiceBound) {
             reactApplicationContext.unbindService(this)
             isServiceBound = false
         }
 
-        musicService.destroy()
+        musicService.destroyIfAllowed()
         binder = null
     }
 
@@ -308,7 +320,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) : ReactCon
     fun reset(callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
 
-        musicService.destroy()
+        musicService.destroyIfAllowed()
         callback.resolve(null)
     }
 
