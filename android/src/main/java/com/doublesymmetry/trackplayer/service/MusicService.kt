@@ -1,5 +1,6 @@
 package com.doublesymmetry.trackplayer.service
 
+import android.app.PendingIntent
 import android.content.Intent
 import android.os.*
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -103,10 +104,17 @@ class MusicService : HeadlessJsTaskService() {
                 }
             }
 
-            val notificationConfig = NotificationConfig(buttonsList)
+            val openAppIntent = packageManager.getLaunchIntentForPackage(packageName)
+            val pendingIntent = PendingIntent.getActivity(this, 0, openAppIntent, getPendingIntentFlags())
+
+            val notificationConfig = NotificationConfig(buttonsList, pendingIntent)
 
             player.notificationManager.createNotification(notificationConfig)
         }
+    }
+
+    private fun getPendingIntentFlags(): Int {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) { PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT } else { PendingIntent.FLAG_CANCEL_CURRENT }
     }
 
     private fun isCompact(capability: Capability): Boolean {
