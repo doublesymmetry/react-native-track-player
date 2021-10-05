@@ -20,7 +20,8 @@ import java.util.*
 import javax.annotation.Nonnull
 
 /**
- * @author Guichaguri
+ * @author Milen Pivchev @mpivchev
+ *
  */
 class MusicModule(private val reactContext: ReactApplicationContext?) : ReactContextBaseJavaModule(reactContext), ServiceConnection, LifecycleEventListener {
     private var binder: MusicService.MusicBinder? = null
@@ -148,19 +149,22 @@ class MusicModule(private val reactContext: ReactApplicationContext?) : ReactCon
     fun destroy() {
         val context: ReactContext = reactApplicationContext
 
-//        if (eventHandler != null) {
-//            val manager = LocalBroadcastManager.getInstance(context)
-//            manager.unregisterReceiver(eventHandler!!)
-//            eventHandler = null
-//        }
+        musicService.destroyIfAllowed()
 
+        if (!musicService.stopWithApp) return
+
+        // The music service will not stop unless we unbind it first.
         if (isServiceBound) {
             reactApplicationContext.unbindService(this)
             isServiceBound = false
+            binder = null
         }
 
-        musicService.destroyIfAllowed()
-        binder = null
+        if (eventHandler != null) {
+            val manager = LocalBroadcastManager.getInstance(context)
+            manager.unregisterReceiver(eventHandler!!)
+            eventHandler = null
+        }
     }
 
     @ReactMethod
@@ -174,7 +178,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) : ReactCon
         }
 
         callback.resolve(null)
-
     }
 
     @ReactMethod

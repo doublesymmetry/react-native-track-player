@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit
 class MusicService : HeadlessJsTaskService() {
     private lateinit var player: QueuedAudioPlayer
     private val handler = Handler(Looper.getMainLooper())
-    private var stopWithApp = false
+    var stopWithApp = false
 
     private val serviceScope = MainScope()
 
