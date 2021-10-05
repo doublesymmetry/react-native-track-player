@@ -9,7 +9,7 @@ import com.doublesymmetry.kotlinaudio.models.NotificationButton.*
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.model.TrackAudioItem
-import com.doublesymmetry.trackplayer.model.asLibState
+import com.doublesymmetry.trackplayer.extensions.asLibState
 import com.doublesymmetry.trackplayer.module.MusicEvents
 import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
 import com.facebook.react.HeadlessJsTaskService
@@ -104,7 +104,10 @@ class MusicService : HeadlessJsTaskService() {
                 }
             }
 
-            val openAppIntent = packageManager.getLaunchIntentForPackage(packageName)
+            val openAppIntent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+
             val pendingIntent = PendingIntent.getActivity(this, 0, openAppIntent, getPendingIntentFlags())
 
             val notificationConfig = NotificationConfig(buttonsList, pendingIntent)
