@@ -230,15 +230,15 @@ class MusicService : HeadlessJsTaskService() {
         }
 
         serviceScope.launch {
-            event.onNotificationAction.collect {
+            event.onNotificationButtonTapped.collect {
                 when (it) {
-                    Action.PLAY -> emit(MusicEvents.BUTTON_PLAY)
-                    Action.PAUSE -> emit(MusicEvents.BUTTON_PAUSE)
-                    Action.NEXT -> emit(MusicEvents.BUTTON_SKIP_NEXT)
-                    Action.PREVIOUS -> emit(MusicEvents.BUTTON_SKIP_PREVIOUS)
-                    Action.STOP -> emit(MusicEvents.BUTTON_STOP)
-                    Action.FORWARD -> emit(MusicEvents.BUTTON_JUMP_FORWARD)
-                    Action.REWIND -> emit(MusicEvents.BUTTON_JUMP_BACKWARD)
+                    is PLAY -> emit(MusicEvents.BUTTON_PLAY)
+                    is PAUSE -> emit(MusicEvents.BUTTON_PAUSE)
+                    is NEXT -> emit(MusicEvents.BUTTON_SKIP_NEXT)
+                    is PREVIOUS -> emit(MusicEvents.BUTTON_SKIP_PREVIOUS)
+                    is STOP -> emit(MusicEvents.BUTTON_STOP)
+                    is FORWARD -> emit(MusicEvents.BUTTON_JUMP_FORWARD)
+                    is BACKWARD -> emit(MusicEvents.BUTTON_JUMP_BACKWARD)
                 }
 
             }
