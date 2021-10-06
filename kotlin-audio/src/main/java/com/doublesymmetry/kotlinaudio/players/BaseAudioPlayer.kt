@@ -12,6 +12,9 @@ import androidx.media.AudioAttributesCompat.USAGE_MEDIA
 import androidx.media.AudioFocusRequestCompat
 import androidx.media.AudioManagerCompat
 import androidx.media.AudioManagerCompat.AUDIOFOCUS_GAIN
+import com.doublesymmetry.kotlinaudio.event.EventHolder
+import com.doublesymmetry.kotlinaudio.event.NotificationEventHolder
+import com.doublesymmetry.kotlinaudio.event.PlayerEventHolder
 import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.notification.NotificationManager
 import com.doublesymmetry.kotlinaudio.utils.isJUnitTest
@@ -29,10 +32,6 @@ import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
 import com.google.android.exoplayer2.upstream.*
 import com.google.android.exoplayer2.util.Util
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -41,8 +40,6 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
     val notificationManager: NotificationManager
 
     open val playerOptions: PlayerOptions = PlayerOptionsImpl()
-
-    protected val scope = CoroutineScope(Dispatchers.Main)
 
     val duration: Long
         get() {
@@ -83,39 +80,42 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
     val isPlaying
         get() = exoPlayer.isPlaying
 
-    val event = EventHolder()
+    private val notificationEventHolder = NotificationEventHolder()
+    private val playerEventHolder = PlayerEventHolder()
+
+    val event = EventHolder(notificationEventHolder, playerEventHolder)
 
     private var focus: AudioFocusRequestCompat? = null
     private var hasAudioFocus = false
     private var wasDucking = false
 
     init {
-        val exoPlayerBuilder = SimpleExoPlayer.Builder(context)
+        exoPlayer = SimpleExoPlayer.Builder(context).apply {
+            if (bufferConfig != null) setLoadControl(setupBuffer(bufferConfig))
+        }.build()
 
-        bufferConfig?.let {
-            val multiplier = DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS / DEFAULT_BUFFER_FOR_PLAYBACK_MS
-            val minBuffer = if (it.minBuffer != null && it.minBuffer != 0) it.minBuffer else DEFAULT_MIN_BUFFER_MS
-            val maxBuffer = if (it.maxBuffer != null && it.maxBuffer != 0) it.maxBuffer else DEFAULT_MAX_BUFFER_MS
-            val playBuffer = if (it.playBuffer != null && it.playBuffer != 0) it.playBuffer else DEFAULT_BUFFER_FOR_PLAYBACK_MS
-            val backBuffer = if (it.backBuffer != null && it.playBuffer != 0) it.backBuffer else DEFAULT_BACK_BUFFER_DURATION_MS
-
-            val loadControl = DefaultLoadControl.Builder()
-                .setBufferDurationsMs(minBuffer, maxBuffer, playBuffer, playBuffer * multiplier)
-                .setBackBuffer(backBuffer, false)
-                .build()
-
-            exoPlayerBuilder.setLoadControl(loadControl)
-        }
-
-        exoPlayer = exoPlayerBuilder.build()
-        notificationManager = NotificationManager(context, exoPlayer)
+        notificationManager = NotificationManager(context, exoPlayer, notificationEventHolder)
 
         if (isJUnitTest()) {
             exoPlayer.setThrowsWhenUsingWrongThread(false)
         }
 
         exoPlayer.addListener(PlayerListener())
-        observeEvents()
+    }
+
+    private fun setupBuffer(bufferConfig: BufferConfig): DefaultLoadControl {
+        bufferConfig.apply {
+            val multiplier = DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS / DEFAULT_BUFFER_FOR_PLAYBACK_MS
+            val minBuffer = if (minBuffer != null && minBuffer != 0) minBuffer else DEFAULT_MIN_BUFFER_MS
+            val maxBuffer = if (maxBuffer != null && maxBuffer != 0) maxBuffer else DEFAULT_MAX_BUFFER_MS
+            val playBuffer = if (playBuffer != null && playBuffer != 0) playBuffer else DEFAULT_BUFFER_FOR_PLAYBACK_MS
+            val backBuffer = if (backBuffer != null && backBuffer != 0) backBuffer else DEFAULT_BACK_BUFFER_DURATION_MS
+
+            return Builder()
+                .setBufferDurationsMs(minBuffer, maxBuffer, playBuffer, playBuffer * multiplier)
+                .setBackBuffer(backBuffer, false)
+                .build()
+        }
     }
 
     /**
@@ -309,47 +309,39 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
             wasDucking = false
         }
 
-        event.updateOnAudioFocusChanged(isPaused, isPermanent)
-    }
-
-    private fun observeEvents() {
-        scope.launch {
-            notificationManager.onNotificationAction.collect {
-                event.updateOnNotificationAction(it)
-            }
-        }
+        playerEventHolder.updateOnAudioFocusChanged(isPaused, isPermanent)
     }
 
     companion object {
         const val APPLICATION_NAME = "react-native-track-player"
     }
 
-    inner class PlayerListener: Listener {
+    inner class PlayerListener : Listener {
         override fun onPlaybackStateChanged(playbackState: Int) {
             when (playbackState) {
-                Player.STATE_BUFFERING -> event.updateAudioPlayerState(AudioPlayerState.BUFFERING)
-                Player.STATE_READY -> event.updateAudioPlayerState(AudioPlayerState.READY)
-                Player.STATE_IDLE -> event.updateAudioPlayerState(AudioPlayerState.IDLE)
-                Player.STATE_ENDED -> event.updateAudioPlayerState(AudioPlayerState.ENDED)
+                Player.STATE_BUFFERING -> playerEventHolder.updateAudioPlayerState(AudioPlayerState.BUFFERING)
+                Player.STATE_READY -> playerEventHolder.updateAudioPlayerState(AudioPlayerState.READY)
+                Player.STATE_IDLE -> playerEventHolder.updateAudioPlayerState(AudioPlayerState.IDLE)
+                Player.STATE_ENDED -> playerEventHolder.updateAudioPlayerState(AudioPlayerState.ENDED)
             }
         }
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             when (reason) {
-                Player.MEDIA_ITEM_TRANSITION_REASON_AUTO -> event.updateAudioItemTransition(AudioItemTransitionReason.AUTO)
-                Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED -> event.updateAudioItemTransition(AudioItemTransitionReason.QUEUE_CHANGED)
-                Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT -> event.updateAudioItemTransition(AudioItemTransitionReason.REPEAT)
-                Player.MEDIA_ITEM_TRANSITION_REASON_SEEK -> event.updateAudioItemTransition(AudioItemTransitionReason.SEEK_TO_ANOTHER_AUDIO_ITEM)
+                Player.MEDIA_ITEM_TRANSITION_REASON_AUTO -> playerEventHolder.updateAudioItemTransition(AudioItemTransitionReason.AUTO)
+                Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED -> playerEventHolder.updateAudioItemTransition(AudioItemTransitionReason.QUEUE_CHANGED)
+                Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT -> playerEventHolder.updateAudioItemTransition(AudioItemTransitionReason.REPEAT)
+                Player.MEDIA_ITEM_TRANSITION_REASON_SEEK -> playerEventHolder.updateAudioItemTransition(AudioItemTransitionReason.SEEK_TO_ANOTHER_AUDIO_ITEM)
             }
         }
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             if (isPlaying) {
                 requestAudioFocus()
-                event.updateAudioPlayerState(AudioPlayerState.PLAYING)
+                playerEventHolder.updateAudioPlayerState(AudioPlayerState.PLAYING)
             } else {
                 abandonAudioFocus()
-                event.updateAudioPlayerState(AudioPlayerState.PAUSED)
+                playerEventHolder.updateAudioPlayerState(AudioPlayerState.PAUSED)
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.doublesymmetry.kotlinaudio.notification
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -8,8 +9,10 @@ import android.os.Build
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.annotation.RequiresApi
 import com.doublesymmetry.kotlinaudio.R
+import com.doublesymmetry.kotlinaudio.event.NotificationEventHolder
 import com.doublesymmetry.kotlinaudio.models.NotificationButton
 import com.doublesymmetry.kotlinaudio.models.NotificationConfig
+import com.doublesymmetry.kotlinaudio.models.NotificationState
 import com.doublesymmetry.kotlinaudio.utils.isJUnitTest
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
@@ -17,23 +20,20 @@ import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
-class NotificationManager internal constructor(private val context: Context, private val exoPlayer: ExoPlayer) : PlayerNotificationManager.PrimaryActionReceiver {
-    private val descriptionAdapter = DescriptionAdapter(context, null)
+class NotificationManager internal constructor(private val context: Context, private val exoPlayer: ExoPlayer, private val event: NotificationEventHolder) : PlayerNotificationManager.PrimaryActionReceiver, PlayerNotificationManager.NotificationListener {
+    private lateinit var descriptionAdapter: DescriptionAdapter
+    private lateinit var playerNotificationManager: PlayerNotificationManager
+
     private val mediaSession: MediaSessionCompat = MediaSessionCompat(context, "AudioPlayerSession")
     private val mediaSessionConnector: MediaSessionConnector = MediaSessionConnector(mediaSession)
-
-    internal val onNotificationAction = MutableSharedFlow<NotificationButton.Action>()
 
     private val scope = CoroutineScope(Dispatchers.Main)
 
     private val buttons = mutableSetOf<NotificationButton?>()
 
     private val channelId: String
-
-    private lateinit var playerNotificationManager: PlayerNotificationManager
 
     private var isNotificationCreated = false
 
@@ -75,8 +75,11 @@ class NotificationManager internal constructor(private val context: Context, pri
             addAll(config.buttons)
         }
 
+        descriptionAdapter = DescriptionAdapter(context, config.pendingIntent)
+
         playerNotificationManager = PlayerNotificationManager.Builder(context, NOTIFICATION_ID, channelId).apply {
             setMediaDescriptionAdapter(descriptionAdapter)
+            setNotificationListener(this@NotificationManager)
 
             if (buttons.isNotEmpty()) {
                 setPrimaryActionReceiver(this@NotificationManager)
@@ -94,7 +97,6 @@ class NotificationManager internal constructor(private val context: Context, pri
                 }
             }
         }.build()
-
 
         if (!isJUnitTest()) {
             playerNotificationManager.apply {
@@ -136,7 +138,19 @@ class NotificationManager internal constructor(private val context: Context, pri
 
     override fun onAction(player: Player, action: String, intent: Intent) {
         scope.launch {
-            onNotificationAction.emit(NotificationButton.valueOf(action))
+            event.updateOnNotificationButtonTapped(NotificationButton.valueOf(action))
+        }
+    }
+
+    override fun onNotificationPosted(notificationId: Int, notification: Notification, ongoing: Boolean) {
+        scope.launch {
+            event.updateNotificationState(NotificationState.POSTED(notificationId, notification))
+        }
+    }
+
+    override fun onNotificationCancelled(notificationId: Int, dismissedByUser: Boolean) {
+        scope.launch {
+            event.updateNotificationState(NotificationState.CANCELLED(notificationId))
         }
     }
 

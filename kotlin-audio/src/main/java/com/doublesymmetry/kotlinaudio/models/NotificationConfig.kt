@@ -1,9 +1,15 @@
 package com.doublesymmetry.kotlinaudio.models
 
+import android.app.PendingIntent
 import androidx.annotation.DrawableRes
 import com.google.android.exoplayer2.ui.PlayerNotificationManager.*
 
-data class NotificationConfig(val buttons: List<NotificationButton>)
+/**
+ * Used to configure the player notification.
+ * @param buttons The buttons that would appear on the notification.
+ * @param pendingIntent The [PendingIntent] that would be called when tapping on the notification itself.
+ */
+data class NotificationConfig(val buttons: List<NotificationButton>, val pendingIntent: PendingIntent? = null)
 
 sealed class NotificationButton(@DrawableRes val icon: Int?) {
     class PLAY(@DrawableRes icon: Int? = null): NotificationButton(icon)
@@ -14,21 +20,17 @@ sealed class NotificationButton(@DrawableRes val icon: Int?) {
     class NEXT(@DrawableRes icon: Int? = null, val isCompact: Boolean = false): NotificationButton(icon)
     class PREVIOUS(@DrawableRes icon: Int? = null, val isCompact: Boolean = false): NotificationButton(icon)
 
-    enum class Action {
-        PLAY, PAUSE, STOP, FORWARD, REWIND, NEXT, PREVIOUS
-    }
-
     companion object {
-        internal fun valueOf(value: String): Action {
+        internal fun valueOf(value: String): NotificationButton {
             return when(value) {
-                ACTION_PLAY -> Action.PLAY
-                ACTION_PAUSE -> Action.PAUSE
-                ACTION_STOP -> Action.STOP
-                ACTION_FAST_FORWARD -> Action.FORWARD
-                ACTION_REWIND -> Action.REWIND
-                ACTION_NEXT -> Action.NEXT
-                ACTION_PREVIOUS -> Action.PREVIOUS
-                else -> error("No such action exists")
+                ACTION_PLAY -> PLAY()
+                ACTION_PAUSE -> PAUSE()
+                ACTION_STOP -> STOP()
+                ACTION_FAST_FORWARD -> FORWARD()
+                ACTION_REWIND -> BACKWARD()
+                ACTION_NEXT -> NEXT()
+                ACTION_PREVIOUS -> PREVIOUS()
+                else -> error("No such button exists")
             }
         }
     }

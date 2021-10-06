@@ -23,17 +23,17 @@ enum class MediaType(val value: String) {
     DEFAULT("default"),
 
     /**
-     * The DASH media type for adaptive streams. Should be used with DASH manifests
+     * The DASH media type for adaptive streams. Should be used with DASH manifests.
      */
     DASH("dash"),
 
     /**
-     * The HLS media type for adaptive streams. Should be used with HLS playlists
+     * The HLS media type for adaptive streams. Should be used with HLS playlists.
      */
     HLS("hls"),
 
     /**
-     * The SmoothStreaming media type for adaptive streams. Should be used with SmoothStreaming manifests
+     * The SmoothStreaming media type for adaptive streams. Should be used with SmoothStreaming manifests.
      */
     SMOOTH_STREAMING("smoothstreaming");
 }

@@ -15,6 +15,8 @@ import com.google.android.exoplayer2.ui.PlayerNotificationManager
 
 /**
  * Provides content assets of the media currently playing. If certain data is missing from [AudioItem], data from the media file's metadata is used instead.
+ * @param context Some Android [Context].
+ * @param pendingIntent The [PendingIntent] that should be fired when the notification is tapped.
  */
 class DescriptionAdapter(private val context: Context, private val pendingIntent: PendingIntent?): PlayerNotificationManager.MediaDescriptionAdapter {
     private var disposable: Disposable? = null
