@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 
 class NotificationManager internal constructor(private val context: Context, private val exoPlayer: ExoPlayer, private val event: NotificationEventHolder) : PlayerNotificationManager.PrimaryActionReceiver, PlayerNotificationManager.NotificationListener {
     private lateinit var descriptionAdapter: DescriptionAdapter
-    private lateinit var playerNotificationManager: PlayerNotificationManager
+    private lateinit var internalManager: PlayerNotificationManager
 
     private val mediaSession: MediaSessionCompat = MediaSessionCompat(context, "AudioPlayerSession")
     private val mediaSessionConnector: MediaSessionConnector = MediaSessionConnector(mediaSession)
@@ -36,6 +36,78 @@ class NotificationManager internal constructor(private val context: Context, pri
     private val channelId: String
 
     private var isNotificationCreated = false
+
+    var showPlayPauseButton: Boolean
+        get() = internalManager.usePlayPauseActions
+        set(value) {
+            internalManager.usePlayPauseActions = value
+        }
+
+    var showStopButton: Boolean
+        get() = internalManager.useStopAction
+        set(value) {
+            internalManager.useStopAction = value
+        }
+
+    var showForwardButton: Boolean
+        get() = internalManager.useFastForwardAction
+        set(value) {
+            internalManager.useFastForwardAction = value
+        }
+
+    /**
+     * Controls whether or not this button should appear when the notification is compact (collapsed).
+     */
+    var showForwardButtonCompact: Boolean
+        get() = internalManager.useFastForwardActionInCompactView
+        set(value) {
+            internalManager.useFastForwardActionInCompactView = value
+        }
+
+    var showBackwardButton: Boolean
+        get() = internalManager.useRewindAction
+        set(value) {
+            internalManager.useRewindAction = value
+        }
+
+    /**
+     * Controls whether or not this button should appear when the notification is compact (collapsed).
+     */
+    var showBackwardButtonCompact: Boolean
+        get() = internalManager.useRewindActionInCompactView
+        set(value) {
+            internalManager.useFastForwardActionInCompactView = value
+        }
+
+    var showNextButton: Boolean
+        get() = internalManager.useNextAction
+        set(value) {
+            internalManager.useNextAction = value
+        }
+
+    /**
+     * Controls whether or not this button should appear when the notification is compact (collapsed).
+     */
+    var showNextButtonCompact: Boolean
+        get() = internalManager.useNextActionInCompactView
+        set(value) {
+            internalManager.useNextActionInCompactView = value
+        }
+
+    var showPreviousButton: Boolean
+        get() = internalManager.usePreviousAction
+        set(value) {
+            internalManager.usePreviousAction = value
+        }
+
+    /**
+     * Controls whether or not this button should appear when the notification is compact (collapsed).
+     */
+    var showPreviousButtonCompact: Boolean
+        get() = internalManager.usePreviousActionInCompactView
+        set(value) {
+            internalManager.usePreviousActionInCompactView = value
+        }
 
     init {
         channelId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -77,7 +149,7 @@ class NotificationManager internal constructor(private val context: Context, pri
 
         descriptionAdapter = DescriptionAdapter(context, config.pendingIntent)
 
-        playerNotificationManager = PlayerNotificationManager.Builder(context, NOTIFICATION_ID, channelId).apply {
+        internalManager = PlayerNotificationManager.Builder(context, NOTIFICATION_ID, channelId).apply {
             setMediaDescriptionAdapter(descriptionAdapter)
             setNotificationListener(this@NotificationManager)
 
@@ -99,39 +171,33 @@ class NotificationManager internal constructor(private val context: Context, pri
         }.build()
 
         if (!isJUnitTest()) {
-            playerNotificationManager.apply {
+            internalManager.apply {
                 setPlayer(exoPlayer)
 
                 config.buttons.forEach { button ->
                     when (button) {
-                        is NotificationButton.PLAY, is NotificationButton.PAUSE -> setUsePlayPauseActions(true)
-                        is NotificationButton.STOP -> setUseStopAction(true)
+                        is NotificationButton.PLAY, is NotificationButton.PAUSE -> showPlayPauseButton = true
+                        is NotificationButton.STOP -> showStopButton = true
                         is NotificationButton.FORWARD -> {
-                            setUseFastForwardAction(true)
-                            setUseFastForwardActionInCompactView(button.isCompact)
+                            showForwardButton = true
+                            showForwardButtonCompact = button.isCompact
                         }
                         is NotificationButton.BACKWARD -> {
-                            setUseRewindAction(true)
-                            setUseRewindActionInCompactView(button.isCompact)
+                            showBackwardButton = true
+                            showBackwardButtonCompact = button.isCompact
                         }
                         is NotificationButton.NEXT -> {
-                            setUseNextAction(true)
-                            setUseNextActionInCompactView(button.isCompact)
+                            showNextButton = true
+                            showNextButtonCompact = button.isCompact
                         }
                         is NotificationButton.PREVIOUS -> {
-                            setUsePreviousAction(true)
-                            setUsePreviousActionInCompactView(button.isCompact)
+                            showPreviousButton = true
+                            showPreviousButtonCompact = button.isCompact
                         }
                     }
                 }
 
                 setMediaSessionToken(mediaSession.sessionToken)
-                setUsePlayPauseActions(buttons.any { it is NotificationButton.PLAY || it is NotificationButton.PAUSE })
-                setUseFastForwardAction(buttons.any { it is NotificationButton.FORWARD })
-                setUseRewindAction(buttons.any { it is NotificationButton.BACKWARD })
-                setUseNextAction(buttons.any { it is NotificationButton.NEXT })
-                setUsePreviousAction(buttons.any { it is NotificationButton.PREVIOUS })
-                setUseStopAction(buttons.any { it is NotificationButton.STOP })
             }
         }
     }
