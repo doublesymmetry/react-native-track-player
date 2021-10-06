@@ -1,4 +1,4 @@
-package com.doublesymmetry.trackplayer
+package com.doublesymmetry.trackplayer.utils
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

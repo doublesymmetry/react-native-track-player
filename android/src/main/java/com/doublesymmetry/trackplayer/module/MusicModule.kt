@@ -9,9 +9,10 @@ import com.doublesymmetry.kotlinaudio.models.Capability
 import com.doublesymmetry.kotlinaudio.models.RepeatMode
 import com.doublesymmetry.trackplayer.model.State
 import com.doublesymmetry.trackplayer.model.Track
-import com.doublesymmetry.trackplayer.model.asLibState
+import com.doublesymmetry.trackplayer.extensions.asLibState
 import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
 import com.doublesymmetry.trackplayer.service.MusicService
+import com.doublesymmetry.trackplayer.interfaces.LifecycleEventsListener
 import com.facebook.react.bridge.*
 import com.google.android.exoplayer2.Player
 import com.orhanobut.logger.AndroidLogAdapter
@@ -20,9 +21,10 @@ import java.util.*
 import javax.annotation.Nonnull
 
 /**
- * @author Guichaguri
+ * @author Milen Pivchev @mpivchev
+ *
  */
-class MusicModule(private val reactContext: ReactApplicationContext?) : ReactContextBaseJavaModule(reactContext), ServiceConnection {
+class MusicModule(private val reactContext: ReactApplicationContext?) : ReactContextBaseJavaModule(reactContext), ServiceConnection, LifecycleEventsListener {
     private var binder: MusicService.MusicBinder? = null
     private var eventHandler: MusicEvents? = null
     private var playerOptions: Bundle? = null
@@ -38,6 +40,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) : ReactCon
 
     override fun initialize() {
         val context: ReactContext = reactApplicationContext
+        context.addLifecycleEventListener(this)
         val manager = LocalBroadcastManager.getInstance(context)
 
         Logger.addLogAdapter(AndroidLogAdapter())
@@ -47,12 +50,11 @@ class MusicModule(private val reactContext: ReactApplicationContext?) : ReactCon
     }
 
     override fun onCatalystInstanceDestroy() {
-        val context: ReactContext = reactApplicationContext
-        if (eventHandler != null) {
-            val manager = LocalBroadcastManager.getInstance(context)
-            manager.unregisterReceiver(eventHandler!!)
-            eventHandler = null
-        }
+        destroy()
+    }
+
+    override fun onHostDestroy() {
+        destroy()
     }
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
@@ -64,7 +66,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) : ReactCon
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
-        musicService.destroy()
+        musicService.destroyIfAllowed()
         isServiceBound = false
     }
 
@@ -139,13 +141,24 @@ class MusicModule(private val reactContext: ReactApplicationContext?) : ReactCon
 
     @ReactMethod
     fun destroy() {
+        val context: ReactContext = reactApplicationContext
+
+        musicService.destroyIfAllowed()
+
+        if (!musicService.stopWithApp) return
+
+        // The music service will not stop unless we unbind it first.
         if (isServiceBound) {
             reactApplicationContext.unbindService(this)
             isServiceBound = false
+            binder = null
         }
 
-        musicService.destroy()
-        binder = null
+        if (eventHandler != null) {
+            val manager = LocalBroadcastManager.getInstance(context)
+            manager.unregisterReceiver(eventHandler!!)
+            eventHandler = null
+        }
     }
 
     @ReactMethod
@@ -159,7 +172,6 @@ class MusicModule(private val reactContext: ReactApplicationContext?) : ReactCon
         }
 
         callback.resolve(null)
-
     }
 
     @ReactMethod
@@ -305,7 +317,7 @@ class MusicModule(private val reactContext: ReactApplicationContext?) : ReactCon
     fun reset(callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
 
-        musicService.destroy()
+        musicService.destroyIfAllowed()
         callback.resolve(null)
     }
 

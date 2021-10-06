@@ -1,5 +1,6 @@
 package com.doublesymmetry.trackplayer.service
 
+import android.app.PendingIntent
 import android.content.Intent
 import android.os.*
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -8,14 +9,13 @@ import com.doublesymmetry.kotlinaudio.models.NotificationButton.*
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.model.TrackAudioItem
-import com.doublesymmetry.trackplayer.model.asLibState
+import com.doublesymmetry.trackplayer.extensions.asLibState
 import com.doublesymmetry.trackplayer.module.MusicEvents
 import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
 import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
-import com.orhanobut.logger.Logger
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit
 class MusicService : HeadlessJsTaskService() {
     private lateinit var player: QueuedAudioPlayer
     private val handler = Handler(Looper.getMainLooper())
-    private var stopWithApp = false
+    var stopWithApp = false
 
     private val serviceScope = MainScope()
 
@@ -79,7 +79,8 @@ class MusicService : HeadlessJsTaskService() {
 
     fun updateOptions(options: Bundle) {
         handler.post {
-            stopWithApp = options.getBoolean(STOP_WITH_APP)
+            stopWithApp = options.getBoolean(STOP_WITH_APP_KEY)
+
             player.playerOptions.alwaysPauseOnInterruption = options.getBoolean(PAUSE_ON_INTERRUPTION_KEY)
 
             capabilities = options.getIntegerArrayList("capabilities")?.map { Capability.values()[it] } ?: emptyList()
@@ -103,10 +104,20 @@ class MusicService : HeadlessJsTaskService() {
                 }
             }
 
-            val notificationConfig = NotificationConfig(buttonsList)
+            val openAppIntent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+
+            val pendingIntent = PendingIntent.getActivity(this, 0, openAppIntent, getPendingIntentFlags())
+
+            val notificationConfig = NotificationConfig(buttonsList, pendingIntent)
 
             player.notificationManager.createNotification(notificationConfig)
         }
+    }
+
+    private fun getPendingIntentFlags(): Int {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) { PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT } else { PendingIntent.FLAG_CANCEL_CURRENT }
     }
 
     private fun isCompact(capability: Capability): Boolean {
@@ -133,11 +144,6 @@ class MusicService : HeadlessJsTaskService() {
 
     fun pause() {
         handler.post { player.pause() }
-    }
-
-    fun destroy() {
-        stopForeground(true)
-        stopSelf()
     }
 
     fun removeUpcomingTracks() {
@@ -227,17 +233,26 @@ class MusicService : HeadlessJsTaskService() {
         }
 
         serviceScope.launch {
-            event.onNotificationAction.collect {
+            event.onNotificationButtonTapped.collect {
                 when (it) {
-                    Action.PLAY -> emit(MusicEvents.BUTTON_PLAY)
-                    Action.PAUSE -> emit(MusicEvents.BUTTON_PAUSE)
-                    Action.NEXT -> emit(MusicEvents.BUTTON_SKIP_NEXT)
-                    Action.PREVIOUS -> emit(MusicEvents.BUTTON_SKIP_PREVIOUS)
-                    Action.STOP -> emit(MusicEvents.BUTTON_STOP)
-                    Action.FORWARD -> emit(MusicEvents.BUTTON_JUMP_FORWARD)
-                    Action.REWIND -> emit(MusicEvents.BUTTON_JUMP_BACKWARD)
+                    is PLAY -> emit(MusicEvents.BUTTON_PLAY)
+                    is PAUSE -> emit(MusicEvents.BUTTON_PAUSE)
+                    is NEXT -> emit(MusicEvents.BUTTON_SKIP_NEXT)
+                    is PREVIOUS -> emit(MusicEvents.BUTTON_SKIP_PREVIOUS)
+                    is STOP -> emit(MusicEvents.BUTTON_STOP)
+                    is FORWARD -> emit(MusicEvents.BUTTON_JUMP_FORWARD)
+                    is BACKWARD -> emit(MusicEvents.BUTTON_JUMP_BACKWARD)
                 }
 
+            }
+        }
+
+        serviceScope.launch {
+            event.notificationStateChange.collect {
+                when (it) {
+                    is NotificationState.POSTED -> startForeground(it.notificationId, it.notification)
+                    is NotificationState.CANCELLED -> stopForeground(true)
+                }
             }
         }
     }
@@ -257,19 +272,25 @@ class MusicService : HeadlessJsTaskService() {
         // Overridden to prevent the service from being terminated
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
+    override fun onBind(intent: Intent?): IBinder {
         return MusicBinder()
     }
 
-    override fun onDestroy() {
-        handler.post { player.destroy() }
-        handler.removeMessages(0)
-        super.onDestroy()
+    fun destroyIfAllowed() {
+        // Player will continue running if this is true, even if the app itself is killed.
+        if (!stopWithApp) return
+
+        stopForeground(true)
+        stopSelf()
     }
 
-    override fun onTaskRemoved(rootIntent: Intent?) {
-        if (stopWithApp) destroy()
-        super.onTaskRemoved(rootIntent)
+    override fun onDestroy() {
+        handler.post {
+            player.destroy()
+            handler.removeMessages(0)
+        }
+
+        super.onDestroy()
     }
 
     inner class MusicBinder : Binder() {
@@ -291,11 +312,10 @@ class MusicService : HeadlessJsTaskService() {
         const val PLAY_BUFFER_KEY = "playBuffer"
         const val BACK_BUFFER_KEY = "backBuffer"
 
-        const val STOP_WITH_APP = "stopWithApp"
+        const val STOP_WITH_APP_KEY = "stopWithApp"
         const val PAUSE_ON_INTERRUPTION_KEY = "alwaysPauseOnInterruption"
 
         const val IS_FOCUS_LOSS_PERMANENT_KEY = "permanent"
         const val IS_PAUSED_KEY = "paused"
-
     }
 }

@@ -3,12 +3,10 @@ package com.doublesymmetry.trackplayer.model
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.MediaSessionCompat
 import com.doublesymmetry.kotlinaudio.models.AudioItemOptions
 import com.doublesymmetry.kotlinaudio.models.MediaType
-import com.doublesymmetry.trackplayer.Utils
+import com.doublesymmetry.trackplayer.utils.Utils
 import com.google.android.exoplayer2.upstream.RawResourceDataSource
 import java.util.*
 
