@@ -7,12 +7,12 @@ import android.support.v4.media.RatingCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.Capability
 import com.doublesymmetry.kotlinaudio.models.RepeatMode
+import com.doublesymmetry.trackplayer.extensions.asLibState
+import com.doublesymmetry.trackplayer.interfaces.LifecycleEventsListener
 import com.doublesymmetry.trackplayer.model.State
 import com.doublesymmetry.trackplayer.model.Track
-import com.doublesymmetry.trackplayer.extensions.asLibState
 import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
 import com.doublesymmetry.trackplayer.service.MusicService
-import com.doublesymmetry.trackplayer.interfaces.LifecycleEventsListener
 import com.facebook.react.bridge.*
 import com.google.android.exoplayer2.Player
 import com.orhanobut.logger.AndroidLogAdapter
@@ -24,7 +24,7 @@ import javax.annotation.Nonnull
  * @author Milen Pivchev @mpivchev
  *
  */
-class MusicModule(private val reactContext: ReactApplicationContext?) : ReactContextBaseJavaModule(reactContext), ServiceConnection, LifecycleEventsListener {
+class MusicModule(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), ServiceConnection, LifecycleEventsListener {
     private var binder: MusicService.MusicBinder? = null
     private var eventHandler: MusicEvents? = null
     private var playerOptions: Bundle? = null
