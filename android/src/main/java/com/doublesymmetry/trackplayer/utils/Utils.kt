@@ -14,7 +14,7 @@ import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper
 import com.google.android.exoplayer2.upstream.RawResourceDataSource
 
 /**
- * @author Milen Pivchev @mpivchevchaguri
+ * @author Milen Pivchev @mpivchev
  */
 object Utils {
     const val EVENT_INTENT = "com.doublesymmetry.trackplayer.event"

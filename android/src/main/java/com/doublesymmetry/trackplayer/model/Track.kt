@@ -11,7 +11,7 @@ import com.google.android.exoplayer2.upstream.RawResourceDataSource
 import java.util.*
 
 /**
- * @author Milen Pivchev @mpivchevchaguri
+ * @author Milen Pivchev @mpivchev
  */
 class Track(context: Context, bundle: Bundle, ratingType: Int) : TrackMetadata() {
     var uri: Uri? = null
