@@ -9,7 +9,7 @@ import com.facebook.react.uimanager.ViewManager
 /**
  * TrackPlayer
  * https://github.com/react-native-kit/react-native-track-player
- * @author Guichaguri
+ * @author Milen Pivchev @mpivchev
  */
 class TrackPlayer : ReactPackage {
     override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> {
