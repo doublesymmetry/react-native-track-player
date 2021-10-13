@@ -37,6 +37,7 @@ To install release candidates run `yarn add react-native-track-player@next`
 * Remove Support for iOS 10 & Support Xcode 13
   [dcvz](https://github.com/dcvz)
   [#1186](https://github.com/DoubleSymmetry/react-native-track-player/issues/1186)
+  - **NOTE: Requires minimum deployment target to be updated to iOS 11.**
 
 * Reset initialization on destroy
   [sreten-bild](https://github.com/sreten-bild)
