@@ -355,6 +355,13 @@ public class RNTrackPlayer: RCTEventEmitter {
         resolve(NSNull())
     }
 
+    @objc(removePreviousTracks:rejecter:)
+    public func removePreviousTracks(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        print("Removing Previous tracks")
+        player.removePreviousItems()
+        resolve(NSNull())
+    }
+
     @objc(removeUpcomingTracks:rejecter:)
     public func removeUpcomingTracks(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         print("Removing upcoming tracks")
