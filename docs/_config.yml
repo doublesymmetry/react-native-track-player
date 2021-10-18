@@ -16,7 +16,7 @@ aux_links:
   "github":
     - "https://github.com/react-native-kit/react-native-track-player"
   "sponsors":
-    - "https://react-native-track-player.js.org/backers-sponsors/"
+    - "https://react-native-track-player.js.org/backers-sponsors.html"
 
 plugins:
   - jekyll-redirect-from
