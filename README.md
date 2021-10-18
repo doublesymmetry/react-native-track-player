@@ -9,13 +9,13 @@ A fully-fledged audio module created for music apps. Provides audio playback, ex
 react-native-track-payer is made possible by the generosity of the sponsors below, and many other [individual backers](docs/backers-sponsors.md#backers). Sponsoring directly impacts the longevity of this project.
 
 **🥇 Gold sponsors (\$1000+ per month):** <br/>
-[Become the first sponsor](https://github.com/sponsors/DoubleSymmetry)
+[Become the first gold sponsor!](https://github.com/sponsors/DoubleSymmetry)
 
 **🥈 Silver sponsors (\$500+ per month):**<br/>
-[Become the first sponsor](https://github.com/sponsors/DoubleSymmetry)
+[Become the first siver sponsor!](https://github.com/sponsors/DoubleSymmetry)
 
 **🥉 Bronze sponsors (\$200+ per month):**<br/>
-[Become the first sponsor](https://github.com/sponsors/DoubleSymmetry)
+[Become the first bronze sponsor!](https://github.com/sponsors/DoubleSymmetry)
 
 **✨ Contributing sponsors (\$25+ per month):**<br/>
 <a href="http://radio.garden/"><img src="https://avatars.githubusercontent.com/u/271885?v=4" align="center" width="100" title="Radio Garden" alt="Radio Garden"></a>
