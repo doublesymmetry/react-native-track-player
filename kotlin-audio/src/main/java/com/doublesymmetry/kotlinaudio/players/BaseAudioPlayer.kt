@@ -149,18 +149,9 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
     }
 
     /**
-     * Stops playback and resets current item to beginning.
-     */
-    fun stop() {
-        exoPlayer.stop()
-        exoPlayer.pause()
-        exoPlayer.seekTo(0)
-    }
-
-    /**
      * Stops playback, resetting the player and queue.
      */
-    open fun reset() {
+    open fun stop() {
         exoPlayer.stop(true)
         exoPlayer.pause()
     }

@@ -186,7 +186,7 @@ class QueuedAudioPlayer(context: Context, bufferConfig: BufferConfig? = null) : 
     /**
      * Stop playback, resetting the player and queue.
      */
-    override fun reset() {
+    override fun stop() {
         super.stop()
         queue.clear()
     }
