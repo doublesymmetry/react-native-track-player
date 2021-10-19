@@ -67,11 +67,15 @@ class MusicService : HeadlessJsTaskService() {
             playerOptions?.getDouble(MAX_BUFFER_KEY)?.toInt(),
             playerOptions?.getDouble(PLAY_BUFFER_KEY)?.toInt(),
             playerOptions?.getDouble(BACK_BUFFER_KEY)?.toInt()
-            //TODO: Ignored maxCacheSize and autoUpdateMetadata. Do we need them?
+            //TODO: Ignored autoUpdateMetadata. Do we need them?
+        )
+
+        val cacheOptions = CacheConfig(
+            playerOptions?.getDouble(MAX_CACHE_SIZE_KEY)?.toLong()
         )
 
         handler.post {
-            player = QueuedAudioPlayer(this, bufferOptions)
+            player = QueuedAudioPlayer(this, bufferOptions, cacheOptions)
             observeEvents()
             promise?.resolve(null)
         }
@@ -322,6 +326,8 @@ class MusicService : HeadlessJsTaskService() {
         const val MAX_BUFFER_KEY = "maxBuffer"
         const val PLAY_BUFFER_KEY = "playBuffer"
         const val BACK_BUFFER_KEY = "backBuffer"
+
+        const val MAX_CACHE_SIZE_KEY = "maxCacheSize"
 
         const val STOP_WITH_APP_KEY = "stopWithApp"
         const val PAUSE_ON_INTERRUPTION_KEY = "alwaysPauseOnInterruption"
