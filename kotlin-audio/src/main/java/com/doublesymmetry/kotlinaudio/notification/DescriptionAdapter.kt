@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import coil.imageLoader
 import coil.request.Disposable
@@ -42,6 +43,9 @@ class DescriptionAdapter(private val context: Context, private val pendingIntent
         val audioItem = player.currentMediaItem?.playbackProperties?.tag as AudioItem?
         var artworkBitmap: Bitmap? = null
 
+        val placeholderImage = Bitmap.createBitmap(60, 60, Bitmap.Config.ARGB_8888)
+        placeholderImage.eraseColor(Color.DKGRAY)
+
         disposable?.dispose()
 
         val imageLoader = context.imageLoader
@@ -55,7 +59,7 @@ class DescriptionAdapter(private val context: Context, private val pendingIntent
 
         disposable = imageLoader.enqueue(request)
 
-        return artworkBitmap
+        return placeholderImage
     }
 
     private fun getArtworkSource(audioItem: AudioItem?, mediaMetadata: MediaMetadata): Any? {
