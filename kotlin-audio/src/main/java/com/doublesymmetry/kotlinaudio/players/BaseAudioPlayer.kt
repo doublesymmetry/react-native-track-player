@@ -34,9 +34,20 @@ import com.google.android.exoplayer2.upstream.*
 import com.google.android.exoplayer2.util.Util
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
+import com.google.android.exoplayer2.upstream.cache.SimpleCache
+import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
 
-abstract class BaseAudioPlayer internal constructor(private val context: Context, bufferConfig: BufferConfig? = null) : AudioManager.OnAudioFocusChangeListener {
+import com.google.android.exoplayer2.database.ExoDatabaseProvider
+
+import com.google.android.exoplayer2.database.DatabaseProvider
+import com.google.android.exoplayer2.upstream.cache.CacheDataSource
+import java.io.File
+
+
+abstract class BaseAudioPlayer internal constructor(private val context: Context, bufferConfig: BufferConfig? = null, private val cacheConfig: CacheConfig? = null) : AudioManager.OnAudioFocusChangeListener {
     protected val exoPlayer: SimpleExoPlayer
+    private var cache: SimpleCache? = null
+
     val notificationManager: NotificationManager
 
     open val playerOptions: PlayerOptions = PlayerOptionsImpl()
@@ -90,6 +101,12 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
     private var wasDucking = false
 
     init {
+        if (cacheConfig != null) {
+            val cacheDir = File(context.cacheDir, "TrackPlayer")
+            val db: DatabaseProvider = ExoDatabaseProvider(context)
+            cache = SimpleCache(cacheDir, LeastRecentlyUsedCacheEvictor(cacheConfig.maxCacheSize ?: 0), db)
+        }
+
         exoPlayer = SimpleExoPlayer.Builder(context).apply {
             if (bufferConfig != null) setLoadControl(setupBuffer(bufferConfig))
         }.build()
@@ -206,11 +223,8 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
                     }
                 }
 
-                tempFactory
+                enableCaching(tempFactory)
             }
-
-            //TODO: Do we need this?
-//        enableCaching()
         }
 
         return when (audioItem.type) {
@@ -244,14 +258,18 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
             .createMediaSource(mediaItem)
     }
 
-//
-//    fun enableCaching(factory: DataSource.Factory): DataSource.Factory {
-//        return if (cache == null || cacheMaxSize <= 0) factory else CacheDataSourceFactory(
-//            cache!!,
-//            factory,
-//            CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR
-//        )
-//    }
+
+    private fun enableCaching(factory: DataSource.Factory): DataSource.Factory {
+        return if (cache == null || cacheConfig == null || (cacheConfig.maxCacheSize ?: 0) <= 0) {
+            factory
+        } else {
+            CacheDataSource.Factory().apply {
+                setCache(cache!!)
+                setUpstreamDataSourceFactory(factory)
+                setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+            }
+        }
+    }
 
     private fun requestAudioFocus() {
         if (hasAudioFocus) return
