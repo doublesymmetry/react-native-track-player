@@ -43,7 +43,7 @@ class DescriptionAdapter(private val context: Context, private val pendingIntent
         val audioItem = player.currentMediaItem?.playbackProperties?.tag as AudioItem?
         var artworkBitmap: Bitmap? = null
 
-        val placeholderImage = Bitmap.createBitmap(60, 60, Bitmap.Config.ARGB_8888)
+        var placeholderImage = Bitmap.createBitmap(400, 400, Bitmap.Config.ARGB_8888)
         placeholderImage.eraseColor(Color.DKGRAY)
 
         disposable?.dispose()
@@ -59,7 +59,7 @@ class DescriptionAdapter(private val context: Context, private val pendingIntent
 
         disposable = imageLoader.enqueue(request)
 
-        return placeholderImage
+        return artworkBitmap ?: placeholderImage
     }
 
     private fun getArtworkSource(audioItem: AudioItem?, mediaMetadata: MediaMetadata): Any? {
