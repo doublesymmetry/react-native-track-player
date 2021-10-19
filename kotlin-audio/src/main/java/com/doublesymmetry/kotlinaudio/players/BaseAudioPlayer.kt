@@ -264,7 +264,7 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
             factory
         } else {
             CacheDataSource.Factory().apply {
-                setCache(cache!!)
+                setCache(this@BaseAudioPlayer.cache!!)
                 setUpstreamDataSourceFactory(factory)
                 setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
             }
