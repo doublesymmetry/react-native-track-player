@@ -146,6 +146,10 @@ class MusicService : HeadlessJsTaskService() {
         handler.post { player.pause() }
     }
 
+    fun stop() {
+        handler.post { player.stop() }
+    }
+
     fun removeUpcomingTracks() {
         handler.post { player.removeUpcomingItems() }
     }
@@ -276,12 +280,19 @@ class MusicService : HeadlessJsTaskService() {
         return MusicBinder()
     }
 
-    fun destroyIfAllowed() {
+    fun destroyIfAllowed(ignoreStopWithAppSetting: Boolean = false) {
         // Player will continue running if this is true, even if the app itself is killed.
-        if (!stopWithApp) return
+        if (ignoreStopWithAppSetting) {
+            stop()
+            stopForeground(true)
+            stopSelf()
+        } else {
+            if (!stopWithApp) return
 
-        stopForeground(true)
-        stopSelf()
+            stop()
+            stopForeground(true)
+            stopSelf()
+        }
     }
 
     override fun onDestroy() {

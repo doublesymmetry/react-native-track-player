@@ -19,6 +19,7 @@ import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import java.util.*
 import javax.annotation.Nonnull
+import kotlin.collections.ArrayList
 
 /**
  * @author Milen Pivchev @mpivchev
@@ -41,20 +42,22 @@ class MusicModule(private val reactContext: ReactApplicationContext) : ReactCont
     override fun initialize() {
         val context: ReactContext = reactApplicationContext
         context.addLifecycleEventListener(this)
-        val manager = LocalBroadcastManager.getInstance(context)
-
         Logger.addLogAdapter(AndroidLogAdapter())
-
-        eventHandler = MusicEvents(context)
-        manager.registerReceiver(eventHandler!!, IntentFilter(EVENT_INTENT))
     }
 
+    /**
+     * Called when the React context is destroyed or reloaded.
+     */
     override fun onCatalystInstanceDestroy() {
-        destroy()
+        destroyIfAllowed()
     }
 
+    /**
+     * Called when host activity receives destroy event (e.g. {@link Activity#onDestroy}. Only called
+     * for the last React activity to be destroyed.
+     */
     override fun onHostDestroy() {
-        destroy()
+        destroyIfAllowed()
     }
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
@@ -65,6 +68,9 @@ class MusicModule(private val reactContext: ReactApplicationContext) : ReactCont
         isServiceBound = true
     }
 
+    /**
+     * Called when a connection to the Service has been lost.
+     */
     override fun onServiceDisconnected(name: ComponentName) {
         musicService.destroyIfAllowed()
         isServiceBound = false
@@ -80,6 +86,23 @@ class MusicModule(private val reactContext: ReactApplicationContext) : ReactCont
         }
 
         return false
+    }
+
+    private fun unbindFromService() {
+        val context: ReactContext = reactApplicationContext
+
+        // The music service will not stop unless we unbind it first.
+        if (isServiceBound) {
+            reactApplicationContext.unbindService(this)
+            isServiceBound = false
+            binder = null
+        }
+
+        if (eventHandler != null) {
+            val manager = LocalBroadcastManager.getInstance(context)
+            manager.unregisterReceiver(eventHandler!!)
+            eventHandler = null
+        }
     }
 
     /* ****************************** API ****************************** */
@@ -134,6 +157,10 @@ class MusicModule(private val reactContext: ReactApplicationContext) : ReactCont
         playerSetUpPromise = promise
         playerOptions = Arguments.toBundle(data)
 
+        val manager = LocalBroadcastManager.getInstance(reactContext)
+        eventHandler = MusicEvents(reactContext)
+        manager.registerReceiver(eventHandler!!, IntentFilter(EVENT_INTENT))
+
         val intent = Intent(reactContext, MusicService::class.java)
         reactContext?.startService(intent)
         reactContext?.bindService(intent, this, Context.BIND_AUTO_CREATE)
@@ -141,24 +168,15 @@ class MusicModule(private val reactContext: ReactApplicationContext) : ReactCont
 
     @ReactMethod
     fun destroy() {
-        val context: ReactContext = reactApplicationContext
+        musicService.destroyIfAllowed(true)
+        unbindFromService()
+    }
 
+    private fun destroyIfAllowed() {
         musicService.destroyIfAllowed()
-
         if (!musicService.stopWithApp) return
 
-        // The music service will not stop unless we unbind it first.
-        if (isServiceBound) {
-            reactApplicationContext.unbindService(this)
-            isServiceBound = false
-            binder = null
-        }
-
-        if (eventHandler != null) {
-            val manager = LocalBroadcastManager.getInstance(context)
-            manager.unregisterReceiver(eventHandler!!)
-            eventHandler = null
-        }
+        unbindFromService()
     }
 
     @ReactMethod
@@ -181,7 +199,7 @@ class MusicModule(private val reactContext: ReactApplicationContext) : ReactCont
         val tracks: MutableList<Track> = mutableListOf()
         val bundleList = Arguments.toList(data)
 
-        if (bundleList == null) {
+        if (bundleList !is ArrayList) {
             callback.reject("invalid_parameter", "Was not given an array of tracks")
             return
         }
@@ -317,7 +335,7 @@ class MusicModule(private val reactContext: ReactApplicationContext) : ReactCont
     fun reset(callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
 
-        musicService.destroyIfAllowed()
+        musicService.stop()
         callback.resolve(null)
     }
 
