@@ -226,6 +226,7 @@ class NotificationManager internal constructor(private val context: Context, pri
 
     internal fun destroy() {
         descriptionAdapter.release()
+        isNotificationCreated = false
     }
 
     companion object {
