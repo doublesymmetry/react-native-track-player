@@ -14,6 +14,22 @@ To install release candidates run `yarn add react-native-track-player@next`
 
 * None.
 
+## 2.1.2 (25.10.21)
+
+##### Enhancements
+
+* None.
+
+##### Bug Fixes
+
+* Update SwiftAudioEx - Fixes issues with flickering notifications + pause between loads
+
+* Fix cyclic require warning regression
+  [#1057](https://github.com/DoubleSymmetry/react-native-track-player/issues/1057)
+
+* [ios] Fix `PlaybackQueueEnded` event to be called only when the track ends
+  [#1243](https://github.com/DoubleSymmetry/react-native-track-player/issues/1243)
+
 ## 2.1.1 (25.09.21)
 
 ##### Enhancements
@@ -37,6 +53,7 @@ To install release candidates run `yarn add react-native-track-player@next`
 * Remove Support for iOS 10 & Support Xcode 13
   [dcvz](https://github.com/dcvz)
   [#1186](https://github.com/DoubleSymmetry/react-native-track-player/issues/1186)
+  - **NOTE: Requires minimum deployment target to be updated to iOS 11.**
 
 * Reset initialization on destroy
   [sreten-bild](https://github.com/sreten-bild)

@@ -750,7 +750,7 @@ public class RNTrackPlayer: RCTEventEmitter {
 
     func handleAudioPlayerPlaybackEnded(reason: PlaybackEndedReason) {
         // fire an event for the queue ending
-        if player.nextItems.count == 0 {
+        if player.nextItems.count == 0 && reason == PlaybackEndedReason.playedUntilEnd {
             sendEvent(withName: "playback-queue-ended", body: [
                 "track": player.currentIndex,
                 "position": player.currentTime,
