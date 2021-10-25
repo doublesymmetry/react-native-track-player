@@ -12,6 +12,16 @@ To install release candidates run `yarn add react-native-track-player@next`
 
 ##### Bug Fixes
 
+* None.
+
+## 2.1.2 (25.10.21)
+
+##### Enhancements
+
+* None.
+
+##### Bug Fixes
+
 * Fix cyclic require warning regression
   [#1057](https://github.com/DoubleSymmetry/react-native-track-player/issues/1057)
 
