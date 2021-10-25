@@ -12,6 +12,9 @@ To install release candidates run `yarn add react-native-track-player@next`
 
 ##### Bug Fixes
 
+* Fix cyclic require warning regression
+  [#1057](https://github.com/DoubleSymmetry/react-native-track-player/issues/1057)
+
 * [ios] Fix `PlaybackQueueEnded` event to be called only when the track ends
   [#1243](https://github.com/DoubleSymmetry/react-native-track-player/issues/1243)
 
