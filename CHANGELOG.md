@@ -22,6 +22,8 @@ To install release candidates run `yarn add react-native-track-player@next`
 
 ##### Bug Fixes
 
+* Update SwiftAudioEx - Fixes issues with flickering notifications + pause between loads
+
 * Fix cyclic require warning regression
   [#1057](https://github.com/DoubleSymmetry/react-native-track-player/issues/1057)
 
