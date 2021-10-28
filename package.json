@@ -52,13 +52,6 @@
     "hooks"
   ],
   "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/react-native-kit/react-native-track-player.git"
-  },
-  "bugs": {
-    "url": "https://github.com/react-native-kit/react-native-track-player/issues"
-  },
   "peerDependencies": {
     "react": ">=16.8.6",
     "react-native": ">=0.60.0-rc.2",
