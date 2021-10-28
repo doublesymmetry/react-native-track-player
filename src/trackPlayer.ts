@@ -1,6 +1,5 @@
 import { Platform, AppRegistry, DeviceEventEmitter, NativeEventEmitter, NativeModules } from 'react-native'
 // @ts-ignore
-import * as resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource'
 import {
   MetadataOptions,
   PlayerOptions,
@@ -12,11 +11,16 @@ import {
   RepeatMode,
 } from './interfaces'
 
-const { TrackPlayerModule: TrackPlayer } = NativeModules
-const emitter = Platform.OS !== 'android' ? new NativeEventEmitter(TrackPlayer) : DeviceEventEmitter
+const TrackPlayer = Platform.OS !== 'web'
+  ? NativeModules.TrackPlayerModule
+  : require("../web/TrackPlayer").TrackPlayerModule;
+
+const emitter = Platform.OS !== 'android'
+  ? new NativeEventEmitter(TrackPlayer)
+  : DeviceEventEmitter
 
 // MARK: - Helpers
-
+const resolveAssetSource = (url: string | number) => url;
 function resolveImportedPath(path?: number | string) {
   if (!path) return undefined
   return resolveAssetSource(path) || path
