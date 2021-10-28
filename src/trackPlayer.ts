@@ -69,8 +69,8 @@ async function add(tracks: Track | Track[], insertBeforeIndex?: number): Promise
     tracks[i] = { ...tracks[i] }
 
     // Resolve the URLs
-    tracks[i].url = resolveImportedPath(tracks[i].url)
-    tracks[i].artwork = resolveImportedPath(tracks[i].artwork)
+    /*tracks[i].url = resolveImportedPath(tracks[i].url)
+    tracks[i].artwork = resolveImportedPath(tracks[i].artwork)*/
   }
 
   // Note: we must be careful about passing nulls to non nullable parameters on Android.
@@ -107,14 +107,14 @@ async function updateOptions(options: MetadataOptions = {}): Promise<void> {
   options = { ...options }
 
   // Resolve the asset for each icon
-  options.icon = resolveImportedPath(options.icon)
+  /*options.icon = resolveImportedPath(options.icon)
   options.playIcon = resolveImportedPath(options.playIcon)
   options.pauseIcon = resolveImportedPath(options.pauseIcon)
   options.stopIcon = resolveImportedPath(options.stopIcon)
   options.previousIcon = resolveImportedPath(options.previousIcon)
   options.nextIcon = resolveImportedPath(options.nextIcon)
   options.rewindIcon = resolveImportedPath(options.rewindIcon)
-  options.forwardIcon = resolveImportedPath(options.forwardIcon)
+  options.forwardIcon = resolveImportedPath(options.forwardIcon)*/
 
   return TrackPlayer.updateOptions(options)
 }
