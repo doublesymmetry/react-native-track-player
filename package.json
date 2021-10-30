@@ -18,6 +18,7 @@
     "lib/**/*",
     "ios/**/*",
     "android/**/*",
+    "web/**/*",
     "*.podspec"
   ],
   "contributors": [
