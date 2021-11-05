@@ -28,7 +28,7 @@ async function setupPlayer(options: PlayerOptions = {}): Promise<void> {
   return TrackPlayer.setupPlayer(options || {})
 }
 
-function destroy() {
+function destroy(): Promise<void> {
   return TrackPlayer.destroy()
 }
 

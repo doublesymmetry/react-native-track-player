@@ -286,8 +286,13 @@ public class RNTrackPlayer: RCTEventEmitter {
         resolve(NSNull())
     }
 
-    @objc(destroy)
-    public func destroy() {
+    @objc(destroy:rejecter:)
+    public func destroy(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        if !hasInitialized {
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
+            return
+        }
+        
         print("Destroying player")
         self.player.stop()
         self.player.nowPlayingInfoController.clear()
@@ -298,7 +303,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(updateOptions:resolver:rejecter:)
     public func update(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -322,7 +327,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(add:before:resolver:rejecter:)
     public func add(trackDicts: [[String: Any]], before trackIndex: NSNumber, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -354,7 +359,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(remove:resolver:rejecter:)
     public func remove(tracks indexes: [Int], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -370,7 +375,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(removeUpcomingTracks:rejecter:)
     public func removeUpcomingTracks(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -381,7 +386,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(skip:resolver:rejecter:)
     public func skip(to trackIndex: NSNumber, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -398,7 +403,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(skipToNext:rejecter:)
     public func skipToNext(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -413,7 +418,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(skipToPrevious:rejecter:)
     public func skipToPrevious(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -428,7 +433,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(reset:rejecter:)
     public func reset(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -442,7 +447,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(play:rejecter:)
     public func play(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -454,7 +459,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(pause:rejecter:)
     public func pause(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -465,7 +470,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(stop:rejecter:)
     public func stop(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -476,7 +481,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(seekTo:resolver:rejecter:)
     public func seek(to time: Double, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -487,7 +492,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(setRepeatMode:resolver:rejecter:)
     public func setRepeatMode(repeatMode: NSNumber, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -498,7 +503,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(getRepeatMode:rejecter:)
     public func getRepeatMode(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -508,7 +513,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(setVolume:resolver:rejecter:)
     public func setVolume(level: Float, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -519,7 +524,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(getVolume:rejecter:)
     public func getVolume(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -529,7 +534,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(setRate:resolver:rejecter:)
     public func setRate(rate: Float, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -540,7 +545,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(getRate:rejecter:)
     public func getRate(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -550,7 +555,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(getTrack:resolver:rejecter:)
     public func getTrack(index: NSNumber, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -565,7 +570,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(getQueue:rejecter:)
     public func getQueue(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -576,7 +581,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(getCurrentTrack:rejecter:)
     public func getCurrentTrack(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -591,7 +596,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(getDuration:rejecter:)
     public func getDuration(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -601,7 +606,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(getBufferedPosition:rejecter:)
     public func getBufferedPosition(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -611,7 +616,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(getPosition:rejecter:)
     public func getPosition(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -621,7 +626,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(getState:rejecter:)
     public func getState(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -631,7 +636,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(updateMetadataForTrack:metadata:resolver:rejecter:)
     public func updateMetadata(for trackIndex: NSNumber, metadata: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -653,7 +658,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(clearNowPlayingMetadata:rejecter:)
     public func clearNowPlayingMetadata(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 
@@ -664,7 +669,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(updateNowPlayingMetadata:resolver:rejecter:)
     public func updateNowPlayingMetadata(metadata: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
-            reject("player_already_initialized", "The player has already been initialized via setupPlayer.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
 

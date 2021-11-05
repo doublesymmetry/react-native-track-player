@@ -167,7 +167,9 @@ class MusicModule(private val reactContext: ReactApplicationContext) : ReactCont
     }
 
     @ReactMethod
-    fun destroy() {
+    fun destroy(callback: Promise) {
+        if (verifyServiceBoundOrReject(callback)) return
+
         musicService.destroyIfAllowed(true)
         unbindFromService()
     }
