@@ -4,7 +4,8 @@
     "title": "Longing",
     "artist": "David Chavez",
     "artwork": "https://i.scdn.co/image/e5c7b168be89098eb686e02152aaee9d3a24e5b6",
-    "duration": 143
+    "duration": 143,
+    "isLiveStream": true
   },
   {
     "url": "https://drive.google.com/uc?export=download&id=1VM9_umeyzJn0v1pRzR1BSm9y3IhZ3c0E",
