@@ -45,7 +45,6 @@ const setupIfNecessary = async () => {
   });
 
   await TrackPlayer.add(playlistData);
-  // @ts-ignore
   await TrackPlayer.add({
     url: localTrack,
     title: 'Pure (Demo)',
