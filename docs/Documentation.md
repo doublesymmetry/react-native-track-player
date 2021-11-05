@@ -519,6 +519,7 @@ Only the `url`, `title` and `artist` properties are required for basic playback
 | artwork        | `string` or [Resource Object](#resource-object) | The artwork url |
 | pitchAlgorithm | [Pitch Algorithm](#pitch-algorithm) | The pitch algorithm |
 | headers        | `object`                    | An object containing all the headers to use in the HTTP request |
+| isLiveStream   | `boolean`                   | Used by iOS to present live stream option in control center |
 
 ### Feedback Object
 Controls the rendering of the control center item.
