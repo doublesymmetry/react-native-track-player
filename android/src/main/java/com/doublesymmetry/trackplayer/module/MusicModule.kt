@@ -175,6 +175,9 @@ class MusicModule(private val reactContext: ReactApplicationContext) : ReactCont
     }
 
     private fun destroyIfAllowed() {
+        // There's nothing to destroy if we have not been service bound yet.
+        if (!isServiceBound) return
+
         musicService.destroyIfAllowed()
         if (!musicService.stopWithApp) return
 
