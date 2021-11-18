@@ -380,7 +380,7 @@ class MusicModule(private val reactContext: ReactApplicationContext) : ReactCont
     fun setVolume(volume: Float, callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
 
-        musicService.volume = volume
+        musicService.setVolume(volume)
         callback.resolve(null)
     }
 
@@ -388,14 +388,16 @@ class MusicModule(private val reactContext: ReactApplicationContext) : ReactCont
     fun getVolume(callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
 
-        callback.resolve(musicService.volume)
+        musicService.getVolume {
+            callback.resolve(it)
+        }
     }
 
     @ReactMethod
     fun setRate(rate: Float, callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
 
-        musicService.rate = rate
+        musicService.setRate(rate);
         callback.resolve(null)
     }
 
@@ -403,7 +405,9 @@ class MusicModule(private val reactContext: ReactApplicationContext) : ReactCont
     fun getRate(callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
 
-        callback.resolve(musicService.rate)
+        musicService.getRate {
+            callback.resolve(it)
+        }
     }
 
     @ReactMethod

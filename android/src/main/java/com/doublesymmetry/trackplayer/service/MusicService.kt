@@ -43,22 +43,6 @@ class MusicService : HeadlessJsTaskService() {
             }
         }
 
-    var volume: Float
-        get() = player.volume
-        set(value) {
-            handler.post {
-                player.volume = value
-            }
-        }
-
-    var rate: Float
-        get() = player.playbackSpeed
-        set(value) {
-            handler.post {
-                player.playbackSpeed = value
-            }
-        }
-
     val event get() = player.event
 
     private var capabilities: List<Capability> = emptyList()
@@ -185,6 +169,30 @@ class MusicService : HeadlessJsTaskService() {
     fun getCurrentTrackIndex(callback: (Int) -> Unit) {
         handler.post {
             callback(player.currentIndex)
+        }
+    }
+
+    fun getRate(callback: (Float) -> Unit) {
+        handler.post {
+            callback(player.playbackSpeed)
+        }
+    }
+
+    fun setRate(value: Float) {
+        handler.post {
+            player.playbackSpeed = value
+        }
+    }
+
+    fun getVolume(callback: (Float) -> Unit) {
+        handler.post {
+            callback(player.volume)
+        }
+    }
+
+    fun setVolume(value: Float) {
+        handler.post {
+            player.volume = value
         }
     }
 
