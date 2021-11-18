@@ -63,27 +63,27 @@ dependencies {
     def exoPlayerVersion = safeExtGet("exoPlayerVersion", '2.12.3')
 
     // ExoPlayer Core
-    implementation "com.google.android.exoplayer:exoplayer-core:${exoPlayerVersion}"
+    implementation "com.google.android.exoplayer:exoplayer-core:2.12.3"
 
     // ExoPlayer DASH
     if (dash) {
-        implementation "com.google.android.exoplayer:exoplayer-dash:${exoPlayerVersion}"
+        implementation "com.google.android.exoplayer:exoplayer-dash:2.12.3"
     } else {
-        compileOnly "com.google.android.exoplayer:exoplayer-dash:${exoPlayerVersion}"
+        compileOnly "com.google.android.exoplayer:exoplayer-dash:2.12.3"
     }
 
     // ExoPlayer HLS
     if (hls) {
-        implementation "com.google.android.exoplayer:exoplayer-hls:${exoPlayerVersion}"
+        implementation "com.google.android.exoplayer:exoplayer-hls:2.12.3"
     } else {
-        compileOnly "com.google.android.exoplayer:exoplayer-hls:${exoPlayerVersion}"
+        compileOnly "com.google.android.exoplayer:exoplayer-hls:2.12.3"
     }
 
     // ExoPlayer SmoothStreaming
     if (smoothstreaming) {
-        implementation "com.google.android.exoplayer:exoplayer-smoothstreaming:${exoPlayerVersion}"
+        implementation "com.google.android.exoplayer:exoplayer-smoothstreaming:2.12.3"
     } else {
-        compileOnly "com.google.android.exoplayer:exoplayer-smoothstreaming:${exoPlayerVersion}"
+        compileOnly "com.google.android.exoplayer:exoplayer-smoothstreaming:2.12.3"
     }
 
     // Make sure we're using androidx
