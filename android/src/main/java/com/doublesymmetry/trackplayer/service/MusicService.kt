@@ -12,6 +12,7 @@ import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.model.TrackAudioItem
 import com.doublesymmetry.trackplayer.module.MusicEvents
 import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
+import com.doublesymmetry.trackplayer.utils.Utils
 import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
@@ -51,11 +52,11 @@ class MusicService : HeadlessJsTaskService() {
 
     fun setupPlayer(playerOptions: Bundle?, promise: Promise?) {
         val bufferOptions = BufferConfig(
-            playerOptions?.getDouble(MIN_BUFFER_KEY)?.toInt(),
-            playerOptions?.getDouble(MAX_BUFFER_KEY)?.toInt(),
-            playerOptions?.getDouble(PLAY_BUFFER_KEY)?.toInt(),
-            playerOptions?.getDouble(BACK_BUFFER_KEY)?.toInt()
-            //TODO: Ignored autoUpdateMetadata. Do we need them?
+            playerOptions?.getDouble(MIN_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
+            playerOptions?.getDouble(MAX_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
+            playerOptions?.getDouble(PLAY_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
+            playerOptions?.getDouble(BACK_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
+            // TODO: Ignored autoUpdateMetadata. Do we need them?
         )
 
         val cacheOptions = CacheConfig(

@@ -13,7 +13,10 @@ import com.doublesymmetry.trackplayer.model.State
 import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
 import com.doublesymmetry.trackplayer.service.MusicService
+import com.doublesymmetry.trackplayer.utils.Utils
 import com.facebook.react.bridge.*
+import com.google.android.exoplayer2.DefaultLoadControl
+import com.google.android.exoplayer2.DefaultLoadControl.*
 import com.google.android.exoplayer2.Player
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
@@ -154,8 +157,31 @@ class MusicModule(private val reactContext: ReactApplicationContext) : ReactCont
             return
         }
 
+        // validate buffer keys.
+        val bundledData = Arguments.toBundle(data)
+        val minBuffer = bundledData?.getDouble(MusicService.MIN_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() } ?: DEFAULT_MIN_BUFFER_MS
+        val maxBuffer = bundledData?.getDouble(MusicService.MAX_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() } ?: DEFAULT_MAX_BUFFER_MS
+        val playBuffer = bundledData?.getDouble(MusicService.PLAY_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() } ?: DEFAULT_BUFFER_FOR_PLAYBACK_MS
+        val backBuffer = bundledData?.getDouble(MusicService.BACK_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() } ?: DEFAULT_BACK_BUFFER_DURATION_MS
+
+        if (playBuffer < 0) {
+            promise.reject("play_buffer_error", "The value for playBuffer should be greater than or equal to zero.")
+        }
+
+        if (backBuffer < 0) {
+            promise.reject("back_buffer_error", "The value for backBuffer should be greater than or equal to zero.")
+        }
+
+        if (minBuffer < playBuffer) {
+            promise.reject("min_buffer_error", "The value for minBuffer should be greater than or equal to playBuffer.")
+        }
+
+        if (maxBuffer < minBuffer) {
+            promise.reject("min_buffer_error", "The value for maxBuffer should be greater than or equal to minBuffer.")
+        }
+
         playerSetUpPromise = promise
-        playerOptions = Arguments.toBundle(data)
+        playerOptions = bundledData
 
         val manager = LocalBroadcastManager.getInstance(reactContext)
         eventHandler = MusicEvents(reactContext)
