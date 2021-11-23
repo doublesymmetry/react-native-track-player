@@ -3,6 +3,7 @@ import groovy.json.JsonSlurper
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
         google()
     }
     dependencies {
@@ -53,6 +54,7 @@ repositories {
     }
 
     mavenCentral()
+    jcenter()
     google()
 }
 
