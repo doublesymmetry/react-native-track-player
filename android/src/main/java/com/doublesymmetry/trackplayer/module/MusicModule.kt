@@ -128,7 +128,7 @@ class MusicModule(private val reactContext: ReactApplicationContext) : ReactCont
 
         // States
         constants["STATE_NONE"] = State.None.ordinal
-        constants["STATE_READY"] = State.Paused.ordinal
+        constants["STATE_READY"] = State.Ready.ordinal
         constants["STATE_PLAYING"] = State.Playing.ordinal
         constants["STATE_PAUSED"] = State.Paused.ordinal
         constants["STATE_STOPPED"] = State.Stopped.ordinal

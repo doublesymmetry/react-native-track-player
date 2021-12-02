@@ -43,12 +43,13 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(constantsToExport)
     override public func constantsToExport() -> [AnyHashable: Any] {
         return [
-            "STATE_NONE": AVPlayerWrapperState.idle.rawValue,
-            "STATE_READY": AVPlayerWrapperState.ready.rawValue,
-            "STATE_PLAYING": AVPlayerWrapperState.playing.rawValue,
-            "STATE_PAUSED": AVPlayerWrapperState.paused.rawValue,
-            "STATE_STOPPED": AVPlayerWrapperState.idle.rawValue,
-            "STATE_BUFFERING": AVPlayerWrapperState.loading.rawValue,
+            "STATE_NONE": State.none.rawValue,
+            "STATE_READY": State.ready.rawValue,
+            "STATE_PLAYING": State.playing.rawValue,
+            "STATE_PAUSED": State.paused.rawValue,
+            "STATE_STOPPED": State.stopped.rawValue,
+            "STATE_BUFFERING": State.buffering.rawValue,
+            "STATE_CONNECTING": State.connecting.rawValue,
 
             "TRACK_PLAYBACK_ENDED_REASON_END": PlaybackEndedReason.playedUntilEnd.rawValue,
             "TRACK_PLAYBACK_ENDED_REASON_JUMPED": PlaybackEndedReason.jumpedToIndex.rawValue,
@@ -630,7 +631,7 @@ public class RNTrackPlayer: RCTEventEmitter {
             return
         }
 
-        resolve(player.playerState.rawValue)
+        resolve(State.fromPlayerState(state: player.playerState).rawValue)
     }
 
     @objc(updateMetadataForTrack:metadata:resolver:rejecter:)
@@ -680,7 +681,7 @@ public class RNTrackPlayer: RCTEventEmitter {
     // MARK: - QueuedAudioPlayer Event Handlers
 
     func handleAudioPlayerStateChange(state: AVPlayerWrapperState) {
-        sendEvent(withName: "playback-state", body: ["state": state.rawValue])
+        sendEvent(withName: "playback-state", body: ["state": State.fromPlayerState(state: state).rawValue])
     }
 
     func handleAudioPlayerMetadataReceived(metadata: [AVMetadataItem]) {

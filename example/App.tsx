@@ -1,5 +1,6 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
   Image,
   SafeAreaView,
   StatusBar,
@@ -64,26 +65,20 @@ const setupIfNecessary = async () => {
   }
 };
 
-const togglePlayback = async (playbackState: State) => {
-  const currentTrack = await TrackPlayer.getCurrentTrack();
-  if (currentTrack == null) {
-    // TODO: Perhaps present an error or restart the playlist?
-  } else {
-    if (playbackState !== State.Playing) {
-      await TrackPlayer.play();
-    } else {
-      await TrackPlayer.pause();
-    }
-  }
-};
-
 const App = () => {
   const playbackState = usePlaybackState();
   const progress = useProgress();
 
+  const state = usePlaybackState();
+  const [isLoading, setIsLoading] = useState(true);
+
   const [trackArtwork, setTrackArtwork] = useState<string | number>();
   const [trackTitle, setTrackTitle] = useState<string>();
   const [trackArtist, setTrackArtist] = useState<string>();
+
+  useEffect(() => {
+    setupIfNecessary();
+  }, []);
 
   useTrackPlayerEvents([Event.PlaybackTrackChanged], async event => {
     if (
@@ -98,9 +93,38 @@ const App = () => {
     }
   });
 
+  // handle changes to state
   useEffect(() => {
-    setupIfNecessary();
-  }, []);
+    switch (state) {
+      case State.Connecting:
+        setIsLoading(true);
+        break;
+      case State.Buffering:
+        setIsLoading(true);
+        break;
+      case State.Ready:
+        setIsLoading(false);
+        break;
+      case State.Playing:
+      case State.Paused:
+      case State.None:
+        setIsLoading(false);
+        break;
+    }
+  }, [state]);
+
+  const togglePlayback = useCallback(async () => {
+    const currentTrack = await TrackPlayer.getCurrentTrack();
+    if (currentTrack == null) {
+      // TODO: Perhaps present an error or restart the playlist?
+    } else {
+      if (playbackState !== State.Playing) {
+        await TrackPlayer.play();
+      } else {
+        await TrackPlayer.pause();
+      }
+    }
+  }, [playbackState]);
 
   return (
     <SafeAreaView style={styles.screenContainer}>
@@ -141,7 +165,7 @@ const App = () => {
         <TouchableWithoutFeedback onPress={() => TrackPlayer.skipToPrevious()}>
           <Text style={styles.secondaryActionButton}>Prev</Text>
         </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback onPress={() => togglePlayback(playbackState)}>
+        <TouchableWithoutFeedback onPress={togglePlayback}>
           <Text style={styles.primaryActionButton}>
             {playbackState === State.Playing ? 'Pause' : 'Play'}
           </Text>
@@ -149,6 +173,9 @@ const App = () => {
         <TouchableWithoutFeedback onPress={() => TrackPlayer.skipToNext()}>
           <Text style={styles.secondaryActionButton}>Next</Text>
         </TouchableWithoutFeedback>
+      </View>
+      <View style={styles.statusContainer}>
+        {isLoading && <ActivityIndicator />}
       </View>
     </SafeAreaView>
   );
@@ -210,7 +237,6 @@ const styles = StyleSheet.create({
   actionRowContainer: {
     width: '60%',
     flexDirection: 'row',
-    marginBottom: 100,
     justifyContent: 'space-between',
   },
   primaryActionButton: {
@@ -221,6 +247,11 @@ const styles = StyleSheet.create({
   secondaryActionButton: {
     fontSize: 14,
     color: '#FFD479',
+  },
+  statusContainer: {
+    height: 40,
+    marginTop: 20,
+    marginBottom: 60,
   },
 });
 
