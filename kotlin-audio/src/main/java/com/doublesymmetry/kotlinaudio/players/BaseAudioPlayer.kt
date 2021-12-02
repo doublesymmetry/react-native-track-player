@@ -361,6 +361,12 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
             }
         }
 
+        override fun onIsLoadingChanged(isLoading: Boolean) {
+            if (isLoading) {
+                playerEventHolder.updateAudioPlayerState(AudioPlayerState.LOADING)
+            }
+        }
+
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             if (isPlaying) {
                 requestAudioFocus()
