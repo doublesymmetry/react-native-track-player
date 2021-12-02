@@ -76,7 +76,7 @@ class NotificationManager internal constructor(private val context: Context, pri
     var showBackwardButtonCompact: Boolean
         get() = internalManager.useRewindActionInCompactView
         set(value) {
-            internalManager.useFastForwardActionInCompactView = value
+            internalManager.useRewindActionInCompactView = value
         }
 
     var showNextButton: Boolean
