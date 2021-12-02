@@ -8,11 +8,13 @@ To install release candidates run `yarn add react-native-track-player@next`
 
 ##### Enhancements
 
-* None.
+* Add property `isLiveStream` to `Track` for correct display in iOS control center.
+  [dcvz](https://github.com/dcvz)
 
 ##### Bug Fixes
 
-* None.
+* Make react-native-windows and optional peer dependency (#1324).
+  [jspizziri](https://github.com/jspizziri)
 
 ## 2.1.2 (25.10.21)
 

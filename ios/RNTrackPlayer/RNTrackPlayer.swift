@@ -646,6 +646,17 @@ public class RNTrackPlayer: RCTEventEmitter {
         if let previousIndex = previousIndex { dictionary["track"] = previousIndex }
         if let nextIndex = nextIndex { dictionary["nextTrack"] = nextIndex }
 
+        // Load isLiveStream option for track
+        var isTrackLiveStream = false
+        if let nextIndex = nextIndex {
+            let track = player.items[nextIndex]
+            isTrackLiveStream = (track as? Track)?.isLiveStream ?? false
+        }
+
+        if player.automaticallyUpdateNowPlayingInfo {
+            player.nowPlayingInfoController.set(keyValue: NowPlayingInfoProperty.isLiveStream(isTrackLiveStream))
+        }
+
         sendEvent(withName: "playback-track-changed", body: dictionary)
     }
 }
