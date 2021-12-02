@@ -82,6 +82,26 @@ object Utils {
         }
     }
 
+    fun getIcon(context: Context, options: Bundle, propertyName: String, defaultIcon: Int): Int {
+        if (!options.containsKey(propertyName)) return defaultIcon
+
+        val bundle = options.getBundle(propertyName) ?: return defaultIcon
+
+        val helper = ResourceDrawableIdHelper.getInstance()
+        val icon = helper.getResourceDrawableId(context, bundle.getString("uri"))
+        return if (icon == 0) defaultIcon else icon
+    }
+
+    fun getIconOrNull(context: Context, options: Bundle, propertyName: String): Int? {
+        if (!options.containsKey(propertyName)) return null
+
+        val bundle = options.getBundle(propertyName) ?: return null
+
+        val helper = ResourceDrawableIdHelper.getInstance()
+        val icon = helper.getResourceDrawableId(context, bundle.getString("uri"))
+        return if (icon == 0) null else icon
+    }
+
     fun isPlaying(state: Int): Boolean {
         return state == PlaybackStateCompat.STATE_PLAYING || state == PlaybackStateCompat.STATE_BUFFERING
     }

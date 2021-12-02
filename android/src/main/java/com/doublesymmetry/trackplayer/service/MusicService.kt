@@ -9,6 +9,7 @@ import com.doublesymmetry.kotlinaudio.models.NotificationButton.*
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.doublesymmetry.trackplayer.extensions.asLibState
 import com.doublesymmetry.trackplayer.model.Track
+import com.doublesymmetry.trackplayer.R
 import com.doublesymmetry.trackplayer.model.TrackAudioItem
 import com.doublesymmetry.trackplayer.module.MusicEvents
 import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
@@ -46,6 +47,7 @@ class MusicService : HeadlessJsTaskService() {
 
     val event get() = player.event
 
+    private var latestOptions: Bundle? = null
     private var capabilities: List<Capability> = emptyList()
     private var notificationCapabilities: List<Capability> = emptyList()
     private var compactCapabilities: List<Capability> = emptyList()
@@ -72,6 +74,7 @@ class MusicService : HeadlessJsTaskService() {
 
     fun updateOptions(options: Bundle) {
         handler.post {
+            latestOptions = options;
             stopWithApp = options.getBoolean(STOP_WITH_APP_KEY)
 
             player.playerOptions.alwaysPauseOnInterruption = options.getBoolean(PAUSE_ON_INTERRUPTION_KEY)
@@ -86,13 +89,34 @@ class MusicService : HeadlessJsTaskService() {
 
             notificationCapabilities.forEach {
                 when (it) {
-                    Capability.PLAY -> buttonsList.add(PLAY())
-                    Capability.PAUSE -> buttonsList.add(PAUSE())
-                    Capability.STOP -> buttonsList.add(STOP())
-                    Capability.SKIP_TO_NEXT -> buttonsList.add(NEXT(isCompact = isCompact(it)))
-                    Capability.SKIP_TO_PREVIOUS -> buttonsList.add(PREVIOUS(isCompact = isCompact(it)))
-                    Capability.JUMP_FORWARD -> buttonsList.add(FORWARD(isCompact = isCompact(it)))
-                    Capability.JUMP_BACKWARD -> buttonsList.add(BACKWARD(isCompact = isCompact(it)))
+                    Capability.PLAY -> {
+                        val playIcon = Utils.getIconOrNull(this, options, "playIcon")
+                        buttonsList.add(PLAY(icon = playIcon))
+                    }
+                    Capability.PAUSE -> {
+                        val pauseIcon = Utils.getIconOrNull(this, options, "pauseIcon")
+                        buttonsList.add(PAUSE(icon = pauseIcon))
+                    }
+                    Capability.STOP -> {
+                        val stopIcon = Utils.getIconOrNull(this, options, "stopIcon")
+                        buttonsList.add(STOP(icon = stopIcon))
+                    }
+                    Capability.SKIP_TO_NEXT -> {
+                        val nextIcon = Utils.getIconOrNull(this, options, "nextIcon")
+                        buttonsList.add(NEXT(icon = nextIcon, isCompact = isCompact(it)))
+                    }
+                    Capability.SKIP_TO_PREVIOUS -> {
+                        val previousIcon = Utils.getIconOrNull(this, options, "previousIcon")
+                        buttonsList.add(PREVIOUS(icon = previousIcon, isCompact = isCompact(it)))
+                    }
+                    Capability.JUMP_FORWARD -> {
+                        val forwardIcon = Utils.getIcon(this, options, "forwardIcon", R.drawable.forward)
+                        buttonsList.add(FORWARD(icon = forwardIcon, isCompact = isCompact(it)))
+                    }
+                    Capability.JUMP_BACKWARD -> {
+                        val backwardIcon = Utils.getIcon(this, options, "rewindIcon", R.drawable.rewind)
+                        buttonsList.add(BACKWARD(icon = backwardIcon, isCompact = isCompact(it)))
+                    }
                     else -> return@forEach
                 }
             }
@@ -261,8 +285,22 @@ class MusicService : HeadlessJsTaskService() {
                     is NEXT -> emit(MusicEvents.BUTTON_SKIP_NEXT)
                     is PREVIOUS -> emit(MusicEvents.BUTTON_SKIP_PREVIOUS)
                     is STOP -> emit(MusicEvents.BUTTON_STOP)
-                    is FORWARD -> emit(MusicEvents.BUTTON_JUMP_FORWARD)
-                    is BACKWARD -> emit(MusicEvents.BUTTON_JUMP_BACKWARD)
+                    is FORWARD -> {
+                        val bundle = Bundle()
+                        val interval = (latestOptions?.getInt(FORWARD_JUMP_INTERVAL_KEY) ?: latestOptions?.getInt(
+                            BACKWARD_JUMP_INTERVAL_KEY)) ?: 15
+
+                        bundle.putInt("interval", interval)
+                        emit(MusicEvents.BUTTON_JUMP_FORWARD)
+                    }
+                    is BACKWARD -> {
+                        val bundle = Bundle()
+                        val interval = (latestOptions?.getInt(BACKWARD_JUMP_INTERVAL_KEY) ?: latestOptions?.getInt(
+                            FORWARD_JUMP_INTERVAL_KEY)) ?: 15
+
+                        bundle.putInt("interval", interval)
+                        emit(MusicEvents.BUTTON_JUMP_BACKWARD)
+                    }
                 }
 
             }
@@ -339,6 +377,9 @@ class MusicService : HeadlessJsTaskService() {
         const val MAX_BUFFER_KEY = "maxBuffer"
         const val PLAY_BUFFER_KEY = "playBuffer"
         const val BACK_BUFFER_KEY = "backBuffer"
+
+        const val FORWARD_JUMP_INTERVAL_KEY = "forwardJumpInterval"
+        const val BACKWARD_JUMP_INTERVAL_KEY = "backwardJumpInterval"
 
         const val MAX_CACHE_SIZE_KEY = "maxCacheSize"
 
