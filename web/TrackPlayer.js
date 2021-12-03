@@ -17,10 +17,14 @@ export class TrackPlayerModule {
     static PLAYBACK_ERROR = "playback-error";
     static PLAYBACK_METADATA_RECEIVED = "playback-metadata-received";
     
-    static REMOTE_PLAY = "remote-play"
-    static REMOTE_PAUSE = "remote-pause"
-    static REMOTE_NEXT = "remote-next"
-    static REMOTE_PREVIOUS = "remote-previous"
+    static REMOTE_PLAY = "remote-play";
+    static REMOTE_PAUSE = "remote-pause";
+    static REMOTE_NEXT = "remote-next";
+    static REMOTE_PREVIOUS = "remote-previous";
+
+    static REPEAT_OFF = "Off";
+    static REPEAT_TRACK = "Track";
+    static REPEAT_QUEUE = "Queue";
 
     static CAPABILITY_PLAY = 0;
     static CAPABILITY_PLAY_FROM_ID = 1;
@@ -47,6 +51,7 @@ export class TrackPlayerModule {
 
     static #emitter;
     static #mediaSession;
+
     static #currentIndex;
     static #playlist;
     static #track;
@@ -74,12 +79,6 @@ export class TrackPlayerModule {
 
         return new Promise((resolve, reject) => {
             this.#emitter = DeviceEventEmitter;
-            this.#mediaSession = new MediaSession({
-                play: () => this.#emitter.emit(Event.RemotePlay),
-                pause: () => this.#emitter.emit(Event.RemotePause),
-                nexttrack: () => this.#emitter.emit(Event.RemoteNext),
-                previoustrack: () => this.#emitter.emit(Event.RemotePrevious)
-            });
 
             this.#currentIndex = null;
             
@@ -114,20 +113,7 @@ export class TrackPlayerModule {
                         this.skip(0);
                 } else {
                     this.seekTo(0);
-                }
-                if (this.#playlist.length - 1 == this.#index) {
-                    this.#playEnded = true;
-                    this.#audio.src = this.#track.url;
-                    this.#emitter.emit(Event.PlaybackState, { state: State.Paused});
-                    this.#emitter.emit(
-                        Event.PlaybackQueueEnded,
-                        {
-                            track: this.#currentIndex,
-                            position: this.#audio.currentTime
-                        }
-                    );
-                } else {
-                    this.skipToNext(true);
+                    this.#emitter.emit(Event.PlaybackState, { state: State.Playing});
                 }
             };
 
@@ -161,6 +147,11 @@ export class TrackPlayerModule {
         if (this.#audio.src != '') {
             console.log(this.#audio);
             this.#audio.play();
+            this.#mediaSession.setMetadata(
+                this.#track.title,
+                this.#track.artist,
+                this.#track.artwork
+            );
         }
     }
 
@@ -190,22 +181,18 @@ export class TrackPlayerModule {
 
     static add = (tracks, insertBeforeIndex) => {
         return new Promise((resolve, reject) => {
-            if (tracks == null)
-                resolve();
+            if (this.#playlist == null)
+                this.#playlist = [];
 
-            if (!tracks.hasOwnProperty("length"))
-                tracks = [tracks];
-
-            if (insertBeforeIndex == undefined || insertBeforeIndex == null)
+            if (insertBeforeIndex == -1)
                 insertBeforeIndex = this.#playlist.length;
             
-            this.#playlist = this.#playlist
-                .slice(0, insertBeforeIndex)
+            this.#playlist = this.#playlist.slice(0, insertBeforeIndex)
                 .concat(
                     tracks,
-                    this.#playlist
-                        .slice(insertBeforeIndex)
+                    this.#playlist.slice(insertBeforeIndex)
                 );
+
             resolve();
         });
     }
@@ -255,49 +242,23 @@ export class TrackPlayerModule {
                 this.#track.artwork
             );
 
-            /*if (this.#playlist[index].url != null) {
-                if (this.#audio.src == this.#track.url) {
-                    this.seekTo(0);
-                } else {
-                    this.#audio.src = this.#track.url;
-                    this.#emitNextTrack(index);
-                    this.#mediaSession.setMetadata(
-                        this.#track.title,
-                        this.#track.artist,
-                        this.#track.artwork
-                    );
-                }
-            } else {
-                this.#emitNextTrack(index);
-                console.log("no url");
-                this.#emitter.emit(Event.PlaybackError, { reason: "url is missing" });
-            }*/
-
             resolve();
         });
     }
 
     static skipToNext = async(wasPlaying) => {
         if (this.#playlist != null) {
-            if (this.#playlist[this.#index + 1].url == null) {
-                this.#emitter.emit(Event.PlaybackError, { reason: "url is missing" });
-            } else {
-                this.skip(this.#playlist[this.#index + 1].id);
-                if (!wasPlaying)
-                    this.pause();
-            }
+            this.skip(this.#playlist[this.#index + 1].id);
+            if (!wasPlaying)
+                this.pause();
         }
     }
 
     static skipToPrevious = () => {
         if (this.#playlist != null) {
-            if (this.#playlist[this.#index - 1].url == null) {
-                this.#emitter.emit(Event.PlaybackError, { reason: "url is missing" });
-            } else {
-                this.skip(this.#playlist[this.#index - 1].id);
-                if (!wasPlaying)
-                    this.pause();
-            }
+            this.skip(this.#playlist[this.#index - 1].id);
+            if (!wasPlaying)
+                this.pause();
         }
 
         if (this.#playlist != null && this.#index != 0)
@@ -325,10 +286,12 @@ export class TrackPlayerModule {
     }
 
     static setRepeatMode = mode => {
-        return new Promise((resolve, reject) => {
-            if (RepeatMode)
+        if (Object.values(RepeatMode).includes(mode))
             this.#repeatMode = mode;
-        });
+    }
+
+    static getRepeatMode = () => {
+        return this.#repeatMode;
     }
 
     static seekTo = seconds => {
@@ -418,7 +381,34 @@ export class TrackPlayerModule {
         });
     }
 
-    static updateOptions = () => {}
-}
+    static updateOptions = options => {
+        return new Promise((resolve, reject) => {
+            let mediaSessionOptions = [];
+            if (options.capabilities.includes(Capability.Play))
+                mediaSessionOptions.push(['play', () => this.#emitter.emit(Event.RemotePlay)]);
+            
+            if (options.capabilities.includes(Capability.Pause))
+                mediaSessionOptions.push(['pause', () => this.#emitter.emit(Event.RemotePause)]);
+            
+            
+            if (options.capabilities.includes(Capability.Stop))
+                mediaSessionOptions.push(['stop', () => this.#emitter.emit(Event.RemoteStop)]);
 
-//module.exports = TrackPlayerModule;
+            mediaSessionOptions.push(['seekbackward', () => this.#emitter.emit(Event.RemoteJumpBackward)]);
+            mediaSessionOptions.push(['seekforward', () => this.#emitter.emit(Event.RemoteJumpForward)]);
+            
+            if (options.capabilities.includes(Capability.SeekTo))
+                mediaSessionOptions.push(['seekto', () => this.#emitter.emit(Event.RemoteSeek)]);
+
+            if (options.capabilities.includes(Capability.SkipToPrevious))
+                mediaSessionOptions.push(['previoustrack', () => this.#emitter.emit(Event.RemotePrevious)]);
+            
+            if (options.capabilities.includes(Capability.SkipToNext))
+                mediaSessionOptions.push(['nexttrack', () => this.#emitter.emit(Event.RemoteNext)]);
+
+            this.#mediaSession = new MediaSession(mediaSessionOptions);
+
+            resolve();
+        });
+    }
+}

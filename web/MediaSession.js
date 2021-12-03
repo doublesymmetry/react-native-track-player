@@ -1,16 +1,8 @@
 export default class MediaSession {
-    constructor({play, pause, nexttrack, previoustrack}) {
+    constructor(capabilities) {
         if ("mediaSession" in navigator) {
             navigator.mediaSession.playbackState = "none";
-            
-            const handlers = [
-                ['play', play],
-                ['pause', pause],
-                ['nexttrack', nexttrack],
-                ['previoustrack', previoustrack]
-            ];
-
-            for (const [action, handler] of handlers) {
+            for (const [action, handler] of capabilities) {
                 try { navigator.mediaSession.setActionHandler(action, handler); }
                 catch{ console.log(action + " is not supported yet"); }
             }
