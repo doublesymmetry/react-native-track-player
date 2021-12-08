@@ -345,7 +345,7 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
     inner class PlayerListener : Listener {
         override fun onPlaybackStateChanged(playbackState: Int) {
             when (playbackState) {
-                Player.STATE_BUFFERING -> playerEventHolder.updateAudioPlayerState(AudioPlayerState.BUFFERING)
+                Player.STATE_BUFFERING -> playerEventHolder.updateAudioPlayerState(if (exoPlayer.playWhenReady) AudioPlayerState.BUFFERING else AudioPlayerState.LOADING)
                 Player.STATE_READY -> playerEventHolder.updateAudioPlayerState(AudioPlayerState.READY)
                 Player.STATE_IDLE -> playerEventHolder.updateAudioPlayerState(AudioPlayerState.IDLE)
                 Player.STATE_ENDED -> playerEventHolder.updateAudioPlayerState(AudioPlayerState.ENDED)
@@ -358,12 +358,6 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
                 Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED -> playerEventHolder.updateAudioItemTransition(AudioItemTransitionReason.QUEUE_CHANGED)
                 Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT -> playerEventHolder.updateAudioItemTransition(AudioItemTransitionReason.REPEAT)
                 Player.MEDIA_ITEM_TRANSITION_REASON_SEEK -> playerEventHolder.updateAudioItemTransition(AudioItemTransitionReason.SEEK_TO_ANOTHER_AUDIO_ITEM)
-            }
-        }
-
-        override fun onIsLoadingChanged(isLoading: Boolean) {
-            if (isLoading) {
-                playerEventHolder.updateAudioPlayerState(AudioPlayerState.LOADING)
             }
         }
 
