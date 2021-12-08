@@ -291,7 +291,7 @@ class MusicService : HeadlessJsTaskService() {
                             BACKWARD_JUMP_INTERVAL_KEY)) ?: 15
 
                         bundle.putInt("interval", interval)
-                        emit(MusicEvents.BUTTON_JUMP_FORWARD)
+                        emit(MusicEvents.BUTTON_JUMP_FORWARD, bundle)
                     }
                     is BACKWARD -> {
                         val bundle = Bundle()
@@ -299,7 +299,7 @@ class MusicService : HeadlessJsTaskService() {
                             FORWARD_JUMP_INTERVAL_KEY)) ?: 15
 
                         bundle.putInt("interval", interval)
-                        emit(MusicEvents.BUTTON_JUMP_BACKWARD)
+                        emit(MusicEvents.BUTTON_JUMP_BACKWARD, bundle)
                     }
                 }
 
