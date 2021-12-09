@@ -181,6 +181,7 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
         abandonAudioFocus()
         notificationManager.destroy()
         exoPlayer.release()
+        cache?.release()
     }
 
     fun seek(duration: Long, unit: TimeUnit) {
