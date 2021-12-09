@@ -286,20 +286,22 @@ class MusicService : HeadlessJsTaskService() {
                     is PREVIOUS -> emit(MusicEvents.BUTTON_SKIP_PREVIOUS)
                     is STOP -> emit(MusicEvents.BUTTON_STOP)
                     is FORWARD -> {
-                        val bundle = Bundle()
-                        val interval = (latestOptions?.getInt(FORWARD_JUMP_INTERVAL_KEY) ?: latestOptions?.getInt(
-                            BACKWARD_JUMP_INTERVAL_KEY)) ?: 15
+                        Bundle().apply {
+                            val interval = (latestOptions?.getInt(FORWARD_JUMP_INTERVAL_KEY) ?: latestOptions?.getInt(
+                                BACKWARD_JUMP_INTERVAL_KEY)) ?: 15
 
-                        bundle.putInt("interval", interval)
-                        emit(MusicEvents.BUTTON_JUMP_FORWARD, bundle)
+                            putInt("interval", interval)
+                            emit(MusicEvents.BUTTON_JUMP_FORWARD, this)
+                        }
                     }
                     is BACKWARD -> {
-                        val bundle = Bundle()
-                        val interval = (latestOptions?.getInt(BACKWARD_JUMP_INTERVAL_KEY) ?: latestOptions?.getInt(
-                            FORWARD_JUMP_INTERVAL_KEY)) ?: 15
+                        Bundle().apply {
+                            val interval = (latestOptions?.getInt(BACKWARD_JUMP_INTERVAL_KEY) ?: latestOptions?.getInt(
+                                FORWARD_JUMP_INTERVAL_KEY)) ?: 15
 
-                        bundle.putInt("interval", interval)
-                        emit(MusicEvents.BUTTON_JUMP_BACKWARD, bundle)
+                            putInt("interval", interval)
+                            emit(MusicEvents.BUTTON_JUMP_BACKWARD, this)
+                        }
                     }
                 }
 
