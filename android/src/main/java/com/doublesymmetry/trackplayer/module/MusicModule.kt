@@ -28,7 +28,7 @@ import kotlin.collections.ArrayList
  * @author Milen Pivchev @mpivchev
  *
  */
-class MusicModule(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), ServiceConnection, LifecycleEventsListener {
+class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), ServiceConnection, LifecycleEventsListener {
     private var binder: MusicService.MusicBinder? = null
     private var eventHandler: MusicEvents? = null
     private var playerOptions: Bundle? = null
@@ -96,7 +96,7 @@ class MusicModule(private val reactContext: ReactApplicationContext) : ReactCont
 
         // The music service will not stop unless we unbind it first.
         if (isServiceBound) {
-            reactApplicationContext.unbindService(this)
+            context.unbindService(this)
             isServiceBound = false
             binder = null
         }
@@ -183,13 +183,16 @@ class MusicModule(private val reactContext: ReactApplicationContext) : ReactCont
         playerSetUpPromise = promise
         playerOptions = bundledData
 
-        val manager = LocalBroadcastManager.getInstance(reactContext)
-        eventHandler = MusicEvents(reactContext)
+        val context: ReactContext = reactApplicationContext
+
+        val manager = LocalBroadcastManager.getInstance(context)
+        eventHandler = MusicEvents(context)
         manager.registerReceiver(eventHandler!!, IntentFilter(EVENT_INTENT))
 
-        val intent = Intent(reactContext, MusicService::class.java)
-        reactContext?.startService(intent)
-        reactContext?.bindService(intent, this, Context.BIND_AUTO_CREATE)
+        Intent(context, MusicService::class.java).also { intent ->
+            context.startService(intent)
+            context.bindService(intent, this, 0)
+        }
     }
 
     @ReactMethod

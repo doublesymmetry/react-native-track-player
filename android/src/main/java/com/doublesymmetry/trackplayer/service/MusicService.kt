@@ -339,17 +339,11 @@ class MusicService : HeadlessJsTaskService() {
 
     fun destroyIfAllowed(ignoreStopWithAppSetting: Boolean = false) {
         // Player will continue running if this is true, even if the app itself is killed.
-        if (ignoreStopWithAppSetting) {
-            stop()
-            stopForeground(true)
-            stopSelf()
-        } else {
-            if (!stopWithApp) return
+        if (!ignoreStopWithAppSetting && !stopWithApp) return
 
-            stop()
-            stopForeground(true)
-            stopSelf()
-        }
+        stop()
+        stopForeground(true)
+        stopSelf()
     }
 
     override fun onDestroy() {
