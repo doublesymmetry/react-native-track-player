@@ -52,6 +52,9 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
 
     open val playerOptions: PlayerOptions = PlayerOptionsImpl()
 
+    open val currentItem: AudioItem?
+        get() = exoPlayer.currentMediaItem?.playbackProperties?.tag as AudioItem?
+
     val duration: Long
         get() {
             return if (exoPlayer.duration == C.TIME_UNSET) 0
@@ -81,6 +84,8 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
         set(value) {
             exoPlayer.setPlaybackSpeed(value)
         }
+
+    var automaticallyUpdateNowPlayingInfo: Boolean = true
 
     private var volumeMultiplier = 1f
         private set(value) {
@@ -179,8 +184,8 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
     @CallSuper
     open fun destroy() {
         abandonAudioFocus()
-        notificationManager.destroy()
         exoPlayer.release()
+        notificationManager.destroy()
         cache?.release()
     }
 
@@ -258,7 +263,6 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
         )
             .createMediaSource(mediaItem)
     }
-
 
     private fun enableCaching(factory: DataSource.Factory): DataSource.Factory {
         return if (cache == null || cacheConfig == null || (cacheConfig.maxCacheSize ?: 0) <= 0) {
@@ -360,6 +364,9 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
                 Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT -> playerEventHolder.updateAudioItemTransition(AudioItemTransitionReason.REPEAT)
                 Player.MEDIA_ITEM_TRANSITION_REASON_SEEK -> playerEventHolder.updateAudioItemTransition(AudioItemTransitionReason.SEEK_TO_ANOTHER_AUDIO_ITEM)
             }
+
+            if (automaticallyUpdateNowPlayingInfo)
+                notificationManager.notificatioMetadata = NotificationMetadata(currentItem?.title, currentItem?.artist, currentItem?.artwork)
         }
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {

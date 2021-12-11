@@ -12,6 +12,7 @@ import com.doublesymmetry.kotlinaudio.R
 import com.doublesymmetry.kotlinaudio.event.NotificationEventHolder
 import com.doublesymmetry.kotlinaudio.models.NotificationButton
 import com.doublesymmetry.kotlinaudio.models.NotificationConfig
+import com.doublesymmetry.kotlinaudio.models.NotificationMetadata
 import com.doublesymmetry.kotlinaudio.models.NotificationState
 import com.doublesymmetry.kotlinaudio.utils.isJUnitTest
 import com.google.android.exoplayer2.ExoPlayer
@@ -23,8 +24,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class NotificationManager internal constructor(private val context: Context, private val exoPlayer: ExoPlayer, private val event: NotificationEventHolder) : PlayerNotificationManager.PrimaryActionReceiver, PlayerNotificationManager.NotificationListener {
-    private lateinit var descriptionAdapter: DescriptionAdapter
-    private lateinit var internalManager: PlayerNotificationManager
+    private var descriptionAdapter: DescriptionAdapter? = null
+    private var internalManager: PlayerNotificationManager? = null
 
     private val mediaSession: MediaSessionCompat = MediaSessionCompat(context, "AudioPlayerSession")
     private val mediaSessionConnector: MediaSessionConnector = MediaSessionConnector(mediaSession)
@@ -37,76 +38,82 @@ class NotificationManager internal constructor(private val context: Context, pri
 
     private var isNotificationCreated = false
 
-    var showPlayPauseButton: Boolean
-        get() = internalManager.usePlayPauseActions
+    var notificatioMetadata: NotificationMetadata? = null
         set(value) {
-            internalManager.usePlayPauseActions = value
+            field = value
+            internalManager?.invalidate()
+        }
+
+    var showPlayPauseButton: Boolean
+        get() = internalManager?.usePlayPauseActions ?: false
+        set(value) {
+            internalManager?.usePlayPauseActions = value
         }
 
     var showStopButton: Boolean
-        get() = internalManager.useStopAction
+        get() = internalManager?.useStopAction ?: false
         set(value) {
-            internalManager.useStopAction = value
+            internalManager?.useStopAction = value
         }
 
     var showForwardButton: Boolean
-        get() = internalManager.useFastForwardAction
+        get() = internalManager?.useFastForwardAction ?: false
         set(value) {
-            internalManager.useFastForwardAction = value
+            internalManager?.useFastForwardAction = value
         }
 
     /**
      * Controls whether or not this button should appear when the notification is compact (collapsed).
      */
     var showForwardButtonCompact: Boolean
-        get() = internalManager.useFastForwardActionInCompactView
+        get() = internalManager?.useFastForwardActionInCompactView ?: false
         set(value) {
-            internalManager.useFastForwardActionInCompactView = value
+            internalManager?.useFastForwardActionInCompactView = value
         }
 
     var showBackwardButton: Boolean
-        get() = internalManager.useRewindAction
+        get() = internalManager?.useRewindAction ?: false
         set(value) {
-            internalManager.useRewindAction = value
+            internalManager?.useRewindAction = value
         }
 
     /**
      * Controls whether or not this button should appear when the notification is compact (collapsed).
      */
     var showBackwardButtonCompact: Boolean
-        get() = internalManager.useRewindActionInCompactView
+        get() = internalManager?.useRewindActionInCompactView ?: false
         set(value) {
-            internalManager.useRewindActionInCompactView = value
+            internalManager?.useRewindActionInCompactView = value
         }
 
     var showNextButton: Boolean
-        get() = internalManager.useNextAction
+        get() = internalManager?.useNextAction ?: false
         set(value) {
-            internalManager.useNextAction = value
+            internalManager?.useNextAction = value
         }
 
     /**
      * Controls whether or not this button should appear when the notification is compact (collapsed).
      */
     var showNextButtonCompact: Boolean
-        get() = internalManager.useNextActionInCompactView
+        get() = internalManager?.useNextActionInCompactView ?: false
         set(value) {
-            internalManager.useNextActionInCompactView = value
+            internalManager?.useNextActionInCompactView = value
         }
 
     var showPreviousButton: Boolean
-        get() = internalManager.usePreviousAction
+        get() = internalManager?.usePreviousAction ?: false
         set(value) {
-            internalManager.usePreviousAction = value
+            internalManager?.usePreviousAction = value
         }
 
     /**
      * Controls whether or not this button should appear when the notification is compact (collapsed).
      */
     var showPreviousButtonCompact: Boolean
-        get() = internalManager.usePreviousActionInCompactView
+        get() = internalManager?.usePreviousActionInCompactView ?: false
         set(value) {
-            internalManager.usePreviousActionInCompactView = value
+            internalManager?.usePreviousActionInCompactView = value
         }
 
     init {
@@ -147,10 +154,22 @@ class NotificationManager internal constructor(private val context: Context, pri
             addAll(config.buttons)
         }
 
-        descriptionAdapter = DescriptionAdapter(context, config.pendingIntent)
+        descriptionAdapter = DescriptionAdapter(object: NotificationMetadataProvider {
+            override fun getTitle(): String? {
+                return notificatioMetadata?.title
+            }
+
+            override fun getArtist(): String? {
+                return notificatioMetadata?.artist
+            }
+
+            override fun getArtworkUrl(): String? {
+                return notificatioMetadata?.artworkUrl
+            }
+        }, context, config.pendingIntent)
 
         internalManager = PlayerNotificationManager.Builder(context, NOTIFICATION_ID, channelId).apply {
-            setMediaDescriptionAdapter(descriptionAdapter)
+            setMediaDescriptionAdapter(descriptionAdapter!!)
             setNotificationListener(this@NotificationManager)
 
             if (buttons.isNotEmpty()) {
@@ -171,7 +190,7 @@ class NotificationManager internal constructor(private val context: Context, pri
         }.build()
 
         if (!isJUnitTest()) {
-            internalManager.apply {
+            internalManager?.apply {
                 setPlayer(exoPlayer)
 
                 config.buttons.forEach { button ->
@@ -202,6 +221,10 @@ class NotificationManager internal constructor(private val context: Context, pri
         }
     }
 
+    fun clearNotification() {
+        mediaSession.isActive = false
+    }
+
     override fun onAction(player: Player, action: String, intent: Intent) {
         scope.launch {
             event.updateOnNotificationButtonTapped(NotificationButton.valueOf(action))
@@ -224,9 +247,14 @@ class NotificationManager internal constructor(private val context: Context, pri
         mediaSession.isActive = true
     }
 
+    internal fun reload() {
+        internalManager?.invalidate()
+    }
+
     internal fun destroy() {
-        descriptionAdapter.release()
+        descriptionAdapter?.release()
         isNotificationCreated = false
+        internalManager?.setPlayer(null)
     }
 
     companion object {

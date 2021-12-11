@@ -1,10 +1,7 @@
 package com.doublesymmetry.kotlinaudio.players
 
 import android.content.Context
-import com.doublesymmetry.kotlinaudio.models.AudioItem
-import com.doublesymmetry.kotlinaudio.models.BufferConfig
-import com.doublesymmetry.kotlinaudio.models.CacheConfig
-import com.doublesymmetry.kotlinaudio.models.QueuePlayerOptionsImpl
+import com.doublesymmetry.kotlinaudio.models.*
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.IllegalSeekPositionException
 import com.google.android.exoplayer2.source.MediaSource
@@ -16,6 +13,9 @@ class QueuedAudioPlayer(context: Context, bufferConfig: BufferConfig? = null, ca
 
     val currentIndex
         get() = exoPlayer.currentWindowIndex
+
+    override val currentItem: AudioItem?
+        get() = queue.getOrNull(currentIndex)?.mediaItem?.playbackProperties?.tag as AudioItem?
 
     val nextIndex: Int?
         get() {
@@ -47,9 +47,6 @@ class QueuedAudioPlayer(context: Context, bufferConfig: BufferConfig? = null, ca
                 .subList(exoPlayer.currentWindowIndex, queue.lastIndex)
                 .map { it.mediaItem.playbackProperties?.tag as AudioItem }
         }
-
-    val currentItem: AudioItem?
-        get() = exoPlayer.currentMediaItem?.playbackProperties?.tag as? AudioItem
 
     val nextItem: AudioItem?
         get() = items.getOrNull(currentIndex + 1)
@@ -164,6 +161,18 @@ class QueuedAudioPlayer(context: Context, bufferConfig: BufferConfig? = null, ca
         } catch (e: IllegalSeekPositionException) {
             throw Error("This item index $index does not exist. The size of the queue is ${queue.size} items.")
         }
+    }
+
+    /**
+     * Replaces item at index in queue.
+     * If updating current index, we update the notification emtadata.
+     */
+    fun replaceItem(index: Int, item: AudioItem) {
+        val mediaSource = getMediaSourceFromAudioItem(item)
+        queue[index] = mediaSource;
+
+        if (currentIndex == index && automaticallyUpdateNowPlayingInfo)
+            notificationManager.notificatioMetadata = NotificationMetadata(item.title, item.artist, item.artwork)
     }
 
     /**
