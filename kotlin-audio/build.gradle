@@ -4,7 +4,7 @@ plugins {
     id 'maven-publish'
 }
 
-def versionNumber = '0.1.24'
+def versionNumber = '0.1.25'
 
 group = 'com.github.doublesymmetry'
 version = versionNumber
