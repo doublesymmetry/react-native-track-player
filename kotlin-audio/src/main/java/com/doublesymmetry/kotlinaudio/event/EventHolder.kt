@@ -18,4 +18,7 @@ class EventHolder internal constructor(private val notificationEventHolder: Noti
 
     val notificationStateChange
         get() = notificationEventHolder.notificationStateChange
+
+    val onMediaSessionCallbackTriggered
+        get() = notificationEventHolder.onMediaSessionCallbackTriggered
 }

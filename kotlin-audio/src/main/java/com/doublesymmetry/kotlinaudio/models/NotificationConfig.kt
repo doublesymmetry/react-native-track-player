@@ -7,9 +7,16 @@ import com.google.android.exoplayer2.ui.PlayerNotificationManager.*
 /**
  * Used to configure the player notification.
  * @param buttons Provide customized notification buttons. They will be shown by default. Note that buttons can still be shown and hidden at runtime by using the functions in [NotificationManager][com.doublesymmetry.kotlinaudio.notification.NotificationManager], but they will have the default icon if not set explicitly here.
+ * @param accentColor The accent color of the notification.
+ * @param smallIcon The small icon of the notification which is also shown in the system status bar.
  * @param pendingIntent The [PendingIntent] that would be called when tapping on the notification itself.
  */
-data class NotificationConfig(val buttons: List<NotificationButton>, val pendingIntent: PendingIntent? = null)
+data class NotificationConfig(
+    val buttons: List<NotificationButton>,
+    val accentColor: Int? = null,
+    @DrawableRes val smallIcon: Int? = null,
+    val pendingIntent: PendingIntent? = null
+)
 
 /**
  * Provide customized notification buttons. They will be shown by default. Note that buttons can still be shown and hidden at runtime by using the functions in [NotificationManager][com.doublesymmetry.kotlinaudio.notification.NotificationManager], but they will have the default icon if not set explicitly here.

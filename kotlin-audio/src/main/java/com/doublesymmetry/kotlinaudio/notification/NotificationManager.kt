@@ -5,16 +5,16 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build
+import android.os.Bundle
+import android.os.ResultReceiver
 import android.support.v4.media.RatingCompat
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.annotation.RequiresApi
 import com.doublesymmetry.kotlinaudio.R
 import com.doublesymmetry.kotlinaudio.event.NotificationEventHolder
-import com.doublesymmetry.kotlinaudio.models.NotificationButton
-import com.doublesymmetry.kotlinaudio.models.NotificationConfig
-import com.doublesymmetry.kotlinaudio.models.NotificationMetadata
-import com.doublesymmetry.kotlinaudio.models.NotificationState
+import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.utils.isJUnitTest
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
@@ -37,8 +37,6 @@ class NotificationManager internal constructor(private val context: Context, pri
 
     private val channelId: String
 
-    private var isNotificationCreated = false
-
     var notificatioMetadata: NotificationMetadata? = null
         set(value) {
             field = value
@@ -49,6 +47,20 @@ class NotificationManager internal constructor(private val context: Context, pri
         set(value) {
             field = value
             mediaSession.setRatingType(ratingType)
+            mediaSessionConnector.setRatingCallback(object: MediaSessionConnector.RatingCallback {
+                override fun onCommand(player: Player, command: String, extras: Bundle?, cb: ResultReceiver?): Boolean {
+                    return true
+                }
+
+                override fun onSetRating(player: Player, rating: RatingCompat) {
+                    event.updateOnMediaSessionCallbackTriggered(MediaSessionCallback.RATING(rating, null))
+                }
+
+                override fun onSetRating(player: Player, rating: RatingCompat, extras: Bundle?) {
+                    event.updateOnMediaSessionCallbackTriggered(MediaSessionCallback.RATING(rating, extras))
+                }
+
+            })
         }
 
     var showPlayPauseButton: Boolean
@@ -154,8 +166,6 @@ class NotificationManager internal constructor(private val context: Context, pri
      * **NOTE:** You should only call this once. Subsequent calls will result in an error.
      */
     fun createNotification(config: NotificationConfig) {
-        if (isNotificationCreated) error("Cannot recreate notification once it's been created.")
-
         buttons.apply {
             clear()
             addAll(config.buttons)
@@ -199,6 +209,8 @@ class NotificationManager internal constructor(private val context: Context, pri
         if (!isJUnitTest()) {
             internalManager?.apply {
                 setPlayer(exoPlayer)
+                setColor(config.accentColor ?: Color.TRANSPARENT)
+                config.smallIcon?.let { setSmallIcon(it) }
 
                 config.buttons.forEach { button ->
                     when (button) {
@@ -230,6 +242,7 @@ class NotificationManager internal constructor(private val context: Context, pri
 
     fun clearNotification() {
         mediaSession.isActive = false
+        internalManager?.setPlayer(null)
     }
 
     override fun onAction(player: Player, action: String, intent: Intent) {
@@ -260,7 +273,6 @@ class NotificationManager internal constructor(private val context: Context, pri
 
     internal fun destroy() {
         descriptionAdapter?.release()
-        isNotificationCreated = false
         internalManager?.setPlayer(null)
     }
 

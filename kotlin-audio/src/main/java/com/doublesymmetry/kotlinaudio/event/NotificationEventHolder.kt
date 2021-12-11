@@ -1,5 +1,6 @@
 package com.doublesymmetry.kotlinaudio.event
 
+import com.doublesymmetry.kotlinaudio.models.MediaSessionCallback
 import com.doublesymmetry.kotlinaudio.models.NotificationButton
 import com.doublesymmetry.kotlinaudio.models.NotificationState
 import kotlinx.coroutines.CoroutineScope
@@ -17,6 +18,9 @@ class NotificationEventHolder {
     private var _notificationStateChange = MutableSharedFlow<NotificationState>(1)
     var notificationStateChange = _notificationStateChange.asSharedFlow()
 
+    private var _onMediaSessionCallbackTriggered = MutableSharedFlow<MediaSessionCallback>()
+    var onMediaSessionCallbackTriggered = _onMediaSessionCallbackTriggered.asSharedFlow()
+
     internal fun updateOnNotificationButtonTapped(button: NotificationButton) {
         coroutineScope.launch {
             _onNotificationButtonTapped.emit(button)
@@ -26,6 +30,12 @@ class NotificationEventHolder {
     internal fun updateNotificationState(state: NotificationState) {
         coroutineScope.launch {
             _notificationStateChange.emit(state)
+        }
+    }
+
+    internal fun updateOnMediaSessionCallbackTriggered(callback: MediaSessionCallback) {
+        coroutineScope.launch {
+            _onMediaSessionCallbackTriggered.emit(callback)
         }
     }
 }

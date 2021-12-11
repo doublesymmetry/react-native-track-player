@@ -85,7 +85,7 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
             exoPlayer.setPlaybackSpeed(value)
         }
 
-    var automaticallyUpdateNowPlayingInfo: Boolean = true
+    var automaticallyUpdateNotificationMetadata: Boolean = true
 
     private var volumeMultiplier = 1f
         private set(value) {
@@ -365,7 +365,7 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
                 Player.MEDIA_ITEM_TRANSITION_REASON_SEEK -> playerEventHolder.updateAudioItemTransition(AudioItemTransitionReason.SEEK_TO_ANOTHER_AUDIO_ITEM)
             }
 
-            if (automaticallyUpdateNowPlayingInfo)
+            if (automaticallyUpdateNotificationMetadata)
                 notificationManager.notificatioMetadata = NotificationMetadata(currentItem?.title, currentItem?.artist, currentItem?.artwork)
         }
 
