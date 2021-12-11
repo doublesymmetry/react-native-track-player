@@ -21,9 +21,30 @@ yarn add react-native-track-player
 
 **2. (iOS) Enable Swift Modules**
 
-Because the iOS module uses Swift, if the user is using a standard react-native application they'll need to add support for Swift in the project. This can be easily by adding a swift file to the Xcode project -- could be called `dummy.swift` and saying yes when prompted if you'd like to generate a bridging header.
+Because the iOS module uses Swift, if the user is using a standard react-native application they'll need to add support for Swift in the project. This can be done easily by adding a swift file to the Xcode project -- could be called `dummy.swift` and saying yes when prompted if you'd like to generate a bridging header.
 
 ![Importing Swift](https://i.imgur.com/CBqBcWs.png)
+
+**3. (Android) Enable Kotlin**
+Because the Android module uses Kotlin, if the user is using a standard react-native application they'll need to add support for Kotlin in the project. This can be done easily by updating your `android/build.gradle` to include:
+
+```
+dependencies {
+  ...
+  classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.30"
+}
+```
+
+## Android Min Compile SDK
+`react-native-track-player` 2.2.0 and above requires that you compile with Android SDK 31. This can be set in `android/build.gradle`:
+
+```
+ext {
+  ...
+  compileSdkVersion = 31
+  ...
+}
+```
 
 ## Automatic Link
 Since `react-native-track-player` only support RN 0.60 and above, the module should be autolinked :tada:
@@ -47,9 +68,13 @@ To update it, run the same command again.
 Currently react-native-track-player does not support projects with Expo or Expokit.
 
 ### iOS: (Enable Swift) `library not found for -lswiftCoreAudio for architecture x86_64`
-Because the iOS module uses Swift, if the user is using a standard react-native application they'll need to add support for Swift in the project. This can be easily by adding a swift file to the Xcode project -- could be called `dummy.swift` and saying yes when prompted if you'd like to generate a bridging header.
+You need to enable Swift in the project -- See Step 2 in installation instructions above.
 
-![Importing Swift](https://i.imgur.com/CBqBcWs.png)
+### Android: (Enable Kotlin) `Unable to instantiate application ...`
+You need to enable Kotlin in the project -- See Step 3 in the installation instructions above.
+
+### Android: The minCompileSdk (31) specified in a dependency's AAR metadata is greater than this module's compileSdkVersion
+Since version 1.2.2, we require to compile using at least SDK 31
 
 ### Android: `CIRCULAR REFERENCE:com.android.tools.r8.ApiLevelException: Default interface methods are only supported starting with Android N (--min-api 24)`
 Since version 1.0.0, we began using a few Java 8 features in the project to reduce the code size.
