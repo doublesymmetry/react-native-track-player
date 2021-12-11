@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.support.v4.media.RatingCompat
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.annotation.RequiresApi
 import com.doublesymmetry.kotlinaudio.R
@@ -42,6 +43,12 @@ class NotificationManager internal constructor(private val context: Context, pri
         set(value) {
             field = value
             internalManager?.invalidate()
+        }
+
+    var ratingType: Int = RatingCompat.RATING_NONE
+        set(value) {
+            field = value
+            mediaSession.setRatingType(ratingType)
         }
 
     var showPlayPauseButton: Boolean
