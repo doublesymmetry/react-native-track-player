@@ -165,11 +165,11 @@ class QueuedAudioPlayer(context: Context, bufferConfig: BufferConfig? = null, ca
 
     /**
      * Replaces item at index in queue.
-     * If updating current index, we update the notification emtadata.
+     * If updating current index, we update the notification metadata if [automaticallyUpdateNowPlayingInfo] is true.
      */
     fun replaceItem(index: Int, item: AudioItem) {
         val mediaSource = getMediaSourceFromAudioItem(item)
-        queue[index] = mediaSource;
+        queue[index] = mediaSource
 
         if (currentIndex == index && automaticallyUpdateNowPlayingInfo)
             notificationManager.notificatioMetadata = NotificationMetadata(item.title, item.artist, item.artwork)
