@@ -3,6 +3,7 @@ package com.doublesymmetry.trackplayer.service
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.*
+import android.support.v4.media.RatingCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.models.NotificationButton.*
@@ -236,6 +237,24 @@ class MusicService : HeadlessJsTaskService() {
     fun getBufferedPositionInSeconds(callback: (Double) -> Unit) {
         handler.post {
             callback(TimeUnit.MILLISECONDS.toSeconds(player.bufferedPosition).toDouble())
+        }
+    }
+
+    fun updateMetadataForTrack(index: Int, track: Track) {
+        handler.post {
+            player.replaceItem(index, track.toAudioItem())
+        }
+    }
+
+    fun updateNotificationMetadata(title: String?, artist: String?, artwork: String?) {
+        handler.post {
+            player.notificationManager.notificatioMetadata = NotificationMetadata(title, artist, artwork)
+        }
+    }
+
+    fun clearNotificationMetadata() {
+        handler.post {
+            player.notificationManager.clearNotification()
         }
     }
 

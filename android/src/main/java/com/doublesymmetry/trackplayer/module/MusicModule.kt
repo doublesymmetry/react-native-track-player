@@ -15,7 +15,6 @@ import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
 import com.doublesymmetry.trackplayer.service.MusicService
 import com.doublesymmetry.trackplayer.utils.Utils
 import com.facebook.react.bridge.*
-import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.DefaultLoadControl.*
 import com.google.android.exoplayer2.Player
 import com.orhanobut.logger.AndroidLogAdapter
@@ -294,44 +293,44 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     fun updateMetadataForTrack(index: Int, map: ReadableMap?, callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
 
-//        waitForConnection {
-//            val playback = binder?.playback
-//            val tracks = playback!!.tracks
-//            if (index < 0 || index >= tracks!!.size) {
-//                callback.reject("index_out_of_bounds", "The index is out of bounds")
-//            } else {
-//                val track = tracks[index]
-//                track!!.setMetadata(
-//                    reactApplicationContext,
-//                    Arguments.toBundle(map),
-//                    binder?.ratingType!!
-//                )
-//                playback.updateTrack(index, track)
-//                callback.resolve(null)
-//            }
-//        }
+        if (index < 0 || index >= musicService.tracks.size) {
+            callback.reject("index_out_of_bounds", "The index is out of bounds")
+        } else {
+            val context: ReactContext = reactApplicationContext
+            val track = musicService.tracks[index]
+            track.setMetadata(context, Arguments.toBundle(map), RatingCompat.RATING_HEART)
+            musicService.updateMetadataForTrack(index, track)
+
+            callback.resolve(null)
+        }
     }
 
     @ReactMethod
     fun updateNowPlayingMetadata(map: ReadableMap?, callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
+        if (musicService.tracks.isEmpty())
+            callback.reject("no_current_item", "There is no current item in the player")
 
-//        val data = Arguments.toBundle(map)
-//        waitForConnection {
-//            val metadata = NowPlayingMetadata(reactApplicationContext, data, binder?.ratingType!!)
-//            binder!!.updateNowPlayingMetadata(metadata)
-//            callback.resolve(null)
-//        }
+        val context: ReactContext = reactApplicationContext
+        val metadata = Arguments.toBundle(map)
+        musicService.updateNotificationMetadata(
+            metadata?.getString("title"),
+            metadata?.getString("artist"),
+            Utils.getUri(context, metadata, "artwork")?.toString()
+        )
+
+        callback.resolve(null)
     }
 
     @ReactMethod
     fun clearNowPlayingMetadata(callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
 
-//        waitForConnection {
-//            binder!!.clearNowPlayingMetadata()
-//            callback.resolve(null)
-//        }
+        if (musicService.tracks.isEmpty())
+            callback.reject("no_current_item", "There is no current item in the player")
+
+        musicService.clearNotificationMetadata()
+        callback.resolve(null)
     }
 
     @ReactMethod
