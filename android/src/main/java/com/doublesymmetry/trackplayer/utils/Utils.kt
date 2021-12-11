@@ -1,43 +1,22 @@
 package com.doublesymmetry.trackplayer.utils
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.support.v4.media.RatingCompat
-import android.support.v4.media.session.PlaybackStateCompat
-import com.facebook.react.bridge.Promise
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper
-import com.google.android.exoplayer2.upstream.RawResourceDataSource
 
 /**
  * @author Milen Pivchev @mpivchev
  */
 object Utils {
-    const val EVENT_INTENT = "com.doublesymmetry.trackplayer.event"
-    const val CONNECT_INTENT = "com.doublesymmetry.trackplayer.connect"
-    const val NOTIFICATION_CHANNEL = "com.doublesymmetry.trackplayer"
-    const val LOG = "RNTrackPlayer"
-    fun toRunnable(promise: Promise): Runnable {
-        return Runnable { promise.resolve(null) }
-    }
-
     fun toMillis(seconds: Double): Long {
         return (seconds * 1000).toLong()
     }
 
     fun toSeconds(millis: Long): Double {
         return millis / 1000.0
-    }
-
-    fun isLocal(uri: Uri?): Boolean {
-        if (uri == null) return false
-        val scheme = uri.scheme
-        val host = uri.host
-        return scheme == null || scheme == ContentResolver.SCHEME_FILE || scheme == ContentResolver.SCHEME_ANDROID_RESOURCE || scheme == ContentResolver.SCHEME_CONTENT || scheme == RawResourceDataSource.RAW_RESOURCE_SCHEME || scheme == "res" || host == null || host == "localhost" || host == "127.0.0.1" || host == "[::1]"
     }
 
     fun getUri(context: Context, data: Bundle?, key: String?): Uri? {
@@ -102,19 +81,7 @@ object Utils {
         return if (icon == 0) null else icon
     }
 
-    fun isPlaying(state: Int): Boolean {
-        return state == PlaybackStateCompat.STATE_PLAYING || state == PlaybackStateCompat.STATE_BUFFERING
-    }
-
-    fun isPaused(state: Int): Boolean {
-        return state == PlaybackStateCompat.STATE_PAUSED || state == PlaybackStateCompat.STATE_CONNECTING
-    }
-
-    fun isStopped(state: Int): Boolean {
-        return state == PlaybackStateCompat.STATE_NONE || state == PlaybackStateCompat.STATE_STOPPED
-    }
-
-    fun getRating(data: Bundle?, key: String?, ratingType: Int): RatingCompat {
+    fun getRating(data: Bundle?, key: String?, ratingType: Int): RatingCompat? {
         return if (!data!!.containsKey(key) || ratingType == RatingCompat.RATING_NONE) {
             RatingCompat.newUnratedRating(ratingType)
         } else if (ratingType == RatingCompat.RATING_HEART) {
@@ -149,19 +116,10 @@ object Utils {
         } else defaultValue
     }
 
-    fun getNotificationChannel(context: Context): String {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                NOTIFICATION_CHANNEL,
-                "MusicService",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            channel.setShowBadge(false)
-            channel.setSound(null, null)
-            (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(
-                channel
-            )
-        }
-        return NOTIFICATION_CHANNEL
+    fun getIntOrNull(data: Bundle?, key: String?): Int? {
+        val value = data!![key]
+        return if (value is Number) {
+            value.toInt()
+        } else null
     }
 }

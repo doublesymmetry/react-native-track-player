@@ -24,6 +24,9 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
+import android.os.Bundle
+import com.doublesymmetry.trackplayer.utils.Utils.setRating
+
 
 class MusicService : HeadlessJsTaskService() {
     private lateinit var player: QueuedAudioPlayer
@@ -38,12 +41,10 @@ class MusicService : HeadlessJsTaskService() {
     val currentTrack
         get() = (player.currentItem as TrackAudioItem).track
 
-    var repeatMode: RepeatMode
-        get() = player.playerOptions.repeatMode
+    var ratingType: Int
+        get() = player.notificationManager.ratingType
         set(value) {
-            handler.post {
-                player.playerOptions.repeatMode = value
-            }
+            player.notificationManager.ratingType = value
         }
 
     val event get() = player.event
@@ -59,15 +60,17 @@ class MusicService : HeadlessJsTaskService() {
             playerOptions?.getDouble(MAX_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
             playerOptions?.getDouble(PLAY_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
             playerOptions?.getDouble(BACK_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
-            // TODO: Ignored autoUpdateMetadata. Do we need them?
         )
 
         val cacheOptions = CacheConfig(
             playerOptions?.getDouble(MAX_CACHE_SIZE_KEY)?.toLong()
         )
 
+        val automaticallyUpdateNotificationMetadata = playerOptions?.getBoolean(AUTO_UPDATE_METADATA, true) ?: true
+
         handler.post {
             player = QueuedAudioPlayer(this, bufferOptions, cacheOptions)
+            player.automaticallyUpdateNotificationMetadata = automaticallyUpdateNotificationMetadata
             observeEvents()
             promise?.resolve(null)
         }
@@ -77,6 +80,8 @@ class MusicService : HeadlessJsTaskService() {
         handler.post {
             latestOptions = options;
             stopWithApp = options.getBoolean(STOP_WITH_APP_KEY)
+
+            ratingType = Utils.getInt(options, "ratingType", RatingCompat.RATING_NONE);
 
             player.playerOptions.alwaysPauseOnInterruption = options.getBoolean(PAUSE_ON_INTERRUPTION_KEY)
 
@@ -126,9 +131,10 @@ class MusicService : HeadlessJsTaskService() {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
 
+            val accentColor = Utils.getIntOrNull(options, "color")
+            val smallIcon = Utils.getIconOrNull(this, options, "icon")
             val pendingIntent = PendingIntent.getActivity(this, 0, openAppIntent, getPendingIntentFlags())
-
-            val notificationConfig = NotificationConfig(buttonsList, pendingIntent)
+            val notificationConfig = NotificationConfig(buttonsList, accentColor, smallIcon, pendingIntent)
 
             player.notificationManager.createNotification(notificationConfig)
         }
@@ -207,6 +213,18 @@ class MusicService : HeadlessJsTaskService() {
     fun setRate(value: Float) {
         handler.post {
             player.playbackSpeed = value
+        }
+    }
+
+    fun getRepeatMode(callback: (RepeatMode) -> Unit) {
+        handler.post {
+            callback(player.playerOptions.repeatMode)
+        }
+    }
+
+    fun setRepeatMode(value: RepeatMode) {
+        handler.post {
+            player.playerOptions.repeatMode = value
         }
     }
 
@@ -335,6 +353,19 @@ class MusicService : HeadlessJsTaskService() {
                 }
             }
         }
+
+        serviceScope.launch {
+            event.onMediaSessionCallbackTriggered.collect {
+                when (it) {
+                    is MediaSessionCallback.RATING -> {
+                        Bundle().apply {
+                            setRating(this, "rating", it.rating)
+                            emit(MusicEvents.BUTTON_SET_RATING, this)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun emit(event: String?, data: Bundle? = null) {
@@ -400,6 +431,7 @@ class MusicService : HeadlessJsTaskService() {
 
         const val STOP_WITH_APP_KEY = "stopWithApp"
         const val PAUSE_ON_INTERRUPTION_KEY = "alwaysPauseOnInterruption"
+        const val AUTO_UPDATE_METADATA = "autoUpdateMetadata"
 
         const val IS_FOCUS_LOSS_PERMANENT_KEY = "permanent"
         const val IS_PAUSED_KEY = "paused"

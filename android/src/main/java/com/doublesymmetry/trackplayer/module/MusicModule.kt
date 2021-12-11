@@ -51,7 +51,10 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
      * Called when the React context is destroyed or reloaded.
      */
     override fun onCatalystInstanceDestroy() {
-        destroyIfAllowed()
+        if (!isServiceBound) return
+
+        musicService.destroyIfAllowed(true)
+        unbindFromService()
     }
 
     /**
@@ -239,7 +242,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
         bundleList.forEach {
             if (it is Bundle) {
-                tracks.add(Track(reactApplicationContext, it, RatingCompat.RATING_HEART))
+                tracks.add(Track(reactApplicationContext, it, musicService.ratingType))
             } else {
                 callback.reject("invalid_track_object", "Track was not a dictionary type")
             }
@@ -298,7 +301,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         } else {
             val context: ReactContext = reactApplicationContext
             val track = musicService.tracks[index]
-            track.setMetadata(context, Arguments.toBundle(map), RatingCompat.RATING_HEART)
+            track.setMetadata(context, Arguments.toBundle(map), musicService.ratingType)
             musicService.updateMetadataForTrack(index, track)
 
             callback.resolve(null)
@@ -442,7 +445,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     fun setRepeatMode(mode: Int, callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
 
-        musicService.repeatMode = RepeatMode.fromOrdinal(mode)
+        musicService.setRepeatMode(RepeatMode.fromOrdinal(mode))
         callback.resolve(null)
     }
 
@@ -450,7 +453,9 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     fun getRepeatMode(callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
 
-        callback.resolve(musicService.repeatMode.ordinal)
+        musicService.getRepeatMode {
+            callback.resolve(it.ordinal)
+        }
     }
 
     @ReactMethod
