@@ -1,5 +1,5 @@
 import { DeviceEventEmitter } from "react-native";
-import { RepeatMode, State, Event } from "react-native-track-player";
+import { RepeatMode, State, Event, Capability } from "react-native-track-player";
 import MediaSession from "./MediaSession";
 
 export class TrackPlayerModule {
@@ -398,44 +398,30 @@ export class TrackPlayerModule {
 
     static updateOptions = options => {
         return new Promise((resolve, reject) => {
-            let mediaSessionOptions = [
-                ['play', () => this.#emitter.emit(this.REMOTE_PLAY)],
-                ['pause', () => this.#emitter.emit(this.REMOTE_PAUSE)],
-                ['stop', () => this.#emitter.emit(this.REMOTE_STOP)],
-                ['seekbackward', () => this.#emitter.emit(this.REMOTE_JUMP_BACKWARD)],
-                ['seekforward', () => this.#emitter.emit(this.REMOTE_JUMP_FORWARD)],
-                ['seekto', () => this.#emitter.emit(this.REMOTE_SEEK)],
-                ['previoustrack', () => this.#emitter.emit(this.REMOTE_PREVIOUS)],
-                ['nexttrack', () => this.#emitter.emit(this.REMOTE_NEXT)]
-            ];
-
-            MediaSession.setCapabilities(mediaSessionOptions);
-            resolve();
-
-            /*let mediaSessionOptions = [];
+            let actionHandlers = [];
             if (options.capabilities.includes(Capability.Play))
-                mediaSessionOptions.push(['play', () => this.#emitter.emit(this.REMOTE_PLAY)]);
+                actionHandlers.push(['play', () => this.#emitter.emit(Event.RemotePlay)]);
             
             if (options.capabilities.includes(Capability.Pause))
-                mediaSessionOptions.push(['pause', () => this.#emitter.emit(this.REMOTE_PAUSE)]);
+                actionHandlers.push(['pause', () => this.#emitter.emit(Event.RemotePause)]);
             
             if (options.capabilities.includes(Capability.Stop))
-                mediaSessionOptions.push(['stop', () => this.#emitter.emit(this.REMOTE_STOP)]);
+                actionHandlers.push(['stop', () => this.#emitter.emit(Event.RemoteStop)]);
 
-            mediaSessionOptions.push(['seekbackward', () => this.#emitter.emit(this.REMOTE_JUMP_BACKWARD)]);
-            mediaSessionOptions.push(['seekforward', () => this.#emitter.emit(this.REMOTE_JUMP_FORWARD)]);
-            
-            if (options.capabilities.includes(Capability.SeekTo))
-                mediaSessionOptions.push(['seekto', () => this.#emitter.emit(this.REMOTE_SEEK)]);
+            if (options.capabilities.includes(Capability.SeekTo)) {
+                actionHandlers.push(['seekbackward', () => this.#emitter.emit(Event.RemoteJumpBackward)]);
+                actionHandlers.push(['seekforward', () => this.#emitter.emit(Event.RemoteJumpForward)]);
+                actionHandlers.push(['seekto', () => this.#emitter.emit(Event.RemoteSeek)]);
+            }
 
             if (options.capabilities.includes(Capability.SkipToPrevious))
-                mediaSessionOptions.push(['previoustrack', () => this.#emitter.emit(this.REMOTE_PREVIOUS)]);
+                actionHandlers.push(['previoustrack', () => this.#emitter.emit(Event.RemotePrevious)]);
             
             if (options.capabilities.includes(Capability.SkipToNext))
-                mediaSessionOptions.push(['nexttrack', () => this.#emitter.emit(this.REMOTE_NEXT)]);
+                actionHandlers.push(['nexttrack', () => this.#emitter.emit(Event.RemoteNext)]);
 
-            MediaSession.setCapabilities(mediaSessionOptions);
-            resolve();*/
+            MediaSession.setCapabilities(actionHandlers);
+            resolve();
         });
     }
 }
