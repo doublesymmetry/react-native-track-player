@@ -1,5 +1,5 @@
 export default class MediaSession {
-    constructor(capabilities) {
+    static setCapabilities = () => {
         if ("mediaSession" in navigator) {
             navigator.mediaSession.playbackState = "none";
             for (const [action, handler] of capabilities) {
@@ -9,17 +9,17 @@ export default class MediaSession {
         }
     }
 
-    setPlaying = () => {
+    static setPlaying = () => {
         if ("mediaSession" in navigator)
             navigator.mediaSession.playbackState = "playing";
     }
 
-    setPaused = () => {
+    static setPaused = () => {
         if ("mediaSession" in navigator)
             navigator.mediaSession.playbackState = "paused";
     }
 
-    setMetadata = (title, artist, artwork) => {
+    static setMetadata = (title, artist, artwork) => {
         if ("mediaSession" in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: title,

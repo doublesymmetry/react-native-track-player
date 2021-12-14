@@ -54,7 +54,6 @@ export class TrackPlayerModule {
     static RATING_PERCENTAGE = 5;
 
     static #emitter;
-    static #mediaSession;
 
     static #currentIndex;
     static #playlist;
@@ -433,5 +432,3 @@ export class TrackPlayerModule {
         });
     }
 }
-
-//module.exports = TrackPlayerModule;
