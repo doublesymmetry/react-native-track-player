@@ -1,10 +1,20 @@
 export default class MediaSession {
+    static capabilities;
+    static actionsEnabled = false;
+
     static setCapabilities = capabilities => {
-        if ("mediaSession" in navigator) {
-            navigator.mediaSession.playbackState = "none";
-            for (const [action, handler] of capabilities) {
-                try { navigator.mediaSession.setActionHandler(action, handler); }
-                catch{ console.log(action + " is not supported yet"); }
+        this.capabilities = capabilities;
+    }
+
+    static enableCapabilities = () => {
+        if (!this.actionsEnabled && this.capabilities) {
+            this.actionsEnabled = true;
+            if ("mediaSession" in navigator) {
+                navigator.mediaSession.playbackState = "none";
+                for (const [action, handler] of this.capabilities) {
+                    try { navigator.mediaSession.setActionHandler(action, handler); }
+                    catch{ console.log(action + " is not supported yet"); }
+                }
             }
         }
     }

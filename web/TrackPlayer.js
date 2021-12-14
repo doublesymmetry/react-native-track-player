@@ -78,9 +78,16 @@ export class TrackPlayerModule {
 
     static play = () => {
         if (this.#audio.src != '') {
-            this.#audio.play().catch(() => {
-                this.#emitter.emit(Event.PlaybackState, { state: State.Paused});
-            });;
+            this.#audio.play()
+                .then(() => {
+                    if (!MediaSession.actionsEnabled)
+                        MediaSession.enableCapabilities();
+                })
+                .catch(() => {
+                    this.#emitter.emit(
+                        Event.PlaybackState, { state: State.Paused}
+                    );
+                });;
         }
     }
 
