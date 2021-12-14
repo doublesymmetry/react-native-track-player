@@ -1,5 +1,5 @@
 export default class MediaSession {
-    static setCapabilities = () => {
+    static setCapabilities = capabilities => {
         if ("mediaSession" in navigator) {
             navigator.mediaSession.playbackState = "none";
             for (const [action, handler] of capabilities) {
