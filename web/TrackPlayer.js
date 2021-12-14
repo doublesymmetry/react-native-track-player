@@ -1,5 +1,5 @@
 import { DeviceEventEmitter } from "react-native";
-import { RepeatMode, Capability, State, RatingType, Event } from "react-native-track-player";
+import { RepeatMode, State, Event } from "react-native-track-player";
 import MediaSession from "./MediaSession";
 
 export class TrackPlayerModule {
@@ -19,6 +19,10 @@ export class TrackPlayerModule {
     
     static REMOTE_PLAY = "remote-play";
     static REMOTE_PAUSE = "remote-pause";
+    static REMOTE_STOP = "remote-stop";
+    static REMOTE_JUMP_BACKWARD = "remote-jump-backward"
+    static REMOTE_JUMP_FORWARD = "remote-jump-forward"
+    static REMOTE_SEEK = "remote-seek";
     static REMOTE_NEXT = "remote-next";
     static REMOTE_PREVIOUS = "remote-previous";
 
@@ -73,85 +77,11 @@ export class TrackPlayerModule {
         this.#currentIndex = index;
     }
 
-    static setupPlayer = () => {
-        this.#audio = document.createElement("audio");
-        document.body.appendChild(this.#audio);
-
-        return new Promise((resolve, reject) => {
-            this.#emitter = DeviceEventEmitter;
-
-            this.#currentIndex = null;
-            
-            this.#playlist = [];
-            this.#track = null;
-            this.#index = null;
-
-            this.#playEnded = false;
-            
-            this.#audio.onended = e => {
-                if (this.#repeatMode == RepeatMode.Off) {
-                    if (this.#playlist.length - 1 == this.#index) {
-                        this.#mediaSession.setPaused();
-                        this.#playEnded = true;
-                        this.#audio.src = this.#track.url;
-                        this.#emitter.emit(Event.PlaybackState, { state: State.Paused});
-                        this.#emitter.emit(
-                            Event.PlaybackQueueEnded,
-                            {
-                                track: this.#currentIndex,
-                                position: this.#audio.currentTime
-                            }
-                        );
-                    } else {
-                        this.skipToNext(true);
-                    }
-
-                } else if (this.#repeatMode == RepeatMode.Queue) {
-                    if (this.#currentIndex < this.#playlist.length)
-                        this.skipToNext(true);
-                    else
-                        this.skip(0);
-                } else {
-                    this.seekTo(0);
-                    this.#emitter.emit(Event.PlaybackState, { state: State.Playing});
-                }
-            };
-
-            this.#audio.oncanplay = e => {
-                this.#audio.play();
-
-                if (this.#playEnded) {
-                    this.#playEnded = false;
-                    this.#audio.pause();
-                }
-            };
-
-            this.#audio.onpause = e => {
-                if (this.#track != null) {
-                    this.#emitter.emit(Event.PlaybackState, {state: State.Paused});
-                    this.#mediaSession.setPaused();
-                }
-            };
-
-            this.#audio.onplay = e => {
-                if (this.#track != null) {
-                    this.#emitter.emit(Event.PlaybackState, {state: State.Playing});
-                    this.#mediaSession.setPlaying();
-                }
-            };
-            resolve();
-        });
-    };
-
     static play = () => {
         if (this.#audio.src != '') {
-            console.log(this.#audio);
-            this.#audio.play();
-            this.#mediaSession.setMetadata(
-                this.#track.title,
-                this.#track.artist,
-                this.#track.artwork
-            );
+            this.#audio.play().catch(() => {
+                this.#emitter.emit(Event.PlaybackState, { state: State.Paused});
+            });;
         }
     }
 
@@ -227,16 +157,14 @@ export class TrackPlayerModule {
 
     static skip = index => {
         return new Promise((resolve, reject) => {
-            if (index < 0 || index > this.#playlist.length - 1)
+            if (index < 0 || index >= this.#playlist.length)
                 resolve();
 
             this.#index = index;
             this.#track = this.#playlist[index];
-
-            console.log(this.#track);
             this.#audio.src = this.#track.url;
             this.#emitNextTrack(index);
-            this.#mediaSession.setMetadata(
+            MediaSession.setMetadata(
                 this.#track.title,
                 this.#track.artist,
                 this.#track.artwork
@@ -248,7 +176,19 @@ export class TrackPlayerModule {
 
     static skipToNext = async(wasPlaying) => {
         if (this.#playlist != null) {
-            this.skip(this.#playlist[this.#index + 1].id);
+            let nextIndex;
+            if ((this.#index + 1) == this.#playlist.length) {
+                if (this.#repeatMode == RepeatMode.Off) {
+                    this.seekTo(0);
+                    return;
+                } else if (this.#repeatMode == RepeatMode.Queue) {
+                    nextIndex = 0;
+                }
+            } else {
+                nextIndex = this.#index + 1;
+            }
+
+            this.skip(nextIndex);
             if (!wasPlaying)
                 this.pause();
         }
@@ -256,24 +196,26 @@ export class TrackPlayerModule {
 
     static skipToPrevious = () => {
         if (this.#playlist != null) {
-            this.skip(this.#playlist[this.#index - 1].id);
+            if (this.#index == 0) {
+                this.seekTo(0);
+                return;
+            }
+
+            this.skip(this.#index - 1);
+
             if (!wasPlaying)
                 this.pause();
         }
-
-        if (this.#playlist != null && this.#index != 0)
-            this.skip(this.#playlist[this.#index - 1].id);
     }
 
     static removeUpcomingTracks = () => {
         return new Promise((resolve, reject) => {
-            if (this.#audio.src != '') {
-                if (this.#audio.fastSeek != undefined)
-                    this.#audio.fastSeek(seconds);
-                else
-                    this.#audio.currentTime = seconds;
+            if (this.#playlist != null) {
+                if (this.#playlist.length > 0) {
+                    this.#playlist = this.#playlist.slice(0, this.#index)
+                }
             }
-            resolve(seconds);
+            resolve();
         });
     }
 
@@ -329,7 +271,7 @@ export class TrackPlayerModule {
             if (this.#audio.src != '')
                 resolve(this.#audio.currentTime);
             else
-                resolve(0); 
+                resolve(0);
         });
     }
 
@@ -381,34 +323,115 @@ export class TrackPlayerModule {
         });
     }
 
+    static setupPlayer = () => {
+        return new Promise((resolve, reject) => {
+            this.#emitter = DeviceEventEmitter;
+            this.#playlist = [];
+            this.#currentIndex = null;
+            this.#track = null;
+            this.#index = null;
+            this.#playEnded = false;
+            
+            this.#audio = document.createElement("audio");
+            this.#audio.onended = e => {
+                if (this.#repeatMode == RepeatMode.Off) {
+                    if (this.#playlist.length - 1 == this.#index) {
+                        MediaSession.setPaused();
+                        this.#playEnded = true;
+                        this.#audio.src = this.#track.url;
+                        this.#emitter.emit(Event.PlaybackState, { state: State.Paused});
+                        this.#emitter.emit(
+                            Event.PlaybackQueueEnded,
+                            {
+                                track: this.#currentIndex,
+                                position: this.#audio.currentTime
+                            }
+                        );
+                    } else {
+                        this.skipToNext(true);
+                    }
+
+                } else if (this.#repeatMode == RepeatMode.Queue) {
+                    if (this.#currentIndex < this.#playlist.length)
+                        this.skipToNext(true);
+                    else
+                        this.skip(0);
+                } else {
+                    this.seekTo(0);
+                    this.#emitter.emit(Event.PlaybackState, { state: State.Playing});
+                }
+            };
+
+            this.#audio.oncanplay = e => {
+                this.play();
+
+                if (this.#playEnded) {
+                    this.#playEnded = false;
+                    this.#audio.pause();
+                }
+            };
+
+            this.#audio.onpause = e => {
+                if (this.#track != null) {
+                    this.#emitter.emit(Event.PlaybackState, {state: State.Paused});
+                    MediaSession.setPaused();
+                }
+            };
+
+            this.#audio.onplay = e => {
+                if (this.#track != null) {
+                    this.#emitter.emit(Event.PlaybackState, {state: State.Playing});
+                    MediaSession.setPlaying();
+                }
+            };
+            
+            document.body.appendChild(this.#audio);
+            resolve();
+        });
+    };
+
     static updateOptions = options => {
         return new Promise((resolve, reject) => {
-            let mediaSessionOptions = [];
+            let mediaSessionOptions = [
+                ['play', () => this.#emitter.emit(this.REMOTE_PLAY)],
+                ['pause', () => this.#emitter.emit(this.REMOTE_PAUSE)],
+                ['stop', () => this.#emitter.emit(this.REMOTE_STOP)],
+                ['seekbackward', () => this.#emitter.emit(this.REMOTE_JUMP_BACKWARD)],
+                ['seekforward', () => this.#emitter.emit(this.REMOTE_JUMP_FORWARD)],
+                ['seekto', () => this.#emitter.emit(this.REMOTE_SEEK)],
+                ['previoustrack', () => this.#emitter.emit(this.REMOTE_PREVIOUS)],
+                ['nexttrack', () => this.#emitter.emit(this.REMOTE_NEXT)]
+            ];
+
+            MediaSession.setCapabilities(mediaSessionOptions);
+            resolve();
+
+            /*let mediaSessionOptions = [];
             if (options.capabilities.includes(Capability.Play))
-                mediaSessionOptions.push(['play', () => this.#emitter.emit(Event.RemotePlay)]);
+                mediaSessionOptions.push(['play', () => this.#emitter.emit(this.REMOTE_PLAY)]);
             
             if (options.capabilities.includes(Capability.Pause))
-                mediaSessionOptions.push(['pause', () => this.#emitter.emit(Event.RemotePause)]);
-            
+                mediaSessionOptions.push(['pause', () => this.#emitter.emit(this.REMOTE_PAUSE)]);
             
             if (options.capabilities.includes(Capability.Stop))
-                mediaSessionOptions.push(['stop', () => this.#emitter.emit(Event.RemoteStop)]);
+                mediaSessionOptions.push(['stop', () => this.#emitter.emit(this.REMOTE_STOP)]);
 
-            mediaSessionOptions.push(['seekbackward', () => this.#emitter.emit(Event.RemoteJumpBackward)]);
-            mediaSessionOptions.push(['seekforward', () => this.#emitter.emit(Event.RemoteJumpForward)]);
+            mediaSessionOptions.push(['seekbackward', () => this.#emitter.emit(this.REMOTE_JUMP_BACKWARD)]);
+            mediaSessionOptions.push(['seekforward', () => this.#emitter.emit(this.REMOTE_JUMP_FORWARD)]);
             
             if (options.capabilities.includes(Capability.SeekTo))
-                mediaSessionOptions.push(['seekto', () => this.#emitter.emit(Event.RemoteSeek)]);
+                mediaSessionOptions.push(['seekto', () => this.#emitter.emit(this.REMOTE_SEEK)]);
 
             if (options.capabilities.includes(Capability.SkipToPrevious))
-                mediaSessionOptions.push(['previoustrack', () => this.#emitter.emit(Event.RemotePrevious)]);
+                mediaSessionOptions.push(['previoustrack', () => this.#emitter.emit(this.REMOTE_PREVIOUS)]);
             
             if (options.capabilities.includes(Capability.SkipToNext))
-                mediaSessionOptions.push(['nexttrack', () => this.#emitter.emit(Event.RemoteNext)]);
+                mediaSessionOptions.push(['nexttrack', () => this.#emitter.emit(this.REMOTE_NEXT)]);
 
-            this.#mediaSession = new MediaSession(mediaSessionOptions);
-
-            resolve();
+            MediaSession.setCapabilities(mediaSessionOptions);
+            resolve();*/
         });
     }
 }
+
+//module.exports = TrackPlayerModule;
