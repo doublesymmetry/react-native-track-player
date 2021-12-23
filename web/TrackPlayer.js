@@ -274,7 +274,7 @@ export class TrackPlayerModule {
 
     static getPosition = () => {
         return new Promise((resolve, reject) => {
-            if (this.#audio.src != '')
+            if (this.#audio.src || this.#audio.readyState == this.#audio.HAVE_ENOUGH_DATA)
                 resolve(this.#audio.currentTime);
             else
                 resolve(0);
@@ -363,8 +363,9 @@ export class TrackPlayerModule {
                     else
                         this.skip(0);
                 } else {
-                    this.seekTo(0);
-                    this.#emitter.emit(Event.PlaybackState, { state: State.Playing});
+                    this.seekTo(0).then(() => {
+                        this.#emitter.emit(Event.PlaybackState, { state: State.Playing});
+                    });
                 }
             };
 
