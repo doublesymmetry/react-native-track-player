@@ -176,7 +176,14 @@ export class TrackPlayerModule {
                 this.#track.artwork
             );
 
-            resolve();
+            this.getPosition().then(position => {
+                MediaSession.setPosition(
+                    this.#track.duration,
+                    position
+                );
+                
+                resolve();
+            });
         });
     }
 
@@ -236,7 +243,7 @@ export class TrackPlayerModule {
     static setRepeatMode = mode => {
         if (Object.values(RepeatMode).includes(mode))
             this.#repeatMode = mode;
-
+        
         if (mode == RepeatMode.Track)
             this.#audio.loop = true;
         else
@@ -254,6 +261,11 @@ export class TrackPlayerModule {
                     this.#audio.fastSeek(seconds);
                 else
                     this.#audio.currentTime = seconds;
+
+                MediaSession.setPosition(
+                    this.#track.duration,
+                    seconds
+                );
             }
             resolve(seconds);
         });

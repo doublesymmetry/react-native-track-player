@@ -9,35 +9,37 @@ export default class MediaSession {
     static enableCapabilities = () => {
         if (!this.actionsEnabled && this.capabilities) {
             this.actionsEnabled = true;
-            if ("mediaSession" in navigator) {
-                navigator.mediaSession.playbackState = "none";
-                for (const [action, handler] of this.capabilities) {
-                    try { navigator.mediaSession.setActionHandler(action, handler); }
-                    catch{ console.log(action + " is not supported yet"); }
-                }
+            navigator.mediaSession.playbackState = "none";
+            for (const [action, handler] of this.capabilities) {
+                try { navigator.mediaSession.setActionHandler(action, handler); }
+                catch{ console.log(action + " is not supported yet"); }
             }
         }
     }
 
     static setPlaying = () => {
-        if ("mediaSession" in navigator)
-            navigator.mediaSession.playbackState = "playing";
+        navigator.mediaSession.playbackState = "playing";
     }
 
     static setPaused = () => {
-        if ("mediaSession" in navigator)
-            navigator.mediaSession.playbackState = "paused";
+        navigator.mediaSession.playbackState = "paused";
     }
 
     static setMetadata = (title, artist, artwork) => {
-        if ("mediaSession" in navigator) {
-            navigator.mediaSession.metadata = new MediaMetadata({
-                title: title,
-                artist: artist,
-                artwork: [
-                    { src: artwork, type: 'image/png' },
-                ]
-            });
-        }
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: title,
+            artist: artist,
+            artwork: [
+                { src: artwork, type: 'image/png' },
+            ]
+        });
+    }
+
+    static setPosition = (duration, position) => {
+        navigator.mediaSession.setPositionState({
+            duration: duration,
+            playbackRate: 1,
+            position: position
+        });
     }
 }
