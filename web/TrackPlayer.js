@@ -148,6 +148,8 @@ export class TrackPlayerModule {
             if (this.#audio.src != '')
                 this.#audio.pause();
 
+            this.#audio.src = "";
+            MediaSession.setNone();
             this.#track = null;
             this.#currentIndex = null;
             this.#playlist = [];

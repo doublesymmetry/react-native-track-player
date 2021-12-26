@@ -25,6 +25,10 @@ export default class MediaSession {
         navigator.mediaSession.playbackState = "paused";
     }
 
+    static setNone = () => {
+        navigator.mediaSession.playbackState = "none";
+    }
+
     static setMetadata = (title, artist, artwork) => {
         navigator.mediaSession.metadata = new MediaMetadata({
             title: title,
