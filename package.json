@@ -15,6 +15,7 @@
     "postversion": "git push && git push --tags"
   },
   "files": [
+    "src/**/*",
     "lib/**/*",
     "ios/**/*",
     "android/**/*",
