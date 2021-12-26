@@ -429,7 +429,9 @@ export class TrackPlayerModule {
             if (options.capabilities.includes(Capability.SeekTo)) {
                 actionHandlers.push(['seekbackward', () => this.#emitter.emit(Event.RemoteJumpBackward)]);
                 actionHandlers.push(['seekforward', () => this.#emitter.emit(Event.RemoteJumpForward)]);
-                actionHandlers.push(['seekto', () => this.#emitter.emit(Event.RemoteSeek)]);
+                actionHandlers.push(['seekto', e => this.#emitter.emit(
+                        Event.RemoteSeek, {position: e.seekTime}
+                )]);
             }
 
             if (options.capabilities.includes(Capability.SkipToPrevious))
