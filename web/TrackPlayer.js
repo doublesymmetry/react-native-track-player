@@ -236,6 +236,11 @@ export class TrackPlayerModule {
     static setRepeatMode = mode => {
         if (Object.values(RepeatMode).includes(mode))
             this.#repeatMode = mode;
+
+        if (mode == RepeatMode.Track)
+            this.#audio.loop = true;
+        else
+            this.#audio.loop = false;
     }
 
     static getRepeatMode = () => {
