@@ -36,10 +36,9 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
-
 import com.google.android.exoplayer2.database.ExoDatabaseProvider
-
 import com.google.android.exoplayer2.database.DatabaseProvider
+import com.google.android.exoplayer2.metadata.Metadata
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import java.io.File
 
@@ -348,6 +347,13 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
     }
 
     inner class PlayerListener : Listener {
+        override fun onMetadata(metadata: Metadata) {
+            PlaybackMetadata.fromId3Metadata(metadata)?.let { playerEventHolder.updateOnPlaybackMetadata(it) }
+            PlaybackMetadata.fromIcy(metadata)?.let { playerEventHolder.updateOnPlaybackMetadata(it) }
+            PlaybackMetadata.fromVorbisComment(metadata)?.let { playerEventHolder.updateOnPlaybackMetadata(it) }
+            PlaybackMetadata.fromQuickTime(metadata)?.let { playerEventHolder.updateOnPlaybackMetadata(it) }
+        }
+
         override fun onPlaybackStateChanged(playbackState: Int) {
             when (playbackState) {
                 Player.STATE_BUFFERING -> playerEventHolder.updateAudioPlayerState(if (exoPlayer.playWhenReady) AudioPlayerState.BUFFERING else AudioPlayerState.LOADING)

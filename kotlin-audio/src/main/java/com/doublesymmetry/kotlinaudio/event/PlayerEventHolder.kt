@@ -1,9 +1,6 @@
 package com.doublesymmetry.kotlinaudio.event
 
-import com.doublesymmetry.kotlinaudio.models.AudioItemTransitionReason
-import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
-import com.doublesymmetry.kotlinaudio.models.FocusChangeData
-import com.doublesymmetry.kotlinaudio.models.PlaybackEndedReason
+import com.doublesymmetry.kotlinaudio.models.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -27,6 +24,9 @@ class PlayerEventHolder {
     private var _onAudioFocusChanged = MutableSharedFlow<FocusChangeData>(1)
     var onAudioFocusChanged = _onAudioFocusChanged.asSharedFlow()
 
+    private var _onPlaybackMetadata = MutableSharedFlow<PlaybackMetadata>(1)
+    var onPlaybackMetadata = _onPlaybackMetadata.asSharedFlow()
+
     internal fun updateAudioPlayerState(state: AudioPlayerState) {
         coroutineScope.launch {
             _stateChange.emit(state)
@@ -49,6 +49,12 @@ class PlayerEventHolder {
     internal fun updateOnAudioFocusChanged(isPaused: Boolean, isPermanent: Boolean) {
         coroutineScope.launch {
             _onAudioFocusChanged.emit(FocusChangeData(isPaused, isPermanent))
+        }
+    }
+
+    internal fun updateOnPlaybackMetadata(metadata: PlaybackMetadata) {
+        coroutineScope.launch {
+            _onPlaybackMetadata.emit(metadata)
         }
     }
 }
