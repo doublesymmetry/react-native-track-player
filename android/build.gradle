@@ -49,7 +49,7 @@ repositories {
 }
 
 dependencies {
-    implementation "com.github.DoubleSymmetry:KotlinAudio:v0.1.26"
+    implementation "com.github.DoubleSymmetry:KotlinAudio:v0.1.27"
 
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'

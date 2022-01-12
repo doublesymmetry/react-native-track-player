@@ -366,6 +366,23 @@ class MusicService : HeadlessJsTaskService() {
                 }
             }
         }
+
+        serviceScope.launch {
+            event.onPlaybackMetadata.collect {
+                handler.post {
+                    Bundle().apply {
+                        putString("source", it.source)
+                        putString("title", it.title)
+                        putString("url", it.url)
+                        putString("artist", it.artist)
+                        putString("album", it.album)
+                        putString("date", it.date)
+                        putString("genre", it.genre)
+                        emit(MusicEvents.PLAYBACK_METADATA, this)
+                    }
+                }
+            }
+        }
     }
 
     private fun emit(event: String?, data: Bundle? = null) {
