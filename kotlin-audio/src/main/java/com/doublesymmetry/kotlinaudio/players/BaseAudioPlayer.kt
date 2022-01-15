@@ -182,7 +182,7 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
      */
     @CallSuper
     open fun destroy() {
-        abandonAudioFocus()
+        abandonAudioFocusIfHeld()
         exoPlayer.release()
         notificationManager.destroy()
         cache?.release()
@@ -299,7 +299,7 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
         hasAudioFocus = (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
     }
 
-    private fun abandonAudioFocus() {
+    private fun abandonAudioFocusIfHeld() {
         if (!hasAudioFocus) return
         Timber.d("Abandoning audio focus...")
 
@@ -324,8 +324,8 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
         when (focusChange) {
             AUDIOFOCUS_LOSS -> {
                 isPermanent = true
-                abandonAudioFocus()
                 isPaused = true
+                abandonAudioFocusIfHeld()
             }
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> isPaused = true
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> if (playerOptions.alwaysPauseOnInterruption) isPaused = true else isDucking = true
@@ -357,8 +357,14 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
         override fun onPlaybackStateChanged(playbackState: Int) {
             when (playbackState) {
                 Player.STATE_BUFFERING -> playerEventHolder.updateAudioPlayerState(if (exoPlayer.playWhenReady) AudioPlayerState.BUFFERING else AudioPlayerState.LOADING)
-                Player.STATE_READY -> playerEventHolder.updateAudioPlayerState(AudioPlayerState.READY)
-                Player.STATE_IDLE -> playerEventHolder.updateAudioPlayerState(AudioPlayerState.IDLE)
+                Player.STATE_READY -> {
+                    requestAudioFocus()
+                    playerEventHolder.updateAudioPlayerState(AudioPlayerState.READY)
+                }
+                Player.STATE_IDLE -> {
+                    abandonAudioFocusIfHeld()
+                    playerEventHolder.updateAudioPlayerState(AudioPlayerState.IDLE)
+                }
                 Player.STATE_ENDED -> playerEventHolder.updateAudioPlayerState(AudioPlayerState.ENDED)
             }
         }
@@ -376,13 +382,9 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
         }
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
-            if (isPlaying) {
-                requestAudioFocus()
-                playerEventHolder.updateAudioPlayerState(AudioPlayerState.PLAYING)
-            } else {
-                abandonAudioFocus()
-                playerEventHolder.updateAudioPlayerState(AudioPlayerState.PAUSED)
-            }
+            playerEventHolder.updateAudioPlayerState(
+                if (isPlaying) AudioPlayerState.PLAYING else AudioPlayerState.PAUSED
+            )
         }
     }
 }
