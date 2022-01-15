@@ -382,6 +382,10 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
         }
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
+            // onIsPlayingChanged with isPlaying = false triggers after player queue ends
+            // which sends a pause state after the STATE_ENDED - ignoring this case.
+            if (exoPlayer.playbackState == Player.STATE_ENDED && !isPlaying) return
+
             playerEventHolder.updateAudioPlayerState(
                 if (isPlaying) AudioPlayerState.PLAYING else AudioPlayerState.PAUSED
             )
