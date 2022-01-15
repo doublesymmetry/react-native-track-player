@@ -1,22 +1,27 @@
 ---
-name: Bug report
+name: Bug Report
 about: Report a bug or crash
 title: ''
-labels: Bug, Needs Confirmation
+labels: Bug
 assignees: ''
-
 ---
 
-**Describe the bug**
+**Describe the Bug**
 A clear and concise description of what the bug is.
 
-**To Reproduce**
-Steps to reproduce the behavior:
+**Steps To Reproduce**
+How can someone else reproduce this bug?
 
-**Environment (please complete the following information):**
-Run `react-native info` in your project and share the content.
-What `react-native-track-player` version are you using?
-Are you testing on a real device or in the simulator? Which OS version are you running?
+**Code To Reproduce**
+Please provide a simple code example that allows others to replicate the bug.
 
-**Code**
-Please, share the code that is causing the issue
+**Environment Info:**
+Paste the results of `npx react-native info`
+Paste the exact `react-native-track-player` version you are using
+Real device? Or simulator?
+What OS are you running?
+
+**How I can Help**
+What can you do to help resolve this?
+Have you investigated the underlying JS or Swift/Android code causing this bug?
+Can you create a Pull Request with a fix?
