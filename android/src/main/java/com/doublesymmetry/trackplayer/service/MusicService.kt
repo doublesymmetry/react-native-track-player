@@ -280,15 +280,16 @@ class MusicService : HeadlessJsTaskService() {
         serviceScope.launch {
             event.stateChange.collect {
                 val bundle = Bundle()
-
                 bundle.putInt(STATE_KEY, it.asLibState.ordinal)
+                emit(MusicEvents.PLAYBACK_STATE, bundle)
 
                 if (it == AudioPlayerState.ENDED && player.nextItem == null) {
-                    if (player.previousIndex != null) bundle.putInt(TRACK_KEY, player.previousIndex!!)
-                    emit(MusicEvents.PLAYBACK_QUEUE_ENDED, null)
-                }
+                    val endBundle = Bundle()
+                    endBundle.putInt(TRACK_KEY, player.currentIndex)
+                    endBundle.putDouble("position", Utils.toSeconds(player.position));
 
-                emit(MusicEvents.PLAYBACK_STATE, bundle)
+                    emit(MusicEvents.PLAYBACK_QUEUE_ENDED, endBundle)
+                }
             }
         }
 
