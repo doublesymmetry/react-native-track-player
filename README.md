@@ -8,7 +8,7 @@
 
 A fully-fledged audio module created for music apps. Provides audio playback, external media controls, background mode and more!
 
-react-native-track-payer is made possible by the generosity of the sponsors below, and many other [individual backers](docs/backers-sponsors.md#backers). Sponsoring directly impacts the longevity of this project.
+react-native-track-player is made possible by the generosity of the sponsors below, and many other [individual backers](docs/backers-sponsors.md#backers). Sponsoring directly impacts the longevity of this project.
 
 **🥇 Gold sponsors (\$2000+ total contributions):** <br/>
 <a href="http://radio.garden/"><img src="https://avatars.githubusercontent.com/u/271885?v=4" align="center" width="100" title="Radio Garden" alt="Radio Garden"></a>
