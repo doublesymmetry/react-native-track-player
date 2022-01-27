@@ -1,6 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     repositories {
+        mavenLocal()
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
@@ -16,6 +17,7 @@ buildscript {
 
 allprojects {
     repositories {
+        mavenLocal()
         mavenCentral()
         google()
         maven { url "https://jitpack.io" }

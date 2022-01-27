@@ -22,6 +22,7 @@ data class NotificationConfig(
  * Provide customized notification buttons. They will be shown by default. Note that buttons can still be shown and hidden at runtime by using the functions in [NotificationManager][com.doublesymmetry.kotlinaudio.notification.NotificationManager], but they will have the default icon if not set explicitly here.
  * @see [com.doublesymmetry.kotlinaudio.notification.NotificationManager.showPlayPauseButton]
  * @see [com.doublesymmetry.kotlinaudio.notification.NotificationManager.showStopButton]
+ * @see [com.doublesymmetry.kotlinaudio.notification.NotificationManager.showStopButtonCompact]
  * @see [com.doublesymmetry.kotlinaudio.notification.NotificationManager.showBackwardButton]
  * @see [com.doublesymmetry.kotlinaudio.notification.NotificationManager.showBackwardButtonCompact]
  * @see [com.doublesymmetry.kotlinaudio.notification.NotificationManager.showForwardButton]
@@ -34,7 +35,7 @@ data class NotificationConfig(
 sealed class NotificationButton(@DrawableRes val icon: Int?) {
     class PLAY(@DrawableRes icon: Int? = null): NotificationButton(icon)
     class PAUSE(@DrawableRes icon: Int? = null): NotificationButton(icon)
-    class STOP(@DrawableRes icon: Int? = null): NotificationButton(icon)
+    class STOP(@DrawableRes icon: Int? = null, val isCompact: Boolean = false): NotificationButton(icon)
     class FORWARD(@DrawableRes icon: Int? = null, val isCompact: Boolean = false): NotificationButton(icon)
     class BACKWARD(@DrawableRes icon: Int? = null, val isCompact: Boolean = false): NotificationButton(icon)
     class NEXT(@DrawableRes icon: Int? = null, val isCompact: Boolean = false): NotificationButton(icon)
