@@ -4,17 +4,19 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.os.*
 import android.support.v4.media.RatingCompat
+import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.models.NotificationButton.*
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
+import com.doublesymmetry.trackplayer.R
 import com.doublesymmetry.trackplayer.extensions.asLibState
 import com.doublesymmetry.trackplayer.model.Track
-import com.doublesymmetry.trackplayer.R
 import com.doublesymmetry.trackplayer.model.TrackAudioItem
 import com.doublesymmetry.trackplayer.module.MusicEvents
 import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
 import com.doublesymmetry.trackplayer.utils.Utils
+import com.doublesymmetry.trackplayer.utils.Utils.setRating
 import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
@@ -24,9 +26,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
-import android.os.Bundle
-import com.doublesymmetry.trackplayer.utils.Utils.setRating
-
 
 class MusicService : HeadlessJsTaskService() {
     private lateinit var player: QueuedAudioPlayer
@@ -105,7 +104,7 @@ class MusicService : HeadlessJsTaskService() {
                     }
                     Capability.STOP -> {
                         val stopIcon = Utils.getIconOrNull(this, options, "stopIcon")
-                        buttonsList.add(STOP(icon = stopIcon))
+                        buttonsList.add(STOP(icon = stopIcon, isCompact = isCompact(it)))
                     }
                     Capability.SKIP_TO_NEXT -> {
                         val nextIcon = Utils.getIconOrNull(this, options, "nextIcon")

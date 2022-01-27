@@ -44,13 +44,12 @@ repositories {
         url "../node_modules/react-native/android"
     }
 
-    mavenLocal()
     mavenCentral()
     google()
 }
 
 dependencies {
-    implementation "com.github.DoubleSymmetry:KotlinAudio:v0.1.29"
+    implementation 'com.github.DoubleSymmetry:KotlinAudio:v0.1.30'
 
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'
