@@ -331,7 +331,7 @@ public class RNTrackPlayer: RCTEventEmitter {
             tracks.append(track)
         }
 
-        var index
+        var index: Int = 0;
         if (trackIndex.intValue > player.items.count) {
             reject("index_out_of_bounds", "The track index is out of bounds", nil)
         } else if trackIndex.intValue == -1 { // -1 means no index was passed and therefore should be inserted at the end.
