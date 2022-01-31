@@ -331,15 +331,17 @@ public class RNTrackPlayer: RCTEventEmitter {
             tracks.append(track)
         }
 
+        var index: Int = 0
         if (trackIndex.intValue > player.items.count) {
             reject("index_out_of_bounds", "The track index is out of bounds", nil)
         } else if trackIndex.intValue == -1 { // -1 means no index was passed and therefore should be inserted at the end.
+            index = player.items.count
             try? player.add(items: tracks, playWhenReady: false)
         } else {
+            index = trackIndex.intValue
             try? player.add(items: tracks, at: trackIndex.intValue)
         }
-
-        resolve(NSNull())
+        resolve(index)
     }
 
     @objc(remove:resolver:rejecter:)
