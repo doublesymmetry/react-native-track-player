@@ -44,6 +44,7 @@ repositories {
         url "../node_modules/react-native/android"
     }
 
+    mavenLocal()
     mavenCentral()
     google()
 }
