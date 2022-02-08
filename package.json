@@ -64,6 +64,11 @@
     "react-native": ">=0.60.0-rc.2",
     "react-native-windows": ">=0.63.0"
   },
+  "peerDependenciesMeta": {
+    "react-native-windows": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@types/react-native": "^0.60.0",
     "@typescript-eslint/eslint-plugin": "^1.7.0",

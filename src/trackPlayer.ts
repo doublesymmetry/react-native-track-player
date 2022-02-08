@@ -184,7 +184,7 @@ async function getRate(): Promise<number> {
   return TrackPlayer.getRate()
 }
 
-async function getTrack(trackIndex: number): Promise<Track> {
+async function getTrack(trackIndex: number): Promise<Track | null> {
   return TrackPlayer.getTrack(trackIndex)
 }
 

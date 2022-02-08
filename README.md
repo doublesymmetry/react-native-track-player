@@ -4,21 +4,24 @@
 [![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player) 
 [![discord](https://img.shields.io/discord/567636850513018880.svg)](https://discordapp.com/invite/ya2XDCR)
 
+### 📢 The Android side of RN track player is currently being rewritten with Kotlin and [KotlinAudio](https://github.com/DoubleSymmetry/KotlinAudio). Help us test! [More information here.](https://github.com/DoubleSymmetry/react-native-track-player/discussions/1264)
+
 A fully-fledged audio module created for music apps. Provides audio playback, external media controls, background mode and more!
 
 react-native-track-payer is made possible by the generosity of the sponsors below, and many other [individual backers](docs/backers-sponsors.md#backers). Sponsoring directly impacts the longevity of this project.
 
-**🥇 Gold sponsors (\$1000+ per month):** <br/>
-[Become the first gold sponsor!](https://github.com/sponsors/DoubleSymmetry)
+**🥇 Gold sponsors (\$2000+ total contributions):** <br/>
+<a href="http://radio.garden/"><img src="https://avatars.githubusercontent.com/u/271885?v=4" align="center" width="100" title="Radio Garden" alt="Radio Garden"></a>
 
-**🥈 Silver sponsors (\$500+ per month):**<br/>
-[Become the first siver sponsor!](https://github.com/sponsors/DoubleSymmetry)
+**🥈 Silver sponsors (\$200+ per month):**<br/>
+<a href="http://www.voxist.com/"><img src="https://avatars.githubusercontent.com/u/18028734?s=200&v=4" align="center" width="100" title="Voxist" alt="Voxist"></a>
+<a href="https://evergrace.co"><img src="https://avatars.githubusercontent.com/u/1085976?v=4" align="center" width="100" title="Evergrace" alt="Evergrace"></a>
 
-**🥉 Bronze sponsors (\$200+ per month):**<br/>
+**🥉 Bronze sponsors (\$500+ total contributions):**<br/>
 [Become the first bronze sponsor!](https://github.com/sponsors/DoubleSymmetry)
 
 **✨ Contributing sponsors (\$25+ per month):**<br/>
-<a href="http://radio.garden/"><img src="https://avatars.githubusercontent.com/u/271885?v=4" align="center" width="100" title="Radio Garden" alt="Radio Garden"></a>
+<a href="https://podverse.fm"><img src="https://avatars.githubusercontent.com/u/11860029?s=200&v=4" align="center" width="100" title="Podverse" alt="Podverse"></a>
 
 ---
 

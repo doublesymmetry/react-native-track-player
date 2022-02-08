@@ -13,7 +13,8 @@ To install release candidates run `yarn add react-native-track-player@next`
 
 ##### Bug Fixes
 
-* None.
+* Make react-native-windows and optional peer dependency (#1324).
+  [jspizziri](https://github.com/jspizziri)
 
 ## 2.1.2 (25.10.21)
 
