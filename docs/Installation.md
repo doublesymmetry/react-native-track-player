@@ -58,7 +58,7 @@ And don't forget to register a [playback service](https://react-native-track-pla
 ## Troubleshooting
 
 ### iOS: (Enable Swift) `library not found for -lswiftCoreAudio for architecture x86_64`
-Because the iOS module uses Swift, if the user is using a standard react-native application they'll need to add support for Swift in the project. This can be easily by adding a swift file to the Xcode project -- could be called `dummy.swift` and saying yes when prompted if you'd like to generate a bridging header.
+Because the iOS module uses Swift, if the user is using a standard react-native application they'll need to add support for Swift in the project. This can easily be done by adding a swift file to the Xcode project -- could be called `dummy.swift` and saying yes when prompted if you'd like to generate a bridging header.
 
 ![Importing Swift](https://i.imgur.com/CBqBcWs.png)
 
