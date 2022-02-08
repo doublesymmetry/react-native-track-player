@@ -49,10 +49,10 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.DoubleSymmetry:KotlinAudio:v0.1.30'
+    implementation "com.github.DoubleSymmetry:KotlinAudio:v0.1.31"
 
     //noinspection GradleDynamicVersion
-    implementation 'com.facebook.react:react-native:+'
+    implementation "com.facebook.react:react-native:+"
 
     // Make sure we're using androidx
     implementation "androidx.core:core-ktx:1.7.0"
