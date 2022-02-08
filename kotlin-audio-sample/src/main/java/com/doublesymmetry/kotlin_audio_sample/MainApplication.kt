@@ -1,13 +1,12 @@
 package com.doublesymmetry.kotlin_audio_sample
 
 import android.app.Application
-import com.orhanobut.logger.AndroidLogAdapter
-import com.orhanobut.logger.Logger
+import timber.log.Timber
 
 
 class MainApplication: Application() {
     override fun onCreate() {
-        Logger.addLogAdapter(AndroidLogAdapter())
+        Timber.plant(Timber.DebugTree())
         super.onCreate()
     }
 }

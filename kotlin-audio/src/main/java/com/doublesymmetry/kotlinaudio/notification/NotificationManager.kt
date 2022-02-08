@@ -274,15 +274,20 @@ class NotificationManager internal constructor(private val context: Context, pri
 
     internal fun onPlay() {
         mediaSession.isActive = true
+        reload()
     }
 
-    internal fun reload() {
-        internalManager?.invalidate()
+    internal fun onPause() {
+        reload()
     }
 
     internal fun destroy() {
         descriptionAdapter?.release()
         internalManager?.setPlayer(null)
+    }
+
+    private fun reload() {
+        internalManager?.invalidate()
     }
 
     companion object {
