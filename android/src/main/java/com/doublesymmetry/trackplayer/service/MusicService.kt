@@ -416,7 +416,9 @@ class MusicService : HeadlessJsTaskService() {
 
     override fun onDestroy() {
         handler.post {
-            player.destroy()
+            if (this::player.isInitialized) {
+                player.destroy()
+            }
             handler.removeMessages(0)
         }
 
