@@ -7,6 +7,7 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.RatingCompat
+import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.Capability
 import com.doublesymmetry.kotlinaudio.models.RepeatMode
@@ -22,7 +23,6 @@ import com.google.android.exoplayer2.DefaultLoadControl.*
 import com.google.android.exoplayer2.Player
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
-import timber.log.Timber
 import javax.annotation.Nonnull
 
 /**
@@ -88,7 +88,10 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
      */
     private fun verifyServiceBoundOrReject(promise: Promise): Boolean {
         if (!isServiceBound) {
-            promise.reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.")
+            promise.reject(
+                    "player_not_initialized",
+                    "The player is not initialized. Call setupPlayer first."
+            )
             return true
         }
 
@@ -157,31 +160,50 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     @ReactMethod
     fun setupPlayer(data: ReadableMap?, promise: Promise) {
         if (isServiceBound) {
-            promise.reject("player_already_initialized", "The player has already been initialized via setupPlayer.")
+            promise.reject(
+                    "player_already_initialized",
+                    "The player has already been initialized via setupPlayer."
+            )
             return
         }
 
         // validate buffer keys.
         val bundledData = Arguments.toBundle(data)
-        val minBuffer = bundledData?.getDouble(MusicService.MIN_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() } ?: DEFAULT_MIN_BUFFER_MS
-        val maxBuffer = bundledData?.getDouble(MusicService.MAX_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() } ?: DEFAULT_MAX_BUFFER_MS
-        val playBuffer = bundledData?.getDouble(MusicService.PLAY_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() } ?: DEFAULT_BUFFER_FOR_PLAYBACK_MS
-        val backBuffer = bundledData?.getDouble(MusicService.BACK_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() } ?: DEFAULT_BACK_BUFFER_DURATION_MS
+        val minBuffer = bundledData?.getDouble(MusicService.MIN_BUFFER_KEY)
+                ?.let { Utils.toMillis(it).toInt() } ?: DEFAULT_MIN_BUFFER_MS
+        val maxBuffer = bundledData?.getDouble(MusicService.MAX_BUFFER_KEY)
+                ?.let { Utils.toMillis(it).toInt() } ?: DEFAULT_MAX_BUFFER_MS
+        val playBuffer = bundledData?.getDouble(MusicService.PLAY_BUFFER_KEY)
+                ?.let { Utils.toMillis(it).toInt() } ?: DEFAULT_BUFFER_FOR_PLAYBACK_MS
+        val backBuffer = bundledData?.getDouble(MusicService.BACK_BUFFER_KEY)
+                ?.let { Utils.toMillis(it).toInt() } ?: DEFAULT_BACK_BUFFER_DURATION_MS
 
         if (playBuffer < 0) {
-            promise.reject("play_buffer_error", "The value for playBuffer should be greater than or equal to zero.")
+            promise.reject(
+                    "play_buffer_error",
+                    "The value for playBuffer should be greater than or equal to zero."
+            )
         }
 
         if (backBuffer < 0) {
-            promise.reject("back_buffer_error", "The value for backBuffer should be greater than or equal to zero.")
+            promise.reject(
+                    "back_buffer_error",
+                    "The value for backBuffer should be greater than or equal to zero."
+            )
         }
 
         if (minBuffer < playBuffer) {
-            promise.reject("min_buffer_error", "The value for minBuffer should be greater than or equal to playBuffer.")
+            promise.reject(
+                    "min_buffer_error",
+                    "The value for minBuffer should be greater than or equal to playBuffer."
+            )
         }
 
         if (maxBuffer < minBuffer) {
-            promise.reject("min_buffer_error", "The value for maxBuffer should be greater than or equal to minBuffer.")
+            promise.reject(
+                    "min_buffer_error",
+                    "The value for maxBuffer should be greater than or equal to minBuffer."
+            )
         }
 
         playerSetUpPromise = promise
@@ -283,7 +305,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
                 // We do not allow removal of the current item
                 musicService.getCurrentTrackIndex {
                     if (index == it) {
-                        Timber.d("This track is currently playing, so it can't be removed")
+                        Log.e(TAG,"This track is currently playing, so it can't be removed")
                         return@getCurrentTrackIndex
                     } else if (index >= 0 && index < queue.size) {
                         musicService.remove(listOf(index))
@@ -320,9 +342,9 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         val context: ReactContext = reactApplicationContext
         val metadata = Arguments.toBundle(map)
         musicService.updateNotificationMetadata(
-            metadata?.getString("title"),
-            metadata?.getString("artist"),
-            Utils.getUri(context, metadata, "artwork")?.toString()
+                metadata?.getString("title"),
+                metadata?.getString("artist"),
+                Utils.getUri(context, metadata, "artwork")?.toString()
         )
 
         callback.resolve(null)
@@ -524,5 +546,9 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         } else {
             callback.resolve(musicService.event.stateChange.value.asLibState.ordinal)
         }
+    }
+
+    companion object {
+        val TAG: String = MusicModule::class.java.simpleName
     }
 }

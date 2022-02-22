@@ -113,11 +113,21 @@ class MusicService : HeadlessJsTaskService() {
                         buttonsList.add(PREVIOUS(icon = previousIcon, isCompact = isCompact(it)))
                     }
                     Capability.JUMP_FORWARD -> {
-                        val forwardIcon = Utils.getIcon(this, options, "forwardIcon", R.drawable.forward)
+                        val forwardIcon = Utils.getIcon(
+                            this,
+                            options,
+                            "forwardIcon",
+                            R.drawable.forward
+                        )
                         buttonsList.add(FORWARD(icon = forwardIcon, isCompact = isCompact(it)))
                     }
                     Capability.JUMP_BACKWARD -> {
-                        val backwardIcon = Utils.getIcon(this, options, "rewindIcon", R.drawable.rewind)
+                        val backwardIcon = Utils.getIcon(
+                            this,
+                            options,
+                            "rewindIcon",
+                            R.drawable.rewind
+                        )
                         buttonsList.add(BACKWARD(icon = backwardIcon, isCompact = isCompact(it)))
                     }
                     else -> return@forEach
