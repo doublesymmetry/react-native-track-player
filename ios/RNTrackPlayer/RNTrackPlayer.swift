@@ -299,7 +299,7 @@ public class RNTrackPlayer: RCTEventEmitter {
             reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
-        
+
         print("Destroying player")
         self.player.stop()
         self.player.nowPlayingInfoController.clear()
@@ -362,7 +362,7 @@ public class RNTrackPlayer: RCTEventEmitter {
             index = trackIndex.intValue
             try? player.add(items: tracks, at: trackIndex.intValue)
         }
-        
+
         resolve(index)
     }
 
@@ -393,8 +393,13 @@ public class RNTrackPlayer: RCTEventEmitter {
         resolve(NSNull())
     }
 
-    @objc(skip:resolver:rejecter:)
-    public func skip(to trackIndex: NSNumber, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+    @objc(skip:initialTime:resolver:rejecter:)
+    public func skip(
+        to trackIndex: NSNumber,
+        initialTime: Double,
+        resolve: RCTPromiseResolveBlock,
+        reject: RCTPromiseRejectBlock
+    ) {
         if !hasInitialized {
             reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
@@ -407,11 +412,21 @@ public class RNTrackPlayer: RCTEventEmitter {
 
         print("Skipping to track:", trackIndex)
         try? player.jumpToItem(atIndex: trackIndex.intValue, playWhenReady: player.playerState == .playing)
-        resolve(NSNull())
+
+        // if an initialTime is passed the seek to it
+        if (initialTime >= 0) {
+            self.seek(to: initialTime, resolve: resolve, reject: reject)
+        } else {
+            resolve(NSNull())
+        }
     }
 
-    @objc(skipToNext:rejecter:)
-    public func skipToNext(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+    @objc(skipToNext:resolver:rejecter:)
+    public func skipToNext(
+        initialTime: Double,
+        resolve: RCTPromiseResolveBlock,
+        reject: RCTPromiseRejectBlock
+    ) {
         if !hasInitialized {
             reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
@@ -419,14 +434,24 @@ public class RNTrackPlayer: RCTEventEmitter {
 
         do {
             try player.next()
-            resolve(NSNull())
+
+            // if an initialTime is passed the seek to it
+            if (initialTime >= 0) {
+                self.seek(to: initialTime, resolve: resolve, reject: reject)
+            } else {
+                resolve(NSNull())
+            }
         } catch (_) {
             reject("queue_exhausted", "There is no tracks left to play", nil)
         }
     }
 
-    @objc(skipToPrevious:rejecter:)
-    public func skipToPrevious(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+    @objc(skipToPrevious:resolver:rejecter:)
+    public func skipToPrevious(
+        initialTime: Double,
+        resolve: RCTPromiseResolveBlock,
+        reject: RCTPromiseRejectBlock
+    ) {
         if !hasInitialized {
             reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
@@ -434,7 +459,13 @@ public class RNTrackPlayer: RCTEventEmitter {
 
         do {
             try player.previous()
-            resolve(NSNull())
+
+            // if an initialTime is passed the seek to it
+            if (initialTime >= 0) {
+                self.seek(to: initialTime, resolve: resolve, reject: reject)
+            } else {
+                resolve(NSNull())
+            }
         } catch (_) {
             reject("no_previous_track", "There is no previous track", nil)
         }

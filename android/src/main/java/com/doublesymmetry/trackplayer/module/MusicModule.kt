@@ -375,25 +375,40 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     @ReactMethod
-    fun skip(index: Int, callback: Promise) {
+    fun skip(index: Int, initialTime: Float, callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
 
         musicService.skip(index)
+
+        if (initialTime >= 0) {
+            musicService.seekTo(initialTime)
+        }
+
         callback.resolve(null)
     }
 
     @ReactMethod
-    fun skipToNext(callback: Promise) {
+    fun skipToNext(initialTime: Float, callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
         musicService.skipToNext()
+
+        if (initialTime >= 0) {
+            musicService.seekTo(initialTime)
+        }
+
         callback.resolve(null)
     }
 
     @ReactMethod
-    fun skipToPrevious(callback: Promise) {
+    fun skipToPrevious(initialTime: Float, callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
 
         musicService.skipToPrevious()
+
+        if (initialTime >= 0) {
+            musicService.seekTo(initialTime)
+        }
+
         callback.resolve(null)
     }
 
