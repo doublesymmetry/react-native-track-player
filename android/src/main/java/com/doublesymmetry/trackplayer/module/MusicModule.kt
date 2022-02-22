@@ -308,7 +308,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
                         Log.e(TAG,"This track is currently playing, so it can't be removed")
                         return@getCurrentTrackIndex
                     } else if (index >= 0 && index < queue.size) {
-                        musicService.remove(listOf(index))
+                        musicService.remove(index)
                     }
                 }
             }
