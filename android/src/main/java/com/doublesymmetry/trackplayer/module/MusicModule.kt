@@ -1,6 +1,9 @@
 package com.doublesymmetry.trackplayer.module
 
-import android.content.*
+import android.content.ComponentName
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.RatingCompat
@@ -19,9 +22,8 @@ import com.google.android.exoplayer2.DefaultLoadControl.*
 import com.google.android.exoplayer2.Player
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
-import java.util.*
+import timber.log.Timber
 import javax.annotation.Nonnull
-import kotlin.collections.ArrayList
 
 /**
  * @author Milen Pivchev @mpivchev
@@ -273,21 +275,22 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
         val trackList = Arguments.toList(data)
         val queue = musicService.tracks
-        val indexes: MutableList<Int> = ArrayList()
-        for (o in trackList!!) {
-            val index = if (o is Int) o else o.toString().toInt()
 
-            // We do not allow removal of the current item
-            musicService.getCurrentTrackIndex {
-                if (index == it) return@getCurrentTrackIndex
-                if (index >= 0 && index < queue.size) {
-                    indexes.add(index)
+        if (trackList != null) {
+            for (track in trackList) {
+                val index = if (track is Int) track else track.toString().toInt()
+
+                // We do not allow removal of the current item
+                musicService.getCurrentTrackIndex {
+                    if (index == it) {
+                        Timber.d("This track is currently playing, so it can't be removed")
+                        return@getCurrentTrackIndex
+                    } else if (index >= 0 && index < queue.size) {
+                        musicService.remove(listOf(index))
+                    }
                 }
             }
         }
-
-        if (indexes.isNotEmpty())
-            musicService.remove(indexes)
 
         callback.resolve(null)
     }
