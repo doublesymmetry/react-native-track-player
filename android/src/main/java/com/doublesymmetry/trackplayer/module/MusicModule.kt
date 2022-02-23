@@ -299,13 +299,13 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         val queue = musicService.tracks
 
         if (trackList != null) {
-            for (track in trackList) {
-                val index = if (track is Int) track else track.toString().toInt()
+            musicService.getCurrentTrackIndex {
+                for (track in trackList) {
+                    val index = if (track is Int) track else track.toString().toInt()
 
-                // We do not allow removal of the current item
-                musicService.getCurrentTrackIndex {
+                    // We do not allow removal of the current item
                     if (index == it) {
-                        Log.e(TAG,"This track is currently playing, so it can't be removed")
+                        Log.e(TAG, "This track is currently playing, so it can't be removed")
                         return@getCurrentTrackIndex
                     } else if (index >= 0 && index < queue.size) {
                         musicService.remove(index)
