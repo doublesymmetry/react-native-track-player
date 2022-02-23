@@ -4,7 +4,6 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.os.*
 import android.support.v4.media.RatingCompat
-import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.models.NotificationButton.*
@@ -24,7 +23,6 @@ import com.facebook.react.jstasks.HeadlessJsTaskConfig
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 class MusicService : HeadlessJsTaskService() {
@@ -115,11 +113,21 @@ class MusicService : HeadlessJsTaskService() {
                         buttonsList.add(PREVIOUS(icon = previousIcon, isCompact = isCompact(it)))
                     }
                     Capability.JUMP_FORWARD -> {
-                        val forwardIcon = Utils.getIcon(this, options, "forwardIcon", R.drawable.forward)
+                        val forwardIcon = Utils.getIcon(
+                            this,
+                            options,
+                            "forwardIcon",
+                            R.drawable.forward
+                        )
                         buttonsList.add(FORWARD(icon = forwardIcon, isCompact = isCompact(it)))
                     }
                     Capability.JUMP_BACKWARD -> {
-                        val backwardIcon = Utils.getIcon(this, options, "rewindIcon", R.drawable.rewind)
+                        val backwardIcon = Utils.getIcon(
+                            this,
+                            options,
+                            "rewindIcon",
+                            R.drawable.rewind
+                        )
                         buttonsList.add(BACKWARD(icon = backwardIcon, isCompact = isCompact(it)))
                     }
                     else -> return@forEach
@@ -132,19 +140,37 @@ class MusicService : HeadlessJsTaskService() {
 
             val accentColor = Utils.getIntOrNull(options, "color")
             val smallIcon = Utils.getIconOrNull(this, options, "icon")
-            val pendingIntent = PendingIntent.getActivity(this, 0, openAppIntent, getPendingIntentFlags())
-            val notificationConfig = NotificationConfig(buttonsList, accentColor, smallIcon, pendingIntent)
+            val pendingIntent = PendingIntent.getActivity(
+                this,
+                0,
+                openAppIntent,
+                getPendingIntentFlags()
+            )
+            val notificationConfig = NotificationConfig(
+                buttonsList,
+                accentColor,
+                smallIcon,
+                pendingIntent
+            )
 
             player.notificationManager.createNotification(notificationConfig)
         }
     }
 
     private fun getPendingIntentFlags(): Int {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) { PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT } else { PendingIntent.FLAG_CANCEL_CURRENT }
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT
+        } else {
+            PendingIntent.FLAG_CANCEL_CURRENT
+        }
     }
 
     private fun isCompact(capability: Capability): Boolean {
         return compactCapabilities.contains(capability)
+    }
+
+    fun add(track: Track) {
+        add(listOf(track))
     }
 
     fun add(tracks: List<Track>) {
@@ -155,6 +181,10 @@ class MusicService : HeadlessJsTaskService() {
     fun add(tracks: List<Track>, atIndex: Int) {
         val items = tracks.map { it.toAudioItem() }
         handler.post { player.add(items, atIndex) }
+    }
+
+    fun remove(index: Int) {
+        remove(listOf(index))
     }
 
     fun remove(indexes: List<Int>) {
@@ -349,7 +379,10 @@ class MusicService : HeadlessJsTaskService() {
         serviceScope.launch {
             event.notificationStateChange.collect {
                 when (it) {
-                    is NotificationState.POSTED -> startForeground(it.notificationId, it.notification)
+                    is NotificationState.POSTED -> startForeground(
+                        it.notificationId,
+                        it.notification
+                    )
                     is NotificationState.CANCELLED -> stopForeground(true)
                 }
             }
