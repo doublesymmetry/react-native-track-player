@@ -442,6 +442,7 @@ public class RNTrackPlayer: RCTEventEmitter {
         }
 
         player.stop()
+        player.nowPlayingInfoController.clear()
         resolve(NSNull())
         DispatchQueue.main.async {
             UIApplication.shared.endReceivingRemoteControlEvents();
