@@ -29,7 +29,10 @@ async function setupPlayer(options: PlayerOptions = {}): Promise<void> {
 }
 
 function destroy(): Promise<void> {
-  emitter.removeAllListeners()
+  if (Platform.OS === 'android') {
+    emitter.removeAllListeners()
+  }
+
   return TrackPlayer.destroy()
 }
 
