@@ -16,7 +16,7 @@
     "fresh": "rm -rf node_modules ; cd .. && yarn build ; cd example && yarn install"
   },
   "dependencies": {
-    "@react-native-community/slider": "4.0.0-rc.3",
+    "@react-native-community/slider": "4.2.0",
     "react": "17.0.2",
     "react-native": "0.65.1",
     "react-native-track-player": "file:..",

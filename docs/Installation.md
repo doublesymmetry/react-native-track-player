@@ -79,7 +79,7 @@ And don't forget to register a [playback service](https://react-native-track-pla
 ## Troubleshooting
 
 ### iOS: (Enable Swift) `library not found for -lswiftCoreAudio for architecture x86_64`
-You need to enable Swift in the project -- See Step 2 in installation instructions above.
+Because the iOS module uses Swift, if the user is using a standard react-native application they'll need to add support for Swift in the project. This can easily be done by adding a swift file to the Xcode project -- could be called `dummy.swift` and saying yes when prompted if you'd like to generate a bridging header.
 
 ### Android: (Enable Kotlin) `Unable to instantiate application ...`
 You need to enable Kotlin in the project -- See Step 3 in the installation instructions above.
