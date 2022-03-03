@@ -224,7 +224,7 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     fun seekTo(seconds: Float) {
-        handler.post { player.seek(seconds.toLong(), TimeUnit.SECONDS) }
+        handler.post { player.seek((seconds * 1000).toLong(), TimeUnit.MILLISECONDS) }
     }
 
     fun getCurrentTrackIndex(callback: (Int) -> Unit) {
