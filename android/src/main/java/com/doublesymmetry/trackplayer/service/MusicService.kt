@@ -271,19 +271,19 @@ class MusicService : HeadlessJsTaskService() {
 
     fun getDurationInSeconds(callback: (Double) -> Unit) {
         handler.post {
-            callback(TimeUnit.MILLISECONDS.toSeconds(player.duration).toDouble())
+            callback(player.duration.toDouble() / 1000)
         }
     }
 
     fun getPositionInSeconds(callback: (Double) -> Unit) {
         handler.post {
-            callback(TimeUnit.MILLISECONDS.toSeconds(player.position).toDouble())
+            callback(player.position.toDouble() / 1000)
         }
     }
 
     fun getBufferedPositionInSeconds(callback: (Double) -> Unit) {
         handler.post {
-            callback(TimeUnit.MILLISECONDS.toSeconds(player.bufferedPosition).toDouble())
+            callback(player.bufferedPosition.toDouble() / 1000)
         }
     }
 
