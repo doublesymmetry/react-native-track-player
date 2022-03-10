@@ -212,7 +212,7 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     fun skip(index: Int) {
-        handler.post { player.jumpToItem(index) }
+        handler.post { player.jumpToItem(index, player.isPlaying) }
     }
 
     fun skipToNext() {
