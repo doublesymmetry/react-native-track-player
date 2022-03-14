@@ -28,7 +28,9 @@ import java.util.concurrent.TimeUnit
 class MusicService : HeadlessJsTaskService() {
     private lateinit var player: QueuedAudioPlayer
     private val handler = Handler(Looper.getMainLooper())
+
     var stopWithApp = false
+        private set
 
     private val serviceScope = MainScope()
 
@@ -53,14 +55,14 @@ class MusicService : HeadlessJsTaskService() {
 
     fun setupPlayer(playerOptions: Bundle?, promise: Promise?) {
         val bufferOptions = BufferConfig(
-            playerOptions?.getDouble(MIN_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
-            playerOptions?.getDouble(MAX_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
-            playerOptions?.getDouble(PLAY_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
-            playerOptions?.getDouble(BACK_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
+                playerOptions?.getDouble(MIN_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
+                playerOptions?.getDouble(MAX_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
+                playerOptions?.getDouble(PLAY_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
+                playerOptions?.getDouble(BACK_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
         )
 
         val cacheOptions = CacheConfig(
-            playerOptions?.getDouble(MAX_CACHE_SIZE_KEY)?.toLong()
+                playerOptions?.getDouble(MAX_CACHE_SIZE_KEY)?.toLong()
         )
 
         val automaticallyUpdateNotificationMetadata = playerOptions?.getBoolean(AUTO_UPDATE_METADATA, true) ?: true
@@ -114,19 +116,19 @@ class MusicService : HeadlessJsTaskService() {
                     }
                     Capability.JUMP_FORWARD -> {
                         val forwardIcon = Utils.getIcon(
-                            this,
-                            options,
-                            "forwardIcon",
-                            R.drawable.forward
+                                this,
+                                options,
+                                "forwardIcon",
+                                R.drawable.forward
                         )
                         buttonsList.add(FORWARD(icon = forwardIcon, isCompact = isCompact(it)))
                     }
                     Capability.JUMP_BACKWARD -> {
                         val backwardIcon = Utils.getIcon(
-                            this,
-                            options,
-                            "rewindIcon",
-                            R.drawable.rewind
+                                this,
+                                options,
+                                "rewindIcon",
+                                R.drawable.rewind
                         )
                         buttonsList.add(BACKWARD(icon = backwardIcon, isCompact = isCompact(it)))
                     }
@@ -141,16 +143,16 @@ class MusicService : HeadlessJsTaskService() {
             val accentColor = Utils.getIntOrNull(options, "color")
             val smallIcon = Utils.getIconOrNull(this, options, "icon")
             val pendingIntent = PendingIntent.getActivity(
-                this,
-                0,
-                openAppIntent,
-                getPendingIntentFlags()
+                    this,
+                    0,
+                    openAppIntent,
+                    getPendingIntentFlags()
             )
             val notificationConfig = NotificationConfig(
-                buttonsList,
-                accentColor,
-                smallIcon,
-                pendingIntent
+                    buttonsList,
+                    accentColor,
+                    smallIcon,
+                    pendingIntent
             )
 
             player.notificationManager.createNotification(notificationConfig)
@@ -356,7 +358,7 @@ class MusicService : HeadlessJsTaskService() {
                     is FORWARD -> {
                         Bundle().apply {
                             val interval = (latestOptions?.getInt(FORWARD_JUMP_INTERVAL_KEY) ?: latestOptions?.getInt(
-                                BACKWARD_JUMP_INTERVAL_KEY)) ?: 15
+                                    BACKWARD_JUMP_INTERVAL_KEY)) ?: 15
 
                             putInt("interval", interval)
                             emit(MusicEvents.BUTTON_JUMP_FORWARD, this)
@@ -365,7 +367,7 @@ class MusicService : HeadlessJsTaskService() {
                     is BACKWARD -> {
                         Bundle().apply {
                             val interval = (latestOptions?.getInt(BACKWARD_JUMP_INTERVAL_KEY) ?: latestOptions?.getInt(
-                                FORWARD_JUMP_INTERVAL_KEY)) ?: 15
+                                    FORWARD_JUMP_INTERVAL_KEY)) ?: 15
 
                             putInt("interval", interval)
                             emit(MusicEvents.BUTTON_JUMP_BACKWARD, this)
@@ -380,8 +382,8 @@ class MusicService : HeadlessJsTaskService() {
             event.notificationStateChange.collect {
                 when (it) {
                     is NotificationState.POSTED -> startForeground(
-                        it.notificationId,
-                        it.notification
+                            it.notificationId,
+                            it.notification
                     )
                     is NotificationState.CANCELLED -> stopForeground(true)
                 }
@@ -438,9 +440,10 @@ class MusicService : HeadlessJsTaskService() {
         return MusicBinder()
     }
 
-    fun destroyIfAllowed(ignoreStopWithAppSetting: Boolean = false) {
+    // TODO: #AEX-45 forceDestroy is needed when calling destroy() manually. Find an alternative solution that does not require a second flag.
+    fun destroyIfAllowed(forceDestroy: Boolean = false) {
         // Player will continue running if this is true, even if the app itself is killed.
-        if (!ignoreStopWithAppSetting && !stopWithApp) return
+        if (!forceDestroy && !stopWithApp) return
 
         stop()
         stopForeground(true)
