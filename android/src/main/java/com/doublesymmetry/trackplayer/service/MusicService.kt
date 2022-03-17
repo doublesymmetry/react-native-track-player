@@ -21,7 +21,6 @@ import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
@@ -77,10 +76,10 @@ class MusicService : HeadlessJsTaskService() {
 
     fun updateOptions(options: Bundle) {
         handler.post {
-            latestOptions = options;
+            latestOptions = options
             stopWithApp = options.getBoolean(STOP_WITH_APP_KEY)
 
-            ratingType = Utils.getInt(options, "ratingType", RatingCompat.RATING_NONE);
+            ratingType = Utils.getInt(options, "ratingType", RatingCompat.RATING_NONE)
 
             player.playerOptions.alwaysPauseOnInterruption = options.getBoolean(PAUSE_ON_INTERRUPTION_KEY)
 
@@ -201,7 +200,7 @@ class MusicService : HeadlessJsTaskService() {
         handler.post { player.pause() }
     }
 
-    fun stop() {
+    fun stopPlayer() {
         handler.post { player.stop() }
     }
 
@@ -297,7 +296,7 @@ class MusicService : HeadlessJsTaskService() {
 
     fun updateNotificationMetadata(title: String?, artist: String?, artwork: String?) {
         handler.post {
-            player.notificationManager.notificatioMetadata = NotificationMetadata(title, artist, artwork)
+            player.notificationManager.notificationMetadata = NotificationMetadata(title, artist, artwork)
         }
     }
 
@@ -317,7 +316,7 @@ class MusicService : HeadlessJsTaskService() {
                 if (it == AudioPlayerState.ENDED && player.nextItem == null) {
                     val endBundle = Bundle()
                     endBundle.putInt(TRACK_KEY, player.currentIndex)
-                    endBundle.putDouble(POSITION_KEY, Utils.toSeconds(player.position));
+                    endBundle.putDouble(POSITION_KEY, Utils.toSeconds(player.position))
 
                     emit(MusicEvents.PLAYBACK_QUEUE_ENDED, endBundle)
                     emit(MusicEvents.PLAYBACK_TRACK_CHANGED, endBundle)
@@ -390,6 +389,18 @@ class MusicService : HeadlessJsTaskService() {
             }
         }
 
+//        serviceScope.launch {
+//            event.notificationStateChange.collect {
+//                when (it) {
+//                    is NotificationState.POSTED -> startForeground(it.notificationId, it.notification)
+//                    is NotificationState.CANCELLED -> {
+//                        stopForeground(true)
+//                        stopSelf()
+//                    }
+//                }
+//            }
+//        }
+
         serviceScope.launch {
             event.onMediaSessionCallbackTriggered.collect {
                 when (it) {
@@ -429,11 +440,7 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     override fun getTaskConfig(intent: Intent?): HeadlessJsTaskConfig {
-        return HeadlessJsTaskConfig(TASK_KEY, Arguments.createMap(), 0, true)
-    }
-
-    override fun onHeadlessJsTaskFinish(taskId: Int) {
-        // Overridden to prevent the service from being terminated
+        return HeadlessJsTaskConfig(TASK_KEY, Arguments.createMap(), 5000, true)
     }
 
     override fun onBind(intent: Intent?): IBinder {
@@ -442,15 +449,39 @@ class MusicService : HeadlessJsTaskService() {
 
     // TODO: #AEX-45 forceDestroy is needed when calling destroy() manually. Find an alternative solution that does not require a second flag.
     fun destroyIfAllowed(forceDestroy: Boolean = false) {
-        // Player will continue running if this is true, even if the app itself is killed.
         if (!forceDestroy && !stopWithApp) return
 
-        stop()
+        stopPlayer()
         stopForeground(true)
         stopSelf()
     }
 
+    override fun onUnbind(intent: Intent?): Boolean {
+        return super.onUnbind(intent)
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+
+        stopPlayer()
+        stopForeground(true)
+        stopSelf()
+        handler.post {
+            if (this::player.isInitialized) {
+                player.destroy()
+            }
+            handler.removeMessages(0)
+        }
+    }
+
     override fun onDestroy() {
+        super.onDestroy()
+
+
+        stopPlayer()
+        stopForeground(true)
+        stopSelf()
+
         handler.post {
             if (this::player.isInitialized) {
                 player.destroy()
@@ -458,7 +489,7 @@ class MusicService : HeadlessJsTaskService() {
             handler.removeMessages(0)
         }
 
-        super.onDestroy()
+
     }
 
     inner class MusicBinder : Binder() {

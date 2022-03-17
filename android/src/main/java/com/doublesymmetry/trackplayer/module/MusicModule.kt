@@ -1,9 +1,6 @@
 package com.doublesymmetry.trackplayer.module
 
-import android.content.ComponentName
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.ServiceConnection
+import android.content.*
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.RatingCompat
@@ -50,13 +47,13 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     /**
-     * Called when the React context is destroyed or reloaded.
+     * Called when the Raect module is destroyed.
      */
-    override fun onCatalystInstanceDestroy() {
+    override fun invalidate() {
         if (!isServiceBound) return
 
+        unbindService()
         musicService.destroyIfAllowed(true)
-        unbindFromService()
     }
 
     /**
@@ -64,7 +61,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
      * for the last React activity to be destroyed.
      */
     override fun onHostDestroy() {
-        destroyIfAllowed()
+        destroyServiceIfAllowed()
     }
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
@@ -98,18 +95,16 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         return false
     }
 
-    private fun unbindFromService() {
-        val context: ReactContext = reactApplicationContext
-
+    private fun unbindService() {
         // The music service will not stop unless we unbind it first.
         if (isServiceBound) {
-            context.unbindService(this)
-            isServiceBound = false
+            reactApplicationContext.unbindService(this)
             binder = null
+            isServiceBound = false
         }
 
         if (eventHandler != null) {
-            val manager = LocalBroadcastManager.getInstance(context)
+            val manager = LocalBroadcastManager.getInstance(reactApplicationContext)
             manager.unregisterReceiver(eventHandler!!)
             eventHandler = null
         }
@@ -167,7 +162,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
             return
         }
 
-        // validate buffer keys.
+        // Validate buffer keys.
         val bundledData = Arguments.toBundle(data)
         val minBuffer = bundledData?.getDouble(MusicService.MIN_BUFFER_KEY)
                 ?.let { Utils.toMillis(it).toInt() } ?: DEFAULT_MIN_BUFFER_MS
@@ -216,8 +211,8 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         manager.registerReceiver(eventHandler!!, IntentFilter(EVENT_INTENT))
 
         Intent(context, MusicService::class.java).also { intent ->
+            context.bindService(intent, this, Context.BIND_AUTO_CREATE)
             context.startService(intent)
-            context.bindService(intent, this, 0)
         }
     }
 
@@ -225,18 +220,19 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     fun destroy(callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
 
+        unbindService()
         musicService.destroyIfAllowed(true)
-        unbindFromService()
     }
 
-    private fun destroyIfAllowed() {
-        // There's nothing to destroy if we have not been service bound yet.
-        if (!isServiceBound) return
-
-        musicService.destroyIfAllowed()
+    /**
+     * Destroy the music service if it's configured to stop with the activities.
+     * @see [MusicService.stopWithApp]
+     */
+    private fun destroyServiceIfAllowed() {
         if (!musicService.stopWithApp) return
 
-        unbindFromService()
+        unbindService()
+        musicService.destroyIfAllowed()
     }
 
     @ReactMethod
@@ -396,7 +392,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     fun reset(callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
 
-        musicService.stop()
+        musicService.stopPlayer()
         callback.resolve(null)
     }
 
