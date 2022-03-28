@@ -1,32 +1,32 @@
 buildscript {
+    def kotlin_version = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : project.properties['RNTP_kotlinVersion']
+
     repositories {
         mavenCentral()
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.3'
+        classpath 'com.android.tools.build:gradle:4.2.2'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
-def safeExtGet(prop, fallback) {
-    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+def getExtOrIntegerDefault(name) {
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties['RNTP_' + name]).toInteger()
 }
 
-def minSdkFallback = 21
-def targetSdkFallback = 31
-
 android {
-    compileSdkVersion safeExtGet("compileSdkVersion", targetSdkFallback)
+    compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
 
     defaultConfig {
-        minSdkVersion safeExtGet("minSdkVersion", minSdkFallback) // RN's minimum version
-        targetSdkVersion safeExtGet("targetSdkVersion", targetSdkFallback)
+        minSdkVersion getExtOrIntegerDefault('minSdkVersion') // RN's minimum version
+        targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
 
         versionCode 1
-        versionName "1.0"
+        versionName '1.0'
 
         consumerProguardFiles 'proguard-rules.txt'
     }
@@ -41,7 +41,7 @@ repositories {
     maven {
         // As RN is not updated in jcenter anymore, we'll have to grab it from npm
         // Make sure you have installed the react-native npm package before compiling
-        url "../node_modules/react-native/android"
+        url '../node_modules/react-native/android'
     }
 
     mavenCentral()
@@ -49,14 +49,14 @@ repositories {
 }
 
 dependencies {
-    implementation "com.github.DoubleSymmetry:KotlinAudio:v0.1.31"
+    implementation 'com.github.DoubleSymmetry:KotlinAudio:v0.1.31'
 
     //noinspection GradleDynamicVersion
-    implementation "com.facebook.react:react-native:+"
+    implementation 'com.facebook.react:react-native:+'
 
     // Make sure we're using androidx
-    implementation "androidx.core:core-ktx:1.7.0"
-    implementation "androidx.localbroadcastmanager:localbroadcastmanager:1.1.0"
-    implementation "com.orhanobut:logger:2.2.0"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2"
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
+    implementation 'com.orhanobut:logger:2.2.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2'
 }
