@@ -29,6 +29,7 @@ class MusicService : HeadlessJsTaskService() {
     private var hasStartedForeground = false
     private lateinit var player: QueuedAudioPlayer
     private val handler = Handler(Looper.getMainLooper())
+    private val binder = MusicBinder()
 
     var stopWithApp = false
         private set
@@ -53,6 +54,11 @@ class MusicService : HeadlessJsTaskService() {
     private var capabilities: List<Capability> = emptyList()
     private var notificationCapabilities: List<Capability> = emptyList()
     private var compactCapabilities: List<Capability> = emptyList()
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        startTask(getTaskConfig(intent))
+        return START_STICKY_COMPATIBILITY
+    }
 
     fun setupPlayer(playerOptions: Bundle?, promise: Promise?) {
         val bufferOptions = BufferConfig(
@@ -436,8 +442,13 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     override fun onBind(intent: Intent?): IBinder {
-        return MusicBinder()
+        return binder
     }
+
+//    override fun onUnbind(intent: Intent?): Boolean {
+//        destroyIfAllowed(true)
+//        return false
+//    }
 
     // TODO: #AEX-45 forceDestroy is needed when calling destroy() manually. Find an alternative solution that does not require a second flag.
     fun destroyIfAllowed(forceDestroy: Boolean = false) {

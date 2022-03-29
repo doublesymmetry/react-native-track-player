@@ -1,5 +1,7 @@
 package com.doublesymmetry.trackplayer.module
 
+import android.app.Activity
+import android.app.Application
 import android.content.*
 import android.os.Bundle
 import android.os.IBinder
@@ -26,7 +28,7 @@ import javax.annotation.Nonnull
  * @author Milen Pivchev @mpivchev
  *
  */
-class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), ServiceConnection, LifecycleEventsListener {
+class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), ServiceConnection, LifecycleEventsListener, Application.ActivityLifecycleCallbacks {
     private var binder: MusicService.MusicBinder? = null
     private var eventHandler: MusicEvents? = null
     private var playerOptions: Bundle? = null
@@ -46,21 +48,50 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         Logger.addLogAdapter(AndroidLogAdapter())
     }
 
-    /**
-     * Called when the Raect module is destroyed.
-     */
-    override fun invalidate() {
-        if (!isServiceBound) return
-
-        unbindService()
-        musicService.destroyIfAllowed(true)
+    override fun onActivityCreated(p0: Activity, p1: Bundle?) {
+        TODO("Not yet implemented")
     }
+
+    override fun onActivityStarted(p0: Activity) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onActivityResumed(p0: Activity) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onActivityPaused(p0: Activity) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onActivityStopped(p0: Activity) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onActivitySaveInstanceState(p0: Activity, p1: Bundle) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onActivityDestroyed(p0: Activity) {
+        TODO("Not yet implemented")
+    }
+
+    //    /**
+//     * Called when the React module is destroyed.
+//     */
+//    override fun invalidate() {
+//        if (!isServiceBound) return
+//
+//        unbindService()
+//        musicService.destroyIfAllowed(true)
+//    }
 
     /**
      * Called when host activity receives destroy event (e.g. {@link Activity#onDestroy}. Only called
      * for the last React activity to be destroyed.
      */
     override fun onHostDestroy() {
+//        unbindService()
         destroyServiceIfAllowed()
     }
 
