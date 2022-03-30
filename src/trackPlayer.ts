@@ -58,6 +58,9 @@ function addEventListener(event: Event, listener: (data: any) => void) {
   return emitter.addListener(event, listener)
 }
 
+/**
+ * @deprecated This method should not be used, most methods reject when service is not bound.
+ */
 function isServiceRunning(): Promise<boolean> {
   return TrackPlayer.isServiceRunning()
 }
