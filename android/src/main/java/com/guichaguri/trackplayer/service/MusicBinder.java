@@ -49,6 +49,10 @@ public class MusicBinder extends Binder {
         return manager.getMetadata().getRatingType();
     }
 
+    public void setEraseNotificationBehaviour(boolean erase) {
+        manager.setEraseNotificationBehaviour(erase);
+    }
+
     public void destroy() {
         service.destroy();
         service.stopSelf();

@@ -50,6 +50,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
     private AudioFocusRequest focus = null;
     private boolean hasAudioFocus = false;
     private boolean wasDucking = false;
+    private boolean shouldEraseNotifications = false;
 
     private BroadcastReceiver noisyReceiver = new BroadcastReceiver() {
         @Override
@@ -218,8 +219,14 @@ public class MusicManager implements OnAudioFocusChangeListener {
         service.emit(MusicEvents.PLAYBACK_TRACK_CHANGED, bundle);
     }
 
+    public void setEraseNotificationBehaviour(boolean erase) {
+        shouldEraseNotifications = erase;
+    }
+
     public void onReset() {
-        metadata.removeNotifications();
+        if (shouldEraseNotifications) {
+            metadata.removeNotifications();
+        }
     }
 
     public void onEnd(Track previous, long prevPos) {

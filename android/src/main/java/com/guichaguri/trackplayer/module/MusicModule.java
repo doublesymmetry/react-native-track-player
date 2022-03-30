@@ -462,4 +462,11 @@ public class MusicModule extends ReactContextBaseJavaModule implements ServiceCo
             waitForConnection(() -> callback.resolve(binder.getPlayback().getState()));
         }
     }
+
+    @ReactMethod
+    public void setEraseNotificationBehaviour(final boolean erase) {
+        waitForConnection(() -> {
+            binder.setEraseNotificationBehaviour(erase);
+        });
+    }
 }
