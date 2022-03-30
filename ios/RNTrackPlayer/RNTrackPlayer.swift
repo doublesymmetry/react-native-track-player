@@ -635,10 +635,8 @@ public class RNTrackPlayer: RCTEventEmitter {
         }
 
         // fire an event for the same track starting again
-        switch player.repeatMode {
-        case .track:
+        if player.items.count != 0 && player.repeatMode == .track {
             handleAudioPlayerQueueIndexChange(previousIndex: player.currentIndex, nextIndex: player.currentIndex)
-        default: break
         }
     }
 
