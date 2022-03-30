@@ -46,6 +46,11 @@ repositories {
 
     mavenCentral()
     google()
+
+    // FIXME: this can be removed once exoplayer has been migrated to a maven
+    // release. See more details here:
+    // https://github.com/DoubleSymmetry/react-native-track-player/issues/1235#issuecomment-921266932
+    jcenter()
 }
 
 dependencies {
