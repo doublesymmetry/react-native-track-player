@@ -11,7 +11,31 @@ To install release candidates run `yarn add react-native-track-player@next`
 * Add property `isLiveStream` to `Track` for correct display in iOS control center.
   [dcvz](https://github.com/dcvz)
 
+* [iOS] Improve method documentation
+  [alpha0010](https://github.com/alpha0010)
+
 ##### Bug Fixes
+
+* [iOS] Fix seek after play
+  [jspizziri](https://github.com/jspizziri)
+
+* [Android] Support Android 12 devices
+  [abhaydee](https://github.com/abhaydee)
+
+* [iOS] Add method resolves promise with index
+  [formula1](https://github.com/formula1)
+
+* Fix getTrack return type
+  [puckey](https://github.com/puckey)
+
+* [iOS] Fix ambient session not working
+  [grubicv](https://github.com/grubicv)
+
+* [Android] Android 12 and higher bug fix
+  [martin-richter-uk](https://github.com/martin-richter-uk)
+
+* [iOS] Update SwiftAudioEx to 0.14.6 to avoid LICENSE warning
+  [dcvz](https://github.com/dcvz)
 
 * Make react-native-windows and optional peer dependency (#1324).
   [jspizziri](https://github.com/jspizziri)
