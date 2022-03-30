@@ -43,33 +43,32 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     override fun initialize() {
+
+        currentActivity?.application?.registerActivityLifecycleCallbacks(this)
         val context: ReactContext = reactApplicationContext
         context.addLifecycleEventListener(this)
         Logger.addLogAdapter(AndroidLogAdapter())
     }
 
     override fun onActivityCreated(p0: Activity, p1: Bundle?) {
-        TODO("Not yet implemented")
+        Log.d("TEST", "TEST")
     }
 
     override fun onActivityStarted(p0: Activity) {
-        TODO("Not yet implemented")
+        Log.d("TEST", "TEST")
     }
 
     override fun onActivityResumed(p0: Activity) {
-        TODO("Not yet implemented")
     }
 
     override fun onActivityPaused(p0: Activity) {
-        TODO("Not yet implemented")
     }
 
     override fun onActivityStopped(p0: Activity) {
-        TODO("Not yet implemented")
+        destroyServiceIfAllowed()
     }
 
     override fun onActivitySaveInstanceState(p0: Activity, p1: Bundle) {
-        TODO("Not yet implemented")
     }
 
     override fun onActivityDestroyed(p0: Activity) {
@@ -92,7 +91,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
      */
     override fun onHostDestroy() {
 //        unbindService()
-        destroyServiceIfAllowed()
+//        destroyServiceIfAllowed()
     }
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
@@ -251,8 +250,9 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     fun destroy(callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
 
-        unbindService()
-        musicService.destroyIfAllowed(true)
+//        unbindService()
+//        musicService.destroyIfAllowed(true)
+        destroyServiceIfAllowed()
     }
 
     /**

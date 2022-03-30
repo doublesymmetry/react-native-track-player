@@ -1,6 +1,5 @@
 package com.doublesymmetry.trackplayer
 
-import android.app.Application
 import com.doublesymmetry.trackplayer.module.MusicModule
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.NativeModule
@@ -12,11 +11,7 @@ import com.facebook.react.uimanager.ViewManager
  * https://github.com/react-native-kit/react-native-track-player
  * @author Milen Pivchev @mpivchev
  */
-class TrackPlayer(application: Application?) : ReactPackage {
-    init {
-        RNHockeyAppUsageTracker.initialize(application)
-    }
-
+class TrackPlayer : ReactPackage {
     override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> {
         return listOf(MusicModule(reactContext))
     }
