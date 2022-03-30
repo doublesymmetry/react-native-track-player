@@ -24,6 +24,9 @@ function resolveImportedPath(path?: number | string) {
 
 // MARK: - General API
 
+/**
+ * Initializes the player with the specified options.
+ */
 async function setupPlayer(options: PlayerOptions = {}): Promise<void> {
   return TrackPlayer.setupPlayer(options || {})
 }
@@ -37,6 +40,9 @@ function destroy(): Promise<void> {
 }
 
 type ServiceHandler = () => Promise<void>
+/**
+ * Register the playback service. The service will run as long as the player runs.
+ */
 function registerPlaybackService(factory: () => ServiceHandler) {
   if (Platform.OS === 'android') {
     // Registers the headless task
@@ -52,8 +58,15 @@ function addEventListener(event: Event, listener: (data: any) => void) {
   return emitter.addListener(event, listener)
 }
 
+function isServiceRunning(): Promise<boolean> {
+  return TrackPlayer.isServiceRunning()
+}
+
 // MARK: - Queue API
 
+/**
+ * Adds one or more tracks to the queue.
+ */
 async function add(tracks: Track | Track[], insertBeforeIndex?: number): Promise<void> {
   // Clone the array before modifying it
   if (Array.isArray(tracks)) {
@@ -77,6 +90,9 @@ async function add(tracks: Track | Track[], insertBeforeIndex?: number): Promise
   return TrackPlayer.add(tracks, insertBeforeIndex === undefined ? -1 : insertBeforeIndex)
 }
 
+/**
+ * Removes one or more tracks from the queue.
+ */
 async function remove(tracks: number | number[]): Promise<void> {
   if (!Array.isArray(tracks)) {
     tracks = [tracks]
@@ -85,24 +101,39 @@ async function remove(tracks: number | number[]): Promise<void> {
   return TrackPlayer.remove(tracks)
 }
 
+/**
+ * Clears any upcoming tracks from the queue.
+ */
 async function removeUpcomingTracks(): Promise<void> {
   return TrackPlayer.removeUpcomingTracks()
 }
 
+/**
+ * Skips to a track in the queue.
+ */
 async function skip(trackIndex: number): Promise<void> {
   return TrackPlayer.skip(trackIndex)
 }
 
+/**
+ * Skips to the next track in the queue.
+ */
 async function skipToNext(): Promise<void> {
   return TrackPlayer.skipToNext()
 }
 
+/**
+ * Skips to the previous track in the queue.
+ */
 async function skipToPrevious(): Promise<void> {
   return TrackPlayer.skipToPrevious()
 }
 
 // MARK: - Control Center / Notifications API
 
+/**
+ * Updates the configuration for the components.
+ */
 async function updateOptions(options: MetadataOptions = {}): Promise<void> {
   options = { ...options }
 
@@ -119,6 +150,10 @@ async function updateOptions(options: MetadataOptions = {}): Promise<void> {
   return TrackPlayer.updateOptions(options)
 }
 
+/**
+ * Updates the metadata of a track in the queue. If the current track is updated,
+ * the notification and the Now Playing Center will be updated accordingly.
+ */
 async function updateMetadataForTrack(trackIndex: number, metadata: TrackMetadataBase): Promise<void> {
   // Clone the object before modifying it
   metadata = Object.assign({}, metadata)
@@ -145,76 +180,130 @@ function updateNowPlayingMetadata(metadata: NowPlayingMetadata): Promise<void> {
 
 // MARK: - Player API
 
+/**
+ * Resets the player stopping the current track and clearing the queue.
+ */
 async function reset(): Promise<void> {
   return TrackPlayer.reset()
 }
 
+/**
+ * Plays or resumes the current track.
+ */
 async function play(): Promise<void> {
   return TrackPlayer.play()
 }
 
+/**
+ * Pauses the current track.
+ */
 async function pause(): Promise<void> {
   return TrackPlayer.pause()
 }
 
+/**
+ * Stops the current track.
+ */
 async function stop(): Promise<void> {
   return TrackPlayer.stop()
 }
 
+/**
+ * Seeks to a specified time position in the current track.
+ */
 async function seekTo(position: number): Promise<void> {
   return TrackPlayer.seekTo(position)
 }
 
+/**
+ * Sets the volume of the player.
+ */
 async function setVolume(level: number): Promise<void> {
   return TrackPlayer.setVolume(level)
 }
 
+/**
+ * Sets the playback rate.
+ */
 async function setRate(rate: number): Promise<void> {
   return TrackPlayer.setRate(rate)
 }
 
+/**
+ * Sets the repeat mode.
+ */
 async function setRepeatMode(mode: RepeatMode): Promise<RepeatMode> {
   return TrackPlayer.setRepeatMode(mode)
 }
 
 // MARK: - Getters
 
+/**
+ * Gets the volume of the player (a number between 0 and 1).
+ */
 async function getVolume(): Promise<number> {
   return TrackPlayer.getVolume()
 }
 
+/**
+ * Gets the playback rate, where 1 is the regular speed.
+ */
 async function getRate(): Promise<number> {
   return TrackPlayer.getRate()
 }
 
+/**
+ * Gets a track object from the queue.
+ */
 async function getTrack(trackIndex: number): Promise<Track | null> {
   return TrackPlayer.getTrack(trackIndex)
 }
 
+/**
+ * Gets the whole queue.
+ */
 async function getQueue(): Promise<Track[]> {
   return TrackPlayer.getQueue()
 }
 
+/**
+ * Gets the index of the current track.
+ */
 async function getCurrentTrack(): Promise<number> {
   return TrackPlayer.getCurrentTrack()
 }
 
+/**
+ * Gets the duration of the current track in seconds.
+ */
 async function getDuration(): Promise<number> {
   return TrackPlayer.getDuration()
 }
 
+/**
+ * Gets the buffered position of the player in seconds.
+ */
 async function getBufferedPosition(): Promise<number> {
   return TrackPlayer.getBufferedPosition()
 }
 
+/**
+ * Gets the position of the player in seconds.
+ */
 async function getPosition(): Promise<number> {
   return TrackPlayer.getPosition()
 }
 
+/**
+ * Gets the state of the player.
+ */
 async function getState(): Promise<State> {
   return TrackPlayer.getState()
 }
 
+/**
+ * Gets the repeat mode.
+ */
 async function getRepeatMode(): Promise<RepeatMode> {
   return TrackPlayer.getRepeatMode()
 }
@@ -225,6 +314,7 @@ export default {
   destroy,
   registerPlaybackService,
   addEventListener,
+  isServiceRunning,
 
   // MARK: - Queue API
   add,

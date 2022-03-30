@@ -18,6 +18,9 @@ RCT_EXTERN_METHOD(setupPlayer:(NSDictionary *)data
 RCT_EXTERN_METHOD(destroy:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
+RCT_EXTERN_METHOD(isServiceRunning:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject);
+
 RCT_EXTERN_METHOD(updateOptions:(NSDictionary *)options
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);

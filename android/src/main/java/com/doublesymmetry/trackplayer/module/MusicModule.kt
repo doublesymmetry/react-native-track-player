@@ -222,6 +222,11 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     @ReactMethod
+    fun isServiceRunning(callback: Promise) {
+        callback.resolve(isServiceBound);
+    }
+
+    @ReactMethod
     fun destroy(callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
 
