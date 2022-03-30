@@ -14,6 +14,9 @@ To install release candidates run `yarn add react-native-track-player@next`
 * [iOS] Improve method documentation
   [alpha0010](https://github.com/alpha0010)
 
+* [Android] Add isServiceRunning method
+  [biomancer](https://github.com/biomancer)
+
 ##### Bug Fixes
 
 * [iOS] Fix track loop crash in certain cases
