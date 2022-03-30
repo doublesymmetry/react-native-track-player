@@ -16,6 +16,9 @@ To install release candidates run `yarn add react-native-track-player@next`
 
 ##### Bug Fixes
 
+* [iOS] Fix track loop crash in certain cases
+  [mmmoussa](https://github.com/mmmoussa)
+
 * [iOS] Fix seek after play
   [jspizziri](https://github.com/jspizziri)
 
