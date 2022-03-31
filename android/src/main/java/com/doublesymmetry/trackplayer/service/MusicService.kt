@@ -21,18 +21,17 @@ import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 class MusicService : HeadlessJsTaskService() {
     private lateinit var player: QueuedAudioPlayer
-    private val handler = Handler(Looper.getMainLooper())
+    private val scope = MainScope()
 
     var stopWithApp = false
         private set
-
-    private val serviceScope = MainScope()
 
     val tracks: List<Track>
         get() = player.items.map { (it as TrackAudioItem).track }
@@ -67,8 +66,8 @@ class MusicService : HeadlessJsTaskService() {
 
         val automaticallyUpdateNotificationMetadata = playerOptions?.getBoolean(AUTO_UPDATE_METADATA, true) ?: true
 
-        handler.post {
-            player = QueuedAudioPlayer(this, bufferOptions, cacheOptions)
+        scope.launch {
+            player = QueuedAudioPlayer(this@MusicService, bufferOptions, cacheOptions)
             player.automaticallyUpdateNotificationMetadata = automaticallyUpdateNotificationMetadata
             observeEvents()
             promise?.resolve(null)
@@ -76,86 +75,108 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     fun updateOptions(options: Bundle) {
-        handler.post {
-            latestOptions = options;
-            stopWithApp = options.getBoolean(STOP_WITH_APP_KEY)
+        scope.launch {
+            with (this@MusicService) {
+                latestOptions = options
+                stopWithApp = options.getBoolean(STOP_WITH_APP_KEY)
 
-            ratingType = Utils.getInt(options, "ratingType", RatingCompat.RATING_NONE);
+                ratingType = Utils.getInt(options, "ratingType", RatingCompat.RATING_NONE)
 
-            player.playerOptions.alwaysPauseOnInterruption = options.getBoolean(PAUSE_ON_INTERRUPTION_KEY)
+                player.playerOptions.alwaysPauseOnInterruption =
+                    options.getBoolean(PAUSE_ON_INTERRUPTION_KEY)
 
-            capabilities = options.getIntegerArrayList("capabilities")?.map { Capability.values()[it] } ?: emptyList()
-            notificationCapabilities = options.getIntegerArrayList("notificationCapabilities")?.map { Capability.values()[it] } ?: emptyList()
-            compactCapabilities = options.getIntegerArrayList("compactCapabilities")?.map { Capability.values()[it] } ?: emptyList()
+                capabilities =
+                    options.getIntegerArrayList("capabilities")?.map { Capability.values()[it] }
+                        ?: emptyList()
+                notificationCapabilities = options.getIntegerArrayList("notificationCapabilities")
+                    ?.map { Capability.values()[it] } ?: emptyList()
+                compactCapabilities = options.getIntegerArrayList("compactCapabilities")
+                    ?.map { Capability.values()[it] } ?: emptyList()
 
-            if (notificationCapabilities.isEmpty()) notificationCapabilities = capabilities
+                if (notificationCapabilities.isEmpty()) notificationCapabilities = capabilities
 
-            val buttonsList = mutableListOf<NotificationButton>()
+                val buttonsList = mutableListOf<NotificationButton>()
 
-            notificationCapabilities.forEach {
-                when (it) {
-                    Capability.PLAY -> {
-                        val playIcon = Utils.getIconOrNull(this, options, "playIcon")
-                        buttonsList.add(PLAY(icon = playIcon))
-                    }
-                    Capability.PAUSE -> {
-                        val pauseIcon = Utils.getIconOrNull(this, options, "pauseIcon")
-                        buttonsList.add(PAUSE(icon = pauseIcon))
-                    }
-                    Capability.STOP -> {
-                        val stopIcon = Utils.getIconOrNull(this, options, "stopIcon")
-                        buttonsList.add(STOP(icon = stopIcon, isCompact = isCompact(it)))
-                    }
-                    Capability.SKIP_TO_NEXT -> {
-                        val nextIcon = Utils.getIconOrNull(this, options, "nextIcon")
-                        buttonsList.add(NEXT(icon = nextIcon, isCompact = isCompact(it)))
-                    }
-                    Capability.SKIP_TO_PREVIOUS -> {
-                        val previousIcon = Utils.getIconOrNull(this, options, "previousIcon")
-                        buttonsList.add(PREVIOUS(icon = previousIcon, isCompact = isCompact(it)))
-                    }
-                    Capability.JUMP_FORWARD -> {
-                        val forwardIcon = Utils.getIcon(
+                notificationCapabilities.forEach {
+                    when (it) {
+                        Capability.PLAY -> {
+                            val playIcon =
+                                Utils.getIconOrNull(this, options, "playIcon")
+                            buttonsList.add(PLAY(icon = playIcon))
+                        }
+                        Capability.PAUSE -> {
+                            val pauseIcon =
+                                Utils.getIconOrNull(this, options, "pauseIcon")
+                            buttonsList.add(PAUSE(icon = pauseIcon))
+                        }
+                        Capability.STOP -> {
+                            val stopIcon =
+                                Utils.getIconOrNull(this, options, "stopIcon")
+                            buttonsList.add(STOP(icon = stopIcon, isCompact = isCompact(it)))
+                        }
+                        Capability.SKIP_TO_NEXT -> {
+                            val nextIcon =
+                                Utils.getIconOrNull(this, options, "nextIcon")
+                            buttonsList.add(NEXT(icon = nextIcon, isCompact = isCompact(it)))
+                        }
+                        Capability.SKIP_TO_PREVIOUS -> {
+                            val previousIcon =
+                                Utils.getIconOrNull(this, options, "previousIcon")
+                            buttonsList.add(
+                                PREVIOUS(
+                                    icon = previousIcon,
+                                    isCompact = isCompact(it)
+                                )
+                            )
+                        }
+                        Capability.JUMP_FORWARD -> {
+                            val forwardIcon = Utils.getIcon(
                                 this,
                                 options,
                                 "forwardIcon",
                                 R.drawable.forward
-                        )
-                        buttonsList.add(FORWARD(icon = forwardIcon, isCompact = isCompact(it)))
-                    }
-                    Capability.JUMP_BACKWARD -> {
-                        val backwardIcon = Utils.getIcon(
+                            )
+                            buttonsList.add(FORWARD(icon = forwardIcon, isCompact = isCompact(it)))
+                        }
+                        Capability.JUMP_BACKWARD -> {
+                            val backwardIcon = Utils.getIcon(
                                 this,
                                 options,
                                 "rewindIcon",
                                 R.drawable.rewind
-                        )
-                        buttonsList.add(BACKWARD(icon = backwardIcon, isCompact = isCompact(it)))
+                            )
+                            buttonsList.add(
+                                BACKWARD(
+                                    icon = backwardIcon,
+                                    isCompact = isCompact(it)
+                                )
+                            )
+                        }
+                        else -> return@forEach
                     }
-                    else -> return@forEach
                 }
-            }
 
-            val openAppIntent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            }
+                val openAppIntent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                }
 
-            val accentColor = Utils.getIntOrNull(options, "color")
-            val smallIcon = Utils.getIconOrNull(this, options, "icon")
-            val pendingIntent = PendingIntent.getActivity(
+                val accentColor = Utils.getIntOrNull(options, "color")
+                val smallIcon = Utils.getIconOrNull(this, options, "icon")
+                val pendingIntent = PendingIntent.getActivity(
                     this,
                     0,
                     openAppIntent,
                     getPendingIntentFlags()
-            )
-            val notificationConfig = NotificationConfig(
+                )
+                val notificationConfig = NotificationConfig(
                     buttonsList,
                     accentColor,
                     smallIcon,
                     pendingIntent
-            )
+                )
 
-            player.notificationManager.createNotification(notificationConfig)
+                player.notificationManager.createNotification(notificationConfig)
+            }
         }
     }
 
@@ -177,138 +198,112 @@ class MusicService : HeadlessJsTaskService() {
 
     fun add(tracks: List<Track>) {
         val items = tracks.map { it.toAudioItem() }
-        handler.post { player.add(items, false) }
+        scope.launch { player.add(items, false) }
     }
 
     fun add(tracks: List<Track>, atIndex: Int) {
         val items = tracks.map { it.toAudioItem() }
-        handler.post { player.add(items, atIndex) }
+        scope.launch { player.add(items, atIndex) }
     }
 
     fun remove(index: Int) {
         remove(listOf(index))
     }
 
-    fun remove(indexes: List<Int>) {
-        handler.post { player.remove(indexes) }
+    fun remove(indexes: List<Int>) = scope.launch {
+        player.remove(indexes)
     }
 
-    fun play() {
-        handler.post { player.play() }
+    fun play() = scope.launch {
+        player.play()
     }
 
-    fun pause() {
-        handler.post { player.pause() }
+    fun pause() = scope.launch {
+        player.pause()
     }
 
-    fun stop() {
-        handler.post { player.stop() }
+    fun stop() = scope.launch {
+        player.stop()
     }
 
-    fun removeUpcomingTracks() {
-        handler.post { player.removeUpcomingItems() }
+    fun removeUpcomingTracks() = scope.launch {
+        player.removeUpcomingItems()
     }
 
-    fun removePreviousTracks() {
-        handler.post { player.removePreviousItems() }
+    fun removePreviousTracks() = scope.launch {
+        player.removePreviousItems()
     }
 
-    fun skip(index: Int) {
-        handler.post { player.jumpToItem(index, player.isPlaying) }
+    fun skip(index: Int) = scope.launch {
+        player.jumpToItem(index, player.isPlaying)
     }
 
-    fun skipToNext() {
-        handler.post { player.next() }
+    fun skipToNext() = scope.launch {
+        player.next()
     }
 
-    fun skipToPrevious() {
-        handler.post { player.previous() }
+    fun skipToPrevious() = scope.launch {
+        player.previous()
     }
 
-    fun seekTo(seconds: Float) {
-        handler.post { player.seek((seconds * 1000).toLong(), TimeUnit.MILLISECONDS) }
+    fun seekTo(seconds: Float) = scope.launch {
+        player.seek((seconds * 1000).toLong(), TimeUnit.MILLISECONDS)
     }
 
-    fun getCurrentTrackIndex(callback: (Int) -> Unit) {
-        handler.post {
-            callback(player.currentIndex)
-        }
+    fun getCurrentTrackIndex(callback: (Int) -> Unit) = scope.launch {
+        callback(player.currentIndex)
     }
 
-    fun getRate(callback: (Float) -> Unit) {
-        handler.post {
-            callback(player.playbackSpeed)
-        }
+    fun getRate(callback: (Float) -> Unit) = scope.launch {
+        callback(player.playbackSpeed)
     }
 
-    fun setRate(value: Float) {
-        handler.post {
-            player.playbackSpeed = value
-        }
+    fun setRate(value: Float) = scope.launch {
+        player.playbackSpeed = value
     }
 
-    fun getRepeatMode(callback: (RepeatMode) -> Unit) {
-        handler.post {
-            callback(player.playerOptions.repeatMode)
-        }
+    fun getRepeatMode(callback: (RepeatMode) -> Unit) = scope.launch {
+        callback(player.playerOptions.repeatMode)
     }
 
-    fun setRepeatMode(value: RepeatMode) {
-        handler.post {
-            player.playerOptions.repeatMode = value
-        }
+    fun setRepeatMode(value: RepeatMode) = scope.launch {
+        player.playerOptions.repeatMode = value
     }
 
-    fun getVolume(callback: (Float) -> Unit) {
-        handler.post {
-            callback(player.volume)
-        }
+    fun getVolume(callback: (Float) -> Unit) = scope.launch {
+        callback(player.volume)
     }
 
-    fun setVolume(value: Float) {
-        handler.post {
-            player.volume = value
-        }
+    fun setVolume(value: Float) = scope.launch {
+        player.volume = value
     }
 
-    fun getDurationInSeconds(callback: (Double) -> Unit) {
-        handler.post {
-            callback(player.duration.toDouble() / 1000)
-        }
+    fun getDurationInSeconds(callback: (Double) -> Unit) = scope.launch {
+        callback(player.duration.toDouble() / 1000)
     }
 
-    fun getPositionInSeconds(callback: (Double) -> Unit) {
-        handler.post {
-            callback(player.position.toDouble() / 1000)
-        }
+    fun getPositionInSeconds(callback: (Double) -> Unit) = scope.launch {
+        callback(player.position.toDouble() / 1000)
     }
 
-    fun getBufferedPositionInSeconds(callback: (Double) -> Unit) {
-        handler.post {
-            callback(player.bufferedPosition.toDouble() / 1000)
-        }
+    fun getBufferedPositionInSeconds(callback: (Double) -> Unit) = scope.launch {
+        callback(player.bufferedPosition.toDouble() / 1000)
     }
 
-    fun updateMetadataForTrack(index: Int, track: Track) {
-        handler.post {
-            player.replaceItem(index, track.toAudioItem())
-        }
+    fun updateMetadataForTrack(index: Int, track: Track) = scope.launch {
+        player.replaceItem(index, track.toAudioItem())
     }
 
-    fun updateNotificationMetadata(title: String?, artist: String?, artwork: String?) {
-        handler.post {
-            player.notificationManager.notificatioMetadata = NotificationMetadata(title, artist, artwork)
-        }
+    fun updateNotificationMetadata(title: String?, artist: String?, artwork: String?) = scope.launch {
+        player.notificationManager.notificatioMetadata = NotificationMetadata(title, artist, artwork)
     }
 
-    fun clearNotificationMetadata() {
-        handler.post {
-            player.notificationManager.clearNotification()
-        }
+    fun clearNotificationMetadata() = scope.launch {
+        player.notificationManager.clearNotification()
     }
 
     private fun observeEvents() {
-        serviceScope.launch {
+        scope.launch {
             event.stateChange.collect {
                 val bundle = Bundle()
                 bundle.putInt(STATE_KEY, it.asLibState.ordinal)
@@ -325,19 +320,17 @@ class MusicService : HeadlessJsTaskService() {
             }
         }
 
-        serviceScope.launch {
+        scope.launch {
             event.audioItemTransition.collect {
-                handler.post {
-                    Bundle().apply {
-                        putDouble(POSITION_KEY, 0.0)
-                        putInt(NEXT_TRACK_KEY, player.currentIndex)
-                        emit(MusicEvents.PLAYBACK_TRACK_CHANGED, this)
-                    }
+                Bundle().apply {
+                    putDouble(POSITION_KEY, 0.0)
+                    putInt(NEXT_TRACK_KEY, player.currentIndex)
+                    emit(MusicEvents.PLAYBACK_TRACK_CHANGED, this)
                 }
             }
         }
 
-        serviceScope.launch {
+        scope.launch {
             event.onAudioFocusChanged.collect {
                 Bundle().apply {
                     putBoolean(IS_FOCUS_LOSS_PERMANENT_KEY, it.isFocusLostPermanently)
@@ -347,7 +340,7 @@ class MusicService : HeadlessJsTaskService() {
             }
         }
 
-        serviceScope.launch {
+        scope.launch {
             event.onNotificationButtonTapped.collect {
                 when (it) {
                     is PLAY -> emit(MusicEvents.BUTTON_PLAY)
@@ -378,7 +371,7 @@ class MusicService : HeadlessJsTaskService() {
             }
         }
 
-        serviceScope.launch {
+        scope.launch {
             event.notificationStateChange.collect {
                 when (it) {
                     is NotificationState.POSTED -> startForeground(
@@ -390,7 +383,7 @@ class MusicService : HeadlessJsTaskService() {
             }
         }
 
-        serviceScope.launch {
+        scope.launch {
             event.onMediaSessionCallbackTriggered.collect {
                 when (it) {
                     is MediaSessionCallback.RATING -> {
@@ -403,19 +396,17 @@ class MusicService : HeadlessJsTaskService() {
             }
         }
 
-        serviceScope.launch {
+        scope.launch {
             event.onPlaybackMetadata.collect {
-                handler.post {
-                    Bundle().apply {
-                        putString("source", it.source)
-                        putString("title", it.title)
-                        putString("url", it.url)
-                        putString("artist", it.artist)
-                        putString("album", it.album)
-                        putString("date", it.date)
-                        putString("genre", it.genre)
-                        emit(MusicEvents.PLAYBACK_METADATA, this)
-                    }
+                Bundle().apply {
+                    putString("source", it.source)
+                    putString("title", it.title)
+                    putString("url", it.url)
+                    putString("artist", it.artist)
+                    putString("album", it.album)
+                    putString("date", it.date)
+                    putString("genre", it.genre)
+                    emit(MusicEvents.PLAYBACK_METADATA, this)
                 }
             }
         }
@@ -451,11 +442,12 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     override fun onDestroy() {
-        handler.post {
-            if (this::player.isInitialized) {
+        scope.launch {
+            if (this@MusicService::player.isInitialized) {
                 player.destroy()
             }
-            handler.removeMessages(0)
+
+            scope.cancel()
         }
 
         super.onDestroy()

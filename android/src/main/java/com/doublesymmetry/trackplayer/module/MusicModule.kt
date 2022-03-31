@@ -7,7 +7,6 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.RatingCompat
-import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.Capability
 import com.doublesymmetry.kotlinaudio.models.RepeatMode
@@ -23,6 +22,7 @@ import com.google.android.exoplayer2.DefaultLoadControl.*
 import com.google.android.exoplayer2.Player
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
+import timber.log.Timber
 import javax.annotation.Nonnull
 
 /**
@@ -223,7 +223,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
     @ReactMethod
     fun isServiceRunning(callback: Promise) {
-        callback.resolve(isServiceBound);
+        callback.resolve(isServiceBound)
     }
 
     @ReactMethod
@@ -310,7 +310,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
                     // We do not allow removal of the current item
                     if (index == it) {
-                        Log.e(TAG, "This track is currently playing, so it can't be removed")
+                        Timber.e("This track is currently playing, so it can't be removed")
                         return@getCurrentTrackIndex
                     } else if (index >= 0 && index < queue.size) {
                         musicService.remove(index)
@@ -449,16 +449,14 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     fun getVolume(callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
 
-        musicService.getVolume {
-            callback.resolve(it)
-        }
+        musicService.getVolume { callback.resolve(it) }
     }
 
     @ReactMethod
     fun setRate(rate: Float, callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
 
-        musicService.setRate(rate);
+        musicService.setRate(rate)
         callback.resolve(null)
     }
 
