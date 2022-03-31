@@ -22,7 +22,6 @@ import com.facebook.react.bridge.Promise
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
@@ -31,6 +30,7 @@ class MusicService : HeadlessJsTaskService() {
     private lateinit var player: QueuedAudioPlayer
     private val handler = Handler(Looper.getMainLooper())
     private val binder = MusicBinder()
+    private val scope = MainScope()
 
     var stopWithApp = false
         private set
@@ -229,7 +229,7 @@ class MusicService : HeadlessJsTaskService() {
         player.pause()
     }
 
-    fun stop() = scope.launch {
+    fun stopPlayer() = scope.launch {
         player.stop()
     }
 
@@ -302,7 +302,7 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     fun updateNotificationMetadata(title: String?, artist: String?, artwork: String?) = scope.launch {
-        player.notificationManager.notificatioMetadata = NotificationMetadata(title, artist, artwork)
+        player.notificationManager.notificationMetadata = NotificationMetadata(title, artist, artwork)
     }
 
     fun clearNotificationMetadata() = scope.launch {
@@ -446,7 +446,7 @@ class MusicService : HeadlessJsTaskService() {
         // Player will continue running if this is true, even if the app itself is killed.
         if (!forceDestroy && !stopWithApp) return
 
-        serviceScope.cancel()
+        scope.cancel()
 
         stopPlayer()
         stopForeground(false)
