@@ -287,6 +287,12 @@ public class RNTrackPlayer: RCTEventEmitter {
         resolve(NSNull())
     }
 
+    @objc(isServiceRunning:rejecter:)
+    public func isServiceRunning(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        // TODO That is probably always true
+        resolve(player != nil)
+    }
+
     @objc(destroy:rejecter:)
     public func destroy(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
@@ -768,10 +774,8 @@ public class RNTrackPlayer: RCTEventEmitter {
         }
 
         // fire an event for the same track starting again
-        switch player.repeatMode {
-        case .track:
+        if player.items.count != 0 && player.repeatMode == .track {
             handleAudioPlayerQueueIndexChange(previousIndex: player.currentIndex, nextIndex: player.currentIndex)
-        default: break
         }
     }
 
