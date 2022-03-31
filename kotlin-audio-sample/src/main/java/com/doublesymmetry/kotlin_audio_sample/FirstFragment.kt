@@ -16,7 +16,6 @@ import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
 import com.doublesymmetry.kotlinaudio.models.NotificationButton
 import com.doublesymmetry.kotlinaudio.models.NotificationConfig
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -27,7 +26,6 @@ class FirstFragment : Fragment() {
     private var _binding: FragmentFirstBinding? = null
     private val binding get() = _binding!!
 
-    private val serviceScope = MainScope()
     private lateinit var player: QueuedAudioPlayer
 
     override fun onCreateView(
@@ -67,10 +65,9 @@ class FirstFragment : Fragment() {
         observeEvents()
     }
 
-    @SuppressLint("SetTextI18n")
     private fun observeEvents() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     player.event.stateChange.collect {
                         when (it) {
@@ -95,7 +92,6 @@ class FirstFragment : Fragment() {
                 }
 
                 launch {
-                    serviceScope.launch {
                         player.event.onNotificationButtonTapped.collect {
                             when (it) {
                                 is NotificationButton.PLAY -> player.play()
@@ -106,18 +102,19 @@ class FirstFragment : Fragment() {
                             }
                         }
                     }
-                }
             }
         }
     }
 
     private fun setupNotification() {
-        val notificationConfig = NotificationConfig(listOf(
-            NotificationButton.PLAY(),
-            NotificationButton.PAUSE(),
-            NotificationButton.NEXT(),
-            NotificationButton.PREVIOUS()
-        ), null, null, null)
+        val notificationConfig = NotificationConfig(
+            listOf(
+                NotificationButton.PLAY(),
+                NotificationButton.PAUSE(),
+                NotificationButton.NEXT(),
+                NotificationButton.PREVIOUS()
+            ), null, null, null
+        )
         player.notificationManager.createNotification(notificationConfig)
     }
 

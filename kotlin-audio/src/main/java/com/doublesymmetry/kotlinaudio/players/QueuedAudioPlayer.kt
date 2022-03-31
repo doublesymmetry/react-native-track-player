@@ -172,7 +172,7 @@ class QueuedAudioPlayer(context: Context, bufferConfig: BufferConfig? = null, ca
         queue[index] = mediaSource
 
         if (currentIndex == index && automaticallyUpdateNotificationMetadata)
-            notificationManager.notificatioMetadata = NotificationMetadata(item.title, item.artist, item.artwork)
+            notificationManager.notificationMetadata = NotificationMetadata(item.title, item.artist, item.artwork)
     }
 
     /**

@@ -37,7 +37,7 @@ class NotificationManager internal constructor(private val context: Context, pri
 
     private val channelId: String
 
-    var notificatioMetadata: NotificationMetadata? = null
+    var notificationMetadata: NotificationMetadata? = null
         set(value) {
             field = value
             internalManager?.invalidate()
@@ -179,15 +179,15 @@ class NotificationManager internal constructor(private val context: Context, pri
 
         descriptionAdapter = DescriptionAdapter(object: NotificationMetadataProvider {
             override fun getTitle(): String? {
-                return notificatioMetadata?.title
+                return notificationMetadata?.title
             }
 
             override fun getArtist(): String? {
-                return notificatioMetadata?.artist
+                return notificationMetadata?.artist
             }
 
             override fun getArtworkUrl(): String? {
-                return notificatioMetadata?.artworkUrl
+                return notificationMetadata?.artworkUrl
             }
         }, context, config.pendingIntent)
 
@@ -262,7 +262,7 @@ class NotificationManager internal constructor(private val context: Context, pri
 
     override fun onNotificationPosted(notificationId: Int, notification: Notification, ongoing: Boolean) {
         scope.launch {
-            event.updateNotificationState(NotificationState.POSTED(notificationId, notification))
+            event.updateNotificationState(NotificationState.POSTED(notificationId, notification, ongoing))
         }
     }
 
