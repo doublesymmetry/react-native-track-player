@@ -386,14 +386,11 @@ class MusicService : HeadlessJsTaskService() {
 
         scope.launch {
             event.notificationStateChange.collect {
-                when (it) {
-                    is NotificationState.POSTED -> {
-                        if (!hasStartedForeground) {
-                            startForeground(it.notificationId, it.notification)
-                            hasStartedForeground = true
-                        }
+                if (it is NotificationState.POSTED) {
+                    if (!hasStartedForeground) {
+                        startForeground(it.notificationId, it.notification)
+                        hasStartedForeground = true
                     }
-//                    is NotificationState.CANCELLED -> stopForeground(true)
                 }
             }
         }
@@ -451,25 +448,10 @@ class MusicService : HeadlessJsTaskService() {
         // Player will continue running if this is true, even if the app itself is killed.
         if (!forceDestroy && !stopWithApp) return
 
-//        scope.cancel()
-
-//        stopPlayer()
         destroyPlayer()
         stopForeground(false)
         stopSelf()
     }
-//
-//    override fun onDestroy() {
-//        scope.launch {
-//            if (this@MusicService::player.isInitialized) {
-//                player.destroy()
-//            }
-//
-//            scope.cancel()
-//        }
-//
-//        super.onDestroy()
-//    }
 
     inner class MusicBinder : Binder() {
         val service = this@MusicService
@@ -502,6 +484,6 @@ class MusicService : HeadlessJsTaskService() {
         const val IS_FOCUS_LOSS_PERMANENT_KEY = "permanent"
         const val IS_PAUSED_KEY = "paused"
 
-        const val TIMEOUT_MILLIS = 50000L
+        const val TIMEOUT_MILLIS = 5000L
     }
 }
