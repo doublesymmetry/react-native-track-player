@@ -2,7 +2,10 @@ package com.doublesymmetry.trackplayer.service
 
 import android.app.PendingIntent
 import android.content.Intent
-import android.os.*
+import android.os.Binder
+import android.os.Build
+import android.os.Bundle
+import android.os.IBinder
 import android.support.v4.media.RatingCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.*
@@ -21,14 +24,13 @@ import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
+
 
 class MusicService : HeadlessJsTaskService() {
     private var hasStartedForeground = false
     private lateinit var player: QueuedAudioPlayer
-    private val handler = Handler(Looper.getMainLooper())
     private val binder = MusicBinder()
     private val scope = MainScope()
 
@@ -56,7 +58,7 @@ class MusicService : HeadlessJsTaskService() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startTask(getTaskConfig(intent))
-        return START_STICKY_COMPATIBILITY
+        return START_STICKY
     }
 
     fun setupPlayer(playerOptions: Bundle?, promise: Promise?) {
@@ -233,6 +235,10 @@ class MusicService : HeadlessJsTaskService() {
         player.stop()
     }
 
+    private fun destroyPlayer() = scope.launch {
+        player.destroy()
+    }
+
     fun removeUpcomingTracks() = scope.launch {
         player.removeUpcomingItems()
     }
@@ -387,7 +393,7 @@ class MusicService : HeadlessJsTaskService() {
                             hasStartedForeground = true
                         }
                     }
-                    is NotificationState.CANCELLED -> stopForeground(true)
+//                    is NotificationState.CANCELLED -> stopForeground(true)
                 }
             }
         }
@@ -429,41 +435,41 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     override fun getTaskConfig(intent: Intent?): HeadlessJsTaskConfig {
-        return HeadlessJsTaskConfig(TASK_KEY, Arguments.createMap(), 5000, true)
+        return HeadlessJsTaskConfig(TASK_KEY, Arguments.createMap(), TIMEOUT_MILLIS, true)
     }
 
     override fun onBind(intent: Intent?): IBinder {
         return binder
     }
 
-//    override fun onUnbind(intent: Intent?): Boolean {
-//        destroyIfAllowed(true)
-//        return false
-//    }
+    override fun onUnbind(intent: Intent?): Boolean {
+        return false
+    }
 
     // TODO: #AEX-45 forceDestroy is needed when calling destroy() manually. Find an alternative solution that does not require a second flag.
     fun destroyIfAllowed(forceDestroy: Boolean = false) {
         // Player will continue running if this is true, even if the app itself is killed.
         if (!forceDestroy && !stopWithApp) return
 
-        scope.cancel()
+//        scope.cancel()
 
-        stopPlayer()
+//        stopPlayer()
+        destroyPlayer()
         stopForeground(false)
         stopSelf()
     }
-
-    override fun onDestroy() {
-        scope.launch {
-            if (this@MusicService::player.isInitialized) {
-                player.destroy()
-            }
-
-            scope.cancel()
-        }
-
-        super.onDestroy()
-    }
+//
+//    override fun onDestroy() {
+//        scope.launch {
+//            if (this@MusicService::player.isInitialized) {
+//                player.destroy()
+//            }
+//
+//            scope.cancel()
+//        }
+//
+//        super.onDestroy()
+//    }
 
     inner class MusicBinder : Binder() {
         val service = this@MusicService
@@ -495,5 +501,7 @@ class MusicService : HeadlessJsTaskService() {
 
         const val IS_FOCUS_LOSS_PERMANENT_KEY = "permanent"
         const val IS_PAUSED_KEY = "paused"
+
+        const val TIMEOUT_MILLIS = 50000L
     }
 }

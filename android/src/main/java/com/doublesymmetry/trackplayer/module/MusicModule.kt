@@ -1,17 +1,15 @@
 package com.doublesymmetry.trackplayer.module
 
 import android.app.Activity
-import android.app.Application
 import android.content.*
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.RatingCompat
-import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.Capability
 import com.doublesymmetry.kotlinaudio.models.RepeatMode
 import com.doublesymmetry.trackplayer.extensions.asLibState
-import com.doublesymmetry.trackplayer.interfaces.LifecycleEventsListener
+import com.doublesymmetry.trackplayer.interfaces.ActivityLifecycleCallbacksAdapter
 import com.doublesymmetry.trackplayer.model.State
 import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
@@ -27,9 +25,8 @@ import javax.annotation.Nonnull
 
 /**
  * @author Milen Pivchev @mpivchev
- *
  */
-class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), ServiceConnection, LifecycleEventsListener, Application.ActivityLifecycleCallbacks {
+class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), ServiceConnection, ActivityLifecycleCallbacksAdapter {
     private var binder: MusicService.MusicBinder? = null
     private var eventHandler: MusicEvents? = null
     private var playerOptions: Bundle? = null
@@ -38,61 +35,26 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
     private lateinit var musicService: MusicService
 
+    val context = reactContext
+
     @Nonnull
     override fun getName(): String {
         return "TrackPlayerModule"
     }
 
     override fun initialize() {
-
         currentActivity?.application?.registerActivityLifecycleCallbacks(this)
-        val context: ReactContext = reactApplicationContext
-        context.addLifecycleEventListener(this)
         Logger.addLogAdapter(AndroidLogAdapter())
     }
 
-    override fun onActivityCreated(p0: Activity, p1: Bundle?) {
-        Log.d("TEST", "TEST")
+    override fun onActivityStopped(activity: Activity) {
+        // Service MUST be unbound during activity onStop
+        unbindServiceIfAllowed()
     }
 
-    override fun onActivityStarted(p0: Activity) {
-        Log.d("TEST", "TEST")
-    }
-
-    override fun onActivityResumed(p0: Activity) {
-    }
-
-    override fun onActivityPaused(p0: Activity) {
-    }
-
-    override fun onActivityStopped(p0: Activity) {
+    override fun onActivityDestroyed(activity: Activity) {
+        // Service MUST be destroyed during activity onDestroy
         destroyServiceIfAllowed()
-    }
-
-    override fun onActivitySaveInstanceState(p0: Activity, p1: Bundle) {
-    }
-
-    override fun onActivityDestroyed(p0: Activity) {
-        TODO("Not yet implemented")
-    }
-
-    //    /**
-//     * Called when the React module is destroyed.
-//     */
-//    override fun invalidate() {
-//        if (!isServiceBound) return
-//
-//        unbindService()
-//        musicService.destroyIfAllowed(true)
-//    }
-
-    /**
-     * Called when host activity receives destroy event (e.g. {@link Activity#onDestroy}. Only called
-     * for the last React activity to be destroyed.
-     */
-    override fun onHostDestroy() {
-//        unbindService()
-//        destroyServiceIfAllowed()
     }
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
@@ -107,7 +69,6 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
      * Called when a connection to the Service has been lost.
      */
     override fun onServiceDisconnected(name: ComponentName) {
-        musicService.destroyIfAllowed()
         isServiceBound = false
     }
 
@@ -126,18 +87,14 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         return false
     }
 
-    private fun unbindService() {
+    private fun unbindServiceIfAllowed() {
+        if (!musicService.stopWithApp) return
+
         // The music service will not stop unless we unbind it first.
         if (isServiceBound) {
-            reactApplicationContext.unbindService(this)
+            context.unbindService(this)
             binder = null
             isServiceBound = false
-        }
-
-        if (eventHandler != null) {
-            val manager = LocalBroadcastManager.getInstance(reactApplicationContext)
-            manager.unregisterReceiver(eventHandler!!)
-            eventHandler = null
         }
     }
 
@@ -160,7 +117,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         constants["CAPABILITY_JUMP_BACKWARD"] = Capability.JUMP_BACKWARD.ordinal
 
         // States
-        constants["STATE_NONE"] = State.None.ordinal
+        constants["STATE_NONE"] = State.Idle.ordinal
         constants["STATE_READY"] = State.Ready.ordinal
         constants["STATE_PLAYING"] = State.Playing.ordinal
         constants["STATE_PAUSED"] = State.Paused.ordinal
@@ -235,19 +192,19 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         playerSetUpPromise = promise
         playerOptions = bundledData
 
-        val context: ReactContext = reactApplicationContext
 
         val manager = LocalBroadcastManager.getInstance(context)
         eventHandler = MusicEvents(context)
         manager.registerReceiver(eventHandler!!, IntentFilter(EVENT_INTENT))
 
         Intent(context, MusicService::class.java).also { intent ->
-            context.bindService(intent, this, Context.BIND_AUTO_CREATE)
             context.startService(intent)
+            context.bindService(intent, this, Context.BIND_AUTO_CREATE)
         }
     }
 
     @ReactMethod
+    @Deprecated("Backwards compatible function from the old android implementation. Should be removed in V3")
     fun isServiceRunning(callback: Promise) {
         callback.resolve(isServiceBound)
     }
@@ -255,21 +212,17 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     @ReactMethod
     fun destroy(callback: Promise) {
         if (verifyServiceBoundOrReject(callback)) return
-
-//        unbindService()
-//        musicService.destroyIfAllowed(true)
-        destroyServiceIfAllowed()
+        // This function can only be called manually, so we force the service to be destroyed.
+        destroyServiceIfAllowed(true)
     }
 
     /**
      * Destroy the music service if it's configured to stop with the activities.
      * @see [MusicService.stopWithApp]
      */
-    private fun destroyServiceIfAllowed() {
+    private fun destroyServiceIfAllowed(forceDestroy: Boolean = false) {
         if (!musicService.stopWithApp) return
-
-        unbindService()
-        musicService.destroyIfAllowed()
+        musicService.destroyIfAllowed(forceDestroy)
     }
 
     @ReactMethod
@@ -299,7 +252,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
         bundleList.forEach {
             if (it is Bundle) {
-                tracks.add(Track(reactApplicationContext, it, musicService.ratingType))
+                tracks.add(Track(context, it, musicService.ratingType))
             } else {
                 callback.reject("invalid_track_object", "Track was not a dictionary type")
             }
@@ -357,7 +310,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         if (index < 0 || index >= musicService.tracks.size) {
             callback.reject("index_out_of_bounds", "The index is out of bounds")
         } else {
-            val context: ReactContext = reactApplicationContext
+            val context: ReactContext = context
             val track = musicService.tracks[index]
             track.setMetadata(context, Arguments.toBundle(map), musicService.ratingType)
             musicService.updateMetadataForTrack(index, track)
@@ -372,7 +325,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         if (musicService.tracks.isEmpty())
             callback.reject("no_current_item", "There is no current item in the player")
 
-        val context: ReactContext = reactApplicationContext
+        val context: ReactContext = context
         val metadata = Arguments.toBundle(map)
         musicService.updateNotificationMetadata(
                 metadata?.getString("title"),
@@ -573,13 +526,9 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         if (verifyServiceBoundOrReject(callback)) return
 
         if (!::musicService.isInitialized) {
-            callback.resolve(State.None.ordinal)
+            callback.resolve(State.Idle.ordinal)
         } else {
             callback.resolve(musicService.event.stateChange.value.asLibState.ordinal)
         }
-    }
-
-    companion object {
-        val TAG: String = MusicModule::class.java.simpleName
     }
 }
