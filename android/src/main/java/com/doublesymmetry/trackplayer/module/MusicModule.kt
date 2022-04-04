@@ -27,7 +27,6 @@ import javax.annotation.Nonnull
  * @author Milen Pivchev @mpivchev
  */
 class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), ServiceConnection, ActivityLifecycleCallbacksAdapter {
-    private var binder: MusicService.MusicBinder? = null
     private var eventHandler: MusicEvents? = null
     private var playerOptions: Bundle? = null
     private var isServiceBound = false
@@ -47,9 +46,17 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         Logger.addLogAdapter(AndroidLogAdapter())
     }
 
+    override fun onActivityStarted(activity: Activity) {
+        if (isServiceBound) return
+
+        Intent(context, MusicService::class.java).also { intent ->
+            context.bindService(intent, this, Context.BIND_AUTO_CREATE)
+        }
+    }
+
     override fun onActivityStopped(activity: Activity) {
         // Service MUST be unbound during activity onStop
-        unbindServiceIfAllowed()
+        unbindService()
     }
 
     override fun onActivityDestroyed(activity: Activity) {
@@ -58,9 +65,12 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
-        val binder: MusicService.MusicBinder = service as MusicService.MusicBinder
-        musicService = binder.service
-        musicService.setupPlayer(playerOptions, playerSetUpPromise)
+        // If a binder already exists, don't get a new one
+        if (!::musicService.isInitialized) {
+            val binder: MusicService.MusicBinder = service as MusicService.MusicBinder
+            musicService = binder.service
+            musicService.setupPlayer(playerOptions, playerSetUpPromise)
+        }
 
         isServiceBound = true
     }
@@ -87,13 +97,10 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         return false
     }
 
-    private fun unbindServiceIfAllowed() {
-        if (!musicService.stopWithApp) return
-
+    private fun unbindService() {
         // The music service will not stop unless we unbind it first.
         if (isServiceBound) {
             context.unbindService(this)
-            binder = null
             isServiceBound = false
         }
     }
