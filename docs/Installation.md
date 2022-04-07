@@ -95,5 +95,23 @@ You can also use [jetifier](https://github.com/mikehardy/jetifier#usage-for-sour
 
 Since API 28, Android disables traffic without TLS. To fix the issue you have to use `https` or [enable clear text traffic](https://stackoverflow.com/a/50834600).
 
+### Android: `Could not determine the dependencies of task ':react-native-track-player:compileDebugAidl'.`
+See issue [https://github.com/doublesymmetry/react-native-track-player/issues/1235](https://github.com/doublesymmetry/react-native-track-player/issues/1235).
+The current version of ExoPlayer is not in maven, so we have to manually add jcenter back to `android/build.gradle`
+```
+allprojects {
+    repositories {
+        ...
+        jcenter() {
+            content {
+                includeGroup("com.google.android.exoplayer")
+            }
+        }
+        ...
+
+    }
+}
+```
+
 ## Next
 You can choose the build preferences for your app using `track-player.json`. See more [here](Build-Preferences.md).
