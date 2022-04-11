@@ -4,20 +4,19 @@
   <PropertyGroup Label="Microsoft.ReactNative Experimental Features">
     
     <!--
+      Enables default usage of Hermes.
+      
+      See https://microsoft.github.io/react-native-windows/docs/hermes
+    -->
+    <UseHermes>false</UseHermes>
+
+    <!--
       Changes compilation to assume use of WinUI 3 instead of System XAML.
       Requires creation of new project.
 
       See https://microsoft.github.io/react-native-windows/docs/winui3
     -->
     <UseWinUI3>false</UseWinUI3>
-
-    <!--
-      Compiles Hermes-related code and sets it to the default JS engine.
-      Requires the "ReactNative.Hermes.Windows" NuGet package.
-      
-      See https://microsoft.github.io/react-native-windows/docs/hermes
-    -->
-    <UseHermes>false</UseHermes>
   
   </PropertyGroup>
 

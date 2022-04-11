@@ -11,8 +11,96 @@ To install release candidates run `yarn add react-native-track-player@next`
 * None.
 
 ##### Bug Fixes
+* None.
+
+## 2.1.3 (30.03.21)
+
+##### Enhancements
+
+* Add property `isLiveStream` to `Track` for correct display in iOS control center.
+  [dcvz](https://github.com/dcvz)
+
+* [iOS] Improve method documentation
+  [alpha0010](https://github.com/alpha0010)
+
+* [Android] Add isServiceRunning method
+  [biomancer](https://github.com/biomancer)
+
+##### Bug Fixes
+
+* [iOS] Fix track loop crash in certain cases
+  [mmmoussa](https://github.com/mmmoussa)
+
+* [iOS] Fix seek after play
+  [jspizziri](https://github.com/jspizziri)
+
+* [Android] Support Android 12 devices
+  [abhaydee](https://github.com/abhaydee)
+
+* [iOS] Add method resolves promise with index
+  [formula1](https://github.com/formula1)
+
+* Fix getTrack return type
+  [puckey](https://github.com/puckey)
+
+* [iOS] Fix ambient session not working
+  [grubicv](https://github.com/grubicv)
+
+* [Android] Android 12 and higher bug fix
+  [martin-richter-uk](https://github.com/martin-richter-uk)
+
+* [iOS] Update SwiftAudioEx to 0.14.6 to avoid LICENSE warning
+  [dcvz](https://github.com/dcvz)
+
+* Make react-native-windows and optional peer dependency (#1324).
+  [jspizziri](https://github.com/jspizziri)
+
+## 2.1.2 (25.10.21)
+
+##### Enhancements
 
 * None.
+
+##### Bug Fixes
+
+* Update SwiftAudioEx - Fixes issues with flickering notifications + pause between loads
+
+* Fix cyclic require warning regression
+  [#1057](https://github.com/DoubleSymmetry/react-native-track-player/issues/1057)
+
+* [ios] Fix `PlaybackQueueEnded` event to be called only when the track ends
+  [#1243](https://github.com/DoubleSymmetry/react-native-track-player/issues/1243)
+
+## 2.1.1 (25.09.21)
+
+##### Enhancements
+
+* [ios] Fix getCurrentTrack returns undefined instead of null
+* [ios] Fix getTrack returning undefined instead of nil
+* Fix an issue with next/previous in the control center stopping playing on iOS15
+
+##### Bug Fixes
+
+* None.
+
+## 2.1.0 (16.09.21)
+
+##### Enhancements
+
+* None.
+
+##### Bug Fixes
+
+* Remove Support for iOS 10 & Support Xcode 13
+  [dcvz](https://github.com/dcvz)
+  [#1186](https://github.com/DoubleSymmetry/react-native-track-player/issues/1186)
+  - **NOTE: Requires minimum deployment target to be updated to iOS 11.**
+
+* Reset initialization on destroy
+  [sreten-bild](https://github.com/sreten-bild)
+
+* Fix `onTaskRemoved` NullPointerException
+  [Markario](https://github.com/Markario)
 
 ## 2.0.3 (19.08.21)
 

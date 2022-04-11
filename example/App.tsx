@@ -24,10 +24,16 @@ import playlistData from './react/data/playlist.json';
 // @ts-ignore
 import localTrack from './react/resources/pure.m4a';
 
-const setup = async () => {
+const setupIfNecessary = async () => {
+  // if app was relaunched and music was already playing, we don't setup again.
+  const currentTrack = await TrackPlayer.getCurrentTrack();
+  if (currentTrack !== null) {
+    return;
+  }
+
   await TrackPlayer.setupPlayer({});
   await TrackPlayer.updateOptions({
-    stopWithApp: true,
+    stopWithApp: false,
     capabilities: [
       Capability.Play,
       Capability.Pause,
@@ -55,7 +61,7 @@ const togglePlayback = async (playbackState: State) => {
   if (currentTrack == null) {
     // TODO: Perhaps present an error or restart the playlist?
   } else {
-    if (playbackState === State.Paused) {
+    if (playbackState !== State.Playing) {
       await TrackPlayer.play();
     } else {
       await TrackPlayer.pause();
@@ -71,35 +77,21 @@ const App = () => {
   const [trackTitle, setTrackTitle] = useState<string>();
   const [trackArtist, setTrackArtist] = useState<string>();
 
-  useTrackPlayerEvents(
-    [
-      Event.PlaybackQueueEnded,
-      Event.PlaybackTrackChanged,
-      Event.RemotePlay,
-      Event.RemotePause,
-    ],
-    async event => {
-      if (
-        event.type === Event.PlaybackTrackChanged &&
-        event.nextTrack !== undefined
-      ) {
-        const track = await TrackPlayer.getTrack(event.nextTrack);
-        const {title, artist, artwork} = track || {};
-        setTrackTitle(title);
-        setTrackArtist(artist);
-        setTrackArtwork(artwork);
-      } else if (event.type === Event.RemotePause) {
-        TrackPlayer.pause();
-      } else if (event.type === Event.RemotePlay) {
-        TrackPlayer.play();
-      } else if (event.type === Event.PlaybackQueueEnded) {
-        console.log('Event.PlaybackQueueEnded fired.');
-      }
-    },
-  );
+  useTrackPlayerEvents([Event.PlaybackTrackChanged], async event => {
+    if (
+      event.type === Event.PlaybackTrackChanged &&
+      event.nextTrack !== undefined
+    ) {
+      const track = await TrackPlayer.getTrack(event.nextTrack);
+      const {title, artist, artwork} = track || {};
+      setTrackTitle(title);
+      setTrackArtist(artist);
+      setTrackArtwork(artwork);
+    }
+  });
 
   useEffect(() => {
-    setup();
+    setupIfNecessary();
   }, []);
 
   return (

@@ -209,6 +209,7 @@ export interface TrackMetadataBase {
   genre?: string
   date?: string
   rating?: number | boolean
+  isLiveStream?: boolean
 }
 
 export interface NowPlayingMetadata extends TrackMetadataBase {
@@ -221,6 +222,8 @@ export interface Track extends TrackMetadataBase {
   userAgent?: string
   contentType?: string
   pitchAlgorithm?: PitchAlgorithm
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  headers?: { [key: string]: any }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any
 }

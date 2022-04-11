@@ -195,9 +195,9 @@ public class RNTrackPlayer: RCTEventEmitter {
         // Progressively opt into AVAudioSession policies for background audio
         // and AirPlay 2.
         if #available(iOS 13.0, *) {
-            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: .longFormAudio, options: sessionCategoryOptions)
+            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: sessionCategory == .ambient ? .default : .longFormAudio, options: sessionCategoryOptions)
         } else if #available(iOS 11.0, *) {
-            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: .longForm, options: sessionCategoryOptions)
+            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: sessionCategory == .ambient ? .default : .longForm, options: sessionCategoryOptions)
         } else {
             try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, options: sessionCategoryOptions)
         }
@@ -286,12 +286,19 @@ public class RNTrackPlayer: RCTEventEmitter {
         resolve(NSNull())
     }
 
+    @objc(isServiceRunning:rejecter:)
+    public func isServiceRunning(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        // TODO That is probably always true
+        resolve(player != nil)
+    }
+
     @objc(destroy)
     public func destroy() {
         print("Destroying player")
         self.player.stop()
         self.player.nowPlayingInfoController.clear()
         try? AVAudioSession.sharedInstance().setActive(false)
+        hasInitialized = false
     }
 
     @objc(updateOptions:resolver:rejecter:)
@@ -330,15 +337,17 @@ public class RNTrackPlayer: RCTEventEmitter {
             tracks.append(track)
         }
 
+        var index: Int = 0
         if (trackIndex.intValue > player.items.count) {
             reject("index_out_of_bounds", "The track index is out of bounds", nil)
         } else if trackIndex.intValue == -1 { // -1 means no index was passed and therefore should be inserted at the end.
+            index = player.items.count
             try? player.add(items: tracks, playWhenReady: false)
         } else {
+            index = trackIndex.intValue
             try? player.add(items: tracks, at: trackIndex.intValue)
         }
-
-        resolve(NSNull())
+        resolve(index)
     }
 
     @objc(remove:resolver:rejecter:)
@@ -478,7 +487,7 @@ public class RNTrackPlayer: RCTEventEmitter {
             let track = player.items[index.intValue]
             resolve((track as? Track)?.toObject())
         } else {
-            resolve(nil)
+            resolve(NSNull())
         }
     }
 
@@ -491,9 +500,12 @@ public class RNTrackPlayer: RCTEventEmitter {
     @objc(getCurrentTrack:rejecter:)
     public func getCurrentTrack(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         let index = player.currentIndex
-        let adjustedIndex = index < 0 || index >= player.items.count ? nil : index;
 
-        resolve(adjustedIndex)
+        if index < 0 || index >= player.items.count {
+            resolve(NSNull())
+        } else {
+            resolve(index)
+        }
     }
 
     @objc(getDuration:rejecter:)
@@ -621,7 +633,7 @@ public class RNTrackPlayer: RCTEventEmitter {
 
     func handleAudioPlayerPlaybackEnded(reason: PlaybackEndedReason) {
         // fire an event for the queue ending
-        if player.nextItems.count == 0 {
+        if player.nextItems.count == 0 && reason == PlaybackEndedReason.playedUntilEnd {
             sendEvent(withName: "playback-queue-ended", body: [
                 "track": player.currentIndex,
                 "position": player.currentTime,
@@ -629,10 +641,8 @@ public class RNTrackPlayer: RCTEventEmitter {
         }
 
         // fire an event for the same track starting again
-        switch player.repeatMode {
-        case .track:
+        if player.items.count != 0 && player.repeatMode == .track {
             handleAudioPlayerQueueIndexChange(previousIndex: player.currentIndex, nextIndex: player.currentIndex)
-        default: break
         }
     }
 
@@ -641,6 +651,17 @@ public class RNTrackPlayer: RCTEventEmitter {
 
         if let previousIndex = previousIndex { dictionary["track"] = previousIndex }
         if let nextIndex = nextIndex { dictionary["nextTrack"] = nextIndex }
+
+        // Load isLiveStream option for track
+        var isTrackLiveStream = false
+        if let nextIndex = nextIndex {
+            let track = player.items[nextIndex]
+            isTrackLiveStream = (track as? Track)?.isLiveStream ?? false
+        }
+
+        if player.automaticallyUpdateNowPlayingInfo {
+            player.nowPlayingInfoController.set(keyValue: NowPlayingInfoProperty.isLiveStream(isTrackLiveStream))
+        }
 
         sendEvent(withName: "playback-track-changed", body: dictionary)
     }

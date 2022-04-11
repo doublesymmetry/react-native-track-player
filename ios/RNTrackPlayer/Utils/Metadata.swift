@@ -36,6 +36,10 @@ struct Metadata {
         if let elapsedTime = metadata["elapsedTime"] as? Double {
             ret.append(NowPlayingInfoProperty.elapsedPlaybackTime(elapsedTime))
         }
+
+        if let isLiveStream = metadata["isLiveStream"] as? Bool {
+            ret.append(NowPlayingInfoProperty.isLiveStream(isLiveStream))
+        }
         
         player.nowPlayingInfoController.set(keyValues: ret)
         
