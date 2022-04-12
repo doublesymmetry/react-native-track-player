@@ -13,7 +13,7 @@ To install release candidates run `yarn add react-native-track-player@next`
 ##### Bug Fixes
 * None.
 
-## 2.1.3 (30.03.21)
+## 2.1.3 (30.03.22)
 
 ##### Enhancements
 
