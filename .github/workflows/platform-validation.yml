@@ -1,5 +1,17 @@
 name: platform-validation
-on: [push]
+on:
+  pull_request:
+    branches:
+      - main
+      - 'feature/**'
+    paths-ignore:
+      - 'docs/**'
+  push:
+    branches:
+      - main
+      - 'feature/**'
+    paths-ignore:
+      - 'docs/**'
 concurrency: 
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -81,26 +93,4 @@ jobs:
         run: |-
           cd example/ios
           xcodebuild build -workspace example.xcworkspace -scheme example -destination 'platform=iOS Simulator,name=iPhone 12 Pro'
-  build-windows:
-    runs-on: windows-latest
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v2
-      - name: Setup Node
-        uses: actions/setup-node@v2
-        with:
-          node-version: '12.18.3'
-      - name: Cache JS Dependencies
-        uses: c-hive/gha-yarn-cache@v1
-      - name: Install Library Dependencies
-        run: yarn install
-      - name: Build Library
-        run: yarn build
-      - name: Install Windows Example Dependencies
-        run: |-
-          cd example
-          yarn install
-      - name: Build App
-        run: |-
-          cd example
-          yarn windows --no-deploy --no-launch --no-packager --logging
+  
