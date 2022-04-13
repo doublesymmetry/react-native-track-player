@@ -232,6 +232,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
         musicService.destroyIfAllowed(true)
         unbindFromService()
+        callback.resolve(null)
     }
 
     private fun destroyIfAllowed() {
