@@ -11,18 +11,20 @@ import MediaPlayer
 import SwiftAudioEx
 
 @objc(RNTrackPlayer)
-public class RNTrackPlayer: RCTEventEmitter {
+public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     // MARK: - Attributes
 
     private var hasInitialized = false
     private let player = QueuedAudioPlayer()
+    private let audioSessionController = AudioSessionController.shared
 
     // MARK: - Lifecycle Methods
 
     public override init() {
         super.init()
 
+        audioSessionController.delegate = self
         player.event.playbackEnd.addListener(self, handleAudioPlayerPlaybackEnded)
         player.event.receiveMetadata.addListener(self, handleAudioPlayerMetadataReceived)
         player.event.stateChange.addListener(self, handleAudioPlayerStateChange)
@@ -106,35 +108,18 @@ public class RNTrackPlayer: RCTEventEmitter {
             "remote-bookmark",
         ]
     }
-
-    func setupInterruptionHandling() {
-        let notificationCenter = NotificationCenter.default
-        notificationCenter.removeObserver(self)
-        notificationCenter.addObserver(self,
-                                       selector: #selector(handleInterruption),
-                                       name: AVAudioSession.interruptionNotification,
-                                       object: nil)
-    }
-
-    @objc func handleInterruption(notification: Notification) {
-        guard let userInfo = notification.userInfo,
-              let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
-              let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
-            return
-        }
-        if type == .began {
+    
+    // MARK: - AudioSessionControllerDelegate
+    
+    public func handleInterruption(type: InterruptionType) {
+        switch type {
+        case .began:
             // Interruption began, take appropriate actions (save state, update user interface)
             self.sendEvent(withName: "remote-duck", body: [
                 "paused": true
             ])
-        }
-        else if type == .ended {
-            guard let optionsValue =
-                    userInfo[AVAudioSessionInterruptionOptionKey] as? UInt else {
-                return
-            }
-            let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
-            if options.contains(.shouldResume) {
+        case let .ended(shouldResume):
+            if shouldResume {
                 // Interruption Ended - playback should resume
                 self.sendEvent(withName: "remote-duck", body: [
                     "paused": false
@@ -158,8 +143,6 @@ public class RNTrackPlayer: RCTEventEmitter {
             return
         }
 
-        setupInterruptionHandling();
-
         // configure if player waits to play
         let autoWait: Bool = config["waitForBuffer"] as? Bool ?? false
         player.automaticallyWaitsToMinimizeStalling = autoWait
@@ -174,8 +157,9 @@ public class RNTrackPlayer: RCTEventEmitter {
 
         // configure audio session - category, options & mode
         var sessionCategory: AVAudioSession.Category = .playback
-        var sessionCategoryOptions: AVAudioSession.CategoryOptions = []
         var sessionCategoryMode: AVAudioSession.Mode = .default
+        var sessionCategoryPolicy: AVAudioSession.RouteSharingPolicy = .default
+        var sessionCategoryOptions: AVAudioSession.CategoryOptions = []
 
         if
             let sessionCategoryStr = config["iosCategory"] as? String,
@@ -183,22 +167,26 @@ public class RNTrackPlayer: RCTEventEmitter {
             sessionCategory = mappedCategory.mapConfigToAVAudioSessionCategory()
         }
 
-        let sessionCategoryOptsStr = config["iosCategoryOptions"] as? [String]
-        let mappedCategoryOpts = sessionCategoryOptsStr?.compactMap { SessionCategoryOptions(rawValue: $0)?.mapConfigToAVAudioSessionCategoryOptions() } ?? []
-        sessionCategoryOptions = AVAudioSession.CategoryOptions(mappedCategoryOpts)
-
         if
             let sessionCategoryModeStr = config["iosCategoryMode"] as? String,
             let mappedCategoryMode = SessionCategoryMode(rawValue: sessionCategoryModeStr) {
             sessionCategoryMode = mappedCategoryMode.mapConfigToAVAudioSessionCategoryMode()
         }
+        
+        if
+            let sessionCategoryPolicyStr = config["iosCategoryPolicy"] as? String,
+            let mappedCategoryPolicy = SessionCategoryPolicy(rawValue: sessionCategoryPolicyStr) {
+            sessionCategoryPolicy = mappedCategoryPolicy.mapConfigToAVAudioSessionCategoryPolicy()
+        }
+        
+        let sessionCategoryOptsStr = config["iosCategoryOptions"] as? [String]
+        let mappedCategoryOpts = sessionCategoryOptsStr?.compactMap { SessionCategoryOptions(rawValue: $0)?.mapConfigToAVAudioSessionCategoryOptions() } ?? []
+        sessionCategoryOptions = AVAudioSession.CategoryOptions(mappedCategoryOpts)
 
-        // Progressively opt into AVAudioSession policies for background audio
-        // and AirPlay 2.
         if #available(iOS 13.0, *) {
-            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: sessionCategory == .ambient ? .default : .longFormAudio, options: sessionCategoryOptions)
+            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: sessionCategoryPolicy, options: sessionCategoryOptions)
         } else if #available(iOS 11.0, *) {
-            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: sessionCategory == .ambient ? .default : .longForm, options: sessionCategoryOptions)
+            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: sessionCategoryPolicy, options: sessionCategoryOptions)
         } else {
             try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, options: sessionCategoryOptions)
         }
@@ -725,7 +713,11 @@ public class RNTrackPlayer: RCTEventEmitter {
         sendEvent(withName: "playback-state", body: ["state": State.fromPlayerState(state: state).rawValue])
     }
 
-    func handleAudioPlayerMetadataReceived(metadata: [AVMetadataItem]) {
+    func handleAudioPlayerMetadataReceived(metadata: [AVTimedMetadataGroup]) {
+        // SwiftAudioEx was updated to return the array of timed metadata
+        // Until we have support for that in RNTP, we take the first item to keep existing behaviour.
+        let metadata = metadata.first?.items ?? []
+        
         func getMetadataItem(forIdentifier: AVMetadataIdentifier) -> String {
             return AVMetadataItem.metadataItems(from: metadata, filteredByIdentifier: forIdentifier).first?.stringValue ?? ""
         }
