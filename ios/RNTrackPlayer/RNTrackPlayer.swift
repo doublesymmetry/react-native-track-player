@@ -108,9 +108,9 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             "remote-bookmark",
         ]
     }
-    
+
     // MARK: - AudioSessionControllerDelegate
-    
+
     public func handleInterruption(type: InterruptionType) {
         switch type {
         case .began:
@@ -172,13 +172,13 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             let mappedCategoryMode = SessionCategoryMode(rawValue: sessionCategoryModeStr) {
             sessionCategoryMode = mappedCategoryMode.mapConfigToAVAudioSessionCategoryMode()
         }
-        
+
         if
             let sessionCategoryPolicyStr = config["iosCategoryPolicy"] as? String,
             let mappedCategoryPolicy = SessionCategoryPolicy(rawValue: sessionCategoryPolicyStr) {
             sessionCategoryPolicy = mappedCategoryPolicy.mapConfigToAVAudioSessionCategoryPolicy()
         }
-        
+
         let sessionCategoryOptsStr = config["iosCategoryOptions"] as? [String]
         let mappedCategoryOpts = sessionCategoryOptsStr?.compactMap { SessionCategoryOptions(rawValue: $0)?.mapConfigToAVAudioSessionCategoryOptions() } ?? []
         sessionCategoryOptions = AVAudioSession.CategoryOptions(mappedCategoryOpts)
@@ -293,6 +293,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         self.player.nowPlayingInfoController.clear()
         try? AVAudioSession.sharedInstance().setActive(false)
         hasInitialized = false
+        resolve(NSNull())
     }
 
     @objc(updateOptions:resolver:rejecter:)
@@ -717,7 +718,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         // SwiftAudioEx was updated to return the array of timed metadata
         // Until we have support for that in RNTP, we take the first item to keep existing behaviour.
         let metadata = metadata.first?.items ?? []
-        
+
         func getMetadataItem(forIdentifier: AVMetadataIdentifier) -> String {
             return AVMetadataItem.metadataItems(from: metadata, filteredByIdentifier: forIdentifier).first?.stringValue ?? ""
         }
