@@ -20,15 +20,14 @@ import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import java.util.concurrent.TimeUnit
 
 class MusicService : HeadlessJsTaskService() {
     private lateinit var player: QueuedAudioPlayer
     private val scope = MainScope()
+    private var progressUpdateJob: Job? = null
 
     var stopWithApp = false
         private set
@@ -176,6 +175,38 @@ class MusicService : HeadlessJsTaskService() {
                 )
 
                 player.notificationManager.createNotification(notificationConfig)
+            }
+        }
+
+        // setup progress update events if configured
+        progressUpdateJob?.cancel()
+        val updateInterval = Utils.getIntOrNull(options, PROGRESS_UPDATE_EVENT_INTERVAL_KEY)
+        if (updateInterval != null && updateInterval > 0) {
+            progressUpdateJob = scope.launch {
+                progressUpdateEventFlow(updateInterval.toLong())
+                    .collect { emit(MusicEvents.PLAYBACK_PROGRESS_UPDATED, it) }
+            }
+        }
+    }
+
+    private fun progressUpdateEventFlow(interval: Long) = flow {
+        while (true) {
+            if (player.isPlaying) {
+                val bundle = progressUpdateEvent()
+                emit(bundle)
+            }
+
+            delay(interval * 1000)
+        }
+    }
+
+    private suspend fun progressUpdateEvent(): Bundle {
+        return withContext(Dispatchers.Main) {
+            Bundle().apply {
+                putDouble(POSITION_KEY, player.position.toDouble() / 1000)
+                putDouble(DURATION_KEY, player.duration.toDouble() / 1000)
+                putDouble(BUFFERED_POSITION_KEY, player.bufferedPosition.toDouble() / 1000)
+                putInt(TRACK_KEY, player.currentIndex)
             }
         }
     }
@@ -464,6 +495,8 @@ class MusicService : HeadlessJsTaskService() {
         const val TRACK_KEY = "track"
         const val NEXT_TRACK_KEY = "nextTrack"
         const val POSITION_KEY = "position"
+        const val DURATION_KEY = "duration"
+        const val BUFFERED_POSITION_KEY = "buffer"
 
         const val TASK_KEY = "TrackPlayer"
 
@@ -474,6 +507,7 @@ class MusicService : HeadlessJsTaskService() {
 
         const val FORWARD_JUMP_INTERVAL_KEY = "forwardJumpInterval"
         const val BACKWARD_JUMP_INTERVAL_KEY = "backwardJumpInterval"
+        const val PROGRESS_UPDATE_EVENT_INTERVAL_KEY = "progressUpdateEventInterval"
 
         const val MAX_CACHE_SIZE_KEY = "maxCacheSize"
 

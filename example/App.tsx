@@ -49,6 +49,7 @@ const setupPlayer = async () => {
         Capability.Pause,
         Capability.SkipToNext,
       ],
+      progressUpdateEventInterval: 2,
     });
     await TrackPlayer.add([
       ...playlistData,
@@ -232,10 +233,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#FFD479',
+    padding: 15,
   },
   secondaryActionButton: {
     fontSize: 14,
     color: '#FFD479',
+    padding: 15,
   },
   statusContainer: {
     height: 40,
