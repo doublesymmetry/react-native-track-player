@@ -35,4 +35,8 @@ module.exports = async function setup() {
       }
     }
   });
+
+  TrackPlayer.addEventListener(Event.PlaybackProgressUpdated, progress => {
+    console.log('Fired PlaybackProgressUpdated', progress);
+  });
 };
