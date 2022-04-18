@@ -10,15 +10,7 @@ redirect_from:
 # Getting Started
 
 ## Starting off
-First of all, you need to set up the player. This usually takes less than a second:
-```typescript
-import TrackPlayer from 'react-native-track-player';
-
-await TrackPlayer.setupPlayer({})
-// The player is ready to be used
-```
-
-You also need to register a [playback service](#playback-service) right after registering the main component of your app:
+First, you need to register a [playback service](#playback-service) right after registering the main component of your app (typically in your `index.js` file at the root of your project):
 ```typescript
 // AppRegistry.registerComponent(...);
 TrackPlayer.registerPlaybackService(() => require('./service'));
@@ -31,6 +23,16 @@ module.exports = async function() {
     // but it will be used later in the "Receiving Events" section
 }
 ```
+
+Then, you need to set up the player. This usually takes less than a second:
+```typescript
+import TrackPlayer from 'react-native-track-player';
+
+await TrackPlayer.setupPlayer()
+// The player is ready to be used
+```
+
+Make sure the setup method has completed before interacting with any other functions in `TrackPlayer` in order to avoid instability.
 
 ## Controlling the Player
 
