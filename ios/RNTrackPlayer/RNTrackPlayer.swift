@@ -788,17 +788,48 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     }
 
     func handleAudioPlayerPlaybackEnded(reason: PlaybackEndedReason) {
+        let isRepeatModeOff = player.repeatMode == .off
+        let isPlayedUntilEnd = reason == PlaybackEndedReason.playedUntilEnd
+        let hasNextItems = player.nextItems.count == 0
+        let isQueueEndReached = hasNextItems && isPlayedUntilEnd
+
         // fire an event for the queue ending
-        if player.nextItems.count == 0 && reason == PlaybackEndedReason.playedUntilEnd {
+        if isRepeatModeOff && isQueueEndReached {
             sendEvent(withName: "playback-queue-ended", body: [
                 "track": player.currentIndex,
                 "position": player.currentTime,
             ])
         }
 
-        // fire an event for the same track starting again
-        if player.items.count != 0 && player.repeatMode == .track {
-            handleAudioPlayerQueueIndexChange(previousIndex: player.currentIndex, nextIndex: player.currentIndex)
+        // There are several scenarios in which a `player.event.queueIndex` is
+        // not emitted. In those cases we need to emit our own playback-track-changed
+        // event in order to have parity with Android. For a detailed breakdown
+        // of those cases view the matrices here:
+        // https://github.com/doublesymmetry/react-native-track-player/pull/1482#issuecomment-1105252330
+        let isMultiItemQueue = player.items.count > 1
+        let isSingleItemQueue = player.items.count == 1
+        let isRepeatModeQueue = player.repeatMode == .queue
+        let isRepeatModeTrack = player.repeatMode == .track
+
+        // per above, identify case where `player.event.queueIndex` is not emitted.
+        let isQueueEndReactedAndNotRepeatModeOff = !isRepeatModeQueue && isQueueEndReached
+        let isRepeatModeEndAndPlayedUntilEndAndNotQueueEndReached = isRepeatModeTrack && !isQueueEndReached && isPlayedUntilEnd
+        let isNotRepeatModeQueueAndQueueIndexNotEmitted = isQueueEndReactedAndNotRepeatModeOff || isRepeatModeEndAndPlayedUntilEndAndNotQueueEndReached
+        let isQueueIndexNotEmitted = isMultiItemQueue && !isRepeatModeQueue && isNotRepeatModeQueueAndQueueIndexNotEmitted
+
+        if isQueueIndexNotEmitted || isSingleItemQueue {
+            var nextIndex: Int? = player.currentIndex
+
+            if isRepeatModeOff {
+                nextIndex = nil
+            } else if isRepeatModeQueue {
+                nextIndex = 0
+            }
+
+            handleAudioPlayerQueueIndexChange(
+                previousIndex: player.currentIndex,
+                nextIndex: nextIndex
+            )
         }
     }
 

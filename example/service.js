@@ -35,4 +35,12 @@ module.exports = async function setup() {
       }
     }
   });
+
+  TrackPlayer.addEventListener(Event.PlaybackQueueEnded, data => {
+    console.log('Event.PlaybackQueueEnded', data);
+  });
+
+  TrackPlayer.addEventListener(Event.PlaybackTrackChanged, data => {
+    console.log('Event.PlaybackTrackChanged', data);
+  });
 };
