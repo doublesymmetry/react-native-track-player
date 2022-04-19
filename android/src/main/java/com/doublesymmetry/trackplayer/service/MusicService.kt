@@ -366,6 +366,19 @@ class MusicService : HeadlessJsTaskService() {
                 Bundle().apply {
                     putDouble(POSITION_KEY, 0.0)
                     putInt(NEXT_TRACK_KEY, player.currentIndex)
+
+                    // correctly set the previous index on the event payload
+                    var previousIndex: Int? = null
+                    if (it == AudioItemTransitionReason.REPEAT) {
+                        previousIndex = player.currentIndex
+                    } else if (player.previousItem != null) {
+                        previousIndex = player?.previousIndex
+                    }
+
+                    if (previousIndex != null) {
+                        putInt(TRACK_KEY, previousIndex)
+                    }
+
                     emit(MusicEvents.PLAYBACK_TRACK_CHANGED, this)
                 }
             }
