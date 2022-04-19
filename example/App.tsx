@@ -99,7 +99,7 @@ const App = () => {
     let mounted = true;
     (async () => {
       const track = await TrackPlayer.getTrack(index);
-      if (mounted) setTrack(track);
+      if (mounted) setTrack(track || undefined);
     })();
     return () => {
       mounted = false;
@@ -113,7 +113,7 @@ const App = () => {
     } else {
       TrackPlayer.play();
     }
-  }, [isPlaying]);
+  }, [isPlaying, index]);
 
   return (
     <SafeAreaView style={styles.screenContainer}>
