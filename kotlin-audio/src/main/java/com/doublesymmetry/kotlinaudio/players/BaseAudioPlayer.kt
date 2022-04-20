@@ -23,7 +23,7 @@ import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.DefaultLoadControl.*
 import com.google.android.exoplayer2.Player.Listener
 import com.google.android.exoplayer2.database.DatabaseProvider
-import com.google.android.exoplayer2.database.ExoDatabaseProvider
+import com.google.android.exoplayer2.database.StandaloneDatabaseProvider
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.metadata.Metadata
 import com.google.android.exoplayer2.source.MediaSource
@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit
 
 
 abstract class BaseAudioPlayer internal constructor(private val context: Context, bufferConfig: BufferConfig? = null, private val cacheConfig: CacheConfig? = null) : AudioManager.OnAudioFocusChangeListener {
-    protected val exoPlayer: SimpleExoPlayer
+    protected val exoPlayer: ExoPlayer
     private var cache: SimpleCache? = null
 
     val notificationManager: NotificationManager
@@ -52,7 +52,7 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
     open val playerOptions: PlayerOptions = PlayerOptionsImpl()
 
     open val currentItem: AudioItem?
-        get() = exoPlayer.currentMediaItem?.playbackProperties?.tag as AudioItem?
+        get() = exoPlayer.currentMediaItem?.localConfiguration?.tag as AudioItem?
 
     val duration: Long
         get() {
@@ -107,11 +107,11 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
     init {
         if (cacheConfig != null) {
             val cacheDir = File(context.cacheDir, "TrackPlayer")
-            val db: DatabaseProvider = ExoDatabaseProvider(context)
+            val db: DatabaseProvider = StandaloneDatabaseProvider(context)
             cache = SimpleCache(cacheDir, LeastRecentlyUsedCacheEvictor(cacheConfig.maxCacheSize ?: 0), db)
         }
 
-        exoPlayer = SimpleExoPlayer.Builder(context).apply {
+        exoPlayer = ExoPlayer.Builder(context).apply {
             if (bufferConfig != null) setLoadControl(setupBuffer(bufferConfig))
         }.build()
 
@@ -174,8 +174,8 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
      * Stops playback, resetting the player and queue.
      */
     open fun stop() {
-        exoPlayer.stop(true)
-        exoPlayer.pause()
+        exoPlayer.stop()
+        exoPlayer.clearMediaItems()
     }
 
     /**
@@ -184,8 +184,9 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
     @CallSuper
     open fun destroy() {
         abandonAudioFocusIfHeld()
-        exoPlayer.release()
+        stop()
         notificationManager.destroy()
+        exoPlayer.release()
         cache?.release()
     }
 
