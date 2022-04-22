@@ -1,86 +1,89 @@
 <img src="docs/assets/optimized-logo.svg" width="300" />
 
 [![downloads](https://img.shields.io/npm/dw/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player)
-[![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player) 
+[![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player)
 [![discord](https://img.shields.io/discord/567636850513018880.svg)](https://discordapp.com/invite/ya2XDCR)
 
 ### 📢 The Android side of RN track player is currently being rewritten with Kotlin and [KotlinAudio](https://github.com/DoubleSymmetry/KotlinAudio). Help us test! [More information here.](https://github.com/DoubleSymmetry/react-native-track-player/discussions/1264)
 
+----
+
 A fully-fledged audio module created for music apps. Provides audio playback, external media controls, background mode and more!
+
+- [Documentation](https://react-native-track-player.js.org)
+  * [Installation](https://react-native-track-player.js.org/install/)
+  * [Getting Started](https://react-native-track-player.js.org/getting-started/)
+  * [API Docs](https://react-native-track-player.js.org/documentation/)
+  * [Platform Support](https://react-native-track-player.js.org/platform-support/)
+  * [Background Mode](https://react-native-track-player.js.org/background/)
+  * [Build Preferences](https://react-native-track-player.js.org/build-preferences/)
+  * [v2 Migration Guide](https://react-native-track-player.js.org/v2-migration/)
+- [Sponsors](#sponsors)
+- [Features](#features)
+- [Why another music module?](#why-another-music-module)
+- [Example Setup](#example-setup)
+- [Core Team ✨](#core-team-)
+- [Special Thanks ✨](#special-thanks-)
+- [Community](#Community)
+
+Not sure where to start?
+
+1. Try [Getting Started](https://react-native-track-player.js.org/getting-started/).
+2. Peruse the [API Docs](https://react-native-track-player.js.org/documentation/).
+3. Run the [Example Project](/example).
+
+## Sponsors
 
 react-native-track-player is made possible by the generosity of the sponsors below, and many other [individual backers](docs/backers-sponsors.md#backers). Sponsoring directly impacts the longevity of this project.
 
-**🥇 Gold sponsors (\$2000+ total contributions):** <br/>
-<a href="http://radio.garden/"><img src="https://avatars.githubusercontent.com/u/271885?v=4" align="center" width="100" title="Radio Garden" alt="Radio Garden"></a>
+#### 🥇 Gold sponsors (\$2000+ total contributions)
 
-**🥈 Silver sponsors (\$200+ per month):**<br/>
-<a href="http://www.voxist.com/"><img src="https://avatars.githubusercontent.com/u/18028734?s=200&v=4" align="center" width="100" title="Voxist" alt="Voxist"></a>
-<a href="https://evergrace.co"><img src="https://avatars.githubusercontent.com/u/1085976?v=4" align="center" width="100" title="Evergrace" alt="Evergrace"></a>
+<table>
+  <tr>
+    <td align="center">
+      <a href="http://radio.garden/">
+        <img src="https://avatars.githubusercontent.com/u/271885?v=4" align="center" width="100" title="Radio Garden" alt="Radio Garden">
+        <br /><sub><b>Radio Garden</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
 
-**🥉 Bronze sponsors (\$500+ total contributions):**<br/>
+#### 🥈 Silver sponsors (\$200+ per month)
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="http://www.voxist.com/">
+        <img src="https://avatars.githubusercontent.com/u/18028734?s=200&v=4" align="center" width="100" title="Voxist" alt="Voxist">
+        <br /><sub><b>Voxist</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://evergrace.co">
+        <img src="https://avatars.githubusercontent.com/u/1085976?v=4" align="center" width="100" title="Evergrace" alt="Evergrace">
+        <br /><sub><b>Evergrace</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
+
+
+#### 🥉 Bronze sponsors (\$500+ total contributions)
 [Become the first bronze sponsor!](https://github.com/sponsors/DoubleSymmetry)
 
-**✨ Contributing sponsors (\$25+ per month):**<br/>
-<a href="https://podverse.fm"><img src="https://avatars.githubusercontent.com/u/11860029?s=200&v=4" align="center" width="100" title="Podverse" alt="Podverse"></a>
+#### ✨ Contributing sponsors (\$25+ per month)
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://podverse.fm"><img src="https://avatars.githubusercontent.com/u/11860029?s=200&v=4" align="center" width="100" title="Podverse" alt="Podverse"></a>
+      <br /><sub><b>Podverse</b></sub>
+    </td>
+  </tr>
+</table>
 
 ---
-
-## ⚠️ V2 Migration Guide
-
-All queue methods have been updating to work on indexes instead of id's. We want this library to support all kinds of apps -- and moving to be index based will allow us to better support applications who have long/endless queues and in the future to allow us to build a performant API around queue management.
-
-We recommend using Typescript to have the system alert you of issues.
-
-When migrating from v1 to v2, the following has changed:
-
-```diff
-// Methods
-
-- async function add(tracks: Track | Track[], insertBeforeId?: string): Promise<void> {
-+ async function add(tracks: Track | Track[], insertBeforeIndex?: number): Promise<void> {
-
-- async function remove(tracks: string | string[]): Promise<void> {
-+ async function remove(tracks: number | number[]): Promise<void> {
-
-- async function skip(trackId: string): Promise<void> {
-+ function skip(trackIndex: number): Promise<void> {
-
-- async function updateMetadataForTrack(trackId: string, metadata: TrackMetadataBase): Promise<void> {
-+ async function updateMetadataForTrack(trackIndex: number, metadata: TrackMetadataBase): Promise<void> {
-
-- async function getTrack(trackId: string): Promise<Track> {
-+ async function getTrack(trackIndex: number): Promise<Track> {
-
-- async function getCurrentTrack(): Promise<string> {
-+ async function getCurrentTrack(): Promise<number> {
-
-// Imports
-
-import TrackPlayer, {
--  STATE_XXX,
--  CAPABILITY_XXX,
--  PITCH_ALGORITHM_XXX,
--  RATING_XXX,
-+  State,
-+  Capability,
-+  PitchAlgorithm,
-+  RatingType,
-+  Event,
-+  RepeatMode
-} from 'react-native-track-player'
-
-// Hooks
-
-- useTrackPlayerProgress
-+ useProgress
-
-// Event Listeners
-// Refrain from using: TrackPlayer.addEventListener() and instead use the provided hooks
-
-+ usePlaybackState
-+ useTrackPlayerEvents
-+ useProgress
-```
 
 ## Features
 
@@ -95,15 +98,6 @@ import TrackPlayer, {
 * **Fully Customizable** - Even the notification icons are customizable!
 * **Supports React Hooks 🎣** - Includes React Hooks for common use-cases so you don't have to write them
 
-## Quick Guides
-
-* [Installation](https://react-native-track-player.js.org/install/)
-* [Getting Started](https://react-native-track-player.js.org/getting-started/)
-* [Documentation](https://react-native-track-player.js.org/documentation/)
-* [Platform Support](https://react-native-track-player.js.org/platform-support/)
-* [Background Mode](https://react-native-track-player.js.org/background/)
-* [Build Preferences](https://react-native-track-player.js.org/build-preferences/)
-
 ## Why another music module?
 After trying to team up modules like `react-native-sound`, `react-native-music-controls` and `react-native-google-cast`, I've noticed, that their structure and the way should be tied together can cause a lot of problems (mainly on Android). Those can heavily affect the app stability and user experience.
 
@@ -113,15 +107,9 @@ All audio modules (like `react-native-sound`) don't play in a separated service 
 
 `react-native-google-cast` works pretty well and also supports custom receivers, but it has fewer player controls, it's harder to integrate and still uses the Cast SDK v2.
 
-## First Steps
+## Example Setup
 
-If you want to get started with this module, check the [Getting Started](https://react-native-track-player.js.org/getting-started/) page.
-
-If you want detailed information about the API, check the [Documentation](https://react-native-track-player.js.org/documentation/). You can also look at our example project [here](/example).
-
-## Example
-
-A basic example of how to play a track:
+First please take a look at the [Getting Started](https://react-native-track-player.js.org/getting-started/) guide, but a basic example of how to play a track:
 
 ```javascript
 import TrackPlayer from 'react-native-track-player';
@@ -151,6 +139,7 @@ start();
   <tr>
     <td align="center"><a href="https://github.com/dcvz"><img src="https://avatars.githubusercontent.com/u/2475932?v=4" width="100px;" alt=""/><br /><sub><b>David Chavez</b></sub></a><br /></td>
     <td align="center"><a href="https://github.com/mpivchev"><img src="https://avatars.githubusercontent.com/u/6960329?v=4" width="100px;" alt=""/><br /><sub><b>Milen Pivchev</b></sub></a><br /></td>
+    https://react-native-track-player.js.org/build-preferences/
   </tr>
 </table>
 
@@ -164,4 +153,5 @@ start();
 </table>
 
 ## Community
+
 You can find us as part of the [React Native Folks](https://discordapp.com/invite/ya2XDCR) Discord in the `#react-native-track-player` channel.
