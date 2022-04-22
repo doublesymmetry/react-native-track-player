@@ -188,13 +188,13 @@ So how can you be a champion? [Sponsor the Project](https://github.com/sponsors/
 - Provide guidance in the implementation journey.
 
 So, in a nutshell, let us know you're willing to do the work and ask for a little
-guidance, and watch the things you care about get done faster then anyone else.
+guidance, and watch the things you care about get done faster than anyone else.
 The best help will be given to those who are willing to help themselves.
 
 ###### You don't have experience you say? It's OK!
 
 You may be thinking that you can't help because you know nothing about native
-iOS or Android or maybe even React code. But we're willing to help teach you.
+iOS or Android or maybe even React code. But we're willing to help guide you.
 
 If you're up for that task then we can help you understand native code and how
 React Native works.
@@ -211,4 +211,9 @@ All the documentation on how to work on the library and it's dependencies is
 
 ## Community
 
-You can find us as part of the [React Native Folks](https://discordapp.com/invite/ya2XDCR) Discord in the `#react-native-track-player` channel.
+You can find us as part of the [React Native Track Player](https://discordapp.com/invite/ya2XDCR):
+
+- `# introductions` - Come greet the newest members of this group!
+- `# support` - Ask members of the community to trouble shoot issues with your app and make recommendations.
+- `# app-anouncements` - Tell the community about the app you made with this project!
+- `# releases` - Stay updated about the latest releases and dev efforts on the project.
