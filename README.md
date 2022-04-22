@@ -211,4 +211,9 @@ All the documentation on how to work on the library and it's dependencies is
 
 ## Community
 
-You can find us as part of the [React Native Folks](https://discordapp.com/invite/ya2XDCR) Discord in the `#react-native-track-player` channel.
+You can find us as part of the [React Native Track Player](https://discordapp.com/invite/ya2XDCR):
+
+- `# introductions` - Come greet the newest members of this group!
+- `# support` - Ask members of the community to trouble shoot issues with your app and make recommendations.
+- `# app-anouncements` - Tell the community about the app you made with this project!
+- `# releases` - Stay updated about the latest releases and dev efforts on the project.
