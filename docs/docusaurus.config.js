@@ -26,6 +26,13 @@ const config = {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/doublesymmetry/react-native-track-player/tree/main/docs/',
+          lastVersion: 'current',
+          versions: {
+            current: {
+              label: '2.2.0',
+              path: '2.2.0',
+            },
+          },
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -45,21 +52,22 @@ const config = {
         },
         items: [
           {
+            type: 'docsVersionDropdown',
+            position: 'left',
+            dropdownItemsAfter: [],
+            dropdownActiveClassDisabled: true,
+          },
+          {
             type: 'doc',
             docId: 'intro',
-            position: 'left',
+            position: 'right',
             label: 'Intro',
           },
           {
             type: 'doc',
             docId: 'basics/installation',
-            position: 'left',
-            label: 'Docs',
-          },
-          {
-            href: 'https://github.com/doublesymmetry/react-native-track-player',
-            label: 'GitHub',
             position: 'right',
+            label: 'Docs',
           },
         ],
       },
