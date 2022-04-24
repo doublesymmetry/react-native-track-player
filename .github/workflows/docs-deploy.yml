@@ -1,5 +1,3 @@
-name: Deploy to GitHub Pages
-
 on:
   push:
     branches:
@@ -10,7 +8,6 @@ on:
 
 jobs:
   deploy:
-    name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}

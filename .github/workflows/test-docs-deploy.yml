@@ -1,5 +1,3 @@
-name: Test deployment
-
 on:
   pull_request:
     branches:
@@ -12,7 +10,6 @@ on:
 
 jobs:
   test-deploy:
-    name: Test deployment
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
