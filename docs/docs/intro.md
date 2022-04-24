@@ -20,6 +20,15 @@ A fully fledged audio module created for music apps. Provides audio playback, ex
 * **Supports React Hooks 🎣** - Includes React Hooks for common use-cases so you don't have to write them
 * **Casting support** - Use in combination with [react-native-track-casting (WIP)](https://github.com/react-native-kit/react-native-track-casting) to seamlessly switch to any Google Cast compatible device that supports custom media receivers
 
+## Why another music module?
+After trying to team up modules like `react-native-sound`, `react-native-music-controls` and `react-native-google-cast`, I've noticed, that their structure and the way should be tied together can cause a lot of problems (mainly on Android). Those can heavily affect the app stability and user experience.
+
+All audio modules (like `react-native-sound`) don't play in a separated service on Android, which should **only** be used for simple audio tracks in the foreground (such as sound effects, voice messages, etc.)
+
+`react-native-music-controls` is meant for apps using those audio modules, but it has a few problems: the audio isn't tied directly to the controls. It can be pretty useful for casting (such as Chromecast).
+
+`react-native-google-cast` works pretty well and also supports custom receivers, but it has fewer player controls, it's harder to integrate and still uses the Cast SDK v2.
+
 ## Example
 
 If you want to get started with this module, check the [Installation](./basics/installation.mdx) & [Getting Started](./basics/getting-started.md) page.
