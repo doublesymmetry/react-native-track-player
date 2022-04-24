@@ -1,4 +1,4 @@
-<img src="docs/assets/optimized-logo.svg" width="300" />
+<img src="https://react-native-track-player.js.org/img/optimized-logo.svg" width="300" />
 
 [![downloads](https://img.shields.io/npm/dw/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player)
 [![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player)
@@ -11,13 +11,13 @@
 A fully-fledged audio module created for music apps. Provides audio playback, external media controls, background mode and more!
 
 - [Documentation](https://react-native-track-player.js.org)
-  * [Installation](https://react-native-track-player.js.org/install/)
-  * [Getting Started](https://react-native-track-player.js.org/getting-started/)
-  * [API Docs](https://react-native-track-player.js.org/documentation/)
-  * [Platform Support](https://react-native-track-player.js.org/platform-support/)
-  * [Background Mode](https://react-native-track-player.js.org/background/)
-  * [Build Preferences](https://react-native-track-player.js.org/build-preferences/)
-  * [v2 Migration Guide](https://react-native-track-player.js.org/v2-migration/)
+  * [Installation](https://react-native-track-player.js.org/docs/basics/installation/)
+  * [Getting Started](https://react-native-track-player.js.org/docs/basics/getting-started/)
+  * [API Docs](https://react-native-track-player.js.org/docs/api/events)
+  * [Platform Support](https://react-native-track-player.js.org/docs/basics/platform-support)
+  * [Background Mode](https://react-native-track-player.js.org/docs/basics/background-mode)
+  * [Build Preferences](https://react-native-track-player.js.org/docs/basics/build-preferences)
+  * [v2 Migration Guide](https://react-native-track-player.js.org/docs/v2-migration)
 - [Sponsors](#sponsors)
 - [Features](#features)
 - [Why another music module?](#why-another-music-module)
@@ -29,13 +29,13 @@ A fully-fledged audio module created for music apps. Provides audio playback, ex
 
 Not sure where to start?
 
-1. Try [Getting Started](https://react-native-track-player.js.org/getting-started/).
-2. Peruse the [API Docs](https://react-native-track-player.js.org/documentation/).
+1. Try [Getting Started](https://react-native-track-player.js.org/docs/basics/getting-started).
+2. Peruse the [API Docs](https://react-native-track-player.js.org/docs/api/events).
 3. Run the [Example Project](/example).
 
 ## Sponsors
 
-react-native-track-player is made possible by the generosity of the sponsors below, and many other [individual backers](docs/backers-sponsors.md#backers). Sponsoring directly impacts the longevity of this project.
+react-native-track-player is made possible by the generosity of the sponsors below, and many other [individual backers](https://react-native-track-player.js.org/docs/sponsors#backers). Sponsoring directly impacts the longevity of this project.
 
 #### 🥇 Gold sponsors (\$2000+ total contributions)
 
@@ -110,7 +110,7 @@ All audio modules (like `react-native-sound`) don't play in a separated service 
 
 ## Example Setup
 
-First please take a look at the [Getting Started](https://react-native-track-player.js.org/getting-started/) guide, but a basic example of how to play a track:
+First please take a look at the [Getting Started](https://react-native-track-player.js.org/docs/basics/getting-started/) guide, but a basic example of how to play a track:
 
 ```javascript
 import TrackPlayer from 'react-native-track-player';
@@ -140,7 +140,7 @@ start();
   <tr>
     <td align="center"><a href="https://github.com/dcvz"><img src="https://avatars.githubusercontent.com/u/2475932?v=4" width="100px;" alt=""/><br /><sub><b>David Chavez</b></sub></a><br /></td>
     <td align="center"><a href="https://github.com/mpivchev"><img src="https://avatars.githubusercontent.com/u/6960329?v=4" width="100px;" alt=""/><br /><sub><b>Milen Pivchev</b></sub></a><br /></td>
-    https://react-native-track-player.js.org/build-preferences/
+    https://react-native-track-player.js.org/docs/build-preferences/
     <td align="center"><a href="https://github.com/jspizziri"><img src="https://avatars.githubusercontent.com/u/1452066?v=4" width="100px;" alt=""/><br /><sub><b>Jacob Spizziri</b></sub></a><br /></td>
   </tr>
 </table>
