@@ -1,5 +1,6 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
   Image,
   SafeAreaView,
   StatusBar,
@@ -14,6 +15,7 @@ import TrackPlayer, {
   Event,
   RepeatMode,
   State,
+  Track,
   usePlaybackState,
   useProgress,
   useTrackPlayerEvents,
@@ -23,76 +25,95 @@ import TrackPlayer, {
 import playlistData from './react/data/playlist.json';
 // @ts-ignore
 import localTrack from './react/resources/pure.m4a';
+// @ts-ignore
+import localArtwork from './react/resources/artwork.jpg';
 
-const setupIfNecessary = async () => {
-  // if app was relaunched and music was already playing, we don't setup again.
-  const currentTrack = await TrackPlayer.getCurrentTrack();
-  if (currentTrack !== null) {
-    return;
-  }
-
-  await TrackPlayer.setupPlayer({});
-  await TrackPlayer.updateOptions({
-    stopWithApp: false,
-    capabilities: [
-      Capability.Play,
-      Capability.Pause,
-      Capability.SkipToNext,
-      Capability.SkipToPrevious,
-      Capability.Stop,
-    ],
-    compactCapabilities: [Capability.Play, Capability.Pause],
-  });
-
-  await TrackPlayer.add(playlistData);
-  await TrackPlayer.add({
-    url: localTrack,
-    title: 'Pure (Demo)',
-    artist: 'David Chavez',
-    artwork: 'https://i.scdn.co/image/e5c7b168be89098eb686e02152aaee9d3a24e5b6',
-    duration: 28,
-  });
-
-  TrackPlayer.setRepeatMode(RepeatMode.Queue);
-};
-
-const togglePlayback = async (playbackState: State) => {
-  const currentTrack = await TrackPlayer.getCurrentTrack();
-  if (currentTrack == null) {
-    // TODO: Perhaps present an error or restart the playlist?
-  } else {
-    if (playbackState !== State.Playing) {
-      await TrackPlayer.play();
-    } else {
-      await TrackPlayer.pause();
-    }
+const setupPlayer = async () => {
+  let index = 0;
+  try {
+    // this method will only reject if player has not been setup yet
+    index = await TrackPlayer.getCurrentTrack();
+  } catch {
+    await TrackPlayer.setupPlayer();
+    await TrackPlayer.updateOptions({
+      stopWithApp: false,
+      capabilities: [
+        Capability.Play,
+        Capability.Pause,
+        Capability.SkipToNext,
+        Capability.SkipToPrevious,
+        Capability.Stop,
+      ],
+      compactCapabilities: [
+        Capability.Play,
+        Capability.Pause,
+        Capability.SkipToNext,
+      ],
+    });
+    await TrackPlayer.add([
+      ...playlistData,
+      {
+        url: localTrack,
+        title: 'Pure (Demo)',
+        artist: 'David Chavez',
+        artwork: localArtwork,
+        duration: 28,
+      },
+    ]);
+    await TrackPlayer.setRepeatMode(RepeatMode.Queue);
+  } finally {
+    return index;
   }
 };
 
 const App = () => {
-  const playbackState = usePlaybackState();
   const progress = useProgress();
-
-  const [trackArtwork, setTrackArtwork] = useState<string | number>();
-  const [trackTitle, setTrackTitle] = useState<string>();
-  const [trackArtist, setTrackArtist] = useState<string>();
-
-  useTrackPlayerEvents([Event.PlaybackTrackChanged], async event => {
-    if (
-      event.type === Event.PlaybackTrackChanged &&
-      event.nextTrack !== undefined
-    ) {
-      const track = await TrackPlayer.getTrack(event.nextTrack);
-      const {title, artist, artwork} = track || {};
-      setTrackTitle(title);
-      setTrackArtist(artist);
-      setTrackArtwork(artwork);
-    }
-  });
+  const state = usePlaybackState();
+  const [index, setIndex] = useState<number | undefined>();
+  const [track, setTrack] = useState<Track | undefined>();
+  const isPlaying = state === State.Playing;
+  const isLoading = state === State.Connecting || state === State.Buffering;
 
   useEffect(() => {
-    setupIfNecessary();
+    let mounted = true;
+    (async () => {
+      const trackIndex = await setupPlayer();
+      if (mounted) {
+        setIndex(trackIndex);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
   }, []);
+
+  useTrackPlayerEvents(
+    [Event.PlaybackTrackChanged],
+    async ({ nextTrack }) => {
+      setIndex(nextTrack);
+    },
+  );
+
+  useEffect(() => {
+    if (index === undefined) return;
+    let mounted = true;
+    (async () => {
+      const track = await TrackPlayer.getTrack(index);
+      if (mounted) setTrack(track);
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [index]);
+
+  const performTogglePlayback = useCallback(() => {
+    if (index === undefined) return;
+    if (isPlaying) {
+      TrackPlayer.pause();
+    } else {
+      TrackPlayer.play();
+    }
+  }, [isPlaying]);
 
   return (
     <SafeAreaView style={styles.screenContainer}>
@@ -103,9 +124,9 @@ const App = () => {
             <Text style={styles.queueButton}>Queue</Text>
           </TouchableWithoutFeedback>
         </View>
-        <Image style={styles.artwork} source={{uri: `${trackArtwork}`}} />
-        <Text style={styles.titleText}>{trackTitle}</Text>
-        <Text style={styles.artistText}>{trackArtist}</Text>
+        <Image style={styles.artwork} source={{uri: `${track?.artwork}`}} />
+        <Text style={styles.titleText}>{track?.title}</Text>
+        <Text style={styles.artistText}>{track?.artist}</Text>
         <Slider
           style={styles.progressContainer}
           value={progress.position}
@@ -114,18 +135,18 @@ const App = () => {
           thumbTintColor="#FFD479"
           minimumTrackTintColor="#FFD479"
           maximumTrackTintColor="#FFFFFF"
-          onSlidingComplete={async value => {
-            await TrackPlayer.seekTo(value);
+          onSlidingComplete={value => {
+            TrackPlayer.seekTo(value);
           }}
         />
         <View style={styles.progressLabelContainer}>
           <Text style={styles.progressLabelText}>
-            {new Date(progress.position * 1000).toISOString().substr(14, 5)}
+            {new Date(progress.position * 1000).toISOString().slice(14, 19)}
           </Text>
           <Text style={styles.progressLabelText}>
             {new Date((progress.duration - progress.position) * 1000)
               .toISOString()
-              .substr(14, 5)}
+              .slice(14, 19)}
           </Text>
         </View>
       </View>
@@ -133,14 +154,17 @@ const App = () => {
         <TouchableWithoutFeedback onPress={() => TrackPlayer.skipToPrevious()}>
           <Text style={styles.secondaryActionButton}>Prev</Text>
         </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback onPress={() => togglePlayback(playbackState)}>
+        <TouchableWithoutFeedback onPress={performTogglePlayback}>
           <Text style={styles.primaryActionButton}>
-            {playbackState === State.Playing ? 'Pause' : 'Play'}
+            {isPlaying ? 'Pause' : 'Play'}
           </Text>
         </TouchableWithoutFeedback>
         <TouchableWithoutFeedback onPress={() => TrackPlayer.skipToNext()}>
           <Text style={styles.secondaryActionButton}>Next</Text>
         </TouchableWithoutFeedback>
+      </View>
+      <View style={styles.statusContainer}>
+        {isLoading && <ActivityIndicator />}
       </View>
     </SafeAreaView>
   );
@@ -202,7 +226,6 @@ const styles = StyleSheet.create({
   actionRowContainer: {
     width: '60%',
     flexDirection: 'row',
-    marginBottom: 100,
     justifyContent: 'space-between',
   },
   primaryActionButton: {
@@ -213,6 +236,11 @@ const styles = StyleSheet.create({
   secondaryActionButton: {
     fontSize: 14,
     color: '#FFD479',
+  },
+  statusContainer: {
+    height: 40,
+    marginTop: 20,
+    marginBottom: 60,
   },
 });
 

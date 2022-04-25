@@ -12,7 +12,8 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "sync:ios": "yarn rimraf ../ios && yarn cpx 'node_modules/react-native-track-player/ios/**' ../ios",
     "sync:android": "yarn rimraf ../android && yarn cpx 'node_modules/react-native-track-player/android/**' ../android",
-    "sync": "yarn sync:ios && yarn sync:android"
+    "sync": "yarn sync:ios && yarn sync:android",
+    "fresh": "rm -rf node_modules ; cd .. && yarn build ; cd example && yarn install"
   },
   "dependencies": {
     "@react-native-community/slider": "4.2.0",

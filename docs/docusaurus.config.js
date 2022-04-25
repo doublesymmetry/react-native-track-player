@@ -45,15 +45,21 @@ const config = {
         },
         items: [
           {
+            type: 'docsVersionDropdown',
+            position: 'left',
+            dropdownItemsAfter: [],
+            dropdownActiveClassDisabled: true,
+          },
+          {
             type: 'doc',
             docId: 'intro',
-            position: 'left',
+            position: 'right',
             label: 'Intro',
           },
           {
             type: 'doc',
             docId: 'basics/installation',
-            position: 'left',
+            position: 'right',
             label: 'Docs',
           },
           {
