@@ -115,11 +115,11 @@ const config = {
               },
               {
                 label: 'Our Sponsors ❤️',
-                href: './docs/sponsors',
+                href: '/docs/sponsors',
               },
               {
                 label: 'Core Team ✨',
-                href: './docs/core-team',
+                href: '/docs/core-team',
               },
             ],
           },
