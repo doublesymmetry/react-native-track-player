@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.os.ResultReceiver
+import android.support.v4.media.MediaMetadataCompat.*
 import android.support.v4.media.RatingCompat
 import android.support.v4.media.session.MediaSessionCompat
 import com.doublesymmetry.kotlinaudio.R
@@ -216,6 +217,16 @@ class NotificationManager internal constructor(private val context: Context, pri
             }
         }.build()
 
+        mediaSessionConnector.setMediaMetadataProvider {
+            Builder().apply {
+                val title = descriptionAdapter.getCurrentContentTitle(it)
+                putText(METADATA_KEY_TITLE, title)
+
+                val artist = descriptionAdapter.getCurrentContentText(it)
+                if (artist != null) putText(METADATA_KEY_ARTIST, artist)
+            }.build()
+        }
+
         if (!isJUnitTest()) {
             internalManager?.apply {
                 setColor(config.accentColor ?: Color.TRANSPARENT)
@@ -298,6 +309,7 @@ class NotificationManager internal constructor(private val context: Context, pri
 
     private fun reload() = scope.launch {
         internalManager?.invalidate()
+        mediaSessionConnector.invalidateMediaSessionMetadata()
     }
 
     companion object {
