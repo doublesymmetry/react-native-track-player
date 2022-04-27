@@ -113,7 +113,7 @@ const App = () => {
     } else {
       TrackPlayer.play();
     }
-  }, [isPlaying]);
+  }, [isPlaying, index]);
 
   return (
     <SafeAreaView style={styles.screenContainer}>

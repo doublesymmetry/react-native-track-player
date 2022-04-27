@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ main, 'feature/**' ]
     paths-ignore: [ 'docs/**' ]
-concurrency: 
+concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
-          node-version: '12.18.3'
+          node-version: 16.x
       - name: Cache JS Dependencies
         uses: c-hive/gha-yarn-cache@v1
       - name: Install Yarn
@@ -55,7 +55,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
-          node-version: '12.18.3'
+          node-version: 16.x
       - name: Cache JS Dependencies
         uses: c-hive/gha-yarn-cache@v1
       - name: Install Yarn
@@ -87,4 +87,3 @@ jobs:
         run: |-
           cd example/ios
           xcodebuild build -workspace example.xcworkspace -scheme example -destination 'platform=iOS Simulator,name=iPhone 12 Pro'
-  
