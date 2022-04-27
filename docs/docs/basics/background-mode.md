@@ -18,7 +18,7 @@ TrackPlayer.updateOptions({
 Please note that while your app is in background, your UI might be unmounted by React Native. Event listeners added in the [playback service](./playback-service.md) will continue to receive events.
 
 ### Notification
-The notification will be visible as long as the playback service runs. Your app will be opened when it is clicked. You can implement a custom initialization (e.g.: opening directly the player UI) by using the [Linking API](https://facebook.github.io/react-native/docs/linking) looking for the `trackplayer://notification.click` URI.
+The notification will be visible as long as the playback service runs. Your app will be opened when it is clicked. You can implement a custom initialization (e.g.: opening directly the player UI) by using the [Linking API](https://reactnative.dev/docs/linking) looking for the `trackplayer://notification.click` URI.
 
 ## iOS
 To allow background audio playback on iOS, you need to activate the 'Audio, Airplay and Picture in Picture' background mode in Xcode. Without activating it, the audio will only play when the app is in the foreground.
