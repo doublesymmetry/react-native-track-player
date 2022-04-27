@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Events
 
-All event types are made available through the named export `TrackPlayerEvents`:
+All event types are made available through the named export `Event`:
 
 ```ts
 import { Event } from 'react-native-track-player';

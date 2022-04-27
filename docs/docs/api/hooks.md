@@ -15,27 +15,27 @@ Check out the [events section](./events.md) for a full list of supported events.
 ```jsx
 import React, { useState } from 'react';
 import { Text, View } from 'react-native';
-import { useTrackPlayerEvents, TrackPlayerEvents, STATE_PLAYING } from 'react-native-track-player';
+import { useTrackPlayerEvents, Event, State } from 'react-native-track-player';
 
 // Subscribing to the following events inside MyComponent
 const events = [
-  TrackPlayerEvents.PLAYBACK_STATE,
-  TrackPlayerEvents.PLAYBACK_ERROR
+  Event.PlaybackState,
+  Event.PlaybackError,
 ];
 
 const MyComponent = () => {
   const [playerState, setPlayerState] = useState(null)
 
   useTrackPlayerEvents(events, (event) => {
-    if (event.type === TrackPlayerEvents.PLAYBACK_ERROR) {
+    if (event.type === Event.PlaybackError) {
       console.warn('An error occured while playing the current track.');
     }
-    if (event.type === TrackPlayerEvents.PLAYBACK_STATE) {
+    if (event.type === Event.PlaybackState) {
       setPlayerState(event.state);
     }
   });
 
-  const isPlaying = playerState === STATE_PLAYING;
+  const isPlaying = playerState === State.Playing;
 
   return (
     <View>
