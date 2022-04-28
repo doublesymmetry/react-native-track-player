@@ -17,12 +17,14 @@ export const usePlaybackState = () => {
 
   useEffect(() => {
     async function setPlayerState() {
-      const playerState = await TrackPlayer.getState()
+      try {
+        const playerState = await TrackPlayer.getState()
 
-      // If the component has been unmounted, exit
-      if (isUnmountedRef.current) return
+        // If the component has been unmounted, exit
+        if (isUnmountedRef.current) return
 
-      setState(playerState)
+        setState(playerState)
+      } catch {} // getState only throw while you haven't yet setup, ignore failure.
     }
 
     // Set initial state
@@ -100,26 +102,28 @@ export function useProgress(updateInterval?: number) {
   }, [])
 
   const getProgress = async () => {
-    const [position, duration, buffered] = await Promise.all([
-      TrackPlayer.getPosition(),
-      TrackPlayer.getDuration(),
-      TrackPlayer.getBufferedPosition(),
-    ])
+    try {
+      const [position, duration, buffered] = await Promise.all([
+        TrackPlayer.getPosition(),
+        TrackPlayer.getDuration(),
+        TrackPlayer.getBufferedPosition(),
+      ])
 
-    // If the component has been unmounted, exit
-    if (isUnmountedRef.current) return
+      // If the component has been unmounted, exit
+      if (isUnmountedRef.current) return
 
-    // If there is no change in properties, exit
-    if (
-      position === stateRef.current.position &&
-      duration === stateRef.current.duration &&
-      buffered === stateRef.current.buffered
-    )
-      return
+      // If there is no change in properties, exit
+      if (
+        position === stateRef.current.position &&
+        duration === stateRef.current.duration &&
+        buffered === stateRef.current.buffered
+      )
+        return
 
-    const state = { position, duration, buffered }
-    stateRef.current = state
-    setState(state)
+      const state = { position, duration, buffered }
+      stateRef.current = state
+      setState(state)
+    } catch {} // these method only throw while you haven't yet setup, ignore failure.
   }
 
   useEffect(() => {
