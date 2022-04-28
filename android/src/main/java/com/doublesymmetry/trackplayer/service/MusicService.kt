@@ -223,18 +223,24 @@ class MusicService : HeadlessJsTaskService() {
         return compactCapabilities.contains(capability)
     }
 
-    fun add(track: Track) {
-        add(listOf(track))
+    // TODO: return Job as a workaround for the async coroutine issue
+    // https://github.com/doublesymmetry/react-native-track-player/issues/1522
+    fun add(track: Track): Job {
+        return add(listOf(track))
     }
 
-    fun add(tracks: List<Track>) {
+    // TODO: return Job as a workaround for the async coroutine issue
+    // https://github.com/doublesymmetry/react-native-track-player/issues/1522
+    fun add(tracks: List<Track>): Job {
         val items = tracks.map { it.toAudioItem() }
-        scope.launch { player.add(items, false) }
+        return scope.launch { player.add(items, false) }
     }
 
-    fun add(tracks: List<Track>, atIndex: Int) {
+    // TODO: return Job as a workaround for the async coroutine issue
+    // https://github.com/doublesymmetry/react-native-track-player/issues/1522
+    fun add(tracks: List<Track>, atIndex: Int): Job {
         val items = tracks.map { it.toAudioItem() }
-        scope.launch { player.add(items, atIndex) }
+        return scope.launch { player.add(items, atIndex) }
     }
 
     fun remove(index: Int) {

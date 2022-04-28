@@ -22,6 +22,7 @@ import com.google.android.exoplayer2.DefaultLoadControl.*
 import com.google.android.exoplayer2.Player
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import javax.annotation.Nonnull
 
@@ -283,14 +284,21 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
             }
             insertBeforeIndex == -1 -> {
                 musicService.apply {
-                    add(tracks)
-                    callback.resolve(null)
+                    // TODO: https://github.com/doublesymmetry/react-native-track-player/issues/1522
+                    runBlocking {
+                        var size = musicService.tracks.size
+                        add(tracks).join()
+                        callback.resolve(size)
+                    }
                 }
             }
             else -> {
                 musicService.apply {
-                    add(tracks, insertBeforeIndex)
-                    callback.resolve(null)
+                    // TODO: https://github.com/doublesymmetry/react-native-track-player/issues/1522
+                    runBlocking {
+                        add(tracks, insertBeforeIndex).join()
+                        callback.resolve(insertBeforeIndex)
+                    }
                 }
             }
         }
