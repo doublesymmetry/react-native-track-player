@@ -130,6 +130,12 @@ const config = {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
       },
+      algolia: {
+        appId: 'CYSR91W7SU',
+        apiKey: 'a5ab4af3642fdd7fbc07030593017797',
+        indexName: 'react-native-track-player',
+        contextualSearch: true,
+      },
     }),
 };
 
