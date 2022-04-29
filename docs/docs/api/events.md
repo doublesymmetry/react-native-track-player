@@ -61,17 +61,17 @@ Fired when an error occurs.
 ## Media Controls
 
 ### `Event.RemotePlay`
-Fired when the user presses the play button. Only fired if the `CAPABILITY_PLAY` is allowed.
+Fired when the user presses the play button. Only fired if the [`Capability.Play`](./constants/capability.md) is allowed.
 
 ### `Event.RemotePlayId`
-Fired when the user selects a track from an external device. Required for Android Auto support. Only fired if the `CAPABILITY_PLAY_FROM_ID` is allowed.
+Fired when the user selects a track from an external device. Required for Android Auto support. Only fired if the [`Capability.PlayFromId`](./constants/capability.md) is allowed.
 
 | Param | Type     | Description   |
 | ----- | -------- | ------------- |
 | id    | `string` | The track id  |
 
 ### `Event.RemotePlaySearch`
-Fired when the user searches for a track (usually voice search). Required for Android Auto support. Only fired if the `CAPABILITY_PLAY_FROM_SEARCH` is allowed.
+Fired when the user searches for a track (usually voice search). Required for Android Auto support. Only fired if the [`Capability.PlayFromSearch`](./constants/capability.md) is allowed.
 
 Every parameter except `query` is optional and may not be provided.
 In the case where `query` is empty, feel free to select any track to play.
@@ -87,47 +87,47 @@ In the case where `query` is empty, feel free to select any track to play.
 | playlist | `string` | The track playlist |
 
 ### `Event.RemotePause`
-Fired when the user presses the pause button. Only fired if the `CAPABILITY_PAUSE` is allowed or if there's a change in outputs (e.g.: headphone disconnected).
+Fired when the user presses the pause button. Only fired if the [`Capability.Pause`](./constants/capability.md) is allowed or if there's a change in outputs (e.g.: headphone disconnected).
 
 ### `Event.RemoteStop`
-Fired when the user presses the stop button. Only fired if the `CAPABILITY_STOP` is allowed.
+Fired when the user presses the stop button. Only fired if the [`Capability.Stop`](./constants/capability.md) is allowed.
 
 ### `Event.RemoteSkip`
-Fired when the user skips to a track in the queue. Only fired if the `CAPABILITY_SKIP` is allowed.
+Fired when the user skips to a track in the queue. Only fired if the [`Capability.Skip`](./constants/capability.md) is allowed.
 
 | Param | Type     | Description   |
 | ----- | -------- | ------------- |
 | index | `number` | The track index  |
 
 ### `Event.RemoteNext`
-Fired when the user presses the next track button. Only fired if the `CAPABILITY_SKIP_TO_NEXT` is allowed.
+Fired when the user presses the next track button. Only fired if the [`Capability.SkipToNext`](./constants/capability.md) is allowed.
 
 ### `Event.RemotePrevious`
-Fired when the user presses the previous track button. Only fired if the `CAPABILITY_SKIP_TO_PREVIOUS` is allowed.
+Fired when the user presses the previous track button. Only fired if the [`Capability.SkipToPrevious`](./constants/capability.md) is allowed.
 
 ### `Event.RemoteSeek`
-Fired when the user changes the position of the timeline. Only fired if the `CAPABILITY_SEEK_TO` is allowed.
+Fired when the user changes the position of the timeline. Only fired if the [`Capability.SeekTo`](./constants/capability.md) is allowed.
 
 | Param    | Type     | Description   |
 | -------- | -------- | ------------- |
 | position | `number` | The position in seconds |
 
 ### `Event.RemoteSetRating`
-Fired when the user changes the rating for the track. Only fired if the `CAPABILITY_SET_RATING` is allowed.
+Fired when the user changes the rating for the track. Only fired if the [`Capability.SetRating`](./constants/capability.md) is allowed.
 
 | Param  | Type     | Description   |
 | ------ | -------- | ------------- |
 | rating | Depends on the [Rating Type](./constants/rating.md) | The rating that was set |
 
 ### `Event.RemoteJumpForward`
-Fired when the user presses the jump forward button. Only fired if the `CAPABILITY_JUMP_FORWARD` is allowed.
+Fired when the user presses the jump forward button. Only fired if the [`Capability.JumpForward`](./constants/capability.md) is allowed.
 
 | Param    | Type     | Description   |
 | -------- | -------- | ------------- |
 | interval | `number` | The number of seconds to jump forward. It's usually the `forwardJumpInterval` set in the options. |
 
 ### `Event.RemoteJumpBackward`
-Fired when the user presses the jump backward button. Only fired if the `CAPABILITY_JUMP_BACKWARD` is allowed.
+Fired when the user presses the jump backward button. Only fired if the [`Capability.JumpBackward`](./constants/capability.md) is allowed.
 
 | Param    | Type     | Description   |
 | -------- | -------- | ------------- |
