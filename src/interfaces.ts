@@ -121,6 +121,7 @@ export interface MetadataOptions {
   ratingType?: RatingType
   forwardJumpInterval?: number
   backwardJumpInterval?: number
+  progressUpdateEventInterval?: number // in seconds
 
   // ios
   likeOptions?: FeedbackOptions
@@ -152,6 +153,7 @@ export enum Event {
   PlaybackQueueEnded = 'playback-queue-ended',
   PlaybackTrackChanged = 'playback-track-changed',
   PlaybackMetadataReceived = 'playback-metadata-received',
+  PlaybackProgressUpdated = 'playback-progress-updated',
   RemotePlay = 'remote-play',
   RemotePlayId = 'remote-play-id',
   RemotePlaySearch = 'remote-play-search',
@@ -226,4 +228,14 @@ export interface Track extends TrackMetadataBase {
   headers?: { [key: string]: any }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any
+}
+
+export interface ProgressState {
+  position: number
+  duration: number
+  buffered: number
+}
+
+export interface ProgressUpdateEvent extends ProgressState {
+  track: number;
 }

@@ -1,4 +1,5 @@
 import TrackPlayer, {Event, State} from 'react-native-track-player';
+import type {ProgressUpdateEvent} from 'react-native-track-player';
 
 let wasPausedByDuck = false;
 
@@ -43,4 +44,11 @@ export async function PlaybackService() {
   TrackPlayer.addEventListener(Event.PlaybackTrackChanged, data => {
     console.log('Event.PlaybackTrackChanged', data);
   });
+
+  TrackPlayer.addEventListener(
+    Event.PlaybackProgressUpdated,
+    (data: ProgressUpdateEvent) => {
+      console.log('Event.PlaybackProgressUpdated', data);
+    },
+  );
 };
