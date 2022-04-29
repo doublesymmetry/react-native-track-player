@@ -54,6 +54,8 @@ struct Metadata {
             })
             
             currentImageTask?.resume()
+        } else {
+            player.nowPlayingInfoController.set(keyValue: MediaItemProperty.artwork(nil))
         }
     }
 }

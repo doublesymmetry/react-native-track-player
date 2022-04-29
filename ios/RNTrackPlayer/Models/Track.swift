@@ -105,14 +105,14 @@ class Track: NSObject, AudioItem, TimePitching, AssetOptionsProviding {
                 URLSession.shared.dataTask(with: artworkURL, completionHandler: { (data, _, error) in
                     if let data = data, let artwork = UIImage(data: data), error == nil {
                         handler(artwork)
+                    } else {
+                        handler(nil)
                     }
-
-                    handler(nil)
                 }).resume()
             }
+        } else {
+            handler(nil)
         }
-
-        handler(nil)
     }
 
     // MARK: - TimePitching Protocol
