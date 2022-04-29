@@ -4,7 +4,7 @@ sidebar_position: 3
 
 # Hooks
 
-React v16.8 introduced [hooks](https://reactjs.org/docs/hooks-intro.html). If you are using a version of React Native that is before [v0.59.0](https://facebook.github.io/react-native/blog/2019/03/12/releasing-react-native-059), your React Native version does not support hooks.
+React v16.8 introduced [hooks](https://reactjs.org/docs/hooks-intro.html). If you are using a version of React Native that is before [v0.59.0](https://reactnative.dev/blog/2019/03/12/releasing-react-native-059), your React Native version does not support hooks.
 
 ## `useTrackPlayerEvents`
 
@@ -12,7 +12,7 @@ Register an event listener for one or more of the [events](./events.md) emitted 
 
 Check out the [events section](./events.md) for a full list of supported events.
 
-```jsx
+```tsx
 import React, { useState } from 'react';
 import { Text, View } from 'react-native';
 import { useTrackPlayerEvents, Event, State } from 'react-native-track-player';
@@ -55,7 +55,7 @@ const MyComponent = () => {
 
 `useProgress` accepts an interval to set the rate (in miliseconds) to poll the track player's progress. The default value is `1000` or every second.
 
-```jsx
+```tsx
 import React from 'react';
 import { Text, View } from 'react-native';
 import { useProgress } from 'react-native-track-player';
@@ -70,4 +70,25 @@ const MyComponent = () => {
     </View>
   )
 }
+```
+
+## `usePlaybackState`
+
+Register an event listener for the [PlaybackState](./events.md#playbackstate) event emitted by the TrackPlayer. The subscription is removed when the component unmounts.
+
+```tsx
+import React, { useState } from 'react';
+import { Text, View } from 'react-native';
+import { usePlaybackState, State } from 'react-native-track-player';
+
+const MyComponent = () => {
+  const playerState = usePlaybackState();
+  const isPlaying = playerState === State.Playing;
+
+  return (
+    <View>
+      <Text>The TrackPlayer is {isPlaying ? 'playing' : 'not playing'}</Text>
+    </View>
+  );
+};
 ```

@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from 'react'
 import TrackPlayer from './trackPlayer'
 import { State, Event } from './interfaces'
 
-/** Get current playback state and subsequent updatates  */
+/** Get current playback state and subsequent updates  */
 export const usePlaybackState = () => {
   const [state, setState] = useState(State.None)
   const isUnmountedRef = useRef(true)
