@@ -17,7 +17,6 @@ import com.doublesymmetry.kotlinaudio.event.NotificationEventHolder
 import com.doublesymmetry.kotlinaudio.event.PlayerEventHolder
 import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.notification.NotificationManager
-import com.doublesymmetry.kotlinaudio.utils.isJUnitTest
 import com.doublesymmetry.kotlinaudio.utils.isUriLocal
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.DefaultLoadControl.*
@@ -116,10 +115,6 @@ abstract class BaseAudioPlayer internal constructor(private val context: Context
         }.build()
 
         notificationManager = NotificationManager(context, exoPlayer, notificationEventHolder)
-
-        if (isJUnitTest()) {
-            exoPlayer.setThrowsWhenUsingWrongThread(false)
-        }
 
         exoPlayer.addListener(PlayerListener())
     }
