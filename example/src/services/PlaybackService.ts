@@ -1,8 +1,9 @@
 import TrackPlayer, {Event, State} from 'react-native-track-player';
+import type {ProgressUpdateEvent} from 'react-native-track-player';
 
 let wasPausedByDuck = false;
 
-module.exports = async function setup() {
+export async function PlaybackService() {
   TrackPlayer.addEventListener(Event.RemotePause, () => {
     TrackPlayer.pause();
   });
@@ -35,4 +36,19 @@ module.exports = async function setup() {
       }
     }
   });
+
+  TrackPlayer.addEventListener(Event.PlaybackQueueEnded, data => {
+    console.log('Event.PlaybackQueueEnded', data);
+  });
+
+  TrackPlayer.addEventListener(Event.PlaybackTrackChanged, data => {
+    console.log('Event.PlaybackTrackChanged', data);
+  });
+
+  TrackPlayer.addEventListener(
+    Event.PlaybackProgressUpdated,
+    (data: ProgressUpdateEvent) => {
+      console.log('Event.PlaybackProgressUpdated', data);
+    },
+  );
 };

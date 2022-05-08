@@ -18,6 +18,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     private var hasInitialized = false
     private let player = QueuedAudioPlayer()
     private let audioSessionController = AudioSessionController.shared
+    private var shouldEmitUpdateEventInterval: Bool = false
 
     // MARK: - Lifecycle Methods
 
@@ -30,6 +31,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         player.event.stateChange.addListener(self, handleAudioPlayerStateChange)
         player.event.fail.addListener(self, handleAudioPlayerFailed)
         player.event.queueIndex.addListener(self, handleAudioPlayerQueueIndexChange)
+        player.event.secondElapse.addListener(self, handleAudioPlayerSecondElapse)
     }
 
     deinit {
@@ -93,6 +95,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             "playback-error",
             "playback-track-changed",
             "playback-metadata-received",
+            "playback-progress-updated",
 
             "remote-stop",
             "remote-pause",
@@ -108,9 +111,9 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             "remote-bookmark",
         ]
     }
-    
+
     // MARK: - AudioSessionControllerDelegate
-    
+
     public func handleInterruption(type: InterruptionType) {
         switch type {
         case .began:
@@ -172,13 +175,13 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             let mappedCategoryMode = SessionCategoryMode(rawValue: sessionCategoryModeStr) {
             sessionCategoryMode = mappedCategoryMode.mapConfigToAVAudioSessionCategoryMode()
         }
-        
+
         if
             let sessionCategoryPolicyStr = config["iosCategoryPolicy"] as? String,
             let mappedCategoryPolicy = SessionCategoryPolicy(rawValue: sessionCategoryPolicyStr) {
             sessionCategoryPolicy = mappedCategoryPolicy.mapConfigToAVAudioSessionCategoryPolicy()
         }
-        
+
         let sessionCategoryOptsStr = config["iosCategoryOptions"] as? [String]
         let mappedCategoryOpts = sessionCategoryOptsStr?.compactMap { SessionCategoryOptions(rawValue: $0)?.mapConfigToAVAudioSessionCategoryOptions() } ?? []
         sessionCategoryOptions = AVAudioSession.CategoryOptions(mappedCategoryOpts)
@@ -316,7 +319,19 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
                                           bookmarkOptions: options["bookmarkOptions"] as? [String: Any])
         }
 
+        if let interval = options["progressUpdateEventInterval"] as? NSNumber, interval.intValue > 0 {
+            shouldEmitUpdateEventInterval = true
+            configureProgressUpdateEvent(interval: interval.doubleValue)
+        } else {
+            shouldEmitUpdateEventInterval = false
+        }
+
         resolve(NSNull())
+    }
+
+    private func configureProgressUpdateEvent(interval: Double) {
+        let time = CMTime(seconds: interval, preferredTimescale: 1)
+        self.player.timeEventFrequency = .custom(time: time)
     }
 
     @objc(add:before:resolver:rejecter:)
@@ -717,7 +732,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         // SwiftAudioEx was updated to return the array of timed metadata
         // Until we have support for that in RNTP, we take the first item to keep existing behaviour.
         let metadata = metadata.first?.items ?? []
-        
+
         func getMetadataItem(forIdentifier: AVMetadataIdentifier) -> String {
             return AVMetadataItem.metadataItems(from: metadata, filteredByIdentifier: forIdentifier).first?.stringValue ?? ""
         }
@@ -820,5 +835,22 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         }
 
         sendEvent(withName: "playback-track-changed", body: dictionary)
+    }
+
+    func handleAudioPlayerSecondElapse(seconds: Double) {
+        // because you cannot prevent the `event.secondElapse` from firing
+        // do not emit an event if `progressUpdateEventInterval` is nil
+        if shouldEmitUpdateEventInterval == false { return }
+
+        let track = player.items[player.currentIndex] as! Track
+        sendEvent(
+            withName: "playback-progress-updated",
+            body: [
+                "position": player.currentTime,
+                "duration": player.duration,
+                "buffered": player.bufferedPosition,
+                "track": player.currentIndex,
+            ]
+        )
     }
 }
