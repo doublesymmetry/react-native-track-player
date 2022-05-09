@@ -77,17 +77,20 @@ export class TrackPlayerModule {
     }
 
     static play = () => {
-        if (this.#audio.src != '') {
+        if (this.#audio.src != "" && this.#audio.src) {
             this.#audio.play()
                 .then(() => {
                     if (!MediaSession.actionsEnabled)
                         MediaSession.enableCapabilities();
                 })
-                .catch(() => {
-                    this.#emitter.emit(
-                        Event.PlaybackState, { state: State.Paused}
-                    );
-                });;
+                .catch(e => {
+                    if (e.message == "Failed to load because no supported source was found") {
+                        this.#audio.src = this.#audio.src;
+                        this.play();
+                    }
+                    
+                    this.#emitter.emit(Event.PlaybackState, {state: State.Paused});
+                });
         }
     }
 
