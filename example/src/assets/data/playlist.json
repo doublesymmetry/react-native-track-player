@@ -26,5 +26,17 @@
     "artist": "David Chavez",
     "artwork": "https://react-native-track-player.js.org/example/Rhythm%20City%20(Demo).jpeg",
     "duration": 106
+  },
+  {
+    "url": "https://react-native-track-player.js.org/example/hls/whip/playlist.m3u8",
+    "title": "Whip",
+    "artist": "prazkhanal",
+    "artwork": "https://react-native-track-player.js.org/example/hls/whip/whip.jpeg"
+  },
+  {
+    "url": "https://ais-sa5.cdnstream1.com/b75154_128mp3",
+    "title": "Smooth Jazz 24/7 (Live Radio)",
+    "artist": "New York, NY",
+    "artwork": "https://react-native-track-player.js.org/example/smooth-jazz-24-7.jpeg"
   }
 ]
