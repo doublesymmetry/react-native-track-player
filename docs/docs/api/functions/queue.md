@@ -19,7 +19,7 @@ Removes one or more tracks from the queue.
 | ------ | -------- | ------------- |
 | tracks | `array` of track indexes or a single one | The tracks that will be removed |
 
-## `skip(index)`
+## `skip(index, initialPosition)`
 Skips to a track in the queue.
 
 **Returns:** `Promise`
@@ -27,16 +27,26 @@ Skips to a track in the queue.
 | Param  | Type     | Description     |
 | ------ | -------- | --------------- |
 | index  | `number` | The track index |
+| initialPosition | `number` | **Optional.** Sets the initial playback for the track you're skipping to. |
 
-## `skipToNext()`
+## `skipToNext(initialPosition)`
 Skips to the next track in the queue.
 
 **Returns:** `Promise`
 
-## `skipToPrevious()`
+| Param  | Type     | Description     |
+| ------ | -------- | --------------- |
+| initialPosition | `number` | **Optional.** Sets the initial playback for the track you're skipping to. |
+
+## `skipToPrevious(initialPosition)`
 Skips to the previous track in the queue.
 
 **Returns:** `Promise`
+
+| Param  | Type     | Description     |
+| ------ | -------- | --------------- |
+| initialPosition | `number` | **Optional.** Sets the initial playback for the track you're skipping to. |
+
 
 ## `reset()`
 Resets the player stopping the current track and clearing the queue.
