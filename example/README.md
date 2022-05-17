@@ -46,3 +46,21 @@ the files from the `example/node_modules/react-native-track-player` directory
 up to the top level project. You would want to use this approach if you're
 making your changes directly to the code in the `example/node_modules/react-native-track-player`
 folder.
+
+## Debugging/Updating Native Code
+
+
+#### iOS
+
+First opening the Xcode Project (`open ios/example.xcworkspace`). Then you can
+simply navigate to the native dependencies, open their source files, modify
+them, or add breakpoints. See the screenshots below for specifically how to
+navigate to react-native-track-player and SwiftAudioEx dependencies (see
+screenshots below).
+
+![Xcode RNTP](https://react-native-track-player.js.org/img/debugging/debug-ios-rntp.png)
+![Xcode SwiftAudioEx](https://react-native-track-player.js.org/img/debugging/debug-ios-swift-audio-ex.png)
+
+#### Android
+
+TODO
