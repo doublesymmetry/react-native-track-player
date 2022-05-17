@@ -512,15 +512,11 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         resolve(NSNull())
     }
 
+    // NOTE: this method is really just an alias for pause. It should NOT call `player.stop` as
+    // that will reset the player, which is not the API intent.
     @objc(stop:rejecter:)
     public func stop(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
-
-        player.stop()
-        resolve(NSNull())
+        self.pause(resolve: resolve, reject: reject)
     }
 
     @objc(seekTo:resolver:rejecter:)
@@ -840,9 +836,11 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     func handleAudioPlayerSecondElapse(seconds: Double) {
         // because you cannot prevent the `event.secondElapse` from firing
         // do not emit an event if `progressUpdateEventInterval` is nil
-        if shouldEmitUpdateEventInterval == false { return }
+        // additionally, there are certain instances in which this event is emitted
+        // _after_ a manipulation to the queu causing no currentItem to exist (see reset)
+        // in which case we shouldn't emit anything or we'll get an exception.
+        if shouldEmitUpdateEventInterval == false || player.currentItem == nil { return }
 
-        let track = player.items[player.currentIndex] as! Track
         sendEvent(
             withName: "playback-progress-updated",
             body: [
