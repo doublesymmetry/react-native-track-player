@@ -20,8 +20,8 @@ Whether it will add support for [DASH](https://en.wikipedia.org/wiki/Dynamic_Ada
 
 ## `hls` (Android)
 
-Whether it will add support for [Smooth Streaming](https://en.wikipedia.org/wiki/Adaptive_bitrate_streaming#Microsoft_Smooth_Streaming) streams. This option adds an extension for handling SmoothStreaming streams, which changes the app size. Defaults to `false`.
+Whether it will add support for [HLS](https://en.wikipedia.org/wiki/Adaptive_bitrate_streaming#Apple_HTTP_Live_Streaming_(HLS)) streams. This option adds an extension for handling HLS streams, which changes the app size. Defaults to `false`.
 
 ## `smoothstreaming` (Android)
 
-Whether it will add support for SmoothStreaming streams. This option adds an extension for handling SmoothStreaming streams, which changes the app size.
+Whether it will add support for [Smooth Streaming](https://en.wikipedia.org/wiki/Adaptive_bitrate_streaming#Microsoft_Smooth_Streaming_(MSS)) streams. This option adds an extension for handling SmoothStreaming streams, which changes the app size. Defaults to `false`.
