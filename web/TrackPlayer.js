@@ -75,7 +75,7 @@ export class TrackPlayerModule {
         this.#currentIndex = index;
     }
 
-    static play = () => {
+    static play() {
         if (this.#audio.src != "" && this.#audio.src) {
             this.#audio.play()
                 .then(() => {
@@ -95,7 +95,7 @@ export class TrackPlayerModule {
         }
     }
 
-    static pause = () => {
+    static pause() {
         if (this.#audio.src)
             this.#audio.pause();
     }
@@ -118,7 +118,7 @@ export class TrackPlayerModule {
         });
     }
 
-    static add = (tracks, insertBeforeIndex) => {
+    static add(tracks, insertBeforeIndex) {
         return new Promise((resolve, reject) => {
             if (this.#playlist == null)
                 this.#playlist = [];
@@ -136,7 +136,7 @@ export class TrackPlayerModule {
         });
     }
 
-    static stop = () => {
+    static stop() {
         return new Promise((resolve, reject) => {
             if (this.#audio.src) {
                 this.#audio.pause();
@@ -146,7 +146,7 @@ export class TrackPlayerModule {
         });
     }
 
-    static reset = () => {
+    static reset() {
         return new Promise((resolve, reject) => {
             if (this.#audio.src)
                 this.#audio.pause();
@@ -162,7 +162,7 @@ export class TrackPlayerModule {
         });
     }
 
-    static destroy = () => {
+    static destroy() {
         return this.reset();
     }
 
@@ -197,8 +197,8 @@ export class TrackPlayerModule {
         });
     }
 
-    static skipToNext = () => {
-        if (this.#playlist != null) {
+    static skipToNext() {
+        if (this.#playlist) {
             let nextIndex;
             if ((this.#index + 1) == this.#playlist.length) {
                 if (this.#repeatMode == RepeatMode.Off) {
@@ -215,9 +215,9 @@ export class TrackPlayerModule {
         }
     }
 
-    static removeUpcomingTracks = () => {
+    static removeUpcomingTracks() {
         return new Promise((resolve, reject) => {
-            if (this.#playlist != null) {
+            if (this.#playlist) {
                 if (this.#playlist.length > 0) {
                     this.#playlist = this.#playlist.slice(0, this.#index)
                 }
@@ -244,14 +244,14 @@ export class TrackPlayerModule {
             this.#audio.loop = false;
     }
 
-    static getRepeatMode = () => {
+    static getRepeatMode() {
         return this.#repeatMode;
     }
 
     static seekTo = seconds => {
         return new Promise((resolve, reject) => {
             if (this.#audio.src) {
-                if (this.#audio.fastSeek != undefined)
+                if (this.#audio.fastSeek)
                     this.#audio.fastSeek(seconds);
                 else
                     this.#audio.currentTime = seconds;
@@ -274,16 +274,16 @@ export class TrackPlayerModule {
         });
     }
 
-    static getCurrentTrack = () => {
+    static getCurrentTrack() {
         return new Promise((resolve, reject) => {
-            if (this.#track != null)
+            if (this.#track)
                 resolve(this.#index);
             else
                 resolve(null);
         });
     }
 
-    static getPosition = () => {
+    static getPosition() {
         return new Promise((resolve, reject) => {
             if (this.#audio.src || this.#audio.readyState == this.#audio.HAVE_ENOUGH_DATA)
                 resolve(this.#audio.currentTime);
@@ -292,27 +292,27 @@ export class TrackPlayerModule {
         });
     }
 
-    static getVolume = () => {
+    static getVolume() {
         return this.#audio.volume;
     }
 
-    static getDuration = () => {
+    static getDuration() {
         return new Promise((resolve, reject) => {
-            if (this.#audio.src && this.#track != null)
+            if (this.#audio.src && this.#track)
                 resolve(this.#track.duration);
             else
                 resolve(0);
         });
     }
 
-    static getBufferedPosition = () => {
+    static getBufferedPosition() {
         return new Promise((resolve, reject) => {
             if (this.#audio.src)
                 resolve(this.#audio.buffered);
         });
     }
 
-    static getState = () => {
+    static getState() {
         return new Promise((resolve, reject) => {
             if (this.#audio.src == '')
                 resolve(State.None);
@@ -325,7 +325,7 @@ export class TrackPlayerModule {
         });
     }
 
-    static getRate = () => {
+    static getRate() {
         return new Promise((resolve, reject) => {
             if (this.#audio.src)
                 resolve(this.#audio.defaultPlaybackRate);
@@ -334,13 +334,13 @@ export class TrackPlayerModule {
         });
     }
 
-    static getQueue = () => {
+    static getQueue() {
         return new Promise((resolve, reject) => {
             resolve(this.#playlist);
         });
     }
 
-    static setupPlayer = () => {
+    static setupPlayer() {
         return new Promise((resolve, reject) => {
             this.#emitter = DeviceEventEmitter;
             this.#playlist = [];
@@ -379,14 +379,14 @@ export class TrackPlayerModule {
             };
 
             this.#audio.onpause = e => {
-                if (this.#track != null) {
+                if (this.#track) {
                     this.#emitter.emit(Event.PlaybackState, {state: State.Paused});
                     MediaSession.setPaused();
                 }
             };
 
             this.#audio.onplay = e => {
-                if (this.#track != null) {
+                if (this.#track) {
                     this.#emitter.emit(Event.PlaybackState, {state: State.Playing});
                     MediaSession.setPlaying();
                 }
