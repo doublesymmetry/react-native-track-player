@@ -59,12 +59,11 @@ export class TrackPlayerModule {
     static #playlist;
     static #track;
     static #index;
-    static #playEnded;
     static #audio;
     static #repeatMode;
 
     static #emitNextTrack = index => {
-        let position = this.#audio.src != ''
+        let position = this.#audio.src
             ? this.#audio.currentTime
             : -0.01
 
@@ -86,7 +85,9 @@ export class TrackPlayerModule {
                 .catch(e => {
                     if (e.message == "Failed to load because no supported source was found") {
                         this.#audio.src = this.#audio.src;
-                        this.play();
+                        this.play().catch(e => this.#emitter.emit(Event.PlaybackError, e));;
+                    } else {
+                        this.#emitter.emit(Event.PlaybackError, e);
                     }
                     
                     this.#emitter.emit(Event.PlaybackState, {state: State.Paused});
@@ -95,9 +96,8 @@ export class TrackPlayerModule {
     }
 
     static pause = () => {
-        if (this.#audio.src != '') {
+        if (this.#audio.src)
             this.#audio.pause();
-        }
     }
 
     static remove = index => {
@@ -138,7 +138,7 @@ export class TrackPlayerModule {
 
     static stop = () => {
         return new Promise((resolve, reject) => {
-            if (this.#audio.src != '') {
+            if (this.#audio.src) {
                 this.#audio.pause();
                 this.#emitter.emit(Event.PlaybackState, {state: State.Stopped});
             }
@@ -148,7 +148,7 @@ export class TrackPlayerModule {
 
     static reset = () => {
         return new Promise((resolve, reject) => {
-            if (this.#audio.src != '')
+            if (this.#audio.src)
                 this.#audio.pause();
 
             this.#audio.src = "";
@@ -170,10 +170,15 @@ export class TrackPlayerModule {
         return new Promise((resolve, reject) => {
             if (index < 0 || index >= this.#playlist.length)
                 resolve();
-
+            console.log({skip: index});
             this.#index = index;
             this.#track = this.#playlist[index];
-            this.#audio.src = this.#track.url;
+            console.log(this.#track);
+            if (this.#audio.src != this.#track.url)
+                this.#audio.src = this.#track.url;
+            else
+                this.seekTo(0);
+
             this.#emitNextTrack(index);
             MediaSession.setMetadata(
                 this.#track.title,
@@ -192,7 +197,7 @@ export class TrackPlayerModule {
         });
     }
 
-    static skipToNext = async(wasPlaying) => {
+    static skipToNext = () => {
         if (this.#playlist != null) {
             let nextIndex;
             if ((this.#index + 1) == this.#playlist.length) {
@@ -207,22 +212,6 @@ export class TrackPlayerModule {
             }
 
             this.skip(nextIndex);
-            if (!wasPlaying)
-                this.pause();
-        }
-    }
-
-    static skipToPrevious = () => {
-        if (this.#playlist != null) {
-            if (this.#index == 0) {
-                this.seekTo(0);
-                return;
-            }
-
-            this.skip(this.#index - 1);
-
-            if (!wasPlaying)
-                this.pause();
         }
     }
 
@@ -261,7 +250,7 @@ export class TrackPlayerModule {
 
     static seekTo = seconds => {
         return new Promise((resolve, reject) => {
-            if (this.#audio.src != '') {
+            if (this.#audio.src) {
                 if (this.#audio.fastSeek != undefined)
                     this.#audio.fastSeek(seconds);
                 else
@@ -309,7 +298,7 @@ export class TrackPlayerModule {
 
     static getDuration = () => {
         return new Promise((resolve, reject) => {
-            if (this.#audio.src != '' && this.#track != null)
+            if (this.#audio.src && this.#track != null)
                 resolve(this.#track.duration);
             else
                 resolve(0);
@@ -318,7 +307,7 @@ export class TrackPlayerModule {
 
     static getBufferedPosition = () => {
         return new Promise((resolve, reject) => {
-            if (this.#audio.src != '')
+            if (this.#audio.src)
                 resolve(this.#audio.buffered);
         });
     }
@@ -338,7 +327,7 @@ export class TrackPlayerModule {
 
     static getRate = () => {
         return new Promise((resolve, reject) => {
-            if (this.#audio.src != '')
+            if (this.#audio.src)
                 resolve(this.#audio.defaultPlaybackRate);
             else
                 resolve(null);
@@ -358,14 +347,12 @@ export class TrackPlayerModule {
             this.#currentIndex = null;
             this.#track = null;
             this.#index = null;
-            this.#playEnded = false;
             
             this.#audio = document.createElement("audio");
             this.#audio.onended = e => {
                 if (this.#repeatMode == RepeatMode.Off) {
                     if (this.#playlist.length - 1 == this.#index) {
                         MediaSession.setPaused();
-                        this.#playEnded = true;
                         this.#audio.src = this.#track.url;
                         this.#emitter.emit(Event.PlaybackState, { state: State.Paused});
                         this.#emitter.emit(
@@ -376,27 +363,18 @@ export class TrackPlayerModule {
                             }
                         );
                     } else {
-                        this.skipToNext(true);
+                        this.skipToNext();
                     }
 
                 } else if (this.#repeatMode == RepeatMode.Queue) {
                     if (this.#currentIndex < this.#playlist.length)
-                        this.skipToNext(true);
+                        this.skipToNext();
                     else
                         this.skip(0);
                 } else {
                     this.seekTo(0).then(() => {
                         this.#emitter.emit(Event.PlaybackState, { state: State.Playing});
                     });
-                }
-            };
-
-            this.#audio.oncanplay = e => {
-                this.play();
-
-                if (this.#playEnded) {
-                    this.#playEnded = false;
-                    this.#audio.pause();
                 }
             };
 
