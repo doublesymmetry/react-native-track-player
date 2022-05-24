@@ -326,7 +326,7 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     fun updateNotificationMetadata(title: String?, artist: String?, artwork: String?) = scope.launch {
-        player.notificationManager.notificatioMetadata = NotificationMetadata(title, artist, artwork)
+        player.notificationManager.notificationMetadata = NotificationMetadata(title, artist, artwork)
     }
 
     fun clearNotificationMetadata() = scope.launch {
