@@ -63,4 +63,71 @@ screenshots below).
 
 #### Android
 
-TODO
+You can modify any android native code for RNTP by simply opening the example
+android project in Android Studio and modifying the source:
+
+**macOS Ex**
+
+```sh
+cd react-native-track-player/example
+open -a /Applications/Android\ Studio.app ./android
+```
+
+**NOTE:** remember to run `yarn sync` when you're done making and testing your
+changes to copy them up from `node_modules` to the main repo so they can be
+committed.
+
+###### KotlinAudio
+
+If you need to resolve a bug that exists in `KotlinAudio` you'll need to build
+and install a local version of `KotlinAudio` in order to do so. Here's how:
+
+1. Clone the `KotlinAudio` project:
+
+```sh
+git clone git@github.com:doublesymmetry/KotlinAudio.git
+```
+
+2. Build and export to maven local which is the local dependency repository:
+
+```sh
+cd KotlinAudio
+./gradlew -x test  build publishToMavenLocal
+```
+
+The result of this is a local version of the build published here:
+
+```
+Windows: C:\Users\<user_name>\.m2
+Linux: /home/<user_name>/.m2
+macOS: /Users/<user_name>/.m2
+```
+
+**NOTE**: the `-x test` skips tests for faster build. Make sure you run the test
+before submitting a PR to the `KotlinAudio` project.
+
+3. Point your RNTP dependency at the local build:
+
+```groovy
+// react-native-track-player/android/build.gradle
+...
+
+dependencies {
+//    implementation 'com.github.doublesymmetry:kotlin-audio:0.1.33' // this is remote
+    implementation 'com.github.DoubleSymmetry:KotlinAudio:v0.1.33' // this is local
+    ...
+}
+```
+
+**NOTE:** there are small differences in the package naming.
+
+
+4. Finally you'll need to install the new version of RNTP in the example app and build android:
+
+```sh
+cd ./example
+yarn add file:..
+yarn android
+```
+
+:confetti_ball: You've done it. :confetti_ball:
