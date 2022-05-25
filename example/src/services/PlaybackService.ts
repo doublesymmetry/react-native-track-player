@@ -51,4 +51,6 @@ export async function PlaybackService() {
       console.log('Event.PlaybackProgressUpdated', data);
     },
   );
+
+  TrackPlayer.addEventListener(Event.RemoteSeek, (event) => console.log('Event.RemoteSeek', event));
 };

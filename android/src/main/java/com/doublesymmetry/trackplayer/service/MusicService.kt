@@ -421,6 +421,12 @@ class MusicService : HeadlessJsTaskService() {
                             emit(MusicEvents.BUTTON_SET_RATING, this)
                         }
                     }
+                    is MediaSessionCallback.SEEK -> {
+                        Bundle().apply {
+                            putDouble("position", it.position.toDouble())
+                            emit(MusicEvents.BUTTON_SEEK_TO, this)
+                        }
+                    }
                 }
             }
         }
