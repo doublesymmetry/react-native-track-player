@@ -363,22 +363,36 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     @ReactMethod
-    fun skip(index: Int, callback: Promise) {
+    fun skip(index: Int, initialTime: Float, callback: Promise) {
         musicService.skip(index)
+
+        if (initialTime >= 0) {
+            musicService.seekTo(initialTime)
+        }
+
         callback.resolve(null)
     }
 
     @ReactMethod
-    fun skipToNext(callback: Promise) {
+    fun skipToNext(initialTime: Float, callback: Promise) {
         musicService.skipToNext()
+
+        if (initialTime >= 0) {
+            musicService.seekTo(initialTime)
+        }
+
         callback.resolve(null)
     }
 
     @ReactMethod
-    fun skipToPrevious(callback: Promise) {
-//    if (verifyServiceBoundOrReject(callback)) return
+    fun skipToPrevious(initialTime: Float, callback: Promise) {
 
         musicService.skipToPrevious()
+
+        if (initialTime >= 0) {
+            musicService.seekTo(initialTime)
+        }
+
         callback.resolve(null)
     }
 
@@ -517,4 +531,12 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
             callback.resolve(musicService.event.stateChange.value.asLibState.ordinal)
         }
     }
+<<<<<<< HEAD
 }
+=======
+
+    companion object {
+        val TAG: String = MusicModule::class.java.simpleName
+    }
+}
+>>>>>>> main

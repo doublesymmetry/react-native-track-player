@@ -22,6 +22,15 @@ function resolveImportedPath(path?: number | string) {
   return resolveAssetSource(path) || path
 }
 
+// RN doesn't allow nullable NSNumbers so convert optional number parameters
+// to a conventional default.
+function optionalNumberToDefault(
+  num?: number,
+  defaultValue: number = -1,
+): number {
+  return num === undefined ? defaultValue : num;
+}
+
 // MARK: - General API
 
 /**
@@ -90,7 +99,7 @@ async function add(tracks: Track | Track[], insertBeforeIndex?: number): Promise
   }
 
   // Note: we must be careful about passing nulls to non nullable parameters on Android.
-  return TrackPlayer.add(tracks, insertBeforeIndex === undefined ? -1 : insertBeforeIndex)
+  return TrackPlayer.add(tracks, optionalNumberToDefault(insertBeforeIndex))
 }
 
 /**
@@ -114,22 +123,22 @@ async function removeUpcomingTracks(): Promise<void> {
 /**
  * Skips to a track in the queue.
  */
-async function skip(trackIndex: number): Promise<void> {
-  return TrackPlayer.skip(trackIndex)
+async function skip(trackIndex: number, initialPosition?: number): Promise<void> {
+  return TrackPlayer.skip(trackIndex, optionalNumberToDefault(initialPosition))
 }
 
 /**
  * Skips to the next track in the queue.
  */
-async function skipToNext(): Promise<void> {
-  return TrackPlayer.skipToNext()
+async function skipToNext(initialPosition?: number): Promise<void> {
+  return TrackPlayer.skipToNext(optionalNumberToDefault(initialPosition))
 }
 
 /**
  * Skips to the previous track in the queue.
  */
-async function skipToPrevious(): Promise<void> {
-  return TrackPlayer.skipToPrevious()
+async function skipToPrevious(initialPosition?: number): Promise<void> {
+  return TrackPlayer.skipToPrevious(optionalNumberToDefault(initialPosition))
 }
 
 // MARK: - Control Center / Notifications API

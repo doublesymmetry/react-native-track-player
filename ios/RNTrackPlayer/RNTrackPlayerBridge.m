@@ -38,13 +38,16 @@ RCT_EXTERN_METHOD(removeUpcomingTracks:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(skip:(nonnull NSNumber *)trackIndex
+                  initialTime:(double)initialTime
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(skipToNext:(RCTPromiseResolveBlock)resolve
+RCT_EXTERN_METHOD(skipToNext:(double)initialTime
+                  resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(skipToPrevious:(RCTPromiseResolveBlock)resolve
+RCT_EXTERN_METHOD(skipToPrevious:(double)initialTime
+                  resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(reset:(RCTPromiseResolveBlock)resolve
