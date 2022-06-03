@@ -73,6 +73,9 @@ Gets the whole queue
 ## `removeUpcomingTracks()`
 Clears any upcoming tracks from the queue.
 
+## `removePreviousTracks()[iOS]`
+Clears any previous tracks from the queue.
+
 ## `updateMetadataForTrack(index, metadata)`
 Updates the metadata of a track in the queue.
 If the current track is updated, the notification and the Now Playing Center will be updated accordingly.
