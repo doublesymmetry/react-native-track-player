@@ -3,7 +3,8 @@
 ## `add(tracks, insertBeforeIndex)`
 Adds one or more tracks to the queue.
 
-**Returns:** `Promise<number>` - The promise resolves with the first added track index
+**Returns:** `Promise<number | void>` - The promise resolves with the first
+added track index. If no tracks were added it returns `void`.
 
 | Param          | Type     | Description   |
 | -------------- | -------- | ------------- |
@@ -13,7 +14,7 @@ Adds one or more tracks to the queue.
 ## `remove(tracks)`
 Removes one or more tracks from the queue.
 
-**Returns:** `Promise`
+**Returns:** `Promise<void>`
 
 | Param  | Type     | Description   |
 | ------ | -------- | ------------- |
@@ -22,7 +23,7 @@ Removes one or more tracks from the queue.
 ## `skip(index)`
 Skips to a track in the queue.
 
-**Returns:** `Promise`
+**Returns:** `Promise<void>`
 
 | Param  | Type     | Description     |
 | ------ | -------- | --------------- |
@@ -31,12 +32,12 @@ Skips to a track in the queue.
 ## `skipToNext()`
 Skips to the next track in the queue.
 
-**Returns:** `Promise`
+**Returns:** `Promise<void>`
 
 ## `skipToPrevious()`
 Skips to the previous track in the queue.
 
-**Returns:** `Promise`
+**Returns:** `Promise<void>`
 
 ## `reset()`
 Resets the player stopping the current track and clearing the queue.
@@ -67,7 +68,7 @@ Clears any upcoming tracks from the queue.
 Updates the metadata of a track in the queue.
 If the current track is updated, the notification and the Now Playing Center will be updated accordingly.
 
-**Returns:** `Promise`
+**Returns:** `Promise<void>`
 
 | Param    | Type       | Description   |
 | -------- | ---------- | ------------- |

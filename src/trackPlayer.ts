@@ -79,7 +79,7 @@ function isServiceRunning(): Promise<boolean> {
 /**
  * Adds one or more tracks to the queue.
  */
-async function add(tracks: Track | Track[], insertBeforeIndex?: number): Promise<void> {
+async function add(tracks: Track | Track[], insertBeforeIndex?: number): Promise<number | void> {
   // Clone the array before modifying it
   if (Array.isArray(tracks)) {
     tracks = [...tracks]
