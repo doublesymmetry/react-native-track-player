@@ -531,12 +531,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
             callback.resolve(musicService.event.stateChange.value.asLibState.ordinal)
         }
     }
-<<<<<<< HEAD
-}
-=======
-
     companion object {
         val TAG: String = MusicModule::class.java.simpleName
     }
 }
->>>>>>> main
