@@ -3,42 +3,54 @@ import { useEffect, useState, useRef } from 'react'
 import TrackPlayer from './trackPlayer'
 import { State, Event, ProgressState } from './interfaces'
 
-/** Get current playback state and subsequent updates  */
-export const usePlaybackState = () => {
-  const [state, setState] = useState(State.None)
-  const isUnmountedRef = useRef(true)
+/**
+ * Get current playback state and subsequent updates
+ * @param {Object} options - The options to custom usePlaybackState
+ * @param {boolean} options.disabled - disabled option in case you don't want to set state
+ */
+export const usePlaybackState = ({ disabled }: { disabled?: boolean }) => {
+    const [state, setState] = useState(State.None);
+    const isUnmountedRef = useRef(true);
+    const disabledRef = useRef(disabled);
 
-  useEffect(() => {
-    isUnmountedRef.current = false
-    return () => {
-      isUnmountedRef.current = true
-    }
-  }, [])
+    const setPlayerState = async () => {
+        try {
+            const playerState = await TrackPlayer.getState();
 
-  useEffect(() => {
-    async function setPlayerState() {
-      try {
-        const playerState = await TrackPlayer.getState()
+            // If the component has been unmounted, exit
+            if (isUnmountedRef.current) {
+                return;
+            }
 
-        // If the component has been unmounted, exit
-        if (isUnmountedRef.current) return
+            setState(playerState);
+        } catch {} // getState only throw while you haven't yet setup, ignore failure.
+    };
 
-        setState(playerState)
-      } catch {} // getState only throw while you haven't yet setup, ignore failure.
-    }
+    useEffect(() => {
+        isUnmountedRef.current = false;
+        setPlayerState();
+        const sub = TrackPlayer.addEventListener(
+            Event.PlaybackState,
+            (data) => {
+                if (disabledRef.current) {
+                    return;
+                }
+                setState(data.state);
+            },
+        );
+        return () => {
+            isUnmountedRef.current = true;
+            sub.remove();
+        };
+    }, []);
 
-    // Set initial state
-    setPlayerState()
+    useEffect(() => {
+        disabledRef.current = disabled;
+        return () => {};
+    }, [disabled]);
 
-    const sub = TrackPlayer.addEventListener(Event.PlaybackState, data => {
-      setState(data.state)
-    })
-
-    return () => sub.remove()
-  }, [])
-
-  return state
-}
+    return state;
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Handler = (payload: { type: Event; [key: string]: any }) => void
@@ -80,59 +92,79 @@ export const useTrackPlayerEvents = (events: Event[], handler: Handler) => {
 
 /**
  * Poll for track progress for the given interval (in miliseconds)
- * @param interval - ms interval
+ * @param {Object} options - The options to custom usePlayerProgress
+ * @param {number} options.updateInterval - ms interval
+ * @param {boolean} options.disabled - disabled option in case you don't want to set state
  */
-export function useProgress(updateInterval?: number) {
-  const [state, setState] = useState<ProgressState>({ position: 0, duration: 0, buffered: 0 })
-  const playerState = usePlaybackState()
-  const stateRef = useRef(state)
-  const isUnmountedRef = useRef(true)
+const usePlayerProgress = (
+    {
+        updateInterval,
+        disabled,
+    }: { updateInterval?: number, disabled?: boolean } = {
+        updateInterval: 1000,
+    },
+) => {
+    const [state, setState] = useState({
+        position: 0,
+        duration: 0,
+        buffered: 0,
+        playerState: State.None,
+    });
+    const playerState = usePlaybackState({ disabled });
+    const stateRef = useRef(state);
+    const isUnmountedRef = useRef(true);
 
-  useEffect(() => {
-    isUnmountedRef.current = false
-    return () => {
-      isUnmountedRef.current = true
-    }
-  }, [])
+    useEffect(() => {
+        isUnmountedRef.current = false;
+        return () => {
+            isUnmountedRef.current = true;
+        };
+    }, []);
 
-  const getProgress = async () => {
-    try {
-      const [position, duration, buffered] = await Promise.all([
-        TrackPlayer.getPosition(),
-        TrackPlayer.getDuration(),
-        TrackPlayer.getBufferedPosition(),
-      ])
+    const getProgress = async (newPlayerState) => {
+        try {
+            const [position, duration, buffered] = await Promise.all([
+                TrackPlayer.getPosition(),
+                TrackPlayer.getDuration(),
+                TrackPlayer.getBufferedPosition(),
+            ]);
 
-      // If the component has been unmounted, exit
-      if (isUnmountedRef.current) return
+            // If the component has been unmounted, exit
+            if (isUnmountedRef.current) {
+                return;
+            }
 
-      // If there is no change in properties, exit
-      if (
-        position === stateRef.current.position &&
-        duration === stateRef.current.duration &&
-        buffered === stateRef.current.buffered
-      )
-        return
+            // If there is no change in properties, exit
+            if (
+                position === stateRef.current.position &&
+                duration === stateRef.current.duration &&
+                buffered === stateRef.current.buffered
+            ) {
+                return;
+            }
 
-      const state = { position, duration, buffered }
-      stateRef.current = state
-      setState(state)
-    } catch {} // these method only throw while you haven't yet setup, ignore failure.
-  }
+            const newState = { position, duration, buffered };
+            stateRef.current = newState;
+            setState({ ...newState, playerState: newPlayerState });
+        } catch {} // these method only throw while you haven't yet setup, ignore failure.
+    };
 
-  useEffect(() => {
-    if (playerState === State.None) {
-      setState({ position: 0, duration: 0, buffered: 0 })
-      return
-    }
+    useEffect(() => {
+        if (disabled) {
+            return;
+        }
+        if (playerState === State.None) {
+            setState({ position: 0, duration: 0, buffered: 0, playerState });
+            return;
+        }
 
-    // Set initial state
-    getProgress()
+        // Set initial state
+        getProgress(playerState);
 
-    // Create interval to update state periodically
-    const poll = setInterval(getProgress, updateInterval || 1000)
-    return () => clearInterval(poll)
-  }, [playerState, updateInterval])
+        // Create interval to update state periodically
+        const poll = setInterval(getProgress, updateInterval || 1000);
+        return () => clearInterval(poll);
+    }, [playerState, updateInterval, disabled]);
 
-  return state
-}
+    return state;
+};
