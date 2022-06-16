@@ -6,6 +6,8 @@ import android.os.Binder
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.os.Process.killProcess
+import android.os.Process.myPid
 import android.support.v4.media.RatingCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.*
@@ -23,10 +25,8 @@ import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.flow
 import java.util.concurrent.TimeUnit
 
 
@@ -91,7 +91,7 @@ class MusicService : HeadlessJsTaskService() {
         scope.launch {
             with(this@MusicService) {
                 latestOptions = options
-                stopWithApp = options.getBoolean(STOP_WITH_APP_KEY)
+                stopWithApp = true
 
                 ratingType = Utils.getInt(options, "ratingType", RatingCompat.RATING_NONE)
 
@@ -196,7 +196,7 @@ class MusicService : HeadlessJsTaskService() {
         if (updateInterval != null && updateInterval > 0) {
             progressUpdateJob = scope.launch {
                 progressUpdateEventFlow(updateInterval.toLong())
-                    .collect { emit(MusicEvents.PLAYBACK_PROGRESS_UPDATED, it) }
+                        .collect { emit(MusicEvents.PLAYBACK_PROGRESS_UPDATED, it) }
             }
         }
     }
@@ -478,10 +478,17 @@ class MusicService : HeadlessJsTaskService() {
         return binder
     }
 
+    override fun onHeadlessJsTaskFinish(taskId: Int) {
+    }
+
+    override fun stopService(name: Intent?): Boolean {
+        return super.stopService(name)
+    }
+
     override fun onUnbind(intent: Intent?): Boolean {
-        if (::player.isInitialized) {
-            player.notificationManager.onUnbind()
-        }
+//        if (::player.isInitialized) {
+//            player.notificationManager.onUnbind()
+//        }
 
         return false
     }
@@ -491,9 +498,15 @@ class MusicService : HeadlessJsTaskService() {
         // Player will continue running if this is true, even if the app itself is killed.
         if (!forceDestroy && !stopWithApp) return
 
-        stopForeground(true)
         destroyPlayer()
+        stopForeground(true)
         stopSelf()
+//        stop() //stopSelf doesnt work here????
+    }
+
+    override fun onDestroy() {
+        killProcess(myPid())
+        super.onDestroy()
     }
 
     inner class MusicBinder : Binder() {

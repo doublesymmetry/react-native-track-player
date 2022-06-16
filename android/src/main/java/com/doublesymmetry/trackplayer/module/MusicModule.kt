@@ -5,6 +5,7 @@ import android.content.*
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.RatingCompat
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.Capability
@@ -35,7 +36,8 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
     private lateinit var musicService: MusicService
 
-    val context = reactContext
+    private val context = reactContext
+    private val activityContext by lazy { currentActivity!! }
 
     @Nonnull
     override fun getName(): String {
@@ -51,14 +53,15 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         // Service MUST be rebound during activity onStart, if not already bound
         if (isServiceBound) return
 
-        Intent(context, MusicService::class.java).also { intent ->
-            context.bindService(intent, this, Context.BIND_AUTO_CREATE)
+        Intent(activityContext, MusicService::class.java).also { intent ->
+            activity.bindService(intent, this, Context.BIND_AUTO_CREATE)
         }
     }
 
     override fun onActivityStopped(activity: Activity) {
         // Service MUST be unbound during activity onStop
-        unbindService()
+        if (musicService.stopWithApp)
+            unbindService()
     }
 
     override fun onActivityDestroyed(activity: Activity) {
@@ -102,7 +105,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     private fun unbindService() {
         // The music service will not stop unless we unbind it first.
         if (isServiceBound) {
-            context.unbindService(this)
+            activityContext.unbindService(this)
             isServiceBound = false
         }
     }
@@ -206,9 +209,9 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         eventHandler = MusicEvents(context)
         manager.registerReceiver(eventHandler!!, IntentFilter(EVENT_INTENT))
 
-        Intent(context, MusicService::class.java).also { intent ->
-            ContextCompat.startForegroundService(context, intent)
-            context.bindService(intent, this, Context.BIND_AUTO_CREATE)
+        Intent(activityContext, MusicService::class.java).also { intent ->
+            activityContext.bindService(intent, this, Context.BIND_AUTO_CREATE)
+            ContextCompat.startForegroundService(activityContext, intent)
         }
     }
 
@@ -230,6 +233,8 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
      * @see [MusicService.stopWithApp]
      */
     private fun destroyServiceIfAllowed(forceDestroy: Boolean = false) {
+        // TODO take into account unbind with forceDestroy
+        Toast.makeText(context, musicService.stopWithApp.toString(), Toast.LENGTH_SHORT).show()
         if (!musicService.stopWithApp) return
         musicService.destroyIfAllowed(forceDestroy)
     }
@@ -530,8 +535,5 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         } else {
             callback.resolve(musicService.event.stateChange.value.asLibState.ordinal)
         }
-    }
-    companion object {
-        val TAG: String = MusicModule::class.java.simpleName
     }
 }
