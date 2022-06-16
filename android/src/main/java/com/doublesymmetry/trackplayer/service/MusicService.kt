@@ -6,8 +6,6 @@ import android.os.Binder
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
-import android.os.Process.killProcess
-import android.os.Process.myPid
 import android.support.v4.media.RatingCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.*
@@ -91,7 +89,7 @@ class MusicService : HeadlessJsTaskService() {
         scope.launch {
             with(this@MusicService) {
                 latestOptions = options
-                stopWithApp = true
+                stopWithApp = false
 
                 ratingType = Utils.getInt(options, "ratingType", RatingCompat.RATING_NONE)
 
@@ -504,10 +502,10 @@ class MusicService : HeadlessJsTaskService() {
 //        stop() //stopSelf doesnt work here????
     }
 
-    override fun onDestroy() {
-        killProcess(myPid())
-        super.onDestroy()
-    }
+//    override fun onDestroy() {
+//        killProcess(myPid())
+//        super.onDestroy()
+//    }
 
     inner class MusicBinder : Binder() {
         val service = this@MusicService

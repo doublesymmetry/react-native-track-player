@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.*
 import android.os.Bundle
 import android.os.IBinder
+import android.os.Process
 import android.support.v4.media.RatingCompat
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -67,6 +68,9 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     override fun onActivityDestroyed(activity: Activity) {
         // Service MUST be destroyed during activity onDestroy
         destroyServiceIfAllowed()
+
+        if (musicService.stopWithApp)
+            Process.killProcess(Process.myPid())
     }
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
