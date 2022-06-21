@@ -2,6 +2,7 @@ buildscript {
     def kotlin_version = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : project.properties['RNTP_kotlinVersion']
 
     repositories {
+        mavenLocal()
         mavenCentral()
         google()
     }
@@ -38,6 +39,7 @@ android {
 }
 
 repositories {
+    mavenLocal()
     maven {
         // As RN is not updated in jcenter anymore, we'll have to grab it from npm
         // Make sure you have installed the react-native npm package before compiling
@@ -49,7 +51,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.DoubleSymmetry:KotlinAudio:v0.1.33'
+    implementation 'com.github.DoubleSymmetry:KotlinAudio:v0.1.34'
 
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'
