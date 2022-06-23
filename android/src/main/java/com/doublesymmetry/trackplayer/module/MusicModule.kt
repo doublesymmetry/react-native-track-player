@@ -512,7 +512,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     fun getRepeatMode(callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
 
-        callback.resolve(musicService.getRepeatMode())
+        callback.resolve(musicService.getRepeatMode().ordinal)
     }
 
     @ReactMethod
