@@ -821,7 +821,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
         // Load isLiveStream option for track
         var isTrackLiveStream = false
-        if let nextIndex = nextIndex {
+        if let nextIndex = nextIndex, nextIndex < player.items.count {
             let track = player.items[nextIndex]
             isTrackLiveStream = (track as? Track)?.isLiveStream ?? false
         }
