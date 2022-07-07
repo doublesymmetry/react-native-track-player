@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.RatingCompat
+import androidx.annotation.MainThread
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.models.NotificationButton.*
@@ -21,7 +22,6 @@ import com.doublesymmetry.trackplayer.utils.Utils
 import com.doublesymmetry.trackplayer.utils.Utils.setRating
 import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
-import com.facebook.react.bridge.Promise
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
@@ -63,7 +63,9 @@ class MusicService : HeadlessJsTaskService() {
         return START_STICKY
     }
 
+    @MainThread
     fun setupPlayer(playerOptions: Bundle?, promise: Promise?) {
+    // fun setupPlayer(playerOptions: Bundle?) {
         val bufferOptions = BufferConfig(
                 playerOptions?.getDouble(MIN_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
                 playerOptions?.getDouble(MAX_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
@@ -77,116 +79,107 @@ class MusicService : HeadlessJsTaskService() {
 
         val automaticallyUpdateNotificationMetadata = playerOptions?.getBoolean(AUTO_UPDATE_METADATA, true) ?: true
 
-        scope.launch {
-            player = QueuedAudioPlayer(this@MusicService, bufferOptions, cacheOptions)
-            player.automaticallyUpdateNotificationMetadata = automaticallyUpdateNotificationMetadata
-            observeEvents()
-            promise?.resolve(null)
-        }
+        player = QueuedAudioPlayer(this@MusicService, bufferOptions, cacheOptions)
+        player.automaticallyUpdateNotificationMetadata = automaticallyUpdateNotificationMetadata
+        observeEvents()
     }
 
+    @MainThread
     fun updateOptions(options: Bundle) {
-        scope.launch {
-            with(this@MusicService) {
-                latestOptions = options
-                stopWithApp = false
+        latestOptions = options
+        stopWithApp = options.getBoolean(STOP_WITH_APP_KEY)
 
-                ratingType = Utils.getInt(options, "ratingType", RatingCompat.RATING_NONE)
+        ratingType = Utils.getInt(options, "ratingType", RatingCompat.RATING_NONE)
 
-                player.playerOptions.alwaysPauseOnInterruption = options.getBoolean(PAUSE_ON_INTERRUPTION_KEY)
+        player.playerOptions.alwaysPauseOnInterruption = options.getBoolean(PAUSE_ON_INTERRUPTION_KEY)
 
-                capabilities = options.getIntegerArrayList("capabilities")
-                        ?.map { Capability.values()[it] } ?: emptyList()
-                notificationCapabilities = options.getIntegerArrayList("notificationCapabilities")
-                        ?.map { Capability.values()[it] } ?: emptyList()
-                compactCapabilities = options.getIntegerArrayList("compactCapabilities")
-                        ?.map { Capability.values()[it] } ?: emptyList()
+        capabilities = options.getIntegerArrayList("capabilities")?.map { Capability.values()[it] } ?: emptyList()
+        notificationCapabilities = options.getIntegerArrayList("notificationCapabilities")?.map { Capability.values()[it] } ?: emptyList()
+        compactCapabilities = options.getIntegerArrayList("compactCapabilities")?.map { Capability.values()[it] } ?: emptyList()
 
-                if (notificationCapabilities.isEmpty()) notificationCapabilities = capabilities
+        if (notificationCapabilities.isEmpty()) notificationCapabilities = capabilities
 
-                val buttonsList = mutableListOf<NotificationButton>()
+        val buttonsList = mutableListOf<NotificationButton>()
 
-                notificationCapabilities.forEach {
-                    when (it) {
-                        Capability.PLAY -> {
-                            val playIcon =
-                                    Utils.getIconOrNull(this, options, "playIcon")
-                            buttonsList.add(PLAY(icon = playIcon))
-                        }
-                        Capability.PAUSE -> {
-                            val pauseIcon =
-                                    Utils.getIconOrNull(this, options, "pauseIcon")
-                            buttonsList.add(PAUSE(icon = pauseIcon))
-                        }
-                        Capability.STOP -> {
-                            val stopIcon =
-                                    Utils.getIconOrNull(this, options, "stopIcon")
-                            buttonsList.add(STOP(icon = stopIcon, isCompact = isCompact(it)))
-                        }
-                        Capability.SKIP_TO_NEXT -> {
-                            val nextIcon =
-                                    Utils.getIconOrNull(this, options, "nextIcon")
-                            buttonsList.add(NEXT(icon = nextIcon, isCompact = isCompact(it)))
-                        }
-                        Capability.SKIP_TO_PREVIOUS -> {
-                            val previousIcon =
-                                    Utils.getIconOrNull(this, options, "previousIcon")
-                            buttonsList.add(
-                                    PREVIOUS(
-                                            icon = previousIcon,
-                                            isCompact = isCompact(it)
-                                    )
-                            )
-                        }
-                        Capability.JUMP_FORWARD -> {
-                            val forwardIcon = Utils.getIcon(
-                                    this,
-                                    options,
-                                    "forwardIcon",
-                                    R.drawable.forward
-                            )
-                            buttonsList.add(FORWARD(icon = forwardIcon, isCompact = isCompact(it)))
-                        }
-                        Capability.JUMP_BACKWARD -> {
-                            val backwardIcon = Utils.getIcon(
-                                    this,
-                                    options,
-                                    "rewindIcon",
-                                    R.drawable.rewind
-                            )
-                            buttonsList.add(
-                                    BACKWARD(
-                                            icon = backwardIcon,
-                                            isCompact = isCompact(it)
-                                    )
-                            )
-                        }
-                        else -> return@forEach
-                    }
+        notificationCapabilities.forEach {
+            when (it) {
+                Capability.PLAY -> {
+                    val playIcon =
+                        Utils.getIconOrNull(this, options, "playIcon")
+                    buttonsList.add(PLAY(icon = playIcon))
                 }
-
-                val openAppIntent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
-                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                Capability.PAUSE -> {
+                    val pauseIcon =
+                        Utils.getIconOrNull(this, options, "pauseIcon")
+                    buttonsList.add(PAUSE(icon = pauseIcon))
                 }
-
-                val accentColor = Utils.getIntOrNull(options, "color")
-                val smallIcon = Utils.getIconOrNull(this, options, "icon")
-                val pendingIntent = PendingIntent.getActivity(
+                Capability.STOP -> {
+                    val stopIcon =
+                        Utils.getIconOrNull(this, options, "stopIcon")
+                    buttonsList.add(STOP(icon = stopIcon, isCompact = isCompact(it)))
+                }
+                Capability.SKIP_TO_NEXT -> {
+                    val nextIcon =
+                        Utils.getIconOrNull(this, options, "nextIcon")
+                    buttonsList.add(NEXT(icon = nextIcon, isCompact = isCompact(it)))
+                }
+                Capability.SKIP_TO_PREVIOUS -> {
+                    val previousIcon =
+                        Utils.getIconOrNull(this, options, "previousIcon")
+                    buttonsList.add(
+                        PREVIOUS(
+                            icon = previousIcon,
+                            isCompact = isCompact(it)
+                        )
+                    )
+                }
+                Capability.JUMP_FORWARD -> {
+                    val forwardIcon = Utils.getIcon(
                         this,
-                        0,
-                        openAppIntent,
-                        getPendingIntentFlags()
-                )
-                val notificationConfig = NotificationConfig(
-                        buttonsList,
-                        accentColor,
-                        smallIcon,
-                        pendingIntent
-                )
-
-                player.notificationManager.createNotification(notificationConfig)
+                        options,
+                        "forwardIcon",
+                        R.drawable.forward
+                    )
+                    buttonsList.add(FORWARD(icon = forwardIcon, isCompact = isCompact(it)))
+                }
+                Capability.JUMP_BACKWARD -> {
+                    val backwardIcon = Utils.getIcon(
+                        this,
+                        options,
+                        "rewindIcon",
+                        R.drawable.rewind
+                    )
+                    buttonsList.add(
+                        BACKWARD(
+                            icon = backwardIcon,
+                            isCompact = isCompact(it)
+                        )
+                    )
+                }
+                else -> return@forEach
             }
         }
+
+        val openAppIntent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+
+        val accentColor = Utils.getIntOrNull(options, "color")
+        val smallIcon = Utils.getIconOrNull(this, options, "icon")
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            openAppIntent,
+            getPendingIntentFlags()
+        )
+        val notificationConfig = NotificationConfig(
+            buttonsList,
+            accentColor,
+            smallIcon,
+            pendingIntent
+        )
+
+        player.notificationManager.createNotification(notificationConfig)
 
         // setup progress update events if configured
         progressUpdateJob?.cancel()
@@ -199,6 +192,7 @@ class MusicService : HeadlessJsTaskService() {
         }
     }
 
+    @MainThread
     private fun progressUpdateEventFlow(interval: Long) = flow {
         while (true) {
             if (player.isPlaying) {
@@ -210,6 +204,7 @@ class MusicService : HeadlessJsTaskService() {
         }
     }
 
+    @MainThread
     private suspend fun progressUpdateEvent(): Bundle {
         return withContext(Dispatchers.Main) {
             Bundle().apply {
@@ -233,117 +228,126 @@ class MusicService : HeadlessJsTaskService() {
         return compactCapabilities.contains(capability)
     }
 
+    @MainThread
     fun add(track: Track) {
         add(listOf(track))
     }
 
+    @MainThread
     fun add(tracks: List<Track>) {
         val items = tracks.map { it.toAudioItem() }
-        scope.launch { player.add(items, false) }
+        player.add(items, false)
     }
 
+    @MainThread
     fun add(tracks: List<Track>, atIndex: Int) {
         val items = tracks.map { it.toAudioItem() }
-        scope.launch { player.add(items, atIndex) }
+        player.add(items, atIndex)
     }
 
+    @MainThread
     fun remove(index: Int) {
         remove(listOf(index))
     }
 
-    fun remove(indexes: List<Int>) = scope.launch {
+    @MainThread
+    fun remove(indexes: List<Int>) {
         player.remove(indexes)
     }
 
-    fun play() = scope.launch {
+    @MainThread
+    fun play() {
         player.play()
     }
 
-    fun pause() = scope.launch {
+    @MainThread
+    fun pause() {
         player.pause()
     }
 
-    fun stopPlayer() = scope.launch {
+    @MainThread
+    fun stopPlayer() {
         player.stop()
     }
 
-    private fun destroyPlayer() = scope.launch {
-        player.destroy()
-    }
-
-    fun removeUpcomingTracks() = scope.launch {
+    @MainThread
+    fun removeUpcomingTracks() {
         player.removeUpcomingItems()
     }
 
-    fun removePreviousTracks() = scope.launch {
+    @MainThread
+    fun removePreviousTracks() {
         player.removePreviousItems()
     }
 
-    fun skip(index: Int) = scope.launch {
+    @MainThread
+    fun skip(index: Int) {
         player.jumpToItem(index, player.isPlaying)
     }
 
-    fun skipToNext() = scope.launch {
+    @MainThread
+    fun skipToNext() {
         player.next()
     }
 
-    fun skipToPrevious() = scope.launch {
+    @MainThread
+    fun skipToPrevious() {
         player.previous()
     }
 
-    fun seekTo(seconds: Float) = scope.launch {
+    @MainThread
+    fun seekTo(seconds: Float) {
         player.seek((seconds * 1000).toLong(), TimeUnit.MILLISECONDS)
     }
 
-    fun getCurrentTrackIndex(callback: (Int) -> Unit) = scope.launch {
-        callback(player.currentIndex)
-    }
+    @MainThread
+    fun getCurrentTrackIndex(): Int = player.currentIndex
 
-    fun getRate(callback: (Float) -> Unit) = scope.launch {
-        callback(player.playbackSpeed)
-    }
+    @MainThread
+    fun getRate(): Float = player.playbackSpeed
 
-    fun setRate(value: Float) = scope.launch {
+    @MainThread
+    fun setRate(value: Float) {
         player.playbackSpeed = value
     }
 
-    fun getRepeatMode(callback: (RepeatMode) -> Unit) = scope.launch {
-        callback(player.playerOptions.repeatMode)
-    }
+    @MainThread
+    fun getRepeatMode(): RepeatMode = player.playerOptions.repeatMode
 
-    fun setRepeatMode(value: RepeatMode) = scope.launch {
+    @MainThread
+    fun setRepeatMode(value: RepeatMode) {
         player.playerOptions.repeatMode = value
     }
 
-    fun getVolume(callback: (Float) -> Unit) = scope.launch {
-        callback(player.volume)
-    }
+    @MainThread
+    fun getVolume(): Float = player.volume
 
-    fun setVolume(value: Float) = scope.launch {
+    @MainThread
+    fun setVolume(value: Float) {
         player.volume = value
     }
 
-    fun getDurationInSeconds(callback: (Double) -> Unit) = scope.launch {
-        callback(player.duration.toDouble() / 1000)
-    }
+    @MainThread
+    fun getDurationInSeconds(): Double = player.duration.toDouble() / 1000
 
-    fun getPositionInSeconds(callback: (Double) -> Unit) = scope.launch {
-        callback(player.position.toDouble() / 1000)
-    }
+    @MainThread
+    fun getPositionInSeconds(): Double = player.position.toDouble() / 1000
 
-    fun getBufferedPositionInSeconds(callback: (Double) -> Unit) = scope.launch {
-        callback(player.bufferedPosition.toDouble() / 1000)
-    }
+    @MainThread
+    fun getBufferedPositionInSeconds(): Double = player.bufferedPosition.toDouble() / 1000
 
-    fun updateMetadataForTrack(index: Int, track: Track) = scope.launch {
+    @MainThread
+    fun updateMetadataForTrack(index: Int, track: Track) {
         player.replaceItem(index, track.toAudioItem())
     }
 
-    fun updateNotificationMetadata(title: String?, artist: String?, artwork: String?) = scope.launch {
+    @MainThread
+    fun updateNotificationMetadata(title: String?, artist: String?, artwork: String?) {
         player.notificationManager.notificationMetadata = NotificationMetadata(title, artist, artwork)
     }
 
-    fun clearNotificationMetadata() = scope.launch {
+    @MainThread
+    fun clearNotificationMetadata() {
         player.notificationManager.clearNotification()
     }
 
