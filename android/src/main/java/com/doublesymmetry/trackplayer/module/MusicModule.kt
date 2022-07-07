@@ -58,11 +58,12 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         if (isServiceBound) return
 
         scope.launch {
-              Intent(activityContext, MusicService::class.java).also { intent ->
-            activity.bindService(intent, this, Context.BIND_AUTO_CREATE)
+            Intent(activityContext, MusicService::class.java).also { intent ->
+                activity.bindService(intent, this@MusicModule, Context.BIND_AUTO_CREATE)
 
-            // musicService.destroyIfAllowed(true)
-            // unbindFromService()
+                // musicService.destroyIfAllowed(true)
+                // unbindFromService()
+            }
         }
     }
 
@@ -82,16 +83,25 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
         // If a binder already exists, don't get a new one
-        if (!::musicService.isInitialized) {
-            val binder: MusicService.MusicBinder = service as MusicService.MusicBinder
-            musicService = binder.service
-            musicService.setupPlayer(playerOptions, playerSetUpPromise)
-        }
+//        if (!::musicService.isInitialized) {
+//            val binder: MusicService.MusicBinder = service as MusicService.MusicBinder
+//            musicService = binder.service
+//            musicService.setupPlayer(playerOptions)
+//        }
 
         scope.launch {
-            musicService.setupPlayer(playerOptions)
-            playerSetUpPromise?.resolve(null)
-            isServiceBound = true
+            // If a binder already exists, don't get a new one
+            if (!::musicService.isInitialized) {
+                val binder: MusicService.MusicBinder = service as MusicService.MusicBinder
+                musicService = binder.service
+                musicService.setupPlayer(playerOptions)
+                playerSetUpPromise?.resolve(null)
+                isServiceBound = true
+            }
+
+//            musicService.setupPlayer(playerOptions)
+////            playerSetUpPromise?.resolve(null)
+////            isServiceBound = true
         }
     }
 

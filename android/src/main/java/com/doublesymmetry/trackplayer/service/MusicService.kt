@@ -24,6 +24,7 @@ import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import java.util.concurrent.TimeUnit
 
@@ -64,7 +65,7 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     @MainThread
-    fun setupPlayer(playerOptions: Bundle?, promise: Promise?) {
+    fun setupPlayer(playerOptions: Bundle?) {
     // fun setupPlayer(playerOptions: Bundle?) {
         val bufferOptions = BufferConfig(
                 playerOptions?.getDouble(MIN_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
@@ -87,7 +88,7 @@ class MusicService : HeadlessJsTaskService() {
     @MainThread
     fun updateOptions(options: Bundle) {
         latestOptions = options
-        stopWithApp = options.getBoolean(STOP_WITH_APP_KEY)
+        stopWithApp = true
 
         ratingType = Utils.getInt(options, "ratingType", RatingCompat.RATING_NONE)
 
@@ -500,7 +501,7 @@ class MusicService : HeadlessJsTaskService() {
         // Player will continue running if this is true, even if the app itself is killed.
         if (!forceDestroy && !stopWithApp) return
 
-        destroyPlayer()
+        stopPlayer()
         stopForeground(true)
         stopSelf()
 //        stop() //stopSelf doesnt work here????
