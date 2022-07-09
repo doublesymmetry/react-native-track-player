@@ -394,7 +394,7 @@ class MusicService : HeadlessJsTaskService() {
                             val interval = (latestOptions?.getInt(FORWARD_JUMP_INTERVAL_KEY) ?: latestOptions?.getInt(
                                     BACKWARD_JUMP_INTERVAL_KEY)) ?: 15
 
-                            putInt("interval", interval)
+                            putInt(INTERVAL_KEY, interval)
                             emit(MusicEvents.BUTTON_JUMP_FORWARD, this)
                         }
                     }
@@ -403,7 +403,7 @@ class MusicService : HeadlessJsTaskService() {
                             val interval = (latestOptions?.getInt(BACKWARD_JUMP_INTERVAL_KEY) ?: latestOptions?.getInt(
                                     FORWARD_JUMP_INTERVAL_KEY)) ?: 15
 
-                            putInt("interval", interval)
+                            putInt(INTERVAL_KEY, interval)
                             emit(MusicEvents.BUTTON_JUMP_BACKWARD, this)
                         }
                     }
@@ -427,6 +427,35 @@ class MusicService : HeadlessJsTaskService() {
         scope.launch {
             event.onMediaSessionCallbackTriggered.collect {
                 when (it) {
+                    is MediaSessionCallback.PLAY -> emit(MusicEvents.BUTTON_PLAY)
+                    is MediaSessionCallback.PAUSE -> emit(MusicEvents.BUTTON_PAUSE)
+                    is MediaSessionCallback.NEXT -> emit(MusicEvents.BUTTON_SKIP_NEXT)
+                    is MediaSessionCallback.PREVIOUS -> emit(MusicEvents.BUTTON_SKIP_PREVIOUS)
+                    is MediaSessionCallback.FORWARD -> {
+                        Bundle().apply {
+                            val interval = (latestOptions?.getInt(FORWARD_JUMP_INTERVAL_KEY) ?: latestOptions?.getInt(
+                                BACKWARD_JUMP_INTERVAL_KEY)) ?: 15
+
+                            putInt(INTERVAL_KEY, interval)
+                            emit(MusicEvents.BUTTON_JUMP_FORWARD, this)
+                        }
+                    }
+                    is MediaSessionCallback.REWIND -> {
+                        Bundle().apply {
+                            val interval = (latestOptions?.getInt(BACKWARD_JUMP_INTERVAL_KEY) ?: latestOptions?.getInt(
+                                FORWARD_JUMP_INTERVAL_KEY)) ?: 15
+
+                            putInt(INTERVAL_KEY, interval)
+                            emit(MusicEvents.BUTTON_JUMP_BACKWARD, this)
+                        }
+                    }
+                    is MediaSessionCallback.STOP -> emit(MusicEvents.BUTTON_STOP)
+                    is MediaSessionCallback.SEEK -> {
+                        Bundle().apply {
+                            putDouble(POSITION_KEY, it.position.toDouble() / 1000)
+                            emit(MusicEvents.BUTTON_SEEK_TO, this)
+                        }
+                    }
                     is MediaSessionCallback.RATING -> {
                         Bundle().apply {
                             setRating(this, "rating", it.rating)
@@ -507,6 +536,7 @@ class MusicService : HeadlessJsTaskService() {
         const val POSITION_KEY = "position"
         const val DURATION_KEY = "duration"
         const val BUFFERED_POSITION_KEY = "buffer"
+        const val INTERVAL_KEY = "interval"
 
         const val TASK_KEY = "TrackPlayer"
 

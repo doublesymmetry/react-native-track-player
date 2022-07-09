@@ -5,22 +5,41 @@ let wasPausedByDuck = false;
 
 export async function PlaybackService() {
   TrackPlayer.addEventListener(Event.RemotePause, () => {
+    console.log('Event.RemotePause');
     TrackPlayer.pause();
   });
 
   TrackPlayer.addEventListener(Event.RemotePlay, () => {
+    console.log('Event.RemotePlay');
     TrackPlayer.play();
   });
 
   TrackPlayer.addEventListener(Event.RemoteNext, () => {
+    console.log('Event.RemoteNext');
     TrackPlayer.skipToNext();
   });
 
   TrackPlayer.addEventListener(Event.RemotePrevious, () => {
+    console.log('Event.RemotePrevious');
     TrackPlayer.skipToPrevious();
   });
 
+  TrackPlayer.addEventListener(Event.RemoteSeek, data => {
+    console.log('Event.RemoteSeek', data);
+    TrackPlayer.seekTo(data.position);
+  });
+
+  TrackPlayer.addEventListener(Event.RemoteJumpForward, data => {
+    console.log('Event.RemoteJumpForward', data);
+  });
+
+  TrackPlayer.addEventListener(Event.RemoteJumpBackward, data => {
+    console.log('Event.RemoteJumpBackward', data);
+  });
+
   TrackPlayer.addEventListener(Event.RemoteDuck, async e => {
+    console.log('Event.RemoteJumpBackward', e);
+
     if (e.permanent === true) {
       TrackPlayer.stop();
     } else {
@@ -51,4 +70,4 @@ export async function PlaybackService() {
       console.log('Event.PlaybackProgressUpdated', data);
     },
   );
-};
+}

@@ -16,6 +16,9 @@ export const SetupService = async (): Promise<boolean> => {
         Capability.SkipToNext,
         Capability.SkipToPrevious,
         Capability.Stop,
+        Capability.SeekTo,
+        Capability.JumpForward,
+        Capability.JumpBackward,
       ],
       compactCapabilities: [
         Capability.Play,
@@ -23,6 +26,8 @@ export const SetupService = async (): Promise<boolean> => {
         Capability.SkipToNext,
       ],
       progressUpdateEventInterval: 2,
+      forwardJumpInterval: 10,
+      backwardJumpInterval: 10,
     });
 
     isSetup = true;
