@@ -30,7 +30,7 @@ export const usePlaybackState = () => {
     // Set initial state
     setPlayerState()
 
-    const sub = TrackPlayer.addEventListener(Event.PlaybackState, data => {
+    const sub = TrackPlayer.addEventListener<Event.PlaybackState>(Event.PlaybackState, data => {
       setState(data.state)
     })
 
