@@ -24,11 +24,8 @@ function resolveImportedPath(path?: number | string) {
 
 // RN doesn't allow nullable NSNumbers so convert optional number parameters
 // to a conventional default.
-function optionalNumberToDefault(
-  num?: number,
-  defaultValue: number = -1,
-): number {
-  return num === undefined ? defaultValue : num;
+function optionalNumberToDefault(num?: number, defaultValue: number = -1): number {
+  return num === undefined ? defaultValue : num
 }
 
 // MARK: - General API
