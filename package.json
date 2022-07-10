@@ -15,7 +15,9 @@
     "prepublishOnly": "yarn lint",
     "preversion": "yarn lint",
     "version": "yarn format && git add -A src",
-    "postversion": "git push && git push --tags"
+    "postversion": "git push && git push --tags",
+    "lint:ci": "eslint \"src/**/*.ts\" --max-warnings=0",
+    "format:ci": "prettier --check \"src/**/*.ts\""
   },
   "files": [
     "lib/**/*",
