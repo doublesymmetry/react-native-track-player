@@ -1,26 +1,28 @@
 import TrackPlayer, {Event, State} from 'react-native-track-player';
-import type {ProgressUpdateEvent} from 'react-native-track-player';
 
 let wasPausedByDuck = false;
 
 export async function PlaybackService() {
-  TrackPlayer.addEventListener(Event.RemotePause, () => {
+  TrackPlayer.addEventListener<Event.RemotePause>(Event.RemotePause, () => {
     TrackPlayer.pause();
   });
 
-  TrackPlayer.addEventListener(Event.RemotePlay, () => {
+  TrackPlayer.addEventListener<Event.RemotePlay>(Event.RemotePlay, () => {
     TrackPlayer.play();
   });
 
-  TrackPlayer.addEventListener(Event.RemoteNext, () => {
+  TrackPlayer.addEventListener<Event.RemoteNext>(Event.RemoteNext, () => {
     TrackPlayer.skipToNext();
   });
 
-  TrackPlayer.addEventListener(Event.RemotePrevious, () => {
-    TrackPlayer.skipToPrevious();
-  });
+  TrackPlayer.addEventListener<Event.RemotePrevious>(
+    Event.RemotePrevious,
+    () => {
+      TrackPlayer.skipToPrevious();
+    },
+  );
 
-  TrackPlayer.addEventListener(Event.RemoteDuck, async e => {
+  TrackPlayer.addEventListener<Event.RemoteDuck>(Event.RemoteDuck, async e => {
     if (e.permanent === true) {
       TrackPlayer.stop();
     } else {
@@ -37,18 +39,24 @@ export async function PlaybackService() {
     }
   });
 
-  TrackPlayer.addEventListener(Event.PlaybackQueueEnded, data => {
-    console.log('Event.PlaybackQueueEnded', data);
-  });
+  TrackPlayer.addEventListener<Event.PlaybackQueueEnded>(
+    Event.PlaybackQueueEnded,
+    data => {
+      console.log('Event.PlaybackQueueEnded', data);
+    },
+  );
 
-  TrackPlayer.addEventListener(Event.PlaybackTrackChanged, data => {
-    console.log('Event.PlaybackTrackChanged', data);
-  });
+  TrackPlayer.addEventListener<Event.PlaybackTrackChanged>(
+    Event.PlaybackTrackChanged,
+    data => {
+      console.log('Event.PlaybackTrackChanged', data);
+    },
+  );
 
-  TrackPlayer.addEventListener(
+  TrackPlayer.addEventListener<Event.PlaybackProgressUpdated>(
     Event.PlaybackProgressUpdated,
-    (data: ProgressUpdateEvent) => {
+    data => {
       console.log('Event.PlaybackProgressUpdated', data);
     },
   );
-};
+}
