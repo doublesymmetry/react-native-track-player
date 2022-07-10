@@ -172,6 +172,79 @@ export enum Event {
   RemoteBookmark = 'remote-bookmark',
 }
 
+export interface EventListenerProp {
+  [Event.PlaybackState]: {
+    state: State
+  }
+  [Event.PlaybackError]: {
+    code: string
+    message: string
+  }
+  [Event.PlaybackQueueEnded]: {
+    track: number
+    position: number
+  }
+  [Event.PlaybackTrackChanged]: {
+    track: number
+    position: number
+    nextTrack: number
+  }
+  [Event.PlaybackMetadataReceived]: {
+    source: string
+    title: string | null
+    url: string | null
+    artist: string | null
+    album: string | null
+    date: string | null
+    genre: string | null
+  }
+  [Event.PlaybackProgressUpdated]: {
+    position: number
+    duration: number
+    buffer: number
+    track: number
+  }
+  [Event.RemotePlay]: null
+  [Event.RemotePlayId]: {
+    id: string
+  }
+  [Event.RemotePlaySearch]: {
+    query: string
+    focus: string
+    title: string
+    artist: string
+    album: string
+    date: string
+    playlist: string
+  }
+  [Event.RemotePause]: null
+  [Event.RemoteStop]: null
+  [Event.RemoteSkip]: {
+    index: number
+  }
+  [Event.RemoteNext]: null
+  [Event.RemotePrevious]: null
+  [Event.RemoteJumpForward]: {
+    interval: number
+  }
+  [Event.RemoteJumpBackward]: {
+    interval: number
+  }
+  [Event.RemoteSeek]: {
+    position: number
+  }
+  [Event.RemoteSetRating]: {
+    rating: boolean | number
+  }
+  [Event.RemoteDuck]: {
+    paused: boolean
+    permanent: boolean
+  }
+  [Event.RemoteLike]: null
+  [Event.RemoteDislike]: null
+  [Event.RemoteBookmark]: null
+}
+
 export enum TrackType {
   Default = 'default',
   Dash = 'dash',

@@ -10,6 +10,7 @@ import {
   TrackMetadataBase,
   NowPlayingMetadata,
   RepeatMode,
+  EventListenerProp,
 } from './interfaces'
 
 const { TrackPlayerModule: TrackPlayer } = NativeModules
@@ -62,8 +63,8 @@ function registerPlaybackService(factory: () => ServiceHandler) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function addEventListener(event: Event, listener: (data: any) => void) {
+type EventListener<T extends Event> = (data: EventListenerProp[T]) => void
+function addEventListener<T extends Event>(event: Event, listener: EventListener<T>) {
   return emitter.addListener(event, listener)
 }
 
