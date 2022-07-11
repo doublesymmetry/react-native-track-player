@@ -391,19 +391,21 @@ class MusicService : HeadlessJsTaskService() {
                     is STOP -> emit(MusicEvents.BUTTON_STOP)
                     is FORWARD -> {
                         Bundle().apply {
-                            val interval = (latestOptions?.getInt(FORWARD_JUMP_INTERVAL_KEY) ?: latestOptions?.getInt(
-                                    BACKWARD_JUMP_INTERVAL_KEY)) ?: 15
-
-                            putInt("interval", interval)
+                            val interval = latestOptions?.getDouble(
+                                FORWARD_JUMP_INTERVAL_KEY,
+                                DEFAULT_JUMP_INTERVAL,
+                            ) ?: DEFAULT_JUMP_INTERVAL
+                            putInt("interval", interval.toInt())
                             emit(MusicEvents.BUTTON_JUMP_FORWARD, this)
                         }
                     }
                     is BACKWARD -> {
                         Bundle().apply {
-                            val interval = (latestOptions?.getInt(BACKWARD_JUMP_INTERVAL_KEY) ?: latestOptions?.getInt(
-                                    FORWARD_JUMP_INTERVAL_KEY)) ?: 15
-
-                            putInt("interval", interval)
+                            val interval = latestOptions?.getDouble(
+                                BACKWARD_JUMP_INTERVAL_KEY,
+                                DEFAULT_JUMP_INTERVAL,
+                            ) ?: DEFAULT_JUMP_INTERVAL
+                            putInt("interval", interval.toInt())
                             emit(MusicEvents.BUTTON_JUMP_BACKWARD, this)
                         }
                     }
@@ -527,5 +529,7 @@ class MusicService : HeadlessJsTaskService() {
 
         const val IS_FOCUS_LOSS_PERMANENT_KEY = "permanent"
         const val IS_PAUSED_KEY = "paused"
+
+        const val DEFAULT_JUMP_INTERVAL = 15.0
     }
 }
