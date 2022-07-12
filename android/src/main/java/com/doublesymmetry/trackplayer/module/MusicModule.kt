@@ -96,8 +96,9 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
                 musicService = binder.service
                 musicService.setupPlayer(playerOptions)
                 playerSetUpPromise?.resolve(null)
-                isServiceBound = true
             }
+
+            isServiceBound = true
 
 //            musicService.setupPlayer(playerOptions)
 ////            playerSetUpPromise?.resolve(null)
