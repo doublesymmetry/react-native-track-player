@@ -237,5 +237,5 @@ export interface ProgressState {
 }
 
 export interface ProgressUpdateEvent extends ProgressState {
-  track: number;
+  track: number
 }
