@@ -799,17 +799,17 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     }
 
     func handleAudioPlayerPlaybackEnded(reason: PlaybackEndedReason) {
+        let isRepeatModeOff = player.repeatMode == .off
+        let isPlayedUntilEnd = reason == PlaybackEndedReason.playedUntilEnd
+        let hasNextItems = player.nextItems.count == 0
+        let isQueueEndReached = hasNextItems && isPlayedUntilEnd
+
         // fire an event for the queue ending
-        if player.nextItems.count == 0 && reason == PlaybackEndedReason.playedUntilEnd {
+        if isRepeatModeOff && isQueueEndReached {
             sendEvent(withName: "playback-queue-ended", body: [
                 "track": player.currentIndex,
                 "position": player.currentTime,
             ])
-        }
-
-        // fire an event for the same track starting again
-        if player.items.count != 0 && player.repeatMode == .track {
-            handleAudioPlayerQueueIndexChange(previousIndex: player.currentIndex, nextIndex: player.currentIndex)
         }
     }
 
