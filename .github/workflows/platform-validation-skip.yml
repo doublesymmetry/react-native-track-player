@@ -1,0 +1,24 @@
+# this validation workflow bypasses the standard platform-validation.yml
+# if only documentation has been modified.
+name: platform-validation
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '!docs/**'
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '!docs/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+      steps:
+        - run: 'echo "No build required"'
