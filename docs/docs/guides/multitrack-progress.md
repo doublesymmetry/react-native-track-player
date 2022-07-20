@@ -70,8 +70,11 @@ use this later on):
 
 ```ts
 // src/hooks/useTrackProgress.ts
+import { useCallback } from 'react';
+import { useProgressStateStore } from '../store';
+
 export const useTrackProgress = (id: string | number): number => {
-  return useDownloadStateStore(useCallback(state => {
+  return useProgressStateStore(useCallback(state => {
     return state.map[id.toString()] || 0;
   }, [id]));
 };
