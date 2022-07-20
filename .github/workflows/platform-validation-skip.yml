@@ -18,15 +18,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-android:
+  build:
     runs-on: ubuntu-latest
-      steps:
-        - run: 'echo "No build required"'
-  build-ios:
-    runs-on: ubuntu-latest
-      steps:
-        - run: 'echo "No build required"'
-  check-typescript:
-    runs-on: ubuntu-latest
-      steps:
-        - run: 'echo "No build required"'
+    steps:
+      - run: 'echo "No build required"'
