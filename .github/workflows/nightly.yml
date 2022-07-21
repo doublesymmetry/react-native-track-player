@@ -1,3 +1,4 @@
+name: nightly
 on:
   workflow_dispatch:
   schedule:
@@ -19,7 +20,7 @@ jobs:
       - name: Build Library
         run: yarn build
       - name: Extract Version
-        run: echo "LIB_VERSION=${yarn info . version | head -2 | tail -1}" >> $GITHUB_ENV
+        run: echo "LIB_VERSION=$(yarn info . version | head -2 | tail -1)" >> $GITHUB_ENV
       - name: Set Nightly Version
         run: yarn version --no-git-tag-version --no-commit-hooks --new-version ${{ env.LIB_VERSION }}-${{ github.sha }}
       - uses: JS-DevTools/npm-publish@v1
