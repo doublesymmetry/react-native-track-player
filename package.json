@@ -15,7 +15,7 @@
     "prepublishOnly": "yarn lint",
     "preversion": "yarn lint",
     "version": "yarn format && git add -A src",
-    "postversion": "git push && git push --tags",
+    "postversion": "if [[ ${npm_package_version} != *'nightly'* ]]; then git push && git push --tags; fi",
     "lint:ci": "eslint \"src/**/*.ts\" --max-warnings=0",
     "format:ci": "prettier --check \"src/**/*.ts\""
   },

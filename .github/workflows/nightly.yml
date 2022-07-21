@@ -1,0 +1,28 @@
+on:
+  workflow_dispatch:
+  schedule:
+    #  run job at 00:00:00 UTC
+    - cron:  '0 0 * * *'
+
+jobs:
+  nightly_build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Build Library
+        run: yarn build
+      - name: Extract Version
+        run: echo "LIB_VERSION=${yarn info . version | head -2 | tail -1}" >> $GITHUB_ENV
+      - name: Set Nightly Version
+        run: yarn version --no-git-tag-version --no-commit-hooks --new-version ${{ env.LIB_VERSION }}-${{ github.sha }}
+      - uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          tag: nightly
