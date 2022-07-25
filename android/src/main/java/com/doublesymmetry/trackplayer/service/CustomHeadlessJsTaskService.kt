@@ -106,10 +106,11 @@ abstract class CustomHeadlessJsTaskService: HeadlessJsTaskService() {
 //    override fun onHeadlessJsTaskStart(taskId: Int) {}
 
     override fun onHeadlessJsTaskFinish(taskId: Int) {
-//        mActiveTasks.remove(taskId) // can we make the task last forever??
+//        mActiveTasks.clear()
 //        if (mActiveTasks.size == 0) {
-//            stopSelf()  // stopSelf only works here smh
+//            stopSelf()
 //        }
+    //        stopSelf()  // stopSelf only works here
     }
 
     fun stop() {

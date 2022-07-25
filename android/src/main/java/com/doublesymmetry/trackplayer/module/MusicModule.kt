@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.*
 import android.os.Bundle
 import android.os.IBinder
-import android.os.Process
 import android.support.v4.media.RatingCompat
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -41,7 +40,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     private lateinit var musicService: MusicService
 
     private val context = reactContext
-    private val activityContext by lazy { currentActivity!! }
+//    private val activityContext by lazy { currentActivity!! }
 
     @Nonnull
     override fun getName(): String {
@@ -58,8 +57,8 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         if (isServiceBound) return
 
         scope.launch {
-            Intent(activityContext, MusicService::class.java).also { intent ->
-                activity.bindService(intent, this@MusicModule, Context.BIND_AUTO_CREATE)
+            Intent(context, MusicService::class.java).also { intent ->
+//                activity.bindService(intent, this@MusicModule, Context.BIND_AUTO_CREATE)
 
                 // musicService.destroyIfAllowed(true)
                 // unbindFromService()
@@ -69,17 +68,37 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
     override fun onActivityStopped(activity: Activity) {
         // Service MUST be unbound during activity onStop
-        if (musicService.stopWithApp)
-            unbindService()
+        scope.launch {
+
+            if (musicService.stopWithApp)
+                unbindService()
+
+//            destroyServiceIfAllowed()
+        }
+//        destroyServiceIfAllowed()
     }
+
+    override fun onActivityPreDestroyed(activity: Activity) {
+//        destroyServiceIfAllowed()
+
+    }
+
+//    override fun invalidate() {
+//        super.invalidate()
+//
+//        destroyServiceIfAllowed()
+//    }
 
     override fun onActivityDestroyed(activity: Activity) {
-        // Service MUST be destroyed during activity onDestroy
-        destroyServiceIfAllowed()
+//        unbindService()
 
-        if (musicService.stopWithApp)
-            Process.killProcess(Process.myPid())
+        // Service MUST be destroyed during activity onDestroy
+        scope.launch {
+            destroyServiceIfAllowed()
+        }
+
     }
+
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
         // If a binder already exists, don't get a new one
@@ -133,10 +152,12 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
     private fun unbindService() {
         // The music service will not stop unless we unbind it first.
-        if (isServiceBound) {
-            activityContext.unbindService(this)
-            isServiceBound = false
-        }
+//        scope.launch {
+//            if (isServiceBound) {
+//                context.unbindService(this@MusicModule)
+//                isServiceBound = false
+//            }
+//        }
     }
 
     /* ****************************** API ****************************** */
@@ -150,7 +171,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         constants["CAPABILITY_PAUSE"] = Capability.PAUSE.ordinal
         constants["CAPABILITY_STOP"] = Capability.STOP.ordinal
         constants["CAPABILITY_SEEK_TO"] = Capability.SEEK_TO.ordinal
-        constants["CAPABILITY_SKIP"] = Capability.SKIP.ordinal
+        constants["CAPABILITY_SKIP"] = OnErrorAction.SKIP.ordinal
         constants["CAPABILITY_SKIP_TO_NEXT"] = Capability.SKIP_TO_NEXT.ordinal
         constants["CAPABILITY_SKIP_TO_PREVIOUS"] = Capability.SKIP_TO_PREVIOUS.ordinal
         constants["CAPABILITY_SET_RATING"] = Capability.SET_RATING.ordinal
@@ -238,9 +259,9 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         eventHandler = MusicEvents(context)
         manager.registerReceiver(eventHandler!!, IntentFilter(EVENT_INTENT))
 
-        Intent(activityContext, MusicService::class.java).also { intent ->
-            activityContext.bindService(intent, this, Context.BIND_AUTO_CREATE)
-            ContextCompat.startForegroundService(activityContext, intent)
+        Intent(context, MusicService::class.java).also { intent ->
+            context.bindService(intent, this, Context.BIND_AUTO_CREATE)
+            ContextCompat.startForegroundService(context, intent)
         }
     }
 
@@ -265,7 +286,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
      */
     private fun destroyServiceIfAllowed(forceDestroy: Boolean = false) {
         // TODO take into account unbind with forceDestroy
-        Toast.makeText(context, musicService.stopWithApp.toString(), Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, musicService.stopWithApp.toString(), Toast.LENGTH_LONG).show()
         if (!musicService.stopWithApp) return
         musicService.destroyIfAllowed(forceDestroy)
     }

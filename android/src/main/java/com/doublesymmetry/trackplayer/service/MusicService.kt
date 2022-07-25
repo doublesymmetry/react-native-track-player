@@ -1,6 +1,7 @@
 package com.doublesymmetry.trackplayer.service
 
 import android.app.PendingIntent
+import android.app.Service
 import android.content.Intent
 import android.os.Binder
 import android.os.Build
@@ -20,16 +21,12 @@ import com.doublesymmetry.trackplayer.module.MusicEvents
 import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
 import com.doublesymmetry.trackplayer.utils.Utils
 import com.doublesymmetry.trackplayer.utils.Utils.setRating
-import com.facebook.react.HeadlessJsTaskService
-import com.facebook.react.bridge.Arguments
-import com.facebook.react.jstasks.HeadlessJsTaskConfig
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import java.util.concurrent.TimeUnit
 
-
-class MusicService : HeadlessJsTaskService() {
+@MainThread
+class MusicService : Service() {
     private lateinit var player: QueuedAudioPlayer
     private val binder = MusicBinder()
     private val scope = MainScope()
@@ -37,7 +34,7 @@ class MusicService : HeadlessJsTaskService() {
 
     private var isForegroundService = false
 
-    var stopWithApp = false
+    var stopWithApp = true
         private set
 
     val tracks: List<Track>
@@ -60,13 +57,13 @@ class MusicService : HeadlessJsTaskService() {
     private var compactCapabilities: List<Capability> = emptyList()
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startTask(getTaskConfig(intent))
+//        startTask(getTaskConfig(intent))
         return START_STICKY
     }
 
     @MainThread
     fun setupPlayer(playerOptions: Bundle?) {
-    // fun setupPlayer(playerOptions: Bundle?) {
+        // fun setupPlayer(playerOptions: Bundle?) {
         val bufferOptions = BufferConfig(
                 playerOptions?.getDouble(MIN_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
                 playerOptions?.getDouble(MAX_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
@@ -106,55 +103,55 @@ class MusicService : HeadlessJsTaskService() {
             when (it) {
                 Capability.PLAY -> {
                     val playIcon =
-                        Utils.getIconOrNull(this, options, "playIcon")
+                            Utils.getIconOrNull(this, options, "playIcon")
                     buttonsList.add(PLAY(icon = playIcon))
                 }
                 Capability.PAUSE -> {
                     val pauseIcon =
-                        Utils.getIconOrNull(this, options, "pauseIcon")
+                            Utils.getIconOrNull(this, options, "pauseIcon")
                     buttonsList.add(PAUSE(icon = pauseIcon))
                 }
                 Capability.STOP -> {
                     val stopIcon =
-                        Utils.getIconOrNull(this, options, "stopIcon")
+                            Utils.getIconOrNull(this, options, "stopIcon")
                     buttonsList.add(STOP(icon = stopIcon, isCompact = isCompact(it)))
                 }
                 Capability.SKIP_TO_NEXT -> {
                     val nextIcon =
-                        Utils.getIconOrNull(this, options, "nextIcon")
+                            Utils.getIconOrNull(this, options, "nextIcon")
                     buttonsList.add(NEXT(icon = nextIcon, isCompact = isCompact(it)))
                 }
                 Capability.SKIP_TO_PREVIOUS -> {
                     val previousIcon =
-                        Utils.getIconOrNull(this, options, "previousIcon")
+                            Utils.getIconOrNull(this, options, "previousIcon")
                     buttonsList.add(
-                        PREVIOUS(
-                            icon = previousIcon,
-                            isCompact = isCompact(it)
-                        )
+                            PREVIOUS(
+                                    icon = previousIcon,
+                                    isCompact = isCompact(it)
+                            )
                     )
                 }
                 Capability.JUMP_FORWARD -> {
                     val forwardIcon = Utils.getIcon(
-                        this,
-                        options,
-                        "forwardIcon",
-                        R.drawable.forward
+                            this,
+                            options,
+                            "forwardIcon",
+                            R.drawable.forward
                     )
                     buttonsList.add(FORWARD(icon = forwardIcon, isCompact = isCompact(it)))
                 }
                 Capability.JUMP_BACKWARD -> {
                     val backwardIcon = Utils.getIcon(
-                        this,
-                        options,
-                        "rewindIcon",
-                        R.drawable.rewind
+                            this,
+                            options,
+                            "rewindIcon",
+                            R.drawable.rewind
                     )
                     buttonsList.add(
-                        BACKWARD(
-                            icon = backwardIcon,
-                            isCompact = isCompact(it)
-                        )
+                            BACKWARD(
+                                    icon = backwardIcon,
+                                    isCompact = isCompact(it)
+                            )
                     )
                 }
                 else -> return@forEach
@@ -168,16 +165,16 @@ class MusicService : HeadlessJsTaskService() {
         val accentColor = Utils.getIntOrNull(options, "color")
         val smallIcon = Utils.getIconOrNull(this, options, "icon")
         val pendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            openAppIntent,
-            getPendingIntentFlags()
+                this,
+                0,
+                openAppIntent,
+                getPendingIntentFlags()
         )
         val notificationConfig = NotificationConfig(
-            buttonsList,
-            accentColor,
-            smallIcon,
-            pendingIntent
+                buttonsList,
+                accentColor,
+                smallIcon,
+                pendingIntent
         )
 
         player.notificationManager.createNotification(notificationConfig)
@@ -269,6 +266,7 @@ class MusicService : HeadlessJsTaskService() {
     @MainThread
     fun stopPlayer() {
         player.stop()
+        player.destroy()
     }
 
     @MainThread
@@ -352,6 +350,7 @@ class MusicService : HeadlessJsTaskService() {
         player.notificationManager.clearNotification()
     }
 
+    @MainThread
     private fun observeEvents() {
         scope.launch {
             event.stateChange.collect {
@@ -466,6 +465,7 @@ class MusicService : HeadlessJsTaskService() {
         }
     }
 
+    @MainThread
     private fun emit(event: String?, data: Bundle? = null) {
         val intent = Intent(EVENT_INTENT)
         intent.putExtra(EVENT_KEY, event)
@@ -473,21 +473,26 @@ class MusicService : HeadlessJsTaskService() {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
-    override fun getTaskConfig(intent: Intent?): HeadlessJsTaskConfig {
-        return HeadlessJsTaskConfig(TASK_KEY, Arguments.createMap(), TIMEOUT_MILLIS, true)
-    }
+//    override fun getTaskConfig(intent: Intent?): HeadlessJsTaskConfig {
+//        return HeadlessJsTaskConfig(TASK_KEY, Arguments.createMap(), 0, true)
+//    }
 
+    @MainThread
     override fun onBind(intent: Intent?): IBinder {
         return binder
     }
+//
+//    override fun onHeadlessJsTaskFinish(taskId: Int) {
+////        if (stopWithApp)
+////            stopSelf()
+//    }
 
-    override fun onHeadlessJsTaskFinish(taskId: Int) {
-    }
-
+    @MainThread
     override fun stopService(name: Intent?): Boolean {
         return super.stopService(name)
     }
 
+    @MainThread
     override fun onUnbind(intent: Intent?): Boolean {
 //        if (::player.isInitialized) {
 //            player.notificationManager.onUnbind()
@@ -497,6 +502,7 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     // TODO: #AEX-45 forceDestroy is needed when calling destroy() manually. Find an alternative solution that does not require a second flag.
+    @MainThread
     fun destroyIfAllowed(forceDestroy: Boolean = false) {
         // Player will continue running if this is true, even if the app itself is killed.
         if (!forceDestroy && !stopWithApp) return
@@ -504,7 +510,7 @@ class MusicService : HeadlessJsTaskService() {
         stopPlayer()
         stopForeground(true)
         stopSelf()
-//        stop() //stopSelf doesnt work here????
+//        stop()
     }
 
 //    override fun onDestroy() {
@@ -512,6 +518,7 @@ class MusicService : HeadlessJsTaskService() {
 //        super.onDestroy()
 //    }
 
+    @MainThread
     inner class MusicBinder : Binder() {
         val service = this@MusicService
     }
