@@ -32,9 +32,7 @@ class MusicService : Service() {
     private val scope = MainScope()
     private var progressUpdateJob: Job? = null
 
-    private var isForegroundService = false
-
-    var stopWithApp = true
+    var stoppingAppPausesPlayback = true
         private set
 
     val tracks: List<Track>
@@ -85,7 +83,7 @@ class MusicService : Service() {
     @MainThread
     fun updateOptions(options: Bundle) {
         latestOptions = options
-        stopWithApp = true
+        stoppingAppPausesPlayback = options.getBoolean(STOPPING_APP_PAUSES_PLAYBACK_KEY)
 
         ratingType = Utils.getInt(options, "ratingType", RatingCompat.RATING_NONE)
 
@@ -424,10 +422,7 @@ class MusicService : Service() {
             event.notificationStateChange.collect {
                 when (it) {
                     is NotificationState.POSTED -> {
-                        if (!isForegroundService) {
-                            startForeground(it.notificationId, it.notification)
-                            isForegroundService = true
-                        }
+                        startForeground(it.notificationId, it.notification)
                     }
                     is NotificationState.CANCELLED -> {
                         stopForeground(true)
@@ -481,42 +476,36 @@ class MusicService : Service() {
     override fun onBind(intent: Intent?): IBinder {
         return binder
     }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+
+        if (stoppingAppPausesPlayback) {
+            player.pause()
+        }
+    }
 //
 //    override fun onHeadlessJsTaskFinish(taskId: Int) {
-////        if (stopWithApp)
+////        if (stoppingAppPausesPlayback)
 ////            stopSelf()
 //    }
 
-    @MainThread
-    override fun stopService(name: Intent?): Boolean {
-        return super.stopService(name)
-    }
+//    // TODO: #AEX-45 forceDestroy is needed when calling destroy() manually. Find an alternative solution that does not require a second flag.
+//    @MainThread
+//    fun destroyIfAllowed(forceDestroy: Boolean = false) {
+//        // Player will continue running if this is true, even if the app itself is killed.
+//        if (!forceDestroy && !stoppingAppPausesPlayback) return
+//
+//        stopForeground(true)
+//        stopSelf()
+////        stop()
+//    }
 
-    @MainThread
-    override fun onUnbind(intent: Intent?): Boolean {
-//        if (::player.isInitialized) {
-//            player.notificationManager.onUnbind()
-//        }
-
-        return false
-    }
-
-    // TODO: #AEX-45 forceDestroy is needed when calling destroy() manually. Find an alternative solution that does not require a second flag.
-    @MainThread
-    fun destroyIfAllowed(forceDestroy: Boolean = false) {
-        // Player will continue running if this is true, even if the app itself is killed.
-        if (!forceDestroy && !stopWithApp) return
+    override fun onDestroy() {
+        super.onDestroy()
 
         stopPlayer()
-        stopForeground(true)
-        stopSelf()
-//        stop()
     }
-
-//    override fun onDestroy() {
-//        killProcess(myPid())
-//        super.onDestroy()
-//    }
 
     @MainThread
     inner class MusicBinder : Binder() {
@@ -546,7 +535,7 @@ class MusicService : Service() {
 
         const val MAX_CACHE_SIZE_KEY = "maxCacheSize"
 
-        const val STOP_WITH_APP_KEY = "stopWithApp"
+        const val STOPPING_APP_PAUSES_PLAYBACK_KEY = "stoppingAppPausesPlayback"
         const val PAUSE_ON_INTERRUPTION_KEY = "alwaysPauseOnInterruption"
         const val AUTO_UPDATE_METADATA = "autoUpdateMetadata"
 

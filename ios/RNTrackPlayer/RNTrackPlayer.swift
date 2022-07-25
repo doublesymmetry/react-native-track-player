@@ -284,6 +284,20 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         resolve(player != nil)
     }
 
+    @objc(destroy:rejecter:)
+    public func destroy(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        if !hasInitialized {
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
+            return
+        }
+
+        print("Destroying player")
+        self.player.stop()
+        self.player.nowPlayingInfoController.clear()
+        try? AVAudioSession.sharedInstance().setActive(false)
+        hasInitialized = false
+    }
+
     @objc(updateOptions:resolver:rejecter:)
     public func update(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
