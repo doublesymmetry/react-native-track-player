@@ -100,57 +100,32 @@ class MusicService : Service() {
         notificationCapabilities.forEach {
             when (it) {
                 Capability.PLAY -> {
-                    val playIcon =
-                            Utils.getIconOrNull(this, options, "playIcon")
+                    val playIcon = Utils.getIconOrNull(this, options, "playIcon")
                     buttonsList.add(PLAY(icon = playIcon))
                 }
                 Capability.PAUSE -> {
-                    val pauseIcon =
-                            Utils.getIconOrNull(this, options, "pauseIcon")
+                    val pauseIcon = Utils.getIconOrNull(this, options, "pauseIcon")
                     buttonsList.add(PAUSE(icon = pauseIcon))
                 }
                 Capability.STOP -> {
-                    val stopIcon =
-                            Utils.getIconOrNull(this, options, "stopIcon")
+                    val stopIcon = Utils.getIconOrNull(this, options, "stopIcon")
                     buttonsList.add(STOP(icon = stopIcon, isCompact = isCompact(it)))
                 }
                 Capability.SKIP_TO_NEXT -> {
-                    val nextIcon =
-                            Utils.getIconOrNull(this, options, "nextIcon")
+                    val nextIcon = Utils.getIconOrNull(this, options, "nextIcon")
                     buttonsList.add(NEXT(icon = nextIcon, isCompact = isCompact(it)))
                 }
                 Capability.SKIP_TO_PREVIOUS -> {
-                    val previousIcon =
-                            Utils.getIconOrNull(this, options, "previousIcon")
-                    buttonsList.add(
-                            PREVIOUS(
-                                    icon = previousIcon,
-                                    isCompact = isCompact(it)
-                            )
-                    )
+                    val previousIcon = Utils.getIconOrNull(this, options, "previousIcon")
+                    buttonsList.add(PREVIOUS(icon = previousIcon, isCompact = isCompact(it)))
                 }
                 Capability.JUMP_FORWARD -> {
-                    val forwardIcon = Utils.getIcon(
-                            this,
-                            options,
-                            "forwardIcon",
-                            R.drawable.forward
-                    )
+                    val forwardIcon = Utils.getIcon(this, options, "forwardIcon", R.drawable.forward)
                     buttonsList.add(FORWARD(icon = forwardIcon, isCompact = isCompact(it)))
                 }
                 Capability.JUMP_BACKWARD -> {
-                    val backwardIcon = Utils.getIcon(
-                            this,
-                            options,
-                            "rewindIcon",
-                            R.drawable.rewind
-                    )
-                    buttonsList.add(
-                            BACKWARD(
-                                    icon = backwardIcon,
-                                    isCompact = isCompact(it)
-                            )
-                    )
+                    val backwardIcon = Utils.getIcon(this, options, "rewindIcon", R.drawable.rewind)
+                    buttonsList.add(BACKWARD(icon = backwardIcon, isCompact = isCompact(it)))
                 }
                 else -> return@forEach
             }
@@ -162,18 +137,8 @@ class MusicService : Service() {
 
         val accentColor = Utils.getIntOrNull(options, "color")
         val smallIcon = Utils.getIconOrNull(this, options, "icon")
-        val pendingIntent = PendingIntent.getActivity(
-                this,
-                0,
-                openAppIntent,
-                getPendingIntentFlags()
-        )
-        val notificationConfig = NotificationConfig(
-                buttonsList,
-                accentColor,
-                smallIcon,
-                pendingIntent
-        )
+        val pendingIntent = PendingIntent.getActivity(this, 0, openAppIntent, getPendingIntentFlags())
+        val notificationConfig = NotificationConfig(buttonsList, accentColor, smallIcon, pendingIntent)
 
         player.notificationManager.createNotification(notificationConfig)
 
@@ -182,8 +147,7 @@ class MusicService : Service() {
         val updateInterval = Utils.getIntOrNull(options, PROGRESS_UPDATE_EVENT_INTERVAL_KEY)
         if (updateInterval != null && updateInterval > 0) {
             progressUpdateJob = scope.launch {
-                progressUpdateEventFlow(updateInterval.toLong())
-                        .collect { emit(MusicEvents.PLAYBACK_PROGRESS_UPDATED, it) }
+                progressUpdateEventFlow(updateInterval.toLong()).collect { emit(MusicEvents.PLAYBACK_PROGRESS_UPDATED, it) }
             }
         }
     }
@@ -484,21 +448,11 @@ class MusicService : Service() {
             player.pause()
         }
     }
+
 //
 //    override fun onHeadlessJsTaskFinish(taskId: Int) {
 ////        if (stoppingAppPausesPlayback)
 ////            stopSelf()
-//    }
-
-//    // TODO: #AEX-45 forceDestroy is needed when calling destroy() manually. Find an alternative solution that does not require a second flag.
-//    @MainThread
-//    fun destroyIfAllowed(forceDestroy: Boolean = false) {
-//        // Player will continue running if this is true, even if the app itself is killed.
-//        if (!forceDestroy && !stoppingAppPausesPlayback) return
-//
-//        stopForeground(true)
-//        stopSelf()
-////        stop()
 //    }
 
     override fun onDestroy() {
