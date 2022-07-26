@@ -1,7 +1,6 @@
 package com.doublesymmetry.trackplayer.service
 
 import android.app.PendingIntent
-import android.app.Service
 import android.content.Intent
 import android.os.Binder
 import android.os.Build
@@ -21,12 +20,15 @@ import com.doublesymmetry.trackplayer.module.MusicEvents
 import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
 import com.doublesymmetry.trackplayer.utils.Utils
 import com.doublesymmetry.trackplayer.utils.Utils.setRating
+import com.facebook.react.HeadlessJsTaskService
+import com.facebook.react.bridge.Arguments
+import com.facebook.react.jstasks.HeadlessJsTaskConfig
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
 import java.util.concurrent.TimeUnit
 
 @MainThread
-class MusicService : Service() {
+class MusicService : HeadlessJsTaskService() {
     private lateinit var player: QueuedAudioPlayer
     private val binder = MusicBinder()
     private val scope = MainScope()
@@ -55,7 +57,7 @@ class MusicService : Service() {
     private var compactCapabilities: List<Capability> = emptyList()
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-//        startTask(getTaskConfig(intent))
+        startTask(getTaskConfig(intent))
         return START_STICKY
     }
 
@@ -432,9 +434,9 @@ class MusicService : Service() {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
-//    override fun getTaskConfig(intent: Intent?): HeadlessJsTaskConfig {
-//        return HeadlessJsTaskConfig(TASK_KEY, Arguments.createMap(), 0, true)
-//    }
+    override fun getTaskConfig(intent: Intent?): HeadlessJsTaskConfig {
+        return HeadlessJsTaskConfig(TASK_KEY, Arguments.createMap(), 0, true)
+    }
 
     @MainThread
     override fun onBind(intent: Intent?): IBinder {
@@ -449,11 +451,10 @@ class MusicService : Service() {
         }
     }
 
-//
-//    override fun onHeadlessJsTaskFinish(taskId: Int) {
-////        if (stoppingAppPausesPlayback)
-////            stopSelf()
-//    }
+
+    override fun onHeadlessJsTaskFinish(taskId: Int) {
+        // This is empty so the service never stops
+    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -495,7 +496,5 @@ class MusicService : Service() {
 
         const val IS_FOCUS_LOSS_PERMANENT_KEY = "permanent"
         const val IS_PAUSED_KEY = "paused"
-
-        const val TIMEOUT_MILLIS = 5000L
     }
 }
