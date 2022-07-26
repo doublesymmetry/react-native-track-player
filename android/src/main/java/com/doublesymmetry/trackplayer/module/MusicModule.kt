@@ -1,6 +1,5 @@
 package com.doublesymmetry.trackplayer.module
 
-import android.app.Activity
 import android.content.*
 import android.os.Bundle
 import android.os.IBinder
@@ -10,7 +9,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.Capability
 import com.doublesymmetry.kotlinaudio.models.RepeatMode
 import com.doublesymmetry.trackplayer.extensions.asLibState
-import com.doublesymmetry.trackplayer.interfaces.ActivityLifecycleCallbacksAdapter
 import com.doublesymmetry.trackplayer.model.State
 import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
@@ -29,7 +27,7 @@ import javax.annotation.Nonnull
 /**
  * @author Milen Pivchev @mpivchev
  */
-class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), ServiceConnection, ActivityLifecycleCallbacksAdapter {
+class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), ServiceConnection {
     private var eventHandler: MusicEvents? = null
     private var playerOptions: Bundle? = null
     private var isServiceBound = false
@@ -46,47 +44,10 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     override fun initialize() {
-        currentActivity?.application?.registerActivityLifecycleCallbacks(this)
         Logger.addLogAdapter(AndroidLogAdapter())
     }
 
-    override fun onActivityStarted(activity: Activity) {
-        // Service MUST be rebound during activity onStart, if not already bound
-        if (isServiceBound) return
-
-        scope.launch {
-            Intent(context, MusicService::class.java).also { intent ->
-                activity.bindService(intent, this@MusicModule, Context.BIND_AUTO_CREATE)
-            }
-        }
-    }
-
-    override fun onActivityStopped(activity: Activity) {
-        // Service MUST be unbound during activity onStop
-        scope.launch {
-
-            if (musicService.stoppingAppPausesPlayback)
-                unbindService()
-
-        }
-    }
-
-//    override fun onActivityDestroyed(activity: Activity) {
-//        // Service MUST be destroyed during activity onDestroy
-//        scope.launch {
-//            destroyServiceIfAllowed()
-//        }
-//    }
-
-
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
-        // If a binder already exists, don't get a new one
-//        if (!::musicService.isInitialized) {
-//            val binder: MusicService.MusicBinder = service as MusicService.MusicBinder
-//            musicService = binder.service
-//            musicService.setupPlayer(playerOptions)
-//        }
-
         scope.launch {
             // If a binder already exists, don't get a new one
             if (!::musicService.isInitialized) {
@@ -97,10 +58,6 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
             }
 
             isServiceBound = true
-
-//            musicService.setupPlayer(playerOptions)
-////            playerSetUpPromise?.resolve(null)
-////            isServiceBound = true
         }
     }
 
@@ -126,16 +83,6 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         }
 
         return false
-    }
-
-    private fun unbindService() {
-        // The music service will not stop unless we unbind it first.
-//        scope.launch {
-//            if (isServiceBound) {
-//                context.unbindService(this@MusicModule)
-//                isServiceBound = false
-//            }
-//        }
     }
 
     /* ****************************** API ****************************** */
@@ -359,9 +306,9 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         val context: ReactContext = context
         val metadata = Arguments.toBundle(map)
         musicService.updateNotificationMetadata(
-            metadata?.getString("title"),
-            metadata?.getString("artist"),
-            Utils.getUri(context, metadata, "artwork")?.toString()
+                metadata?.getString("title"),
+                metadata?.getString("artist"),
+                Utils.getUri(context, metadata, "artwork")?.toString()
         )
 
         callback.resolve(null)
@@ -435,7 +382,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
     @ReactMethod
     fun play(callback: Promise) = scope.launch {
-        // if (verifyServiceBoundOrReject(callback)) return@launch
+        if (verifyServiceBoundOrReject(callback)) return@launch
 
         musicService.play()
         callback.resolve(null)
@@ -443,7 +390,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
     @ReactMethod
     fun pause(callback: Promise) = scope.launch {
-        // if (verifyServiceBoundOrReject(callback)) return@launch
+        if (verifyServiceBoundOrReject(callback)) return@launch
 
         musicService.pause()
         callback.resolve(null)
@@ -451,7 +398,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
     @ReactMethod
     fun stop(callback: Promise) = scope.launch {
-        // if (verifyServiceBoundOrReject(callback)) return@launch
+        if (verifyServiceBoundOrReject(callback)) return@launch
 
         musicService.pause()
         callback.resolve(null)
@@ -490,7 +437,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
     @ReactMethod
     fun getRate(callback: Promise) = scope.launch {
-        // if (verifyServiceBoundOrReject(callback)) return@launch
+        if (verifyServiceBoundOrReject(callback)) return@launch
 
         callback.resolve(musicService.getRate())
     }
