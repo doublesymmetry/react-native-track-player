@@ -131,7 +131,7 @@ export interface MetadataOptions {
   capabilities?: Capability[]
 
   // android
-  stopWithApp?: boolean
+  stoppingAppPausesPlayback?: boolean
   alwaysPauseOnInterruption?: boolean
   notificationCapabilities?: Capability[]
   compactCapabilities?: Capability[]
