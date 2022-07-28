@@ -185,8 +185,8 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         manager.registerReceiver(eventHandler!!, IntentFilter(EVENT_INTENT))
 
         Intent(context, MusicService::class.java).also { intent ->
+            context.startService(intent)
             context.bindService(intent, this, Context.BIND_AUTO_CREATE)
-            ContextCompat.startForegroundService(context, intent)
         }
     }
 

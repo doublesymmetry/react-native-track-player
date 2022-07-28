@@ -443,6 +443,7 @@ class MusicService : HeadlessJsTaskService() {
         return binder
     }
 
+    @MainThread
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
 
@@ -451,11 +452,12 @@ class MusicService : HeadlessJsTaskService() {
         }
     }
 
-
+    @MainThread
     override fun onHeadlessJsTaskFinish(taskId: Int) {
         // This is empty so the service never stops
     }
 
+    @MainThread
     override fun onDestroy() {
         super.onDestroy()
 
