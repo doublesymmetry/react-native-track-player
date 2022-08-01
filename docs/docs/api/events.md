@@ -169,3 +169,5 @@ On Android, the volume may also be lowered on an transient interruption without 
 | --------- | --------- | -------------------------------------------- |
 | paused    | `boolean` | On Android when `true` the player should pause playback, when `false` the player may resume playback. On iOS when `true` the playback was paused and when `false` the player may resume playback. |
 | permanent | `boolean` | Whether the interruption is permanent. On Android the player should stop playback.  |
+
+Implementation examples can be found in the [example project](https://github.com/doublesymmetry/react-native-track-player/blob/main/example/src/services/PlaybackService.ts).
