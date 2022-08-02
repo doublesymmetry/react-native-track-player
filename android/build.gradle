@@ -16,7 +16,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 def getExtOrIntegerDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties['RNTP_' + name]).toInteger()
+    return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties['RNTP_' + name]).toInteger()
 }
 
 android {
@@ -51,14 +51,15 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.DoubleSymmetry:KotlinAudio:v0.1.34'
+     implementation "com.github.DoubleSymmetry:KotlinAudio:v0.1.34"
+//    implementation "com.github.doublesymmetry:kotlin-audio:0.1.36"
 
     //noinspection GradleDynamicVersion
-    implementation 'com.facebook.react:react-native:+'
+    implementation "com.facebook.react:react-native:+"
 
     // Make sure we're using androidx
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
-    implementation 'com.orhanobut:logger:2.2.0'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2'
+    implementation "androidx.core:core-ktx:1.8.0"
+    implementation "androidx.localbroadcastmanager:localbroadcastmanager:1.1.0"
+    implementation "com.orhanobut:logger:2.2.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3"
 }

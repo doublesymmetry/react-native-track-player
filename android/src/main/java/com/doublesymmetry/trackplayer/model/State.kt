@@ -1,7 +1,7 @@
 package com.doublesymmetry.trackplayer.model
 
 enum class State {
-    None,
+    Idle,
     Ready,
     Playing,
     Paused,
