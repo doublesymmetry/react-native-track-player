@@ -41,3 +41,24 @@ You can also use [jetifier](https://github.com/mikehardy/jetifier#usage-for-sour
 ## Android: Cleartext HTTP traffic not permitted
 
 Since API 28, Android disables traffic without TLS. To fix the issue you have to use `https` or [enable clear text traffic](https://stackoverflow.com/a/50834600).
+
+## [ERROR] Could not find com.google.android.exoplayer:exoplayer:2.11.4
+If you encounter this error while running a task such as `npx react-native run-android` or any other task that requires building your app, you can fix it by editing `android/build.gradle` file as follows:
+```
+// build.gradle
+buildScript {
+    ...
+    repositories {
+        ...
+        jcenter() // <-- add this line
+    }
+ }
+...
+allprojects {
+    ...
+    repositories {
+        ...
+        jcenter() // <-- and this line
+    }
+}
+```
