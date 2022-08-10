@@ -172,79 +172,6 @@ export enum Event {
   RemoteBookmark = 'remote-bookmark',
 }
 
-export interface EventListenerProp {
-  [Event.PlaybackState]: {
-    state: State
-  }
-  [Event.PlaybackError]: {
-    code: string
-    message: string
-  }
-  [Event.PlaybackQueueEnded]: {
-    track: number
-    position: number
-  }
-  [Event.PlaybackTrackChanged]: {
-    track: number
-    position: number
-    nextTrack: number
-  }
-  [Event.PlaybackMetadataReceived]: {
-    source: string
-    title: string | null
-    url: string | null
-    artist: string | null
-    album: string | null
-    date: string | null
-    genre: string | null
-  }
-  [Event.PlaybackProgressUpdated]: {
-    position: number
-    duration: number
-    buffer: number
-    track: number
-  }
-  [Event.RemotePlay]: null
-  [Event.RemotePlayId]: {
-    id: string
-  }
-  [Event.RemotePlaySearch]: {
-    query: string
-    focus: string
-    title: string
-    artist: string
-    album: string
-    date: string
-    playlist: string
-  }
-  [Event.RemotePause]: null
-  [Event.RemoteStop]: null
-  [Event.RemoteSkip]: {
-    index: number
-  }
-  [Event.RemoteNext]: null
-  [Event.RemotePrevious]: null
-  [Event.RemoteJumpForward]: {
-    interval: number
-  }
-  [Event.RemoteJumpBackward]: {
-    interval: number
-  }
-  [Event.RemoteSeek]: {
-    position: number
-  }
-  [Event.RemoteSetRating]: {
-    rating: boolean | number
-  }
-  [Event.RemoteDuck]: {
-    paused: boolean
-    permanent: boolean
-  }
-  [Event.RemoteLike]: null
-  [Event.RemoteDislike]: null
-  [Event.RemoteBookmark]: null
-}
-
 export enum TrackType {
   Default = 'default',
   Dash = 'dash',
@@ -303,12 +230,130 @@ export interface Track extends TrackMetadataBase {
   [key: string]: any
 }
 
-export interface ProgressState {
+export interface Progress {
   position: number
   duration: number
   buffered: number
 }
 
-export interface ProgressUpdateEvent extends ProgressState {
+export interface PlaybackProgressUpdatedEvent extends Progress {
   track: number
+}
+
+export interface PlaybackStateEvent {
+  state: State
+}
+
+export interface PlaybackErrorEvent {
+  code: string
+  message: string
+}
+
+export interface PlaybackQueueEndedEvent {
+  track: number
+  position: number
+}
+
+export interface PlaybackTrackChangedEvent {
+  track: number
+  position: number
+  nextTrack: number
+}
+
+export interface PlaybackMetadataReceivedEvent {
+  source: string
+  title: string | null
+  url: string | null
+  artist: string | null
+  album: string | null
+  date: string | null
+  genre: string | null
+}
+
+export interface RemotePlayIdEvent {
+  id: string
+}
+
+export interface RemotePlaySearchEvent {
+  query: string
+  focus: string
+  title: string
+  artist: string
+  album: string
+  date: string
+  playlist: string
+}
+
+export interface RemoteSkipEvent {
+  index: number
+}
+
+export interface RemoteJumpForwardEvent {
+  interval: number
+}
+
+export interface RemoteJumpBackwardEvent {
+  interval: number
+}
+
+export interface RemoteSeekEvent {
+  position: number
+}
+
+export interface RemoteSetRatingEvent {
+  rating: boolean | number
+}
+
+export interface RemoteDuckEvent {
+  paused: boolean
+  permanent: boolean
+}
+export interface EventPayloadByEvent {
+  [Event.PlaybackState]: PlaybackStateEvent
+  [Event.PlaybackError]: PlaybackErrorEvent
+  [Event.PlaybackQueueEnded]: PlaybackQueueEndedEvent
+  [Event.PlaybackTrackChanged]: PlaybackTrackChangedEvent
+  [Event.PlaybackMetadataReceived]: PlaybackMetadataReceivedEvent
+  [Event.PlaybackProgressUpdated]: PlaybackProgressUpdatedEvent
+  [Event.RemotePlay]: never
+  [Event.RemotePlayId]: RemotePlayIdEvent
+  [Event.RemotePlaySearch]: RemotePlaySearchEvent
+  [Event.RemotePause]: never
+  [Event.RemoteStop]: never
+  [Event.RemoteSkip]: RemoteSkipEvent
+  [Event.RemoteNext]: never
+  [Event.RemotePrevious]: never
+  [Event.RemoteJumpForward]: RemoteJumpForwardEvent
+  [Event.RemoteJumpBackward]: RemoteJumpBackwardEvent
+  [Event.RemoteSeek]: RemoteSeekEvent
+  [Event.RemoteSetRating]: RemoteSetRatingEvent
+  [Event.RemoteDuck]: RemoteDuckEvent
+  [Event.RemoteLike]: never
+  [Event.RemoteDislike]: never
+  [Event.RemoteBookmark]: never
+}
+
+export interface EventsPayloadByEvent {
+  [Event.PlaybackState]: PlaybackStateEvent & { event: Event.PlaybackState }
+  [Event.PlaybackError]: PlaybackErrorEvent & { event: Event.PlaybackError }
+  [Event.PlaybackQueueEnded]: PlaybackQueueEndedEvent & { event: Event.PlaybackQueueEnded }
+  [Event.PlaybackTrackChanged]: PlaybackTrackChangedEvent & { event: Event.PlaybackTrackChanged }
+  [Event.PlaybackMetadataReceived]: PlaybackMetadataReceivedEvent & { event: Event.PlaybackMetadataReceived }
+  [Event.PlaybackProgressUpdated]: PlaybackProgressUpdatedEvent & { event: Event.PlaybackProgressUpdated }
+  [Event.RemotePlay]: { event: Event.RemotePlay }
+  [Event.RemotePlayId]: RemotePlayIdEvent & { event: Event.RemotePlayId }
+  [Event.RemotePlaySearch]: RemotePlaySearchEvent & { event: Event.RemotePlaySearch }
+  [Event.RemotePause]: { event: Event.RemotePause }
+  [Event.RemoteStop]: { event: Event.RemoteStop }
+  [Event.RemoteSkip]: RemoteSkipEvent & { event: Event.RemoteSkip }
+  [Event.RemoteNext]: { event: Event.RemoteNext }
+  [Event.RemotePrevious]: { event: Event.RemotePrevious }
+  [Event.RemoteJumpForward]: RemoteJumpForwardEvent & { event: Event.RemoteJumpForward }
+  [Event.RemoteJumpBackward]: RemoteJumpBackwardEvent & { event: Event.RemoteJumpBackward }
+  [Event.RemoteSeek]: RemoteSeekEvent & { event: Event.RemoteSeek }
+  [Event.RemoteSetRating]: RemoteSetRatingEvent & { event: Event.RemoteSetRating }
+  [Event.RemoteDuck]: RemoteDuckEvent & { event: Event.RemoteDuck }
+  [Event.RemoteLike]: { event: Event.RemoteLike }
+  [Event.RemoteDislike]: { event: Event.RemoteDislike }
+  [Event.RemoteBookmark]: { event: Event.RemoteBookmark }
 }

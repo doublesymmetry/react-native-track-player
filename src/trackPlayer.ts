@@ -1,16 +1,16 @@
-import { Platform, AppRegistry, DeviceEventEmitter, NativeEventEmitter, NativeModules } from 'react-native'
+import { AppRegistry, DeviceEventEmitter, NativeEventEmitter, NativeModules, Platform } from 'react-native'
 // @ts-ignore
 import * as resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource'
 import {
-  MetadataOptions,
-  PlayerOptions,
   Event,
-  Track,
-  State,
-  TrackMetadataBase,
+  EventPayloadByEvent,
+  MetadataOptions,
   NowPlayingMetadata,
+  PlayerOptions,
   RepeatMode,
-  EventListenerProp,
+  State,
+  Track,
+  TrackMetadataBase,
 } from './interfaces'
 
 const { TrackPlayerModule: TrackPlayer } = NativeModules
@@ -60,8 +60,10 @@ function registerPlaybackService(factory: () => ServiceHandler) {
   }
 }
 
-type EventListener<T extends Event> = (data: EventListenerProp[T]) => void
-function addEventListener<T extends Event>(event: Event, listener: EventListener<T>) {
+function addEventListener<T extends Event>(
+  event: T,
+  listener: EventPayloadByEvent[T] extends never ? () => void : (event: EventPayloadByEvent[T]) => void,
+) {
   return emitter.addListener(event, listener)
 }
 
