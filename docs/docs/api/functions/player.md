@@ -42,9 +42,6 @@ Plays or resumes the current track.
 ## `pause()`
 Pauses the current track.
 
-## `stop()`
-Stops the current track.
-
 ## `seekTo(seconds)`
 Seeks to a specified time position in the current track.
 
