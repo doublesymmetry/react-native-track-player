@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.RatingCompat
+import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toMilliseconds
 import com.doublesymmetry.trackplayer.utils.Utils
 
 abstract class TrackMetadata {
@@ -23,7 +24,7 @@ abstract class TrackMetadata {
         album = bundle.getString("album")
         date = bundle.getString("date")
         genre = bundle.getString("genre")
-        duration = Utils.toMillis(bundle.getDouble("duration", 0.0))
+        duration = (bundle.getDouble("duration", 0.0)).toMilliseconds()
         rating = Utils.getRating(bundle, "rating", ratingType)
     }
 

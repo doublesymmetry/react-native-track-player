@@ -26,8 +26,8 @@ android {
         minSdkVersion getExtOrIntegerDefault('minSdkVersion') // RN's minimum version
         targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
 
-        versionCode 1
-        versionName '1.0'
+        versionCode 300
+        versionName '3.0'
 
         consumerProguardFiles 'proguard-rules.txt'
     }
@@ -51,8 +51,8 @@ repositories {
 }
 
 dependencies {
-    implementation "com.github.DoubleSymmetry:KotlinAudio:v0.1.35"
-//    implementation "com.github.doublesymmetry:kotlin-audio:0.1.36"
+    implementation 'com.github.DoubleSymmetry:KotlinAudio:v1.0'
+//    implementation "com.github.doublesymmetry:kotlin-audio:1.0"
 
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"

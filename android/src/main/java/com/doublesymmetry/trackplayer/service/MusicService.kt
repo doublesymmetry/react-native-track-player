@@ -13,6 +13,8 @@ import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.models.NotificationButton.*
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.doublesymmetry.trackplayer.R
+import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toMilliseconds
+import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toSeconds
 import com.doublesymmetry.trackplayer.extensions.asLibState
 import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.model.TrackAudioItem
@@ -65,10 +67,10 @@ class MusicService : HeadlessJsTaskService() {
     fun setupPlayer(playerOptions: Bundle?) {
         // fun setupPlayer(playerOptions: Bundle?) {
         val bufferOptions = BufferConfig(
-                playerOptions?.getDouble(MIN_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
-                playerOptions?.getDouble(MAX_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
-                playerOptions?.getDouble(PLAY_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
-                playerOptions?.getDouble(BACK_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
+                playerOptions?.getDouble(MIN_BUFFER_KEY)?.toMilliseconds()?.toInt(),
+                playerOptions?.getDouble(MAX_BUFFER_KEY)?.toMilliseconds()?.toInt(),
+                playerOptions?.getDouble(PLAY_BUFFER_KEY)?.toMilliseconds()?.toInt(),
+                playerOptions?.getDouble(BACK_BUFFER_KEY)?.toMilliseconds()?.toInt(),
         )
 
         val cacheOptions = CacheConfig(
@@ -170,9 +172,9 @@ class MusicService : HeadlessJsTaskService() {
     private suspend fun progressUpdateEvent(): Bundle {
         return withContext(Dispatchers.Main) {
             Bundle().apply {
-                putDouble(POSITION_KEY, player.position.toDouble() / 1000)
-                putDouble(DURATION_KEY, player.duration.toDouble() / 1000)
-                putDouble(BUFFERED_POSITION_KEY, player.bufferedPosition.toDouble() / 1000)
+                putDouble(POSITION_KEY, player.position.toSeconds())
+                putDouble(DURATION_KEY, player.duration.toSeconds())
+                putDouble(BUFFERED_POSITION_KEY, player.bufferedPosition.toSeconds())
                 putInt(TRACK_KEY, player.currentIndex)
             }
         }
@@ -260,7 +262,7 @@ class MusicService : HeadlessJsTaskService() {
 
     @MainThread
     fun seekTo(seconds: Float) {
-        player.seek((seconds * 1000).toLong(), TimeUnit.MILLISECONDS)
+        player.seek((seconds.toMilliseconds()), TimeUnit.MILLISECONDS)
     }
 
     @MainThread
@@ -291,13 +293,13 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     @MainThread
-    fun getDurationInSeconds(): Double = player.duration.toDouble() / 1000
+    fun getDurationInSeconds(): Double = player.duration.toSeconds()
 
     @MainThread
-    fun getPositionInSeconds(): Double = player.position.toDouble() / 1000
+    fun getPositionInSeconds(): Double = player.position.toSeconds()
 
     @MainThread
-    fun getBufferedPositionInSeconds(): Double = player.bufferedPosition.toDouble() / 1000
+    fun getBufferedPositionInSeconds(): Double = player.bufferedPosition.toSeconds()
 
     @MainThread
     fun updateMetadataForTrack(index: Int, track: Track) {
@@ -323,12 +325,13 @@ class MusicService : HeadlessJsTaskService() {
                 emit(MusicEvents.PLAYBACK_STATE, bundle)
 
                 if (it == AudioPlayerState.ENDED && player.nextItem == null) {
-                    val endBundle = Bundle()
-                    endBundle.putInt(TRACK_KEY, player.currentIndex)
-                    endBundle.putDouble(POSITION_KEY, Utils.toSeconds(player.position))
+                    Bundle().apply {
+                        putInt(TRACK_KEY, player.currentIndex)
+                        putDouble(POSITION_KEY, player.position.toSeconds())
 
-                    emit(MusicEvents.PLAYBACK_QUEUE_ENDED, endBundle)
-                    emit(MusicEvents.PLAYBACK_TRACK_CHANGED, endBundle)
+                        emit(MusicEvents.PLAYBACK_QUEUE_ENDED, this)
+                        emit(MusicEvents.PLAYBACK_TRACK_CHANGED, this)
+                    }
                 }
             }
         }
@@ -336,15 +339,15 @@ class MusicService : HeadlessJsTaskService() {
         scope.launch {
             event.audioItemTransition.collect {
                 Bundle().apply {
-                    putDouble(POSITION_KEY, 0.0)
+                    putDouble(POSITION_KEY, (it?.oldPosition ?: 0).toSeconds())
                     putInt(NEXT_TRACK_KEY, player.currentIndex)
 
                     // correctly set the previous index on the event payload
                     var previousIndex: Int? = null
-                    if (it == AudioItemTransitionReason.REPEAT) {
+                    if (it is AudioItemTransitionReason.REPEAT) {
                         previousIndex = player.currentIndex
                     } else if (player.previousItem != null) {
-                        previousIndex = player?.previousIndex
+                        previousIndex = player.previousIndex
                     }
 
                     if (previousIndex != null) {
@@ -377,8 +380,8 @@ class MusicService : HeadlessJsTaskService() {
                     is FORWARD -> {
                         Bundle().apply {
                             val interval = latestOptions?.getDouble(
-                                FORWARD_JUMP_INTERVAL_KEY,
-                                DEFAULT_JUMP_INTERVAL,
+                                    FORWARD_JUMP_INTERVAL_KEY,
+                                    DEFAULT_JUMP_INTERVAL,
                             ) ?: DEFAULT_JUMP_INTERVAL
                             putInt("interval", interval.toInt())
                             emit(MusicEvents.BUTTON_JUMP_FORWARD, this)
@@ -387,8 +390,8 @@ class MusicService : HeadlessJsTaskService() {
                     is BACKWARD -> {
                         Bundle().apply {
                             val interval = latestOptions?.getDouble(
-                                BACKWARD_JUMP_INTERVAL_KEY,
-                                DEFAULT_JUMP_INTERVAL,
+                                    BACKWARD_JUMP_INTERVAL_KEY,
+                                    DEFAULT_JUMP_INTERVAL,
                             ) ?: DEFAULT_JUMP_INTERVAL
                             putInt("interval", interval.toInt())
                             emit(MusicEvents.BUTTON_JUMP_BACKWARD, this)
