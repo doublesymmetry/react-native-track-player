@@ -344,10 +344,10 @@ class MusicService : HeadlessJsTaskService() {
 
                     // correctly set the previous index on the event payload
                     var previousIndex: Int? = null
-                    if (it == AudioItemTransitionReason.REPEAT) {
+                    if (it is AudioItemTransitionReason.REPEAT) {
                         previousIndex = player.currentIndex
                     } else if (player.previousItem != null) {
-                        previousIndex = player?.previousIndex
+                        previousIndex = player.previousIndex
                     }
 
                     if (previousIndex != null) {
@@ -424,12 +424,7 @@ class MusicService : HeadlessJsTaskService() {
                             emit(MusicEvents.BUTTON_SET_RATING, this)
                         }
                     }
-                    is MediaSessionCallback.SEEK -> {
-                        Bundle().apply {
-                            putDouble("position", it.position.toDouble())
-                            emit(MusicEvents.BUTTON_SEEK_TO, this)
-                        }
-                    }
+                    else -> {}
                 }
             }
         }
