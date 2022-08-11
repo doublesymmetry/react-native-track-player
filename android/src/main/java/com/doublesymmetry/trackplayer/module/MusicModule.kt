@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.Capability
 import com.doublesymmetry.kotlinaudio.models.RepeatMode
+import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toMilliseconds
 import com.doublesymmetry.trackplayer.extensions.asLibState
 import com.doublesymmetry.trackplayer.model.State
 import com.doublesymmetry.trackplayer.model.Track
@@ -139,14 +140,10 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
         // Validate buffer keys.
         val bundledData = Arguments.toBundle(data)
-        val minBuffer = bundledData?.getDouble(MusicService.MIN_BUFFER_KEY)
-                ?.let { Utils.toMillis(it).toInt() } ?: DEFAULT_MIN_BUFFER_MS
-        val maxBuffer = bundledData?.getDouble(MusicService.MAX_BUFFER_KEY)
-                ?.let { Utils.toMillis(it).toInt() } ?: DEFAULT_MAX_BUFFER_MS
-        val playBuffer = bundledData?.getDouble(MusicService.PLAY_BUFFER_KEY)
-                ?.let { Utils.toMillis(it).toInt() } ?: DEFAULT_BUFFER_FOR_PLAYBACK_MS
-        val backBuffer = bundledData?.getDouble(MusicService.BACK_BUFFER_KEY)
-                ?.let { Utils.toMillis(it).toInt() } ?: DEFAULT_BACK_BUFFER_DURATION_MS
+        val minBuffer = bundledData?.getDouble(MusicService.MIN_BUFFER_KEY)?.toMilliseconds()?.toInt() ?: DEFAULT_MIN_BUFFER_MS
+        val maxBuffer = bundledData?.getDouble(MusicService.MAX_BUFFER_KEY)?.toMilliseconds()?.toInt() ?: DEFAULT_MAX_BUFFER_MS
+        val playBuffer = bundledData?.getDouble(MusicService.PLAY_BUFFER_KEY)?.toMilliseconds()?.toInt() ?: DEFAULT_BUFFER_FOR_PLAYBACK_MS
+        val backBuffer = bundledData?.getDouble(MusicService.BACK_BUFFER_KEY)?.toMilliseconds()?.toInt() ?: DEFAULT_BACK_BUFFER_DURATION_MS
 
         if (playBuffer < 0) {
             promise.reject(

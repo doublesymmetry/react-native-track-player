@@ -11,14 +11,6 @@ import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper
  * @author Milen Pivchev @mpivchev
  */
 object Utils {
-    fun toMillis(seconds: Double): Long {
-        return (seconds * 1000).toLong()
-    }
-
-    fun toSeconds(millis: Long): Double {
-        return millis / 1000.0
-    }
-
     fun getUri(context: Context, data: Bundle?, key: String?): Uri? {
         if (!data!!.containsKey(key)) return null
         val obj = data[key]

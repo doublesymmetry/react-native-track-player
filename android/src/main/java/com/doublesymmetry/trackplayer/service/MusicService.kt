@@ -13,6 +13,8 @@ import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.models.NotificationButton.*
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.doublesymmetry.trackplayer.R
+import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toMilliseconds
+import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toSeconds
 import com.doublesymmetry.trackplayer.extensions.asLibState
 import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.model.TrackAudioItem
@@ -24,6 +26,7 @@ import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import java.util.concurrent.TimeUnit
 
@@ -65,10 +68,10 @@ class MusicService : HeadlessJsTaskService() {
     fun setupPlayer(playerOptions: Bundle?) {
         // fun setupPlayer(playerOptions: Bundle?) {
         val bufferOptions = BufferConfig(
-                playerOptions?.getDouble(MIN_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
-                playerOptions?.getDouble(MAX_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
-                playerOptions?.getDouble(PLAY_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
-                playerOptions?.getDouble(BACK_BUFFER_KEY)?.let { Utils.toMillis(it).toInt() },
+                playerOptions?.getDouble(MIN_BUFFER_KEY)?.toMilliseconds()?.toInt(),
+                playerOptions?.getDouble(MAX_BUFFER_KEY)?.toMilliseconds()?.toInt(),
+                playerOptions?.getDouble(PLAY_BUFFER_KEY)?.toMilliseconds()?.toInt(),
+                playerOptions?.getDouble(BACK_BUFFER_KEY)?.toMilliseconds()?.toInt(),
         )
 
         val cacheOptions = CacheConfig(
@@ -170,9 +173,9 @@ class MusicService : HeadlessJsTaskService() {
     private suspend fun progressUpdateEvent(): Bundle {
         return withContext(Dispatchers.Main) {
             Bundle().apply {
-                putDouble(POSITION_KEY, player.position.toDouble() / 1000)
-                putDouble(DURATION_KEY, player.duration.toDouble() / 1000)
-                putDouble(BUFFERED_POSITION_KEY, player.bufferedPosition.toDouble() / 1000)
+                putDouble(POSITION_KEY, player.position.toSeconds())
+                putDouble(DURATION_KEY, player.duration.toSeconds())
+                putDouble(BUFFERED_POSITION_KEY, player.bufferedPosition.toSeconds())
                 putInt(TRACK_KEY, player.currentIndex)
             }
         }
@@ -323,12 +326,13 @@ class MusicService : HeadlessJsTaskService() {
                 emit(MusicEvents.PLAYBACK_STATE, bundle)
 
                 if (it == AudioPlayerState.ENDED && player.nextItem == null) {
-                    val endBundle = Bundle()
-                    endBundle.putInt(TRACK_KEY, player.currentIndex)
-                    endBundle.putDouble(POSITION_KEY, Utils.toSeconds(player.position))
+                    Bundle().apply {
+                        putInt(TRACK_KEY, player.currentIndex)
+                        putDouble(POSITION_KEY, player.position.toSeconds())
 
-                    emit(MusicEvents.PLAYBACK_QUEUE_ENDED, endBundle)
-                    emit(MusicEvents.PLAYBACK_TRACK_CHANGED, endBundle)
+                        emit(MusicEvents.PLAYBACK_QUEUE_ENDED, this)
+                        emit(MusicEvents.PLAYBACK_TRACK_CHANGED, this)
+                    }
                 }
             }
         }
@@ -336,7 +340,7 @@ class MusicService : HeadlessJsTaskService() {
         scope.launch {
             event.audioItemTransition.collect {
                 Bundle().apply {
-                    putDouble(POSITION_KEY, 0.0)
+                    putDouble(POSITION_KEY, (it?.oldPosition ?: 0).toSeconds())
                     putInt(NEXT_TRACK_KEY, player.currentIndex)
 
                     // correctly set the previous index on the event payload
