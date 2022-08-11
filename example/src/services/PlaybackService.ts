@@ -1,5 +1,4 @@
-import TrackPlayer, {Event, State} from 'react-native-track-player';
-import type {ProgressUpdateEvent} from 'react-native-track-player';
+import TrackPlayer, { Event, State } from 'react-native-track-player';
 
 let wasPausedByDuck = false;
 
@@ -20,37 +19,39 @@ export async function PlaybackService() {
     TrackPlayer.skipToPrevious();
   });
 
-  TrackPlayer.addEventListener(Event.RemoteDuck, async e => {
-    if (e.permanent === true) {
-      TrackPlayer.stop();
-    } else {
-      if (e.paused === true) {
+  TrackPlayer.addEventListener(
+    Event.RemoteDuck,
+    async ({permanent, paused}) => {
+      if (permanent) {
+        TrackPlayer.stop();
+        return;
+      }
+      if (paused) {
         const playerState = await TrackPlayer.getState();
         wasPausedByDuck = playerState !== State.Paused;
         TrackPlayer.pause();
       } else {
-        if (wasPausedByDuck === true) {
+        if (wasPausedByDuck) {
           TrackPlayer.play();
           wasPausedByDuck = false;
         }
       }
-    }
-  });
-
-  TrackPlayer.addEventListener(Event.PlaybackQueueEnded, data => {
-    console.log('Event.PlaybackQueueEnded', data);
-  });
-
-  TrackPlayer.addEventListener(Event.PlaybackTrackChanged, data => {
-    console.log('Event.PlaybackTrackChanged', data);
-  });
-
-  TrackPlayer.addEventListener(
-    Event.PlaybackProgressUpdated,
-    (data: ProgressUpdateEvent) => {
-      console.log('Event.PlaybackProgressUpdated', data);
     },
   );
 
-  TrackPlayer.addEventListener(Event.RemoteSeek, (event) => console.log('Event.RemoteSeek', event));
-};
+  TrackPlayer.addEventListener(Event.PlaybackQueueEnded, event => {
+    console.log('Event.PlaybackQueueEnded', event);
+  });
+
+  TrackPlayer.addEventListener(Event.PlaybackTrackChanged, event => {
+    console.log('Event.PlaybackTrackChanged', event);
+  });
+
+  TrackPlayer.addEventListener(Event.PlaybackProgressUpdated, event => {
+    console.log('Event.PlaybackProgressUpdated', event);
+  });
+
+  TrackPlayer.addEventListener(Event.RemoteSeek, event =>
+    console.log('Event.RemoteSeek', event),
+  );
+}
