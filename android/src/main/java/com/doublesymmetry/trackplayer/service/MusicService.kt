@@ -380,8 +380,8 @@ class MusicService : HeadlessJsTaskService() {
                     is FORWARD -> {
                         Bundle().apply {
                             val interval = latestOptions?.getDouble(
-                                FORWARD_JUMP_INTERVAL_KEY,
-                                DEFAULT_JUMP_INTERVAL,
+                                    FORWARD_JUMP_INTERVAL_KEY,
+                                    DEFAULT_JUMP_INTERVAL,
                             ) ?: DEFAULT_JUMP_INTERVAL
                             putInt("interval", interval.toInt())
                             emit(MusicEvents.BUTTON_JUMP_FORWARD, this)
@@ -390,8 +390,8 @@ class MusicService : HeadlessJsTaskService() {
                     is BACKWARD -> {
                         Bundle().apply {
                             val interval = latestOptions?.getDouble(
-                                BACKWARD_JUMP_INTERVAL_KEY,
-                                DEFAULT_JUMP_INTERVAL,
+                                    BACKWARD_JUMP_INTERVAL_KEY,
+                                    DEFAULT_JUMP_INTERVAL,
                             ) ?: DEFAULT_JUMP_INTERVAL
                             putInt("interval", interval.toInt())
                             emit(MusicEvents.BUTTON_JUMP_BACKWARD, this)
