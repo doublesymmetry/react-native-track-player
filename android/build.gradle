@@ -26,8 +26,8 @@ android {
         minSdkVersion getExtOrIntegerDefault('minSdkVersion') // RN's minimum version
         targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
 
-        versionCode 1
-        versionName '1.0'
+        versionCode 300
+        versionName '3.0'
 
         consumerProguardFiles 'proguard-rules.txt'
     }

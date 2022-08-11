@@ -26,7 +26,6 @@ import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import java.util.concurrent.TimeUnit
 
@@ -263,7 +262,7 @@ class MusicService : HeadlessJsTaskService() {
 
     @MainThread
     fun seekTo(seconds: Float) {
-        player.seek((seconds * 1000).toLong(), TimeUnit.MILLISECONDS)
+        player.seek((seconds.toMilliseconds()), TimeUnit.MILLISECONDS)
     }
 
     @MainThread
@@ -294,13 +293,13 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     @MainThread
-    fun getDurationInSeconds(): Double = player.duration.toDouble() / 1000
+    fun getDurationInSeconds(): Double = player.duration.toSeconds()
 
     @MainThread
-    fun getPositionInSeconds(): Double = player.position.toDouble() / 1000
+    fun getPositionInSeconds(): Double = player.position.toSeconds()
 
     @MainThread
-    fun getBufferedPositionInSeconds(): Double = player.bufferedPosition.toDouble() / 1000
+    fun getBufferedPositionInSeconds(): Double = player.bufferedPosition.toSeconds()
 
     @MainThread
     fun updateMetadataForTrack(index: Int, track: Track) {
