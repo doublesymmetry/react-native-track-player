@@ -468,6 +468,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         }
 
         player.stop()
+        player.reset()
         player.nowPlayingInfoController.clear()
         resolve(NSNull())
         DispatchQueue.main.async {
@@ -496,13 +497,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
         player.pause()
         resolve(NSNull())
-    }
-
-    // NOTE: this method is really just an alias for pause. It should NOT call `player.stop` as
-    // that will reset the player, which is not the API intent.
-    @objc(stop:rejecter:)
-    public func stop(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        self.pause(resolve: resolve, reject: reject)
     }
 
     @objc(seekTo:resolver:rejecter:)
