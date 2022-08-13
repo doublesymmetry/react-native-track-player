@@ -41,3 +41,59 @@ You can also use [jetifier](https://github.com/mikehardy/jetifier#usage-for-sour
 ## Android: Cleartext HTTP traffic not permitted
 
 Since API 28, Android disables traffic without TLS. To fix the issue you have to use `https` or [enable clear text traffic](https://stackoverflow.com/a/50834600).
+
+## Android: Duplicate package names
+
+Currently React Native Track Player uses a fork of Googles exoplayer which causes conflicts with other packages also using the original exoplayer.
+Until trackplayer moves away from the work you can resolve conflicts with [gradle](https://docs.gradle.org/current/userguide/resolution_rules.html#sec:dependency_resolve_rules) by doing the following:
+
+```diff
+// Add this to the dependencies object in app/build.gradle
+    modules {
+        module("com.google.android.exoplayer:exoplayer") {
+            replacedBy("com.github.doublesymmetry.Exoplayer:exoplayer", "replace exoplayer with doublesymmetry.Exoplayer")
+        }
+        module("com.google.android.exoplayer:exoplayer-core") {
+            replacedBy("com.github.doublesymmetry.Exoplayer:exoplayer-core", "replace exoplayer with doublesymmetry.Exoplayer")
+        }
+        module("com.google.android.exoplayer:exoplayer-ui") {
+            replacedBy("com.github.doublesymmetry.Exoplayer:exoplayer-ui", "replace exoplayer with doublesymmetry.Exoplayer")
+        }
+        module("com.google.android.exoplayer:exoplayer-common") {
+            replacedBy("com.github.doublesymmetry.Exoplayer:exoplayer-common", "replace exoplayer with doublesymmetry.Exoplayer")
+        }
+        module("com.google.android.exoplayer:exoplayer-smoothstreaming") {
+            replacedBy("com.github.doublesymmetry.Exoplayer:exoplayer-smoothstreaming", "replace exoplayer with doublesymmetry.Exoplayer")
+        }
+        module("com.google.android.exoplayer:exoplayer-hls") {
+            replacedBy("com.github.doublesymmetry.Exoplayer:exoplayer-hls", "replace exoplayer with doublesymmetry.Exoplayer")
+        }
+        module("com.google.android.exoplayer:exoplayer-dash") {
+            replacedBy("com.github.doublesymmetry.Exoplayer:exoplayer-dash", "replace exoplayer with doublesymmetry.Exoplayer")
+        }
+        
+    }
+```
+
+### Still having conflicts
+
+The example above is specific to expo-av and your package might be using additional modules of exoplayer. Here's an example on how to resolve any additional conflicts you might have
+
+#### Example of Error Log
+
+```log
+Duplicate class com.google.android.exoplayer2.upstream.crypto.AesCipherDataSink found in modules jetified-exoplayer-datasource-2.17.1-runtime (com.google.android.exoplayer:exoplayer-datasource:2.17.1) and jetified-exoplayer-datasource-r2.17.2-runtime (com.github.doublesymmetry.Exoplayer:exoplayer-datasource:r2.17.2)
+```
+
+The conflict is with what is in the brackets (): `(com.google.android.exoplayer:exoplayer-datasource:2.17.1)`
+
+So the conflicting module is: `exoplayer-datasource`
+
+Resolve the conflict by adding another module to replace:
+
+```diff
+module("com.google.android.exoplayer:exoplayer-datasource") {
+            replacedBy("com.github.doublesymmetry.Exoplayer:exoplayer-datasource", "replace exoplayer with doublesymmetry.Exoplayer")
+}
+```
+
