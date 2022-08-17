@@ -232,7 +232,6 @@ class MusicService : HeadlessJsTaskService() {
     @MainThread
     fun stopPlayer() {
         player.stop()
-        player.destroy()
     }
 
     @MainThread

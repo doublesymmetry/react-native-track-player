@@ -38,14 +38,6 @@ async function setupPlayer(options: PlayerOptions = {}): Promise<void> {
   return TrackPlayer.setupPlayer(options || {})
 }
 
-function destroy(): Promise<void> {
-  if (Platform.OS === 'android') {
-    emitter.removeAllListeners()
-  }
-
-  return TrackPlayer.destroy()
-}
-
 type ServiceHandler = () => Promise<void>
 /**
  * Register the playback service. The service will run as long as the player runs.
@@ -214,13 +206,6 @@ async function pause(): Promise<void> {
 }
 
 /**
- * Stops the current track.
- */
-async function stop(): Promise<void> {
-  return TrackPlayer.stop()
-}
-
-/**
  * Seeks to a specified time position in the current track.
  */
 async function seekTo(position: number): Promise<void> {
@@ -323,7 +308,6 @@ async function getRepeatMode(): Promise<RepeatMode> {
 export default {
   // MARK: - General API
   setupPlayer,
-  destroy,
   registerPlaybackService,
   addEventListener,
   isServiceRunning,
@@ -346,7 +330,6 @@ export default {
   reset,
   play,
   pause,
-  stop,
   seekTo,
   setVolume,
   setRate,

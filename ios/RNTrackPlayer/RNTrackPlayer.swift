@@ -284,20 +284,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         resolve(player != nil)
     }
 
-    @objc(destroy:rejecter:)
-    public func destroy(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
-
-        print("Destroying player")
-        self.player.stop()
-        self.player.nowPlayingInfoController.clear()
-        try? AVAudioSession.sharedInstance().setActive(false)
-        hasInitialized = false
-    }
-
     @objc(updateOptions:resolver:rejecter:)
     public func update(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
@@ -510,13 +496,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
         player.pause()
         resolve(NSNull())
-    }
-
-    // NOTE: this method is really just an alias for pause. It should NOT call `player.stop` as
-    // that will reset the player, which is not the API intent.
-    @objc(stop:rejecter:)
-    public func stop(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        self.pause(resolve: resolve, reject: reject)
     }
 
     @objc(seekTo:resolver:rejecter:)

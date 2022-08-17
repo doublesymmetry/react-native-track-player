@@ -23,7 +23,7 @@ export async function PlaybackService() {
     Event.RemoteDuck,
     async ({permanent, paused}) => {
       if (permanent) {
-        TrackPlayer.stop();
+        TrackPlayer.pause();
         return;
       }
       if (paused) {
