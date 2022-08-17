@@ -468,7 +468,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         }
 
         player.stop()
-        player.reset()
         player.nowPlayingInfoController.clear()
         resolve(NSNull())
         DispatchQueue.main.async {
