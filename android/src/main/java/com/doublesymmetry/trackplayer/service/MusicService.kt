@@ -369,39 +369,6 @@ class MusicService : HeadlessJsTaskService() {
         }
 
         scope.launch {
-            event.onNotificationButtonTapped.collect {
-                when (it) {
-                    is PLAY -> emit(MusicEvents.BUTTON_PLAY)
-                    is PAUSE -> emit(MusicEvents.BUTTON_PAUSE)
-                    is NEXT -> emit(MusicEvents.BUTTON_SKIP_NEXT)
-                    is PREVIOUS -> emit(MusicEvents.BUTTON_SKIP_PREVIOUS)
-                    is STOP -> emit(MusicEvents.BUTTON_STOP)
-                    is FORWARD -> {
-                        Bundle().apply {
-                            val interval = latestOptions?.getDouble(
-                                    FORWARD_JUMP_INTERVAL_KEY,
-                                    DEFAULT_JUMP_INTERVAL,
-                            ) ?: DEFAULT_JUMP_INTERVAL
-                            putInt("interval", interval.toInt())
-                            emit(MusicEvents.BUTTON_JUMP_FORWARD, this)
-                        }
-                    }
-                    is BACKWARD -> {
-                        Bundle().apply {
-                            val interval = latestOptions?.getDouble(
-                                    BACKWARD_JUMP_INTERVAL_KEY,
-                                    DEFAULT_JUMP_INTERVAL,
-                            ) ?: DEFAULT_JUMP_INTERVAL
-                            putInt("interval", interval.toInt())
-                            emit(MusicEvents.BUTTON_JUMP_BACKWARD, this)
-                        }
-                    }
-                }
-
-            }
-        }
-
-        scope.launch {
             event.notificationStateChange.collect {
                 when (it) {
                     is NotificationState.POSTED -> {
@@ -436,20 +403,14 @@ class MusicService : HeadlessJsTaskService() {
                     MediaSessionCallback.STOP -> emit(MusicEvents.BUTTON_STOP)
                     MediaSessionCallback.FORWARD -> {
                         Bundle().apply {
-                            val interval = latestOptions?.getDouble(
-                                    FORWARD_JUMP_INTERVAL_KEY,
-                                    DEFAULT_JUMP_INTERVAL,
-                            ) ?: DEFAULT_JUMP_INTERVAL
+                            val interval = latestOptions?.getDouble(FORWARD_JUMP_INTERVAL_KEY, DEFAULT_JUMP_INTERVAL) ?: DEFAULT_JUMP_INTERVAL
                             putInt("interval", interval.toInt())
                             emit(MusicEvents.BUTTON_JUMP_FORWARD, this)
                         }
                     }
                     MediaSessionCallback.REWIND -> {
                         Bundle().apply {
-                            val interval = latestOptions?.getDouble(
-                                    BACKWARD_JUMP_INTERVAL_KEY,
-                                    DEFAULT_JUMP_INTERVAL,
-                            ) ?: DEFAULT_JUMP_INTERVAL
+                            val interval = latestOptions?.getDouble(BACKWARD_JUMP_INTERVAL_KEY, DEFAULT_JUMP_INTERVAL) ?: DEFAULT_JUMP_INTERVAL
                             putInt("interval", interval.toInt())
                             emit(MusicEvents.BUTTON_JUMP_BACKWARD, this)
                         }
