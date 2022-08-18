@@ -13,6 +13,39 @@ To install release candidates run `yarn add react-native-track-player@next`
 ##### Bug Fixes
 * None.
 
+
+## 3.1.0 (18.08.22)
+
+##### Enhancements
+
+* Use latest KotlinAudio which does not use ExoPlayer fork.
+  [mpivchev](https://github.com/mpivchev)
+
+##### Bug Fixes
+* Fix crash with `reset()` on Android.
+  [dcvz](https://github.com/dcvz)
+* Removes `destroy()` on iOS - this was missed.
+* Removes the `stop()` method -- use `pause()` instead.
+
+## 3.0.0 (11.08.22)
+
+We are changing how the audio service handles its lifecycle. Previously we had the stopWithApp bool that would try and stop the service when you remove the app from recents, but due to how Android handles foreground services the OS never stops the app process, as it's waiting for the foreground service to come back. We are embracing this and going with what other audio apps (Spotify, Soundcloud, Google Podcast etc.) are doing.
+
+##### Enhancements
+
+* Rewrite Android module in Kotlin and using KotlinAudio.
+  [mpivchev](
+
+##### Breaking
+
+* stopWithApp turns into stoppingAppPausesPlayback
+* `destroy()` is no longer available
+* 
+
+##### Bug Fixes
+* Fix crash with `reset()` on Android.
+  [dcvz](https://github.com/dcvz)
+
 ## 2.1.3 (30.03.22)
 
 ##### Enhancements
