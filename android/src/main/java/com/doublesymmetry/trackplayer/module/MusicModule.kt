@@ -4,7 +4,6 @@ import android.content.*
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.RatingCompat
-import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.Capability
 import com.doublesymmetry.kotlinaudio.models.RepeatMode
@@ -188,7 +187,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     @ReactMethod
-    @Deprecated("Backwards compatible function from the old android implementation. Should be removed in V3")
+    @Deprecated("Backwards compatible function from the old android implementation. Should be removed in the next major release.")
     fun isServiceRunning(callback: Promise) {
         callback.resolve(isServiceBound)
     }
