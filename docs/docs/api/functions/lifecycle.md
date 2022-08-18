@@ -26,10 +26,6 @@ If the player is already initialized, the promise will resolve instantly.
 | options.waitForBuffer   | `boolean` | Indicates whether the player should automatically delay playback in order to minimize stalling. If you notice that network media immediately pauses after it buffers, setting this to `true` may help. | false | ❌ | ✅ | ❌ |
 | options.autoUpdateMetadata   | `boolean` | Indicates whether the player should automatically update now playing metadata data in control center / notification. | true | ✅ | ❌ | ❌ |
 
-## `destroy()`
-
-Destroys the player, cleaning up its resources. After executing this function, you won't be able to use the player anymore, unless you call `setupPlayer()` again.
-
 ## `registerPlaybackService(serviceProvider)`
 
 Register the playback service. The service will run as long as the player runs.

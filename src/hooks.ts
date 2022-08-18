@@ -1,7 +1,7 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
+import { Event, EventsPayloadByEvent, Progress, State } from './interfaces'
 import TrackPlayer from './trackPlayer'
-import { State, Event, ProgressState } from './interfaces'
 
 /** Get current playback state and subsequent updates  */
 export const usePlaybackState = () => {
@@ -30,7 +30,7 @@ export const usePlaybackState = () => {
     // Set initial state
     setPlayerState()
 
-    const sub = TrackPlayer.addEventListener(Event.PlaybackState, data => {
+    const sub = TrackPlayer.addEventListener<Event.PlaybackState>(Event.PlaybackState, data => {
       setState(data.state)
     })
 
@@ -40,20 +40,17 @@ export const usePlaybackState = () => {
   return state
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Handler = (payload: { type: Event; [key: string]: any }) => void
-
 /**
  * Attaches a handler to the given TrackPlayer events and performs cleanup on unmount
  * @param events - TrackPlayer events to subscribe to
  * @param handler - callback invoked when the event fires
  */
-export const useTrackPlayerEvents = (events: Event[], handler: Handler) => {
-  const savedHandler = useRef<Handler>()
-
-  useEffect(() => {
-    savedHandler.current = handler
-  }, [handler])
+export const useTrackPlayerEvents = <T extends Event[], H extends (data: EventsPayloadByEvent[T[number]]) => void>(
+  events: T,
+  handler: H,
+) => {
+  const savedHandler = useRef(handler)
+  savedHandler.current = handler
 
   useEffect(() => {
     if (__DEV__) {
@@ -69,9 +66,11 @@ export const useTrackPlayerEvents = (events: Event[], handler: Handler) => {
       }
     }
 
-    const subs = events.map(event =>
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      TrackPlayer.addEventListener(event, payload => savedHandler.current!({ ...payload, type: event })),
+    const subs = events.map(type =>
+      TrackPlayer.addEventListener(type, payload => {
+        // @ts-expect-error
+        savedHandler.current({ ...payload, type })
+      }),
     )
 
     return () => subs.forEach(sub => sub.remove())
@@ -83,7 +82,7 @@ export const useTrackPlayerEvents = (events: Event[], handler: Handler) => {
  * @param interval - ms interval
  */
 export function useProgress(updateInterval?: number) {
-  const [state, setState] = useState<ProgressState>({ position: 0, duration: 0, buffered: 0 })
+  const [state, setState] = useState<Progress>({ position: 0, duration: 0, buffered: 0 })
   const playerState = usePlaybackState()
   const stateRef = useRef(state)
   const isUnmountedRef = useRef(true)

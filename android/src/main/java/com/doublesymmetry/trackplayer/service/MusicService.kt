@@ -46,9 +46,9 @@ class MusicService : HeadlessJsTaskService() {
         get() = (player.currentItem as TrackAudioItem).track
 
     var ratingType: Int
-        get() = player.notificationManager.ratingType
+        get() = player.ratingType
         set(value) {
-            player.notificationManager.ratingType = value
+            player.ratingType = value
         }
 
     val event get() = player.event
@@ -65,7 +65,6 @@ class MusicService : HeadlessJsTaskService() {
 
     @MainThread
     fun setupPlayer(playerOptions: Bundle?) {
-        // fun setupPlayer(playerOptions: Bundle?) {
         val bufferOptions = BufferConfig(
                 playerOptions?.getDouble(MIN_BUFFER_KEY)?.toMilliseconds()?.toInt(),
                 playerOptions?.getDouble(MAX_BUFFER_KEY)?.toMilliseconds()?.toInt(),
@@ -113,7 +112,7 @@ class MusicService : HeadlessJsTaskService() {
                 }
                 Capability.STOP -> {
                     val stopIcon = Utils.getIconOrNull(this, options, "stopIcon")
-                    buttonsList.add(STOP(icon = stopIcon, isCompact = isCompact(it)))
+                    buttonsList.add(STOP(icon = stopIcon))
                 }
                 Capability.SKIP_TO_NEXT -> {
                     val nextIcon = Utils.getIconOrNull(this, options, "nextIcon")
@@ -232,7 +231,6 @@ class MusicService : HeadlessJsTaskService() {
     @MainThread
     fun stopPlayer() {
         player.stop()
-        player.destroy()
     }
 
     @MainThread
@@ -313,7 +311,7 @@ class MusicService : HeadlessJsTaskService() {
 
     @MainThread
     fun clearNotificationMetadata() {
-        player.notificationManager.clearNotification()
+        player.notificationManager.hideNotification()
     }
 
     @MainThread
@@ -370,39 +368,6 @@ class MusicService : HeadlessJsTaskService() {
         }
 
         scope.launch {
-            event.onNotificationButtonTapped.collect {
-                when (it) {
-                    is PLAY -> emit(MusicEvents.BUTTON_PLAY)
-                    is PAUSE -> emit(MusicEvents.BUTTON_PAUSE)
-                    is NEXT -> emit(MusicEvents.BUTTON_SKIP_NEXT)
-                    is PREVIOUS -> emit(MusicEvents.BUTTON_SKIP_PREVIOUS)
-                    is STOP -> emit(MusicEvents.BUTTON_STOP)
-                    is FORWARD -> {
-                        Bundle().apply {
-                            val interval = latestOptions?.getDouble(
-                                    FORWARD_JUMP_INTERVAL_KEY,
-                                    DEFAULT_JUMP_INTERVAL,
-                            ) ?: DEFAULT_JUMP_INTERVAL
-                            putInt("interval", interval.toInt())
-                            emit(MusicEvents.BUTTON_JUMP_FORWARD, this)
-                        }
-                    }
-                    is BACKWARD -> {
-                        Bundle().apply {
-                            val interval = latestOptions?.getDouble(
-                                    BACKWARD_JUMP_INTERVAL_KEY,
-                                    DEFAULT_JUMP_INTERVAL,
-                            ) ?: DEFAULT_JUMP_INTERVAL
-                            putInt("interval", interval.toInt())
-                            emit(MusicEvents.BUTTON_JUMP_BACKWARD, this)
-                        }
-                    }
-                }
-
-            }
-        }
-
-        scope.launch {
             event.notificationStateChange.collect {
                 when (it) {
                     is NotificationState.POSTED -> {
@@ -428,6 +393,25 @@ class MusicService : HeadlessJsTaskService() {
                         Bundle().apply {
                             putDouble("position", it.position.toDouble())
                             emit(MusicEvents.BUTTON_SEEK_TO, this)
+                        }
+                    }
+                    MediaSessionCallback.PLAY -> emit(MusicEvents.BUTTON_PLAY)
+                    MediaSessionCallback.PAUSE -> emit(MusicEvents.BUTTON_PAUSE)
+                    MediaSessionCallback.NEXT -> emit(MusicEvents.BUTTON_SKIP_NEXT)
+                    MediaSessionCallback.PREVIOUS -> emit(MusicEvents.BUTTON_SKIP_PREVIOUS)
+                    MediaSessionCallback.STOP -> emit(MusicEvents.BUTTON_STOP)
+                    MediaSessionCallback.FORWARD -> {
+                        Bundle().apply {
+                            val interval = latestOptions?.getDouble(FORWARD_JUMP_INTERVAL_KEY, DEFAULT_JUMP_INTERVAL) ?: DEFAULT_JUMP_INTERVAL
+                            putInt("interval", interval.toInt())
+                            emit(MusicEvents.BUTTON_JUMP_FORWARD, this)
+                        }
+                    }
+                    MediaSessionCallback.REWIND -> {
+                        Bundle().apply {
+                            val interval = latestOptions?.getDouble(BACKWARD_JUMP_INTERVAL_KEY, DEFAULT_JUMP_INTERVAL) ?: DEFAULT_JUMP_INTERVAL
+                            putInt("interval", interval.toInt())
+                            emit(MusicEvents.BUTTON_JUMP_BACKWARD, this)
                         }
                     }
                 }
@@ -484,8 +468,7 @@ class MusicService : HeadlessJsTaskService() {
     @MainThread
     override fun onDestroy() {
         super.onDestroy()
-
-        stopPlayer()
+        player.stop()
     }
 
     @MainThread
