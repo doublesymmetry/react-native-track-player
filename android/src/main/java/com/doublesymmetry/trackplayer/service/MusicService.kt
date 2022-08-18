@@ -229,9 +229,8 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     @MainThread
-    fun reset() {
-        player.pause()
-        player.clearQueue()
+    fun stopPlayer() {
+        player.stop()
     }
 
     @MainThread
@@ -469,8 +468,7 @@ class MusicService : HeadlessJsTaskService() {
     @MainThread
     override fun onDestroy() {
         super.onDestroy()
-
-        reset()
+        player.stop()
     }
 
     @MainThread
