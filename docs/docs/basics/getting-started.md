@@ -41,7 +41,7 @@ is a plain javascript object with a number of properties describing the track.
 Then add the track to the queue:
 
 ```ts
-var track = {
+var track1 = {
     url: 'http://example.com/avaritia.mp3', // Load media from the network
     title: 'Avaritia',
     artist: 'deadmau5',
