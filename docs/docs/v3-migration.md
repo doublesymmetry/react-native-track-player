@@ -30,6 +30,7 @@ await TrackPlayer.updateOptions({
   ...
 });
 
-// remove all usage of `.destroy()`
+// remove all usages of `.destroy()` and `.stop()`
 -  TrackPlayer.destroy();
+-  TrackPlayer.stop();
 ```
