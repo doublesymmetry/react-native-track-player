@@ -18,12 +18,11 @@ To install release candidates run `yarn add react-native-track-player@next`
 
 ##### Enhancements
 
-* Use latest KotlinAudio which does not use ExoPlayer fork.
-  [mpivchev](https://github.com/mpivchev)
+* Uses latest KotlinAudio which does not use ExoPlayer fork.
+* Adds back support for bluetooth playback control.
 
 ##### Bug Fixes
-* Fix crash with `reset()` on Android.
-  [dcvz](https://github.com/dcvz)
+* Fixes crash with `reset()` on Android.
 * Removes `destroy()` on iOS - this was missed.
 * Removes the `stop()` method -- use `pause()` instead.
 
