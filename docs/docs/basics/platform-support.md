@@ -55,7 +55,6 @@ sidebar_position: 5
 | `addEventListener` | ✅ | ✅ | ✅ |
 | `play` | ✅ | ✅ | ✅ |
 | `pause` | ✅ | ✅ | ✅ |
-| `stop` | ✅ | ✅ | ✅ |
 | `reset` | ✅ | ✅ | ✅ |
 | `setVolume` | ✅ | ✅ | ✅ |
 | `getVolume` | ✅ | ✅ | ✅ |
@@ -75,7 +74,6 @@ sidebar_position: 5
 | `skipToPrevious` | ✅ | ✅ | ✅ |
 | `skipToNext` | ✅ | ✅ | ✅ |
 | `removeUpcomingTracks` | ✅ | ✅ | ✅ |
-| `destroy` | ✅ | ✅ | ✅ |
 
 ## Events
 
