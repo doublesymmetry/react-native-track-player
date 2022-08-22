@@ -98,7 +98,6 @@ console.log(`${duration - position} seconds left.`);
 ```ts
 TrackPlayer.play();
 TrackPlayer.pause();
-TrackPlayer.stop();
 TrackPlayer.reset();
 
 // Seek to 12.5 seconds:
@@ -225,12 +224,3 @@ TrackPlayer.updateOptions({
     icon: require('./notification-icon.png')
 });
 ```
-
-### Notes
-
-In order to keep playing audio in the background, the Android player service
-requires a notification in order to be in the "foreground" state (allowing it to
-use more system resources without being killed) which is forced to be "ongoing"
-(not swipable). Because you can not stop the player service by swiping the
-Android notification, we highly recommend you to have a stop button in the
-notification. The button should `destroy()` the player.

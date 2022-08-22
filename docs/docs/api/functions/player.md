@@ -15,7 +15,7 @@ Some parameters are unused depending on platform.
 | options.ratingType | [RatingType](../constants/rating.md) | The rating type | ✅ | ❌ | ❌ |
 | options.forwardJumpInterval | `number` | The interval in seconds for the jump forward buttons (if only one is given then we use that value for both) | ✅ | ✅ | ❌ |
 | options.backwardJumpInterval | `number` | The interval in seconds for the jump backward buttons (if only one is given then we use that value for both) | ✅ | ✅ | ✅ |
-| options.stoppingAppPausesPlayback | `boolean` | Whether the player will be destroyed when the app closes | ✅ | ❌ | ❌ |
+| options.stoppingAppPausesPlayback | `boolean` | Whether the player will pause playback when the app closes | ✅ | ❌ | ❌ |
 | options.alwaysPauseOnInterruption | `boolean` | Whether the `remote-duck` event will be triggered on every interruption | ✅ | ❌ | ❌ |
 | options.likeOptions | [FeedbackOptions](../objects/feedback.md) | The media controls that will be enabled | ❌ | ✅ | ❌ |
 | options.dislikeOptions | [FeedbackOptions](../objects/feedback.md) | The media controls that will be enabled | ❌ | ✅ | ❌ |
