@@ -334,26 +334,26 @@ export interface EventPayloadByEvent {
 }
 
 export interface EventsPayloadByEvent {
-  [Event.PlaybackState]: PlaybackStateEvent & { event: Event.PlaybackState }
-  [Event.PlaybackError]: PlaybackErrorEvent & { event: Event.PlaybackError }
-  [Event.PlaybackQueueEnded]: PlaybackQueueEndedEvent & { event: Event.PlaybackQueueEnded }
-  [Event.PlaybackTrackChanged]: PlaybackTrackChangedEvent & { event: Event.PlaybackTrackChanged }
-  [Event.PlaybackMetadataReceived]: PlaybackMetadataReceivedEvent & { event: Event.PlaybackMetadataReceived }
-  [Event.PlaybackProgressUpdated]: PlaybackProgressUpdatedEvent & { event: Event.PlaybackProgressUpdated }
-  [Event.RemotePlay]: { event: Event.RemotePlay }
-  [Event.RemotePlayId]: RemotePlayIdEvent & { event: Event.RemotePlayId }
-  [Event.RemotePlaySearch]: RemotePlaySearchEvent & { event: Event.RemotePlaySearch }
-  [Event.RemotePause]: { event: Event.RemotePause }
-  [Event.RemoteStop]: { event: Event.RemoteStop }
-  [Event.RemoteSkip]: RemoteSkipEvent & { event: Event.RemoteSkip }
-  [Event.RemoteNext]: { event: Event.RemoteNext }
-  [Event.RemotePrevious]: { event: Event.RemotePrevious }
-  [Event.RemoteJumpForward]: RemoteJumpForwardEvent & { event: Event.RemoteJumpForward }
-  [Event.RemoteJumpBackward]: RemoteJumpBackwardEvent & { event: Event.RemoteJumpBackward }
-  [Event.RemoteSeek]: RemoteSeekEvent & { event: Event.RemoteSeek }
-  [Event.RemoteSetRating]: RemoteSetRatingEvent & { event: Event.RemoteSetRating }
-  [Event.RemoteDuck]: RemoteDuckEvent & { event: Event.RemoteDuck }
-  [Event.RemoteLike]: { event: Event.RemoteLike }
-  [Event.RemoteDislike]: { event: Event.RemoteDislike }
-  [Event.RemoteBookmark]: { event: Event.RemoteBookmark }
+  [Event.PlaybackState]: PlaybackStateEvent & { type: Event.PlaybackState }
+  [Event.PlaybackError]: PlaybackErrorEvent & { type: Event.PlaybackError }
+  [Event.PlaybackQueueEnded]: PlaybackQueueEndedEvent & { type: Event.PlaybackQueueEnded }
+  [Event.PlaybackTrackChanged]: PlaybackTrackChangedEvent & { type: Event.PlaybackTrackChanged }
+  [Event.PlaybackMetadataReceived]: PlaybackMetadataReceivedEvent & { type: Event.PlaybackMetadataReceived }
+  [Event.PlaybackProgressUpdated]: PlaybackProgressUpdatedEvent & { type: Event.PlaybackProgressUpdated }
+  [Event.RemotePlay]: { type: Event.RemotePlay }
+  [Event.RemotePlayId]: RemotePlayIdEvent & { type: Event.RemotePlayId }
+  [Event.RemotePlaySearch]: RemotePlaySearchEvent & { type: Event.RemotePlaySearch }
+  [Event.RemotePause]: { type: Event.RemotePause }
+  [Event.RemoteStop]: { type: Event.RemoteStop }
+  [Event.RemoteSkip]: RemoteSkipEvent & { type: Event.RemoteSkip }
+  [Event.RemoteNext]: { type: Event.RemoteNext }
+  [Event.RemotePrevious]: { type: Event.RemotePrevious }
+  [Event.RemoteJumpForward]: RemoteJumpForwardEvent & { type: Event.RemoteJumpForward }
+  [Event.RemoteJumpBackward]: RemoteJumpBackwardEvent & { type: Event.RemoteJumpBackward }
+  [Event.RemoteSeek]: RemoteSeekEvent & { type: Event.RemoteSeek }
+  [Event.RemoteSetRating]: RemoteSetRatingEvent & { type: Event.RemoteSetRating }
+  [Event.RemoteDuck]: RemoteDuckEvent & { type: Event.RemoteDuck }
+  [Event.RemoteLike]: { type: Event.RemoteLike }
+  [Event.RemoteDislike]: { type: Event.RemoteDislike }
+  [Event.RemoteBookmark]: { type: Event.RemoteBookmark }
 }
