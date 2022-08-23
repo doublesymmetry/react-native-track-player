@@ -9,7 +9,7 @@
     "lint": "eslint src",
     "format": "prettier --write src",
     "types": "tsc --noEmit true",
-    "prepare": "yarn build",
+    "prepare": "yarn build && husky install",
     "example": "yarn --cwd example",
     "pods": "cd example/ios && pod install",
     "bootstrap": "yarn example && yarn && yarn pods",
@@ -17,8 +17,13 @@
     "preversion": "yarn lint",
     "version": "yarn format && git add -A src",
     "postversion": "if [[ ${npm_package_version} != *'nightly'* ]]; then git push && git push --tags; fi",
+    "version": "yarn format && git add -A src && yarn changelog && git add CHANGELOG.md",
+    "postversion": "if [[ ${npm_package_version} != *'nightly'* ]]; then yarn publish:git && yarn publish:npm; fi",
     "ci:lint": "eslint src --max-warnings=0",
-    "ci:format": "prettier --check src"
+    "ci:format": "prettier --check src",
+    "changelog": "conventional-changelog -p angular -s -i CHANGELOG.md -r 1",
+    "publish:git": "git push && git push --tags",
+    "publish:npm": "yarn prepare && npm publish --access public"
   },
   "files": [
     "lib/**/*",
@@ -60,10 +65,10 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/react-native-kit/react-native-track-player.git"
+    "url": "https://github.com/doublesymmetry/react-native-track-player.git"
   },
   "bugs": {
-    "url": "https://github.com/react-native-kit/react-native-track-player/issues"
+    "url": "https://github.com/doublesymmetry/react-native-track-player/issues"
   },
   "peerDependencies": {
     "react": ">=16.8.6",
@@ -79,10 +84,18 @@
     "@types/react-native": "^0.64.5",
     "@typescript-eslint/eslint-plugin": "^5.36.0",
     "@typescript-eslint/parser": "^5.36.0",
+    "conventional-changelog-cli": "^2.2.2",
+    "cz-conventional-changelog": "3.3.0",
     "eslint": "^8.23.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "prettier": "^2.7.1",
     "rimraf": "^2.6.2",
-    "typescript": "^4.8.2"
+    "typescript": "^4.8.2",
+    "husky": "^8.0.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
   }
 }
