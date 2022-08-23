@@ -17,6 +17,7 @@ how other popular apps (Spotify, Soundcloud, Google Podcasts, etc.) work.
 - The `destroy` function does not exist anymore. 
 - The `stopWithApp` flag turns into `stoppingAppPausesPlayback` 
     - [More information here](https://github.com/doublesymmetry/react-native-track-player/pull/1447#issuecomment-1195246389)
+- The react-native version has to be 0.68 or higher
 
 The full changelog of added features and bug fixes [can be found here](https://github.com/doublesymmetry/react-native-track-player/releases/tag/v3.0).
 
