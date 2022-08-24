@@ -1,10 +1,10 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import Slider from '@react-native-community/slider';
-import TrackPlayer, { useProgress } from 'react-native-track-player';
+import React from 'react';
+import {StyleSheet, Text, View} from 'react-native';
+import TrackPlayer, {useProgress} from 'react-native-track-player';
 
 export const Progress: React.FC = () => {
-  const progress = useProgress();
+  const progress = useProgress(2000);
   return (
     <>
       <Slider
