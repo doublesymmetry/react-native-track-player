@@ -52,6 +52,7 @@ export const useTrackPlayerEvents = <T extends Event[], H extends (data: EventsP
   const savedHandler = useRef(handler)
   savedHandler.current = handler
 
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     if (__DEV__) {
       const allowedTypes = Object.values(Event)
@@ -74,7 +75,7 @@ export const useTrackPlayerEvents = <T extends Event[], H extends (data: EventsP
     )
 
     return () => subs.forEach(sub => sub.remove())
-  }, [events])
+  }, events)
 }
 
 /**
