@@ -324,8 +324,9 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     @ReactMethod
     fun removeUpcomingTracks(callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
-
-        musicService.removeUpcomingTracks()
+        if(musicService.tracks.isNotEmpty()) {
+            musicService.removeUpcomingTracks()
+        }
         callback.resolve(null)
     }
 
