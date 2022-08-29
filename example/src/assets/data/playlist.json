@@ -31,7 +31,8 @@
     "url": "https://react-native-track-player.js.org/example/hls/whip/playlist.m3u8",
     "title": "Whip",
     "artist": "prazkhanal",
-    "artwork": "https://react-native-track-player.js.org/example/hls/whip/whip.jpeg"
+    "artwork": "https://react-native-track-player.js.org/example/hls/whip/whip.jpeg",
+    "type": "hls"
   },
   {
     "url": "https://ais-sa5.cdnstream1.com/b75154_128mp3",
