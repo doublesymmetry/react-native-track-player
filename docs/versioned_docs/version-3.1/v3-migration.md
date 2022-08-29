@@ -22,6 +22,11 @@ The full changelog of added features and bug fixes [can be found here](https://g
 
 When migrating from v2 to v3, the following has changed:
 
+
+## API Changes
+
+### `stopWithApp` is now `stoppingAppPausesPlayback`
+
 ```diff
 // Methods
 await TrackPlayer.updateOptions({
@@ -29,8 +34,26 @@ await TrackPlayer.updateOptions({
 +  stoppingAppPausesPlayback: true,
   ...
 });
+```
 
+### `destroy` and `stop` have been removed
+
+```diff
 // remove all usages of `.destroy()` and `.stop()`
 -  TrackPlayer.destroy();
 -  TrackPlayer.stop();
+```
+
+
+## Configuration Changes
+
+### `track-player.json` / Build Preferences no longer needed
+
+HLS, Dash, & Smoothstreaming are now supported on Android out of the box. You
+can remove your `track-player.json` file if you have one. You still need to
+ensure that [the correct `type` is specified on your `Track`
+object](./api/objects/track.md).
+
+```diff
+- track-player.json
 ```
