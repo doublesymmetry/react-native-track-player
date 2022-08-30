@@ -1,5 +1,5 @@
-import { NativeModules } from 'react-native'
-const { TrackPlayerModule: TrackPlayer } = NativeModules
+import { NativeModules } from 'react-native';
+const { TrackPlayerModule: TrackPlayer } = NativeModules;
 
 export enum IOSCategory {
   Playback = 'playback',
@@ -36,48 +36,48 @@ export interface PlayerOptions {
   /**
    * Minimum time in seconds that needs to be buffered.
    */
-  minBuffer?: number
+  minBuffer?: number;
   /**
    * Maximum time in seconds that needs to be buffered
    */
-  maxBuffer?: number
+  maxBuffer?: number;
   /**
    * Time in seconds that should be kept in the buffer behind the current playhead time.
    */
-  backBuffer?: number
+  backBuffer?: number;
   /**
    * Minimum time in seconds that needs to be buffered to start playing.
    */
-  playBuffer?: number
+  playBuffer?: number;
   /**
    * Maximum cache size in kilobytes.
    */
-  maxCacheSize?: number
+  maxCacheSize?: number;
   /**
    * [AVAudioSession.Category](https://developer.apple.com/documentation/avfoundation/avaudiosession/1616615-category) for iOS.
    * Sets on `play()`.
    */
-  iosCategory?: IOSCategory
+  iosCategory?: IOSCategory;
   /**
    * [AVAudioSession.Mode](https://developer.apple.com/documentation/avfoundation/avaudiosession/1616508-mode) for iOS.
    * Sets on `play()`.
    */
-  iosCategoryMode?: IOSCategoryMode
+  iosCategoryMode?: IOSCategoryMode;
   /**
    * [AVAudioSession.CategoryOptions](https://developer.apple.com/documentation/avfoundation/avaudiosession/1616503-categoryoptions) for iOS.
    * Sets on `play()`.
    */
-  iosCategoryOptions?: IOSCategoryOptions[]
+  iosCategoryOptions?: IOSCategoryOptions[];
   /**
    * Indicates whether the player should automatically delay playback in order to minimize stalling.
    * Defaults to `false`.
    */
-  waitForBuffer?: boolean
+  waitForBuffer?: boolean;
   /**
    * Indicates whether the player should automatically update now playing metadata data in control center / notification.
    * Defaults to `true`.
    */
-  autoUpdateMetadata?: boolean
+  autoUpdateMetadata?: boolean;
 }
 
 export enum RatingType {
@@ -91,10 +91,10 @@ export enum RatingType {
 
 export interface FeedbackOptions {
   /** Marks wether the option should be marked as active or "done" */
-  isActive: boolean
+  isActive: boolean;
 
   /** The title to give the action (relevant for iOS) */
-  title: string
+  title: string;
 }
 
 export enum Capability {
@@ -115,36 +115,36 @@ export enum Capability {
   Bookmark = TrackPlayer.CAPABILITY_BOOKMARK,
 }
 
-export type ResourceObject = number
+export type ResourceObject = number;
 
 export interface MetadataOptions {
-  ratingType?: RatingType
-  forwardJumpInterval?: number
-  backwardJumpInterval?: number
-  progressUpdateEventInterval?: number // in seconds
+  ratingType?: RatingType;
+  forwardJumpInterval?: number;
+  backwardJumpInterval?: number;
+  progressUpdateEventInterval?: number; // in seconds
 
   // ios
-  likeOptions?: FeedbackOptions
-  dislikeOptions?: FeedbackOptions
-  bookmarkOptions?: FeedbackOptions
+  likeOptions?: FeedbackOptions;
+  dislikeOptions?: FeedbackOptions;
+  bookmarkOptions?: FeedbackOptions;
 
-  capabilities?: Capability[]
+  capabilities?: Capability[];
 
   // android
-  stoppingAppPausesPlayback?: boolean
-  alwaysPauseOnInterruption?: boolean
-  notificationCapabilities?: Capability[]
-  compactCapabilities?: Capability[]
+  stoppingAppPausesPlayback?: boolean;
+  alwaysPauseOnInterruption?: boolean;
+  notificationCapabilities?: Capability[];
+  compactCapabilities?: Capability[];
 
-  icon?: ResourceObject
-  playIcon?: ResourceObject
-  pauseIcon?: ResourceObject
-  stopIcon?: ResourceObject
-  previousIcon?: ResourceObject
-  nextIcon?: ResourceObject
-  rewindIcon?: ResourceObject
-  forwardIcon?: ResourceObject
-  color?: number
+  icon?: ResourceObject;
+  playIcon?: ResourceObject;
+  pauseIcon?: ResourceObject;
+  stopIcon?: ResourceObject;
+  previousIcon?: ResourceObject;
+  nextIcon?: ResourceObject;
+  rewindIcon?: ResourceObject;
+  forwardIcon?: ResourceObject;
+  color?: number;
 }
 
 export enum Event {
@@ -202,158 +202,174 @@ export enum State {
 }
 
 export interface TrackMetadataBase {
-  title?: string
-  album?: string
-  artist?: string
-  duration?: number
-  artwork?: string | ResourceObject
-  description?: string
-  genre?: string
-  date?: string
-  rating?: number | boolean
-  isLiveStream?: boolean
+  title?: string;
+  album?: string;
+  artist?: string;
+  duration?: number;
+  artwork?: string | ResourceObject;
+  description?: string;
+  genre?: string;
+  date?: string;
+  rating?: number | boolean;
+  isLiveStream?: boolean;
 }
 
 export interface NowPlayingMetadata extends TrackMetadataBase {
-  elapsedTime?: number
+  elapsedTime?: number;
 }
 
 export interface Track extends TrackMetadataBase {
-  url: string | ResourceObject
-  type?: TrackType
-  userAgent?: string
-  contentType?: string
-  pitchAlgorithm?: PitchAlgorithm
+  url: string | ResourceObject;
+  type?: TrackType;
+  userAgent?: string;
+  contentType?: string;
+  pitchAlgorithm?: PitchAlgorithm;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  headers?: { [key: string]: any }
+  headers?: { [key: string]: any };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any
+  [key: string]: any;
 }
 
 export interface Progress {
-  position: number
-  duration: number
-  buffered: number
+  position: number;
+  duration: number;
+  buffered: number;
 }
 
 export interface PlaybackProgressUpdatedEvent extends Progress {
-  track: number
+  track: number;
 }
 
 export interface PlaybackStateEvent {
-  state: State
+  state: State;
 }
 
 export interface PlaybackErrorEvent {
-  code: string
-  message: string
+  code: string;
+  message: string;
 }
 
 export interface PlaybackQueueEndedEvent {
-  track: number
-  position: number
+  track: number;
+  position: number;
 }
 
 export interface PlaybackTrackChangedEvent {
-  track: number
-  position: number
-  nextTrack: number
+  track: number;
+  position: number;
+  nextTrack: number;
 }
 
 export interface PlaybackMetadataReceivedEvent {
-  source: string
-  title: string | null
-  url: string | null
-  artist: string | null
-  album: string | null
-  date: string | null
-  genre: string | null
+  source: string;
+  title: string | null;
+  url: string | null;
+  artist: string | null;
+  album: string | null;
+  date: string | null;
+  genre: string | null;
 }
 
 export interface RemotePlayIdEvent {
-  id: string
+  id: string;
 }
 
 export interface RemotePlaySearchEvent {
-  query: string
-  focus: string
-  title: string
-  artist: string
-  album: string
-  date: string
-  playlist: string
+  query: string;
+  focus: string;
+  title: string;
+  artist: string;
+  album: string;
+  date: string;
+  playlist: string;
 }
 
 export interface RemoteSkipEvent {
-  index: number
+  index: number;
 }
 
 export interface RemoteJumpForwardEvent {
-  interval: number
+  interval: number;
 }
 
 export interface RemoteJumpBackwardEvent {
-  interval: number
+  interval: number;
 }
 
 export interface RemoteSeekEvent {
-  position: number
+  position: number;
 }
 
 export interface RemoteSetRatingEvent {
-  rating: boolean | number
+  rating: boolean | number;
 }
 
 export interface RemoteDuckEvent {
-  paused: boolean
-  permanent: boolean
+  paused: boolean;
+  permanent: boolean;
 }
 export interface EventPayloadByEvent {
-  [Event.PlaybackState]: PlaybackStateEvent
-  [Event.PlaybackError]: PlaybackErrorEvent
-  [Event.PlaybackQueueEnded]: PlaybackQueueEndedEvent
-  [Event.PlaybackTrackChanged]: PlaybackTrackChangedEvent
-  [Event.PlaybackMetadataReceived]: PlaybackMetadataReceivedEvent
-  [Event.PlaybackProgressUpdated]: PlaybackProgressUpdatedEvent
-  [Event.RemotePlay]: never
-  [Event.RemotePlayId]: RemotePlayIdEvent
-  [Event.RemotePlaySearch]: RemotePlaySearchEvent
-  [Event.RemotePause]: never
-  [Event.RemoteStop]: never
-  [Event.RemoteSkip]: RemoteSkipEvent
-  [Event.RemoteNext]: never
-  [Event.RemotePrevious]: never
-  [Event.RemoteJumpForward]: RemoteJumpForwardEvent
-  [Event.RemoteJumpBackward]: RemoteJumpBackwardEvent
-  [Event.RemoteSeek]: RemoteSeekEvent
-  [Event.RemoteSetRating]: RemoteSetRatingEvent
-  [Event.RemoteDuck]: RemoteDuckEvent
-  [Event.RemoteLike]: never
-  [Event.RemoteDislike]: never
-  [Event.RemoteBookmark]: never
+  [Event.PlaybackState]: PlaybackStateEvent;
+  [Event.PlaybackError]: PlaybackErrorEvent;
+  [Event.PlaybackQueueEnded]: PlaybackQueueEndedEvent;
+  [Event.PlaybackTrackChanged]: PlaybackTrackChangedEvent;
+  [Event.PlaybackMetadataReceived]: PlaybackMetadataReceivedEvent;
+  [Event.PlaybackProgressUpdated]: PlaybackProgressUpdatedEvent;
+  [Event.RemotePlay]: never;
+  [Event.RemotePlayId]: RemotePlayIdEvent;
+  [Event.RemotePlaySearch]: RemotePlaySearchEvent;
+  [Event.RemotePause]: never;
+  [Event.RemoteStop]: never;
+  [Event.RemoteSkip]: RemoteSkipEvent;
+  [Event.RemoteNext]: never;
+  [Event.RemotePrevious]: never;
+  [Event.RemoteJumpForward]: RemoteJumpForwardEvent;
+  [Event.RemoteJumpBackward]: RemoteJumpBackwardEvent;
+  [Event.RemoteSeek]: RemoteSeekEvent;
+  [Event.RemoteSetRating]: RemoteSetRatingEvent;
+  [Event.RemoteDuck]: RemoteDuckEvent;
+  [Event.RemoteLike]: never;
+  [Event.RemoteDislike]: never;
+  [Event.RemoteBookmark]: never;
 }
 
 export interface EventsPayloadByEvent {
-  [Event.PlaybackState]: PlaybackStateEvent & { type: Event.PlaybackState }
-  [Event.PlaybackError]: PlaybackErrorEvent & { type: Event.PlaybackError }
-  [Event.PlaybackQueueEnded]: PlaybackQueueEndedEvent & { type: Event.PlaybackQueueEnded }
-  [Event.PlaybackTrackChanged]: PlaybackTrackChangedEvent & { type: Event.PlaybackTrackChanged }
-  [Event.PlaybackMetadataReceived]: PlaybackMetadataReceivedEvent & { type: Event.PlaybackMetadataReceived }
-  [Event.PlaybackProgressUpdated]: PlaybackProgressUpdatedEvent & { type: Event.PlaybackProgressUpdated }
-  [Event.RemotePlay]: { type: Event.RemotePlay }
-  [Event.RemotePlayId]: RemotePlayIdEvent & { type: Event.RemotePlayId }
-  [Event.RemotePlaySearch]: RemotePlaySearchEvent & { type: Event.RemotePlaySearch }
-  [Event.RemotePause]: { type: Event.RemotePause }
-  [Event.RemoteStop]: { type: Event.RemoteStop }
-  [Event.RemoteSkip]: RemoteSkipEvent & { type: Event.RemoteSkip }
-  [Event.RemoteNext]: { type: Event.RemoteNext }
-  [Event.RemotePrevious]: { type: Event.RemotePrevious }
-  [Event.RemoteJumpForward]: RemoteJumpForwardEvent & { type: Event.RemoteJumpForward }
-  [Event.RemoteJumpBackward]: RemoteJumpBackwardEvent & { type: Event.RemoteJumpBackward }
-  [Event.RemoteSeek]: RemoteSeekEvent & { type: Event.RemoteSeek }
-  [Event.RemoteSetRating]: RemoteSetRatingEvent & { type: Event.RemoteSetRating }
-  [Event.RemoteDuck]: RemoteDuckEvent & { type: Event.RemoteDuck }
-  [Event.RemoteLike]: { type: Event.RemoteLike }
-  [Event.RemoteDislike]: { type: Event.RemoteDislike }
-  [Event.RemoteBookmark]: { type: Event.RemoteBookmark }
+  [Event.PlaybackState]: PlaybackStateEvent & { type: Event.PlaybackState };
+  [Event.PlaybackError]: PlaybackErrorEvent & { type: Event.PlaybackError };
+  [Event.PlaybackQueueEnded]: PlaybackQueueEndedEvent & {
+    type: Event.PlaybackQueueEnded;
+  };
+  [Event.PlaybackTrackChanged]: PlaybackTrackChangedEvent & {
+    type: Event.PlaybackTrackChanged;
+  };
+  [Event.PlaybackMetadataReceived]: PlaybackMetadataReceivedEvent & {
+    type: Event.PlaybackMetadataReceived;
+  };
+  [Event.PlaybackProgressUpdated]: PlaybackProgressUpdatedEvent & {
+    type: Event.PlaybackProgressUpdated;
+  };
+  [Event.RemotePlay]: { type: Event.RemotePlay };
+  [Event.RemotePlayId]: RemotePlayIdEvent & { type: Event.RemotePlayId };
+  [Event.RemotePlaySearch]: RemotePlaySearchEvent & {
+    type: Event.RemotePlaySearch;
+  };
+  [Event.RemotePause]: { type: Event.RemotePause };
+  [Event.RemoteStop]: { type: Event.RemoteStop };
+  [Event.RemoteSkip]: RemoteSkipEvent & { type: Event.RemoteSkip };
+  [Event.RemoteNext]: { type: Event.RemoteNext };
+  [Event.RemotePrevious]: { type: Event.RemotePrevious };
+  [Event.RemoteJumpForward]: RemoteJumpForwardEvent & {
+    type: Event.RemoteJumpForward;
+  };
+  [Event.RemoteJumpBackward]: RemoteJumpBackwardEvent & {
+    type: Event.RemoteJumpBackward;
+  };
+  [Event.RemoteSeek]: RemoteSeekEvent & { type: Event.RemoteSeek };
+  [Event.RemoteSetRating]: RemoteSetRatingEvent & {
+    type: Event.RemoteSetRating;
+  };
+  [Event.RemoteDuck]: RemoteDuckEvent & { type: Event.RemoteDuck };
+  [Event.RemoteLike]: { type: Event.RemoteLike };
+  [Event.RemoteDislike]: { type: Event.RemoteDislike };
+  [Event.RemoteBookmark]: { type: Event.RemoteBookmark };
 }

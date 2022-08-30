@@ -6,8 +6,9 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "build": "rimraf lib && tsc",
-    "lint": "eslint \"src/**/*.ts\"",
-    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint src",
+    "format": "prettier --write src",
+    "types": "tsc --noEmit true",
     "prepare": "yarn build",
     "example": "yarn --cwd example",
     "pods": "cd example/ios && pod install",
@@ -16,8 +17,8 @@
     "preversion": "yarn lint",
     "version": "yarn format && git add -A src",
     "postversion": "if [[ ${npm_package_version} != *'nightly'* ]]; then git push && git push --tags; fi",
-    "lint:ci": "eslint \"src/**/*.ts\" --max-warnings=0",
-    "format:ci": "prettier --check \"src/**/*.ts\""
+    "ci:lint": "eslint src --max-warnings=0",
+    "ci:format": "prettier --check src"
   },
   "files": [
     "lib/**/*",
@@ -75,15 +76,13 @@
     }
   },
   "devDependencies": {
-    "@types/react-native": "^0.60.0",
-    "@typescript-eslint/eslint-plugin": "^1.7.0",
-    "@typescript-eslint/parser": "^1.7.0",
-    "eslint": "^5.16.0",
-    "eslint-config-prettier": "^4.2.0",
-    "eslint-plugin-prettier": "^3.0.1",
-    "eslint-plugin-react-hooks": "^4.2.0",
-    "prettier": "^1.17.0",
+    "@types/react-native": "^0.64.5",
+    "@typescript-eslint/eslint-plugin": "^5.36.0",
+    "@typescript-eslint/parser": "^5.36.0",
+    "eslint": "^8.23.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "prettier": "^2.7.1",
     "rimraf": "^2.6.2",
-    "typescript": "^3.2.4"
+    "typescript": "^4.8.2"
   }
 }

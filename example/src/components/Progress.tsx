@@ -15,7 +15,7 @@ export const Progress: React.FC = () => {
         thumbTintColor="#FFD479"
         minimumTrackTintColor="#FFD479"
         maximumTrackTintColor="#FFFFFF"
-        onSlidingComplete={value => {
+        onSlidingComplete={(value) => {
           TrackPlayer.seekTo(value);
         }}
       />

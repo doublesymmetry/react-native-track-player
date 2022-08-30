@@ -65,20 +65,24 @@ class MusicService : HeadlessJsTaskService() {
 
     @MainThread
     fun setupPlayer(playerOptions: Bundle?) {
-        val bufferOptions = BufferConfig(
+        val bufferConfig = BufferConfig(
                 playerOptions?.getDouble(MIN_BUFFER_KEY)?.toMilliseconds()?.toInt(),
                 playerOptions?.getDouble(MAX_BUFFER_KEY)?.toMilliseconds()?.toInt(),
                 playerOptions?.getDouble(PLAY_BUFFER_KEY)?.toMilliseconds()?.toInt(),
                 playerOptions?.getDouble(BACK_BUFFER_KEY)?.toMilliseconds()?.toInt(),
         )
 
-        val cacheOptions = CacheConfig(
+        val cacheConfig = CacheConfig(
                 playerOptions?.getDouble(MAX_CACHE_SIZE_KEY)?.toLong()
+        )
+
+        val playerConfig = PlayerConfig(
+                true
         )
 
         val automaticallyUpdateNotificationMetadata = playerOptions?.getBoolean(AUTO_UPDATE_METADATA, true) ?: true
 
-        player = QueuedAudioPlayer(this@MusicService, bufferOptions, cacheOptions)
+        player = QueuedAudioPlayer(this@MusicService, playerConfig, bufferConfig, cacheConfig)
         player.automaticallyUpdateNotificationMetadata = automaticallyUpdateNotificationMetadata
         observeEvents()
     }
@@ -260,7 +264,7 @@ class MusicService : HeadlessJsTaskService() {
 
     @MainThread
     fun seekTo(seconds: Float) {
-        player.seek((seconds.toMilliseconds()), TimeUnit.MILLISECONDS)
+        player.seek((seconds.toLong()), TimeUnit.SECONDS)
     }
 
     @MainThread
@@ -381,7 +385,7 @@ class MusicService : HeadlessJsTaskService() {
         }
 
         scope.launch {
-            event.onMediaSessionCallbackTriggered.collect {
+            event.onPlayerActionTriggeredExternally.collect {
                 when (it) {
                     is MediaSessionCallback.RATING -> {
                         Bundle().apply {
@@ -391,7 +395,7 @@ class MusicService : HeadlessJsTaskService() {
                     }
                     is MediaSessionCallback.SEEK -> {
                         Bundle().apply {
-                            putDouble("position", it.position.toDouble())
+                            putDouble("position", it.positionMs.toSeconds())
                             emit(MusicEvents.BUTTON_SEEK_TO, this)
                         }
                     }

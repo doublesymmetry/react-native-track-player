@@ -1,5 +1,8 @@
-import {useCallback} from 'react';
-import TrackPlayer, {usePlaybackState, State} from 'react-native-track-player';
+import { useCallback } from 'react';
+import TrackPlayer, {
+  usePlaybackState,
+  State,
+} from 'react-native-track-player';
 
 export const useOnTogglePlayback = () => {
   const state = usePlaybackState();

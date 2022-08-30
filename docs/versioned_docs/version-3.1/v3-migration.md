@@ -44,7 +44,6 @@ await TrackPlayer.updateOptions({
 -  TrackPlayer.stop();
 ```
 
-
 ## Configuration Changes
 
 ### `track-player.json` / Build Preferences no longer needed
@@ -56,4 +55,16 @@ object](./api/objects/track.md).
 
 ```diff
 - track-player.json
+```
+
+### Minimum Compile/Target SDK
+
+You also need to have a minimum compile & target SDK of 31 (Android 12)
+
+```groovy
+// android/build.gradle
+...
+    compileSdkVersion = 31
+    targetSdkVersion = 31
+...
 ```
