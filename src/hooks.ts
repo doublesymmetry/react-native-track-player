@@ -101,7 +101,7 @@ export function useProgress(updateInterval = 1000) {
     async function poll() {
       await update();
       if (!mounted) return;
-      await new Promise((resolve) => setTimeout(resolve, updateInterval));
+      await new Promise<void>((resolve) => setTimeout(resolve, updateInterval));
       if (!mounted) return;
       poll();
     }
