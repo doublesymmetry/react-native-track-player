@@ -7,7 +7,7 @@
   "scripts": {
     "build": "rimraf lib && tsc",
     "lint": "eslint src",
-    "format": "prettier --write \"src/**/*.ts\"",
+    "format": "prettier --write src",
     "types": "tsc --noEmit true",
     "prepare": "yarn build",
     "example": "yarn --cwd example",
@@ -17,8 +17,8 @@
     "preversion": "yarn lint",
     "version": "yarn format && git add -A src",
     "postversion": "if [[ ${npm_package_version} != *'nightly'* ]]; then git push && git push --tags; fi",
-    "lint:ci": "eslint src --max-warnings=0",
-    "format:ci": "prettier --check \"src/**/*.ts\""
+    "ci:lint": "eslint src --max-warnings=0",
+    "ci:format": "prettier --check src"
   },
   "files": [
     "lib/**/*",
