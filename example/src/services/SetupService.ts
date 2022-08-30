@@ -1,4 +1,4 @@
-import TrackPlayer, {Capability} from 'react-native-track-player';
+import TrackPlayer, { Capability } from 'react-native-track-player';
 
 export const SetupService = async (): Promise<boolean> => {
   let isSetup = false;
@@ -28,6 +28,7 @@ export const SetupService = async (): Promise<boolean> => {
 
     isSetup = true;
   } finally {
+    // eslint-disable-next-line no-unsafe-finally
     return isSetup;
   }
 };

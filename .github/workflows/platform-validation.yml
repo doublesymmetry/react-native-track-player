@@ -1,11 +1,11 @@
 name: platform-validation
 on:
   push:
-    branches: [ main ]
-    paths-ignore: [ 'docs/**' ]
+    branches: [main]
+    paths-ignore: ['docs/**']
   pull_request:
-    branches: [ main, 'feature/**' ]
-    paths-ignore: [ 'docs/**' ]
+    branches: [main, 'feature/**']
+    paths-ignore: ['docs/**']
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -14,17 +14,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: 16.x
-      - name: Cache JS Dependencies
-        uses: c-hive/gha-yarn-cache@v1
-      - name: Install Yarn
-        run: npm install --global yarn
+          node-version: 16
+          cache: 'yarn'
       - name: Install Library Dependencies
-        run: yarn install
+        run: yarn install --frozen-lockfile
       - name: Build Library
         run: yarn build
       - name: Install Mobile Dependencies
@@ -51,23 +48,20 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: 16.x
-      - name: Cache JS Dependencies
-        uses: c-hive/gha-yarn-cache@v1
-      - name: Install Yarn
-        run: npm install --global yarn
+          node-version: 16
+          cache: 'yarn'
       - name: Install Library Dependencies
-        run: yarn install
+        run: yarn install --frozen-lockfile
       - name: Build Library
         run: yarn build
-      - name: Install Mobile Dependencies
+      - name: Install Example Dependencies
         run: |-
           cd example
-          yarn install
+          yarn install --frozen-lockfile
       - name: Bundler
         run: |-
           cd example/ios
@@ -91,18 +85,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: 16.x
-      - name: Cache JS Dependencies
-        uses: c-hive/gha-yarn-cache@v1
-      - name: Install Yarn
-        run: npm install --global yarn
-      - name: Install Library Dependencies
-        run: yarn install
-      - name: Check Lint & Format
+          node-version: 16
+          cache: 'yarn'
+      - name: Install Dependencies
+        run: |-
+          yarn install --frozen-lockfile
+      - name: Install Example Dependencies
+        run: |-
+          cd example
+          yarn install --frozen-lockfile
+      - name: Check Lint, Format & Types
         run: |
-          npm run lint:ci
-          npm run format:ci
+          yarn run ci:lint
+          yarn run ci:format
+          yarn run types
+      - name: Example - Check Lint, Format & Types
+        run: |
+          cd example
+          yarn run ci:lint
+          yarn run ci:format
+          yarn run types

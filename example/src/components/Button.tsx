@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  TouchableWithoutFeedback,
-} from 'react-native';
+import { StyleSheet, Text, TouchableWithoutFeedback } from 'react-native';
 
 export interface ButtonProps {
   title: string;

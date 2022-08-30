@@ -1,9 +1,9 @@
 import React from 'react';
-import {ActivityIndicator, View, StyleSheet} from 'react-native';
-import {usePlaybackState, State} from 'react-native-track-player';
+import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { usePlaybackState, State } from 'react-native-track-player';
 
-import {Button} from './Button';
-import {useOnTogglePlayback} from '../hooks';
+import { Button } from './Button';
+import { useOnTogglePlayback } from '../hooks';
 
 export const PlayPauseButton: React.FC = () => {
   const state = usePlaybackState();
