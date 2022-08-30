@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import TrackPlayer from 'react-native-track-player';
 import {
   SafeAreaView,
@@ -8,9 +8,9 @@ import {
   ActivityIndicator,
 } from 'react-native';
 
-import {Button, PlayerControls, Progress, TrackInfo} from './components';
-import {SetupService, QueueInitalTracksService} from './services';
-import {useCurrentTrack} from './hooks';
+import { Button, PlayerControls, Progress, TrackInfo } from './components';
+import { SetupService, QueueInitalTracksService } from './services';
+import { useCurrentTrack } from './hooks';
 
 const App: React.FC = () => {
   const track = useCurrentTrack();
@@ -33,7 +33,7 @@ const App: React.FC = () => {
   if (!isPlayerReady) {
     return (
       <SafeAreaView style={styles.screenContainer}>
-        <ActivityIndicator/>
+        <ActivityIndicator />
       </SafeAreaView>
     );
   }
@@ -49,11 +49,11 @@ const App: React.FC = () => {
             type="primary"
           />
         </View>
-        <TrackInfo track={track}/>
+        <TrackInfo track={track} />
         <Progress />
       </View>
       <View style={styles.actionRowContainer}>
-        <PlayerControls/>
+        <PlayerControls />
       </View>
     </SafeAreaView>
   );

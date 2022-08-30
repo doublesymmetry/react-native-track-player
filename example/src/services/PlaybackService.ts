@@ -21,7 +21,7 @@ export async function PlaybackService() {
 
   TrackPlayer.addEventListener(
     Event.RemoteDuck,
-    async ({permanent, paused}) => {
+    async ({ permanent, paused }) => {
       if (permanent) {
         TrackPlayer.pause();
         return;
@@ -36,22 +36,22 @@ export async function PlaybackService() {
           wasPausedByDuck = false;
         }
       }
-    },
+    }
   );
 
-  TrackPlayer.addEventListener(Event.PlaybackQueueEnded, event => {
+  TrackPlayer.addEventListener(Event.PlaybackQueueEnded, (event) => {
     console.log('Event.PlaybackQueueEnded', event);
   });
 
-  TrackPlayer.addEventListener(Event.PlaybackTrackChanged, event => {
+  TrackPlayer.addEventListener(Event.PlaybackTrackChanged, (event) => {
     console.log('Event.PlaybackTrackChanged', event);
   });
 
-  TrackPlayer.addEventListener(Event.PlaybackProgressUpdated, event => {
+  TrackPlayer.addEventListener(Event.PlaybackProgressUpdated, (event) => {
     console.log('Event.PlaybackProgressUpdated', event);
   });
 
-  TrackPlayer.addEventListener(Event.RemoteSeek, event =>
-    console.log('Event.RemoteSeek', event),
+  TrackPlayer.addEventListener(Event.RemoteSeek, (event) =>
+    console.log('Event.RemoteSeek', event)
   );
 }
