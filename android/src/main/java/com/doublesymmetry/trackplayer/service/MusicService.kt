@@ -456,7 +456,7 @@ class MusicService : HeadlessJsTaskService() {
         super.onTaskRemoved(rootIntent)
 
         if (stoppingAppPausesPlayback) {
-            player.pause()
+            player.stop()
         }
     }
 
