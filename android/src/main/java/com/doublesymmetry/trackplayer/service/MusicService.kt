@@ -264,7 +264,7 @@ class MusicService : HeadlessJsTaskService() {
 
     @MainThread
     fun seekTo(seconds: Float) {
-        player.seek((seconds.toMilliseconds()), TimeUnit.MILLISECONDS)
+        player.seek((seconds.toLong()), TimeUnit.SECONDS)
     }
 
     @MainThread
@@ -395,7 +395,7 @@ class MusicService : HeadlessJsTaskService() {
                     }
                     is MediaSessionCallback.SEEK -> {
                         Bundle().apply {
-                            putDouble("position", it.position.toDouble())
+                            putDouble("position", it.positionMs.toSeconds())
                             emit(MusicEvents.BUTTON_SEEK_TO, this)
                         }
                     }

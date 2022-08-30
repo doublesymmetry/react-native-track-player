@@ -3,7 +3,6 @@ package com.doublesymmetry.trackplayer.model
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.RatingCompat
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toMilliseconds
 import com.doublesymmetry.trackplayer.utils.Utils
@@ -26,28 +25,5 @@ abstract class TrackMetadata {
         genre = bundle.getString("genre")
         duration = (bundle.getDouble("duration", 0.0)).toMilliseconds()
         rating = Utils.getRating(bundle, "rating", ratingType)
-    }
-
-    open fun toMediaMetadata(): MediaMetadataCompat.Builder? {
-        val builder = MediaMetadataCompat.Builder()
-        builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
-        builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist)
-        builder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, album)
-        builder.putString(MediaMetadataCompat.METADATA_KEY_DATE, date)
-        builder.putString(MediaMetadataCompat.METADATA_KEY_GENRE, genre)
-
-        if (duration > 0) {
-            builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration)
-        }
-
-        if (artwork != null) {
-            builder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, artwork.toString())
-        }
-
-        if (rating != null) {
-            builder.putRating(MediaMetadataCompat.METADATA_KEY_RATING, rating)
-        }
-
-        return builder
     }
 }
