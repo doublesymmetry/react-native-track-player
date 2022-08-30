@@ -1,17 +1,12 @@
 import React from 'react';
-import {
-  Image,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import {Image, StyleSheet, Text, View} from 'react-native';
 import type {Track} from 'react-native-track-player';
 
 export interface TrackInfoProps {
   track?: Track;
 }
 
-export const TrackInfo: React.FC<TrackInfoProps> = ({ track }) => {
+export const TrackInfo: React.FC<TrackInfoProps> = ({track}) => {
   return (
     <View style={styles.container}>
       <Image style={styles.artwork} source={{uri: `${track?.artwork}`}} />

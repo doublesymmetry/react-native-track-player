@@ -33,7 +33,7 @@ const App: React.FC = () => {
   if (!isPlayerReady) {
     return (
       <SafeAreaView style={styles.screenContainer}>
-        <ActivityIndicator/>
+        <ActivityIndicator />
       </SafeAreaView>
     );
   }
@@ -49,11 +49,11 @@ const App: React.FC = () => {
             type="primary"
           />
         </View>
-        <TrackInfo track={track}/>
+        <TrackInfo track={track} />
         <Progress />
       </View>
       <View style={styles.actionRowContainer}>
-        <PlayerControls/>
+        <PlayerControls />
       </View>
     </SafeAreaView>
   );

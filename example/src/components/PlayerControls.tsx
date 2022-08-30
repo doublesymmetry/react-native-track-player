@@ -7,7 +7,7 @@ import {PlayPauseButton} from './PlayPauseButton';
 
 export const PlayerControls: React.FC = () => {
   return (
-    <View style={{ width: '100%' }}>
+    <View style={{width: '100%'}}>
       <View style={styles.row}>
         <Button
           title="Prev"
@@ -31,6 +31,6 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    justifyContent: 'space-evenly'
+    justifyContent: 'space-evenly',
   },
 });
