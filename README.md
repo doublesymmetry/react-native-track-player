@@ -81,7 +81,7 @@ Businesses: support continued development and maintenance via sponsoring contrac
     </td>
     <td align="center">
       <a href="https://stand.fm/">
-        <img src="https://cdn.stand.fm/web/top-images/footer_logo.png" align="center" width="50" title="Voxist" alt="Voxist">
+        <img src="https://drive.google.com/uc?id=1PwVUjqiqIQqw18sL_0n9Cx0VQ5zisoUW" align="center" height="50" title="stand.fm" alt="stand.fm">
         <br /><sub><b>stand.fm</b></sub>
       </a>
     </td>
