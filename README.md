@@ -35,6 +35,9 @@ Not sure where to start?
 
 react-native-track-player is made possible by the generosity of the sponsors below, and many other [individual backers](https://react-native-track-player.js.org/docs/sponsors#backers). Sponsoring directly impacts the longevity of this project.
 
+Businesses: support continued development and maintenance via sponsoring contracts:
+  E-mail: oss @ doublesymmetry dot com
+
 #### 🥇 Gold sponsors (\$2000+ total contributions)
 
 <table>
@@ -48,36 +51,61 @@ react-native-track-player is made possible by the generosity of the sponsors bel
   </tr>
 </table>
 
-#### 🥈 Silver sponsors (\$200+ per month)
+#### 🗝 Silver Sponsor (\$500+ per month)
+
+[Become the first silver sponsor!](https://github.com/sponsors/DoubleSymmetry)
+
+#### 🔑 Bronze Sponsor (\$200+ per month)
 
 <table>
   <tr>
     <td align="center">
       <a href="http://www.voxist.com/">
-        <img src="https://avatars.githubusercontent.com/u/18028734?s=200&v=4" align="center" width="100" title="Voxist" alt="Voxist">
+        <img src="https://avatars.githubusercontent.com/u/18028734?s=200&v=4" align="center" width="75" title="Voxist" alt="Voxist">
         <br /><sub><b>Voxist</b></sub>
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://evergrace.co">
-        <img src="https://avatars.githubusercontent.com/u/1085976?v=4" align="center" width="100" title="Evergrace" alt="Evergrace">
-        <br /><sub><b>Evergrace</b></sub>
       </a>
     </td>
   </tr>
 </table>
 
 
-#### 🥉 Bronze sponsors (\$500+ total contributions)
-[Become the first bronze sponsor!](https://github.com/sponsors/DoubleSymmetry)
+#### 🥉 Bronze sponsors (\$100+ per month)
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://app.momento.fm/">
+        <img src="https://avatars.githubusercontent.com/u/98929576?s=200&v=4" align="center" width="50" title="Voxist" alt="Voxist">
+        <br /><sub><b>Momento</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://stand.fm/">
+        <img src="https://cdn.stand.fm/web/top-images/footer_logo.png" align="center" width="50" title="Voxist" alt="Voxist">
+        <br /><sub><b>stand.fm</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
 
 #### ✨ Contributing sponsors (\$25+ per month)
 
 <table>
   <tr>
     <td align="center">
-      <a href="https://podverse.fm"><img src="https://avatars.githubusercontent.com/u/11860029?s=200&v=4" align="center" width="100" title="Podverse" alt="Podverse"></a>
-      <br /><sub><b>Podverse</b></sub>
+      <img src="https://avatars.githubusercontent.com/u/102089139?s=30&v=4" align="center" width="30" title="Through the Word" alt="Through the Word">
+    </td>
+    <td align="center">
+      <img src="https://avatars.githubusercontent.com/u/11860029?s=30&v=4" align="center" width="30" title="Podverse" alt="Podverse">
+    </td>
+    <td align="center">
+      <img src="https://avatars.githubusercontent.com/u/2523678?s=30&v=4" align="center" width="30" title="Elliot Dickison" alt="Elliot Dickison">
+    </td>
+    <td align="center">
+      <img src="https://avatars.githubusercontent.com/u/1085976?s=30&v=4" align="center" width="30" title="Brad Flood" alt="Brad Flood">
+    </td>
+    <td align="center">
+      <img src="https://avatars.githubusercontent.com/u/271885?s=30&v=4" align="center" width="30" title="puckey" alt="puckey">
     </td>
   </tr>
 </table>
