@@ -472,7 +472,9 @@ class MusicService : HeadlessJsTaskService() {
     @MainThread
     override fun onDestroy() {
         super.onDestroy()
-        player.stop()
+        if (player.isInitialized) {
+            player.stop()
+        }
     }
 
     @MainThread
