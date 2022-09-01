@@ -91,22 +91,13 @@ export function useProgress(updateInterval = 1000) {
   const playerState = usePlaybackState();
 
   useEffect(() => {
+    let mounted = true;
     if (playerState === State.None) {
       setState({ position: 0, duration: 0, buffered: 0 });
       return;
     }
-    poll();
 
-    let mounted = true;
-    async function poll() {
-      await update();
-      if (!mounted) return;
-      await new Promise<void>((resolve) => setTimeout(resolve, updateInterval));
-      if (!mounted) return;
-      poll();
-    }
-
-    async function update() {
+    const update = async () => {
       try {
         const [position, duration, buffered] = await Promise.all([
           TrackPlayer.getPosition(),
@@ -125,7 +116,17 @@ export function useProgress(updateInterval = 1000) {
       } catch {
         // these method only throw while you haven't yet setup, ignore failure.
       }
-    }
+    };
+
+    const poll = async () => {
+      await update();
+      if (!mounted) return;
+      await new Promise<void>((resolve) => setTimeout(resolve, updateInterval));
+      if (!mounted) return;
+      poll();
+    };
+
+    poll();
 
     return () => {
       mounted = false;
