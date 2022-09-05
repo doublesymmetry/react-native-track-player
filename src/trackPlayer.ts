@@ -1,15 +1,16 @@
-import { Platform, AppRegistry, DeviceEventEmitter, NativeEventEmitter, NativeModules } from 'react-native'
+import { AppRegistry, DeviceEventEmitter, NativeEventEmitter, NativeModules, Platform } from 'react-native'
 // @ts-ignore
 import * as resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource'
 import {
-  MetadataOptions,
-  PlayerOptions,
   Event,
-  Track,
-  State,
-  TrackMetadataBase,
+  EventPayloadByEvent,
+  MetadataOptions,
   NowPlayingMetadata,
+  PlayerOptions,
   RepeatMode,
+  State,
+  Track,
+  TrackMetadataBase,
 } from './interfaces'
 
 const { TrackPlayerModule: TrackPlayer } = NativeModules
@@ -22,6 +23,12 @@ function resolveImportedPath(path?: number | string) {
   return resolveAssetSource(path) || path
 }
 
+// RN doesn't allow nullable NSNumbers so convert optional number parameters
+// to a conventional default.
+function optionalNumberToDefault(num?: number, defaultValue: number = -1): number {
+  return num === undefined ? defaultValue : num
+}
+
 // MARK: - General API
 
 /**
@@ -29,13 +36,6 @@ function resolveImportedPath(path?: number | string) {
  */
 async function setupPlayer(options: PlayerOptions = {}): Promise<void> {
   return TrackPlayer.setupPlayer(options || {})
-}
-
-/**
- * Destroys the player, cleaning up its resources.
- */
-function destroy() {
-  return TrackPlayer.destroy()
 }
 
 type ServiceHandler = () => Promise<void>
@@ -52,11 +52,16 @@ function registerPlaybackService(factory: () => ServiceHandler) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function addEventListener(event: Event, listener: (data: any) => void) {
+function addEventListener<T extends Event>(
+  event: T,
+  listener: EventPayloadByEvent[T] extends never ? () => void : (event: EventPayloadByEvent[T]) => void,
+) {
   return emitter.addListener(event, listener)
 }
 
+/**
+ * @deprecated This method should not be used, most methods reject when service is not bound.
+ */
 function isServiceRunning(): Promise<boolean> {
   return TrackPlayer.isServiceRunning()
 }
@@ -66,7 +71,7 @@ function isServiceRunning(): Promise<boolean> {
 /**
  * Adds one or more tracks to the queue.
  */
-async function add(tracks: Track | Track[], insertBeforeIndex?: number): Promise<void> {
+async function add(tracks: Track | Track[], insertBeforeIndex?: number): Promise<number | void> {
   // Clone the array before modifying it
   if (Array.isArray(tracks)) {
     tracks = [...tracks]
@@ -86,7 +91,7 @@ async function add(tracks: Track | Track[], insertBeforeIndex?: number): Promise
   }
 
   // Note: we must be careful about passing nulls to non nullable parameters on Android.
-  return TrackPlayer.add(tracks, insertBeforeIndex === undefined ? -1 : insertBeforeIndex)
+  return TrackPlayer.add(tracks, optionalNumberToDefault(insertBeforeIndex))
 }
 
 /**
@@ -110,22 +115,22 @@ async function removeUpcomingTracks(): Promise<void> {
 /**
  * Skips to a track in the queue.
  */
-async function skip(trackIndex: number): Promise<void> {
-  return TrackPlayer.skip(trackIndex)
+async function skip(trackIndex: number, initialPosition?: number): Promise<void> {
+  return TrackPlayer.skip(trackIndex, optionalNumberToDefault(initialPosition))
 }
 
 /**
  * Skips to the next track in the queue.
  */
-async function skipToNext(): Promise<void> {
-  return TrackPlayer.skipToNext()
+async function skipToNext(initialPosition?: number): Promise<void> {
+  return TrackPlayer.skipToNext(optionalNumberToDefault(initialPosition))
 }
 
 /**
  * Skips to the previous track in the queue.
  */
-async function skipToPrevious(): Promise<void> {
-  return TrackPlayer.skipToPrevious()
+async function skipToPrevious(initialPosition?: number): Promise<void> {
+  return TrackPlayer.skipToPrevious(optionalNumberToDefault(initialPosition))
 }
 
 // MARK: - Control Center / Notifications API
@@ -198,13 +203,6 @@ async function play(): Promise<void> {
  */
 async function pause(): Promise<void> {
   return TrackPlayer.pause()
-}
-
-/**
- * Stops the current track.
- */
-async function stop(): Promise<void> {
-  return TrackPlayer.stop()
 }
 
 /**
@@ -310,7 +308,6 @@ async function getRepeatMode(): Promise<RepeatMode> {
 export default {
   // MARK: - General API
   setupPlayer,
-  destroy,
   registerPlaybackService,
   addEventListener,
   isServiceRunning,
@@ -333,7 +330,6 @@ export default {
   reset,
   play,
   pause,
-  stop,
   seekTo,
   setVolume,
   setRate,

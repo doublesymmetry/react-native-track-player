@@ -51,7 +51,7 @@ void TrackPlayerModule::Destroy() noexcept
 {
     if (!manager)
         return;
-    
+
     manager->SwitchPlayback(nullptr);
 }
 
@@ -166,31 +166,43 @@ void TrackPlayerModule::Remove(JSValueArray arr, ReactPromise<JSValue> promise) 
     player->Remove(tracks, promise);
 }
 
-void TrackPlayerModule::Skip(const int trackId, ReactPromise<JSValue> promise) noexcept
+void TrackPlayerModule::Skip(const int trackId, double initialTime, ReactPromise<JSValue> promise) noexcept
 {
     auto player = manager ? manager->GetPlayer() : nullptr;
     if (Utils::CheckPlayback(player, promise))
         return;
 
     player->Skip(trackId, promise);
+
+    if (initialTime > 0) {
+        player->SeekTo(initialTime);
+    }
 }
 
-void TrackPlayerModule::SkipToNext(ReactPromise<JSValue> promise) noexcept
+void TrackPlayerModule::SkipToNext(double initialTime, ReactPromise<JSValue> promise) noexcept
 {
     auto player = manager ? manager->GetPlayer() : nullptr;
     if (Utils::CheckPlayback(player, promise))
         return;
 
     player->SkipToNext(promise);
+
+    if (initialTime > 0) {
+        player->SeekTo(initialTime);
+    }
 }
 
-void TrackPlayerModule::SkipToPrevious(ReactPromise<JSValue> promise) noexcept
+void TrackPlayerModule::SkipToPrevious(double initialTime, ReactPromise<JSValue> promise) noexcept
 {
     auto player = manager ? manager->GetPlayer() : nullptr;
     if (Utils::CheckPlayback(player, promise))
         return;
 
     player->SkipToPrevious(promise);
+
+    if (initialTime > 0) {
+        player->SeekTo(initialTime);
+    }
 }
 
 void TrackPlayerModule::GetQueue(ReactPromise<JSValue> promise) noexcept
@@ -224,7 +236,7 @@ void TrackPlayerModule::GetCurrentTrack(ReactPromise<JSValue> promise) noexcept
         promise.Resolve(index);
     } else {
         promise.Resolve(nullptr);
-    } 
+    }
 }
 
 void TrackPlayerModule::GetTrack(const int index, ReactPromise<JSValue> promise) noexcept

@@ -55,13 +55,13 @@ namespace winrt::RNTrackPlayer {
     void Remove(JSValueArray arr, ReactPromise<JSValue> promise) noexcept;
 
     REACT_METHOD(Skip, L"skip")
-    void Skip(const int trackId, ReactPromise<JSValue> promise) noexcept;
+    void Skip(const int trackId, double initialTime, ReactPromise<JSValue> promise) noexcept;
 
     REACT_METHOD(SkipToNext, L"skipToNext")
-    void SkipToNext(ReactPromise<JSValue> promise) noexcept;
+    void SkipToNext(double initialTime, ReactPromise<JSValue> promise) noexcept;
 
     REACT_METHOD(SkipToPrevious, L"skipToPrevious")
-    void SkipToPrevious(ReactPromise<JSValue> promise) noexcept;
+    void SkipToPrevious(double initialTime, ReactPromise<JSValue> promise) noexcept;
 
     REACT_METHOD(GetQueue, L"getQueue")
     void GetQueue(ReactPromise<JSValue> promise) noexcept;
