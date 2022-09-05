@@ -459,7 +459,7 @@ class MusicService : HeadlessJsTaskService() {
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
 
-        if (stoppingAppPausesPlayback) {
+        if (stoppingAppPausesPlayback && this::player.isInitialized) {
             player.pause()
         }
     }
@@ -472,7 +472,7 @@ class MusicService : HeadlessJsTaskService() {
     @MainThread
     override fun onDestroy() {
         super.onDestroy()
-        if (player.isInitialized) {
+        if (this::player.isInitialized) {
             player.stop()
         }
     }
