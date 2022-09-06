@@ -1,21 +1,35 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableWithoutFeedback } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TextStyle,
+  TouchableWithoutFeedback,
+  ViewStyle,
+} from 'react-native';
 
 export interface ButtonProps {
   title: string;
   onPress: () => void;
-  type?: 'primary' | 'secondary';
+  type?: keyof typeof styles;
+  style?: ViewStyle | TextStyle;
 }
 
 export const Button: React.FC<ButtonProps> = ({
   title,
   onPress,
   type = 'primary',
+  style,
 }) => {
-  const style = type == 'primary' ? styles.primary : styles.secondary;
   return (
     <TouchableWithoutFeedback onPress={onPress}>
-      <Text style={style}>{title}</Text>
+      <Text
+        style={{
+          ...styles[type],
+          ...style,
+        }}
+      >
+        {title}
+      </Text>
     </TouchableWithoutFeedback>
   );
 };

@@ -1,11 +1,15 @@
+import Slider from '@react-native-community/slider';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import Slider from '@react-native-community/slider';
 import TrackPlayer, { useProgress } from 'react-native-track-player';
 
-export const Progress: React.FC = () => {
+export const Progress: React.FC<{ live?: boolean }> = ({ live }) => {
   const progress = useProgress();
-  return (
+  return live ? (
+    <View style={styles.liveContainer}>
+      <Text style={styles.liveText}>Live Stream</Text>
+    </View>
+  ) : (
     <>
       <Slider
         style={styles.container}
@@ -15,9 +19,7 @@ export const Progress: React.FC = () => {
         thumbTintColor="#FFD479"
         minimumTrackTintColor="#FFD479"
         maximumTrackTintColor="#FFFFFF"
-        onSlidingComplete={(value) => {
-          TrackPlayer.seekTo(value);
-        }}
+        onSlidingComplete={TrackPlayer.seekTo}
       />
       <View style={styles.labelContainer}>
         <Text style={styles.labelText}>
@@ -34,6 +36,16 @@ export const Progress: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  liveContainer: {
+    height: 100,
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  liveText: {
+    color: 'white',
+    alignSelf: 'center',
+    fontSize: 18,
+  },
   container: {
     height: 40,
     width: 380,
