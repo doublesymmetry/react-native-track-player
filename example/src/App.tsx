@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import TrackPlayer from 'react-native-track-player';
+import React, { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   SafeAreaView,
   StatusBar,
   StyleSheet,
   View,
-  ActivityIndicator,
 } from 'react-native';
+import TrackPlayer from 'react-native-track-player';
 
 import { Button, PlayerControls, Progress, TrackInfo } from './components';
-import { SetupService, QueueInitalTracksService } from './services';
 import { useCurrentTrack } from './hooks';
+import { QueueInitalTracksService, SetupService } from './services';
 
 const App: React.FC = () => {
   const track = useCurrentTrack();
@@ -50,7 +50,7 @@ const App: React.FC = () => {
           />
         </View>
         <TrackInfo track={track} />
-        <Progress />
+        <Progress live={track?.isLiveStream} />
       </View>
       <View style={styles.actionRowContainer}>
         <PlayerControls />

@@ -36,8 +36,9 @@
   },
   {
     "url": "https://ais-sa5.cdnstream1.com/b75154_128mp3",
-    "title": "Smooth Jazz 24/7 (Live Radio)",
+    "title": "Smooth Jazz 24/7",
     "artist": "New York, NY",
-    "artwork": "https://react-native-track-player.js.org/example/smooth-jazz-24-7.jpeg"
+    "artwork": "https://react-native-track-player.js.org/example/smooth-jazz-24-7.jpeg",
+    "isLiveStream": true
   }
 ]
