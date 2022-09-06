@@ -139,6 +139,14 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     // MARK: - Bridged Methods
 
+    private func rejectWhenNotInitialized(reject: RCTPromiseRejectBlock) -> Bool {
+        let rejected = !hasInitialized;
+        if (rejected) {
+            reject("player_already_initialized", "The player is not initialized. Call setupPlayer first.", nil)
+        }
+        return rejected;
+    }
+
     @objc(setupPlayer:resolver:rejecter:)
     public func setupPlayer(config: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if hasInitialized {
@@ -288,10 +296,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     @objc(updateOptions:resolver:rejecter:)
     public func update(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         var capabilitiesStr = options["capabilities"] as? [String] ?? []
         if (capabilitiesStr.contains("play") && capabilitiesStr.contains("pause")) {
@@ -324,10 +329,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     @objc(add:before:resolver:rejecter:)
     public func add(trackDicts: [[String: Any]], before trackIndex: NSNumber, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             UIApplication.shared.beginReceivingRemoteControlEvents();
@@ -359,10 +361,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     @objc(remove:resolver:rejecter:)
     public func remove(tracks indexes: [Int], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         for index in indexes {
             // we do not allow removal of the current item
@@ -375,10 +374,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     @objc(removeUpcomingTracks:rejecter:)
     public func removeUpcomingTracks(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         player.removeUpcomingItems()
         resolve(NSNull())
@@ -391,10 +387,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         resolve: RCTPromiseResolveBlock,
         reject: RCTPromiseRejectBlock
     ) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         if (trackIndex.intValue < 0 || trackIndex.intValue >= player.items.count) {
             reject("index_out_of_bounds", "The track index is out of bounds", nil)
@@ -418,10 +411,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         resolve: RCTPromiseResolveBlock,
         reject: RCTPromiseRejectBlock
     ) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         do {
             try player.next()
@@ -443,10 +433,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         resolve: RCTPromiseResolveBlock,
         reject: RCTPromiseRejectBlock
     ) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         do {
             try player.previous()
@@ -464,10 +451,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     @objc(reset:rejecter:)
     public func reset(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         player.stop()
         player.nowPlayingInfoController.clear()
@@ -479,10 +463,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     @objc(play:rejecter:)
     public func play(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         try? AVAudioSession.sharedInstance().setActive(true)
         player.play()
@@ -491,10 +472,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     @objc(pause:rejecter:)
     public func pause(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         player.pause()
         resolve(NSNull())
@@ -502,10 +480,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     @objc(seekTo:resolver:rejecter:)
     public func seek(to time: Double, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         player.seek(to: time)
         resolve(NSNull())
@@ -513,10 +488,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     @objc(setRepeatMode:resolver:rejecter:)
     public func setRepeatMode(repeatMode: NSNumber, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         player.repeatMode = SwiftAudioEx.RepeatMode(rawValue: repeatMode.intValue) ?? .off
         resolve(NSNull())
@@ -524,20 +496,14 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     @objc(getRepeatMode:rejecter:)
     public func getRepeatMode(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         resolve(player.repeatMode.rawValue)
     }
 
     @objc(setVolume:resolver:rejecter:)
     public func setVolume(level: Float, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         player.volume = level
         resolve(NSNull())
@@ -545,20 +511,14 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     @objc(getVolume:rejecter:)
     public func getVolume(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         resolve(player.volume)
     }
 
     @objc(setRate:resolver:rejecter:)
     public func setRate(rate: Float, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         player.rate = rate
         resolve(NSNull())
@@ -566,20 +526,14 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     @objc(getRate:rejecter:)
     public func getRate(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         resolve(player.rate)
     }
 
     @objc(getTrack:resolver:rejecter:)
     public func getTrack(index: NSNumber, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         if (index.intValue >= 0 && index.intValue < player.items.count) {
             let track = player.items[index.intValue]
@@ -591,10 +545,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     @objc(getQueue:rejecter:)
     public func getQueue(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         let serializedQueue = player.items.map { ($0 as! Track).toObject() }
         resolve(serializedQueue)
@@ -602,10 +553,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     @objc(getCurrentTrack:rejecter:)
     public func getCurrentTrack(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         let index = player.currentIndex
         if index < 0 || index >= player.items.count {
@@ -617,50 +565,35 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     @objc(getDuration:rejecter:)
     public func getDuration(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         resolve(player.duration)
     }
 
     @objc(getBufferedPosition:rejecter:)
     public func getBufferedPosition(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         resolve(player.bufferedPosition)
     }
 
     @objc(getPosition:rejecter:)
     public func getPosition(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         resolve(player.currentTime)
     }
 
     @objc(getState:rejecter:)
     public func getState(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         resolve(State.fromPlayerState(state: player.playerState).rawValue)
     }
 
     @objc(updateMetadataForTrack:metadata:resolver:rejecter:)
     public func updateMetadata(for trackIndex: NSNumber, metadata: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         if (trackIndex.intValue < 0 || trackIndex.intValue >= player.items.count) {
             reject("index_out_of_bounds", "The track index is out of bounds", nil)
@@ -679,10 +612,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     @objc(clearNowPlayingMetadata:rejecter:)
     public func clearNowPlayingMetadata(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         player.nowPlayingInfoController.clear()
         resolve(NSNull())
@@ -690,10 +620,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     @objc(updateNowPlayingMetadata:resolver:rejecter:)
     public func updateNowPlayingMetadata(metadata: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
+        if (rejectWhenNotInitialized(reject: reject)) { return }
 
         Metadata.update(for: player, with: metadata)
         resolve(NSNull())
