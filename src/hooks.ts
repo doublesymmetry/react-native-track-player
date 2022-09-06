@@ -6,40 +6,30 @@ import TrackPlayer from './trackPlayer';
 /** Get current playback state and subsequent updates  */
 export const usePlaybackState = () => {
   const [state, setState] = useState(State.None);
-  const isUnmountedRef = useRef(true);
-
   useEffect(() => {
-    isUnmountedRef.current = false;
-    return () => {
-      isUnmountedRef.current = true;
-    };
-  }, []);
+    let mounted = true;
 
-  useEffect(() => {
-    async function setPlayerState() {
-      try {
-        const playerState = await TrackPlayer.getState();
-
-        // If the component has been unmounted, exit
-        if (isUnmountedRef.current) return;
-
-        setState(playerState);
-      } catch {
-        // getState only throw while you haven't yet setup, ignore failure.
-      }
-    }
-
-    // Set initial state
-    setPlayerState();
+    TrackPlayer.getState()
+      .then((initialState) => {
+        if (!mounted) return;
+        // Only set the state if it wasn't already set by the Event.PlaybackState listener below:
+        setState((state) => state ?? initialState);
+      })
+      .catch(() => {
+        /** getState only throw while you haven't yet setup, ignore failure. */
+      });
 
     const sub = TrackPlayer.addEventListener<Event.PlaybackState>(
       Event.PlaybackState,
-      (data) => {
-        setState(data.state);
+      ({ state }) => {
+        setState(state);
       }
     );
 
-    return () => sub.remove();
+    return () => {
+      mounted = false;
+      sub.remove();
+    };
   }, []);
 
   return state;
@@ -90,64 +80,57 @@ export const useTrackPlayerEvents = <
 
 /**
  * Poll for track progress for the given interval (in miliseconds)
- * @param interval - ms interval
+ * @param updateInterval - ms interval
  */
-export function useProgress(updateInterval?: number) {
+export function useProgress(updateInterval = 1000) {
   const [state, setState] = useState<Progress>({
     position: 0,
     duration: 0,
     buffered: 0,
   });
   const playerState = usePlaybackState();
-  const stateRef = useRef(state);
-  const isUnmountedRef = useRef(true);
 
   useEffect(() => {
-    isUnmountedRef.current = false;
-    return () => {
-      isUnmountedRef.current = true;
-    };
-  }, []);
-
-  const getProgress = async () => {
-    try {
-      const [position, duration, buffered] = await Promise.all([
-        TrackPlayer.getPosition(),
-        TrackPlayer.getDuration(),
-        TrackPlayer.getBufferedPosition(),
-      ]);
-
-      // If the component has been unmounted, exit
-      if (isUnmountedRef.current) return;
-
-      // If there is no change in properties, exit
-      if (
-        position === stateRef.current.position &&
-        duration === stateRef.current.duration &&
-        buffered === stateRef.current.buffered
-      )
-        return;
-
-      const state = { position, duration, buffered };
-      stateRef.current = state;
-      setState(state);
-    } catch {
-      // these method only throw while you haven't yet setup, ignore failure.
-    }
-  };
-
-  useEffect(() => {
+    let mounted = true;
     if (playerState === State.None) {
       setState({ position: 0, duration: 0, buffered: 0 });
       return;
     }
 
-    // Set initial state
-    getProgress();
+    const update = async () => {
+      try {
+        const [position, duration, buffered] = await Promise.all([
+          TrackPlayer.getPosition(),
+          TrackPlayer.getDuration(),
+          TrackPlayer.getBufferedPosition(),
+        ]);
+        if (!mounted) return;
 
-    // Create interval to update state periodically
-    const poll = setInterval(getProgress, updateInterval || 1000);
-    return () => clearInterval(poll);
+        setState((state) =>
+          position === state.position &&
+          duration === state.duration &&
+          buffered === state.buffered
+            ? state
+            : { position, duration, buffered }
+        );
+      } catch {
+        // these method only throw while you haven't yet setup, ignore failure.
+      }
+    };
+
+    const poll = async () => {
+      await update();
+      if (!mounted) return;
+      await new Promise<void>((resolve) => setTimeout(resolve, updateInterval));
+      if (!mounted) return;
+      poll();
+    };
+
+    poll();
+
+    return () => {
+      mounted = false;
+    };
   }, [playerState, updateInterval]);
 
   return state;
