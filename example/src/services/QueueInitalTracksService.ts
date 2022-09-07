@@ -1,10 +1,10 @@
-import TrackPlayer, {RepeatMode} from 'react-native-track-player';
+import TrackPlayer, { RepeatMode } from 'react-native-track-player';
 
-// @ts-ignore
+// @ts-expect-error – sure we can import this
 import playlistData from '../assets/data/playlist.json';
-// @ts-ignore
+// @ts-expect-error – sure we can import this
 import localTrack from '../assets/resources/pure.m4a';
-// @ts-ignore
+// @ts-expect-error – sure we can import this
 import localArtwork from '../assets/resources/artwork.jpg';
 
 export const QueueInitalTracksService = async (): Promise<void> => {

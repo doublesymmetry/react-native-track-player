@@ -146,17 +146,19 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             return
         }
 
-        // configure if player waits to play
-        let autoWait: Bool = config["waitForBuffer"] as? Bool ?? false
-        player.automaticallyWaitsToMinimizeStalling = autoWait
-
         // configure buffer size
-        let minBuffer: TimeInterval = config["minBuffer"] as? TimeInterval ?? 0
-        player.bufferDuration = minBuffer
+        if let bufferDuration = config["minBuffer"] as? TimeInterval {
+            player.bufferDuration = bufferDuration
+        }
 
-        // configure if control center metdata should auto update
-        let autoUpdateMetadata: Bool = config["autoUpdateMetadata"] as? Bool ?? true
-        player.automaticallyUpdateNowPlayingInfo = autoUpdateMetadata
+
+        // configure wether player waits to play (deprecated)
+        if let waitForBuffer = config["waitForBuffer"] as? Bool {
+            player.automaticallyWaitsToMinimizeStalling = waitForBuffer
+        }
+
+        // configure wether control center metdata should auto update
+        player.automaticallyUpdateNowPlayingInfo = config["autoUpdateMetadata"] as? Bool ?? true
 
         // configure audio session - category, options & mode
         var sessionCategory: AVAudioSession.Category = .playback
