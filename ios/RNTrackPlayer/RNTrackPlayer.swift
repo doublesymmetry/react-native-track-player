@@ -19,6 +19,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     private let player = QueuedAudioPlayer()
     private let audioSessionController = AudioSessionController.shared
     private var shouldEmitUpdateEventInterval: Bool = false
+    private var previousIndex: Int?
 
     // MARK: - Lifecycle Methods
 
@@ -30,7 +31,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         player.event.receiveMetadata.addListener(self, handleAudioPlayerMetadataReceived)
         player.event.stateChange.addListener(self, handleAudioPlayerStateChange)
         player.event.fail.addListener(self, handleAudioPlayerFailed)
-        player.event.queueIndex.addListener(self, handleAudioPlayerQueueIndexChange)
+        player.event.currentItem.addListener(self, handleAudioPlayerCurrentItemChange)
         player.event.secondElapse.addListener(self, handleAudioPlayerSecondElapse)
     }
 
@@ -147,6 +148,19 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         return rejected;
     }
 
+    private func rejectWhenTrackIndexOutOfBounds(
+        index: Int,
+        min: Int? = nil,
+        max : Int? = nil,
+        reject: RCTPromiseRejectBlock
+    ) -> Bool {
+        let rejected = index < (min ?? 0) || index > (max ?? player.items.count - 1);
+        if (rejected) {
+            reject("index_out_of_bounds", "The track index is out of bounds", nil)
+        }
+        return rejected
+    }
+    
     @objc(setupPlayer:resolver:rejecter:)
     public func setupPlayer(config: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if hasInitialized {
@@ -302,15 +316,18 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         if (capabilitiesStr.contains("play") && capabilitiesStr.contains("pause")) {
             capabilitiesStr.append("togglePlayPause");
         }
-        let capabilities = capabilitiesStr.compactMap { Capability(rawValue: $0) }
 
-        player.remoteCommands = capabilities.map { capability in
-            capability.mapToPlayerCommand(forwardJumpInterval: options["forwardJumpInterval"] as? NSNumber,
-                                          backwardJumpInterval: options["backwardJumpInterval"] as? NSNumber,
-                                          likeOptions: options["likeOptions"] as? [String: Any],
-                                          dislikeOptions: options["dislikeOptions"] as? [String: Any],
-                                          bookmarkOptions: options["bookmarkOptions"] as? [String: Any])
-        }
+        player.remoteCommands = capabilitiesStr
+            .compactMap { Capability(rawValue: $0) }
+            .map { capability in
+                capability.mapToPlayerCommand(
+                    forwardJumpInterval: options["forwardJumpInterval"] as? NSNumber,
+                    backwardJumpInterval: options["backwardJumpInterval"] as? NSNumber,
+                    likeOptions: options["likeOptions"] as? [String: Any],
+                    dislikeOptions: options["dislikeOptions"] as? [String: Any],
+                    bookmarkOptions: options["bookmarkOptions"] as? [String: Any]
+                )
+            }
 
         if let interval = options["progressUpdateEventInterval"] as? NSNumber, interval.intValue > 0 {
             shouldEmitUpdateEventInterval = true
@@ -328,8 +345,20 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     }
 
     @objc(add:before:resolver:rejecter:)
-    public func add(trackDicts: [[String: Any]], before trackIndex: NSNumber, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+    public func add(
+        trackDicts: [[String: Any]],
+        before trackIndex: NSNumber,
+        resolve: RCTPromiseResolveBlock,
+        reject: RCTPromiseRejectBlock
+    ) {
+        // -1 means no index was passed and therefore should be inserted at the end.
+        let index = trackIndex.intValue == -1 ? player.items.count : trackIndex.intValue;
         if (rejectWhenNotInitialized(reject: reject)) { return }
+        if (rejectWhenTrackIndexOutOfBounds(
+            index: index,
+            max: player.items.count,
+            reject: reject
+        )) { return }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             UIApplication.shared.beginReceivingRemoteControlEvents();
@@ -345,17 +374,10 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             tracks.append(track)
         }
 
-        var index: Int = 0
-        if (trackIndex.intValue < -1 || trackIndex.intValue > player.items.count) {
-            reject("index_out_of_bounds", "The track index is out of bounds", nil)
-        } else if trackIndex.intValue == -1 { // -1 means no index was passed and therefore should be inserted at the end.
-            index = player.items.count
-            try? player.add(items: tracks, playWhenReady: false)
-        } else {
-            index = trackIndex.intValue
-            try? player.add(items: tracks, at: trackIndex.intValue)
-        }
-
+        try? player.add(
+            items: tracks,
+            at: index
+        )
         resolve(index)
     }
 
@@ -387,15 +409,13 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         resolve: RCTPromiseResolveBlock,
         reject: RCTPromiseRejectBlock
     ) {
+        let index = trackIndex.intValue;
+        if (rejectWhenTrackIndexOutOfBounds(index: index, reject: reject)) { return }
+
         if (rejectWhenNotInitialized(reject: reject)) { return }
 
-        if (trackIndex.intValue < 0 || trackIndex.intValue >= player.items.count) {
-            reject("index_out_of_bounds", "The track index is out of bounds", nil)
-            return
-        }
-
-        print("Skipping to track:", trackIndex)
-        try? player.jumpToItem(atIndex: trackIndex.intValue, playWhenReady: player.playerState == .playing)
+        print("Skipping to track:", index)
+        try? player.jumpToItem(atIndex: index, playWhenReady: player.playerState == .playing)
 
         // if an initialTime is passed the seek to it
         if (initialTime >= 0) {
@@ -593,17 +613,14 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     @objc(updateMetadataForTrack:metadata:resolver:rejecter:)
     public func updateMetadata(for trackIndex: NSNumber, metadata: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        let index = trackIndex.intValue;
         if (rejectWhenNotInitialized(reject: reject)) { return }
+        if (rejectWhenTrackIndexOutOfBounds(index: index, reject: reject)) { return }
 
-        if (trackIndex.intValue < 0 || trackIndex.intValue >= player.items.count) {
-            reject("index_out_of_bounds", "The track index is out of bounds", nil)
-            return
-        }
-
-        let track = player.items[trackIndex.intValue] as! Track
+        let track : Track = player.items[index] as! Track;
         track.updateMetadata(dictionary: metadata)
 
-        if (player.currentIndex == trackIndex.intValue) {
+        if (player.currentIndex == index) {
             Metadata.update(for: player, with: metadata)
         }
 
@@ -721,24 +738,20 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         }
     }
 
-    func handleAudioPlayerQueueIndexChange(previousIndex: Int?, nextIndex: Int?) {
+    func handleAudioPlayerCurrentItemChange(item: AudioItem?, index: Int?) {
         var dictionary: [String: Any] = [ "position": player.currentTime ]
 
-        if let previousIndex = previousIndex { dictionary["track"] = previousIndex }
-        if let nextIndex = nextIndex { dictionary["nextTrack"] = nextIndex }
+        dictionary["track"] = previousIndex
+        dictionary["nextTrack"] = index
 
-        // Load isLiveStream option for track
-        var isTrackLiveStream = false
-        if let nextIndex = nextIndex, nextIndex < player.items.count {
-            let track = player.items[nextIndex]
-            isTrackLiveStream = (track as? Track)?.isLiveStream ?? false
-        }
-
+        // Update now playing controller with isLiveStream option from track
         if player.automaticallyUpdateNowPlayingInfo {
+            let isTrackLiveStream = (player.currentItem as? Track)?.isLiveStream ?? false
             player.nowPlayingInfoController.set(keyValue: NowPlayingInfoProperty.isLiveStream(isTrackLiveStream))
         }
 
         sendEvent(withName: "playback-track-changed", body: dictionary)
+        previousIndex = index
     }
 
     func handleAudioPlayerSecondElapse(seconds: Double) {
