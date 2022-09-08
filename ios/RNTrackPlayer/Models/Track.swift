@@ -11,7 +11,7 @@ import MediaPlayer
 import AVFoundation
 import SwiftAudioEx
 
-class Track: NSObject, AudioItem, TimePitching, AssetOptionsProviding {
+class Track: AudioItem, TimePitching, AssetOptionsProviding {
     let url: MediaURL
 
     @objc var title: String?
@@ -21,35 +21,23 @@ class Track: NSObject, AudioItem, TimePitching, AssetOptionsProviding {
     var desc: String?
     var genre: String?
     var duration: Double?
-    var skipped: Bool = false
     var artworkURL: MediaURL?
     let headers: [String: Any]?
     let pitchAlgorithm: String?
     var isLiveStream: Bool?
 
-    @objc var album: String?
-    @objc var artwork: MPMediaItemArtwork?
+    var album: String?
+    var artwork: MPMediaItemArtwork?
 
-    private var originalObject: [String: Any]
+    private var originalObject: [String: Any] = [:]
 
     init?(dictionary: [String: Any]) {
         guard let url = MediaURL(object: dictionary["url"]) else { return nil }
-
         self.url = url
-
-        self.title = dictionary["title"] as? String
-        self.artist = dictionary["artist"] as? String
-        self.date = dictionary["date"] as? String
-        self.album = dictionary["album"] as? String
-        self.genre = dictionary["genre"] as? String
-        self.desc = dictionary["description"] as? String
-        self.duration = dictionary["duration"] as? Double
         self.headers = dictionary["headers"] as? [String: Any]
-        self.artworkURL = MediaURL(object: dictionary["artwork"])
         self.pitchAlgorithm = dictionary["pitchAlgorithm"] as? String
-        self.isLiveStream = dictionary["isLiveStream"] as? Bool
 
-        self.originalObject = dictionary
+        updateMetadata(dictionary: dictionary);
     }
 
 
@@ -62,7 +50,6 @@ class Track: NSObject, AudioItem, TimePitching, AssetOptionsProviding {
     func updateMetadata(dictionary: [String: Any]) {
         self.title = (dictionary["title"] as? String) ?? self.title
         self.artist = (dictionary["artist"] as? String) ?? self.artist
-
         self.date = dictionary["date"] as? String
         self.album = dictionary["album"] as? String
         self.genre = dictionary["genre"] as? String
