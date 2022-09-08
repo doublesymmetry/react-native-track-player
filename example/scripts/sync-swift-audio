@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+
+DIRECTORY=$(cd "$(dirname "$0")" && pwd)
+SOURCE=$(realpath "$DIRECTORY/../ios/Pods/SwiftAudioEx/SwiftAudioEx")
+TARGET=$(realpath "$DIRECTORY/../../../SwiftAudioEx/SwiftAudioEx")
+
+if [ ! -d "$SOURCE" ]; then
+    echo "This script relies on the directory \"$SOURCE\" to exist. Aborting."
+    exit 1
+fi
+
+rm -rf "$TARGET"
+cp -R "$SOURCE" "$TARGET"
+
+echo "Copied files from \"$SOURCE\" to \"$TARGET\""

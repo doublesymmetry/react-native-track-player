@@ -14,6 +14,7 @@
     "lint": "eslint src",
     "sync:ios": "yarn rimraf ../ios && yarn cpx 'node_modules/react-native-track-player/ios/**' ../ios",
     "sync:android": "yarn rimraf ../android && yarn cpx 'node_modules/react-native-track-player/android/**' ../android",
+    "sync:swift-audio": "scripts/sync-swift-audio",
     "sync": "yarn sync:ios && yarn sync:android",
     "fresh": "rm -rf node_modules ; cd .. && yarn build ; cd example && yarn install",
     "types": "tsc --noEmit true",
