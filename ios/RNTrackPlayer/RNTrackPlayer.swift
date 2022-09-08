@@ -381,6 +381,26 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         resolve(index)
     }
 
+    @objc(load:resolver:rejecter:)
+    public func load(
+        trackDict: [String: Any],
+        resolve: RCTPromiseResolveBlock,
+        reject: RCTPromiseRejectBlock
+    ) {
+        if (rejectWhenNotInitialized(reject: reject)) { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            UIApplication.shared.beginReceivingRemoteControlEvents();
+        }
+
+        guard let track = Track(dictionary: trackDict) else {
+            reject("invalid_track_object", "Track is missing a required key", nil)
+            return
+        }
+        
+        player.load(item: track)
+        resolve(player.currentIndex)
+    }
+    
     @objc(remove:resolver:rejecter:)
     public func remove(tracks indexes: [Int], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }

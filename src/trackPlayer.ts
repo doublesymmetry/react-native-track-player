@@ -102,6 +102,13 @@ async function add(
 }
 
 /**
+ * Replaces the current track or loads the track as the first in the queue.
+ */
+async function load(track: Track): Promise<number | void> {
+  return TrackPlayer.load(track);
+}
+
+/**
  * Removes one or more tracks from the queue.
  */
 async function remove(tracks: number | number[]): Promise<void> {
@@ -324,6 +331,7 @@ export default {
 
   // MARK: - Queue API
   add,
+  load,
   remove,
   removeUpcomingTracks,
   skip,
