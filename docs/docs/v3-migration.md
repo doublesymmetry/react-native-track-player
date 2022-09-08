@@ -4,10 +4,7 @@ sidebar_position: 6
 
 # Migrating from v2 to v3
 
-This version includes fundamental changes in how we handle the Android
-foreground service, ensuring that the OS never stops the app process, and that
-controls for audio playback are present even if the app is stopped. This mimics
-how other popular apps (Spotify, Soundcloud, Google Podcasts, etc.) work.
+Due to how Android handles foreground services, it's not possible for us to stop the process manually, as it's waiting for the foreground service to come back. With v3 we are introducing the following changes related to this:
 
 - On Android, the audio service can't be manually stopped by the app anymore.
     The OS itself decides when to stop it.
