@@ -203,7 +203,7 @@ class MusicService : HeadlessJsTaskService() {
     @MainThread
     fun add(tracks: List<Track>) {
         val items = tracks.map { it.toAudioItem() }
-        player.add(items, false)
+        player.add(items)
     }
 
     @MainThread
@@ -249,7 +249,7 @@ class MusicService : HeadlessJsTaskService() {
 
     @MainThread
     fun skip(index: Int) {
-        player.jumpToItem(index, player.isPlaying)
+        player.jumpToItem(index)
     }
 
     @MainThread
