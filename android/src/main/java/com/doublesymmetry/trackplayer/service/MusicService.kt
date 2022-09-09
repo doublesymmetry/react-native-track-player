@@ -213,6 +213,12 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     @MainThread
+    fun load(track: Track) {
+        player.load(track.toAudioItem())
+    }
+
+
+    @MainThread
     fun remove(index: Int) {
         remove(listOf(index))
     }
