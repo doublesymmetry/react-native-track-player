@@ -5,7 +5,7 @@ import TrackPlayer from './trackPlayer';
 
 /** Get current playback state and subsequent updates  */
 export const usePlaybackState = () => {
-  const [state, setState] = useState(State.None);
+  const [state, setState] = useState<State | undefined>(undefined);
   useEffect(() => {
     let mounted = true;
 
@@ -89,10 +89,10 @@ export function useProgress(updateInterval = 1000) {
     buffered: 0,
   });
   const playerState = usePlaybackState();
-
+  const isNone = playerState === State.None;
   useEffect(() => {
     let mounted = true;
-    if (playerState === State.None) {
+    if (isNone) {
       setState({ position: 0, duration: 0, buffered: 0 });
       return;
     }
@@ -131,7 +131,7 @@ export function useProgress(updateInterval = 1000) {
     return () => {
       mounted = false;
     };
-  }, [playerState, updateInterval]);
+  }, [isNone, updateInterval]);
 
   return state;
 }
