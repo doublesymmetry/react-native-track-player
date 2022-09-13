@@ -123,7 +123,7 @@ Fired when the user changes the position of the timeline. Only fired if the [`Ca
 
 | Param    | Type     | Description   |
 | -------- | -------- | ------------- |
-| position | `number` | The position in seconds |
+| position | `number` | The position to seek to in seconds |
 
 ### `RemoteSetRating`
 Fired when the user changes the rating for the track. Only fired if the [`Capability.SetRating`](./constants/capability.md) is allowed.
