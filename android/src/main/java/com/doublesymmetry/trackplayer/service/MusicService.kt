@@ -104,15 +104,16 @@ class MusicService : HeadlessJsTaskService() {
 
         val buttonsList = mutableListOf<NotificationButton>()
 
+        var hasPlayPauseBeenAdded = false
         notificationCapabilities.forEach {
             when (it) {
-                Capability.PLAY -> {
-                    val playIcon = Utils.getIconOrNull(this, options, "playIcon")
-                    buttonsList.add(PLAY(icon = playIcon))
-                }
-                Capability.PAUSE -> {
-                    val pauseIcon = Utils.getIconOrNull(this, options, "pauseIcon")
-                    buttonsList.add(PAUSE(icon = pauseIcon))
+                Capability.PLAY, Capability.PAUSE -> {
+                    if (!hasPlayPauseBeenAdded) {
+                        val playIcon = Utils.getIconOrNull(this, options, "playIcon")
+                        val pauseIcon = Utils.getIconOrNull(this, options, "stopIcon")
+                        buttonsList.add(PLAY_PAUSE(playIcon, pauseIcon))
+                        hasPlayPauseBeenAdded = true
+                    }
                 }
                 Capability.STOP -> {
                     val stopIcon = Utils.getIconOrNull(this, options, "stopIcon")
