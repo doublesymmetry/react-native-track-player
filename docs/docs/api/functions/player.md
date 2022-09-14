@@ -94,6 +94,6 @@ Gets the buffered position of the current track in seconds.
 **Returns:** `Promise<number>`
 
 ## `getState()`
-Gets the playback state of the player.
+Gets the playback [`State`](../constants/state.md) of the player.
 
 **Returns:** `Promise<`[State](../constants/state.md)`>`
