@@ -517,7 +517,7 @@ class MusicService : HeadlessJsTaskService() {
 
         const val MAX_CACHE_SIZE_KEY = "maxCacheSize"
 
-        const val ANDROID_OPTIONS_KEY = "androidOptions"
+        const val ANDROID_OPTIONS_KEY = "android"
         const val STOPPING_APP_PAUSES_PLAYBACK_KEY = "stoppingAppPausesPlayback"
         const val STOPPING_APP_REMOVES_NOTIFICATION_KEY = "stoppingAppRemovesNotification"
         const val PAUSE_ON_INTERRUPTION_KEY = "alwaysPauseOnInterruption"

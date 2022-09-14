@@ -130,7 +130,7 @@ export interface AndroidOptions {
 }
 
 export interface MetadataOptions {
-  androidOptions?: AndroidOptions;
+  android?: AndroidOptions;
   ratingType?: RatingType;
   forwardJumpInterval?: number;
   backwardJumpInterval?: number;

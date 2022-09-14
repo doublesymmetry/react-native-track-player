@@ -9,7 +9,7 @@ export const SetupService = async (): Promise<boolean> => {
   } catch {
     await TrackPlayer.setupPlayer();
     await TrackPlayer.updateOptions({
-      androidOptions: {
+      android: {
         stoppingAppRemovesNotification: true
       },
       stoppingAppPausesPlayback: true,
