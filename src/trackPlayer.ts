@@ -288,21 +288,21 @@ async function getDuration(): Promise<number> {
 }
 
 /**
- * Gets the buffered position of the player in seconds.
+ * Gets the buffered position of the current track in seconds.
  */
 async function getBufferedPosition(): Promise<number> {
   return TrackPlayer.getBufferedPosition();
 }
 
 /**
- * Gets the position of the player in seconds.
+ * Gets the position of the current track in seconds.
  */
 async function getPosition(): Promise<number> {
   return TrackPlayer.getPosition();
 }
 
 /**
- * Gets the state of the player.
+ * Gets the playback state of the player.
  */
 async function getState(): Promise<State> {
   return TrackPlayer.getState();

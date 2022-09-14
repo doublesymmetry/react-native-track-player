@@ -84,16 +84,16 @@ You should only trust the result of this function if you included the `duration`
 **Returns:** `Promise<number>`
 
 ## `getPosition()`
-Gets the position of the player in seconds.
+Gets the position of the current track in seconds.
 
 **Returns:** `Promise<number>`
 
 ## `getBufferedPosition()`
-Gets the buffered position of the player in seconds.
+Gets the buffered position of the current track in seconds.
 
 **Returns:** `Promise<number>`
 
 ## `getState()`
-Gets the state of the player.
+Gets the playback [`State`](../constants/state.md) of the player.
 
 **Returns:** `Promise<`[State](../constants/state.md)`>`
