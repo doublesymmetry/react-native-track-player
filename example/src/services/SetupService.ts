@@ -21,7 +21,6 @@ export const SetupService = async (): Promise<boolean> => {
         Capability.Play,
         Capability.Pause,
         Capability.SkipToNext,
-        Capability.SeekTo,
       ],
       progressUpdateEventInterval: 2,
     });

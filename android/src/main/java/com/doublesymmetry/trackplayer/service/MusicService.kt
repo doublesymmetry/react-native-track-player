@@ -36,8 +36,8 @@ class MusicService : HeadlessJsTaskService() {
     private val scope = MainScope()
     private var progressUpdateJob: Job? = null
 
-    var stoppingAppPausesPlayback = true
-        private set
+    private var stoppingAppAlsoStopsPlayback = true
+    private var stoppingAppRemovesNotification = true
 
     val tracks: List<Track>
         get() = player.items.map { (it as TrackAudioItem).track }
@@ -61,6 +61,15 @@ class MusicService : HeadlessJsTaskService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startTask(getTaskConfig(intent))
         return START_STICKY
+    }
+
+    /**
+     * Configure whether the audio playback should stop whenever the app is removed from recents (killed).
+     * @param alsoRemovesNotification Whether the audio playback notification is also removed when the playback stops. If [enabled] is set to false, this will be ignored.
+     */
+    fun setStoppingAppAlsoStopsPlayback(enabled: Boolean, alsoRemovesNotification: Boolean = true) {
+        stoppingAppAlsoStopsPlayback = enabled
+        stoppingAppRemovesNotification = alsoRemovesNotification
     }
 
     @MainThread
@@ -90,7 +99,7 @@ class MusicService : HeadlessJsTaskService() {
     @MainThread
     fun updateOptions(options: Bundle) {
         latestOptions = options
-        stoppingAppPausesPlayback = options.getBoolean(STOPPING_APP_PAUSES_PLAYBACK_KEY)
+//        stoppingAppAlsoStopsPlayback = options.getBoolean(STOPPING_APP_PAUSES_PLAYBACK_KEY)
 
         ratingType = Utils.getInt(options, "ratingType", RatingCompat.RATING_NONE)
 
@@ -106,13 +115,10 @@ class MusicService : HeadlessJsTaskService() {
 
         notificationCapabilities.forEach {
             when (it) {
-                Capability.PLAY -> {
+                Capability.PLAY, Capability.PAUSE -> {
                     val playIcon = Utils.getIconOrNull(this, options, "playIcon")
-                    buttonsList.add(PLAY(icon = playIcon))
-                }
-                Capability.PAUSE -> {
                     val pauseIcon = Utils.getIconOrNull(this, options, "pauseIcon")
-                    buttonsList.add(PAUSE(icon = pauseIcon))
+                    buttonsList.add(PLAY_PAUSE(playIcon = playIcon, pauseIcon = pauseIcon))
                 }
                 Capability.STOP -> {
                     val stopIcon = Utils.getIconOrNull(this, options, "stopIcon")
@@ -459,8 +465,9 @@ class MusicService : HeadlessJsTaskService() {
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
 
-        if (stoppingAppPausesPlayback && this::player.isInitialized) {
-            player.pause()
+        if (::player.isInitialized) {
+            if (stoppingAppAlsoStopsPlayback && stoppingAppRemovesNotification) player.stop()
+            else if (stoppingAppAlsoStopsPlayback && !stoppingAppAlsoStopsPlayback) player.pause()
         }
     }
 
@@ -472,8 +479,8 @@ class MusicService : HeadlessJsTaskService() {
     @MainThread
     override fun onDestroy() {
         super.onDestroy()
-        if (this::player.isInitialized) {
-            player.stop()
+        if (::player.isInitialized) {
+            player.destroy()
         }
     }
 
