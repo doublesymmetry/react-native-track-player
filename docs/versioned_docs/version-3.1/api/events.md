@@ -20,7 +20,7 @@ Fired when the state of the player changes.
 | state | [State](./constants/state.md) | The new state |
 
 ### `PlaybackTrackChanged`
-Fired when a track is changed.
+Fired when another track has become active or when there no longer is an active track.
 
 | Param     | Type     | Description                            |
 | --------- | -------- | -------------------------------------- |
@@ -123,7 +123,7 @@ Fired when the user changes the position of the timeline. Only fired if the [`Ca
 
 | Param    | Type     | Description   |
 | -------- | -------- | ------------- |
-| position | `number` | The position in seconds |
+| position | `number` | The position to seek to in seconds |
 
 ### `RemoteSetRating`
 Fired when the user changes the rating for the track. Only fired if the [`Capability.SetRating`](./constants/capability.md) is allowed.
