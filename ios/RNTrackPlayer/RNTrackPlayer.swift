@@ -404,10 +404,15 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     @objc(remove:resolver:rejecter:)
     public func remove(tracks indexes: [Int], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
-
         for index in indexes {
-            // we do not allow removal of the current item
-            if index == player.currentIndex { continue }
+            if (rejectWhenTrackIndexOutOfBounds(index: index, message: "One or more of the indexes were out of bounds.", reject: reject)) {
+                return
+            }
+        }
+
+        // Sort the indexes in descending order so we can safely remove them one by one
+        // without having the next index possibly newly pointing to another item than intended:
+        for index in indexes.sorted().reversed() {
             try? player.removeItem(at: index)
         }
 
