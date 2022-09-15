@@ -123,9 +123,9 @@ export enum Capability {
 export type ResourceObject = number;
 
 /**
- * Define how the audio playback should react to removing the app from recents (killing it). Default is `ContinuePlayback`.
+ * Define how the audio playback should behave to removing the app from recents (killing it). Default is `ContinuePlayback`.
  */
-export enum AppKilledPlaybackMode {
+export enum AppKilledPlaybackBehavior {
   /**
    * This option will continue playing audio in the background when the app is removed from recents. The notification remains. This is the default.
    */
@@ -146,7 +146,7 @@ export interface AndroidOptions {
   /**
    * Whether the audio playback notification is also removed when the playback stops. **If `stoppingAppPausesPlayback` is set to false, this will be ignored.**
    */
-  appKilledPlaybackMode: AppKilledPlaybackMode;
+  appKilledPlaybackBehavior: AppKilledPlaybackBehavior;
 }
 
 export interface MetadataOptions {
