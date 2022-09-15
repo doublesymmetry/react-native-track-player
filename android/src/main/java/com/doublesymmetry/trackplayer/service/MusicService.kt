@@ -38,29 +38,16 @@ class MusicService : HeadlessJsTaskService() {
     private var progressUpdateJob: Job? = null
 
 
-//    export enum AppKilledPlaybackMode {
-//        /**
-//         * This option will continue playing audio in the background when the app is removed from recents. The notification remains. This is the default.
-//         */
-//        ContinuePlayback = "continue-playback",
-//
-//        /**
-//         * This option will pause playing audio in the background when the app is removed from recents. The notification remains and can be used to resume playback.
-//         */
-//        PausePlayback = "pause-playback",
-//
-//        /**
-//         * This option will stop playing audio in the background when the app is removed from recents. The notification is removed and can't be used to resume playback. Users would need to open the app again to start playing audio.
-//         */
-//        StopPlaybackAndRemoveNotification = "stop-playback-and-remove-notification",
-//    }
+    /**
+     * Use [appKilledPlaybackMode] instead.
+     */
+    @Deprecated("This will be removed soon")
+    var stoppingAppPausesPlayback = true
+        private set
 
     enum class AppKilledPlaybackMode(val string: String) {
         CONTINUE_PLAYBACK("continue-playback"), PAUSE_PLAYBACK("pause-playback"), STOP_PLAYBACK_AND_REMOVE_NOTIFICATION("stop-playback-and-remove-notification")
     }
-
-//    private var stoppingAppAlsoStopsPlayback = false
-//    private var stoppingAppRemovesNotification = false
 
     private var appKilledPlaybackMode = AppKilledPlaybackMode.CONTINUE_PLAYBACK
 
@@ -88,15 +75,6 @@ class MusicService : HeadlessJsTaskService() {
         return START_STICKY
     }
 
-//    /**
-//     * Configure whether the audio playback should stop whenever the app is removed from recents (killed).
-//     * @param alsoRemovesNotification Whether the audio playback notification is also removed when the playback stops. **If [enabled] is set to false, this will be ignored.**
-//     */
-//    private fun setStoppingAppAlsoStopsPlayback(enabled: Boolean, alsoRemovesNotification: Boolean) {
-//        stoppingAppAlsoStopsPlayback = enabled
-//        stoppingAppRemovesNotification = alsoRemovesNotification
-//    }
-
     @MainThread
     fun setupPlayer(playerOptions: Bundle?) {
         val bufferConfig = BufferConfig(
@@ -121,6 +99,14 @@ class MusicService : HeadlessJsTaskService() {
         val androidOptions = options.getBundle(ANDROID_OPTIONS_KEY)
 
         appKilledPlaybackMode = AppKilledPlaybackMode::string.find(androidOptions?.getString(APP_KILLED_PLAYBACK_MODE_KEY)) ?: AppKilledPlaybackMode.CONTINUE_PLAYBACK
+
+        //TODO: This handles a deprecated flag. Should be removed soon.
+        options.getBoolean(STOPPING_APP_PAUSES_PLAYBACK_KEY).let {
+            stoppingAppPausesPlayback = options.getBoolean(STOPPING_APP_PAUSES_PLAYBACK_KEY)
+            if (stoppingAppPausesPlayback) {
+                appKilledPlaybackMode = AppKilledPlaybackMode.PAUSE_PLAYBACK
+            }
+        }
 
         ratingType = BundleUtils.getInt(options, "ratingType", RatingCompat.RATING_NONE)
 
@@ -543,8 +529,8 @@ class MusicService : HeadlessJsTaskService() {
         const val MAX_CACHE_SIZE_KEY = "maxCacheSize"
 
         const val ANDROID_OPTIONS_KEY = "android"
-//        const val STOPPING_APP_PAUSES_PLAYBACK_KEY = "stoppingAppPausesPlayback"
-//        const val STOPPING_APP_REMOVES_NOTIFICATION_KEY = "stoppingAppRemovesNotification"
+
+        const val STOPPING_APP_PAUSES_PLAYBACK_KEY = "stoppingAppPausesPlayback"
         const val APP_KILLED_PLAYBACK_MODE_KEY = "appKilledPlaybackMode"
         const val PAUSE_ON_INTERRUPTION_KEY = "alwaysPauseOnInterruption"
         const val AUTO_UPDATE_METADATA = "autoUpdateMetadata"

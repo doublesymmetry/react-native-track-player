@@ -12,7 +12,6 @@ export const SetupService = async (): Promise<boolean> => {
       android: {
         appKilledPlaybackMode: AppKilledPlaybackMode.PausePlayback
       },
-      stoppingAppPausesPlayback: false,
       capabilities: [
         Capability.Play,
         Capability.Pause,
