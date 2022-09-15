@@ -397,6 +397,8 @@ class MusicService : HeadlessJsTaskService() {
                             @Suppress("DEPRECATION")
                             stopForeground(true)
                         }
+
+                        stopSelf()
                     }
                 }
             }
