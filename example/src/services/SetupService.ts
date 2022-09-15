@@ -12,7 +12,7 @@ export const SetupService = async (): Promise<boolean> => {
       android: {
         stoppingAppRemovesNotification: true
       },
-      stoppingAppPausesPlayback: true,
+      stoppingAppPausesPlayback: false,
       capabilities: [
         Capability.Play,
         Capability.Pause,

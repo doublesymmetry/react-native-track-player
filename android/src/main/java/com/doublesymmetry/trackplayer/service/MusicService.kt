@@ -16,6 +16,7 @@ import com.doublesymmetry.trackplayer.R
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toMilliseconds
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toSeconds
 import com.doublesymmetry.trackplayer.extensions.asLibState
+import com.doublesymmetry.trackplayer.extensions.find
 import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.model.TrackAudioItem
 import com.doublesymmetry.trackplayer.module.MusicEvents
@@ -36,8 +37,32 @@ class MusicService : HeadlessJsTaskService() {
     private val scope = MainScope()
     private var progressUpdateJob: Job? = null
 
-    private var stoppingAppAlsoStopsPlayback = false
-    private var stoppingAppRemovesNotification = false
+
+//    export enum AppKilledPlaybackMode {
+//        /**
+//         * This option will continue playing audio in the background when the app is removed from recents. The notification remains. This is the default.
+//         */
+//        ContinuePlayback = "continue-playback",
+//
+//        /**
+//         * This option will pause playing audio in the background when the app is removed from recents. The notification remains and can be used to resume playback.
+//         */
+//        PausePlayback = "pause-playback",
+//
+//        /**
+//         * This option will stop playing audio in the background when the app is removed from recents. The notification is removed and can't be used to resume playback. Users would need to open the app again to start playing audio.
+//         */
+//        StopPlaybackAndRemoveNotification = "stop-playback-and-remove-notification",
+//    }
+
+    enum class AppKilledPlaybackMode(val string: String) {
+        CONTINUE_PLAYBACK("continue-playback"), PAUSE_PLAYBACK("pause-playback"), STOP_PLAYBACK_AND_REMOVE_NOTIFICATION("stop-playback-and-remove-notification")
+    }
+
+//    private var stoppingAppAlsoStopsPlayback = false
+//    private var stoppingAppRemovesNotification = false
+
+    private var appKilledPlaybackMode = AppKilledPlaybackMode.CONTINUE_PLAYBACK
 
     val tracks: List<Track>
         get() = player.items.map { (it as TrackAudioItem).track }
@@ -63,14 +88,14 @@ class MusicService : HeadlessJsTaskService() {
         return START_STICKY
     }
 
-    /**
-     * Configure whether the audio playback should stop whenever the app is removed from recents (killed).
-     * @param alsoRemovesNotification Whether the audio playback notification is also removed when the playback stops. **If [enabled] is set to false, this will be ignored.**
-     */
-    private fun setStoppingAppAlsoStopsPlayback(enabled: Boolean, alsoRemovesNotification: Boolean) {
-        stoppingAppAlsoStopsPlayback = enabled
-        stoppingAppRemovesNotification = alsoRemovesNotification
-    }
+//    /**
+//     * Configure whether the audio playback should stop whenever the app is removed from recents (killed).
+//     * @param alsoRemovesNotification Whether the audio playback notification is also removed when the playback stops. **If [enabled] is set to false, this will be ignored.**
+//     */
+//    private fun setStoppingAppAlsoStopsPlayback(enabled: Boolean, alsoRemovesNotification: Boolean) {
+//        stoppingAppAlsoStopsPlayback = enabled
+//        stoppingAppRemovesNotification = alsoRemovesNotification
+//    }
 
     @MainThread
     fun setupPlayer(playerOptions: Bundle?) {
@@ -81,14 +106,8 @@ class MusicService : HeadlessJsTaskService() {
                 playerOptions?.getDouble(BACK_BUFFER_KEY)?.toMilliseconds()?.toInt(),
         )
 
-        val cacheConfig = CacheConfig(
-                playerOptions?.getDouble(MAX_CACHE_SIZE_KEY)?.toLong()
-        )
-
-        val playerConfig = PlayerConfig(
-                true
-        )
-
+        val cacheConfig = CacheConfig(playerOptions?.getDouble(MAX_CACHE_SIZE_KEY)?.toLong())
+        val playerConfig = PlayerConfig(true)
         val automaticallyUpdateNotificationMetadata = playerOptions?.getBoolean(AUTO_UPDATE_METADATA, true) ?: true
 
         player = QueuedAudioPlayer(this@MusicService, playerConfig, bufferConfig, cacheConfig)
@@ -101,7 +120,7 @@ class MusicService : HeadlessJsTaskService() {
         latestOptions = options
         val androidOptions = options.getBundle(ANDROID_OPTIONS_KEY)
 
-        setStoppingAppAlsoStopsPlayback(options.getBoolean(STOPPING_APP_PAUSES_PLAYBACK_KEY), androidOptions?.getBoolean(STOPPING_APP_REMOVES_NOTIFICATION_KEY) ?: false)
+        appKilledPlaybackMode = AppKilledPlaybackMode::string.find(androidOptions?.getString(APP_KILLED_PLAYBACK_MODE_KEY)) ?: AppKilledPlaybackMode.CONTINUE_PLAYBACK
 
         ratingType = BundleUtils.getInt(options, "ratingType", RatingCompat.RATING_NONE)
 
@@ -386,8 +405,12 @@ class MusicService : HeadlessJsTaskService() {
                         startForeground(it.notificationId, it.notification)
                     }
                     is NotificationState.CANCELLED -> {
-                        stopForeground(true)
-                        stopSelf()
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            stopForeground(STOP_FOREGROUND_REMOVE)
+                        } else {
+                            @Suppress("DEPRECATION")
+                            stopForeground(true)
+                        }
                     }
                 }
             }
@@ -470,8 +493,10 @@ class MusicService : HeadlessJsTaskService() {
 
         if (!::player.isInitialized) return
 
-        if (stoppingAppAlsoStopsPlayback) {
-            if (stoppingAppRemovesNotification) player.stop() else player.pause()
+        when (appKilledPlaybackMode) {
+            AppKilledPlaybackMode.PAUSE_PLAYBACK -> player.pause()
+            AppKilledPlaybackMode.STOP_PLAYBACK_AND_REMOVE_NOTIFICATION -> player.stop()
+            else -> {}
         }
     }
 
@@ -518,8 +543,9 @@ class MusicService : HeadlessJsTaskService() {
         const val MAX_CACHE_SIZE_KEY = "maxCacheSize"
 
         const val ANDROID_OPTIONS_KEY = "android"
-        const val STOPPING_APP_PAUSES_PLAYBACK_KEY = "stoppingAppPausesPlayback"
-        const val STOPPING_APP_REMOVES_NOTIFICATION_KEY = "stoppingAppRemovesNotification"
+//        const val STOPPING_APP_PAUSES_PLAYBACK_KEY = "stoppingAppPausesPlayback"
+//        const val STOPPING_APP_REMOVES_NOTIFICATION_KEY = "stoppingAppRemovesNotification"
+        const val APP_KILLED_PLAYBACK_MODE_KEY = "appKilledPlaybackMode"
         const val PAUSE_ON_INTERRUPTION_KEY = "alwaysPauseOnInterruption"
         const val AUTO_UPDATE_METADATA = "autoUpdateMetadata"
 
