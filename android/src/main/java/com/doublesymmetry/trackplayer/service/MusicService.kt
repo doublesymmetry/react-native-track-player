@@ -39,17 +39,17 @@ class MusicService : HeadlessJsTaskService() {
 
 
     /**
-     * Use [appKilledPlaybackMode] instead.
+     * Use [appKilledPlaybackBehavior] instead.
      */
     @Deprecated("This will be removed soon")
     var stoppingAppPausesPlayback = true
         private set
 
-    enum class AppKilledPlaybackMode(val string: String) {
+    enum class AppKilledPlaybackBehavior(val string: String) {
         CONTINUE_PLAYBACK("continue-playback"), PAUSE_PLAYBACK("pause-playback"), STOP_PLAYBACK_AND_REMOVE_NOTIFICATION("stop-playback-and-remove-notification")
     }
 
-    private var appKilledPlaybackMode = AppKilledPlaybackMode.CONTINUE_PLAYBACK
+    private var appKilledPlaybackBehavior = AppKilledPlaybackBehavior.CONTINUE_PLAYBACK
 
     val tracks: List<Track>
         get() = player.items.map { (it as TrackAudioItem).track }
@@ -98,13 +98,13 @@ class MusicService : HeadlessJsTaskService() {
         latestOptions = options
         val androidOptions = options.getBundle(ANDROID_OPTIONS_KEY)
 
-        appKilledPlaybackMode = AppKilledPlaybackMode::string.find(androidOptions?.getString(APP_KILLED_PLAYBACK_MODE_KEY)) ?: AppKilledPlaybackMode.CONTINUE_PLAYBACK
+        appKilledPlaybackBehavior = AppKilledPlaybackBehavior::string.find(androidOptions?.getString(APP_KILLED_PLAYBACK_BEHAVIOR_KEY)) ?: AppKilledPlaybackBehavior.CONTINUE_PLAYBACK
 
         //TODO: This handles a deprecated flag. Should be removed soon.
         options.getBoolean(STOPPING_APP_PAUSES_PLAYBACK_KEY).let {
             stoppingAppPausesPlayback = options.getBoolean(STOPPING_APP_PAUSES_PLAYBACK_KEY)
             if (stoppingAppPausesPlayback) {
-                appKilledPlaybackMode = AppKilledPlaybackMode.PAUSE_PLAYBACK
+                appKilledPlaybackBehavior = AppKilledPlaybackBehavior.PAUSE_PLAYBACK
             }
         }
 
@@ -481,9 +481,9 @@ class MusicService : HeadlessJsTaskService() {
 
         if (!::player.isInitialized) return
 
-        when (appKilledPlaybackMode) {
-            AppKilledPlaybackMode.PAUSE_PLAYBACK -> player.pause()
-            AppKilledPlaybackMode.STOP_PLAYBACK_AND_REMOVE_NOTIFICATION -> player.stop()
+        when (appKilledPlaybackBehavior) {
+            AppKilledPlaybackBehavior.PAUSE_PLAYBACK -> player.pause()
+            AppKilledPlaybackBehavior.STOP_PLAYBACK_AND_REMOVE_NOTIFICATION -> player.stop()
             else -> {}
         }
     }
@@ -533,7 +533,7 @@ class MusicService : HeadlessJsTaskService() {
         const val ANDROID_OPTIONS_KEY = "android"
 
         const val STOPPING_APP_PAUSES_PLAYBACK_KEY = "stoppingAppPausesPlayback"
-        const val APP_KILLED_PLAYBACK_MODE_KEY = "appKilledPlaybackMode"
+        const val APP_KILLED_PLAYBACK_BEHAVIOR_KEY = "appKilledPlaybackBehavior"
         const val PAUSE_ON_INTERRUPTION_KEY = "alwaysPauseOnInterruption"
         const val AUTO_UPDATE_METADATA = "autoUpdateMetadata"
 
