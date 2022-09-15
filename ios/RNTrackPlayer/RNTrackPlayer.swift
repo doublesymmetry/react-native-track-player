@@ -629,6 +629,16 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         resolve(player.currentTime)
     }
 
+    @objc(getProgress:rejecter:)
+    public func getProgress(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        if (rejectWhenNotInitialized(reject: reject)) { return }
+        resolve([
+            "position": player.currentTime,
+            "duration": player.duration,
+            "buffered": player.bufferedPosition
+        ])
+    }
+    
     @objc(getState:rejecter:)
     public func getState(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }

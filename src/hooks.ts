@@ -99,11 +99,8 @@ export function useProgress(updateInterval = 1000) {
 
     const update = async () => {
       try {
-        const [position, duration, buffered] = await Promise.all([
-          TrackPlayer.getPosition(),
-          TrackPlayer.getDuration(),
-          TrackPlayer.getBufferedPosition(),
-        ]);
+        const { position, duration, buffered } =
+          await TrackPlayer.getProgress();
         if (!mounted) return;
 
         setState((state) =>

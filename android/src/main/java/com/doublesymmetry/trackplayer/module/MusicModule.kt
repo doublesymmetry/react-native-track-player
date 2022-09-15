@@ -496,6 +496,16 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     @ReactMethod
+    fun getProgress(callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        var bundle = Bundle()
+        bundle.putDouble("duration", musicService.getDurationInSeconds());
+        bundle.putDouble("position", musicService.getPositionInSeconds());
+        bundle.putDouble("buffered", musicService.getBufferedPositionInSeconds());
+        callback.resolve(Arguments.fromBundle(bundle))
+    }
+
+    @ReactMethod
     fun getState(callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
 

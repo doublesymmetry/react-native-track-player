@@ -236,8 +236,11 @@ export interface Track extends TrackMetadataBase {
 }
 
 export interface Progress {
+  /** The playback position in seconds. */
   position: number;
+  /** The track duration in seconds. */
   duration: number;
+  /** The buffered duration in seconds. */
   buffered: number;
 }
 

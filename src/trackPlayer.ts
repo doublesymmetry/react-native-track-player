@@ -13,6 +13,7 @@ import {
   MetadataOptions,
   NowPlayingMetadata,
   PlayerOptions,
+  Progress,
   RepeatMode,
   State,
   Track,
@@ -289,27 +290,40 @@ async function getCurrentTrack(): Promise<number | null> {
 
 /**
  * Gets the duration of the current track in seconds.
+ * @deprecated Use `TrackPlayer.getProgress().then((progress) => progress.buffered)` instead.
  */
 async function getDuration(): Promise<number> {
   return TrackPlayer.getDuration();
 }
 
 /**
- * Gets the buffered position of the player in seconds.
+ * Gets the buffered position of the current track in seconds.
+ * @deprecated Use `TrackPlayer.getProgress().then((progress) => progress.buffered)` instead.
  */
 async function getBufferedPosition(): Promise<number> {
   return TrackPlayer.getBufferedPosition();
 }
 
 /**
- * Gets the position of the player in seconds.
+ * Gets the playback position of the current track in seconds.
+ * @deprecated Use `TrackPlayer.getProgress().then((progress) => progress.position)` instead.
  */
 async function getPosition(): Promise<number> {
   return TrackPlayer.getPosition();
 }
 
 /**
- * Gets the state of the player.
+ * Gets information on the progress of the currently active track, including its
+ * current playback position in seconds, buffered position in seconds and
+ * duration in seconds.
+ */
+async function getProgress(): Promise<Progress> {
+  return TrackPlayer.getProgress();
+}
+
+/**
+ * Gets the playback state of the player.
+ * @see https://react-native-track-player.js.org/docs/api/constants/state
  */
 async function getState(): Promise<State> {
   return TrackPlayer.getState();
@@ -362,6 +376,7 @@ export default {
   getDuration,
   getBufferedPosition,
   getPosition,
+  getProgress,
   getState,
   getRepeatMode,
 };
