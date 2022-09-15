@@ -37,6 +37,9 @@ function resolveImportedPath(path?: number | string) {
 
 /**
  * Initializes the player with the specified options.
+ *
+ * @param options The options to initialize the player with.
+ * @see https://react-native-track-player.js.org/docs/api/functions/lifecycle
  */
 async function setupPlayer(options: PlayerOptions = {}): Promise<void> {
   return TrackPlayer.setupPlayer(options || {});
@@ -76,7 +79,26 @@ function isServiceRunning(): Promise<boolean> {
 
 /**
  * Adds one or more tracks to the queue.
+ *
+ * @param tracks The tracks to add to the queue.
+ * @param insertBeforeIndex (Optional) The index to insert the tracks before.
+ * By default the tracks will be added to the end of the queue.
  */
+async function add(
+  tracks: Track[],
+  insertBeforeIndex?: number
+): Promise<number | void>;
+/**
+ * Adds a track to the queue.
+ *
+ * @param track The track to add to the queue.
+ * @param insertBeforeIndex (Optional) The index to insert the track before.
+ * By default the track will be added to the end of the queue.
+ */
+async function add(
+  track: Track,
+  insertBeforeIndex?: number
+): Promise<number | void>;
 async function add(
   tracks: Track | Track[],
   insertBeforeIndex = -1
@@ -104,20 +126,48 @@ async function add(
 
 /**
  * Replaces the current track or loads the track as the first in the queue.
+ *
+ * @param track The track to load.
  */
 async function load(track: Track): Promise<number | void> {
   return TrackPlayer.load(track);
 }
 
 /**
- * Removes one or more tracks from the queue.
+ * Move a track within the queue.
+ *
+ * @param fromIndex The index of the track to be moved.
+ * @param toIndex The index to move the track to. If the index is larger than
+ * the size of the queue, then the track is moved to the end of the queue.
  */
-async function remove(tracks: number | number[]): Promise<void> {
-  if (!Array.isArray(tracks)) {
-    tracks = [tracks];
-  }
+async function move(fromIndex: number, toIndex: number): Promise<void> {
+  return TrackPlayer.move(fromIndex, toIndex);
+}
 
-  return TrackPlayer.remove(tracks);
+/**
+ * Removes multiple tracks from the queue by their indexes.
+ *
+ * If the current track is removed, the next track will activated. If the
+ * current track was the last track in the queue, the first track will be
+ * activated.
+ *
+ * @param indexes The indexes of the tracks to be removed.
+ */
+async function remove(indexes: number[]): Promise<void>;
+/**
+ * Removes a track from the queue by its index.
+ *
+ * If the current track is removed, the next track will activated. If the
+ * current track was the last track in the queue, the first track will be
+ * activated.
+ *
+ * @param index The index of the track to be removed.
+ */
+async function remove(index: number): Promise<void>;
+async function remove(indexOrIndexes: number | number[]): Promise<void> {
+  return TrackPlayer.remove(
+    Array.isArray(indexOrIndexes) ? indexOrIndexes : [indexOrIndexes]
+  );
 }
 
 /**
@@ -129,13 +179,18 @@ async function removeUpcomingTracks(): Promise<void> {
 
 /**
  * Skips to a track in the queue.
+ *
+ * @param index The index of the track to skip to.
+ * @param initialPosition (Optional) The initial position to seek to in seconds.
  */
-async function skip(trackIndex: number, initialPosition = -1): Promise<void> {
-  return TrackPlayer.skip(trackIndex, initialPosition);
+async function skip(index: number, initialPosition = -1): Promise<void> {
+  return TrackPlayer.skip(index, initialPosition);
 }
 
 /**
  * Skips to the next track in the queue.
+ *
+ * @param initialPosition (Optional) The initial position to seek to in seconds.
  */
 async function skipToNext(initialPosition = -1): Promise<void> {
   return TrackPlayer.skipToNext(initialPosition);
@@ -143,6 +198,8 @@ async function skipToNext(initialPosition = -1): Promise<void> {
 
 /**
  * Skips to the previous track in the queue.
+ *
+ * @param initialPosition (Optional) The initial position to seek to in seconds.
  */
 async function skipToPrevious(initialPosition = -1): Promise<void> {
   return TrackPlayer.skipToPrevious(initialPosition);
@@ -152,6 +209,9 @@ async function skipToPrevious(initialPosition = -1): Promise<void> {
 
 /**
  * Updates the configuration for the components.
+ *
+ * @param options The options to update.
+ * @see https://react-native-track-player.js.org/docs/api/functions/player#updateoptionsoptions
  */
 async function updateOptions(options: MetadataOptions = {}): Promise<void> {
   options = { ...options };
@@ -172,6 +232,9 @@ async function updateOptions(options: MetadataOptions = {}): Promise<void> {
 /**
  * Updates the metadata of a track in the queue. If the current track is updated,
  * the notification and the Now Playing Center will be updated accordingly.
+ *
+ * @param trackIndex The index of the track whose metadata will be updated.
+ * @param metadata The metadata to update.
  */
 async function updateMetadataForTrack(
   trackIndex: number,
@@ -225,6 +288,8 @@ async function pause(): Promise<void> {
 
 /**
  * Seeks to a specified time position in the current track.
+ *
+ * @param position The position to seek to in seconds.
  */
 async function seekTo(position: number): Promise<void> {
   return TrackPlayer.seekTo(position);
@@ -232,6 +297,8 @@ async function seekTo(position: number): Promise<void> {
 
 /**
  * Sets the volume of the player.
+ *
+ * @param volume The volume as a number between 0 and 1.
  */
 async function setVolume(level: number): Promise<void> {
   return TrackPlayer.setVolume(level);
@@ -239,13 +306,19 @@ async function setVolume(level: number): Promise<void> {
 
 /**
  * Sets the playback rate.
+ *
+ * @param rate The playback rate to change to, where 0.5 would be half speed,
+ * 1 would be regular speed, 2 would be double speed etc.
  */
 async function setRate(rate: number): Promise<void> {
   return TrackPlayer.setRate(rate);
 }
 
 /**
- * Sets the repeat mode.
+ * Sets the queue repeat mode.
+ *
+ * @param repeatMode The repeat mode to set.
+ * @see https://react-native-track-player.js.org/docs/api/constants/repeat-mode
  */
 async function setRepeatMode(mode: RepeatMode): Promise<RepeatMode> {
   return TrackPlayer.setRepeatMode(mode);
@@ -254,14 +327,15 @@ async function setRepeatMode(mode: RepeatMode): Promise<RepeatMode> {
 // MARK: - Getters
 
 /**
- * Gets the volume of the player (a number between 0 and 1).
+ * Gets the volume of the player as a number between 0 and 1.
  */
 async function getVolume(): Promise<number> {
   return TrackPlayer.getVolume();
 }
 
 /**
- * Gets the playback rate, where 1 is the regular speed.
+ * Gets the playback rate where 0.5 would be half speed, 1 would be
+ * regular speed and 2 would be double speed etc.
  */
 async function getRate(): Promise<number> {
   return TrackPlayer.getRate();
@@ -269,9 +343,12 @@ async function getRate(): Promise<number> {
 
 /**
  * Gets a track object from the queue.
+ *
+ * @param index The index of the track.
+ * @returns The track object or null if there isn't a track object at that index.
  */
-async function getTrack(trackIndex: number): Promise<Track | null> {
-  return TrackPlayer.getTrack(trackIndex);
+async function getTrack(index: number): Promise<Track | null> {
+  return TrackPlayer.getTrack(index);
 }
 
 /**
@@ -282,7 +359,7 @@ async function getQueue(): Promise<Track[]> {
 }
 
 /**
- * Gets the index of the current track.
+ * Gets the index of the current track or null if there is no current track.
  */
 async function getCurrentTrack(): Promise<number | null> {
   return TrackPlayer.getCurrentTrack();
@@ -330,7 +407,9 @@ async function getState(): Promise<State> {
 }
 
 /**
- * Gets the repeat mode.
+ * Gets the queue repeat mode.
+ *
+ * @see https://react-native-track-player.js.org/docs/api/constants/repeat-mode
  */
 async function getRepeatMode(): Promise<RepeatMode> {
   return TrackPlayer.getRepeatMode();
@@ -346,6 +425,7 @@ export default {
   // MARK: - Queue API
   add,
   load,
+  move,
   remove,
   removeUpcomingTracks,
   skip,
