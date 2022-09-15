@@ -217,6 +217,10 @@ class MusicService : HeadlessJsTaskService() {
         player.load(track.toAudioItem())
     }
 
+    @MainThread
+    fun move(fromIndex: Int, toIndex: Int) {
+        player.move(fromIndex, toIndex);
+    }
 
     @MainThread
     fun remove(index: Int) {

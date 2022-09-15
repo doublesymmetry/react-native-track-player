@@ -21,13 +21,14 @@ import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import java.util.*
 import javax.annotation.Nonnull
 
 /**
  * @author Milen Pivchev @mpivchev
  */
-class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), ServiceConnection {
+class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext),
+    ServiceConnection {
     private var eventHandler: MusicEvents? = null
     private var playerOptions: Bundle? = null
     private var isServiceBound = false
@@ -76,8 +77,8 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     private fun verifyServiceBoundOrReject(promise: Promise): Boolean {
         if (!isServiceBound) {
             promise.reject(
-                    "player_not_initialized",
-                    "The player is not initialized. Call setupPlayer first."
+                "player_not_initialized",
+                "The player is not initialized. Call setupPlayer first."
             )
             return true
         }
@@ -131,44 +132,52 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     fun setupPlayer(data: ReadableMap?, promise: Promise) {
         if (isServiceBound) {
             promise.reject(
-                    "player_already_initialized",
-                    "The player has already been initialized via setupPlayer."
+                "player_already_initialized",
+                "The player has already been initialized via setupPlayer."
             )
             return
         }
 
         // Validate buffer keys.
         val bundledData = Arguments.toBundle(data)
-        val minBuffer = bundledData?.getDouble(MusicService.MIN_BUFFER_KEY)?.toMilliseconds()?.toInt() ?: DEFAULT_MIN_BUFFER_MS
-        val maxBuffer = bundledData?.getDouble(MusicService.MAX_BUFFER_KEY)?.toMilliseconds()?.toInt() ?: DEFAULT_MAX_BUFFER_MS
-        val playBuffer = bundledData?.getDouble(MusicService.PLAY_BUFFER_KEY)?.toMilliseconds()?.toInt() ?: DEFAULT_BUFFER_FOR_PLAYBACK_MS
-        val backBuffer = bundledData?.getDouble(MusicService.BACK_BUFFER_KEY)?.toMilliseconds()?.toInt() ?: DEFAULT_BACK_BUFFER_DURATION_MS
+        val minBuffer =
+            bundledData?.getDouble(MusicService.MIN_BUFFER_KEY)?.toMilliseconds()?.toInt()
+                ?: DEFAULT_MIN_BUFFER_MS
+        val maxBuffer =
+            bundledData?.getDouble(MusicService.MAX_BUFFER_KEY)?.toMilliseconds()?.toInt()
+                ?: DEFAULT_MAX_BUFFER_MS
+        val playBuffer =
+            bundledData?.getDouble(MusicService.PLAY_BUFFER_KEY)?.toMilliseconds()?.toInt()
+                ?: DEFAULT_BUFFER_FOR_PLAYBACK_MS
+        val backBuffer =
+            bundledData?.getDouble(MusicService.BACK_BUFFER_KEY)?.toMilliseconds()?.toInt()
+                ?: DEFAULT_BACK_BUFFER_DURATION_MS
 
         if (playBuffer < 0) {
             promise.reject(
-                    "play_buffer_error",
-                    "The value for playBuffer should be greater than or equal to zero."
+                "play_buffer_error",
+                "The value for playBuffer should be greater than or equal to zero."
             )
         }
 
         if (backBuffer < 0) {
             promise.reject(
-                    "back_buffer_error",
-                    "The value for backBuffer should be greater than or equal to zero."
+                "back_buffer_error",
+                "The value for backBuffer should be greater than or equal to zero."
             )
         }
 
         if (minBuffer < playBuffer) {
             promise.reject(
-                    "min_buffer_error",
-                    "The value for minBuffer should be greater than or equal to playBuffer."
+                "min_buffer_error",
+                "The value for minBuffer should be greater than or equal to playBuffer."
             )
         }
 
         if (maxBuffer < minBuffer) {
             promise.reject(
-                    "min_buffer_error",
-                    "The value for maxBuffer should be greater than or equal to minBuffer."
+                "min_buffer_error",
+                "The value for maxBuffer should be greater than or equal to minBuffer."
             )
         }
 
@@ -249,31 +258,46 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     @ReactMethod
-    fun remove(data: ReadableArray?, callback: Promise) {
-        if (verifyServiceBoundOrReject(callback)) return
-
-        val trackList = Arguments.toList(data)
-        val queue = musicService.tracks
-
-        scope.launch {
-            if (trackList != null) {
-                val currentIndex = musicService.getCurrentTrackIndex()
-
-                for (track in trackList) {
-                    val index = if (track is Int) track else track.toString().toInt()
-
-                    // We do not allow removal of the current item
-                    if (index == currentIndex) {
-                        Timber.e("This track is currently playing, so it can't be removed")
-                        continue
-                    } else if (index >= 0 && index < queue.size) {
-                        musicService.remove(index)
-                    }
-                }
-            }
-
+    fun load(data: ReadableMap?, callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        if (data == null) {
             callback.resolve(null)
+            return@launch
         }
+        var bundle = Arguments.toBundle(data);
+        if (bundle is Bundle) {
+            musicService.load(Track(context, bundle, musicService.ratingType))
+            callback.resolve(null)
+        } else {
+            callback.reject("invalid_track_object", "Track was not a dictionary type")
+        }
+    }
+
+    @ReactMethod
+    fun move(fromIndex: Int, toIndex: Int, callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        musicService.move(fromIndex, toIndex)
+        callback.resolve(null)
+    }
+
+    @ReactMethod
+    fun remove(data: ReadableArray?, callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        val inputIndexes = Arguments.toList(data)
+        if (inputIndexes != null) {
+            val size = musicService.tracks.size
+            var indexes: ArrayList<Int> = ArrayList();
+            for (inputIndex in indexes) {
+                val index = if (inputIndex is Int) inputIndex else inputIndex.toString().toInt()
+                if (index < 0 || index >= size) {
+                    callback.reject("index_out_of_bounds", "One or more indexes was out of bounds")
+                    return@launch
+                }
+                indexes.add(index)
+            }
+            musicService.remove(indexes)
+        }
+        callback.resolve(null)
     }
 
     @ReactMethod
@@ -302,9 +326,9 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         val context: ReactContext = context
         val metadata = Arguments.toBundle(map)
         musicService.updateNotificationMetadata(
-                metadata?.getString("title"),
-                metadata?.getString("artist"),
-                Utils.getUri(context, metadata, "artwork")?.toString()
+            metadata?.getString("title"),
+            metadata?.getString("artist"),
+            Utils.getUri(context, metadata, "artwork")?.toString()
         )
 
         callback.resolve(null)
