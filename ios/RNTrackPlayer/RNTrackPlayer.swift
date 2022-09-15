@@ -152,15 +152,16 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         index: Int,
         min: Int? = nil,
         max : Int? = nil,
+        message : String? = "The track index is out of bounds",
         reject: RCTPromiseRejectBlock
     ) -> Bool {
         let rejected = index < (min ?? 0) || index > (max ?? player.items.count - 1);
         if (rejected) {
-            reject("index_out_of_bounds", "The track index is out of bounds", nil)
+            reject("index_out_of_bounds", message, nil)
         }
         return rejected
     }
-    
+
     @objc(setupPlayer:resolver:rejecter:)
     public func setupPlayer(config: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if hasInitialized {
@@ -396,11 +397,11 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             reject("invalid_track_object", "Track is missing a required key", nil)
             return
         }
-        
+
         player.load(item: track)
         resolve(player.currentIndex)
     }
-    
+
     @objc(remove:resolver:rejecter:)
     public func remove(tracks indexes: [Int], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
@@ -418,6 +419,30 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
         resolve(NSNull())
     }
+
+    @objc(move:toIndex:resolver:rejecter:)
+    public func move(
+        fromIndex: NSNumber,
+        toIndex: NSNumber,
+        resolve: RCTPromiseResolveBlock,
+        reject: RCTPromiseRejectBlock
+    ) {
+        if (rejectWhenNotInitialized(reject: reject)) { return }
+        if (rejectWhenTrackIndexOutOfBounds(
+            index: fromIndex.intValue,
+            message: "The fromIndex is out of bounds",
+            reject: reject)
+        ) { return }
+        if (rejectWhenTrackIndexOutOfBounds(
+            index: toIndex.intValue,
+            max: Int.max,
+            message: "The toIndex is out of bounds",
+            reject: reject)
+        ) { return }
+        try? player.moveItem(fromIndex: fromIndex.intValue, toIndex: toIndex.intValue)
+        resolve(NSNull())
+    }
+
 
     @objc(removeUpcomingTracks:rejecter:)
     public func removeUpcomingTracks(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
