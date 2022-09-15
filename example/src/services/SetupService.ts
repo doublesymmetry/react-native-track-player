@@ -1,4 +1,4 @@
-import TrackPlayer, { Capability } from 'react-native-track-player';
+import TrackPlayer, { AppKilledPlaybackMode, Capability } from 'react-native-track-player';
 
 export const SetupService = async (): Promise<boolean> => {
   let isSetup = false;
@@ -10,7 +10,7 @@ export const SetupService = async (): Promise<boolean> => {
     await TrackPlayer.setupPlayer();
     await TrackPlayer.updateOptions({
       android: {
-        stoppingAppRemovesNotification: true
+        appKilledPlaybackMode: AppKilledPlaybackMode.PausePlayback
       },
       stoppingAppPausesPlayback: false,
       capabilities: [

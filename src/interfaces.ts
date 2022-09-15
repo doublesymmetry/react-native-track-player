@@ -122,6 +122,9 @@ export enum Capability {
 
 export type ResourceObject = number;
 
+/**
+ * Define how the audio playback should react to removing the app from recents (killing it). Default is `ContinuePlayback`.
+ */
 export enum AppKilledPlaybackMode {
   /**
    * This option will continue playing audio in the background when the app is removed from recents. The notification remains. This is the default.
@@ -161,6 +164,17 @@ export interface MetadataOptions {
   capabilities?: Capability[];
 
   // android
+  /**
+   * @deprecated Use `android` options and `appKilledPlaybackMode` instead.
+   * @example
+   * ```
+   * await TrackPlayer.updateOptions({
+   *   android: {
+   *     appKilledPlaybackMode: AppKilledPlaybackMode.PausePlayback
+   *  },
+   * });
+   *  ```
+   */
   stoppingAppPausesPlayback?: boolean;
   alwaysPauseOnInterruption?: boolean;
   notificationCapabilities?: Capability[];
