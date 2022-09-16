@@ -375,6 +375,7 @@ async function getDuration(): Promise<number> {
 
 /**
  * Gets the buffered position of the current track in seconds.
+ *
  * @deprecated Use `TrackPlayer.getProgress().then((progress) => progress.buffered)` instead.
  */
 async function getBufferedPosition(): Promise<number> {
@@ -400,6 +401,7 @@ async function getProgress(): Promise<Progress> {
 
 /**
  * Gets the playback state of the player.
+ *
  * @see https://react-native-track-player.js.org/docs/api/constants/state
  */
 async function getState(): Promise<State> {
