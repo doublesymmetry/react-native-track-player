@@ -536,7 +536,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         if (!::musicService.isInitialized) {
             callback.resolve(State.Idle.ordinal)
         } else {
-            callback.resolve(musicService.event.stateChange.value.asLibState.ordinal)
+            callback.resolve(musicService.event.stateChange.value.asLibState.state)
         }
     }
 }
