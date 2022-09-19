@@ -51,7 +51,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.DoubleSymmetry:KotlinAudio:v1.2.1'
+    implementation 'com.github.DoubleSymmetry:KotlinAudio:v1.2.4'
 //    implementation "com.github.doublesymmetry:kotlin-audio:1.2.1"
 
     //noinspection GradleDynamicVersion
