@@ -3,6 +3,39 @@ import { useEffect, useRef, useState } from 'react';
 import { Event, EventsPayloadByEvent, Progress, State } from './interfaces';
 import TrackPlayer from './trackPlayer';
 
+export const usePlayWhenReady = () => {
+  const [playWhenReady, setPlayWhenReady] = useState<boolean | undefined>(
+    undefined
+  );
+  useEffect(() => {
+    let mounted = true;
+
+    TrackPlayer.getPlayWhenReady()
+      .then((initialState) => {
+        if (!mounted) return;
+        // Only set the state if it wasn't already set by the Event.PlaybackPlayWhenReadyChanged listener below:
+        setPlayWhenReady((state) => state ?? initialState);
+      })
+      .catch(() => {
+        /** getState only throw while you haven't yet setup, ignore failure. */
+      });
+
+    const sub = TrackPlayer.addEventListener(
+      Event.PlaybackPlayWhenReadyChanged,
+      (event) => {
+        setPlayWhenReady(event.playWhenReady);
+      }
+    );
+
+    return () => {
+      mounted = false;
+      sub.remove();
+    };
+  }, []);
+
+  return playWhenReady;
+};
+
 const usePlaybackStateWithoutInitialValue = () => {
   const [state, setState] = useState<State | undefined>(undefined);
   useEffect(() => {
@@ -18,7 +51,7 @@ const usePlaybackStateWithoutInitialValue = () => {
         /** getState only throw while you haven't yet setup, ignore failure. */
       });
 
-    const sub = TrackPlayer.addEventListener<Event.PlaybackState>(
+    const sub = TrackPlayer.addEventListener(
       Event.PlaybackState,
       ({ state }) => {
         setState(state);

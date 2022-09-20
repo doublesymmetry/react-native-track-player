@@ -287,6 +287,22 @@ async function pause(): Promise<void> {
 }
 
 /**
+ * Sets wether the player will play automatically when it is ready to do so.
+ * This is the equivalent of calling `TrackPlayer.play()` when `playWhenReady = true`
+ * or `TrackPlayer.pause()` when `playWhenReady = false`.
+ */
+async function setPlayWhenReady(playWhenReady: boolean): Promise<boolean> {
+  return TrackPlayer.setPlayWhenReady(playWhenReady);
+}
+
+/**
+ * Gets wether the player will play automatically when it is ready to do so.
+ */
+async function getPlayWhenReady(): Promise<boolean> {
+  return TrackPlayer.getPlayWhenReady();
+}
+
+/**
  * Seeks to a specified time position in the current track.
  *
  * @param position The position to seek to in seconds.
@@ -444,6 +460,8 @@ export default {
   reset,
   play,
   pause,
+  getPlayWhenReady,
+  setPlayWhenReady,
   seekTo,
   setVolume,
   setRate,

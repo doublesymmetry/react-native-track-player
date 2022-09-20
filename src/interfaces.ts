@@ -274,6 +274,10 @@ export enum Event {
    **/
   PlaybackMetadataReceived = 'playback-metadata-received',
   /**
+   * Fired when playback play when ready has changed.
+   **/
+  PlaybackPlayWhenReadyChanged = 'playback-play-when-ready-changed',
+  /**
    * Fired when playback progress has been updated.
    * See https://react-native-track-player.js.org/docs/api/events#playbackprogressupdated
    **/
@@ -505,6 +509,11 @@ export interface PlaybackTrackChangedEvent {
   nextTrack: number;
 }
 
+export interface PlaybackPlayWhenReadyChangedEvent {
+  /** Whether the player will play when it is ready to do so. */
+  playWhenReady: boolean;
+}
+
 export interface PlaybackMetadataReceivedEvent {
   /** The metadata source  */
   source: string;
@@ -585,6 +594,7 @@ export interface EventPayloadByEvent {
   [Event.PlaybackQueueEnded]: PlaybackQueueEndedEvent;
   [Event.PlaybackTrackChanged]: PlaybackTrackChangedEvent;
   [Event.PlaybackMetadataReceived]: PlaybackMetadataReceivedEvent;
+  [Event.PlaybackPlayWhenReadyChanged]: PlaybackPlayWhenReadyChangedEvent;
   [Event.PlaybackProgressUpdated]: PlaybackProgressUpdatedEvent;
   [Event.RemotePlay]: never;
   [Event.RemotePlayId]: RemotePlayIdEvent;
@@ -615,6 +625,9 @@ export interface EventsPayloadByEvent {
   };
   [Event.PlaybackMetadataReceived]: PlaybackMetadataReceivedEvent & {
     type: Event.PlaybackMetadataReceived;
+  };
+  [Event.PlaybackPlayWhenReadyChanged]: PlaybackPlayWhenReadyChangedEvent & {
+    type: Event.PlaybackPlayWhenReadyChanged;
   };
   [Event.PlaybackProgressUpdated]: PlaybackProgressUpdatedEvent & {
     type: Event.PlaybackProgressUpdated;
