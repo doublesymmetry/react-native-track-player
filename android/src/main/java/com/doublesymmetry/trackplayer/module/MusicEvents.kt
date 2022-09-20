@@ -37,6 +37,7 @@ class MusicEvents(private val reactContext: ReactContext) : BroadcastReceiver() 
         const val BUTTON_DUCK = "remote-duck"
 
         // Playback Events
+        const val PLAYBACK_PLAY_WHEN_READY_CHANGED = "playback-play-when-ready-changed"
         const val PLAYBACK_STATE = "playback-state"
         const val PLAYBACK_TRACK_CHANGED = "playback-track-changed"
         const val PLAYBACK_QUEUE_ENDED = "playback-queue-ended"

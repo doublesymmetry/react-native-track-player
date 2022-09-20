@@ -53,6 +53,12 @@ class MusicService : HeadlessJsTaskService() {
 
     val event get() = player.event
 
+    var playWhenReady: Boolean
+        get() = true
+        set(value) {
+             player.playWhenReady = value
+        }
+
     private var latestOptions: Bundle? = null
     private var capabilities: List<Capability> = emptyList()
     private var notificationCapabilities: List<Capability> = emptyList()
@@ -443,6 +449,15 @@ class MusicService : HeadlessJsTaskService() {
                     putString("date", it.date)
                     putString("genre", it.genre)
                     emit(MusicEvents.PLAYBACK_METADATA, this)
+                }
+            }
+        }
+
+        scope.launch {
+            event.playWhenReadyChange.collect {
+                Bundle().apply {
+                    putBoolean("playWhenReady", it.playWhenReady)
+                    emit(MusicEvents.PLAYBACK_PLAY_WHEN_READY_CHANGED, this)
                 }
             }
         }

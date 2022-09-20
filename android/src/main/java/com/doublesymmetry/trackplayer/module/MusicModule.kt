@@ -474,6 +474,21 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     @ReactMethod
+    fun setPlayWhenReady(playWhenReady: Boolean, callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+
+        musicService.playWhenReady = playWhenReady
+        callback.resolve(null)
+    }
+
+    @ReactMethod
+    fun getPlayWhenReady(callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+
+        callback.resolve(musicService.playWhenReady)
+    }
+
+    @ReactMethod
     fun getTrack(index: Int, callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
 
