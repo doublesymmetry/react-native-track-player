@@ -158,6 +158,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
                 "play_buffer_error",
                 "The value for playBuffer should be greater than or equal to zero."
             )
+            return
         }
 
         if (backBuffer < 0) {
@@ -165,6 +166,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
                 "back_buffer_error",
                 "The value for backBuffer should be greater than or equal to zero."
             )
+            return
         }
 
         if (minBuffer < playBuffer) {
@@ -172,6 +174,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
                 "min_buffer_error",
                 "The value for minBuffer should be greater than or equal to playBuffer."
             )
+            return
         }
 
         if (maxBuffer < minBuffer) {
@@ -179,6 +182,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
                 "min_buffer_error",
                 "The value for maxBuffer should be greater than or equal to minBuffer."
             )
+            return
         }
 
         playerSetUpPromise = promise
