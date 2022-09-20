@@ -1,33 +1,35 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { State, usePlaybackState } from 'react-native-track-player';
-import { useOnTogglePlayback } from '../hooks';
-import { useDebouncedValue } from '../hooks/useDebouncedValue';
-
+import TrackPlayer, {
+  State,
+  usePlaybackState,
+  usePlayWhenReady,
+} from 'react-native-track-player';
+import { useDebouncedValue } from '../hooks';
 import { Button } from './Button';
 
 export const PlayPauseButton: React.FC = () => {
   const state = usePlaybackState();
-  const isPlaying = state === State.Playing;
+  const playWhenReady = usePlayWhenReady();
   const isLoading = useDebouncedValue(
     state === State.Connecting || state === State.Buffering,
     250
   );
 
-  const onTogglePlayback = useOnTogglePlayback();
+  const showLoadingIndicator = playWhenReady && isLoading;
 
   if (isLoading) {
     return (
       <View style={styles.statusContainer}>
-        {isLoading && <ActivityIndicator />}
+        {showLoadingIndicator && <ActivityIndicator />}
       </View>
     );
   }
 
   return (
     <Button
-      title={isPlaying ? 'Pause' : 'Play'}
-      onPress={onTogglePlayback}
+      title={playWhenReady ? 'Pause' : 'Play'}
+      onPress={playWhenReady ? TrackPlayer.pause : TrackPlayer.play}
       type="primary"
       style={styles.playPause}
     />
