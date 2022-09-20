@@ -532,11 +532,6 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     @ReactMethod
     fun getState(callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
-
-        if (!::musicService.isInitialized) {
-            callback.resolve(State.Idle.ordinal)
-        } else {
-            callback.resolve(musicService.event.stateChange.value.asLibState.state)
-        }
+        callback.resolve(musicService.event.stateChange.value.asLibState.state)
     }
 }
