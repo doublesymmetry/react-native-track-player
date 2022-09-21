@@ -22,14 +22,15 @@ When migrating from v2 to v3, the following has changed:
 
 ## API Changes
 
-### `stopWithApp` is now `stoppingAppPausesPlayback`
+### `stopWithApp` is now `appKilledPlaybackBehavior` inside `android` options
 
 ```diff
 // Methods
 await TrackPlayer.updateOptions({
--  stopWithApp: true,
-+  stoppingAppPausesPlayback: true,
-  ...
+-      stopWithApp: true,
++      android: {
++        appKilledPlaybackBehavior: AppKilledPlaybackBehavior.ContinuePlayback
++      }
 });
 ```
 
@@ -39,6 +40,18 @@ await TrackPlayer.updateOptions({
 // remove all usages of `.destroy()` and `.stop()`
 -  TrackPlayer.destroy();
 -  TrackPlayer.stop();
+```
+
+### `stoppingAppPausesPlayback` is deprecated
+
+```diff
+await TrackPlayer.updateOptions({
++      android: {
++        appKilledPlaybackBehavior: AppKilledPlaybackBehavior.ContinuePlayback
++      },
+      // This flag is now deprecated. Please use the above to define playback mode.
+-      stoppingAppPausesPlayback: true,
+}
 ```
 
 ## Configuration Changes
