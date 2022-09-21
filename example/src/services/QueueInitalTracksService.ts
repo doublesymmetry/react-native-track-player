@@ -7,7 +7,7 @@ import localTrack from '../assets/resources/pure.m4a';
 // @ts-expect-error – sure we can import this
 import localArtwork from '../assets/resources/artwork.jpg';
 
-export const QueueInitalTracksService = async (): Promise<void> => {
+export const QueueInitialTracksService = async (): Promise<void> => {
   await TrackPlayer.add([
     ...playlistData,
     {
