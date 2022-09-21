@@ -11,9 +11,6 @@ Due to how Android handles foreground services, it's not possible for us to stop
 - An audio control notification will *always* be present (depending on phone
     vendor, this would look and behave differently), which allows users to
     quickly go back to the app by tapping on it.
-- The `destroy` function does not exist anymore. 
-- The `stopWithApp` flag turns into `stoppingAppPausesPlayback` 
-    - [More information here](https://github.com/doublesymmetry/react-native-track-player/pull/1447#issuecomment-1195246389)
 
 The full changelog of added features and bug fixes [can be found here](https://github.com/doublesymmetry/react-native-track-player/releases/tag/v3.0).
 
@@ -22,7 +19,7 @@ When migrating from v2 to v3, the following has changed:
 
 ## API Changes
 
-### `stopWithApp` is now `appKilledPlaybackBehavior` inside `android` options
+### `stopWithApp` is now `android.appKilledPlaybackBehavior` 
 
 ```diff
 // Methods
@@ -40,18 +37,6 @@ await TrackPlayer.updateOptions({
 // remove all usages of `.destroy()` and `.stop()`
 -  TrackPlayer.destroy();
 -  TrackPlayer.stop();
-```
-
-### `stoppingAppPausesPlayback` is deprecated
-
-```diff
-await TrackPlayer.updateOptions({
-+      android: {
-+        appKilledPlaybackBehavior: AppKilledPlaybackBehavior.ContinuePlayback
-+      },
-      // This flag is now deprecated. Please use the above to define playback mode.
--      stoppingAppPausesPlayback: true,
-}
 ```
 
 ## Configuration Changes
