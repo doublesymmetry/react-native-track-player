@@ -18,7 +18,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     private var hasInitialized = false
     private let player = QueuedAudioPlayer()
     private let audioSessionController = AudioSessionController.shared
-    private var shouldEmitUpdateEventInterval: Bool = false
+    private var shouldEmitProgressEvent: Bool = false
 
     // MARK: - Lifecycle Methods
 
@@ -307,19 +307,18 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
                                           bookmarkOptions: options["bookmarkOptions"] as? [String: Any])
         }
 
-        if let interval = options["progressUpdateEventInterval"] as? NSNumber, interval.intValue > 0 {
-            shouldEmitUpdateEventInterval = true
-            configureProgressUpdateEvent(interval: interval.doubleValue)
-        } else {
-            shouldEmitUpdateEventInterval = false
-        }
+        configureProgressUpdateEvent(
+            interval: ((options["progressUpdateEventInterval"] as? NSNumber) ?? 0).doubleValue
+        )
 
         resolve(NSNull())
     }
 
     private func configureProgressUpdateEvent(interval: Double) {
-        let time = CMTime(seconds: interval, preferredTimescale: 1)
-        self.player.timeEventFrequency = .custom(time: time)
+        shouldEmitProgressEvent = interval > 0
+        self.player.timeEventFrequency = shouldEmitProgressEvent
+            ? .custom(time: CMTime(seconds: interval, preferredTimescale: 1))
+            : .everySecond
     }
 
     @objc(add:before:resolver:rejecter:)
@@ -820,7 +819,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         // additionally, there are certain instances in which this event is emitted
         // _after_ a manipulation to the queu causing no currentItem to exist (see reset)
         // in which case we shouldn't emit anything or we'll get an exception.
-        if shouldEmitUpdateEventInterval == false || player.currentItem == nil { return }
+        if !shouldEmitProgressEvent || player.currentItem == nil { return }
 
         sendEvent(
             withName: "playback-progress-updated",
