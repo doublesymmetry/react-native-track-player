@@ -1,40 +1,17 @@
 # Player
 
+## `setupPlayer(options)`
+
+Accepts a [`PlayerOptions`](../objects/metadata-options.md) object.
+
 ## `updateOptions(options)`
-Updates the configuration for the components.
 
-All parameters are optional. You also only need to specify the ones you want to update.
+Accepts a [`MetadataOptions`](../objects/metadata-options.md) object. Updates
+the configuration for the components.
 
-These parameters are different than the ones set using `setupPlayer()`. Parameters other than those listed below will not be applied.
 
-Some parameters are unused depending on platform.
-
-| Param     | Type       | Description          | Android | iOS | Windows |
-| --------- | ---------- | -------------------- | :-----: | :-: | :-----: |
-| options      | `MetadataOptions`   | The options |
-| options.ratingType | [RatingType](../constants/rating.md) | The rating type | ✅ | ❌ | ❌ |
-| options.forwardJumpInterval | `number` | The interval in seconds for the jump forward buttons (if only one is given then we use that value for both) | ✅ | ✅ | ❌ |
-| options.backwardJumpInterval | `number` | The interval in seconds for the jump backward buttons (if only one is given then we use that value for both) | ✅ | ✅ | ✅ |
-| options.stoppingAppPausesPlayback | `boolean` | Whether the player will pause playback when the app closes | ✅ | ❌ | ❌ |
-| options.alwaysPauseOnInterruption | `boolean` | Whether the `remote-duck` event will be triggered on every interruption | ✅ | ❌ | ❌ |
-| options.likeOptions | [FeedbackOptions](../objects/feedback.md) | The media controls that will be enabled | ❌ | ✅ | ❌ |
-| options.dislikeOptions | [FeedbackOptions](../objects/feedback.md) | The media controls that will be enabled | ❌ | ✅ | ❌ |
-| options.bookmarkOptions | [FeedbackOptions](../objects/feedback.md) | The media controls that will be enabled | ❌ | ✅ | ❌ |
-| options.capabilities | [Capability[]](../constants/capability.md) | The media controls that will be enabled | ✅ | ✅ | ✅ |
-| options.notificationCapabilities | [Capability[]](../constants/capability.md) | The buttons that it will show in the notification. Defaults to `data.capabilities`  | ✅ | ❌ | ❌ |
-| options.compactCapabilities | [Capability[]](../constants/capability.md) | The buttons that it will show in the compact notification | ✅ | ❌ | ❌ |
-| options.icon | [Resource Object](../objects/resource.md) | The notification icon¹ | ✅ | ❌ | ❌ |
-| options.playIcon | [Resource Object](../objects/resource.md) | The play icon¹ | ✅ | ❌ | ❌ |
-| options.pauseIcon | [Resource Object](../objects/resource.md) | The pause icon¹ | ✅ | ❌ | ❌ |
-| options.stopIcon | [Resource Object](../objects/resource.md) | The stop icon¹ | ✅ | ❌ | ❌ |
-| options.previousIcon | [Resource Object](../objects/resource.md) | The previous icon¹ | ✅ | ❌ | ❌ |
-| options.nextIcon | [Resource Object](../objects/resource.md) | The next icon¹ | ✅ | ❌ | ❌ |
-| options.rewindIcon | [Resource Object](../objects/resource.md) | The jump backward icon¹ | ✅ | ❌ | ❌ |
-| options.forwardIcon | [Resource Object](../objects/resource.md) | The jump forward icon¹ | ✅ | ❌ | ❌ |
-| options.color | `number` | The notification color in an ARGB hex | ✅ | ❌ | ❌ |
-| options.progressUpdateEventInterval | `number` | The interval (in seconds) that the [`Event.PlaybackProgressUpdated`](../events.md#playbackprogressupdated) will be fired. `undefined` by default. | ✅ | ✅ | ❌ |
-
-*¹ - The custom icons will only work in release builds*
+:warning: These parameters are different than the ones set using `setupPlayer()`.
+Parameters other than those listed below will not be applied.
 
 ## `play()`
 Plays or resumes the current track.
