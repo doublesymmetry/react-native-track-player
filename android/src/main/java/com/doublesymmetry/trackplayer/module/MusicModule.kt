@@ -13,7 +13,7 @@ import com.doublesymmetry.trackplayer.model.State
 import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
 import com.doublesymmetry.trackplayer.service.MusicService
-import com.doublesymmetry.trackplayer.utils.Utils
+import com.doublesymmetry.trackplayer.utils.BundleUtils
 import com.facebook.react.bridge.*
 import com.google.android.exoplayer2.DefaultLoadControl.*
 import com.google.android.exoplayer2.Player
@@ -304,7 +304,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         musicService.updateNotificationMetadata(
                 metadata?.getString("title"),
                 metadata?.getString("artist"),
-                Utils.getUri(context, metadata, "artwork")?.toString()
+                BundleUtils.getUri(context, metadata, "artwork")?.toString()
         )
 
         callback.resolve(null)
@@ -502,7 +502,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         if (!::musicService.isInitialized) {
             callback.resolve(State.Idle.ordinal)
         } else {
-            callback.resolve(musicService.event.stateChange.value.asLibState.ordinal)
+            callback.resolve(musicService.event.stateChange.value.asLibState.state)
         }
     }
 }

@@ -5,7 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import com.doublesymmetry.kotlinaudio.models.AudioItemOptions
 import com.doublesymmetry.kotlinaudio.models.MediaType
-import com.doublesymmetry.trackplayer.utils.Utils
+import com.doublesymmetry.trackplayer.utils.BundleUtils
 import com.google.android.exoplayer2.upstream.RawResourceDataSource
 
 /**
@@ -32,10 +32,10 @@ class Track(context: Context, bundle: Bundle, ratingType: Int) : TrackMetadata()
     }
 
     init {
-        resourceId = Utils.getRawResourceId(context, bundle, "url")
+        resourceId = BundleUtils.getRawResourceId(context, bundle, "url")
         uri = if (resourceId == 0) {
             resourceId = null
-            Utils.getUri(context, bundle, "url")
+            BundleUtils.getUri(context, bundle, "url")
         } else {
             RawResourceDataSource.buildRawResourceUri(resourceId!!)
         }
