@@ -16,12 +16,13 @@ import com.doublesymmetry.trackplayer.R
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toMilliseconds
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toSeconds
 import com.doublesymmetry.trackplayer.extensions.asLibState
+import com.doublesymmetry.trackplayer.extensions.find
 import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.model.TrackAudioItem
 import com.doublesymmetry.trackplayer.module.MusicEvents
 import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
-import com.doublesymmetry.trackplayer.utils.Utils
-import com.doublesymmetry.trackplayer.utils.Utils.setRating
+import com.doublesymmetry.trackplayer.utils.BundleUtils
+import com.doublesymmetry.trackplayer.utils.BundleUtils.setRating
 import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
@@ -36,8 +37,19 @@ class MusicService : HeadlessJsTaskService() {
     private val scope = MainScope()
     private var progressUpdateJob: Job? = null
 
+
+    /**
+     * Use [appKilledPlaybackBehavior] instead.
+     */
+    @Deprecated("This will be removed soon")
     var stoppingAppPausesPlayback = true
         private set
+
+    enum class AppKilledPlaybackBehavior(val string: String) {
+        CONTINUE_PLAYBACK("continue-playback"), PAUSE_PLAYBACK("pause-playback"), STOP_PLAYBACK_AND_REMOVE_NOTIFICATION("stop-playback-and-remove-notification")
+    }
+
+    private var appKilledPlaybackBehavior = AppKilledPlaybackBehavior.CONTINUE_PLAYBACK
 
     val tracks: List<Track>
         get() = player.items.map { (it as TrackAudioItem).track }
@@ -72,14 +84,8 @@ class MusicService : HeadlessJsTaskService() {
                 playerOptions?.getDouble(BACK_BUFFER_KEY)?.toMilliseconds()?.toInt(),
         )
 
-        val cacheConfig = CacheConfig(
-                playerOptions?.getDouble(MAX_CACHE_SIZE_KEY)?.toLong()
-        )
-
-        val playerConfig = PlayerConfig(
-                true
-        )
-
+        val cacheConfig = CacheConfig(playerOptions?.getDouble(MAX_CACHE_SIZE_KEY)?.toLong())
+        val playerConfig = PlayerConfig(true)
         val automaticallyUpdateNotificationMetadata = playerOptions?.getBoolean(AUTO_UPDATE_METADATA, true) ?: true
 
         player = QueuedAudioPlayer(this@MusicService, playerConfig, bufferConfig, cacheConfig)
@@ -90,9 +96,19 @@ class MusicService : HeadlessJsTaskService() {
     @MainThread
     fun updateOptions(options: Bundle) {
         latestOptions = options
-        stoppingAppPausesPlayback = options.getBoolean(STOPPING_APP_PAUSES_PLAYBACK_KEY)
+        val androidOptions = options.getBundle(ANDROID_OPTIONS_KEY)
 
-        ratingType = Utils.getInt(options, "ratingType", RatingCompat.RATING_NONE)
+        appKilledPlaybackBehavior = AppKilledPlaybackBehavior::string.find(androidOptions?.getString(APP_KILLED_PLAYBACK_BEHAVIOR_KEY)) ?: AppKilledPlaybackBehavior.CONTINUE_PLAYBACK
+
+        //TODO: This handles a deprecated flag. Should be removed soon.
+        options.getBoolean(STOPPING_APP_PAUSES_PLAYBACK_KEY).let {
+            stoppingAppPausesPlayback = options.getBoolean(STOPPING_APP_PAUSES_PLAYBACK_KEY)
+            if (stoppingAppPausesPlayback) {
+                appKilledPlaybackBehavior = AppKilledPlaybackBehavior.PAUSE_PLAYBACK
+            }
+        }
+
+        ratingType = BundleUtils.getInt(options, "ratingType", RatingCompat.RATING_NONE)
 
         player.playerOptions.alwaysPauseOnInterruption = options.getBoolean(PAUSE_ON_INTERRUPTION_KEY)
 
@@ -106,32 +122,29 @@ class MusicService : HeadlessJsTaskService() {
 
         notificationCapabilities.forEach {
             when (it) {
-                Capability.PLAY -> {
-                    val playIcon = Utils.getIconOrNull(this, options, "playIcon")
-                    buttonsList.add(PLAY(icon = playIcon))
-                }
-                Capability.PAUSE -> {
-                    val pauseIcon = Utils.getIconOrNull(this, options, "pauseIcon")
-                    buttonsList.add(PAUSE(icon = pauseIcon))
+                Capability.PLAY, Capability.PAUSE -> {
+                    val playIcon = BundleUtils.getIconOrNull(this, options, "playIcon")
+                    val pauseIcon = BundleUtils.getIconOrNull(this, options, "pauseIcon")
+                    buttonsList.add(PLAY_PAUSE(playIcon = playIcon, pauseIcon = pauseIcon))
                 }
                 Capability.STOP -> {
-                    val stopIcon = Utils.getIconOrNull(this, options, "stopIcon")
+                    val stopIcon = BundleUtils.getIconOrNull(this, options, "stopIcon")
                     buttonsList.add(STOP(icon = stopIcon))
                 }
                 Capability.SKIP_TO_NEXT -> {
-                    val nextIcon = Utils.getIconOrNull(this, options, "nextIcon")
+                    val nextIcon = BundleUtils.getIconOrNull(this, options, "nextIcon")
                     buttonsList.add(NEXT(icon = nextIcon, isCompact = isCompact(it)))
                 }
                 Capability.SKIP_TO_PREVIOUS -> {
-                    val previousIcon = Utils.getIconOrNull(this, options, "previousIcon")
+                    val previousIcon = BundleUtils.getIconOrNull(this, options, "previousIcon")
                     buttonsList.add(PREVIOUS(icon = previousIcon, isCompact = isCompact(it)))
                 }
                 Capability.JUMP_FORWARD -> {
-                    val forwardIcon = Utils.getIcon(this, options, "forwardIcon", R.drawable.forward)
+                    val forwardIcon = BundleUtils.getIcon(this, options, "forwardIcon", R.drawable.forward)
                     buttonsList.add(FORWARD(icon = forwardIcon, isCompact = isCompact(it)))
                 }
                 Capability.JUMP_BACKWARD -> {
-                    val backwardIcon = Utils.getIcon(this, options, "rewindIcon", R.drawable.rewind)
+                    val backwardIcon = BundleUtils.getIcon(this, options, "rewindIcon", R.drawable.rewind)
                     buttonsList.add(BACKWARD(icon = backwardIcon, isCompact = isCompact(it)))
                 }
                 else -> return@forEach
@@ -142,8 +155,8 @@ class MusicService : HeadlessJsTaskService() {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
 
-        val accentColor = Utils.getIntOrNull(options, "color")
-        val smallIcon = Utils.getIconOrNull(this, options, "icon")
+        val accentColor = BundleUtils.getIntOrNull(options, "color")
+        val smallIcon = BundleUtils.getIconOrNull(this, options, "icon")
         val pendingIntent = PendingIntent.getActivity(this, 0, openAppIntent, getPendingIntentFlags())
         val notificationConfig = NotificationConfig(buttonsList, accentColor, smallIcon, pendingIntent)
 
@@ -151,7 +164,7 @@ class MusicService : HeadlessJsTaskService() {
 
         // setup progress update events if configured
         progressUpdateJob?.cancel()
-        val updateInterval = Utils.getIntOrNull(options, PROGRESS_UPDATE_EVENT_INTERVAL_KEY)
+        val updateInterval = BundleUtils.getIntOrNull(options, PROGRESS_UPDATE_EVENT_INTERVAL_KEY)
         if (updateInterval != null && updateInterval > 0) {
             progressUpdateJob = scope.launch {
                 progressUpdateEventFlow(updateInterval.toLong()).collect { emit(MusicEvents.PLAYBACK_PROGRESS_UPDATED, it) }
@@ -378,7 +391,14 @@ class MusicService : HeadlessJsTaskService() {
                         startForeground(it.notificationId, it.notification)
                     }
                     is NotificationState.CANCELLED -> {
-                        stopForeground(true)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            stopForeground(STOP_FOREGROUND_REMOVE)
+                        } else {
+                            @Suppress("DEPRECATION")
+                            stopForeground(true)
+                        }
+
+                        stopSelf()
                     }
                 }
             }
@@ -459,21 +479,26 @@ class MusicService : HeadlessJsTaskService() {
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
 
-        if (stoppingAppPausesPlayback && this::player.isInitialized) {
-            player.pause()
+        if (!::player.isInitialized) return
+
+        when (appKilledPlaybackBehavior) {
+            AppKilledPlaybackBehavior.PAUSE_PLAYBACK -> player.pause()
+            AppKilledPlaybackBehavior.STOP_PLAYBACK_AND_REMOVE_NOTIFICATION -> player.stop()
+            else -> {}
         }
     }
 
     @MainThread
     override fun onHeadlessJsTaskFinish(taskId: Int) {
-        // This is empty so the service never stops
+        // This is empty so ReactNative doesn't kill this service
     }
 
     @MainThread
     override fun onDestroy() {
         super.onDestroy()
-        if (this::player.isInitialized) {
-            player.stop()
+
+        if (::player.isInitialized) {
+            player.destroy()
         }
     }
 
@@ -505,7 +530,10 @@ class MusicService : HeadlessJsTaskService() {
 
         const val MAX_CACHE_SIZE_KEY = "maxCacheSize"
 
+        const val ANDROID_OPTIONS_KEY = "android"
+
         const val STOPPING_APP_PAUSES_PLAYBACK_KEY = "stoppingAppPausesPlayback"
+        const val APP_KILLED_PLAYBACK_BEHAVIOR_KEY = "appKilledPlaybackBehavior"
         const val PAUSE_ON_INTERRUPTION_KEY = "alwaysPauseOnInterruption"
         const val AUTO_UPDATE_METADATA = "autoUpdateMetadata"
 

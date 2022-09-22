@@ -10,7 +10,7 @@ import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper
 /**
  * @author Milen Pivchev @mpivchev
  */
-object Utils {
+object BundleUtils {
     fun getUri(context: Context, data: Bundle?, key: String?): Uri? {
         if (!data!!.containsKey(key)) return null
         val obj = data[key]
