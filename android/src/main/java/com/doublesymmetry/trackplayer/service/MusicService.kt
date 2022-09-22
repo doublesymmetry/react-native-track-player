@@ -85,7 +85,8 @@ class MusicService : HeadlessJsTaskService() {
         )
 
         val cacheConfig = CacheConfig(playerOptions?.getDouble(MAX_CACHE_SIZE_KEY)?.toLong())
-        val playerConfig = PlayerConfig(true)
+        val playerConfig = PlayerConfig(true, true)
+
         val automaticallyUpdateNotificationMetadata = playerOptions?.getBoolean(AUTO_UPDATE_METADATA, true) ?: true
 
         player = QueuedAudioPlayer(this@MusicService, playerConfig, bufferConfig, cacheConfig)
