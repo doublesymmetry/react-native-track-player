@@ -1,19 +1,3 @@
-# Installation
-
-To install `react-native-track-player` see this [guide](https://react-native-track-player.js.org/install/).
-
-To install release candidates run `yarn add react-native-track-player@next`
-
-## Main
-
-##### Enhancements
-
-* None.
-
-##### Bug Fixes
-* None.
-
-
 ## 3.1.0 (18.08.22)
 
 ##### Enhancements
