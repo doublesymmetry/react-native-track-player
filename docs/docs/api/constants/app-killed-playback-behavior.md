@@ -4,8 +4,6 @@ sidebar_position: 6
 
 # App Killed Playback Behavior (android-only)
 
-All iOS Category types are made available through the named export `AppKilledPlaybackBehavior`:
-
 ```ts
 import { AppKilledPlaybackBehavior } from 'react-native-track-player';
 ```

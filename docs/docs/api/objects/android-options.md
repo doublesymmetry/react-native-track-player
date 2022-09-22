@@ -4,4 +4,4 @@ Options available for the android player. All options are optional.
 
 | Param | Type  | Default | Description |
 |-------|-------|---------|-------------|
-| `appKilledPlaybackBehavior` | [`AppKilledPlaybackBehavior`](../constants/app-killed-playback-behavior.md) | [`ContinuePlayback`](../constants/app-killed-playback-behavior#continueplayback-default.md) | Whether the audio playback notification is also removed when the playback stops. |
+| `appKilledPlaybackBehavior` | [`AppKilledPlaybackBehavior`](../constants/app-killed-playback-behavior.md) | [`ContinuePlayback`](../constants/app-killed-playback-behavior#continueplayback-default.md) | Define how the audio playback should behave after removing the app from recents (killing it). |

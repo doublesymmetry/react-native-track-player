@@ -9,7 +9,7 @@ background on all supported platforms.
 
 ## Android
 Background audio playback works right out of the box. By default, the audio will
-ontinue to play, not only when the app is suspended in the background, but also
+continue to play, not only when the app is suspended in the background, but also
 after the app is closed by the user. If that is not the desired behavior, you
 can disable it with the `android.appKilledPlaybackBehavior` property in
 `updateOptions`.
