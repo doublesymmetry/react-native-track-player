@@ -336,7 +336,7 @@ class MusicService : HeadlessJsTaskService() {
         scope.launch {
             event.stateChange.collect {
                 val bundle = Bundle()
-                bundle.putInt(STATE_KEY, it.asLibState.ordinal)
+                bundle.putString(STATE_KEY, it.asLibState.state)
                 emit(MusicEvents.PLAYBACK_STATE, bundle)
 
                 if (it == AudioPlayerState.ENDED && player.nextItem == null) {
