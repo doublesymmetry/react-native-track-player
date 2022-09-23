@@ -1,26 +1,28 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import TrackPlayer from 'react-native-track-player';
 
 import { Button } from './Button';
+import { PlaybackError } from './PlaybackError';
 import { PlayPauseButton } from './PlayPauseButton';
 
-export const PlayerControls: React.FC = () => {
+export const PlayerControls: React.FC<{ error?: string }> = ({ error }) => {
   return (
-    <View style={{ width: '100%' }}>
+    <View style={styles.container}>
       <View style={styles.row}>
         <Button
           title="Prev"
           onPress={() => TrackPlayer.skipToPrevious()}
           type="secondary"
         />
-        <PlayPauseButton />
+        <PlayPauseButton error={error} />
         <Button
           title="Next"
           onPress={() => TrackPlayer.skipToNext()}
           type="secondary"
         />
       </View>
+      <PlaybackError error={error} />
     </View>
   );
 };

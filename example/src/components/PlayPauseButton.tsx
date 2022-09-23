@@ -8,28 +8,23 @@ import TrackPlayer, {
 import { useDebouncedValue } from '../hooks';
 import { Button } from './Button';
 
-export const PlayPauseButton: React.FC = () => {
+export const PlayPauseButton: React.FC<{ error?: string }> = ({ error }) => {
   const state = usePlaybackState();
   const playWhenReady = usePlayWhenReady();
   const isLoading = useDebouncedValue(
     state === State.Connecting || state === State.Buffering,
     250
   );
-
-  const showLoadingIndicator = playWhenReady && isLoading;
-
-  if (isLoading) {
-    return (
-      <View style={styles.statusContainer}>
-        {showLoadingIndicator && <ActivityIndicator />}
-      </View>
-    );
-  }
-
-  return (
+  const showPause = playWhenReady && !error;
+  const showBuffering = playWhenReady && isLoading;
+  return showBuffering ? (
+    <View style={styles.statusContainer}>
+      <ActivityIndicator />
+    </View>
+  ) : (
     <Button
-      title={playWhenReady ? 'Pause' : 'Play'}
-      onPress={playWhenReady ? TrackPlayer.pause : TrackPlayer.play}
+      title={showPause ? 'Pause' : 'Play'}
+      onPress={showPause ? TrackPlayer.pause : TrackPlayer.play}
       type="primary"
       style={styles.playPause}
     />

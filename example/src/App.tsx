@@ -9,12 +9,13 @@ import {
 import TrackPlayer from 'react-native-track-player';
 
 import { Button, PlayerControls, Progress, TrackInfo } from './components';
-import { useCurrentTrack } from './hooks';
+import { useCurrentTrack, usePlaybackError } from './hooks';
 import { QueueInitialTracksService, SetupService } from './services';
 
 const App: React.FC = () => {
   const track = useCurrentTrack();
   const [isPlayerReady, setIsPlayerReady] = useState<boolean>(false);
+  const error = usePlaybackError();
 
   useEffect(() => {
     async function run() {
@@ -53,7 +54,7 @@ const App: React.FC = () => {
         <Progress live={track?.isLiveStream} />
       </View>
       <View style={styles.actionRowContainer}>
-        <PlayerControls />
+        <PlayerControls error={error?.message} />
       </View>
     </SafeAreaView>
   );
