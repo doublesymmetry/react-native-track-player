@@ -226,7 +226,35 @@ export enum Capability {
 
 export type ResourceObject = number;
 
+/**
+ * Define how the audio playback should behave to removing the app from recents (killing it). Default is `ContinuePlayback`.
+ */
+export enum AppKilledPlaybackBehavior {
+  /**
+   * This option will continue playing audio in the background when the app is removed from recents. The notification remains. This is the default.
+   */
+  ContinuePlayback = 'continue-playback',
+
+  /**
+   * This option will pause playing audio in the background when the app is removed from recents. The notification remains and can be used to resume playback.
+   */
+  PausePlayback = 'pause-playback',
+
+  /**
+   * This option will stop playing audio in the background when the app is removed from recents. The notification is removed and can't be used to resume playback. Users would need to open the app again to start playing audio.
+   */
+  StopPlaybackAndRemoveNotification = 'stop-playback-and-remove-notification',
+}
+
+export interface AndroidOptions {
+  /**
+   * Whether the audio playback notification is also removed when the playback stops. **If `stoppingAppPausesPlayback` is set to false, this will be ignored.**
+   */
+  appKilledPlaybackBehavior: AppKilledPlaybackBehavior;
+}
+
 export interface MetadataOptions {
+  android?: AndroidOptions;
   ratingType?: RatingType;
   forwardJumpInterval?: number;
   backwardJumpInterval?: number;
@@ -240,6 +268,17 @@ export interface MetadataOptions {
   capabilities?: Capability[];
 
   // android
+  /**
+   * @deprecated Use `android` options and `appKilledPlaybackMode` instead.
+   * @example
+   * ```
+   * await TrackPlayer.updateOptions({
+   *   android: {
+   *     appKilledPlaybackMode: AppKilledPlaybackMode.PausePlayback
+   *  },
+   * });
+   *  ```
+   */
   stoppingAppPausesPlayback?: boolean;
   alwaysPauseOnInterruption?: boolean;
   notificationCapabilities?: Capability[];

@@ -10,7 +10,7 @@ import TrackPlayer from 'react-native-track-player';
 
 import { Button, PlayerControls, Progress, TrackInfo } from './components';
 import { useCurrentTrack } from './hooks';
-import { QueueInitalTracksService, SetupService } from './services';
+import { QueueInitialTracksService, SetupService } from './services';
 
 const App: React.FC = () => {
   const track = useCurrentTrack();
@@ -23,7 +23,7 @@ const App: React.FC = () => {
 
       const queue = await TrackPlayer.getQueue();
       if (isSetup && queue.length <= 0) {
-        await QueueInitalTracksService();
+        await QueueInitialTracksService();
       }
     }
 

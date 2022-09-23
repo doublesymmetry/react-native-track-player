@@ -1,6 +1,4 @@
 buildscript {
-    def kotlin_version = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : project.properties['RNTP_kotlinVersion']
-
     repositories {
         mavenLocal()
         mavenCentral()
@@ -8,7 +6,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.2.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10"
     }
 }
 
@@ -51,14 +49,14 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.DoubleSymmetry:KotlinAudio:v1.2.1'
-//    implementation "com.github.doublesymmetry:kotlin-audio:1.2.1"
+    implementation 'com.github.DoubleSymmetry:KotlinAudio:v1.2.4'
+//    implementation "com.github.doublesymmetry:kotlin-audio:1.2.2"
 
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"
 
     // Make sure we're using androidx
-    implementation "androidx.core:core-ktx:1.8.0"
+    implementation "androidx.core:core-ktx:1.9.0"
     implementation "androidx.localbroadcastmanager:localbroadcastmanager:1.1.0"
     implementation "com.orhanobut:logger:2.2.0"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3"

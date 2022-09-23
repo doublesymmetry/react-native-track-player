@@ -3,6 +3,7 @@
 [![downloads](https://img.shields.io/npm/dw/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player)
 [![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player)
 [![discord](https://img.shields.io/discord/567636850513018880.svg)](https://discordapp.com/invite/ya2XDCR)
+[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
 ----
 
@@ -232,6 +233,30 @@ something you should be ashamed of nor is it something you should be scared of.
 Our goal is to make it as easy as possible for you to make changes to the library.
 All the documentation on how to work on the library and it's dependencies is
 [located in this Guide](./example/README.md)
+
+## Release
+
+The standard release command for this project is [`yarn version`](https://classic.yarnpkg.com/lang/en/docs/cli/version/).
+
+```
+yarn version [--major | --minor | --patch | --new-version <version>]
+```
+
+Ex.
+
+```
+yarn version --new-version 1.2.17
+yarn version --patch // 1.2.17 -> 1.2.18
+yarn version --minor // 1.2.18 -> 1.3.0
+yarn version --major // 2.0.0
+```
+
+This command will:
+
+1. Generate/update the Changelog
+1. Bump the package version
+1. Tag & pushing the commit
+1. Build & publish the package
 
 
 ## Community
