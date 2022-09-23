@@ -25,7 +25,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     public override init() {
         super.init()
-
         audioSessionController.delegate = self
         player.playWhenReady = false;
         player.event.playbackEnd.addListener(self, handleAudioPlayerPlaybackEnded)
@@ -34,6 +33,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         player.event.fail.addListener(self, handleAudioPlayerFailed)
         player.event.currentItem.addListener(self, handleAudioPlayerCurrentItemChange)
         player.event.secondElapse.addListener(self, handleAudioPlayerSecondElapse)
+        player.event.playWhenReadyChange.addListener(self, handlePlayWhenReadyChange)
     }
 
     deinit {
@@ -98,6 +98,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             "playback-track-changed",
             "playback-metadata-received",
             "playback-progress-updated",
+            "playback-play-when-ready-changed",
 
             "remote-stop",
             "remote-pause",
@@ -829,6 +830,15 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
                 "duration": player.duration,
                 "buffered": player.bufferedPosition,
                 "track": player.currentIndex,
+            ]
+        )
+    }
+
+    func handlePlayWhenReadyChange(playWhenReady: Bool) {
+        sendEvent(
+            withName: "playback-play-when-ready-changed",
+            body: [
+                "playWhenReady": playWhenReady
             ]
         )
     }
