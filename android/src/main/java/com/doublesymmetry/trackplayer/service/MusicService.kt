@@ -66,7 +66,7 @@ class MusicService : HeadlessJsTaskService() {
     val event get() = player.event
 
     var playWhenReady: Boolean
-        get() = true
+        get() = player.playWhenReady
         set(value) {
              player.playWhenReady = value
         }
