@@ -26,7 +26,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         super.init()
 
         audioSessionController.delegate = self
-        player.event.playbackEnd.addListener(self, handleAudioPlayerPlaybackEnded)
         player.event.receiveMetadata.addListener(self, handleAudioPlayerMetadataReceived)
         player.event.stateChange.addListener(self, handleAudioPlayerStateChange)
         player.event.fail.addListener(self, handleAudioPlayerFailed)
@@ -778,21 +777,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         sendEvent(withName: "playback-error", body: ["error": error?.localizedDescription])
     }
 
-    func handleAudioPlayerPlaybackEnded(reason: PlaybackEndedReason) {
-        let isRepeatModeOff = player.repeatMode == .off
-        let isPlayedUntilEnd = reason == PlaybackEndedReason.playedUntilEnd
-        let hasNextItems = player.nextItems.count == 0
-        let isQueueEndReached = hasNextItems && isPlayedUntilEnd
-
-        // fire an event for the queue ending
-        if isRepeatModeOff && isQueueEndReached {
-            sendEvent(withName: "playback-queue-ended", body: [
-                "track": player.currentIndex,
-                "position": player.currentTime,
-            ])
-        }
-    }
-
     func handleAudioPlayerQueueIndexChange(previousIndex: Int?, nextIndex: Int?) {
         var dictionary: [String: Any] = [ "position": player.currentTime ]
 
@@ -811,6 +795,25 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         }
 
         sendEvent(withName: "playback-track-changed", body: dictionary)
+
+        self.handleQueueEnded(previousIndex: previousIndex)
+    }
+
+    func handleQueueEnded(previousIndex: Int?) {
+        guard let index = previousIndex else {
+          return
+        }
+
+        let isRepeatModeOff = player.repeatMode == .off
+        let isQueueEndReached = player.items.count == index + 1
+
+        // fire an event for the queue ending
+        if isRepeatModeOff && isQueueEndReached {
+            sendEvent(withName: "playback-queue-ended", body: [
+                "track": index,
+                "position": player.currentTime,
+            ])
+        }
     }
 
     func handleAudioPlayerSecondElapse(seconds: Double) {

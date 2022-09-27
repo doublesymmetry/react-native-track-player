@@ -64,8 +64,9 @@ const config = {
           },
           {
             href: 'https://github.com/doublesymmetry/react-native-track-player',
-            label: 'GitHub',
             position: 'right',
+            className: 'header-github-link',
+            'aria-label': 'GitHub repository',
           },
         ],
       },
