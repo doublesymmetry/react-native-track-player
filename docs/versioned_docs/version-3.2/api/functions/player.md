@@ -2,7 +2,7 @@
 
 ## `setupPlayer(options)`
 
-Accepts a [`PlayerOptions`](../objects/metadata-options.md) object.
+Accepts a [`PlayerOptions`](../objects/player-options.md) object.
 
 ## `updateOptions(options)`
 
