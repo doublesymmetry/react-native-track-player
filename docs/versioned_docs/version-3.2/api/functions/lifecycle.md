@@ -35,7 +35,7 @@ You should use the playback service to register the event handlers that must be 
 
 | Param   | Type     | Description   |
 | ------- | -------- | ------------- |
-| serviceProvider | `function` | The function that must return an async service function. |
+| serviceProvider | `function` | The function that returns the playback service function. |
 
 ## `useTrackPlayerEvents(events: Event[], handler: Handler)`
 
