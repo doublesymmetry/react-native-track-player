@@ -1,0 +1,63 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        google()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.2.2'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10"
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+def getExtOrIntegerDefault(name) {
+    return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties['RNTP_' + name]).toInteger()
+}
+
+android {
+    compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
+
+    defaultConfig {
+        minSdkVersion getExtOrIntegerDefault('minSdkVersion') // RN's minimum version
+        targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
+
+        versionCode 300
+        versionName '3.0'
+
+        consumerProguardFiles 'proguard-rules.txt'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        // As RN is not updated in jcenter anymore, we'll have to grab it from npm
+        // Make sure you have installed the react-native npm package before compiling
+        url '../node_modules/react-native/android'
+    }
+
+    mavenCentral()
+    google()
+}
+
+dependencies {
+    implementation 'com.github.DoubleSymmetry:KotlinAudio:v1.2.4'
+//    implementation "com.github.doublesymmetry:kotlin-audio:1.2.2"
+
+    //noinspection GradleDynamicVersion
+    implementation "com.facebook.react:react-native:+"
+
+    // Make sure we're using androidx
+    implementation "androidx.core:core-ktx:1.9.0"
+    implementation "androidx.localbroadcastmanager:localbroadcastmanager:1.1.0"
+    implementation "com.orhanobut:logger:2.2.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3"
+}

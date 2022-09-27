@@ -1,0 +1,3 @@
+
+# Ignore "not found" errors for libraries
+-dontwarn com.google.android.exoplayer2.**
