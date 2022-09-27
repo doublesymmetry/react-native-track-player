@@ -41,7 +41,7 @@ async function setupPlayer(options: PlayerOptions = {}): Promise<void> {
   return TrackPlayer.setupPlayer(options || {});
 }
 
-type ServiceHandler = () => Promise<void>;
+type ServiceHandler = () => void | Promise<void>;
 /**
  * Register the playback service. The service will run as long as the player runs.
  */
