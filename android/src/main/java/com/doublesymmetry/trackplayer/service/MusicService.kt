@@ -344,11 +344,12 @@ class MusicService : HeadlessJsTaskService() {
                     putInt(TRACK_KEY, player.currentIndex)
                     putDouble(POSITION_KEY, player.position.toSeconds())
 
+                    emit(MusicEvents.PLAYBACK_TRACK_CHANGED, this)
+
                     if (it == AudioPlayerState.ENDED && player.nextItem == null) {
                         emit(MusicEvents.PLAYBACK_QUEUE_ENDED, this)
                     }
 
-                    emit(MusicEvents.PLAYBACK_TRACK_CHANGED, this)
                 }
             }
         }
