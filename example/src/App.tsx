@@ -45,7 +45,7 @@ const App: React.FC = () => {
         <View style={styles.topBarContainer}>
           <Button
             title="Queue"
-            onPress={() => console.log('TODO: implement queue interface')}
+            onPress={() => TrackPlayer.resetPlaylist()}
             type="primary"
           />
         </View>
