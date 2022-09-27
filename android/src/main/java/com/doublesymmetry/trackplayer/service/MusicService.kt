@@ -340,14 +340,15 @@ class MusicService : HeadlessJsTaskService() {
                 bundle.putString(STATE_KEY, it.asLibState.state)
                 emit(MusicEvents.PLAYBACK_STATE, bundle)
 
-                if (it == AudioPlayerState.ENDED && player.nextItem == null) {
-                    Bundle().apply {
-                        putInt(TRACK_KEY, player.currentIndex)
-                        putDouble(POSITION_KEY, player.position.toSeconds())
+                Bundle().apply {
+                    putInt(TRACK_KEY, player.currentIndex)
+                    putDouble(POSITION_KEY, player.position.toSeconds())
 
+                    if (it == AudioPlayerState.ENDED && player.nextItem == null) {
                         emit(MusicEvents.PLAYBACK_QUEUE_ENDED, this)
-                        emit(MusicEvents.PLAYBACK_TRACK_CHANGED, this)
                     }
+
+                    emit(MusicEvents.PLAYBACK_TRACK_CHANGED, this)
                 }
             }
         }
