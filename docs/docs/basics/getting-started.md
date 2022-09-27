@@ -98,7 +98,7 @@ console.log(`${duration - position} seconds left.`);
 ```ts
 TrackPlayer.play();
 TrackPlayer.pause();
-TrackPlayer.reset();
+TrackPlayer.resetPlaylist();
 
 // Seek to 12.5 seconds:
 TrackPlayer.seekTo(12.5);

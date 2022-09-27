@@ -197,8 +197,8 @@ function updateNowPlayingMetadata(metadata: NowPlayingMetadata): Promise<void> {
 /**
  * Resets the player stopping the current track and clearing the queue.
  */
-async function reset(): Promise<void> {
-  return TrackPlayer.reset();
+async function resetPlaylist(): Promise<void> {
+  return TrackPlayer.resetPlaylist();
 }
 
 /**
@@ -337,7 +337,7 @@ export default {
   updateNowPlayingMetadata,
 
   // MARK: - Player API
-  reset,
+  resetPlaylist,
   play,
   pause,
   seekTo,

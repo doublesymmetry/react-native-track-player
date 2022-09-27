@@ -55,7 +55,7 @@ sidebar_position: 5
 | `addEventListener` | ✅ | ✅ | ✅ |
 | `play` | ✅ | ✅ | ✅ |
 | `pause` | ✅ | ✅ | ✅ |
-| `reset` | ✅ | ✅ | ✅ |
+| `resetPlaylist` | ✅ | ✅ | ✅ |
 | `setVolume` | ✅ | ✅ | ✅ |
 | `getVolume` | ✅ | ✅ | ✅ |
 | `setRate` | ✅ | ✅ | ✅ |
