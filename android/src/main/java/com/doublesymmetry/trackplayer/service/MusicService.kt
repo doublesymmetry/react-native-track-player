@@ -2,6 +2,7 @@ package com.doublesymmetry.trackplayer.service
 
 import android.app.PendingIntent
 import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Binder
 import android.os.Build
 import android.os.Bundle
@@ -29,6 +30,7 @@ import com.facebook.react.jstasks.HeadlessJsTaskConfig
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
 import java.util.concurrent.TimeUnit
+import kotlin.system.exitProcess
 
 @MainThread
 class MusicService : HeadlessJsTaskService() {
@@ -36,7 +38,6 @@ class MusicService : HeadlessJsTaskService() {
     private val binder = MusicBinder()
     private val scope = MainScope()
     private var progressUpdateJob: Job? = null
-
 
     /**
      * Use [appKilledPlaybackBehavior] instead.
@@ -400,6 +401,7 @@ class MusicService : HeadlessJsTaskService() {
                         }
 
                         stopSelf()
+                        exitProcess(0)
                     }
                 }
             }
@@ -496,11 +498,11 @@ class MusicService : HeadlessJsTaskService() {
 
     @MainThread
     override fun onDestroy() {
-        super.onDestroy()
-
         if (::player.isInitialized) {
             player.destroy()
         }
+
+        progressUpdateJob?.cancel()
     }
 
     @MainThread

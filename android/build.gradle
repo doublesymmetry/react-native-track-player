@@ -58,6 +58,5 @@ dependencies {
     // Make sure we're using androidx
     implementation "androidx.core:core-ktx:1.9.0"
     implementation "androidx.localbroadcastmanager:localbroadcastmanager:1.1.0"
-    implementation "com.orhanobut:logger:2.2.0"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3"
 }
