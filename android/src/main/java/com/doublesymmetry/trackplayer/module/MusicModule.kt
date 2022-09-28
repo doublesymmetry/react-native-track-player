@@ -17,8 +17,6 @@ import com.doublesymmetry.trackplayer.utils.BundleUtils
 import com.facebook.react.bridge.*
 import com.google.android.exoplayer2.DefaultLoadControl.*
 import com.google.android.exoplayer2.Player
-import com.orhanobut.logger.AndroidLogAdapter
-import com.orhanobut.logger.Logger
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -44,7 +42,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     override fun initialize() {
-        Logger.addLogAdapter(AndroidLogAdapter())
+        Timber.plant(Timber.DebugTree())
     }
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {

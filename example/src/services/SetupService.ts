@@ -13,7 +13,8 @@ export const SetupService = async (): Promise<boolean> => {
     await TrackPlayer.setupPlayer();
     await TrackPlayer.updateOptions({
       android: {
-        appKilledPlaybackBehavior: AppKilledPlaybackBehavior.ContinuePlayback,
+        appKilledPlaybackBehavior:
+          AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
       },
       // This flag is now deprecated. Please use the above to define playback mode.
       // stoppingAppPausesPlayback: true,
