@@ -57,6 +57,9 @@ class MusicService : HeadlessJsTaskService() {
     val currentTrack
         get() = (player.currentItem as TrackAudioItem).track
 
+    val state
+        get() = player.state
+
     var ratingType: Int
         get() = player.ratingType
         set(value) {
