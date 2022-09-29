@@ -7,5 +7,6 @@ enum class State(val state: String) {
     Paused("paused"),
     Stopped("stopped"),
     Buffering("buffering"),
-    Connecting("connecting"),
+    Loading("loading"),
+    Error("error")
 }

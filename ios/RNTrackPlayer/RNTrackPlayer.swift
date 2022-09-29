@@ -55,7 +55,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             "STATE_PAUSED": State.paused.rawValue,
             "STATE_STOPPED": State.stopped.rawValue,
             "STATE_BUFFERING": State.buffering.rawValue,
-            "STATE_CONNECTING": State.connecting.rawValue,
+            "STATE_LOADING": State.loading.rawValue,
 
             "TRACK_PLAYBACK_ENDED_REASON_END": PlaybackEndedReason.playedUntilEnd.rawValue,
             "TRACK_PLAYBACK_ENDED_REASON_JUMPED": PlaybackEndedReason.jumpedToIndex.rawValue,
@@ -664,7 +664,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             "buffered": player.bufferedPosition
         ])
     }
-    
+
     @objc(getState:rejecter:)
     public func getState(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }

@@ -148,7 +148,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         constants["STATE_PAUSED"] = State.Paused.state
         constants["STATE_STOPPED"] = State.Stopped.state
         constants["STATE_BUFFERING"] = State.Buffering.state
-        constants["STATE_CONNECTING"] = State.Connecting.state
+        constants["STATE_LOADING"] = State.Loading.state
 
         // Rating Types
         constants["RATING_HEART"] = RatingCompat.RATING_HEART
