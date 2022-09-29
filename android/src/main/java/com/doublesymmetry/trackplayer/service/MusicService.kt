@@ -66,12 +66,16 @@ class MusicService : HeadlessJsTaskService() {
             player.ratingType = value
         }
 
-    val event get() = player.event
+    val playbackError
+        get() = player.playbackError
+
+    val event
+        get() = player.event
 
     var playWhenReady: Boolean
         get() = player.playWhenReady
         set(value) {
-             player.playWhenReady = value
+            player.playWhenReady = value
         }
 
     private var latestOptions: Bundle? = null
@@ -357,16 +361,17 @@ class MusicService : HeadlessJsTaskService() {
             event.stateChange.collect {
                 val bundle = Bundle()
                 bundle.putString(STATE_KEY, it.asLibState.state)
+                if (it == AudioPlayerState.ERROR) {
+                    bundle.putBundle("error", getPlaybackErrorBundle())
+                }
                 emit(MusicEvents.PLAYBACK_STATE, bundle)
 
                 if (it == AudioPlayerState.ENDED && player.nextItem == null) {
-                    Bundle().apply {
-                        putInt(TRACK_KEY, player.currentIndex)
-                        putDouble(POSITION_KEY, player.position.toSeconds())
-
-                        emit(MusicEvents.PLAYBACK_QUEUE_ENDED, this)
-                        emit(MusicEvents.PLAYBACK_TRACK_CHANGED, this)
-                    }
+                    val endedBundle = Bundle()
+                    endedBundle.putInt(TRACK_KEY, player.currentIndex)
+                    endedBundle.putInt(POSITION_KEY, player.position.toSeconds())
+                    emit(MusicEvents.PLAYBACK_QUEUE_ENDED, endedBundle)
+                    emit(MusicEvents.PLAYBACK_TRACK_CHANGED, endedBundle)
                 }
             }
         }
@@ -485,6 +490,24 @@ class MusicService : HeadlessJsTaskService() {
                 }
             }
         }
+
+        scope.launch {
+            event.playbackError.collect {
+                emit(MusicEvents.PLAYBACK_ERROR, getPlaybackErrorBundle())
+            }
+        }
+    }
+
+    private fun getPlaybackErrorBundle(): Bundle {
+        var bundle = Bundle()
+        var error = playbackError
+        if (error?.message != null) {
+            bundle.putString("message", error.message)
+        }
+        if (error?.code != null) {
+            bundle.putString("code", "android-" + error.code)
+        }
+        return bundle
     }
 
     @MainThread

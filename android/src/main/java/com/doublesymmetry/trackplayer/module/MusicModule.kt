@@ -12,6 +12,7 @@ import com.doublesymmetry.trackplayer.extensions.asLibState
 import com.doublesymmetry.trackplayer.model.State
 import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
+import com.doublesymmetry.trackplayer.utils.RejectionException
 import com.doublesymmetry.trackplayer.service.MusicService
 import com.doublesymmetry.trackplayer.utils.BundleUtils
 import com.facebook.react.bridge.*
@@ -84,6 +85,42 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         }
 
         return false
+    }
+
+    private fun bundleToTrack(bundle: Bundle): Track {
+        return Track(context, bundle, musicService.ratingType)
+    }
+
+    private fun rejectWithException(callback: Promise, exception: Exception) {
+        when (exception) {
+            is RejectionException -> {
+                callback.reject(exception.code, exception)
+            }
+            else -> {
+                callback.reject("runtime_exception", exception)
+            }
+        }
+    }
+
+    private fun readableArrayToTrackList(data: ReadableArray?): MutableList<Track> {
+        val tracks: MutableList<Track> = mutableListOf()
+        val bundleList = Arguments.toList(data)
+
+        if (bundleList !is ArrayList) {
+            throw RejectionException("invalid_parameter", "Was not given an array of tracks")
+        }
+
+        bundleList.forEach {
+            if (it is Bundle) {
+                tracks.add(bundleToTrack(it))
+            } else {
+                throw RejectionException(
+                    "invalid_track_object",
+                    "Track was not a dictionary type"
+                )
+            }
+        }
+        return tracks
     }
 
     /* ****************************** API ****************************** */
@@ -219,45 +256,21 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     @ReactMethod
-    fun add(data: ReadableArray?, insertBeforeIndex: Int, callback: Promise) {
-        if (verifyServiceBoundOrReject(callback)) return
+    fun add(data: ReadableArray?, insertBeforeIndex: Int, callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
 
-        val tracks: MutableList<Track> = mutableListOf()
-        val bundleList = Arguments.toList(data)
-
-        if (bundleList !is ArrayList) {
-            callback.reject("invalid_parameter", "Was not given an array of tracks")
-            return
-        }
-
-        bundleList.forEach {
-            if (it is Bundle) {
-                tracks.add(Track(context, it, musicService.ratingType))
-            } else {
-                callback.reject("invalid_track_object", "Track was not a dictionary type")
+        try {
+            val tracks = readableArrayToTrackList(data);
+            if (insertBeforeIndex < -1 || insertBeforeIndex > musicService.tracks.size) {
+                callback.reject("index_out_of_bounds", "The track index is out of bounds")
+                return@launch
             }
-        }
-
-        scope.launch {
-            when {
-                insertBeforeIndex < -1 || insertBeforeIndex > musicService.tracks.size -> {
-                    callback.reject("index_out_of_bounds", "The track index is out of bounds")
-                }
-
-                insertBeforeIndex == -1 -> {
-                    musicService.apply {
-                        var size = musicService.tracks.size
-                        add(tracks)
-                        callback.resolve(size)
-                    }
-                }
-                else -> {
-                    musicService.apply {
-                        add(tracks, insertBeforeIndex)
-                        callback.resolve(insertBeforeIndex)
-                    }
-                }
-            }
+            musicService.add(
+                tracks,
+                if (insertBeforeIndex == -1) musicService.tracks.size else insertBeforeIndex
+            )
+        } catch (exception: Exception) {
+            rejectWithException(callback, exception)
         }
     }
 
@@ -270,7 +283,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         }
         var bundle = Arguments.toBundle(data);
         if (bundle is Bundle) {
-            musicService.load(Track(context, bundle, musicService.ratingType))
+            musicService.load(bundleToTrack(bundle))
             callback.resolve(null)
         } else {
             callback.reject("invalid_track_object", "Track was not a dictionary type")
@@ -294,7 +307,10 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
             for (inputIndex in indexes) {
                 val index = if (inputIndex is Int) inputIndex else inputIndex.toString().toInt()
                 if (index < 0 || index >= size) {
-                    callback.reject("index_out_of_bounds", "One or more indexes was out of bounds")
+                    callback.reject(
+                        "index_out_of_bounds",
+                        "One or more indexes was out of bounds"
+                    )
                     return@launch
                 }
                 indexes.add(index)
@@ -305,20 +321,21 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     @ReactMethod
-    fun updateMetadataForTrack(index: Int, map: ReadableMap?, callback: Promise) = scope.launch {
-        if (verifyServiceBoundOrReject(callback)) return@launch
+    fun updateMetadataForTrack(index: Int, map: ReadableMap?, callback: Promise) =
+        scope.launch {
+            if (verifyServiceBoundOrReject(callback)) return@launch
 
-        if (index < 0 || index >= musicService.tracks.size) {
-            callback.reject("index_out_of_bounds", "The index is out of bounds")
-        } else {
-            val context: ReactContext = context
-            val track = musicService.tracks[index]
-            track.setMetadata(context, Arguments.toBundle(map), musicService.ratingType)
-            musicService.updateMetadataForTrack(index, track)
+            if (index < 0 || index >= musicService.tracks.size) {
+                callback.reject("index_out_of_bounds", "The index is out of bounds")
+            } else {
+                val context: ReactContext = context
+                val track = musicService.tracks[index]
+                track.setMetadata(context, Arguments.toBundle(map), musicService.ratingType)
+                musicService.updateMetadataForTrack(index, track)
 
-            callback.resolve(null)
+                callback.resolve(null)
+            }
         }
-    }
 
     @ReactMethod
     fun updateNowPlayingMetadata(map: ReadableMap?, callback: Promise) = scope.launch {
@@ -507,14 +524,24 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     @ReactMethod
+    fun setQueue(data: ReadableArray?, callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+
+        try {
+            var tracks = readableArrayToTrackList(data);
+            musicService.add(tracks)
+            callback.resolve(null)
+        } catch (exception: Exception) {
+            rejectWithException(callback, exception)
+        }
+    }
+
+    @ReactMethod
     fun getCurrentTrack(callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
-        val currentTrackIndex = musicService.getCurrentTrackIndex()
-        if (currentTrackIndex >= 0 || currentTrackIndex < musicService.tracks.size) {
-            callback.resolve(currentTrackIndex)
-        } else {
-            callback.resolve(null)
-        }
+        callback.resolve(
+            if (musicService.tracks.isEmpty()) null else musicService.getCurrentTrackIndex()
+        )
     }
 
     @ReactMethod
