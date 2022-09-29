@@ -433,6 +433,15 @@ async function getRepeatMode(): Promise<RepeatMode> {
   return TrackPlayer.getRepeatMode();
 }
 
+/**
+ * Reloads the current item.
+ */
+async function reload({
+  startFromCurrentTime = true,
+}: { startFromCurrentTime?: boolean } = {}) {
+  return TrackPlayer.reload({ startFromCurrentTime });
+}
+
 export default {
   // MARK: - General API
   setupPlayer,
@@ -443,6 +452,8 @@ export default {
   // MARK: - Queue API
   add,
   load,
+  reload,
+  reset,
   move,
   remove,
   removeUpcomingTracks,
@@ -457,7 +468,6 @@ export default {
   updateNowPlayingMetadata,
 
   // MARK: - Player API
-  reset,
   play,
   pause,
   getPlayWhenReady,
