@@ -369,7 +369,7 @@ class MusicService : HeadlessJsTaskService() {
                 if (it == AudioPlayerState.ENDED && player.nextItem == null) {
                     val endedBundle = Bundle()
                     endedBundle.putInt(TRACK_KEY, player.currentIndex)
-                    endedBundle.putInt(POSITION_KEY, player.position.toSeconds())
+                    endedBundle.putDouble(POSITION_KEY, player.position.toSeconds())
                     emit(MusicEvents.PLAYBACK_QUEUE_ENDED, endedBundle)
                     emit(MusicEvents.PLAYBACK_TRACK_CHANGED, endedBundle)
                 }
