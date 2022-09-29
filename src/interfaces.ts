@@ -436,21 +436,36 @@ export enum PitchAlgorithm {
   Voice = TrackPlayer.PITCH_ALGORITHM_VOICE,
 }
 
-export enum State {
+export const enum State {
   /** Indicates that no media is currently loaded */
-  None = TrackPlayer.STATE_NONE,
+  None = 'none',
   /** Indicates that the player is ready to start playing */
-  Ready = TrackPlayer.STATE_READY,
+  Ready = 'ready',
   /** Indicates that the player is currently playing */
-  Playing = TrackPlayer.STATE_PLAYING,
+  Playing = 'playing',
   /** Indicates that the player is currently paused */
-  Paused = TrackPlayer.STATE_PAUSED,
+  Paused = 'paused',
   /** Indicates that the player is currently stopped */
-  Stopped = TrackPlayer.STATE_STOPPED,
-  /** Indicates that the player is currently buffering (in "play" state) */
-  Buffering = TrackPlayer.STATE_BUFFERING,
-  /** Indicates that the player is currently buffering (in "pause" state) */
-  Connecting = TrackPlayer.STATE_CONNECTING,
+  Stopped = 'stopped',
+  /** Indicates that the initial load of the item is occurring. */
+  Loading = 'loading',
+  /**
+   * @deprecated Use `State.Loading` instead.
+   **/
+  Connecting = 'loading',
+  /**
+   * Indicates that the player is currently loading more data before it can
+   * continue playing or is ready to start playing.
+   */
+  Buffering = 'buffering',
+  /**
+   * Indicates that playback of the current item failed. Call `TrackPlayer.getError()`
+   * to get more information on the type of error that occurred.
+   * Call `TrackPlayer.reload({ startAtCurrentTime: boolean })` to try to play
+   * the item again. Calling `TrackPlayer.play()` will also cause the current
+   * item to be reloaded.
+   */
+  Error = 'error',
 }
 
 export interface TrackMetadataBase {
@@ -518,9 +533,21 @@ export interface PlaybackProgressUpdatedEvent extends Progress {
   track: number;
 }
 
-export interface PlaybackStateEvent {
-  state: State;
-}
+export type PlaybackStateEvent =
+  | {
+      state:
+        | State.None
+        | State.Buffering
+        | State.Loading
+        | State.Playing
+        | State.Paused
+        | State.Ready
+        | State.Paused;
+    }
+  | {
+      state: State.Error;
+      error: PlaybackErrorEvent;
+    };
 
 export interface PlaybackErrorEvent {
   /** The error code */
