@@ -112,7 +112,7 @@ RCT_EXTERN_METHOD(getPosition:(RCTPromiseResolveBlock)resolve
 RCT_EXTERN_METHOD(getProgress:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(getState:(RCTPromiseResolveBlock)resolve
+RCT_EXTERN_METHOD(getPlaybackState:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(updateMetadataForTrack:(nonnull NSNumber *)trackIndex

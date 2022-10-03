@@ -56,6 +56,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             "STATE_STOPPED": State.stopped.rawValue,
             "STATE_BUFFERING": State.buffering.rawValue,
             "STATE_LOADING": State.loading.rawValue,
+            "STATE_ERROR": State.error.rawValue,
 
             "TRACK_PLAYBACK_ENDED_REASON_END": PlaybackEndedReason.playedUntilEnd.rawValue,
             "TRACK_PLAYBACK_ENDED_REASON_JUMPED": PlaybackEndedReason.jumpedToIndex.rawValue,
@@ -665,11 +666,11 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         ])
     }
 
-    @objc(getState:rejecter:)
-    public func getState(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+    @objc(getPlaybackState:rejecter:)
+    public func getPlaybackState(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
 
-        resolve(State.fromPlayerState(state: player.playerState).rawValue)
+        resolve(getPlaybackStateBodyKeyValues())
     }
 
     @objc(updateMetadataForTrack:metadata:resolver:rejecter:)
@@ -704,10 +705,54 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         resolve(NSNull())
     }
 
+    private func getPlaybackStateErrorKeyValues() -> Dictionary<String, Any> {
+        switch player.playbackError {
+            case .networkUnreachable: return [
+                "message": "The network was unreachable",
+                "code": "ios_network_unreachable"
+            ]
+            case .failedToLoadKeyValue: return [
+                "message": "Failed to load resource",
+                "code": "ios_failed_to_load_resource"
+            ]
+            case .invalidSourceUrl: return [
+                "message": "The source url was invalid",
+                "code": "ios_invalid_source_url"
+            ]
+            case .notConnectedToInternet: return [
+                "message": "A network resource was requested, but an internet connection has not been established and can’t be established automatically.",
+                "code": "ios_not_connected_to_internet"
+            ]
+            case .playbackFailed: return [
+                "message": "Playback of the track failed",
+                "code": "ios_playback_failed"
+            ]
+            case .itemWasUnplayable: return [
+                "message": "The track could not be played",
+                "code": "ios_track_unplayable"
+            ]
+            default: return [
+                "message": "A playback error occurred",
+                "code": "ios_playback_error"
+            ]
+        }
+    }
+    
+    private func getPlaybackStateBodyKeyValues() -> Dictionary<String, Any> {
+        var body: Dictionary<String, Any> = ["state": State.fromPlayerState(state: player.playerState).rawValue]
+        if (player.playerState == AudioPlayerState.failed) {
+            body["error"] = getPlaybackStateErrorKeyValues()
+        }
+        return body
+    }
+    
     // MARK: - QueuedAudioPlayer Event Handlers
 
     func handleAudioPlayerStateChange(state: AVPlayerWrapperState) {
-        sendEvent(withName: "playback-state", body: ["state": State.fromPlayerState(state: state).rawValue])
+        sendEvent(
+            withName: "playback-state",
+            body: getPlaybackStateBodyKeyValues()
+        )
     }
 
     func handleAudioPlayerMetadataReceived(metadata: [AVTimedMetadataGroup]) {
