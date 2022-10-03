@@ -1,12 +1,13 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import TrackPlayer from 'react-native-track-player';
+import TrackPlayer, { usePlaybackState } from 'react-native-track-player';
 
 import { Button } from './Button';
 import { PlaybackError } from './PlaybackError';
 import { PlayPauseButton } from './PlayPauseButton';
 
-export const PlayerControls: React.FC<{ error?: string }> = ({ error }) => {
+export const PlayerControls: React.FC = () => {
+  const playbackState = usePlaybackState();
   return (
     <View style={styles.container}>
       <View style={styles.row}>
@@ -15,14 +16,14 @@ export const PlayerControls: React.FC<{ error?: string }> = ({ error }) => {
           onPress={() => TrackPlayer.skipToPrevious()}
           type="secondary"
         />
-        <PlayPauseButton error={error} />
+        <PlayPauseButton playbackState={playbackState} />
         <Button
           title="Next"
           onPress={() => TrackPlayer.skipToNext()}
           type="secondary"
         />
       </View>
-      <PlaybackError error={error} />
+      <PlaybackError playbackState={playbackState} />
     </View>
   );
 };

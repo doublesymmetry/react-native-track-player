@@ -1,13 +1,24 @@
-import { useState, useEffect } from 'react';
-import TrackPlayer, {
-  useTrackPlayerEvents,
-  Event,
-} from 'react-native-track-player';
+import { useEffect, useState } from 'react';
 import type { Track } from 'react-native-track-player';
+import TrackPlayer, {
+  Event,
+  useTrackPlayerEvents,
+} from 'react-native-track-player';
 
 export const useCurrentTrack = (): Track | undefined => {
   const [index, setIndex] = useState<number | undefined>();
   const [track, setTrack] = useState<Track | undefined>();
+
+  useEffect(() => {
+    let unmounted = false;
+    TrackPlayer.getCurrentTrack().then((currentTrack) => {
+      if (unmounted) return;
+      setIndex((index) => index ?? currentTrack ?? undefined);
+    });
+    return () => {
+      unmounted = true;
+    };
+  });
 
   useTrackPlayerEvents([Event.PlaybackTrackChanged], async ({ nextTrack }) => {
     setIndex(nextTrack);
@@ -15,10 +26,15 @@ export const useCurrentTrack = (): Track | undefined => {
 
   useEffect(() => {
     if (index === undefined) return;
-    (async () => {
-      const track = await TrackPlayer.getTrack(index);
-      setTrack(track || undefined);
-    })();
+
+    let unmounted = false;
+    TrackPlayer.getTrack(index).then((track) => {
+      if (unmounted) return;
+      setTrack(track ?? undefined);
+    });
+    return () => {
+      unmounted = true;
+    };
   }, [index]);
 
   return track;
