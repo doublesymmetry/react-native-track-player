@@ -58,7 +58,7 @@ class MusicService : HeadlessJsTaskService() {
         get() = (player.currentItem as TrackAudioItem).track
 
     val state
-        get() = player.state
+        get() = player.playerState
 
     var ratingType: Int
         get() = player.ratingType
@@ -341,6 +341,16 @@ class MusicService : HeadlessJsTaskService() {
     fun getBufferedPositionInSeconds(): Double = player.bufferedPosition.toSeconds()
 
     @MainThread
+    fun getPlayerStateBundle(state: AudioPlayerState): Bundle {
+        val bundle = Bundle()
+        bundle.putString(STATE_KEY, state.asLibState.state)
+        if (state == AudioPlayerState.ERROR) {
+            bundle.putBundle(ERROR_KEY, getPlaybackErrorBundle())
+        }
+        return bundle
+    }
+
+    @MainThread
     fun updateMetadataForTrack(index: Int, track: Track) {
         player.replaceItem(index, track.toAudioItem())
     }
@@ -359,12 +369,7 @@ class MusicService : HeadlessJsTaskService() {
     private fun observeEvents() {
         scope.launch {
             event.stateChange.collect {
-                val bundle = Bundle()
-                bundle.putString(STATE_KEY, it.asLibState.state)
-                if (it == AudioPlayerState.ERROR) {
-                    bundle.putBundle("error", getPlaybackErrorBundle())
-                }
-                emit(MusicEvents.PLAYBACK_STATE, bundle)
+                emit(MusicEvents.PLAYBACK_STATE, getPlayerStateBundle(it))
 
                 if (it == AudioPlayerState.ENDED && player.nextItem == null) {
                     val endedBundle = Bundle()
@@ -561,6 +566,7 @@ class MusicService : HeadlessJsTaskService() {
 
     companion object {
         const val STATE_KEY = "state"
+        const val ERROR_KEY  = "error"
         const val EVENT_KEY = "event"
         const val DATA_KEY = "data"
         const val TRACK_KEY = "track"
