@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { Event, EventsPayloadByEvent, Progress, State } from './interfaces';
+import {
+  Event,
+  EventsPayloadByEvent,
+  PlaybackState,
+  Progress,
+  State,
+} from './interfaces';
 import TrackPlayer from './trackPlayer';
 
 export const usePlayWhenReady = () => {
@@ -36,12 +42,16 @@ export const usePlayWhenReady = () => {
   return playWhenReady;
 };
 
-const usePlaybackStateWithoutInitialValue = () => {
-  const [state, setState] = useState<State | undefined>(undefined);
+/**
+ * Get current playback state and subsequent updates. While it is fetching the
+ * initial state from the native module, it will return undefined.
+ * */
+export const usePlaybackState = (): PlaybackState | undefined => {
+  const [state, setState] = useState<PlaybackState | undefined>(undefined);
   useEffect(() => {
     let mounted = true;
 
-    TrackPlayer.getState()
+    TrackPlayer.getPlaybackState()
       .then((initialState) => {
         if (!mounted) return;
         // Only set the state if it wasn't already set by the Event.PlaybackState listener below:
@@ -51,12 +61,9 @@ const usePlaybackStateWithoutInitialValue = () => {
         /** getState only throw while you haven't yet setup, ignore failure. */
       });
 
-    const sub = TrackPlayer.addEventListener(
-      Event.PlaybackState,
-      ({ state }) => {
-        setState(state);
-      }
-    );
+    const sub = TrackPlayer.addEventListener(Event.PlaybackState, (state) => {
+      setState(state);
+    });
 
     return () => {
       mounted = false;
@@ -65,12 +72,6 @@ const usePlaybackStateWithoutInitialValue = () => {
   }, []);
 
   return state;
-};
-
-/** Get current playback state and subsequent updates  */
-export const usePlaybackState = () => {
-  const state = usePlaybackStateWithoutInitialValue();
-  return state ?? State.None;
 };
 
 /**
@@ -126,8 +127,8 @@ export function useProgress(updateInterval = 1000) {
     duration: 0,
     buffered: 0,
   });
-  const playerState = usePlaybackStateWithoutInitialValue();
-  const isNone = playerState === State.None;
+  const playerState = usePlaybackState();
+  const isNone = playerState?.state === State.None;
   useEffect(() => {
     let mounted = true;
     if (isNone) {

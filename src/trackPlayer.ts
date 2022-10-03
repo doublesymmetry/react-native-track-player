@@ -12,6 +12,7 @@ import {
   EventPayloadByEvent,
   MetadataOptions,
   NowPlayingMetadata,
+  PlaybackState,
   PlayerOptions,
   Progress,
   RepeatMode,
@@ -416,12 +417,19 @@ async function getProgress(): Promise<Progress> {
 }
 
 /**
+ * @deprecated use (await getPlaybackState()).state instead.
+ */
+async function getState(): Promise<State> {
+  return TrackPlayer.getState();
+}
+
+/**
  * Gets the playback state of the player.
  *
  * @see https://react-native-track-player.js.org/docs/api/constants/state
  */
-async function getState(): Promise<State> {
-  return TrackPlayer.getState();
+async function getPlaybackState(): Promise<PlaybackState> {
+  return TrackPlayer.getPlaybackState();
 }
 
 /**
@@ -488,5 +496,6 @@ export default {
   getPosition,
   getProgress,
   getState,
+  getPlaybackState,
   getRepeatMode,
 };

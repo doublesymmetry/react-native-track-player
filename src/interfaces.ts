@@ -436,7 +436,7 @@ export enum PitchAlgorithm {
   Voice = TrackPlayer.PITCH_ALGORITHM_VOICE,
 }
 
-export const enum State {
+export enum State {
   /** Indicates that no media is currently loaded */
   None = 'none',
   /** Indicates that the player is ready to start playing */
@@ -533,7 +533,7 @@ export interface PlaybackProgressUpdatedEvent extends Progress {
   track: number;
 }
 
-export type PlaybackStateEvent =
+export type PlaybackState =
   | {
       state:
         | State.None
@@ -655,7 +655,7 @@ export interface RemoteDuckEvent {
   permanent: boolean;
 }
 export interface EventPayloadByEvent {
-  [Event.PlaybackState]: PlaybackStateEvent;
+  [Event.PlaybackState]: PlaybackState;
   [Event.PlaybackError]: PlaybackErrorEvent;
   [Event.PlaybackQueueEnded]: PlaybackQueueEndedEvent;
   [Event.PlaybackTrackChanged]: PlaybackTrackChangedEvent;
@@ -681,7 +681,7 @@ export interface EventPayloadByEvent {
 }
 
 export interface EventsPayloadByEvent {
-  [Event.PlaybackState]: PlaybackStateEvent & { type: Event.PlaybackState };
+  [Event.PlaybackState]: PlaybackState & { type: Event.PlaybackState };
   [Event.PlaybackError]: PlaybackErrorEvent & { type: Event.PlaybackError };
   [Event.PlaybackQueueEnded]: PlaybackQueueEndedEvent & {
     type: Event.PlaybackQueueEnded;
