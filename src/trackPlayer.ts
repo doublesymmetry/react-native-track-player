@@ -420,7 +420,7 @@ async function getProgress(): Promise<Progress> {
  * @deprecated use (await getPlaybackState()).state instead.
  */
 async function getState(): Promise<State> {
-  return TrackPlayer.getState();
+  return (await TrackPlayer.getPlaybackState()).state;
 }
 
 /**
