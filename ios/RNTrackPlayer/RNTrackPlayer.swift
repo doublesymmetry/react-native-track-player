@@ -707,10 +707,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     private func getPlaybackStateErrorKeyValues() -> Dictionary<String, Any> {
         switch player.playbackError {
-            case .networkUnreachable: return [
-                "message": "The network was unreachable",
-                "code": "ios_network_unreachable"
-            ]
             case .failedToLoadKeyValue: return [
                 "message": "Failed to load resource",
                 "code": "ios_failed_to_load_resource"
@@ -737,7 +733,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             ]
         }
     }
-    
+
     private func getPlaybackStateBodyKeyValues() -> Dictionary<String, Any> {
         var body: Dictionary<String, Any> = ["state": State.fromPlayerState(state: player.playerState).rawValue]
         if (player.playerState == AudioPlayerState.failed) {
@@ -745,7 +741,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         }
         return body
     }
-    
+
     // MARK: - QueuedAudioPlayer Event Handlers
 
     func handleAudioPlayerStateChange(state: AVPlayerWrapperState) {
