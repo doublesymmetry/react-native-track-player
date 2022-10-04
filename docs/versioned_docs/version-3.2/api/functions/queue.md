@@ -18,7 +18,7 @@ Removes one or more tracks from the queue.
 
 | Param  | Type     | Description   |
 | ------ | -------- | ------------- |
-| tracks | `array` of track indexes or a single one | The tracks that will be removed |
+| tracks | `number` or an `array` of `number` | The index(es) of track(s) to be removed from the queue |
 
 ## `skip(index, initialPosition)`
 Skips to a track in the queue.
