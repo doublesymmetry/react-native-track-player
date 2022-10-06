@@ -528,8 +528,8 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         if (verifyServiceBoundOrReject(callback)) return@launch
 
         try {
-            var tracks = readableArrayToTrackList(data);
-            musicService.add(tracks)
+            musicService.clear()
+            musicService.add(readableArrayToTrackList(data))
             callback.resolve(null)
         } catch (exception: Exception) {
             rejectWithException(callback, exception)
@@ -537,10 +537,21 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     @ReactMethod
-    fun getCurrentTrack(callback: Promise) = scope.launch {
+    fun getActiveTrackIndex(callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
         callback.resolve(
             if (musicService.tracks.isEmpty()) null else musicService.getCurrentTrackIndex()
+        )
+    }
+
+    @ReactMethod
+    fun getActiveTrack(callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        callback.resolve(
+            if (musicService.tracks.isEmpty()) null
+            else Arguments.fromBundle(
+                musicService.tracks[musicService.getCurrentTrackIndex()].originalItem
+            )
         )
     }
 

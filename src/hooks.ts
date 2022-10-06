@@ -5,7 +5,7 @@ import {
   EventsPayloadByEvent,
   PlaybackState,
   Progress,
-  State,
+  Track,
 } from './interfaces';
 import TrackPlayer from './trackPlayer';
 
@@ -43,11 +43,15 @@ export const usePlayWhenReady = () => {
 };
 
 /**
- * Get current playback state and subsequent updates. While it is fetching the
- * initial state from the native module, it will return undefined.
+ * Get current playback state and subsequent updates.
+ *
+ * Note: While it is fetching the initial state from the native module, the
+ * returned state property will be `undefined`.
  * */
-export const usePlaybackState = (): PlaybackState | undefined => {
-  const [state, setState] = useState<PlaybackState | undefined>(undefined);
+export const usePlaybackState = (): PlaybackState | { state: undefined } => {
+  const [state, setState] = useState<PlaybackState | { state: undefined }>({
+    state: undefined,
+  });
   useEffect(() => {
     let mounted = true;
 
@@ -122,19 +126,19 @@ export const useTrackPlayerEvents = <
  * @param updateInterval - ms interval
  */
 export function useProgress(updateInterval = 1000) {
-  const [state, setState] = useState<Progress>({
+  const INITIAL = {
     position: 0,
     duration: 0,
     buffered: 0,
+  };
+  const [state, setState] = useState<Progress>(INITIAL);
+
+  useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], () => {
+    setState(INITIAL);
   });
-  const playerState = usePlaybackState();
-  const isNone = playerState?.state === State.None;
+
   useEffect(() => {
     let mounted = true;
-    if (isNone) {
-      setState({ position: 0, duration: 0, buffered: 0 });
-      return;
-    }
 
     const update = async () => {
       try {
@@ -167,7 +171,37 @@ export function useProgress(updateInterval = 1000) {
     return () => {
       mounted = false;
     };
-  }, [isNone, updateInterval]);
+  }, [updateInterval]);
 
   return state;
 }
+
+export const useActiveTrack = (): Track | undefined => {
+  const [track, setTrack] = useState<Track | undefined>();
+
+  // Sets the initial index (if still undefined)
+  useEffect(() => {
+    let unmounted = false;
+    TrackPlayer.getActiveTrack()
+      .then((initialTrack) => {
+        if (unmounted) return;
+        setTrack((track) => track ?? initialTrack ?? undefined);
+      })
+      .catch(() => {
+        // throws when you haven't yet setup, which is fine because it also
+        // means there's no active track
+      });
+    return () => {
+      unmounted = true;
+    };
+  }, []);
+
+  useTrackPlayerEvents(
+    [Event.PlaybackActiveTrackChanged],
+    async ({ track }) => {
+      setTrack(track ?? undefined);
+    }
+  );
+
+  return track;
+};

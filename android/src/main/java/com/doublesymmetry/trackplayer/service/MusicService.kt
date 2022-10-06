@@ -91,10 +91,10 @@ class MusicService : HeadlessJsTaskService() {
     @MainThread
     fun setupPlayer(playerOptions: Bundle?) {
         val bufferConfig = BufferConfig(
-                playerOptions?.getDouble(MIN_BUFFER_KEY)?.toMilliseconds()?.toInt(),
-                playerOptions?.getDouble(MAX_BUFFER_KEY)?.toMilliseconds()?.toInt(),
-                playerOptions?.getDouble(PLAY_BUFFER_KEY)?.toMilliseconds()?.toInt(),
-                playerOptions?.getDouble(BACK_BUFFER_KEY)?.toMilliseconds()?.toInt(),
+            playerOptions?.getDouble(MIN_BUFFER_KEY)?.toMilliseconds()?.toInt(),
+            playerOptions?.getDouble(MAX_BUFFER_KEY)?.toMilliseconds()?.toInt(),
+            playerOptions?.getDouble(PLAY_BUFFER_KEY)?.toMilliseconds()?.toInt(),
+            playerOptions?.getDouble(BACK_BUFFER_KEY)?.toMilliseconds()?.toInt(),
         )
 
         val cacheConfig = CacheConfig(playerOptions?.getDouble(MAX_CACHE_SIZE_KEY)?.toLong())
@@ -260,6 +260,11 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     @MainThread
+    fun clear() {
+        player.clear()
+    }
+
+    @MainThread
     fun play() {
         player.play()
     }
@@ -365,6 +370,43 @@ class MusicService : HeadlessJsTaskService() {
         player.notificationManager.hideNotification()
     }
 
+    private fun emitPlaybackTrackChangedEvents(
+        index: Int?,
+        previousIndex: Int?,
+        oldPosition: Double
+    ) {
+        var a = Bundle()
+        a.putDouble(POSITION_KEY, oldPosition)
+        if (index != null) {
+            a.putInt(NEXT_TRACK_KEY, index)
+        }
+
+        if (previousIndex != null) {
+            a.putInt(TRACK_KEY, previousIndex)
+        }
+
+        emit(MusicEvents.PLAYBACK_TRACK_CHANGED, a)
+
+        var b = Bundle()
+        b.putDouble("lastPosition", oldPosition)
+        if (tracks.size > 0) {
+            b.putInt("index", player.currentIndex)
+            b.putBundle("track", tracks[player.currentIndex].originalItem)
+            if (previousIndex != null) {
+                b.putInt("lastIndex", previousIndex)
+                b.putBundle("lastTrack", tracks[previousIndex].originalItem)
+            }
+        }
+        emit(MusicEvents.PLAYBACK_ACTIVE_TRACK_CHANGED, b)
+    }
+
+    private fun emitQueueEndedEvent() {
+        val bundle = Bundle()
+        bundle.putInt(TRACK_KEY, player.currentIndex)
+        bundle.putDouble(POSITION_KEY, player.position.toSeconds())
+        emit(MusicEvents.PLAYBACK_QUEUE_ENDED, bundle)
+    }
+
     @MainThread
     private fun observeEvents() {
         scope.launch {
@@ -372,35 +414,22 @@ class MusicService : HeadlessJsTaskService() {
                 emit(MusicEvents.PLAYBACK_STATE, getPlayerStateBundle(it))
 
                 if (it == AudioPlayerState.ENDED && player.nextItem == null) {
-                    val endedBundle = Bundle()
-                    endedBundle.putInt(TRACK_KEY, player.currentIndex)
-                    endedBundle.putDouble(POSITION_KEY, player.position.toSeconds())
-                    emit(MusicEvents.PLAYBACK_QUEUE_ENDED, endedBundle)
-                    emit(MusicEvents.PLAYBACK_TRACK_CHANGED, endedBundle)
+                    emitQueueEndedEvent()
+                    emitPlaybackTrackChangedEvents(null, player.currentIndex, player.position.toSeconds())
                 }
             }
         }
 
         scope.launch {
             event.audioItemTransition.collect {
-                Bundle().apply {
-                    putDouble(POSITION_KEY, (it?.oldPosition ?: 0).toSeconds())
-                    putInt(NEXT_TRACK_KEY, player.currentIndex)
-
-                    // correctly set the previous index on the event payload
-                    var previousIndex: Int? = null
-                    if (it is AudioItemTransitionReason.REPEAT) {
-                        previousIndex = player.currentIndex
-                    } else if (player.previousItem != null) {
-                        previousIndex = player.previousIndex
-                    }
-
-                    if (previousIndex != null) {
-                        putInt(TRACK_KEY, previousIndex)
-                    }
-
-                    emit(MusicEvents.PLAYBACK_TRACK_CHANGED, this)
+                var lastIndex: Int? = null
+                if (it is AudioItemTransitionReason.REPEAT) {
+                    lastIndex = player.currentIndex
+                } else if (player.previousItem != null) {
+                    lastIndex = player.previousIndex
                 }
+                var lastPosition = (it?.oldPosition ?: 0).toSeconds();
+                emitPlaybackTrackChangedEvents(player.currentIndex, lastIndex, lastPosition)
             }
         }
 

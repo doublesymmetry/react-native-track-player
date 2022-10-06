@@ -97,7 +97,14 @@ RCT_EXTERN_METHOD(getTrack:(nonnull NSNumber *)trackIndex
 RCT_EXTERN_METHOD(getQueue:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(getCurrentTrack:(RCTPromiseResolveBlock)resolve
+RCT_EXTERN_METHOD(setQueue:(NSArray *)objects
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject);
+
+RCT_EXTERN_METHOD(getActiveTrack:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject);
+
+RCT_EXTERN_METHOD(getActiveTrackIndex:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(getDuration:(RCTPromiseResolveBlock)resolve

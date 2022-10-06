@@ -332,6 +332,16 @@ async function setRate(rate: number): Promise<void> {
 }
 
 /**
+ * Sets the queue.
+ *
+ * @param tracks The tracks to set as the queue.
+ * @see https://react-native-track-player.js.org/docs/api/constants/repeat-mode
+ */
+async function setQueue(tracks: Track[]): Promise<void> {
+  return TrackPlayer.setQueue(tracks);
+}
+
+/**
  * Sets the queue repeat mode.
  *
  * @param repeatMode The repeat mode to set.
@@ -362,9 +372,10 @@ async function getRate(): Promise<number> {
  * Gets a track object from the queue.
  *
  * @param index The index of the track.
- * @returns The track object or null if there isn't a track object at that index.
+ * @returns The track object or undefined if there isn't a track object at that
+ * index.
  */
-async function getTrack(index: number): Promise<Track | null> {
+async function getTrack(index: number): Promise<Track | undefined> {
   return TrackPlayer.getTrack(index);
 }
 
@@ -376,10 +387,27 @@ async function getQueue(): Promise<Track[]> {
 }
 
 /**
+ * Gets the index of the active track in the queue or undefined if there is no
+ * current track.
+ */
+async function getActiveTrackIndex(): Promise<number | undefined> {
+  return (await TrackPlayer.getActiveTrackIndex()) ?? undefined;
+}
+
+/**
+ * Gets the active track or undefined if there is no current track.
+ */
+async function getActiveTrack(): Promise<Track | undefined> {
+  return (await TrackPlayer.getActiveTrack()) ?? undefined;
+}
+
+/**
  * Gets the index of the current track or null if there is no current track.
+ *
+ * @deprecated use `TrackPlayer.getActiveTrackIndex()` instead.
  */
 async function getCurrentTrack(): Promise<number | null> {
-  return TrackPlayer.getCurrentTrack();
+  return TrackPlayer.getActiveTrackIndex();
 }
 
 /**
@@ -468,6 +496,7 @@ export default {
   skip,
   skipToNext,
   skipToPrevious,
+  setQueue,
 
   // MARK: - Control Center / Notifications API
   updateOptions,
@@ -491,6 +520,8 @@ export default {
   getTrack,
   getQueue,
   getCurrentTrack,
+  getActiveTrackIndex,
+  getActiveTrack,
   getDuration,
   getBufferedPosition,
   getPosition,

@@ -305,8 +305,15 @@ export enum Event {
   /**
    * Fired when another track has become active or when there no longer is an
    * active track.
+   *
+   * @deprecated use `playback-active-track-changed` instead.
    **/
   PlaybackTrackChanged = 'playback-track-changed',
+  /**
+   * Fired when another track has become active or when there no longer is an
+   * active track.
+   **/
+  PlaybackActiveTrackChanged = 'playback-active-track-changed',
   /**
    * Fired when the current track receives metadata encoded in. (e.g. ID3 tags,
    * Icy Metadata, Vorbis Comments or QuickTime metadata).
@@ -566,6 +573,9 @@ export interface PlaybackQueueEndedEvent {
   position: number;
 }
 
+/**
+ * @deprecated
+ */
 export interface PlaybackTrackChangedEvent {
   /** The index of previously active track. */
   track: number | null;
@@ -573,6 +583,34 @@ export interface PlaybackTrackChangedEvent {
   position: number;
   /** The next (active) track index. */
   nextTrack: number;
+}
+
+export interface PlaybackActiveTrackChangedEvent {
+  /** The index of previously active track. */
+  lastIndex?: number;
+
+  /**
+   * The previously active track or `undefined` when there wasn't a previously
+   * active track.
+   */
+  lastTrack?: Track;
+
+  /**
+   * The position of the previously active track in seconds.
+   */
+  lastPosition: number;
+
+  /**
+   * The newly active track index or `undefined` if there is no longer an
+   * active track.
+   */
+  index?: number;
+
+  /**
+   * The newly active track or `undefined` if there is no longer an
+   * active track.
+   */
+  track?: Track;
 }
 
 export interface PlaybackPlayWhenReadyChangedEvent {
@@ -659,6 +697,7 @@ export interface EventPayloadByEvent {
   [Event.PlaybackError]: PlaybackErrorEvent;
   [Event.PlaybackQueueEnded]: PlaybackQueueEndedEvent;
   [Event.PlaybackTrackChanged]: PlaybackTrackChangedEvent;
+  [Event.PlaybackActiveTrackChanged]: PlaybackActiveTrackChangedEvent;
   [Event.PlaybackMetadataReceived]: PlaybackMetadataReceivedEvent;
   [Event.PlaybackPlayWhenReadyChanged]: PlaybackPlayWhenReadyChangedEvent;
   [Event.PlaybackProgressUpdated]: PlaybackProgressUpdatedEvent;
@@ -688,6 +727,9 @@ export interface EventsPayloadByEvent {
   };
   [Event.PlaybackTrackChanged]: PlaybackTrackChangedEvent & {
     type: Event.PlaybackTrackChanged;
+  };
+  [Event.PlaybackActiveTrackChanged]: PlaybackActiveTrackChangedEvent & {
+    type: Event.PlaybackActiveTrackChanged;
   };
   [Event.PlaybackMetadataReceived]: PlaybackMetadataReceivedEvent & {
     type: Event.PlaybackMetadataReceived;

@@ -18,7 +18,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     private var hasInitialized = false
     private let player = QueuedAudioPlayer()
     private let audioSessionController = AudioSessionController.shared
-    private var previousIndex: Int?
     private var shouldEmitProgressEvent: Bool = false
 
     // MARK: - Lifecycle Methods
@@ -97,6 +96,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             "playback-state",
             "playback-error",
             "playback-track-changed",
+            "playback-active-track-changed",
             "playback-metadata-received",
             "playback-progress-updated",
             "playback-play-when-ready-changed",
@@ -623,8 +623,46 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         resolve(serializedQueue)
     }
 
-    @objc(getCurrentTrack:rejecter:)
-    public func getCurrentTrack(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+    @objc(setQueue:resolver:rejecter:)
+    public func setQueue(
+        trackDicts: [[String: Any]],
+        resolve: RCTPromiseResolveBlock,
+        reject: RCTPromiseRejectBlock
+    ) {
+        if (rejectWhenNotInitialized(reject: reject)) { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            UIApplication.shared.beginReceivingRemoteControlEvents();
+        }
+
+        var tracks = [Track]()
+        for trackDict in trackDicts {
+            guard let track = Track(dictionary: trackDict) else {
+                reject("invalid_track_object", "Track is missing a required key", nil)
+                return
+            }
+
+            tracks.append(track)
+        }
+        player.clear()
+        try? player.add(items: tracks)
+        resolve(index)
+    }
+
+    @objc(getActiveTrack:rejecter:)
+    public func getActiveTrack(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        if (rejectWhenNotInitialized(reject: reject)) { return }
+
+        let index = player.currentIndex
+        if (index >= 0 && index < player.items.count) {
+            let track = player.items[index]
+            resolve((track as? Track)?.toObject())
+        } else {
+            resolve(NSNull())
+        }
+    }
+
+    @objc(getActiveTrackIndex:rejecter:)
+    public func getActiveTrackIndex(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
 
         let index = player.currentIndex
@@ -840,20 +878,48 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         }
     }
 
-    func handleAudioPlayerCurrentItemChange(item: AudioItem?, index: Int?) {
-        var dictionary: [String: Any] = [ "position": player.currentTime ]
-
-        dictionary["track"] = previousIndex
-        dictionary["nextTrack"] = index
-
+    func handleAudioPlayerCurrentItemChange(
+        item: AudioItem?,
+        index: Int?,
+        lastItem: AudioItem?,
+        lastIndex: Int?,
+        lastPosition: Double?
+    ) {
         // Update now playing controller with isLiveStream option from track
         if player.automaticallyUpdateNowPlayingInfo {
-            let isTrackLiveStream = (player.currentItem as? Track)?.isLiveStream ?? false
+            let isTrackLiveStream = (item as? Track)?.isLiveStream ?? false
             player.nowPlayingInfoController.set(keyValue: NowPlayingInfoProperty.isLiveStream(isTrackLiveStream))
         }
 
-        sendEvent(withName: "playback-track-changed", body: dictionary)
-        previousIndex = index
+        var a: Dictionary<String, Any> = ["lastPosition": lastPosition ?? 0]
+        if let lastIndex = lastIndex {
+            a["lastIndex"] = lastIndex
+        }
+
+        if let lastTrack = (lastItem as? Track)?.toObject() {
+            a["lastTrack"] = lastTrack
+        }
+
+        if let index = index {
+            a["index"] = index
+        }
+
+        if let track = (item as? Track)?.toObject() {
+            a["track"] = track
+        }
+
+        self.sendEvent(withName: "playback-active-track-changed", body: a)
+
+
+        // deprecated:
+        var b: Dictionary<String, Any> = ["position": lastPosition ?? 0]
+        if let lastIndex = lastIndex {
+            b["lastIndex"] = lastIndex
+        }
+        if let index = index {
+            b["nextTrack"] = index
+        }
+        self.sendEvent(withName: "playback-track-changed", body: b)
     }
 
     func handleAudioPlayerSecondElapse(seconds: Double) {
