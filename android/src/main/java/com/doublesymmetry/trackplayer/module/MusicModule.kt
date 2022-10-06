@@ -446,6 +446,14 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     @ReactMethod
+    fun seekBy(offset: Float, callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+
+        musicService.seekBy(offset)
+        callback.resolve(null)
+    }
+
+    @ReactMethod
     fun setVolume(volume: Float, callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
 

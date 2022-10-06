@@ -471,7 +471,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
         // if an initialTime is passed the seek to it
         if (initialTime >= 0) {
-            self.seek(to: initialTime, resolve: resolve, reject: reject)
+            self.seekTo(time: initialTime, resolve: resolve, reject: reject)
         } else {
             resolve(NSNull())
         }
@@ -485,17 +485,13 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     ) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
 
-        do {
-            try player.next()
+        player.next()
 
-            // if an initialTime is passed the seek to it
-            if (initialTime >= 0) {
-                self.seek(to: initialTime, resolve: resolve, reject: reject)
-            } else {
-                resolve(NSNull())
-            }
-        } catch (_) {
-            reject("queue_exhausted", "There is no tracks left to play", nil)
+        // if an initialTime is passed the seek to it
+        if (initialTime >= 0) {
+            self.seekTo(time: initialTime, resolve: resolve, reject: reject)
+        } else {
+            resolve(NSNull())
         }
     }
 
@@ -507,17 +503,13 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     ) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
 
-        do {
-            try player.previous()
+        player.previous()
 
-            // if an initialTime is passed the seek to it
-            if (initialTime >= 0) {
-                self.seek(to: initialTime, resolve: resolve, reject: reject)
-            } else {
-                resolve(NSNull())
-            }
-        } catch (_) {
-            reject("no_previous_track", "There is no previous track", nil)
+        // if an initialTime is passed the seek to it
+        if (initialTime >= 0) {
+            self.seekTo(time: initialTime, resolve: resolve, reject: reject)
+        } else {
+            resolve(NSNull())
         }
     }
 
@@ -551,10 +543,18 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     }
 
     @objc(seekTo:resolver:rejecter:)
-    public func seek(to time: Double, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+    public func seekTo(time: Double, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
 
         player.seek(to: time)
+        resolve(NSNull())
+    }
+
+    @objc(seekBy:resolver:rejecter:)
+    public func seekBy(offset: Double, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        if (rejectWhenNotInitialized(reject: reject)) { return }
+
+        player.seek(by: offset)
         resolve(NSNull())
     }
 

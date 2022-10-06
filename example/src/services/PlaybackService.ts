@@ -25,16 +25,12 @@ export async function PlaybackService() {
 
   TrackPlayer.addEventListener(Event.RemoteJumpForward, async (event) => {
     console.log('Event.RemoteJumpForward', event);
-    const position =
-      (await TrackPlayer.getProgress()).position + event.interval;
-    TrackPlayer.seekTo(position);
+    TrackPlayer.seekBy(event.interval);
   });
 
   TrackPlayer.addEventListener(Event.RemoteJumpBackward, async (event) => {
     console.log('Event.RemoteJumpBackward', event);
-    const position =
-      (await TrackPlayer.getProgress()).position - event.interval;
-    TrackPlayer.seekTo(position);
+    TrackPlayer.seekBy(-event.interval);
   });
 
   TrackPlayer.addEventListener(Event.RemoteSeek, (event) => {
@@ -51,8 +47,8 @@ export async function PlaybackService() {
         return;
       }
       if (paused) {
-        const playerState = await TrackPlayer.getState();
-        wasPausedByDuck = playerState !== State.Paused;
+        const playback = await TrackPlayer.getPlaybackState();
+        wasPausedByDuck = playback.state !== State.Paused;
         TrackPlayer.pause();
       } else {
         if (wasPausedByDuck) {

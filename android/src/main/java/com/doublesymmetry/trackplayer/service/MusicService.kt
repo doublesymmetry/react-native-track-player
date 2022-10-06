@@ -310,6 +310,11 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     @MainThread
+    fun seekBy(offset: Float) {
+        player.seekBy((offset.toLong()), TimeUnit.SECONDS)
+    }
+
+    @MainThread
     fun getCurrentTrackIndex(): Int = player.currentIndex
 
     @MainThread

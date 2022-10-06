@@ -313,6 +313,15 @@ async function seekTo(position: number): Promise<void> {
 }
 
 /**
+ * Seeks by a relative time offset in the current track.
+ *
+ * @param offset The time offset to seek by in seconds.
+ */
+async function seekBy(offset: number): Promise<void> {
+  return TrackPlayer.seekBy(offset);
+}
+
+/**
  * Sets the volume of the player.
  *
  * @param volume The volume as a number between 0 and 1.
@@ -510,6 +519,7 @@ export default {
   getPlayWhenReady,
   setPlayWhenReady,
   seekTo,
+  seekBy,
   setVolume,
   setRate,
   setRepeatMode,
