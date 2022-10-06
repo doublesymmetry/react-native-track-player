@@ -1,23 +1,21 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import TrackPlayer, {
-  PlaybackState,
   State,
   usePlayWhenReady,
 } from 'react-native-track-player';
 import { useDebouncedValue } from '../hooks';
 import { Button } from './Button';
 
-export const PlayPauseButton: React.FC<{ playbackState: PlaybackState }> = ({
-  playbackState,
-}) => {
+export const PlayPauseButton: React.FC<{
+  state: State | undefined;
+}> = ({ state }) => {
   const playWhenReady = usePlayWhenReady();
   const isLoading = useDebouncedValue(
-    playbackState.state === State.Loading ||
-      playbackState.state === State.Buffering,
+    state === State.Loading || state === State.Buffering,
     250
   );
-  const showPause = playWhenReady && playbackState.state !== State.Error;
+  const showPause = playWhenReady && state !== State.Error;
   const showBuffering = playWhenReady && isLoading;
   return showBuffering ? (
     <View style={styles.statusContainer}>

@@ -1,4 +1,4 @@
-import TrackPlayer, { RepeatMode } from 'react-native-track-player';
+import TrackPlayer from 'react-native-track-player';
 
 // @ts-expect-error – sure we can import this
 import playlistData from '../assets/data/playlist.json';
@@ -18,5 +18,4 @@ export const QueueInitialTracksService = async (): Promise<void> => {
       duration: 28,
     },
   ]);
-  await TrackPlayer.setRepeatMode(RepeatMode.Queue);
 };

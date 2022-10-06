@@ -6,14 +6,13 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import TrackPlayer from 'react-native-track-player';
+import TrackPlayer, { useActiveTrack } from 'react-native-track-player';
 
 import { Button, PlayerControls, Progress, TrackInfo } from './components';
-import { useCurrentTrack } from './hooks';
 import { QueueInitialTracksService, SetupService } from './services';
 
 const App: React.FC = () => {
-  const track = useCurrentTrack();
+  const track = useActiveTrack();
   const [isPlayerReady, setIsPlayerReady] = useState<boolean>(false);
 
   useEffect(() => {

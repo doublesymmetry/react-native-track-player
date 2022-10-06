@@ -1,20 +1,12 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { PlaybackState, State } from 'react-native-track-player';
 
-export const PlaybackError: React.FC<{ playbackState: PlaybackState }> = ({
-  playbackState,
-}) => {
+export const PlaybackError: React.FC<{
+  error?: string;
+}> = ({ error }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>
-        {
-          (playbackState.state === State.Error
-            ? playbackState.error
-            : undefined
-          )?.message
-        }
-      </Text>
+      <Text style={styles.text}>{error}</Text>
     </View>
   );
 };

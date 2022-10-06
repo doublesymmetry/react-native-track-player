@@ -67,12 +67,8 @@ export async function PlaybackService() {
     console.log('Event.PlaybackQueueEnded', event);
   });
 
-  TrackPlayer.addEventListener(Event.PlaybackTrackChanged, (event) => {
-    console.log('Event.PlaybackTrackChanged', event);
-  });
-
-  TrackPlayer.addEventListener(Event.PlaybackProgressUpdated, (event) => {
-    console.log('Event.PlaybackProgressUpdated', event);
+  TrackPlayer.addEventListener(Event.PlaybackActiveTrackChanged, (event) => {
+    console.log('Event.PlaybackActiveTrackChanged', event);
   });
 
   TrackPlayer.addEventListener(Event.PlaybackPlayWhenReadyChanged, (event) => {

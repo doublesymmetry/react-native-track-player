@@ -6,24 +6,21 @@ import { Button } from './Button';
 import { PlaybackError } from './PlaybackError';
 import { PlayPauseButton } from './PlayPauseButton';
 
+const performSkipToNext = () => TrackPlayer.skipToNext();
+const performSkipToPrevious = () => TrackPlayer.skipToPrevious();
+
 export const PlayerControls: React.FC = () => {
-  const playbackState = usePlaybackState();
+  const playback = usePlaybackState();
   return (
     <View style={styles.container}>
       <View style={styles.row}>
-        <Button
-          title="Prev"
-          onPress={() => TrackPlayer.skipToPrevious()}
-          type="secondary"
-        />
-        <PlayPauseButton playbackState={playbackState} />
-        <Button
-          title="Next"
-          onPress={() => TrackPlayer.skipToNext()}
-          type="secondary"
-        />
+        <Button title="Prev" onPress={performSkipToPrevious} type="secondary" />
+        <PlayPauseButton state={playback.state} />
+        <Button title="Next" onPress={performSkipToNext} type="secondary" />
       </View>
-      <PlaybackError playbackState={playbackState} />
+      <PlaybackError
+        error={'error' in playback ? playback.error.message : undefined}
+      />
     </View>
   );
 };
