@@ -363,10 +363,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             reject: reject
         )) { return }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            UIApplication.shared.beginReceivingRemoteControlEvents();
-        }
-
         var tracks = [Track]()
         for trackDict in trackDicts {
             guard let track = Track(dictionary: trackDict) else {
@@ -391,9 +387,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         reject: RCTPromiseRejectBlock
     ) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            UIApplication.shared.beginReceivingRemoteControlEvents();
-        }
 
         guard let track = Track(dictionary: trackDict) else {
             reject("invalid_track_object", "Track is missing a required key", nil)
@@ -518,11 +511,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         if (rejectWhenNotInitialized(reject: reject)) { return }
 
         player.stop()
-        player.nowPlayingInfoController.clear()
         resolve(NSNull())
-        DispatchQueue.main.async {
-            UIApplication.shared.endReceivingRemoteControlEvents();
-        }
     }
 
     @objc(play:rejecter:)
@@ -637,9 +626,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         reject: RCTPromiseRejectBlock
     ) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            UIApplication.shared.beginReceivingRemoteControlEvents();
-        }
 
         var tracks = [Track]()
         for trackDict in trackDicts {
@@ -892,12 +878,22 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         lastIndex: Int?,
         lastPosition: Double?
     ) {
-        // Update now playing controller with isLiveStream option from track
-        if player.automaticallyUpdateNowPlayingInfo {
-            let isTrackLiveStream = (item as? Track)?.isLiveStream ?? false
-            player.nowPlayingInfoController.set(keyValue: NowPlayingInfoProperty.isLiveStream(isTrackLiveStream))
-        }
 
+        if let item = item {
+            DispatchQueue.main.async {
+                UIApplication.shared.beginReceivingRemoteControlEvents();
+            }
+            // Update now playing controller with isLiveStream option from track
+            if self.player.automaticallyUpdateNowPlayingInfo {
+                let isTrackLiveStream = (item as? Track)?.isLiveStream ?? false
+                self.player.nowPlayingInfoController.set(keyValue: NowPlayingInfoProperty.isLiveStream(isTrackLiveStream))
+            }
+        } else {
+            DispatchQueue.main.async {
+                UIApplication.shared.endReceivingRemoteControlEvents();
+            }
+        }
+        
         var a: Dictionary<String, Any> = ["lastPosition": lastPosition ?? 0]
         if let lastIndex = lastIndex {
             a["lastIndex"] = lastIndex
