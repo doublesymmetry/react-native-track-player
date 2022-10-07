@@ -446,7 +446,7 @@ export enum PitchAlgorithm {
 export enum State {
   /** Indicates that no media is currently loaded */
   None = 'none',
-  /** Indicates that the player is ready to start playing */
+  /** Indicates that the player is paused, but ready to start playing */
   Ready = 'ready',
   /** Indicates that the player is currently playing */
   Playing = 'playing',
@@ -468,9 +468,8 @@ export enum State {
   /**
    * Indicates that playback of the current item failed. Call `TrackPlayer.getError()`
    * to get more information on the type of error that occurred.
-   * Call `TrackPlayer.reload({ startAtCurrentTime: boolean })` to try to play
-   * the item again. Calling `TrackPlayer.play()` will also cause the current
-   * item to be reloaded.
+   * Call `TrackPlayer.retry()` or `TrackPlayer.play()` to try to play the item
+   * again.
    */
   Error = 'error',
 }

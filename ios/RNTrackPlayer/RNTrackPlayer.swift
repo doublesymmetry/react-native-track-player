@@ -558,6 +558,13 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         resolve(NSNull())
     }
 
+    @objc(retry:rejecter:)
+    public func retry(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        if (rejectWhenNotInitialized(reject: reject)) { return }
+        player.reload(startFromCurrentTime: true)
+        resolve(NSNull())
+    }
+
     @objc(setRepeatMode:resolver:rejecter:)
     public func setRepeatMode(repeatMode: NSNumber, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }

@@ -315,6 +315,11 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     @MainThread
+    fun retry() {
+        player.prepare()
+    }
+
+    @MainThread
     fun getCurrentTrackIndex(): Int = player.currentIndex
 
     @MainThread

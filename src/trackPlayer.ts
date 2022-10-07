@@ -479,12 +479,10 @@ async function getRepeatMode(): Promise<RepeatMode> {
 }
 
 /**
- * Reloads the current item.
+ * Retries the current item when the playback state is `State.Error`.
  */
-async function reload({
-  startFromCurrentTime = true,
-}: { startFromCurrentTime?: boolean } = {}) {
-  return TrackPlayer.reload({ startFromCurrentTime });
+async function retry() {
+  return TrackPlayer.retry();
 }
 
 export default {
@@ -497,7 +495,7 @@ export default {
   // MARK: - Queue API
   add,
   load,
-  reload,
+  retry,
   reset,
   move,
   remove,
