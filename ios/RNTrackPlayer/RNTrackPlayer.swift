@@ -19,6 +19,10 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     private let player = QueuedAudioPlayer()
     private let audioSessionController = AudioSessionController.shared
     private var shouldEmitProgressEvent: Bool = false
+    private var sessionCategory: AVAudioSession.Category = .playback
+    private var sessionCategoryMode: AVAudioSession.Mode = .default
+    private var sessionCategoryPolicy: AVAudioSession.RouteSharingPolicy = .default
+    private var sessionCategoryOptions: AVAudioSession.CategoryOptions = []
 
     // MARK: - Lifecycle Methods
 
@@ -160,10 +164,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         player.automaticallyUpdateNowPlayingInfo = config["autoUpdateMetadata"] as? Bool ?? true
 
         // configure audio session - category, options & mode
-        var sessionCategory: AVAudioSession.Category = .playback
-        var sessionCategoryMode: AVAudioSession.Mode = .default
-        var sessionCategoryPolicy: AVAudioSession.RouteSharingPolicy = .default
-        var sessionCategoryOptions: AVAudioSession.CategoryOptions = []
 
         if
             let sessionCategoryStr = config["iosCategory"] as? String,
@@ -187,13 +187,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         let mappedCategoryOpts = sessionCategoryOptsStr?.compactMap { SessionCategoryOptions(rawValue: $0)?.mapConfigToAVAudioSessionCategoryOptions() } ?? []
         sessionCategoryOptions = AVAudioSession.CategoryOptions(mappedCategoryOpts)
 
-        if #available(iOS 13.0, *) {
-            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: sessionCategoryPolicy, options: sessionCategoryOptions)
-        } else if #available(iOS 11.0, *) {
-            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: sessionCategoryPolicy, options: sessionCategoryOptions)
-        } else {
-            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, options: sessionCategoryOptions)
-        }
+        configureAudioSession()
 
         // setup event listeners
         player.remoteCommandController.handleChangePlaybackPositionCommand = { [weak self] event in
@@ -481,7 +475,8 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
             return
         }
-
+        
+        configureAudioSession()
         try? AVAudioSession.sharedInstance().setActive(true)
         player.play()
         resolve(NSNull())
@@ -833,5 +828,15 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
                 "track": player.currentIndex,
             ]
         )
+    }
+    
+    func configureAudioSession(){
+        if #available(iOS 13.0, *) {
+            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: sessionCategoryPolicy, options: sessionCategoryOptions)
+        } else if #available(iOS 11.0, *) {
+            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: sessionCategoryPolicy, options: sessionCategoryOptions)
+        } else {
+            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, options: sessionCategoryOptions)
+        }
     }
 }
