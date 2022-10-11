@@ -8,7 +8,7 @@ added track index. If no tracks were added it returns `void`.
 
 | Param          | Type     | Description   |
 | -------------- | -------- | ------------- |
-| tracks         | `array` of [Track Object](../objects/track.md) or a single one | The tracks that will be added |
+| tracks         | `Track \| Track[]` | The [Track](../objects/track.md) objects that will be added |
 | insertBeforeIndex | `number` | The index of the track that will be located immediately after the inserted tracks. Set it to `null` to add it at the end of the queue |
 
 ## `remove(tracks)`
@@ -16,9 +16,9 @@ Removes one or more tracks from the queue.
 
 **Returns:** `Promise<void>`
 
-| Param  | Type     | Description   |
-| ------ | -------- | ------------- |
-| tracks | `array` of track indexes or a single one | The tracks that will be removed |
+| Param  | Type              | Description |
+|--------|-------------------|-------------|
+| tracks | `Track \| Track[]` | The [Track](../objects/track.md) objects that will be removed |
 
 ## `skip(index, initialPosition)`
 Skips to a track in the queue.
@@ -62,9 +62,9 @@ Gets a track object from the queue.
 | index    | `number`   | The track index |
 
 ## `getCurrentTrack()`
-Gets the index of the current track
+Gets the index of the current track, or null if no track loaded
 
-**Returns:** `Promise<number>`
+**Returns:** `Promise<number | null>`
 
 ## `getQueue()`
 Gets the whole queue
