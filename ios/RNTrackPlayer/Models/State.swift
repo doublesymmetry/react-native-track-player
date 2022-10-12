@@ -9,7 +9,7 @@ import Foundation
 import SwiftAudioEx
 
 enum State: String {
-    case none, ready, playing, paused, stopped, buffering, loading, error
+    case none, ready, playing, paused, stopped, buffering, loading, error, ended
 
     static func fromPlayerState(state: AVPlayerWrapperState) -> State {
         switch state {
@@ -20,6 +20,8 @@ enum State: String {
         case .playing: return .playing
         case .ready: return .ready
         case .failed: return .error
+        case .stopped: return .stopped
+        case .ended: return .ended
         }
     }
 }

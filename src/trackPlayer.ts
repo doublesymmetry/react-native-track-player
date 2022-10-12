@@ -288,6 +288,13 @@ async function pause(): Promise<void> {
 }
 
 /**
+ * Stops the current track.
+ */
+async function stop(): Promise<void> {
+  return TrackPlayer.stop();
+}
+
+/**
  * Sets wether the player will play automatically when it is ready to do so.
  * This is the equivalent of calling `TrackPlayer.play()` when `playWhenReady = true`
  * or `TrackPlayer.pause()` when `playWhenReady = false`.
@@ -514,6 +521,7 @@ export default {
   // MARK: - Player API
   play,
   pause,
+  stop,
   getPlayWhenReady,
   setPlayWhenReady,
   seekTo,

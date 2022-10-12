@@ -472,6 +472,10 @@ export enum State {
    * again.
    */
   Error = 'error',
+  /**
+   * Indicates that playback stopped due to the end of the queue being reached.
+   */
+  Ended = 'ended'
 }
 
 export interface TrackMetadataBase {

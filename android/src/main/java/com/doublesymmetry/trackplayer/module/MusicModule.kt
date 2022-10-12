@@ -417,7 +417,8 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     fun reset(callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
 
-        musicService.stopPlayer()
+        musicService.clear()
+        musicService.stop()
         callback.resolve(null)
     }
 
@@ -434,6 +435,14 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         if (verifyServiceBoundOrReject(callback)) return@launch
 
         musicService.pause()
+        callback.resolve(null)
+    }
+
+    @ReactMethod
+    fun stop(callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+
+        musicService.stop()
         callback.resolve(null)
     }
 
