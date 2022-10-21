@@ -865,13 +865,9 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     }
 
     func handleAudioPlayerPlaybackEnded(reason: PlaybackEndedReason) {
-        let isRepeatModeOff = player.repeatMode == .off
-        let isPlayedUntilEnd = reason == PlaybackEndedReason.playedUntilEnd
-        let hasNextItems = player.nextItems.count == 0
-        let isQueueEndReached = hasNextItems && isPlayedUntilEnd
-
         // fire an event for the queue ending
-        if isRepeatModeOff && isQueueEndReached {
+        let queueEndReached = player.nextItems.count == 0 && reason == PlaybackEndedReason.playedUntilEnd
+        if queueEndReached && player.repeatMode != .queue {
             sendEvent(withName: "playback-queue-ended", body: [
                 "track": player.currentIndex,
                 "position": player.currentTime,
