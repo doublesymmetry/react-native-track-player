@@ -55,4 +55,12 @@ export async function PlaybackService() {
   TrackPlayer.addEventListener(Event.PlaybackState, (event) => {
     console.log('Event.PlaybackState', event);
   });
+
+  TrackPlayer.addEventListener(Event.SleepTimerChanged, (event) => {
+    console.log('Event.SleepTimerChanged', JSON.stringify(event, null, 2));
+  });
+
+  TrackPlayer.addEventListener(Event.SleepTimerComplete, () => {
+    console.log('Event.SleepTimerComplete');
+  });
 }

@@ -16,6 +16,7 @@ import type {
   PlayerOptions,
   Progress,
   ServiceHandler,
+  SleepTimer,
   Track,
   TrackMetadataBase,
   UpdateOptions,
@@ -501,6 +502,45 @@ export async function getPlaybackState(): Promise<PlaybackState> {
  */
 export async function getRepeatMode(): Promise<RepeatMode> {
   return TrackPlayer.getRepeatMode();
+}
+
+/**
+ * Sets a sleep timer to fire after a specified amount of seconds.
+ *
+ * Note that if a sleep timer was set previously, it will be replaced by the
+ * new one.
+ */
+export async function setSleepTimer(seconds: number): Promise<SleepTimer> {
+  if (seconds <= 0) {
+    throw new Error('The sleep timer must be greater than 0.');
+  }
+  return TrackPlayer.setSleepTimer(seconds);
+}
+
+/**
+ * Pauses playback when the active track ends. Note that this will override any
+ * sleep timer that was set previously. To clear call `TrackPlayer.clearSleepTimer()`.
+ */
+export async function sleepWhenActiveTrackReachesEnd(): Promise<void> {
+  return TrackPlayer.sleepWhenActiveTrackReachesEnd();
+}
+
+/**
+ * Gets information on the current sleep timer. Returns `null` if there is no
+ * sleep timer set.
+ */
+export async function getSleepTimer(): Promise<SleepTimer> {
+  return (await TrackPlayer.getSleepTimer()) ?? undefined;
+}
+
+/**
+ * Clears the sleep timer if it was set previously.
+ *
+ * Note that it is not necessary to clear the sleep timer before setting a new
+ * one.
+ */
+export async function clearSleepTimer(): Promise<void> {
+  return TrackPlayer.clearSleepTimer();
 }
 
 /**

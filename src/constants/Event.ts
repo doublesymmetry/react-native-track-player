@@ -113,4 +113,12 @@ export enum Event {
    * See https://react-native-track-player.js.org/docs/api/events#remoteskip
    **/
   RemoteSkip = 'remote-skip',
+  /**
+   * Fired when sleep timer has changed.
+   **/
+  SleepTimerChanged = 'sleep-timer-changed',
+  /**
+   * Fired when sleep timer has completed.
+   **/
+   SleepTimerComplete = 'sleep-timer-complete'
 }

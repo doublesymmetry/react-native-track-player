@@ -15,6 +15,7 @@ import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.models.NotificationButton.*
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.doublesymmetry.trackplayer.R
+import com.doublesymmetry.trackplayer.addons.SleepTimer
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toMilliseconds
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toSeconds
 import com.doublesymmetry.trackplayer.extensions.asLibState
@@ -38,8 +39,14 @@ class MusicService : HeadlessJsTaskService() {
     private lateinit var player: QueuedAudioPlayer
     private val binder = MusicBinder()
     private val scope = MainScope()
+    private val sleepTimer = object : SleepTimer() {
+        override fun onComplete() {
+            player.pause()
+            emit(MusicEvents.SLEEP_TIMER_COMPLETE)
+            emit(MusicEvents.SLEEP_TIMER_CHANGED)
+        }
+    }
     private var progressUpdateJob: Job? = null
-
     /**
      * Use [appKilledPlaybackBehavior] instead.
      */
@@ -84,6 +91,7 @@ class MusicService : HeadlessJsTaskService() {
     private var capabilities: List<Capability> = emptyList()
     private var notificationCapabilities: List<Capability> = emptyList()
     private var compactCapabilities: List<Capability> = emptyList()
+    private var willSleepWhenActiveTrackReachesEnd = false
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startTask(getTaskConfig(intent))
@@ -398,6 +406,62 @@ class MusicService : HeadlessJsTaskService() {
         player.notificationManager.hideNotification()
     }
 
+    private fun cancelSleepWhenActiveTrackReachesEnd(): Boolean {
+        val wasActive = willSleepWhenActiveTrackReachesEnd
+        willSleepWhenActiveTrackReachesEnd = false
+        player.setPauseAtEndOfItem(false)
+        if (wasActive) {
+            emit(MusicEvents.SLEEP_TIMER_CHANGED)
+        }
+        return wasActive
+    }
+
+    @MainThread
+    fun sleepWhenActiveTrackReachesEnd() {
+        willSleepWhenActiveTrackReachesEnd = true
+        player.setPauseAtEndOfItem(true)
+        sleepTimer.clear()
+        emit(MusicEvents.SLEEP_TIMER_CHANGED, getSleepTimer())
+    }
+
+    private fun onSleepWhenActiveTrackReachesEndComplete() {
+        player.setPauseAtEndOfItem(false)
+        willSleepWhenActiveTrackReachesEnd = false
+        emit(MusicEvents.SLEEP_TIMER_CHANGED)
+        emit(MusicEvents.SLEEP_TIMER_COMPLETE)
+    }
+
+    @MainThread
+    fun setSleepTimer(seconds: Double): Bundle? {
+        cancelSleepWhenActiveTrackReachesEnd()
+        sleepTimer.sleepAfter(seconds)
+        val timer = getSleepTimer()
+        emit(MusicEvents.SLEEP_TIMER_CHANGED, timer)
+        return timer
+    }
+
+    @MainThread
+    fun clearSleepTimer() {
+        if (cancelSleepWhenActiveTrackReachesEnd() || sleepTimer.clear()) {
+            emit(MusicEvents.SLEEP_TIMER_CHANGED)
+        }
+    }
+
+    @MainThread
+    fun getSleepTimer(): Bundle? {
+        if (!willSleepWhenActiveTrackReachesEnd && !sleepTimer.isRunning) return null
+        val bundle = Bundle()
+        if (willSleepWhenActiveTrackReachesEnd) {
+            bundle.putBoolean("sleepWhenPlayedToEnd", true)
+        } else {
+            val time = sleepTimer.time
+            if (time != null) {
+                bundle.putDouble("time", time)
+            }
+        }
+        return bundle
+    }
+
     private fun emitPlaybackTrackChangedEvents(
         index: Int?,
         previousIndex: Int?,
@@ -458,6 +522,7 @@ class MusicService : HeadlessJsTaskService() {
                 }
                 var lastPosition = (it?.oldPosition ?: 0).toSeconds();
                 emitPlaybackTrackChangedEvents(player.currentIndex, lastIndex, lastPosition)
+                cancelSleepWhenActiveTrackReachesEnd()
             }
         }
 
@@ -548,6 +613,9 @@ class MusicService : HeadlessJsTaskService() {
                     putBoolean("playWhenReady", it.playWhenReady)
                     emit(MusicEvents.PLAYBACK_PLAY_WHEN_READY_CHANGED, this)
                 }
+                if (it.pausedBecauseReachedEnd && willSleepWhenActiveTrackReachesEnd) {
+                    onSleepWhenActiveTrackReachesEndComplete()
+                }
             }
         }
 
@@ -626,6 +694,7 @@ class MusicService : HeadlessJsTaskService() {
         }
 
         progressUpdateJob?.cancel()
+        sleepTimer.clear()
     }
 
     @MainThread

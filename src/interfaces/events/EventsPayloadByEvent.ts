@@ -1,21 +1,22 @@
 import { Event } from '../../constants';
 
 import type { PlaybackState } from '../PlaybackState';
-import type { PlaybackErrorEvent } from './PlaybackErrorEvent';
-import type { PlaybackQueueEndedEvent } from './PlaybackQueueEndedEvent';
-import type { PlaybackTrackChangedEvent } from './PlaybackTrackChangedEvent';
+import { SleepTimerChangedEvent } from '../SleepTimer';
 import type { PlaybackActiveTrackChangedEvent } from './PlaybackActiveTrackChangedEvent';
+import type { PlaybackErrorEvent } from './PlaybackErrorEvent';
 import type { PlaybackMetadataReceivedEvent } from './PlaybackMetadataReceivedEvent';
 import type { PlaybackPlayWhenReadyChangedEvent } from './PlaybackPlayWhenReadyChangedEvent';
 import type { PlaybackProgressUpdatedEvent } from './PlaybackProgressUpdatedEvent';
+import type { PlaybackQueueEndedEvent } from './PlaybackQueueEndedEvent';
+import type { PlaybackTrackChangedEvent } from './PlaybackTrackChangedEvent';
+import type { RemoteDuckEvent } from './RemoteDuckEvent';
+import type { RemoteJumpBackwardEvent } from './RemoteJumpBackwardEvent';
+import type { RemoteJumpForwardEvent } from './RemoteJumpForwardEvent';
 import type { RemotePlayIdEvent } from './RemotePlayIdEvent';
 import type { RemotePlaySearchEvent } from './RemotePlaySearchEvent';
-import type { RemoteSkipEvent } from './RemoteSkipEvent';
-import type { RemoteJumpForwardEvent } from './RemoteJumpForwardEvent';
-import type { RemoteJumpBackwardEvent } from './RemoteJumpBackwardEvent';
 import type { RemoteSeekEvent } from './RemoteSeekEvent';
 import type { RemoteSetRatingEvent } from './RemoteSetRatingEvent';
-import type { RemoteDuckEvent } from './RemoteDuckEvent';
+import type { RemoteSkipEvent } from './RemoteSkipEvent';
 
 export interface EventsPayloadByEvent {
   [Event.PlaybackState]: PlaybackState & { type: Event.PlaybackState };
@@ -62,4 +63,8 @@ export interface EventsPayloadByEvent {
   [Event.RemoteLike]: { type: Event.RemoteLike };
   [Event.RemoteDislike]: { type: Event.RemoteDislike };
   [Event.RemoteBookmark]: { type: Event.RemoteBookmark };
+  [Event.SleepTimerChanged]: SleepTimerChangedEvent & {
+    type: Event.SleepTimerChanged;
+  };
+  [Event.SleepTimerComplete]: { type: Event.SleepTimerComplete; };
 }
