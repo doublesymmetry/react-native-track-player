@@ -329,6 +329,14 @@ export enum Event {
    **/
   PlaybackProgressUpdated = 'playback-progress-updated',
   /**
+   * Fired when sleep timer has changed.
+   **/
+  SleepTimerChanged = 'sleep-timer-changed',
+  /**
+   * Fired when sleep timer has completed.
+   **/
+   SleepTimerComplete = 'sleep-timer-complete',
+  /**
    * Fired when the user presses the play button.
    * See https://react-native-track-player.js.org/docs/api/events#remoteplay
    **/
@@ -475,7 +483,7 @@ export enum State {
   /**
    * Indicates that playback stopped due to the end of the queue being reached.
    */
-  Ended = 'ended'
+  Ended = 'ended',
 }
 
 export interface TrackMetadataBase {
@@ -542,6 +550,13 @@ export interface Progress {
 export interface PlaybackProgressUpdatedEvent extends Progress {
   track: number;
 }
+
+export type SleepTimer =
+| { time: number }
+| { sleepWhenPlayedToEnd: boolean }
+| null
+
+export type SleepTimerChangedEvent = SleepTimer;
 
 export type PlaybackState =
   | {
@@ -704,6 +719,8 @@ export interface EventPayloadByEvent {
   [Event.PlaybackMetadataReceived]: PlaybackMetadataReceivedEvent;
   [Event.PlaybackPlayWhenReadyChanged]: PlaybackPlayWhenReadyChangedEvent;
   [Event.PlaybackProgressUpdated]: PlaybackProgressUpdatedEvent;
+  [Event.SleepTimerChanged]: SleepTimerChangedEvent;
+  [Event.SleepTimerComplete]: never;
   [Event.RemotePlay]: never;
   [Event.RemotePlayId]: RemotePlayIdEvent;
   [Event.RemotePlaySearch]: RemotePlaySearchEvent;
@@ -743,6 +760,10 @@ export interface EventsPayloadByEvent {
   [Event.PlaybackProgressUpdated]: PlaybackProgressUpdatedEvent & {
     type: Event.PlaybackProgressUpdated;
   };
+  [Event.SleepTimerChanged]: SleepTimerChangedEvent & {
+    type: Event.SleepTimerChanged;
+  };
+  [Event.SleepTimerComplete]: { type: Event.SleepTimerComplete; };
   [Event.RemotePlay]: { type: Event.RemotePlay };
   [Event.RemotePlayId]: RemotePlayIdEvent & { type: Event.RemotePlayId };
   [Event.RemotePlaySearch]: RemotePlaySearchEvent & {

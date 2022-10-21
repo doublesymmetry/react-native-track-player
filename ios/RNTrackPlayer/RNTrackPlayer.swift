@@ -33,6 +33,8 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         player.event.currentItem.addListener(self, handleAudioPlayerCurrentItemChange)
         player.event.secondElapse.addListener(self, handleAudioPlayerSecondElapse)
         player.event.playWhenReadyChange.addListener(self, handlePlayWhenReadyChange)
+        player.event.sleepTimerChange.addListener(self, handleSleepTimerChange)
+        player.event.sleepTimerComplete.addListener(self, handleSleepTimerComplete)
     }
 
     deinit {
@@ -100,6 +102,8 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             "playback-metadata-received",
             "playback-progress-updated",
             "playback-play-when-ready-changed",
+            "sleep-timer-changed",
+            "sleep-timer-complete",
 
             "remote-stop",
             "remote-pause",
@@ -744,6 +748,33 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         resolve(NSNull())
     }
 
+    @objc(getSleepTimerProgress:rejecter:)
+    public func getSleepTimer(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        if (rejectWhenNotInitialized(reject: reject)) { return }
+        resolve(player.getSleepTimer())
+    }
+
+    @objc(setSleepTimer:resolver:rejecter:)
+    public func setSleepTimer(seconds: Double, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        if (rejectWhenNotInitialized(reject: reject)) { return }
+        player.setSleepTimer(time: seconds)
+        resolve(player.getSleepTimer())
+    }
+
+    @objc(sleepWhenActiveTrackReachesEnd:rejecter:)
+    public func sleepWhenActiveTrackReachesEnd(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        if (rejectWhenNotInitialized(reject: reject)) { return }
+        player.sleepWhenCurrentItemReachesEnd()
+        resolve(player.getSleepTimer())
+    }
+
+    @objc(clearSleepTimer:rejecter:)
+    public func clearSleepTimer(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        if (rejectWhenNotInitialized(reject: reject)) { return }
+        player.clearSleepTimer()
+        resolve(NSNull())
+    }
+    
     private func getPlaybackStateErrorKeyValues() -> Dictionary<String, Any> {
         switch player.playbackError {
             case .failedToLoadKeyValue: return [
@@ -955,5 +986,16 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
                 "playWhenReady": playWhenReady
             ]
         )
+    }
+    
+    func handleSleepTimerChange(sleepTimer: [String : Any]?) {
+        sendEvent(
+            withName: "sleep-timer-changed",
+            body: sleepTimer
+        )
+    }
+
+    func handleSleepTimerComplete(sleepTimer: [String : Any]?) {
+        sendEvent(withName: "sleep-timer-complete", body: nil)
     }
 }

@@ -8,13 +8,12 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.Capability
 import com.doublesymmetry.kotlinaudio.models.RepeatMode
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toMilliseconds
-import com.doublesymmetry.trackplayer.extensions.asLibState
 import com.doublesymmetry.trackplayer.model.State
 import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
-import com.doublesymmetry.trackplayer.utils.RejectionException
 import com.doublesymmetry.trackplayer.service.MusicService
 import com.doublesymmetry.trackplayer.utils.BundleUtils
+import com.doublesymmetry.trackplayer.utils.RejectionException
 import com.facebook.react.bridge.*
 import com.google.android.exoplayer2.DefaultLoadControl.*
 import com.google.android.exoplayer2.Player
@@ -24,6 +23,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.annotation.Nonnull
+
 
 /**
  * @author Milen Pivchev @mpivchev
@@ -35,9 +35,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     private var isServiceBound = false
     private var playerSetUpPromise: Promise? = null
     private val scope = MainScope()
-
     private lateinit var musicService: MusicService
-
     private val context = reactContext
 
     @Nonnull
@@ -614,6 +612,33 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     @ReactMethod
     fun getPlaybackState(callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
-        callback.resolve(musicService.getPlayerStateBundle(musicService.state))
+        callback.resolve(Arguments.fromBundle(musicService.getPlayerStateBundle(musicService.state)))
+    }
+
+    @ReactMethod
+    fun setSleepTimer(seconds: Double, callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        callback.resolve(Arguments.fromBundle(musicService!!.setSleepTimer(seconds)))
+    }
+
+    @ReactMethod
+    fun getSleepTimer(callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        val timer = musicService!!.getSleepTimer()
+        callback.resolve(if (timer == null) null else Arguments.fromBundle(timer))
+    }
+
+    @ReactMethod
+    fun clearSleepTimer(callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        musicService!!.clearSleepTimer()
+        callback.resolve(null)
+    }
+
+    @ReactMethod
+    fun sleepWhenActiveTrackReachesEnd(callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        musicService!!.sleepWhenActiveTrackReachesEnd()
+        callback.resolve(null)
     }
 }
