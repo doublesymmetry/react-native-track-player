@@ -131,6 +131,16 @@ void TrackPlayerModule::RemoveUpcomingTracks(ReactPromise<JSValue> promise) noex
     promise.Resolve(nullptr);
 }
 
+void TrackPlayerModule::RemoveAllTracks(ReactPromise<JSValue> promise) noexcept
+{
+    auto player = manager ? manager->GetPlayer() : nullptr;
+    if (Utils::CheckPlayback(player, promise))
+        return;
+
+    player->RemoveAllTracks();
+    promise.Resolve(nullptr);
+}
+
 void TrackPlayerModule::Add(JSValueArray arr, int insertBeforeIndex,
     ReactPromise<JSValue> promise) noexcept
 {

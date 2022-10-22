@@ -43,6 +43,7 @@ namespace winrt::RNTrackPlayer {
         virtual void Stop() = 0;
         void Reset();
         void RemoveUpcomingTracks();
+        void RemoveAllTracks();
         void Skip(int index, React::ReactPromise<JSValue>& promise);
         bool HasNext();
         void SkipToNext(React::ReactPromise<JSValue>& promise);

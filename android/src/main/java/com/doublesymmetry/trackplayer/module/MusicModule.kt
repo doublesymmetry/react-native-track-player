@@ -328,6 +328,14 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     @ReactMethod
+    fun removeAllTracks(callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+
+        musicService.removeAllTracks()
+        callback.resolve(null)
+    }
+
+    @ReactMethod
     fun skip(index: Int, initialTime: Float, callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
 

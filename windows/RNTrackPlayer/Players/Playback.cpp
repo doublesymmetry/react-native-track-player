@@ -151,6 +151,17 @@ void Playback::RemoveUpcomingTracks()
     queue.erase(queue.begin() + currentTrack, queue.end());
 }
 
+void Playback::RemoveAllTracks()
+{
+  double pos = GetPosition();
+
+    Stop();
+
+    manager.OnTrackUpdate(currentTrack, pos, -1, nullptr);
+    currentTrack = -1;
+    queue.clear();
+}
+
 void Playback::Skip(int index, React::ReactPromise<JSValue>& promise)
 {
     if (index < 0 || index >= queue.size()) {
