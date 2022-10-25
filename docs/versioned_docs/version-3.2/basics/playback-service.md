@@ -12,6 +12,10 @@ The playback service keeps running even when the app is in the background. It wi
 
 If you create a listener to a remote event like `Event.RemotePause` in the context of a React component, there is a chance the UI will be unmounted automatically when the app is in the background, causing it to be missed. For this reason it is best to place remote listeners in the playback service, since it will keep running even when the app is in the background.
 
+## Adding Capabilities
+
+Before adding the events, you must add the corresponding [capabilities](../api/constants/capability.md) to the `TrackPlayer.updateOptions` function.
+
 ## Example
 ```js
 import { PlaybackService } from './src/services';
