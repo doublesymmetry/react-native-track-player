@@ -210,7 +210,6 @@ export function useSleepTimer(updateInterval = 60000) {
     | { sleepWhenPlayedToEnd: boolean }
     | undefined
   >(undefined);
-  console.log(state);
   const time = state && 'time' in state ? state.time : undefined;
 
   const addSecondsLeft = (
