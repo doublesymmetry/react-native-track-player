@@ -662,6 +662,7 @@ class MusicService : HeadlessJsTaskService() {
         }
 
         progressUpdateJob?.cancel()
+        sleepTimer.clear()
     }
 
     @MainThread
