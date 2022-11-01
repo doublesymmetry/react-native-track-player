@@ -22,3 +22,4 @@ Become a sponsor and get your logo on our README on Github with a link to your s
 <a href="https://evergrace.co"><img src="https://avatars.githubusercontent.com/u/1085976?v=4" width="192" /></a>
 <a href="https://podverse.fm"><img src="https://avatars.githubusercontent.com/u/11860029?s=200&v=4" width="192" /></a>
 <a href="http://www.voxist.com/"><img src="https://avatars.githubusercontent.com/u/18028734?s=200&v=4" width="192" /></a>
+<a href="https://stand.fm/"><img src="https://drive.google.com/uc?id=1PwVUjqiqIQqw18sL_0n9Cx0VQ5zisoUW" width="192" /></a>
