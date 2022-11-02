@@ -24,6 +24,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     public override init() {
         super.init()
+        EventEmitter.shared.register(eventEmitter: self)
         audioSessionController.delegate = self
         player.playWhenReady = false;
         player.event.playbackEnd.addListener(self, handleAudioPlayerPlaybackEnded)
@@ -93,51 +94,31 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     @objc(supportedEvents)
     override public func supportedEvents() -> [String] {
-        return [
-            "playback-queue-ended",
-            "playback-state",
-            "playback-error",
-            "playback-track-changed",
-            "playback-active-track-changed",
-            "playback-metadata-received",
-            "playback-progress-updated",
-            "playback-play-when-ready-changed",
-            "sleep-timer-changed",
-            "sleep-timer-complete",
-
-            "remote-stop",
-            "remote-pause",
-            "remote-play",
-            "remote-duck",
-            "remote-next",
-            "remote-seek",
-            "remote-previous",
-            "remote-jump-forward",
-            "remote-jump-backward",
-            "remote-like",
-            "remote-dislike",
-            "remote-bookmark",
-        ]
+        return EventEmitter.shared.allEvents
     }
-
+    
+    private func emit(event: EventType, body: Any? = nil) {
+        EventEmitter.shared.emit(event: event, body: body)
+    }
+    
     // MARK: - AudioSessionControllerDelegate
 
     public func handleInterruption(type: InterruptionType) {
         switch type {
         case .began:
             // Interruption began, take appropriate actions (save state, update user interface)
-            self.sendEvent(withName: "remote-duck", body: [
+            emit(event: EventType.RemoteDuck, body: [
                 "paused": true
             ])
         case let .ended(shouldResume):
             if shouldResume {
                 // Interruption Ended - playback should resume
-                self.sendEvent(withName: "remote-duck", body: [
+                emit(event: EventType.RemoteDuck, body: [
                     "paused": false
                 ])
             } else {
                 // Interruption Ended - playback should NOT resume
-                self.sendEvent(withName: "remote-duck", body: [
+                emit(event: EventType.RemoteDuck, body: [
                     "paused": true,
                     "permanent": true
                 ])
@@ -229,7 +210,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         // setup event listeners
         player.remoteCommandController.handleChangePlaybackPositionCommand = { [weak self] event in
             if let event = event as? MPChangePlaybackPositionCommandEvent {
-                self?.sendEvent(withName: "remote-seek", body: ["position": event.positionTime])
+                self?.emit(event: EventType.RemoteSeek, body: ["position": event.positionTime])
                 return MPRemoteCommandHandlerStatus.success
             }
 
@@ -237,29 +218,29 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         }
 
         player.remoteCommandController.handleNextTrackCommand = { [weak self] _ in
-            self?.sendEvent(withName: "remote-next", body: nil)
+            self?.emit(event: EventType.RemoteNext)
             return MPRemoteCommandHandlerStatus.success
         }
 
         player.remoteCommandController.handlePauseCommand = { [weak self] _ in
-            self?.sendEvent(withName: "remote-pause", body: nil)
+            self?.emit(event: EventType.RemotePause)
             return MPRemoteCommandHandlerStatus.success
         }
 
         player.remoteCommandController.handlePlayCommand = { [weak self] _ in
-            self?.sendEvent(withName: "remote-play", body: nil)
+            self?.emit(event: EventType.RemotePlay)
             return MPRemoteCommandHandlerStatus.success
         }
 
         player.remoteCommandController.handlePreviousTrackCommand = { [weak self] _ in
-            self?.sendEvent(withName: "remote-previous", body: nil)
+            self?.emit(event: EventType.RemotePrevious)
             return MPRemoteCommandHandlerStatus.success
         }
 
         player.remoteCommandController.handleSkipBackwardCommand = { [weak self] event in
             if let command = event.command as? MPSkipIntervalCommand,
                let interval = command.preferredIntervals.first {
-                self?.sendEvent(withName: "remote-jump-backward", body: ["interval": interval])
+                self?.emit(event: EventType.RemoteJumpBackward, body: ["interval": interval])
                 return MPRemoteCommandHandlerStatus.success
             }
 
@@ -269,7 +250,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         player.remoteCommandController.handleSkipForwardCommand = { [weak self] event in
             if let command = event.command as? MPSkipIntervalCommand,
                let interval = command.preferredIntervals.first {
-                self?.sendEvent(withName: "remote-jump-forward", body: ["interval": interval])
+                self?.emit(event: EventType.RemoteJumpForward, body: ["interval": interval])
                 return MPRemoteCommandHandlerStatus.success
             }
 
@@ -277,32 +258,31 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         }
 
         player.remoteCommandController.handleStopCommand = { [weak self] _ in
-            self?.sendEvent(withName: "remote-stop", body: nil)
+            self?.emit(event: EventType.RemoteStop)
             return MPRemoteCommandHandlerStatus.success
         }
 
         player.remoteCommandController.handleTogglePlayPauseCommand = { [weak self] _ in
-            if self?.player.playerState == .paused {
-                self?.sendEvent(withName: "remote-play", body: nil)
-                return MPRemoteCommandHandlerStatus.success
-            }
-
-            self?.sendEvent(withName: "remote-pause", body: nil)
+            self?.emit(event: self?.player.playerState == .paused
+                ? EventType.RemotePlay
+                : EventType.RemotePause
+            )
+            
             return MPRemoteCommandHandlerStatus.success
         }
 
         player.remoteCommandController.handleLikeCommand = { [weak self] _ in
-            self?.sendEvent(withName: "remote-like", body: nil)
+            self?.emit(event: EventType.RemoteLike)
             return MPRemoteCommandHandlerStatus.success
         }
 
         player.remoteCommandController.handleDislikeCommand = { [weak self] _ in
-            self?.sendEvent(withName: "remote-dislike", body: nil)
+            self?.emit(event: EventType.RemoteDislike)
             return MPRemoteCommandHandlerStatus.success
         }
 
         player.remoteCommandController.handleBookmarkCommand = { [weak self] _ in
-            self?.sendEvent(withName: "remote-bookmark", body: nil)
+            self?.emit(event: EventType.RemoteBookmark)
             return MPRemoteCommandHandlerStatus.success
         }
 
@@ -815,10 +795,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     // MARK: - QueuedAudioPlayer Event Handlers
 
     func handleAudioPlayerStateChange(state: AVPlayerWrapperState) {
-        sendEvent(
-            withName: "playback-state",
-            body: getPlaybackStateBodyKeyValues()
-        )
+        emit(event: EventType.PlaybackState, body: getPlaybackStateBodyKeyValues())
     }
 
     func handleAudioPlayerMetadataReceived(metadata: [AVTimedMetadataGroup]) {
@@ -887,19 +864,19 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         ]
         if (data.values.contains { $0 != nil }) {
             data["source"] = source
-            sendEvent(withName: "playback-metadata-received", body: data)
+            emit(event: EventType.PlaybackMetadataReceived, body: data)
         }
     }
 
     func handleAudioPlayerFailed(error: Error?) {
-        sendEvent(withName: "playback-error", body: ["error": error?.localizedDescription])
+        emit(event: EventType.PlaybackError, body: ["error": error?.localizedDescription])
     }
 
     func handleAudioPlayerPlaybackEnded(reason: PlaybackEndedReason) {
         // fire an event for the queue ending
         let queueEndReached = player.nextItems.count == 0 && reason == PlaybackEndedReason.playedUntilEnd
         if queueEndReached && player.repeatMode != .queue {
-            sendEvent(withName: "playback-queue-ended", body: [
+            emit(event: EventType.PlaybackQueueEnded, body: [
                 "track": player.currentIndex,
                 "position": player.currentTime,
             ])
@@ -945,10 +922,9 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         if let track = (item as? Track)?.toObject() {
             a["track"] = track
         }
-
-        self.sendEvent(withName: "playback-active-track-changed", body: a)
-
-
+        emit(event: EventType.PlaybackActiveTrackChanged, body: a)
+        
+        
         // deprecated:
         var b: Dictionary<String, Any> = ["position": lastPosition ?? 0]
         if let lastIndex = lastIndex {
@@ -957,7 +933,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         if let index = index {
             b["nextTrack"] = index
         }
-        self.sendEvent(withName: "playback-track-changed", body: b)
+        emit(event: EventType.PlaybackTrackChanged, body: b)
     }
 
     func handleAudioPlayerSecondElapse(seconds: Double) {
@@ -967,9 +943,8 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         // _after_ a manipulation to the queu causing no currentItem to exist (see reset)
         // in which case we shouldn't emit anything or we'll get an exception.
         if !shouldEmitProgressEvent || player.currentItem == nil { return }
-
-        sendEvent(
-            withName: "playback-progress-updated",
+        emit(
+            event: EventType.PlaybackProgressUpdated,
             body: [
                 "position": player.currentTime,
                 "duration": player.duration,
@@ -980,8 +955,8 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     }
 
     func handlePlayWhenReadyChange(playWhenReady: Bool) {
-        sendEvent(
-            withName: "playback-play-when-ready-changed",
+        emit(
+            event: EventType.PlaybackPlayWhenReadyChanged,
             body: [
                 "playWhenReady": playWhenReady
             ]
@@ -989,13 +964,13 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     }
     
     func handleSleepTimerChange(sleepTimer: [String : Any]?) {
-        sendEvent(
-            withName: "sleep-timer-changed",
+        emit(
+            event: EventType.SleepTimerChanged,
             body: sleepTimer
         )
     }
 
-    func handleSleepTimerComplete(sleepTimer: [String : Any]?) {
-        sendEvent(withName: "sleep-timer-complete", body: nil)
+    func handleSleepTimerComplete(_: ()) {
+        emit(event: EventType.SleepTimerComplete)
     }
 }
