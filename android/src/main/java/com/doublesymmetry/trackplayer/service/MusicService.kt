@@ -102,7 +102,19 @@ class MusicService : HeadlessJsTaskService() {
         )
 
         val cacheConfig = CacheConfig(playerOptions?.getDouble(MAX_CACHE_SIZE_KEY)?.toLong())
-        val playerConfig = PlayerConfig(true, true)
+        val playerConfig = PlayerConfig(
+            true,
+            true,
+            playerOptions?.getBoolean(AUTO_HANDLE_INTERRUPTIONS) ?: false,
+            when(playerOptions?.getString(ANDROID_AUDIO_CONTENT_TYPE)) {
+                "music" -> AudioContentType.MUSIC
+                "speech" -> AudioContentType.SPEECH
+                "sonification" -> AudioContentType.SONIFICATION
+                "movie" -> AudioContentType.MOVIE
+                "unknown" -> AudioContentType.UNKNOWN
+                else -> AudioContentType.MUSIC
+            }
+        )
 
         val automaticallyUpdateNotificationMetadata = playerOptions?.getBoolean(AUTO_UPDATE_METADATA, true) ?: true
 
@@ -128,7 +140,7 @@ class MusicService : HeadlessJsTaskService() {
 
         ratingType = BundleUtils.getInt(options, "ratingType", RatingCompat.RATING_NONE)
 
-        player.playerOptions.alwaysPauseOnInterruption = options.getBoolean(PAUSE_ON_INTERRUPTION_KEY)
+        player.playerOptions.alwaysPauseOnInterruption = androidOptions?.getBoolean(PAUSE_ON_INTERRUPTION_KEY) ?: false
 
         capabilities = options.getIntegerArrayList("capabilities")?.map { Capability.values()[it] } ?: emptyList()
         notificationCapabilities = options.getIntegerArrayList("notificationCapabilities")?.map { Capability.values()[it] } ?: emptyList()
@@ -700,7 +712,8 @@ class MusicService : HeadlessJsTaskService() {
         const val APP_KILLED_PLAYBACK_BEHAVIOR_KEY = "appKilledPlaybackBehavior"
         const val PAUSE_ON_INTERRUPTION_KEY = "alwaysPauseOnInterruption"
         const val AUTO_UPDATE_METADATA = "autoUpdateMetadata"
-
+        const val AUTO_HANDLE_INTERRUPTIONS = "autoHandleInterruptions"
+        const val ANDROID_AUDIO_CONTENT_TYPE = "androidAudioContentType"
         const val IS_FOCUS_LOSS_PERMANENT_KEY = "permanent"
         const val IS_PAUSED_KEY = "paused"
 

@@ -10,7 +10,6 @@ import { default as resolveAssetSource } from 'react-native/Libraries/Image/reso
 import {
   Event,
   EventPayloadByEvent,
-  MetadataOptions,
   NowPlayingMetadata,
   PlaybackState,
   PlayerOptions,
@@ -19,7 +18,8 @@ import {
   SleepTimer,
   State,
   Track,
-  TrackMetadataBase
+  TrackMetadataBase,
+  UpdateOptions
 } from './interfaces';
 
 const { TrackPlayerModule: TrackPlayer } = NativeModules;
@@ -44,7 +44,7 @@ function resolveImportedPath(path?: number | string) {
  * @see https://react-native-track-player.js.org/docs/api/functions/lifecycle
  */
 async function setupPlayer(options: PlayerOptions = {}): Promise<void> {
-  return TrackPlayer.setupPlayer(options || {});
+  return TrackPlayer.setupPlayer(options);
 }
 
 type ServiceHandler = () => Promise<void>;
@@ -215,8 +215,19 @@ async function skipToPrevious(initialPosition = -1): Promise<void> {
  * @param options The options to update.
  * @see https://react-native-track-player.js.org/docs/api/functions/player#updateoptionsoptions
  */
-async function updateOptions(options: MetadataOptions = {}): Promise<void> {
-  options = { ...options };
+async function updateOptions({
+  alwaysPauseOnInterruption,
+  ...options
+}: UpdateOptions = {}): Promise<void> {
+
+  // Handle deprecated alwaysPauseOnInterruption option:
+  if (
+    alwaysPauseOnInterruption !== undefined &&
+    !(options.android && 'alwaysPauseOnInterruption' in options.android)
+  ) {
+    if (!options.android) options.android = {};
+    options.android.alwaysPauseOnInterruption = alwaysPauseOnInterruption;
+  }
 
   // Resolve the asset for each icon
   options.icon = resolveImportedPath(options.icon);

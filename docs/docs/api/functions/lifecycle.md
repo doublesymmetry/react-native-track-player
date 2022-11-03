@@ -20,10 +20,12 @@ If the player is already initialized, the promise will resolve instantly.
 | options.playBuffer   | `number` | Minimum time in seconds that needs to be buffered to start playing | 2.5 | ✅ | ❌ | ❌ |
 | options.backBuffer   | `number` | Time in seconds that should be kept in the buffer behind the current playhead time. | 0 | ✅ | ❌ | ❌ |
 | options.maxCacheSize | `number` | Maximum cache size in kilobytes | 0 | ✅ | ❌ | ❌ |
-| options.iosCategory  | `IOSCategory` | [AVAudioSession.Category](https://developer.apple.com/documentation/avfoundation/avaudiosession/1616615-category) for iOS. Sets on `play()` | `playback` | ❌ | ✅ | ❌ |
+| options.androidAudioContentType  | `AndroidAudioContentType` | The audio content type indicates to the android system how you intend to use audio in your app. | `AndroidAudioContentType.Music` | ✅ | ❌ | ❌ |
+| options.iosCategory  | `IOSCategory` | [AVAudioSession.Category](https://developer.apple.com/documentation/avfoundation/avaudiosession/1616615-category) for iOS. Sets on `play()` | `IOSCategory.Playback` | ❌ | ✅ | ❌ |
 | options.iosCategoryOptions | `IOSCategoryOptions[]` | [AVAudioSession.CategoryOptions](https://developer.apple.com/documentation/avfoundation/avaudiosession/1616503-categoryoptions) for iOS. Sets on `play()` | `[]` | ❌ | ✅ | ❌ |
 | options.iosCategoryMode  | `IOSCategoryMode` | [AVAudioSession.Mode](https://developer.apple.com/documentation/avfoundation/avaudiosession/1616508-mode) for iOS. Sets on `play()` | `default` | ❌ | ✅ | ❌ |
-| options.autoUpdateMetadata   | `boolean` | Indicates whether the player should automatically update now playing metadata data in control center / notification. | true | ✅ | ❌ | ❌ |
+| options.autoHandleInterruptions   | `boolean` | Indicates whether the player should automatically handle audio interruptions. | false | ✅ | ✅  | ❌ |
+| options.autoUpdateMetadata   | `boolean` | Indicates whether the player should automatically update now playing metadata data in control center / notification. | true | ✅ | ✅ | ❌ |
 
 ## `registerPlaybackService(serviceProvider)`
 

@@ -1,4 +1,4 @@
-import TrackPlayer, { Event, State } from 'react-native-track-player';
+import TrackPlayer, { Event } from 'react-native-track-player';
 
 let wasPausedByDuck = false;
 
@@ -40,22 +40,8 @@ export async function PlaybackService() {
 
   TrackPlayer.addEventListener(
     Event.RemoteDuck,
-    async ({ permanent, paused }) => {
-      console.log('Event.RemoteDuck');
-      if (permanent) {
-        TrackPlayer.pause();
-        return;
-      }
-      if (paused) {
-        const playback = await TrackPlayer.getPlaybackState();
-        wasPausedByDuck = playback.state !== State.Paused;
-        TrackPlayer.pause();
-      } else {
-        if (wasPausedByDuck) {
-          TrackPlayer.play();
-          wasPausedByDuck = false;
-        }
-      }
+    async (event) => {
+      console.log('Event.RemoteDuck', event);
     }
   );
 

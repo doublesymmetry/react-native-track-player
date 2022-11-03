@@ -19,6 +19,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     private let player = QueuedAudioPlayer()
     private let audioSessionController = AudioSessionController.shared
     private var shouldEmitProgressEvent: Bool = false
+    private var shouldResumePlaybackAfterInterruptionEnds: Bool = false
 
     // MARK: - Lifecycle Methods
 
@@ -112,6 +113,9 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             ])
         case let .ended(shouldResume):
             if shouldResume {
+                if (shouldResumePlaybackAfterInterruptionEnds) {
+                    player.play()
+                }
                 // Interruption Ended - playback should resume
                 emit(event: EventType.RemoteDuck, body: [
                     "paused": false
@@ -161,8 +165,11 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         if let bufferDuration = config["minBuffer"] as? TimeInterval {
             player.bufferDuration = bufferDuration
         }
-
-
+        
+        if let autoHandleInterruptions = config["autoHandleInterruptions"] as? Bool {
+            self.shouldResumePlaybackAfterInterruptionEnds = autoHandleInterruptions
+        }
+        
         // configure wether player waits to play (deprecated)
         if let waitForBuffer = config["waitForBuffer"] as? Bool {
             player.automaticallyWaitsToMinimizeStalling = waitForBuffer

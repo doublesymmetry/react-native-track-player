@@ -131,6 +131,42 @@ export enum IOSCategoryOptions {
   DefaultToSpeaker = 'defaultToSpeaker',
 }
 
+export enum AndroidAudioContentType {
+  /**
+   * Content type value to use when the content type is music.
+   *
+   * See https://developer.android.com/reference/android/media/AudioAttributes#CONTENT_TYPE_MUSIC
+   */
+  Music = 'music',
+  /**
+   * Content type value to use when the content type is speech.
+   *
+   * See https://developer.android.com/reference/android/media/AudioAttributes#CONTENT_TYPE_SPEECH
+   */
+   Speech = 'speech',
+  /**
+   * Content type value to use when the content type is a sound used to
+   * accompany a user action, such as a beep or sound effect expressing a key
+   * click, or event, such as the type of a sound for a bonus being received in
+   * a game. These sounds are mostly synthesized or short Foley sounds.
+   *
+   * See https://developer.android.com/reference/android/media/AudioAttributes#CONTENT_TYPE_SONIFICATION
+   */
+  Sonification = 'sonification',
+  /**
+   * Content type value to use when the content type is a soundtrack, typically
+   * accompanying a movie or TV program.
+   */
+  Movie = 'movie',
+  /**
+   * Content type value to use when the content type is unknown, or other than
+   * the ones defined.
+   *
+   * See https://developer.android.com/reference/android/media/AudioAttributes#CONTENT_TYPE_UNKNOWN
+   */
+   Unknown = 'unknown',
+}
+
 export interface PlayerOptions {
   /**
    * Minimum time in seconds that needs to be buffered.
@@ -173,6 +209,18 @@ export interface PlayerOptions {
    */
   iosCategoryOptions?: IOSCategoryOptions[];
   /**
+   * (Android only) The audio content type indicates to the android system how
+   * you intend to use audio in your app.
+   *
+   * With `autoHandleInterruptions: true` and
+   * `androidContentType: AndroidAudioContentType.Speech`, the audio will be
+   * paused during short interruptions, such as when a message arrives.
+   * Otherwise the playback volume is reduced while the notification is playing.
+   *
+   * @default AndroidAudioContentType.Music
+   */
+  androidContentType?: AndroidAudioContentType;
+  /**
    * Indicates whether the player should automatically delay playback in order to minimize stalling.
    * Defaults to `true`.
    * @deprecated This option has been nominated for removal in a future version
@@ -187,7 +235,12 @@ export interface PlayerOptions {
    * Defaults to `true`.
    */
   autoUpdateMetadata?: boolean;
-}
+  /**
+   * Indicates whether the player should automatically handle audio interruptions.
+   * Defaults to `false`.
+   */
+  autoHandleInterruptions?: boolean;
+ }
 
 export enum RatingType {
   Heart = TrackPlayer.RATING_HEART,
@@ -248,12 +301,15 @@ export enum AppKilledPlaybackBehavior {
 
 export interface AndroidOptions {
   /**
-   * Whether the audio playback notification is also removed when the playback stops. **If `stoppingAppPausesPlayback` is set to false, this will be ignored.**
+   * Whether the audio playback notification is also removed when the playback
+   * stops. **If `stoppingAppPausesPlayback` is set to false, this will be
+   * ignored.**
    */
-  appKilledPlaybackBehavior: AppKilledPlaybackBehavior;
+  appKilledPlaybackBehavior?: AppKilledPlaybackBehavior;
+  alwaysPauseOnInterruption?: boolean
 }
 
-export interface MetadataOptions {
+export interface UpdateOptions {
   android?: AndroidOptions;
   ratingType?: RatingType;
   forwardJumpInterval?: number;
@@ -280,6 +336,9 @@ export interface MetadataOptions {
    *  ```
    */
   stoppingAppPausesPlayback?: boolean;
+  /**
+   * @deprecated use `TrackPlayer.updateOptions({ android: { alwaysPauseOnInterruption: boolean }})` instead
+   */
   alwaysPauseOnInterruption?: boolean;
   notificationCapabilities?: Capability[];
   compactCapabilities?: Capability[];
@@ -294,6 +353,9 @@ export interface MetadataOptions {
   forwardIcon?: ResourceObject;
   color?: number;
 }
+
+/** @deprecated use UpdateOptions instead */
+export type MetadataOptions = UpdateOptions
 
 export enum Event {
   /** Fired when the state of the player changes. */
