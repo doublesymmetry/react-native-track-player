@@ -24,6 +24,7 @@ class Track: NSObject, AudioItem, TimePitching, AssetOptionsProviding {
     var skipped: Bool = false
     var artworkURL: MediaURL?
     let headers: [String: Any]?
+    var userAgent: String?
     let pitchAlgorithm: String?
     var isLiveStream: Bool?
 
@@ -45,6 +46,7 @@ class Track: NSObject, AudioItem, TimePitching, AssetOptionsProviding {
         self.desc = dictionary["description"] as? String
         self.duration = dictionary["duration"] as? Double
         self.headers = dictionary["headers"] as? [String: Any]
+        self.userAgent = dictionary["userAgent"] as? String
         self.artworkURL = MediaURL(object: dictionary["artwork"])
         self.pitchAlgorithm = dictionary["pitchAlgorithm"] as? String
         self.isLiveStream = dictionary["isLiveStream"] as? Bool
@@ -137,11 +139,18 @@ class Track: NSObject, AudioItem, TimePitching, AssetOptionsProviding {
     // MARK: - Authorizing Protocol
 
     func getAssetOptions() -> [String: Any] {
+        var options: [String: Any] = [:]
         if let headers = headers {
-            return ["AVURLAssetHTTPHeaderFieldsKey": headers]
+            options["AVURLAssetHTTPHeaderFieldsKey"] = headers
         }
-
-        return [:]
+        if #available(iOS 16, *) {
+            if let userAgent = userAgent {
+                // there is now an official, working way to set the user-agent for every request
+                // https://developer.apple.com/documentation/avfoundation/avurlassethttpuseragentkey
+                options[AVURLAssetHTTPUserAgentKey] = userAgent
+            }
+        }
+        return options
     }
 
 }
