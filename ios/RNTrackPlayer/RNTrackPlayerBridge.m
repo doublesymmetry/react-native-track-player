@@ -34,6 +34,9 @@ RCT_EXTERN_METHOD(remove:(NSArray *)objects
 RCT_EXTERN_METHOD(removeUpcomingTracks:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
+RCT_EXTERN_METHOD(removeAllTracks:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject);
+
 RCT_EXTERN_METHOD(skip:(nonnull NSNumber *)trackIndex
                   initialTime:(double)initialTime
                   resolver:(RCTPromiseResolveBlock)resolve

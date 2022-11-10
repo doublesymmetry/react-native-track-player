@@ -120,6 +120,13 @@ async function removeUpcomingTracks(): Promise<void> {
 }
 
 /**
+ * Removes all tracks from the queue.
+ */
+ async function removeAllTracks(): Promise<void> {
+  return TrackPlayer.removeAllTracks();
+}
+
+/**
  * Skips to a track in the queue.
  */
 async function skip(trackIndex: number, initialPosition = -1): Promise<void> {
@@ -326,6 +333,7 @@ export default {
   add,
   remove,
   removeUpcomingTracks,
+  removeAllTracks,
   skip,
   skipToNext,
   skipToPrevious,

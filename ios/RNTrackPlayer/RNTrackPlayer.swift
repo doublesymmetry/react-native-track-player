@@ -382,6 +382,17 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         resolve(NSNull())
     }
 
+    @objc(removeAllTracks:rejecter:)
+    public func removeAllTracks(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        if !hasInitialized {
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
+            return
+        }
+
+        player.reset()
+        resolve(NSNull())
+    }
+
     @objc(skip:initialTime:resolver:rejecter:)
     public func skip(
         to trackIndex: NSNumber,
