@@ -819,7 +819,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         let isQueueEndReached = player.items.count == index + 1
 
         // fire an event for the queue ending
-        if isRepeatModeOff && isQueueEndReached && player.currentTime === player.duration {
+        if isRepeatModeOff && isQueueEndReached && player.currentTime == player.duration {
             sendEvent(withName: "playback-queue-ended", body: [
                 "track": index,
                 "position": player.currentTime,
