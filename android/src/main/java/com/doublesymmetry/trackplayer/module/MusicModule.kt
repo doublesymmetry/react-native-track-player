@@ -617,27 +617,27 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     @ReactMethod
     fun setSleepTimer(seconds: Double, callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
-        callback.resolve(Arguments.fromBundle(musicService!!.setSleepTimer(seconds)))
+        callback.resolve(Arguments.fromBundle(musicService.setSleepTimer(seconds)))
     }
 
     @ReactMethod
     fun getSleepTimer(callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
-        val timer = musicService!!.getSleepTimer()
+        val timer = musicService.getSleepTimer()
         callback.resolve(if (timer == null) null else Arguments.fromBundle(timer))
     }
 
     @ReactMethod
     fun clearSleepTimer(callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
-        musicService!!.clearSleepTimer()
+        musicService.clearSleepTimer()
         callback.resolve(null)
     }
 
     @ReactMethod
     fun sleepWhenActiveTrackReachesEnd(callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
-        musicService!!.sleepWhenActiveTrackReachesEnd()
+        musicService.sleepWhenActiveTrackReachesEnd()
         callback.resolve(null)
     }
 }
