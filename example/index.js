@@ -1,9 +1,7 @@
-import {AppRegistry} from 'react-native';
+import { AppRegistry } from 'react-native';
 import TrackPlayer from 'react-native-track-player';
 
-import App from './src/App';
-import {PlaybackService} from './src/services';
-import {name as appName} from './app.json';
+import App from './App';
 
-AppRegistry.registerComponent(appName, () => App);
-TrackPlayer.registerPlaybackService(() => PlaybackService);
+AppRegistry.registerComponent('example', () => App);
+TrackPlayer.registerPlaybackService(() => require('./service'));

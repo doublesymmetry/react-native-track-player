@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.doublesymmetry.trackplayer">
+          package="com.guichaguri.trackplayer">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -8,7 +8,7 @@
     <application>
 
         <!-- The main service, handles playback, playlists and media buttons -->
-        <service android:name="com.doublesymmetry.trackplayer.service.MusicService" android:enabled="true" android:exported="false">
+        <service android:name=".service.MusicService" android:enabled="true" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>

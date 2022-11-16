@@ -15,15 +15,14 @@ RCT_EXTERN_METHOD(setupPlayer:(NSDictionary *)data
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(isServiceRunning:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject);
+RCT_EXTERN_METHOD(destroy);
 
 RCT_EXTERN_METHOD(updateOptions:(NSDictionary *)options
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(add:(NSArray *)objects
-                  before:(nonnull NSNumber *)trackIndex
+                  before:(NSString *)trackId
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
@@ -34,17 +33,14 @@ RCT_EXTERN_METHOD(remove:(NSArray *)objects
 RCT_EXTERN_METHOD(removeUpcomingTracks:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(skip:(nonnull NSNumber *)trackIndex
-                  initialTime:(double)initialTime
+RCT_EXTERN_METHOD(skip:(NSString *)trackId
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(skipToNext:(double)initialTime
-                  resolver:(RCTPromiseResolveBlock)resolve
+RCT_EXTERN_METHOD(skipToNext:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(skipToPrevious:(double)initialTime
-                  resolver:(RCTPromiseResolveBlock)resolve
+RCT_EXTERN_METHOD(skipToPrevious:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(reset:(RCTPromiseResolveBlock)resolve
@@ -56,15 +52,11 @@ RCT_EXTERN_METHOD(play:(RCTPromiseResolveBlock)resolve
 RCT_EXTERN_METHOD(pause:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
+RCT_EXTERN_METHOD(stop:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject);
+
 RCT_EXTERN_METHOD(seekTo:(double)time
                   resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject);
-
-RCT_EXTERN_METHOD(setRepeatMode:(nonnull NSNumber *)repeatMode
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject);
-
-RCT_EXTERN_METHOD(getRepeatMode:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(setVolume:(float)volume
@@ -81,7 +73,7 @@ RCT_EXTERN_METHOD(setRate:(float)rate
 RCT_EXTERN_METHOD(getRate:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(getTrack:(nonnull NSNumber *)trackIndex
+RCT_EXTERN_METHOD(getTrack:(NSString *)trackId
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
@@ -103,15 +95,8 @@ RCT_EXTERN_METHOD(getPosition:(RCTPromiseResolveBlock)resolve
 RCT_EXTERN_METHOD(getState:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(updateMetadataForTrack:(nonnull NSNumber *)trackIndex
-                  metadata:(NSDictionary *)metadata
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject);
-
-RCT_EXTERN_METHOD(clearNowPlayingMetadata:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject);
-
-RCT_EXTERN_METHOD(updateNowPlayingMetadata:(NSDictionary *)metadata
+RCT_EXTERN_METHOD(updateMetadataForTrack:(NSString *)trackId
+                  properties:(NSDictionary *)properties
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 

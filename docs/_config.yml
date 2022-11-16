@@ -1,0 +1,20 @@
+title: react-native-track-player
+remote_theme: pmarsceill/just-the-docs
+logo: "/assets/optimized-logo.svg"
+
+gh_edit_link: true
+gh_edit_link_text: "Improve this page"
+gh_edit_repository: "https://github.com/react-native-kit/react-native-track-player"
+gh_edit_branch: "dev"
+gh_edit_view_mode: "edit"
+
+aux_links:
+  "discord":
+    - "https://discordapp.com/invite/ya2XDCR"
+  "npm":
+    - "https://www.npmjs.com/package/react-native-track-player"
+  "github":
+    - "https://github.com/react-native-kit/react-native-track-player"
+
+plugins:
+  - jekyll-redirect-from
