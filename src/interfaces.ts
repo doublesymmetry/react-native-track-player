@@ -219,7 +219,7 @@ export interface PlayerOptions {
    *
    * @default AndroidAudioContentType.Music
    */
-  androidContentType?: AndroidAudioContentType;
+  androidAudioContentType?: AndroidAudioContentType;
   /**
    * Indicates whether the player should automatically delay playback in order to minimize stalling.
    * Defaults to `true`.
