@@ -629,7 +629,8 @@ export type PlaybackState =
         | State.Playing
         | State.Paused
         | State.Ready
-        | State.Paused;
+        | State.Paused
+        | State.Stopped;
     }
   | {
       state: State.Error;
