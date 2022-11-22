@@ -109,7 +109,7 @@ Businesses: support continued development and maintenance via sponsoring contrac
       <img src="https://avatars.githubusercontent.com/u/271885?s=30&v=4" align="center" width="30" title="puckey" alt="puckey">
     </td>
    <td align="center">
-      <img src="https://avatars.githubusercontent.com/u/77853659?s=30&v=4" align="center" width="30" title="puckey" alt="puckey">
+      <img src="https://avatars.githubusercontent.com/u/77853659?s=30&v=4" align="center" width="30" title="Studio 206" alt="Studio 206">
     </td>
   </tr>
 </table>
