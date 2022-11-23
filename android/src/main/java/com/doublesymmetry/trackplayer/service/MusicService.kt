@@ -656,7 +656,10 @@ class MusicService : HeadlessJsTaskService() {
 
         when (appKilledPlaybackBehavior) {
             AppKilledPlaybackBehavior.PAUSE_PLAYBACK -> player.pause()
-            AppKilledPlaybackBehavior.STOP_PLAYBACK_AND_REMOVE_NOTIFICATION -> player.stop()
+            AppKilledPlaybackBehavior.STOP_PLAYBACK_AND_REMOVE_NOTIFICATION -> {
+                player.stop()
+                player.clear()
+            }
             else -> {}
         }
     }
