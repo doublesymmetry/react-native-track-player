@@ -6,10 +6,6 @@ import {
   Platform,
 } from 'react-native';
 
-const resolveAssetSource = Platform.OS !== "web"
-  ? require('react-native/Libraries/Image/resolveAssetSource')
-  : (path: number | string) => path;
-
 import {
   Event,
   EventPayloadByEvent,
@@ -30,12 +26,6 @@ const emitter =
   Platform.OS !== 'android'
     ? new NativeEventEmitter(TrackPlayer)
     : DeviceEventEmitter;
-
-// MARK: - Helpers
-function resolveImportedPath(path?: number | string) {
-  if (!path) return undefined;
-  return resolveAssetSource(path) || path;
-}
 
 // MARK: - General API
 
@@ -94,15 +84,6 @@ async function add(
 
   if (tracks.length < 1) return;
 
-  for (let i = 0; i < tracks.length; i++) {
-    // Clone the object before modifying it
-    tracks[i] = { ...tracks[i] };
-
-    // Resolve the URLs
-    tracks[i].url = resolveImportedPath(tracks[i].url);
-    tracks[i].artwork = resolveImportedPath(tracks[i].artwork);
-  }
-
   return TrackPlayer.add(tracks, insertBeforeIndex);
 }
 
@@ -151,18 +132,6 @@ async function skipToPrevious(initialPosition = -1): Promise<void> {
  * Updates the configuration for the components.
  */
 async function updateOptions(options: MetadataOptions = {}): Promise<void> {
-  options = { ...options };
-
-  // Resolve the asset for each icon
-  options.icon = resolveImportedPath(options.icon);
-  options.playIcon = resolveImportedPath(options.playIcon);
-  options.pauseIcon = resolveImportedPath(options.pauseIcon);
-  options.stopIcon = resolveImportedPath(options.stopIcon);
-  options.previousIcon = resolveImportedPath(options.previousIcon);
-  options.nextIcon = resolveImportedPath(options.nextIcon);
-  options.rewindIcon = resolveImportedPath(options.rewindIcon);
-  options.forwardIcon = resolveImportedPath(options.forwardIcon);
-
   return TrackPlayer.updateOptions(options);
 }
 
@@ -177,9 +146,6 @@ async function updateMetadataForTrack(
   // Clone the object before modifying it
   metadata = Object.assign({}, metadata);
 
-  // Resolve the artwork URL
-  metadata.artwork = resolveImportedPath(metadata.artwork);
-
   return TrackPlayer.updateMetadataForTrack(trackIndex, metadata);
 }
 
@@ -190,9 +156,6 @@ function clearNowPlayingMetadata(): Promise<void> {
 function updateNowPlayingMetadata(metadata: NowPlayingMetadata): Promise<void> {
   // Clone the object before modifying it
   metadata = Object.assign({}, metadata);
-
-  // Resolve the artwork URL
-  metadata.artwork = resolveImportedPath(metadata.artwork);
 
   return TrackPlayer.updateNowPlayingMetadata(metadata);
 }
