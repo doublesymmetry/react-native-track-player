@@ -22,9 +22,6 @@ import {
 if (Platform.OS == 'web')
   NativeModules.TrackPlayerModule = require('../web/TrackPlayer').TrackPlayerModule;
 
-if (Platform.OS == 'web')
-  NativeModules.TrackPlayerModule = require('../web/TrackPlayer').TrackPlayerModule;
-
 const { TrackPlayerModule: TrackPlayer } = NativeModules;
 const emitter =
   Platform.OS !== 'android'
