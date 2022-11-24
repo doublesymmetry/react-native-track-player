@@ -5,8 +5,11 @@ import {
   NativeModules,
   Platform,
 } from 'react-native';
-// @ts-expect-error because resolveAssetSource is untyped
-import { default as resolveAssetSource } from 'react-native/Libraries/Image/resolveAssetSource';
+
+const resolveAssetSource = Platform.OS !== "web"
+  ? require('react-native/Libraries/Image/resolveAssetSource')
+  : (path: number | string) => path;
+
 import {
   Event,
   EventPayloadByEvent,
