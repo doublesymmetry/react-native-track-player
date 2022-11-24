@@ -9,7 +9,7 @@
     "lint": "eslint src",
     "format": "prettier --write src",
     "types": "tsc --noEmit true",
-    "prepare": "npm run build && husky install",
+    "prepare": "npm run build",
     "example": "yarn --cwd example",
     "pods": "cd example/ios && pod install",
     "bootstrap": "yarn example && yarn && yarn pods",
