@@ -136,16 +136,6 @@ export class TrackPlayerModule {
         });
     }
 
-    static stop() {
-        return new Promise((resolve, reject) => {
-            if (this.#audio.src) {
-                this.#audio.pause();
-                this.#emitter.emit(Event.PlaybackState, {state: State.Stopped});
-            }
-            resolve();
-        });
-    }
-
     static reset() {
         return new Promise((resolve, reject) => {
             if (this.#audio.src)
@@ -160,10 +150,6 @@ export class TrackPlayerModule {
             this.#emitter.emit(Event.PlaybackState, {state: State.None});
             resolve();
         });
-    }
-
-    static destroy() {
-        return this.reset();
     }
 
     static skip = index => {
