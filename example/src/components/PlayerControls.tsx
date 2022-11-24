@@ -1,9 +1,9 @@
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import TrackPlayer from 'react-native-track-player';
 
-import {Button} from './Button';
-import {PlayPauseButton} from './PlayPauseButton';
+import { Button } from './Button';
+import { PlayPauseButton } from './PlayPauseButton';
 
 export const PlayerControls: React.FC = () => {
   return (
@@ -31,6 +31,6 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    justifyContent: 'space-evenly'
+    justifyContent: 'space-evenly',
   },
 });

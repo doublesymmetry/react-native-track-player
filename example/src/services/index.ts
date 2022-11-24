@@ -1,3 +1,3 @@
 export * from './PlaybackService';
-export * from './QueueInitalTracksService';
+export * from './QueueInitialTracksService';
 export * from './SetupService';

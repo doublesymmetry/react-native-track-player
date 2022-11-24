@@ -3,8 +3,7 @@
 [![downloads](https://img.shields.io/npm/dw/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player)
 [![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player)
 [![discord](https://img.shields.io/discord/567636850513018880.svg)](https://discordapp.com/invite/ya2XDCR)
-
-### 📢 The Android side of RN track player is currently being rewritten with Kotlin and [KotlinAudio](https://github.com/DoubleSymmetry/KotlinAudio). Help us test! [More information here.](https://github.com/DoubleSymmetry/react-native-track-player/discussions/1264)
+[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
 ----
 
@@ -37,6 +36,9 @@ Not sure where to start?
 
 react-native-track-player is made possible by the generosity of the sponsors below, and many other [individual backers](https://react-native-track-player.js.org/docs/sponsors#backers). Sponsoring directly impacts the longevity of this project.
 
+Businesses: support continued development and maintenance via sponsoring contracts:
+  E-mail: oss @ doublesymmetry dot com
+
 #### 🥇 Gold sponsors (\$2000+ total contributions)
 
 <table>
@@ -50,36 +52,64 @@ react-native-track-player is made possible by the generosity of the sponsors bel
   </tr>
 </table>
 
-#### 🥈 Silver sponsors (\$200+ per month)
+#### 🗝 Silver Sponsor (\$500+ per month)
+
+[Become the first silver sponsor!](https://github.com/sponsors/DoubleSymmetry)
+
+#### 🔑 Bronze Sponsor (\$200+ per month)
 
 <table>
   <tr>
     <td align="center">
       <a href="http://www.voxist.com/">
-        <img src="https://avatars.githubusercontent.com/u/18028734?s=200&v=4" align="center" width="100" title="Voxist" alt="Voxist">
+        <img src="https://avatars.githubusercontent.com/u/18028734?s=200&v=4" align="center" width="75" title="Voxist" alt="Voxist">
         <br /><sub><b>Voxist</b></sub>
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://evergrace.co">
-        <img src="https://avatars.githubusercontent.com/u/1085976?v=4" align="center" width="100" title="Evergrace" alt="Evergrace">
-        <br /><sub><b>Evergrace</b></sub>
       </a>
     </td>
   </tr>
 </table>
 
 
-#### 🥉 Bronze sponsors (\$500+ total contributions)
-[Become the first bronze sponsor!](https://github.com/sponsors/DoubleSymmetry)
+#### 🥉 Bronze sponsors (\$100+ per month)
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://app.momento.fm/">
+        <img src="https://avatars.githubusercontent.com/u/98929576?s=200&v=4" align="center" width="50" title="Voxist" alt="Voxist">
+        <br /><sub><b>Momento</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://stand.fm/">
+        <img src="https://drive.google.com/uc?id=1PwVUjqiqIQqw18sL_0n9Cx0VQ5zisoUW" align="center" height="50" title="stand.fm" alt="stand.fm">
+        <br /><sub><b>stand.fm</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
 
 #### ✨ Contributing sponsors (\$25+ per month)
 
 <table>
   <tr>
     <td align="center">
-      <a href="https://podverse.fm"><img src="https://avatars.githubusercontent.com/u/11860029?s=200&v=4" align="center" width="100" title="Podverse" alt="Podverse"></a>
-      <br /><sub><b>Podverse</b></sub>
+      <img src="https://avatars.githubusercontent.com/u/102089139?s=30&v=4" align="center" width="30" title="Through the Word" alt="Through the Word">
+    </td>
+    <td align="center">
+      <img src="https://avatars.githubusercontent.com/u/11860029?s=30&v=4" align="center" width="30" title="Podverse" alt="Podverse">
+    </td>
+    <td align="center">
+      <img src="https://avatars.githubusercontent.com/u/2523678?s=30&v=4" align="center" width="30" title="Elliot Dickison" alt="Elliot Dickison">
+    </td>
+    <td align="center">
+      <img src="https://avatars.githubusercontent.com/u/1085976?s=30&v=4" align="center" width="30" title="Brad Flood" alt="Brad Flood">
+    </td>
+    <td align="center">
+      <img src="https://avatars.githubusercontent.com/u/271885?s=30&v=4" align="center" width="30" title="puckey" alt="puckey">
+    </td>
+   <td align="center">
+      <img src="https://avatars.githubusercontent.com/u/77853659?s=30&v=4" align="center" width="30" title="Studio 206" alt="Studio 206">
     </td>
   </tr>
 </table>
@@ -206,6 +236,30 @@ something you should be ashamed of nor is it something you should be scared of.
 Our goal is to make it as easy as possible for you to make changes to the library.
 All the documentation on how to work on the library and it's dependencies is
 [located in this Guide](./example/README.md)
+
+## Release
+
+The standard release command for this project is [`yarn version`](https://classic.yarnpkg.com/lang/en/docs/cli/version/).
+
+```
+yarn version [--major | --minor | --patch | --new-version <version>]
+```
+
+Ex.
+
+```
+yarn version --new-version 1.2.17
+yarn version --patch // 1.2.17 -> 1.2.18
+yarn version --minor // 1.2.18 -> 1.3.0
+yarn version --major // 2.0.0
+```
+
+This command will:
+
+1. Generate/update the Changelog
+1. Bump the package version
+1. Tag & pushing the commit
+1. Build & publish the package
 
 
 ## Community

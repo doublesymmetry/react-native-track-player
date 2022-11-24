@@ -18,7 +18,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     private var hasInitialized = false
     private let player = QueuedAudioPlayer()
     private let audioSessionController = AudioSessionController.shared
-    private var shouldEmitUpdateEventInterval: Bool = false
+    private var shouldEmitProgressEvent: Bool = false
 
     // MARK: - Lifecycle Methods
 
@@ -26,7 +26,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         super.init()
 
         audioSessionController.delegate = self
-        player.event.playbackEnd.addListener(self, handleAudioPlayerPlaybackEnded)
         player.event.receiveMetadata.addListener(self, handleAudioPlayerMetadataReceived)
         player.event.stateChange.addListener(self, handleAudioPlayerStateChange)
         player.event.fail.addListener(self, handleAudioPlayerFailed)
@@ -146,17 +145,19 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             return
         }
 
-        // configure if player waits to play
-        let autoWait: Bool = config["waitForBuffer"] as? Bool ?? false
-        player.automaticallyWaitsToMinimizeStalling = autoWait
-
         // configure buffer size
-        let minBuffer: TimeInterval = config["minBuffer"] as? TimeInterval ?? 0
-        player.bufferDuration = minBuffer
+        if let bufferDuration = config["minBuffer"] as? TimeInterval {
+            player.bufferDuration = bufferDuration
+        }
 
-        // configure if control center metdata should auto update
-        let autoUpdateMetadata: Bool = config["autoUpdateMetadata"] as? Bool ?? true
-        player.automaticallyUpdateNowPlayingInfo = autoUpdateMetadata
+
+        // configure wether player waits to play (deprecated)
+        if let waitForBuffer = config["waitForBuffer"] as? Bool {
+            player.automaticallyWaitsToMinimizeStalling = waitForBuffer
+        }
+
+        // configure wether control center metdata should auto update
+        player.automaticallyUpdateNowPlayingInfo = config["autoUpdateMetadata"] as? Bool ?? true
 
         // configure audio session - category, options & mode
         var sessionCategory: AVAudioSession.Category = .playback
@@ -284,20 +285,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         resolve(player != nil)
     }
 
-    @objc(destroy:rejecter:)
-    public func destroy(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
-
-        print("Destroying player")
-        self.player.stop()
-        self.player.nowPlayingInfoController.clear()
-        try? AVAudioSession.sharedInstance().setActive(false)
-        hasInitialized = false
-    }
-
     @objc(updateOptions:resolver:rejecter:)
     public func update(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if !hasInitialized {
@@ -319,19 +306,18 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
                                           bookmarkOptions: options["bookmarkOptions"] as? [String: Any])
         }
 
-        if let interval = options["progressUpdateEventInterval"] as? NSNumber, interval.intValue > 0 {
-            shouldEmitUpdateEventInterval = true
-            configureProgressUpdateEvent(interval: interval.doubleValue)
-        } else {
-            shouldEmitUpdateEventInterval = false
-        }
+        configureProgressUpdateEvent(
+            interval: ((options["progressUpdateEventInterval"] as? NSNumber) ?? 0).doubleValue
+        )
 
         resolve(NSNull())
     }
 
     private func configureProgressUpdateEvent(interval: Double) {
-        let time = CMTime(seconds: interval, preferredTimescale: 1)
-        self.player.timeEventFrequency = .custom(time: time)
+        shouldEmitProgressEvent = interval > 0
+        self.player.timeEventFrequency = shouldEmitProgressEvent
+            ? .custom(time: CMTime(seconds: interval, preferredTimescale: 1))
+            : .everySecond
     }
 
     @objc(add:before:resolver:rejecter:)
@@ -509,17 +495,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         }
 
         player.pause()
-        resolve(NSNull())
-    }
-
-    @objc(stop:rejecter:)
-    public func stop(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if !hasInitialized {
-            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
-            return
-        }
-
-        player.stop()
         resolve(NSNull())
     }
 
@@ -802,21 +777,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         sendEvent(withName: "playback-error", body: ["error": error?.localizedDescription])
     }
 
-    func handleAudioPlayerPlaybackEnded(reason: PlaybackEndedReason) {
-        // fire an event for the queue ending
-        if player.nextItems.count == 0 && reason == PlaybackEndedReason.playedUntilEnd {
-            sendEvent(withName: "playback-queue-ended", body: [
-                "track": player.currentIndex,
-                "position": player.currentTime,
-            ])
-        }
-
-        // fire an event for the same track starting again
-        if player.items.count != 0 && player.repeatMode == .track {
-            handleAudioPlayerQueueIndexChange(previousIndex: player.currentIndex, nextIndex: player.currentIndex)
-        }
-    }
-
     func handleAudioPlayerQueueIndexChange(previousIndex: Int?, nextIndex: Int?) {
         var dictionary: [String: Any] = [ "position": player.currentTime ]
 
@@ -825,7 +785,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
         // Load isLiveStream option for track
         var isTrackLiveStream = false
-        if let nextIndex = nextIndex {
+        if let nextIndex = nextIndex, nextIndex < player.items.count {
             let track = player.items[nextIndex]
             isTrackLiveStream = (track as? Track)?.isLiveStream ?? false
         }
@@ -835,14 +795,35 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         }
 
         sendEvent(withName: "playback-track-changed", body: dictionary)
+
+        self.handleQueueEnded(previousIndex: previousIndex)
+    }
+
+    func handleQueueEnded(previousIndex: Int?) {
+        guard let index = previousIndex else {
+          return
+        }
+
+        let isRepeatModeOff = player.repeatMode == .off
+        let isQueueEndReached = player.items.count == index + 1
+
+        // fire an event for the queue ending
+        if isRepeatModeOff && isQueueEndReached {
+            sendEvent(withName: "playback-queue-ended", body: [
+                "track": index,
+                "position": player.currentTime,
+            ])
+        }
     }
 
     func handleAudioPlayerSecondElapse(seconds: Double) {
         // because you cannot prevent the `event.secondElapse` from firing
         // do not emit an event if `progressUpdateEventInterval` is nil
-        if shouldEmitUpdateEventInterval == false { return }
+        // additionally, there are certain instances in which this event is emitted
+        // _after_ a manipulation to the queu causing no currentItem to exist (see reset)
+        // in which case we shouldn't emit anything or we'll get an exception.
+        if !shouldEmitProgressEvent || player.currentItem == nil { return }
 
-        let track = player.items[player.currentIndex] as! Track
         sendEvent(
             withName: "playback-progress-updated",
             body: [

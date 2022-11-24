@@ -3,12 +3,10 @@ package com.doublesymmetry.trackplayer.model
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.media.MediaMetadataCompat
 import com.doublesymmetry.kotlinaudio.models.AudioItemOptions
 import com.doublesymmetry.kotlinaudio.models.MediaType
-import com.doublesymmetry.trackplayer.utils.Utils
+import com.doublesymmetry.trackplayer.utils.BundleUtils
 import com.google.android.exoplayer2.upstream.RawResourceDataSource
-import java.util.*
 
 /**
  * @author Milen Pivchev @mpivchev
@@ -28,34 +26,16 @@ class Track(context: Context, bundle: Bundle, ratingType: Int) : TrackMetadata()
         if (originalItem != null && originalItem != bundle) originalItem!!.putAll(bundle)
     }
 
-    override fun toMediaMetadata(): MediaMetadataCompat.Builder {
-        val builder = super.toMediaMetadata()
-        builder!!.putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, uri.toString())
-        return builder
-    }
-
     fun toAudioItem(): TrackAudioItem {
-        return TrackAudioItem(
-            this,
-            type,
-            uri.toString(),
-            artist,
-            title,
-            album,
-            artwork.toString(),
-            AudioItemOptions(
-                headers,
-                userAgent,
-                resourceId
-            )
-        )
+        return TrackAudioItem(this, type, uri.toString(), artist, title, album, artwork.toString(), duration,
+                AudioItemOptions(headers, userAgent, resourceId))
     }
 
     init {
-        resourceId = Utils.getRawResourceId(context, bundle, "url")
+        resourceId = BundleUtils.getRawResourceId(context, bundle, "url")
         uri = if (resourceId == 0) {
             resourceId = null
-            Utils.getUri(context, bundle, "url")
+            BundleUtils.getUri(context, bundle, "url")
         } else {
             RawResourceDataSource.buildRawResourceUri(resourceId!!)
         }
