@@ -60,3 +60,4 @@ buck-out/
 
 # Gemfile
 ios/vendor/
+vendor/

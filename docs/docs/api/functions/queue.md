@@ -3,40 +3,51 @@
 ## `add(tracks, insertBeforeIndex)`
 Adds one or more tracks to the queue.
 
-**Returns:** `Promise<number>` - The promise resolves with the first added track index
+**Returns:** `Promise<number | void>` - The promise resolves with the first
+added track index. If no tracks were added it returns `void`.
 
 | Param          | Type     | Description   |
 | -------------- | -------- | ------------- |
-| tracks         | `array` of [Track Object](../objects/track.md) or a single one | The tracks that will be added |
+| tracks         | `Track \| Track[]` | The [Track](../objects/track.md) objects that will be added |
 | insertBeforeIndex | `number` | The index of the track that will be located immediately after the inserted tracks. Set it to `null` to add it at the end of the queue |
 
 ## `remove(tracks)`
 Removes one or more tracks from the queue.
 
-**Returns:** `Promise`
+**Returns:** `Promise<void>`
 
-| Param  | Type     | Description   |
-| ------ | -------- | ------------- |
-| tracks | `array` of track indexes or a single one | The tracks that will be removed |
+| Param  | Type              | Description |
+|--------|-------------------|-------------|
+| tracks | `Track \| Track[]` | The [Track](../objects/track.md) objects that will be removed |
 
-## `skip(index)`
+## `skip(index, initialPosition)`
 Skips to a track in the queue.
 
-**Returns:** `Promise`
+**Returns:** `Promise<void>`
 
 | Param  | Type     | Description     |
 | ------ | -------- | --------------- |
 | index  | `number` | The track index |
+| initialPosition | `number` | **Optional.** Sets the initial playback for the track you're skipping to. |
 
-## `skipToNext()`
+## `skipToNext(initialPosition)`
 Skips to the next track in the queue.
 
-**Returns:** `Promise`
+**Returns:** `Promise<void>`
 
-## `skipToPrevious()`
+| Param  | Type     | Description     |
+| ------ | -------- | --------------- |
+| initialPosition | `number` | **Optional.** Sets the initial playback for the track you're skipping to. |
+
+## `skipToPrevious(initialPosition)`
 Skips to the previous track in the queue.
 
-**Returns:** `Promise`
+**Returns:** `Promise<void>`
+
+| Param  | Type     | Description     |
+| ------ | -------- | --------------- |
+| initialPosition | `number` | **Optional.** Sets the initial playback for the track you're skipping to. |
+
 
 ## `reset()`
 Resets the player stopping the current track and clearing the queue.
@@ -51,9 +62,9 @@ Gets a track object from the queue.
 | index    | `number`   | The track index |
 
 ## `getCurrentTrack()`
-Gets the index of the current track
+Gets the index of the current track, or null if no track loaded
 
-**Returns:** `Promise<number>`
+**Returns:** `Promise<number | null>`
 
 ## `getQueue()`
 Gets the whole queue
@@ -67,7 +78,7 @@ Clears any upcoming tracks from the queue.
 Updates the metadata of a track in the queue.
 If the current track is updated, the notification and the Now Playing Center will be updated accordingly.
 
-**Returns:** `Promise`
+**Returns:** `Promise<void>`
 
 | Param    | Type       | Description   |
 | -------- | ---------- | ------------- |
