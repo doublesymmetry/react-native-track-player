@@ -364,13 +364,8 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
         for index in indexes {
             // we do not allow removal of the current item
-            //if index == player.currentIndex { continue }
-            do{
-                try player.removeItem(at: index)
-            }
-            catch {
-            	print ("Unexpected error writing to log: : \(error).")
-            }
+            if index == player.currentIndex { continue }
+            try? player.removeItem(at: index)
         }
 
         resolve(NSNull())
