@@ -308,6 +308,14 @@ export enum Event {
    **/
   PlaybackTrackChanged = 'playback-track-changed',
   /**
+  * Fired when the repeat mode is changed.
+  **/
+  PlaybackRepeatModeChanged = "playback-repeat-mode-changed",
+  /**
+  * Fired when the volume is changed.
+  **/
+  PlaybackVolumeChanged = "playback-volume-changed",
+  /**
    * Fired when the current track receives metadata encoded in. (e.g. ID3 tags,
    * Icy Metadata, Vorbis Comments or QuickTime metadata).
    **/
@@ -544,6 +552,16 @@ export interface PlaybackTrackChangedEvent {
   nextTrack: number;
 }
 
+export interface PlaybackRepeatModeChangedEvent {
+  /** Repeat mode status */
+  repeatMode: number | null;
+}
+
+export interface PlaybackVolumeChangedEvent {
+  /** Volume status */
+  volume: number | null;
+}
+
 export interface PlaybackMetadataReceivedEvent {
   /** The metadata source  */
   source: string;
@@ -623,6 +641,8 @@ export interface EventPayloadByEvent {
   [Event.PlaybackError]: PlaybackErrorEvent;
   [Event.PlaybackQueueEnded]: PlaybackQueueEndedEvent;
   [Event.PlaybackTrackChanged]: PlaybackTrackChangedEvent;
+  [Event.PlaybackRepeatModeChanged]: PlaybackRepeatModeChangedEvent;
+  [Event.PlaybackVolumeChanged]: PlaybackVolumeChangedEvent;
   [Event.PlaybackMetadataReceived]: PlaybackMetadataReceivedEvent;
   [Event.PlaybackProgressUpdated]: PlaybackProgressUpdatedEvent;
   [Event.RemotePlay]: never;
@@ -651,6 +671,12 @@ export interface EventsPayloadByEvent {
   };
   [Event.PlaybackTrackChanged]: PlaybackTrackChangedEvent & {
     type: Event.PlaybackTrackChanged;
+  };
+  [Event.PlaybackRepeatModeChanged]: PlaybackRepeatModeChangedEvent & {
+    type: Event.PlaybackRepeatModeChanged;
+  };
+  [Event.PlaybackVolumeChanged]: PlaybackVolumeChangedEvent & {
+    type: Event.PlaybackVolumeChanged;
   };
   [Event.PlaybackMetadataReceived]: PlaybackMetadataReceivedEvent & {
     type: Event.PlaybackMetadataReceived;
