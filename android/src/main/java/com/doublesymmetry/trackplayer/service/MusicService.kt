@@ -299,6 +299,10 @@ class MusicService : HeadlessJsTaskService() {
     @MainThread
     fun setRepeatMode(value: RepeatMode) {
         player.playerOptions.repeatMode = value
+        Bundle().apply {
+            putSerializable(REPEAT_MODE_KEY, value.ordinal)
+            emit(MusicEvents.PLAYBACK_REPEAT_MODE_CHANGED, this)
+        }
     }
 
     @MainThread
@@ -307,6 +311,10 @@ class MusicService : HeadlessJsTaskService() {
     @MainThread
     fun setVolume(value: Float) {
         player.volume = value
+        Bundle().apply {
+            putFloat(VOLUME_KEY, value)
+            emit(MusicEvents.PLAYBACK_VOLUME_CHANGED, this)
+        }
     }
 
     @MainThread
@@ -519,6 +527,9 @@ class MusicService : HeadlessJsTaskService() {
         const val POSITION_KEY = "position"
         const val DURATION_KEY = "duration"
         const val BUFFERED_POSITION_KEY = "buffer"
+
+        const val REPEAT_MODE_KEY = "repeatMode"
+        const val VOLUME_KEY = "volume"
 
         const val TASK_KEY = "TrackPlayer"
 
