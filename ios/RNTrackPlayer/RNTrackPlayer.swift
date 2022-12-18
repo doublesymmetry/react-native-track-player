@@ -310,12 +310,24 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             capabilitiesStr.append("togglePlayPause");
         }
 
+        var forwardJumpInterval: NSNumber = lastForwardJumpInterval;
+        if let explicitForwardJumpInterval = options["forwardJumpInterval"] as? NSNumber {
+            forwardJumpInterval = explicitForwardJumpInterval;
+            lastForwardJumpInterval = forwardJumpInterval;
+        }
+
+        var backwardJumpInterval: NSNumber = lastBackwardJumpInterval;
+        if let explicitBackwardJumpInterval = options["backwardJumpInterval"] as? NSNumber {
+            backwardJumpInterval = explicitBackwardJumpInterval;
+            lastBackwardJumpInterval = backwardJumpInterval;
+        }
+
         player.remoteCommands = capabilitiesStr
             .compactMap { Capability(rawValue: $0) }
             .map { capability in
                 capability.mapToPlayerCommand(
-                    forwardJumpInterval: options["forwardJumpInterval"] as? NSNumber,
-                    backwardJumpInterval: options["backwardJumpInterval"] as? NSNumber,
+                    forwardJumpInterval: forwardJumpInterval,
+                    backwardJumpInterval: backwardJumpInterval,
                     likeOptions: options["likeOptions"] as? [String: Any],
                     dislikeOptions: options["dislikeOptions"] as? [String: Any],
                     bookmarkOptions: options["bookmarkOptions"] as? [String: Any]
