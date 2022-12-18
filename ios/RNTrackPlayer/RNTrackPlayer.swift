@@ -21,6 +21,9 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     private var shouldEmitProgressEvent: Bool = false
     private var shouldResumePlaybackAfterInterruptionEnds: Bool = false
 
+    private var lastForwardJumpInterval: NSNumber = 0;
+    private var lastBackwardJumpInterval: NSNumber = 0;
+
     // MARK: - Lifecycle Methods
 
     public override init() {
