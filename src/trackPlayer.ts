@@ -5,8 +5,6 @@ import {
   NativeModules,
   Platform,
 } from 'react-native';
-// @ts-expect-error because resolveAssetSource is untyped
-import { default as resolveAssetSource } from 'react-native/Libraries/Image/resolveAssetSource';
 
 import { Event, RepeatMode, State } from './constants';
 import type {
@@ -20,6 +18,10 @@ import type {
   TrackMetadataBase,
   UpdateOptions,
 } from './interfaces';
+
+// the Image.resolveAssetResource is the same as the raw import, but it works with web
+// so use it here. Use a `require` to avoid typescript inconsistencies.
+const resolveAssetSource = require('react-native').Image.resolveAssetSource;
 
 const { TrackPlayerModule: TrackPlayer } = NativeModules;
 const emitter =
