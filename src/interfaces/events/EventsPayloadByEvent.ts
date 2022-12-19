@@ -8,7 +8,6 @@ import type { PlaybackActiveTrackChangedEvent } from './PlaybackActiveTrackChang
 import type { PlaybackMetadataReceivedEvent } from './PlaybackMetadataReceivedEvent';
 import type { PlaybackPlayWhenReadyChangedEvent } from './PlaybackPlayWhenReadyChangedEvent';
 import type { PlaybackProgressUpdatedEvent } from './PlaybackProgressUpdatedEvent';
-import type { SleepTimerChangedEvent } from './SleepTimerChangedEvent';
 import type { RemotePlayIdEvent } from './RemotePlayIdEvent';
 import type { RemotePlaySearchEvent } from './RemotePlaySearchEvent';
 import type { RemoteSkipEvent } from './RemoteSkipEvent';
@@ -39,10 +38,6 @@ export interface EventsPayloadByEvent {
   [Event.PlaybackProgressUpdated]: PlaybackProgressUpdatedEvent & {
     type: Event.PlaybackProgressUpdated;
   };
-  [Event.SleepTimerChanged]: SleepTimerChangedEvent & {
-    type: Event.SleepTimerChanged;
-  };
-  [Event.SleepTimerComplete]: { type: Event.SleepTimerComplete };
   [Event.RemotePlay]: { type: Event.RemotePlay };
   [Event.RemotePlayId]: RemotePlayIdEvent & { type: Event.RemotePlayId };
   [Event.RemotePlaySearch]: RemotePlaySearchEvent & {
