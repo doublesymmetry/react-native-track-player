@@ -6,8 +6,14 @@
     "esModuleInterop": true,
     "isolatedModules": true,
     "jsx": "react-native",
-    "lib": ["es2017"],
+    "lib": ["es2017", "DOM", "DOM.Iterable"],
     "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "react-native-track-player": [
+        "../src/index.ts"
+      ]
+    },
     "outDir": "./lib",
     "strict": true,
     "target": "esnext",
