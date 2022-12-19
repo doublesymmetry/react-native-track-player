@@ -32,14 +32,6 @@ export enum Event {
    **/
   PlaybackProgressUpdated = 'playback-progress-updated',
   /**
-   * Fired when sleep timer has changed.
-   **/
-  SleepTimerChanged = 'sleep-timer-changed',
-  /**
-   * Fired when sleep timer has completed.
-   **/
-  SleepTimerComplete = 'sleep-timer-complete',
-  /**
    * Fired when the user presses the play button.
    * See https://react-native-track-player.js.org/docs/api/events#remoteplay
    **/
