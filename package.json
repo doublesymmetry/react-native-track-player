@@ -4,8 +4,11 @@
   "description": "A fully fledged audio module created for music apps",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "react-native": "src/index",
+  "source": "src/index",
   "scripts": {
     "build": "rimraf lib && tsc",
+    "dev": "tsc --watch",
     "lint": "eslint src",
     "format": "prettier --write src",
     "types": "tsc --noEmit true",
@@ -24,6 +27,7 @@
     "publish:npm": "yarn prepare && npm publish --access public"
   },
   "files": [
+    "src",
     "lib/**/*",
     "ios/**/*",
     "android/**/*",
@@ -79,7 +83,8 @@
     }
   },
   "devDependencies": {
-    "@types/react-native": "^0.64.5",
+    "@types/react": "^17.0.52",
+    "@types/react-native": "^0.68",
     "@typescript-eslint/eslint-plugin": "^5.36.0",
     "@typescript-eslint/parser": "^5.36.0",
     "conventional-changelog-cli": "^2.2.2",
@@ -89,6 +94,9 @@
     "husky": "^8.0.0",
     "prettier": "^2.7.1",
     "rimraf": "^2.6.2",
+    "react": "17.0.2",
+    "react-native": "0.68.1",
+    "react-native-windows": "^0.65.0-0",
     "typescript": "^4.8.2"
   },
   "config": {
