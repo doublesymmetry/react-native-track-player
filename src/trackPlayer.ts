@@ -2,10 +2,10 @@ import {
   AppRegistry,
   DeviceEventEmitter,
   NativeEventEmitter,
-  NativeModules,
   Platform,
 } from 'react-native';
 
+import TrackPlayer from './TrackPlayerModule';
 import { Event, RepeatMode, State } from './constants';
 import type {
   EventPayloadByEvent,
@@ -18,12 +18,8 @@ import type {
   TrackMetadataBase,
   UpdateOptions,
 } from './interfaces';
+import resolveAssetSource from './resolveAssetSource';
 
-// the Image.resolveAssetResource is the same as the raw import, but it works with web
-// so use it here. Use a `require` to avoid typescript inconsistencies.
-const resolveAssetSource = require('react-native').Image.resolveAssetSource;
-
-const { TrackPlayerModule: TrackPlayer } = NativeModules;
 const emitter =
   Platform.OS !== 'android'
     ? new NativeEventEmitter(TrackPlayer)
@@ -55,6 +51,8 @@ export function registerPlaybackService(factory: () => ServiceHandler) {
   if (Platform.OS === 'android') {
     // Registers the headless task
     AppRegistry.registerHeadlessTask('TrackPlayer', factory);
+  } else if (Platform.OS === 'web') {
+    factory()();
   } else {
     // Initializes and runs the service in the next tick
     setImmediate(factory());

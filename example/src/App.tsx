@@ -6,6 +6,7 @@ import {
   StatusBar,
   StyleSheet,
   View,
+  Platform,
 } from 'react-native';
 import TrackPlayer, { useActiveTrack } from 'react-native-track-player';
 
@@ -84,6 +85,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#212121',
     alignItems: 'center',
     justifyContent: 'center',
+    minHeight: Platform.OS === 'web' ? '100vh' : '100%',
   },
   contentContainer: {
     flex: 3,
