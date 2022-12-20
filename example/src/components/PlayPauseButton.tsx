@@ -15,7 +15,12 @@ export const PlayPauseButton: React.FC<{
     state === State.Loading || state === State.Buffering,
     250
   );
-  const showPause = playWhenReady && state !== State.Error;
+
+  const isErrored = state === State.Error;
+  const isPaused = state === State.Paused;
+  const isStopped = state === State.Stopped;
+  const isEnded = state === State.Ended;
+  const showPause = playWhenReady && !(isErrored || isStopped || isPaused || isEnded);
   const showBuffering = playWhenReady && isLoading;
   return showBuffering ? (
     <View style={styles.statusContainer}>
