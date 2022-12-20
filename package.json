@@ -2,8 +2,8 @@
   "name": "react-native-track-player",
   "version": "4.0.0-rc03",
   "description": "A fully fledged audio module created for music apps",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "lib/src/index.js",
+  "types": "lib/src/index.d.ts",
   "react-native": "src/index",
   "source": "src/index",
   "scripts": {
@@ -31,6 +31,7 @@
     "lib/**/*",
     "ios/**/*",
     "android/**/*",
+    "web/**/*",
     "*.podspec"
   ],
   "contributors": [
@@ -103,5 +104,8 @@
     "commitizen": {
       "path": "cz-conventional-changelog"
     }
+  },
+  "dependencies": {
+    "shaka-player": "^4.3.2"
   }
 }

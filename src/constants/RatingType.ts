@@ -1,5 +1,4 @@
-import { NativeModules } from 'react-native';
-const { TrackPlayerModule: TrackPlayer } = NativeModules;
+import TrackPlayer from '../TrackPlayerModule';
 
 export enum RatingType {
   Heart = TrackPlayer.RATING_HEART,

@@ -273,3 +273,14 @@ You can find us as part of the [React Native Track Player](https://discordapp.co
 - `# support` - Ask members of the community to trouble shoot issues with your app and make recommendations.
 - `# app-anouncements` - Tell the community about the app you made with this project!
 - `# releases` - Stay updated about the latest releases and dev efforts on the project.
+
+
+### Web Notes
+
+https://github.com/shaka-project/shaka-player/blob/7772099029acb47e6905a688f6cfc9c8738c6ff2/docs/tutorials/faq.md
+
+Q: Why doesn't my HLS content work?
+
+A: If your HLS content uses MPEG2-TS, you may need to enable transmuxing. The only browsers capable of playing TS natively are Edge and Chromecast. You will get a CONTENT_UNSUPPORTED_BY_BROWSER error on other browsers due to their lack of TS support.
+
+You can enable transmuxing by including mux.js v5.6.3+ in your application. If Shaka Player detects that mux.js has been loaded, we will use it to transmux TS content into MP4 on-the-fly, so that the content can be played by the browser.
