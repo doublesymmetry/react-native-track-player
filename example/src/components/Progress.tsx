@@ -15,7 +15,7 @@ export const Progress: React.FC<{ live?: boolean }> = ({ live }) => {
       {live ? (
         <Text style={styles.liveText}>Live Stream</Text>
       ) : (
-        <>
+        <View>
           <Slider
             style={{ ...styles.slider, width: progressBarWidth }}
             value={position}
@@ -33,7 +33,7 @@ export const Progress: React.FC<{ live?: boolean }> = ({ live }) => {
               {formatSeconds(Math.max(0, duration - position))}
             </Text>
           </View>
-        </>
+        </View>
       )}
     </View>
   );

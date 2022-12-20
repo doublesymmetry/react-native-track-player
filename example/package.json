@@ -27,6 +27,7 @@
     "@gorhom/bottom-sheet": "^4",
     "@react-native-community/slider": "^4.4.2",
     "@react-native-segmented-control/segmented-control": "^2.4.2",
+    "mux.js": "^6.2.0",
     "react-dom": "^18.0.2",
     "react-native-gesture-handler": "^2.12.1",
     "react-native-reanimated": "^3.4.1",
