@@ -5,6 +5,6 @@ const resolveAssetResource = (base64: any) => {
 
   // TODO: resolveAssetResource for web
   return base64;
-}
+};
 
 export default resolveAssetResource;
