@@ -3,7 +3,8 @@ require "json"
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 
 Pod::Spec.new do |s|
-  s.name = package["name"]
+  # change package name to work under the redistributed @5stones/react-native-track-player
+  s.name = "react-native-track-player"
   s.version = package["version"]
   s.summary = package["description"]
   s.license = package["license"]
@@ -18,5 +19,7 @@ Pod::Spec.new do |s|
   s.swift_version = "4.2"
 
   s.dependency "React-Core"
-  s.dependency "SwiftAudioEx", "0.15.3"
+  # downgrade SwiftAudioEx verion to work with https://github.com/puckey/SwiftAudioEx/tree/feature/queue-improvements
+  # this can be removed once merged.
+  s.dependency "SwiftAudioEx", "0.15.2"
 end
