@@ -1,3 +1,64 @@
+# [4.0.0-web.6](https://github.com/doublesymmetry/react-native-track-player/compare/v3.1.0...v4.0.0-web.6) (2022-12-21)
+
+
+### Bug Fixes
+
+* **android, events:** properly intercept and fire remote playback events ([#1668](https://github.com/doublesymmetry/react-native-track-player/issues/1668)) ([9ed308c](https://github.com/doublesymmetry/react-native-track-player/commit/9ed308c2a8f5bbd4ab69df01a7cfb86047960538))
+* **android:** call queue methods without playWhenReady parameter ([b4e7149](https://github.com/doublesymmetry/react-native-track-player/commit/b4e7149ad064d310680ff1cd131301ba83acdda2))
+* **android:** fix AppKilledPlaybackBehavior.STOP_PLAYBACK_AND_REMOVE_NOTIFICATION ([3a15334](https://github.com/doublesymmetry/react-native-track-player/commit/3a15334e7a6dc25aa0bb41ad28afaa2b7fdd036b))
+* **android:** fix playWhenReady getter ([5087e03](https://github.com/doublesymmetry/react-native-track-player/commit/5087e032a34a64d063485ca1b1ef233f3543b1f1))
+* **android:** fix state constants ([#1751](https://github.com/doublesymmetry/react-native-track-player/issues/1751)) ([7215e64](https://github.com/doublesymmetry/react-native-track-player/commit/7215e641615a1526e536d5f0e7bb6b0bb2b6d0f7))
+* **android:** implement playback error event ([eccc815](https://github.com/doublesymmetry/react-native-track-player/commit/eccc8151a8577176e3ca684e10f83b8c326ab5dc))
+* **android:** resolve problem with StopPlaybackAndRemoveNotification not working on subsequent exists ([#1762](https://github.com/doublesymmetry/react-native-track-player/issues/1762)) ([e742959](https://github.com/doublesymmetry/react-native-track-player/commit/e742959cc1d697d69daeade39830155bce2ccde7))
+* **example, ios:** remove Capability.Stop ([#1671](https://github.com/doublesymmetry/react-native-track-player/issues/1671)) ([49800ab](https://github.com/doublesymmetry/react-native-track-player/commit/49800ab81f9dbc34a136632a3c7623666e1ae95d))
+* **hooks:**  fix issues with excessive number of pending callbacks  ([#1686](https://github.com/doublesymmetry/react-native-track-player/issues/1686)) ([1b5bb02](https://github.com/doublesymmetry/react-native-track-player/commit/1b5bb02bbe1457902949ebd9c29829ba4998eb07))
+* **hooks:** fix useTrackPlayerEvents dependencies ([#1672](https://github.com/doublesymmetry/react-native-track-player/issues/1672)) ([f6229d6](https://github.com/doublesymmetry/react-native-track-player/commit/f6229d68c2cdb650b90c38fa47f7e40d0028dfee))
+* **hooks:** useProgress & usePlayback hooks ([#1723](https://github.com/doublesymmetry/react-native-track-player/issues/1723)) ([31fa40a](https://github.com/doublesymmetry/react-native-track-player/commit/31fa40acafed2d4bb09a718e4c51879fb1c7e747))
+* **interfaces:** update the definition of PlaybackState to use Exclude<> ([b33cc5b](https://github.com/doublesymmetry/react-native-track-player/commit/b33cc5b34b02c65a5f21f97fb4f80c11dd3e5919))
+* **ios, events:** fix an issue with PlaybackQueueEnded resulting from a race condition ([#1750](https://github.com/doublesymmetry/react-native-track-player/issues/1750)) ([e938c68](https://github.com/doublesymmetry/react-native-track-player/commit/e938c68a1968c8a0fa4aa1019d0343c04a427d60))
+* **ios:** fix various issues in iOS by upgrading SwiftAudioEx ([#1738](https://github.com/doublesymmetry/react-native-track-player/issues/1738)) ([224c491](https://github.com/doublesymmetry/react-native-track-player/commit/224c4910e4c3fe2164ac1cbf0bb3f61810062d48))
+* **ios:** use shared event emitter ([d6bba9a](https://github.com/doublesymmetry/react-native-track-player/commit/d6bba9aa6f77d87257994a4071ee2c4fd1c81f47)), closes [#1139](https://github.com/doublesymmetry/react-native-track-player/issues/1139)
+* **ts:** add `null` to getCurrentTrack return type ([#1681](https://github.com/doublesymmetry/react-native-track-player/issues/1681)) ([096ec68](https://github.com/doublesymmetry/react-native-track-player/commit/096ec68bc0c3150f02c068ed20dd07f0ddf53e35))
+* **ts:** add State.Stopped to PlaybackState type ([0efb0af](https://github.com/doublesymmetry/react-native-track-player/commit/0efb0af993ef3bc8d1e7bce2f42b0382d2d7020c))
+
+
+### Code Refactoring
+
+* **src:** refactor the file structure for better organization ([c4ac5cf](https://github.com/doublesymmetry/react-native-track-player/commit/c4ac5cfca337de65b615d63af67d45417625cf45))
+
+
+### Features
+
+* **android:** add back option to remove notification ([#1730](https://github.com/doublesymmetry/react-native-track-player/issues/1730)) ([82a5df9](https://github.com/doublesymmetry/react-native-track-player/commit/82a5df9ec62476b05bbef6f5d18ca9b0b801d298))
+* **android:** add string values to State enum ([9994b58](https://github.com/doublesymmetry/react-native-track-player/commit/9994b583b1c18f5624cfc6bd9257b9250456950c)), closes [#1688](https://github.com/doublesymmetry/react-native-track-player/issues/1688)
+* **android:** add string values to State enum ([#1734](https://github.com/doublesymmetry/react-native-track-player/issues/1734)) ([bd48c2d](https://github.com/doublesymmetry/react-native-track-player/commit/bd48c2d6de2a56e0a96be8dd47bc316ea0dcd8cf)), closes [#1688](https://github.com/doublesymmetry/react-native-track-player/issues/1688)
+* **android:** default the behavior to handle audio becoming noisy ([#1732](https://github.com/doublesymmetry/react-native-track-player/issues/1732)) ([dabf715](https://github.com/doublesymmetry/react-native-track-player/commit/dabf71566cba1cc9fba48899ad6be58e59a90212))
+* **android:** implement move, load and improve remove ([ddbf302](https://github.com/doublesymmetry/react-native-track-player/commit/ddbf302ae11d29df494f504979212f50b00d546c))
+* **android:** implement TrackPlayer.load(track) ([0cb5fd6](https://github.com/doublesymmetry/react-native-track-player/commit/0cb5fd6d67b9fe24bd08455d3208cb05e89f683b))
+* **api:** Implement TrackPlayer.getProgress(). ([1cc8488](https://github.com/doublesymmetry/react-native-track-player/commit/1cc8488b54d4fdfb2b2b02b1ff33bcbeb721d290))
+* **api:** move(fromIndex, toIndex) ([7a5ea07](https://github.com/doublesymmetry/react-native-track-player/commit/7a5ea077c28093d018a3f017038385b317906a3a))
+* automatic interruption handling ([1126f03](https://github.com/doublesymmetry/react-native-track-player/commit/1126f03ff02b0f60c355faf162cf3728d2db9694))
+* **ios:** deprecate waitForBuffer ([#1695](https://github.com/doublesymmetry/react-native-track-player/issues/1695)) ([d277182](https://github.com/doublesymmetry/react-native-track-player/commit/d27718295cecc88886db2cbe96666c9c50d34b34))
+* **ios:** implement getPlaybackState ([bbc5c53](https://github.com/doublesymmetry/react-native-track-player/commit/bbc5c533fc51af8f6c1935cdff9d78e93788882b))
+* **ios:** implement move(fromIndex, toIndex) ([f1cf09e](https://github.com/doublesymmetry/react-native-track-player/commit/f1cf09efff832f055ff1df70bcfc8a7e73a0c31f))
+* **ios:** improve disabling of playback-progress-updated ([#1706](https://github.com/doublesymmetry/react-native-track-player/issues/1706)) ([57de8b5](https://github.com/doublesymmetry/react-native-track-player/commit/57de8b5e12c05bed093a754474b2e4e0e8597578))
+* **js:** Extend State ([9b84820](https://github.com/doublesymmetry/react-native-track-player/commit/9b84820a43e9a2a9049da3d0aa015ae2e7ebf022))
+* **js:** implement getPlaybackState() ([2e4c891](https://github.com/doublesymmetry/react-native-track-player/commit/2e4c89168e597e8169936ee8b9bc32d4e2e332b4))
+* **js:** implement play when ready functionality ([e5f5d21](https://github.com/doublesymmetry/react-native-track-player/commit/e5f5d218af1ea26df3a836f7facd34a9e70fd09a))
+* **js:** TrackPlayer.reload() ([bfe451a](https://github.com/doublesymmetry/react-native-track-player/commit/bfe451af2a658103fbf1b1bdd68e74fb9f5d81a0))
+* sleep timer ([5c9ca2f](https://github.com/doublesymmetry/react-native-track-player/commit/5c9ca2fcbc296f7fd03583b54060f7857ddf5848))
+* TrackPlayer.load(track) ([884afa0](https://github.com/doublesymmetry/react-native-track-player/commit/884afa07afc8ae9833a0d63d8f58fb86f5fc4d66))
+* TrackPlayer.stop() ([4bf1121](https://github.com/doublesymmetry/react-native-track-player/commit/4bf11217e784a2dcdb54d74f4e46f17c0912efae))
+* **web:** add a web implementation ([aa6ed21](https://github.com/doublesymmetry/react-native-track-player/commit/aa6ed218651c1a5e6bc40998e77801f1ac1bad08))
+
+
+### BREAKING CHANGES
+
+* **src:** this restructure will potentially be a breaking change for projects that use deep
+imports. if your project uses deep imports please refactor them to the new structure.
+
+
+
 # [4.0.0-web.5](https://github.com/doublesymmetry/react-native-track-player/compare/v3.1.0...v4.0.0-web.5) (2022-12-21)
 
 
