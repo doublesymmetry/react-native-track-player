@@ -622,15 +622,7 @@ export type SleepTimerChangedEvent = SleepTimer;
 
 export type PlaybackState =
   | {
-      state:
-        | State.None
-        | State.Buffering
-        | State.Loading
-        | State.Playing
-        | State.Paused
-        | State.Ready
-        | State.Paused
-        | State.Stopped;
+      state: Exclude<State, State.Error>
     }
   | {
       state: State.Error;
