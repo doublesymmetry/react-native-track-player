@@ -19,10 +19,15 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     private let player = QueuedAudioPlayer()
     private let audioSessionController = AudioSessionController.shared
     private var shouldEmitProgressEvent: Bool = false
+<<<<<<< HEAD
     private var shouldResumePlaybackAfterInterruptionEnds: Bool = false
 
     private var lastForwardJumpInterval: NSNumber = 0;
     private var lastBackwardJumpInterval: NSNumber = 0;
+=======
+    private var forwardJumpInterval: NSNumber?;
+    private var backwardJumpInterval: NSNumber?;
+>>>>>>> 51c7616 (fix: updated to preserve nil-hood as suggested)
 
     // MARK: - Lifecycle Methods
 
