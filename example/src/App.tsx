@@ -32,18 +32,18 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    function deepLinkHandler(data: { url: string; }) {
-      console.log("deepLinkHandler", data.url)
+    function deepLinkHandler(data: { url: string }) {
+      console.log('deepLinkHandler', data.url);
     }
 
     // This event will be fired when the app is already open and the notification is clicked
-    Linking.addEventListener("url", deepLinkHandler);
+    Linking.addEventListener('url', deepLinkHandler);
 
-    // When you launch the closed app from the notification or any other link 
-    Linking.getInitialURL().then(url => console.log("getInitialURL", url));
+    // When you launch the closed app from the notification or any other link
+    Linking.getInitialURL().then((url) => console.log('getInitialURL', url));
 
     return () => {
-      Linking.removeEventListener("url", deepLinkHandler);
+      Linking.removeEventListener('url', deepLinkHandler);
     };
   }, []);
 
