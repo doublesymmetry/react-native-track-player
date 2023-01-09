@@ -401,15 +401,8 @@ class MusicService : HeadlessJsTaskService() {
                         startForeground(it.notificationId, it.notification)
                     }
                     is NotificationState.CANCELLED -> {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            stopForeground(STOP_FOREGROUND_REMOVE)
-                        } else {
-                            @Suppress("DEPRECATION")
-                            stopForeground(true)
-                        }
-
+                        stopForeground(true)
                         stopSelf()
-                        exitProcess(0)
                     }
                 }
             }
@@ -506,6 +499,8 @@ class MusicService : HeadlessJsTaskService() {
 
     @MainThread
     override fun onDestroy() {
+        super.onDestroy()
+
         if (::player.isInitialized) {
             player.destroy()
         }
