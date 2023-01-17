@@ -12,19 +12,15 @@
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint src",
-    "sync:ios": "yarn rimraf ../ios && yarn cpx 'node_modules/react-native-track-player/ios/**' ../ios",
-    "sync:android": "yarn rimraf ../android && yarn cpx 'node_modules/react-native-track-player/android/**' ../android",
-    "sync": "yarn sync:ios && yarn sync:android",
     "fresh": "rm -rf node_modules ; cd .. && yarn build ; cd example && yarn install",
     "types": "tsc --noEmit true",
     "ci:lint": "eslint src --max-warnings=0",
     "ci:format": "prettier --check src"
   },
   "dependencies": {
-    "@react-native-community/slider": "4.2.0",
+    "@react-native-community/slider": "^4.4.0",
     "react": "17.0.2",
     "react-native": "0.68.1",
-    "react-native-track-player": "file:..",
     "react-native-windows": "^0.65.0-0"
   },
   "devDependencies": {
