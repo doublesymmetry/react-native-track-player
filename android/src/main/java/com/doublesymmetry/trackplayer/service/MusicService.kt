@@ -66,6 +66,8 @@ class MusicService : HeadlessJsTaskService() {
 
     val event get() = player.event
 
+    val state get() = player.playerState.asLibState.state
+
     private var latestOptions: Bundle? = null
     private var capabilities: List<Capability> = emptyList()
     private var notificationCapabilities: List<Capability> = emptyList()
@@ -248,8 +250,13 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     @MainThread
-    fun stopPlayer() {
+    fun stop() {
         player.stop()
+    }
+
+    @MainThread
+    fun clear() {
+        player.clear()
     }
 
     @MainThread
@@ -401,8 +408,12 @@ class MusicService : HeadlessJsTaskService() {
                         startForeground(it.notificationId, it.notification)
                     }
                     is NotificationState.CANCELLED -> {
-                        stopForeground(true)
-                        stopSelf()
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            stopForeground(STOP_FOREGROUND_REMOVE)
+                        } else {
+                            @Suppress("DEPRECATION")
+                            stopForeground(true)
+                        }
                     }
                 }
             }
@@ -487,7 +498,20 @@ class MusicService : HeadlessJsTaskService() {
 
         when (appKilledPlaybackBehavior) {
             AppKilledPlaybackBehavior.PAUSE_PLAYBACK -> player.pause()
-            AppKilledPlaybackBehavior.STOP_PLAYBACK_AND_REMOVE_NOTIFICATION -> player.stop()
+            AppKilledPlaybackBehavior.STOP_PLAYBACK_AND_REMOVE_NOTIFICATION -> {
+                player.clear()
+                player.stop()
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    stopForeground(STOP_FOREGROUND_REMOVE)
+                } else {
+                    @Suppress("DEPRECATION")
+                    stopForeground(true)
+                }
+
+                stopSelf()
+                exitProcess(0)
+            }
             else -> {}
         }
     }
