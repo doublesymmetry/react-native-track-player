@@ -93,8 +93,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             "playback-state",
             "playback-error",
             "playback-track-changed",
-            "playback-repeat-mode-changed",
-            "playback-volume-changed",
             "playback-metadata-received",
             "playback-progress-updated",
 
@@ -519,9 +517,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         }
 
         player.repeatMode = SwiftAudioEx.RepeatMode(rawValue: repeatMode.intValue) ?? .off
-        sendEvent(withName: "playback-repeat-mode-changed", body: [
-            "repeatMode": repeatMode,
-        ])
         resolve(NSNull())
     }
 
@@ -543,9 +538,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         }
 
         player.volume = level
-        sendEvent(withName: "playback-volume-changed", body: [
-            "volume": level,
-        ])
         resolve(NSNull())
     }
 
