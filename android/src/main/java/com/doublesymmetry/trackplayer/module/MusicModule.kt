@@ -370,7 +370,8 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     fun reset(callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
 
-        musicService.stopPlayer()
+        musicService.clear()
+        musicService.stop()
         callback.resolve(null)
     }
 
@@ -500,7 +501,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         if (!::musicService.isInitialized) {
             callback.resolve(State.Idle.ordinal)
         } else {
-            callback.resolve(musicService.event.stateChange.value.asLibState.state)
+            callback.resolve(musicService.state)
         }
     }
 }
