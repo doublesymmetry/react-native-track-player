@@ -39,8 +39,6 @@ class MusicEvents(private val reactContext: ReactContext) : BroadcastReceiver() 
         // Playback Events
         const val PLAYBACK_STATE = "playback-state"
         const val PLAYBACK_TRACK_CHANGED = "playback-track-changed"
-        const val PLAYBACK_REPEAT_MODE_CHANGED = "playback-repeat-mode-changed"
-        const val PLAYBACK_VOLUME_CHANGED = "playback-volume-changed"
         const val PLAYBACK_QUEUE_ENDED = "playback-queue-ended"
         const val PLAYBACK_METADATA = "playback-metadata-received"
         const val PLAYBACK_PROGRESS_UPDATED = "playback-progress-updated"
