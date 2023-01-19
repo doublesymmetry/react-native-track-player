@@ -18,10 +18,10 @@ You can optionally configure a few options for how the Track Player module is bu
 
 Whether it will add support for [DASH](https://en.wikipedia.org/wiki/Dynamic_Adaptive_Streaming_over_HTTP) streams. This option adds an extension for handling DASH streams, which changes the app size. Defaults to `false`.
 
-## `hls` (Android)
+## `hls`
 
-Whether it will add support for [Smooth Streaming](https://en.wikipedia.org/wiki/Adaptive_bitrate_streaming#Microsoft_Smooth_Streaming) streams. This option adds an extension for handling SmoothStreaming streams, which changes the app size. Defaults to `false`.
+Whether it will add support for [HLS](https://en.wikipedia.org/wiki/HTTP_Live_Streaming) streams. This option adds an extension for handling HLS streams, which changes the app size. Defaults to `false`.
 
 ## `smoothstreaming` (Android)
 
-Whether it will add support for SmoothStreaming streams. This option adds an extension for handling SmoothStreaming streams, which changes the app size.
+Whether it will add support for [Smooth Streaming](https://en.wikipedia.org/wiki/Adaptive_bitrate_streaming#Microsoft_Smooth_Streaming) streams. This option adds an extension for handling SmoothStreaming streams, which changes the app size.
