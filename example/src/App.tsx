@@ -6,28 +6,30 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import TrackPlayer from 'react-native-track-player';
+import TrackPlayer, { useActiveTrack } from 'react-native-track-player';
 
 import { Button, PlayerControls, Progress, TrackInfo } from './components';
-import { useCurrentTrack } from './hooks';
 import { QueueInitialTracksService, SetupService } from './services';
 
 const App: React.FC = () => {
-  const track = useCurrentTrack();
+  const track = useActiveTrack();
   const [isPlayerReady, setIsPlayerReady] = useState<boolean>(false);
 
   useEffect(() => {
-    async function run() {
+    let unmounted = false;
+    (async () => {
       const isSetup = await SetupService();
+      if (unmounted) return;
       setIsPlayerReady(isSetup);
-
       const queue = await TrackPlayer.getQueue();
+      if (unmounted) return;
       if (isSetup && queue.length <= 0) {
         await QueueInitialTracksService();
       }
-    }
-
-    run();
+    })();
+    return () => {
+      unmounted = true;
+    };
   }, []);
 
   if (!isPlayerReady) {

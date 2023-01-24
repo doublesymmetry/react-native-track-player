@@ -1,26 +1,26 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import TrackPlayer from 'react-native-track-player';
+import { StyleSheet, View } from 'react-native';
+import TrackPlayer, { usePlaybackState } from 'react-native-track-player';
 
 import { Button } from './Button';
+import { PlaybackError } from './PlaybackError';
 import { PlayPauseButton } from './PlayPauseButton';
 
+const performSkipToNext = () => TrackPlayer.skipToNext();
+const performSkipToPrevious = () => TrackPlayer.skipToPrevious();
+
 export const PlayerControls: React.FC = () => {
+  const playback = usePlaybackState();
   return (
-    <View style={{ width: '100%' }}>
+    <View style={styles.container}>
       <View style={styles.row}>
-        <Button
-          title="Prev"
-          onPress={() => TrackPlayer.skipToPrevious()}
-          type="secondary"
-        />
-        <PlayPauseButton />
-        <Button
-          title="Next"
-          onPress={() => TrackPlayer.skipToNext()}
-          type="secondary"
-        />
+        <Button title="Prev" onPress={performSkipToPrevious} type="secondary" />
+        <PlayPauseButton state={playback.state} />
+        <Button title="Next" onPress={performSkipToNext} type="secondary" />
       </View>
+      <PlaybackError
+        error={'error' in playback ? playback.error.message : undefined}
+      />
     </View>
   );
 };

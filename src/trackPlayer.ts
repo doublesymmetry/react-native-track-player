@@ -7,16 +7,18 @@ import {
 } from 'react-native';
 // @ts-expect-error because resolveAssetSource is untyped
 import { default as resolveAssetSource } from 'react-native/Libraries/Image/resolveAssetSource';
-import {
-  Event,
+
+import { Event, RepeatMode, State } from './constants';
+import type {
   EventPayloadByEvent,
-  MetadataOptions,
   NowPlayingMetadata,
+  PlaybackState,
   PlayerOptions,
-  RepeatMode,
-  State,
+  Progress,
+  ServiceHandler,
   Track,
   TrackMetadataBase,
+  UpdateOptions,
 } from './interfaces';
 
 const { TrackPlayerModule: TrackPlayer } = NativeModules;
@@ -36,16 +38,18 @@ function resolveImportedPath(path?: number | string) {
 
 /**
  * Initializes the player with the specified options.
+ *
+ * @param options The options to initialize the player with.
+ * @see https://react-native-track-player.js.org/docs/api/functions/lifecycle
  */
-async function setupPlayer(options: PlayerOptions = {}): Promise<void> {
-  return TrackPlayer.setupPlayer(options || {});
+export async function setupPlayer(options: PlayerOptions = {}): Promise<void> {
+  return TrackPlayer.setupPlayer(options);
 }
 
-type ServiceHandler = () => Promise<void>;
 /**
  * Register the playback service. The service will run as long as the player runs.
  */
-function registerPlaybackService(factory: () => ServiceHandler) {
+export function registerPlaybackService(factory: () => ServiceHandler) {
   if (Platform.OS === 'android') {
     // Registers the headless task
     AppRegistry.registerHeadlessTask('TrackPlayer', factory);
@@ -55,7 +59,7 @@ function registerPlaybackService(factory: () => ServiceHandler) {
   }
 }
 
-function addEventListener<T extends Event>(
+export function addEventListener<T extends Event>(
   event: T,
   listener: EventPayloadByEvent[T] extends never
     ? () => void
@@ -67,7 +71,7 @@ function addEventListener<T extends Event>(
 /**
  * @deprecated This method should not be used, most methods reject when service is not bound.
  */
-function isServiceRunning(): Promise<boolean> {
+export function isServiceRunning(): Promise<boolean> {
   return TrackPlayer.isServiceRunning();
 }
 
@@ -75,8 +79,27 @@ function isServiceRunning(): Promise<boolean> {
 
 /**
  * Adds one or more tracks to the queue.
+ *
+ * @param tracks The tracks to add to the queue.
+ * @param insertBeforeIndex (Optional) The index to insert the tracks before.
+ * By default the tracks will be added to the end of the queue.
  */
-async function add(
+export async function add(
+  tracks: Track[],
+  insertBeforeIndex?: number
+): Promise<number | void>;
+/**
+ * Adds a track to the queue.
+ *
+ * @param track The track to add to the queue.
+ * @param insertBeforeIndex (Optional) The index to insert the track before.
+ * By default the track will be added to the end of the queue.
+ */
+export async function add(
+  track: Track,
+  insertBeforeIndex?: number
+): Promise<number | void>;
+export async function add(
   tracks: Track | Track[],
   insertBeforeIndex = -1
 ): Promise<number | void> {
@@ -102,41 +125,83 @@ async function add(
 }
 
 /**
- * Removes one or more tracks from the queue.
+ * Replaces the current track or loads the track as the first in the queue.
+ *
+ * @param track The track to load.
  */
-async function remove(tracks: number | number[]): Promise<void> {
-  if (!Array.isArray(tracks)) {
-    tracks = [tracks];
-  }
+export async function load(track: Track): Promise<number | void> {
+  return TrackPlayer.load(track);
+}
 
-  return TrackPlayer.remove(tracks);
+/**
+ * Move a track within the queue.
+ *
+ * @param fromIndex The index of the track to be moved.
+ * @param toIndex The index to move the track to. If the index is larger than
+ * the size of the queue, then the track is moved to the end of the queue.
+ */
+export async function move(fromIndex: number, toIndex: number): Promise<void> {
+  return TrackPlayer.move(fromIndex, toIndex);
+}
+
+/**
+ * Removes multiple tracks from the queue by their indexes.
+ *
+ * If the current track is removed, the next track will activated. If the
+ * current track was the last track in the queue, the first track will be
+ * activated.
+ *
+ * @param indexes The indexes of the tracks to be removed.
+ */
+export async function remove(indexes: number[]): Promise<void>;
+/**
+ * Removes a track from the queue by its index.
+ *
+ * If the current track is removed, the next track will activated. If the
+ * current track was the last track in the queue, the first track will be
+ * activated.
+ *
+ * @param index The index of the track to be removed.
+ */
+export async function remove(index: number): Promise<void>;
+export async function remove(indexOrIndexes: number | number[]): Promise<void> {
+  return TrackPlayer.remove(
+    Array.isArray(indexOrIndexes) ? indexOrIndexes : [indexOrIndexes]
+  );
 }
 
 /**
  * Clears any upcoming tracks from the queue.
  */
-async function removeUpcomingTracks(): Promise<void> {
+export async function removeUpcomingTracks(): Promise<void> {
   return TrackPlayer.removeUpcomingTracks();
 }
 
 /**
  * Skips to a track in the queue.
+ *
+ * @param index The index of the track to skip to.
+ * @param initialPosition (Optional) The initial position to seek to in seconds.
  */
-async function skip(trackIndex: number, initialPosition = -1): Promise<void> {
-  return TrackPlayer.skip(trackIndex, initialPosition);
+export async function skip(index: number, initialPosition = -1): Promise<void> {
+  return TrackPlayer.skip(index, initialPosition);
 }
 
 /**
  * Skips to the next track in the queue.
+ *
+ * @param initialPosition (Optional) The initial position to seek to in seconds.
  */
-async function skipToNext(initialPosition = -1): Promise<void> {
+export async function skipToNext(initialPosition = -1): Promise<void> {
   return TrackPlayer.skipToNext(initialPosition);
 }
 
 /**
  * Skips to the previous track in the queue.
+ *
+ * @param initialPosition (Optional) The initial position to seek to in seconds.
  */
-async function skipToPrevious(initialPosition = -1): Promise<void> {
+export async function skipToPrevious(initialPosition = -1): Promise<void> {
   return TrackPlayer.skipToPrevious(initialPosition);
 }
 
@@ -144,9 +209,22 @@ async function skipToPrevious(initialPosition = -1): Promise<void> {
 
 /**
  * Updates the configuration for the components.
+ *
+ * @param options The options to update.
+ * @see https://react-native-track-player.js.org/docs/api/functions/player#updateoptionsoptions
  */
-async function updateOptions(options: MetadataOptions = {}): Promise<void> {
-  options = { ...options };
+export async function updateOptions({
+  alwaysPauseOnInterruption,
+  ...options
+}: UpdateOptions = {}): Promise<void> {
+  // Handle deprecated alwaysPauseOnInterruption option:
+  if (
+    alwaysPauseOnInterruption !== undefined &&
+    !(options.android && 'alwaysPauseOnInterruption' in options.android)
+  ) {
+    if (!options.android) options.android = {};
+    options.android.alwaysPauseOnInterruption = alwaysPauseOnInterruption;
+  }
 
   // Resolve the asset for each icon
   options.icon = resolveImportedPath(options.icon);
@@ -164,8 +242,11 @@ async function updateOptions(options: MetadataOptions = {}): Promise<void> {
 /**
  * Updates the metadata of a track in the queue. If the current track is updated,
  * the notification and the Now Playing Center will be updated accordingly.
+ *
+ * @param trackIndex The index of the track whose metadata will be updated.
+ * @param metadata The metadata to update.
  */
-async function updateMetadataForTrack(
+export async function updateMetadataForTrack(
   trackIndex: number,
   metadata: TrackMetadataBase
 ): Promise<void> {
@@ -178,11 +259,13 @@ async function updateMetadataForTrack(
   return TrackPlayer.updateMetadataForTrack(trackIndex, metadata);
 }
 
-function clearNowPlayingMetadata(): Promise<void> {
+export function clearNowPlayingMetadata(): Promise<void> {
   return TrackPlayer.clearNowPlayingMetadata();
 }
 
-function updateNowPlayingMetadata(metadata: NowPlayingMetadata): Promise<void> {
+export function updateNowPlayingMetadata(
+  metadata: NowPlayingMetadata
+): Promise<void> {
   // Clone the object before modifying it
   metadata = Object.assign({}, metadata);
 
@@ -197,163 +280,227 @@ function updateNowPlayingMetadata(metadata: NowPlayingMetadata): Promise<void> {
 /**
  * Resets the player stopping the current track and clearing the queue.
  */
-async function reset(): Promise<void> {
+export async function reset(): Promise<void> {
   return TrackPlayer.reset();
 }
 
 /**
  * Plays or resumes the current track.
  */
-async function play(): Promise<void> {
+export async function play(): Promise<void> {
   return TrackPlayer.play();
 }
 
 /**
  * Pauses the current track.
  */
-async function pause(): Promise<void> {
+export async function pause(): Promise<void> {
   return TrackPlayer.pause();
 }
 
 /**
- * Seeks to a specified time position in the current track.
+ * Stops the current track.
  */
-async function seekTo(position: number): Promise<void> {
+export async function stop(): Promise<void> {
+  return TrackPlayer.stop();
+}
+
+/**
+ * Sets wether the player will play automatically when it is ready to do so.
+ * This is the equivalent of calling `TrackPlayer.play()` when `playWhenReady = true`
+ * or `TrackPlayer.pause()` when `playWhenReady = false`.
+ */
+export async function setPlayWhenReady(
+  playWhenReady: boolean
+): Promise<boolean> {
+  return TrackPlayer.setPlayWhenReady(playWhenReady);
+}
+
+/**
+ * Gets wether the player will play automatically when it is ready to do so.
+ */
+export async function getPlayWhenReady(): Promise<boolean> {
+  return TrackPlayer.getPlayWhenReady();
+}
+
+/**
+ * Seeks to a specified time position in the current track.
+ *
+ * @param position The position to seek to in seconds.
+ */
+export async function seekTo(position: number): Promise<void> {
   return TrackPlayer.seekTo(position);
 }
 
 /**
- * Sets the volume of the player.
+ * Seeks by a relative time offset in the current track.
+ *
+ * @param offset The time offset to seek by in seconds.
  */
-async function setVolume(level: number): Promise<void> {
+export async function seekBy(offset: number): Promise<void> {
+  return TrackPlayer.seekBy(offset);
+}
+
+/**
+ * Sets the volume of the player.
+ *
+ * @param volume The volume as a number between 0 and 1.
+ */
+export async function setVolume(level: number): Promise<void> {
   return TrackPlayer.setVolume(level);
 }
 
 /**
  * Sets the playback rate.
+ *
+ * @param rate The playback rate to change to, where 0.5 would be half speed,
+ * 1 would be regular speed, 2 would be double speed etc.
  */
-async function setRate(rate: number): Promise<void> {
+export async function setRate(rate: number): Promise<void> {
   return TrackPlayer.setRate(rate);
 }
 
 /**
- * Sets the repeat mode.
+ * Sets the queue.
+ *
+ * @param tracks The tracks to set as the queue.
+ * @see https://react-native-track-player.js.org/docs/api/constants/repeat-mode
  */
-async function setRepeatMode(mode: RepeatMode): Promise<RepeatMode> {
+export async function setQueue(tracks: Track[]): Promise<void> {
+  return TrackPlayer.setQueue(tracks);
+}
+
+/**
+ * Sets the queue repeat mode.
+ *
+ * @param repeatMode The repeat mode to set.
+ * @see https://react-native-track-player.js.org/docs/api/constants/repeat-mode
+ */
+export async function setRepeatMode(mode: RepeatMode): Promise<RepeatMode> {
   return TrackPlayer.setRepeatMode(mode);
 }
 
 // MARK: - Getters
 
 /**
- * Gets the volume of the player (a number between 0 and 1).
+ * Gets the volume of the player as a number between 0 and 1.
  */
-async function getVolume(): Promise<number> {
+export async function getVolume(): Promise<number> {
   return TrackPlayer.getVolume();
 }
 
 /**
- * Gets the playback rate, where 1 is the regular speed.
+ * Gets the playback rate where 0.5 would be half speed, 1 would be
+ * regular speed and 2 would be double speed etc.
  */
-async function getRate(): Promise<number> {
+export async function getRate(): Promise<number> {
   return TrackPlayer.getRate();
 }
 
 /**
  * Gets a track object from the queue.
+ *
+ * @param index The index of the track.
+ * @returns The track object or undefined if there isn't a track object at that
+ * index.
  */
-async function getTrack(trackIndex: number): Promise<Track | null> {
-  return TrackPlayer.getTrack(trackIndex);
+export async function getTrack(index: number): Promise<Track | undefined> {
+  return TrackPlayer.getTrack(index);
 }
 
 /**
  * Gets the whole queue.
  */
-async function getQueue(): Promise<Track[]> {
+export async function getQueue(): Promise<Track[]> {
   return TrackPlayer.getQueue();
 }
 
 /**
- * Gets the index of the current track.
+ * Gets the index of the active track in the queue or undefined if there is no
+ * current track.
  */
-async function getCurrentTrack(): Promise<number | null> {
-  return TrackPlayer.getCurrentTrack();
+export async function getActiveTrackIndex(): Promise<number | undefined> {
+  return (await TrackPlayer.getActiveTrackIndex()) ?? undefined;
+}
+
+/**
+ * Gets the active track or undefined if there is no current track.
+ */
+export async function getActiveTrack(): Promise<Track | undefined> {
+  return (await TrackPlayer.getActiveTrack()) ?? undefined;
+}
+
+/**
+ * Gets the index of the current track or null if there is no current track.
+ *
+ * @deprecated use `TrackPlayer.getActiveTrackIndex()` instead.
+ */
+export async function getCurrentTrack(): Promise<number | null> {
+  return TrackPlayer.getActiveTrackIndex();
 }
 
 /**
  * Gets the duration of the current track in seconds.
+ * @deprecated Use `TrackPlayer.getProgress().then((progress) => progress.buffered)` instead.
  */
-async function getDuration(): Promise<number> {
+export async function getDuration(): Promise<number> {
   return TrackPlayer.getDuration();
 }
 
 /**
  * Gets the buffered position of the current track in seconds.
+ *
+ * @deprecated Use `TrackPlayer.getProgress().then((progress) => progress.buffered)` instead.
  */
-async function getBufferedPosition(): Promise<number> {
+export async function getBufferedPosition(): Promise<number> {
   return TrackPlayer.getBufferedPosition();
 }
 
 /**
- * Gets the position of the current track in seconds.
+ * Gets the playback position of the current track in seconds.
+ * @deprecated Use `TrackPlayer.getProgress().then((progress) => progress.position)` instead.
  */
-async function getPosition(): Promise<number> {
+export async function getPosition(): Promise<number> {
   return TrackPlayer.getPosition();
 }
 
 /**
- * Gets the playback state of the player.
+ * Gets information on the progress of the currently active track, including its
+ * current playback position in seconds, buffered position in seconds and
+ * duration in seconds.
  */
-async function getState(): Promise<State> {
-  return TrackPlayer.getState();
+export async function getProgress(): Promise<Progress> {
+  return TrackPlayer.getProgress();
 }
 
 /**
- * Gets the repeat mode.
+ * @deprecated use (await getPlaybackState()).state instead.
  */
-async function getRepeatMode(): Promise<RepeatMode> {
+export async function getState(): Promise<State> {
+  return (await TrackPlayer.getPlaybackState()).state;
+}
+
+/**
+ * Gets the playback state of the player.
+ *
+ * @see https://react-native-track-player.js.org/docs/api/constants/state
+ */
+export async function getPlaybackState(): Promise<PlaybackState> {
+  return TrackPlayer.getPlaybackState();
+}
+
+/**
+ * Gets the queue repeat mode.
+ *
+ * @see https://react-native-track-player.js.org/docs/api/constants/repeat-mode
+ */
+export async function getRepeatMode(): Promise<RepeatMode> {
   return TrackPlayer.getRepeatMode();
 }
 
-export default {
-  // MARK: - General API
-  setupPlayer,
-  registerPlaybackService,
-  addEventListener,
-  isServiceRunning,
-
-  // MARK: - Queue API
-  add,
-  remove,
-  removeUpcomingTracks,
-  skip,
-  skipToNext,
-  skipToPrevious,
-
-  // MARK: - Control Center / Notifications API
-  updateOptions,
-  updateMetadataForTrack,
-  clearNowPlayingMetadata,
-  updateNowPlayingMetadata,
-
-  // MARK: - Player API
-  reset,
-  play,
-  pause,
-  seekTo,
-  setVolume,
-  setRate,
-  setRepeatMode,
-
-  // MARK: - Getters
-  getVolume,
-  getRate,
-  getTrack,
-  getQueue,
-  getCurrentTrack,
-  getDuration,
-  getBufferedPosition,
-  getPosition,
-  getState,
-  getRepeatMode,
-};
+/**
+ * Retries the current item when the playback state is `State.Error`.
+ */
+export async function retry() {
+  return TrackPlayer.retry();
+}

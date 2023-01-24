@@ -1,33 +1,35 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { State, usePlaybackState } from 'react-native-track-player';
-import { useOnTogglePlayback } from '../hooks';
-import { useDebouncedValue } from '../hooks/useDebouncedValue';
-
+import TrackPlayer, {
+  State,
+  usePlayWhenReady,
+} from 'react-native-track-player';
+import { useDebouncedValue } from '../hooks';
 import { Button } from './Button';
 
-export const PlayPauseButton: React.FC = () => {
-  const state = usePlaybackState();
-  const isPlaying = state === State.Playing;
+export const PlayPauseButton: React.FC<{
+  state: State | undefined;
+}> = ({ state }) => {
+  const playWhenReady = usePlayWhenReady();
   const isLoading = useDebouncedValue(
-    state === State.Connecting || state === State.Buffering,
+    state === State.Loading || state === State.Buffering,
     250
   );
 
-  const onTogglePlayback = useOnTogglePlayback();
-
-  if (isLoading) {
-    return (
-      <View style={styles.statusContainer}>
-        {isLoading && <ActivityIndicator />}
-      </View>
-    );
-  }
-
-  return (
+  const isErrored = state === State.Error;
+  const isPaused = state === State.Paused;
+  const isStopped = state === State.Stopped;
+  const isEnded = state === State.Ended;
+  const showPause = playWhenReady && !(isErrored || isStopped || isPaused || isEnded);
+  const showBuffering = playWhenReady && isLoading;
+  return showBuffering ? (
+    <View style={styles.statusContainer}>
+      <ActivityIndicator />
+    </View>
+  ) : (
     <Button
-      title={isPlaying ? 'Pause' : 'Play'}
-      onPress={onTogglePlayback}
+      title={showPause ? 'Pause' : 'Play'}
+      onPress={showPause ? TrackPlayer.pause : TrackPlayer.play}
       type="primary"
       style={styles.playPause}
     />

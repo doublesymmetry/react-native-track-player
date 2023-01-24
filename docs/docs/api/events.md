@@ -156,18 +156,22 @@ Fired when the user presses the dislike button in the now playing center. Only f
 Fired when the user presses the bookmark button in the now playing center. Only fired if the `bookmarkOptions` is set in `updateOptions`.
 
 ### `RemoteDuck`
-Subscribing to this event to handle interruptions ensures that your app’s audio continues behaving gracefully when a phone call arrives, a clock or calendar alarm sounds, or another app plays audio.
+Fired when the audio is interrupted. For example when a phone call arrives,
+a clock or calender sounds, or another app starts playing audio.
 
-On Android, this event is fired when the device needs the player to pause or stop for an interruption and again when the interruption has passed and playback may resume. On iOS this event is fired after playback was already interrupted (meaning pausing playback is unnecessary) and again when playback may resume or to notify that the interruption was permanent.
+We recommend to set `autoHandleInterruptions: true` in
+`TrackPlayer.setupPlayer`. This way toggling playback is handled automatically.
 
-On Android, the volume may also be lowered on an transient interruption without triggering this event. If you want to receive those interruptions, set the `alwaysPauseOnInterruption` option to `true`.
-
-- When the event is triggered with `paused` set to `true`, on Android the player should pause playback. When `permanent` is also set to `true`, on Android the player should stop playback.
-- When the event is triggered and `paused` is not set to `true`, the player may resume playback.
+By default `autoHandleInterruptions` is set to `false` (default) in
+`TrackPlayer.setupPlayer`, which means your app is expected to respond to this
+event in the following situations:
+- When the event is triggered with `paused` set to `true`, on Android playback
+  should be paused. When `permanent` is also set to `true`, on Android the
+  player should stop playback.
+- When the event is triggered and `paused` is set to `false`, the player may
+  resume playback.
 
 | Param     | Type      | Description                                  |
 | --------- | --------- | -------------------------------------------- |
 | paused    | `boolean` | On Android when `true` the player should pause playback, when `false` the player may resume playback. On iOS when `true` the playback was paused and when `false` the player may resume playback. |
 | permanent | `boolean` | Whether the interruption is permanent. On Android the player should stop playback.  |
-
-Implementation examples can be found in the [example project](https://github.com/doublesymmetry/react-native-track-player/blob/main/example/src/services/PlaybackService.ts).

@@ -262,6 +262,10 @@ android {
 }
 
 dependencies {
+    implementation 'com.android.support:appcompat-v7:25.0.0'
+    implementation 'com.android.support:support-annotations:25.0.0'
+    implementation 'com.android.support:design:25.0.0'
+
     implementation fileTree(dir: "libs", include: ["*.jar"])
 
     //noinspection GradleDynamicVersion
@@ -289,6 +293,8 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+    implementation project(':reactnativetrackplayer')
 }
 
 if (isNewArchitectureEnabled()) {

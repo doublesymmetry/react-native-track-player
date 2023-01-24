@@ -6,12 +6,14 @@ import com.doublesymmetry.trackplayer.model.State
 val AudioPlayerState.asLibState: State
     get() {
         return when(this) {
-            AudioPlayerState.LOADING -> State.Connecting
+            AudioPlayerState.LOADING -> State.Loading
             AudioPlayerState.READY -> State.Ready
             AudioPlayerState.BUFFERING -> State.Buffering
             AudioPlayerState.PAUSED -> State.Paused
             AudioPlayerState.PLAYING -> State.Playing
             AudioPlayerState.IDLE -> State.Idle
-            AudioPlayerState.ENDED -> State.Stopped
+            AudioPlayerState.ENDED -> State.Ended
+            AudioPlayerState.ERROR -> State.Error
+            AudioPlayerState.STOPPED -> State.Stopped
         }
     }

@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import TrackPlayer, { useProgress } from 'react-native-track-player';
 
 export const Progress: React.FC<{ live?: boolean }> = ({ live }) => {
-  const progress = useProgress();
+  const { position, duration } = useProgress();
   return live ? (
     <View style={styles.liveContainer}>
       <Text style={styles.liveText}>Live Stream</Text>
@@ -13,27 +13,26 @@ export const Progress: React.FC<{ live?: boolean }> = ({ live }) => {
     <>
       <Slider
         style={styles.container}
-        value={progress.position}
+        value={position}
         minimumValue={0}
-        maximumValue={progress.duration}
+        maximumValue={duration}
         thumbTintColor="#FFD479"
         minimumTrackTintColor="#FFD479"
         maximumTrackTintColor="#FFFFFF"
         onSlidingComplete={TrackPlayer.seekTo}
       />
       <View style={styles.labelContainer}>
+        <Text style={styles.labelText}>{formatSeconds(position)}</Text>
         <Text style={styles.labelText}>
-          {new Date(progress.position * 1000).toISOString().slice(14, 19)}
-        </Text>
-        <Text style={styles.labelText}>
-          {new Date((progress.duration - progress.position) * 1000)
-            .toISOString()
-            .slice(14, 19)}
+          {formatSeconds(Math.max(0, duration - position))}
         </Text>
       </View>
     </>
   );
 };
+
+const formatSeconds = (time: number) =>
+  new Date(time * 1000).toISOString().slice(14, 19);
 
 const styles = StyleSheet.create({
   liveContainer: {
