@@ -1,7 +1,7 @@
 import TrackPlayer, {
   AppKilledPlaybackBehavior,
   Capability,
-  RepeatMode
+  RepeatMode,
 } from 'react-native-track-player';
 
 export const SetupService = async (): Promise<boolean> => {
@@ -12,7 +12,7 @@ export const SetupService = async (): Promise<boolean> => {
     isSetup = true;
   } catch {
     await TrackPlayer.setupPlayer({
-      autoHandleInterruptions: true
+      autoHandleInterruptions: true,
     });
     await TrackPlayer.updateOptions({
       android: {

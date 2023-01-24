@@ -1,7 +1,5 @@
 import TrackPlayer, { Event } from 'react-native-track-player';
 
-let wasPausedByDuck = false;
-
 export async function PlaybackService() {
   TrackPlayer.addEventListener(Event.RemotePause, () => {
     console.log('Event.RemotePause');
@@ -38,12 +36,9 @@ export async function PlaybackService() {
     TrackPlayer.seekTo(event.position);
   });
 
-  TrackPlayer.addEventListener(
-    Event.RemoteDuck,
-    async (event) => {
-      console.log('Event.RemoteDuck', event);
-    }
-  );
+  TrackPlayer.addEventListener(Event.RemoteDuck, async (event) => {
+    console.log('Event.RemoteDuck', event);
+  });
 
   TrackPlayer.addEventListener(Event.PlaybackQueueEnded, (event) => {
     console.log('Event.PlaybackQueueEnded', event);

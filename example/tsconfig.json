@@ -1,5 +1,10 @@
 {
   "compilerOptions": {
+    "paths": {
+      "react-native-track-player": [
+        "../src/index.ts"
+      ]
+    },
     "allowJs": false,
     "allowSyntheticDefaultImports": true,
     "declaration": true,
