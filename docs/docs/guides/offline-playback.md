@@ -23,7 +23,7 @@ path** to your audio.
 This case is simple, just stick your audio files in your repository with your
 source code and use the file paths to them when adding Tracks.
 
-:warning: Please take into consideration that this approach will increase
+⚠️ Please take into consideration that this approach will increase
 the size of your App based on how much audio you want the user to be able to
 play. If you're doing anything substantial, it's recommended that you use
 the [Hybrid Offline/Network](#hybrid-offline-network) approach.
