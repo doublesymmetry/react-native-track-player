@@ -13,14 +13,6 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </service>
-
-        <!-- A receiver that will receive media buttons. Required on pre-lollipop devices -->
-        <receiver android:name="androidx.media.session.MediaButtonReceiver" android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-            </intent-filter>
-        </receiver>
-
     </application>
 
 </manifest>
