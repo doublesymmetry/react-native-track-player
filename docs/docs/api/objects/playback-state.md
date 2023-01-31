@@ -1,6 +1,6 @@
 # PlaybackState
 
-An object to represent the full state of the player.
+An object representing the playback state of the player.
 
 | Property       | Type                        | Description  |
 | -------------- | --------------------------- | ------------ |

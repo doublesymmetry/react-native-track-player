@@ -32,7 +32,7 @@ Clears the current queue and adds the supplied tracks to the now empty queue.
 
 ## `load(track)`
 
-Replaces the current track with the supplied track or creates a track when the queue is empty. This feature would mainly be used by simple single track apps.
+Replaces the current track with the supplied track or creates a track when the queue is empty.
 
 | Param  | Type              | Description |
 |--------|-------------------|-------------|
@@ -68,7 +68,7 @@ Skips to the previous track in the queue.
 
 ## `move(fromIndex, toIndex)`
 
-Moves a track from a the specified index to another.
+Moves a track from the specified index to another.
 
 | Param  | Type     | Description     |
 | ------ | -------- | --------------- |
@@ -133,7 +133,9 @@ Gets the repeat mode.
 
 ## ⚠️ `getCurrentTrack()`
 
-**⚠️ Deprecated**
+**⚠️ Deprecated:** To get the active track index use
+[`getActiveTrackIndex()`](#getactivetrackindex) instead or use
+[`getActiveTrack()`](#getactivetrack) to get the active track object.
 
 Gets the index of the current track, or null if no track loaded
 

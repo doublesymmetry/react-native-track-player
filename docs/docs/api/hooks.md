@@ -74,7 +74,9 @@ const MyComponent = () => {
 
 ## `usePlaybackState`
 
-Register an event listener for the [PlaybackState](./events.md#playbackstate) event emitted by the TrackPlayer. The subscription is removed when the component unmounts. This hook will initially return `{ state: undefined }` while it is awaiting the initial state of the player.
+A hook which returns the up to date state of [`getPlaybackState()`](./functions/player.md#getplaybackstate).
+The hook will initially return `{ state: undefined }` while it is awaiting the
+initial state of the player.
 
 ```tsx
 import React, { useState } from 'react';

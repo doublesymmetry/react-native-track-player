@@ -29,8 +29,6 @@ is unloaded.
 
 This function causes any further loading / buffering to stop.
 
-See [[Feature Request] add a stop method #1786](https://github.com/doublesymmetry/react-native-track-player/issues/1786).
-
 ## `retry()`
 
 Retries the current track when it stopped playing due to a playback error.

@@ -72,7 +72,14 @@ Fired when an error occurs.
 | ------- | -------- | ----------------- |
 | code    | `string` | The error code    |
 | message | `string` | The error message |
----
+
+### `PlaybackPlayWhenReadyChanged`
+
+Fired when the `playWhenReady` property is changed.
+
+| Param         | Type     | Description                           |
+| ------------- | -------- | ------------------------------------- |
+| playWhenReady | `boolean` | The current value of `playWhenReady` |
 
 ### ⚠️`PlaybackTrackChanged`
 
@@ -80,12 +87,13 @@ Fired when an error occurs.
 
 Fired when a track is changed.
 
-| Param     | Type     | Description                            |
-| --------- | -------- | -------------------------------------- |
-| track     | `number` | The previous track index. Might be null   |
-| position  | `number` | The previous track position in seconds |
-| nextTrack | `number` | The next track index. Might be null       |
+| Param     | Type     | Description                             |
+| --------- | -------- | --------------------------------------- |
+| track     | `number` | The previous track index. Might be null |
+| position  | `number` | The previous track position in seconds  |
+| nextTrack | `number` | The next track index. Might be null     |
 
+----
 
 ## Media Controls
 

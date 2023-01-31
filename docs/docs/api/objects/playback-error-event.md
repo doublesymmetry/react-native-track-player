@@ -1,8 +1,7 @@
 # PlaybackErrorEvent
 
-This error event is the error emitted by the native device itself. Both
-the code and value will correspond to error codes emitted by the underlying
-native players.
+An object denoting a playback error encountered during loading or playback of a
+track.
 
 | Property | Type     | Description |
 |----------|----------|-------------|
