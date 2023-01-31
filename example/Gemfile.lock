@@ -92,9 +92,10 @@ PLATFORMS
 
 DEPENDENCIES
   cocoapods (~> 1.11, >= 1.11.2)
+  rexml
 
 RUBY VERSION
-   ruby 2.7.4p191
+   ruby 3.0.5p211
 
 BUNDLED WITH
-   2.2.27
+   2.2.33
