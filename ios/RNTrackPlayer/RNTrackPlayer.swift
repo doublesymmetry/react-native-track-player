@@ -20,8 +20,8 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     private let audioSessionController = AudioSessionController.shared
     private var shouldEmitProgressEvent: Bool = false
     private var shouldResumePlaybackAfterInterruptionEnds: Bool = false
-    private var lastForwardJumpInterval: NSNumber = 0;
-    private var lastBackwardJumpInterval: NSNumber = 0;
+    private var forwardJumpInterval: NSNumber? = nil;
+    private var backwardJumpInterval: NSNumber? = nil;
 
     // MARK: - Lifecycle Methods
 
@@ -312,17 +312,8 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             capabilitiesStr.append("togglePlayPause");
         }
 
-        var forwardJumpInterval: NSNumber = lastForwardJumpInterval;
-        if let explicitForwardJumpInterval = options["forwardJumpInterval"] as? NSNumber {
-            forwardJumpInterval = explicitForwardJumpInterval;
-            lastForwardJumpInterval = forwardJumpInterval;
-        }
-
-        var backwardJumpInterval: NSNumber = lastBackwardJumpInterval;
-        if let explicitBackwardJumpInterval = options["backwardJumpInterval"] as? NSNumber {
-            backwardJumpInterval = explicitBackwardJumpInterval;
-            lastBackwardJumpInterval = backwardJumpInterval;
-        }
+        forwardJumpInterval = options["forwardJumpInterval"] as? NSNumber ?? forwardJumpInterval
+        backwardJumpInterval = options["backwardJumpInterval"] as? NSNumber ?? backwardJumpInterval
 
         player.remoteCommands = capabilitiesStr
             .compactMap { Capability(rawValue: $0) }
