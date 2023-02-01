@@ -301,7 +301,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         if (inputIndexes != null) {
             val size = musicService.tracks.size
             var indexes: ArrayList<Int> = ArrayList();
-            for (inputIndex in indexes) {
+            for (inputIndex in inputIndexes) {
                 val index = if (inputIndex is Int) inputIndex else inputIndex.toString().toInt()
                 if (index < 0 || index >= size) {
                     callback.reject(
