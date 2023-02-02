@@ -505,6 +505,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         if (rejectWhenNotInitialized(reject: reject)) { return }
 
         player.stop()
+        player.clear()
         resolve(NSNull())
     }
 
