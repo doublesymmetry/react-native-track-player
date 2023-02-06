@@ -54,6 +54,10 @@ jobs:
         with:
           node-version: 16
           cache: 'yarn'
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1.0'
+          bundler-cache: false
       - name: Install Library Dependencies
         run: yarn install --frozen-lockfile
       - name: Build Library
