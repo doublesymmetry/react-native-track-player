@@ -259,6 +259,11 @@ export async function updateMetadataForTrack(
   return TrackPlayer.updateMetadataForTrack(trackIndex, metadata);
 }
 
+/**
+ * @deprecated Nominated for removal in the next major version. If you object
+ * to this, please describe your use-case in the following issue:
+ * https://github.com/doublesymmetry/react-native-track-player/issues/1653
+ */
 export function clearNowPlayingMetadata(): Promise<void> {
   return TrackPlayer.clearNowPlayingMetadata();
 }
