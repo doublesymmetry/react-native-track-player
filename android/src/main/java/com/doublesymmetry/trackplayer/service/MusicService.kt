@@ -485,7 +485,6 @@ class MusicService : HeadlessJsTaskService() {
                         }
 
                         stopSelf()
-                        exitProcess(0)
                     }
                 }
             }
