@@ -54,6 +54,11 @@ jobs:
         with:
           node-version: 16
           cache: 'yarn'
+      - uses: masa-iwasaki/setup-rbenv@v1
+      - name: Install Ruby
+        run: |
+          eval "$(rbenv init -)"
+          rbenv install -s 3.1.0
       - name: Install Library Dependencies
         run: yarn install --frozen-lockfile
       - name: Build Library
@@ -64,6 +69,7 @@ jobs:
           yarn install --frozen-lockfile
       - name: Bundler
         run: |-
+          eval "$(rbenv init -)"
           cd example/ios
           bundle install
       - name: Cache Cocoapods Dependencies
@@ -75,6 +81,7 @@ jobs:
             ${{ runner.os }}-pods-
       - name: Cococapods
         run: |-
+          eval "$(rbenv init -)"
           cd example/ios
           bundle exec pod install
       - name: Build App
