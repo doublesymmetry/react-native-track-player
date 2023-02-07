@@ -16,12 +16,6 @@ export const PlayPauseButton: React.FC<{
     250
   );
 
-  const isErrored = state === State.Error;
-  const isPaused = state === State.Paused;
-  const isStopped = state === State.Stopped;
-  const isEnded = state === State.Ended;
-  const showPause =
-    playWhenReady && !(isErrored || isStopped || isPaused || isEnded);
   const showBuffering = playWhenReady && isLoading;
   return showBuffering ? (
     <View style={styles.statusContainer}>
@@ -29,8 +23,8 @@ export const PlayPauseButton: React.FC<{
     </View>
   ) : (
     <Button
-      title={showPause ? 'Pause' : 'Play'}
-      onPress={showPause ? TrackPlayer.pause : TrackPlayer.play}
+      title={playWhenReady ? 'Pause' : 'Play'}
+      onPress={playWhenReady ? TrackPlayer.pause : TrackPlayer.play}
       type="primary"
       style={styles.playPause}
     />
