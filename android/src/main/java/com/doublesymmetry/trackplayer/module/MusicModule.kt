@@ -262,10 +262,12 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
                 callback.reject("index_out_of_bounds", "The track index is out of bounds")
                 return@launch
             }
+            val index = if (insertBeforeIndex == -1) musicService.tracks.size else insertBeforeIndex
             musicService.add(
                 tracks,
-                if (insertBeforeIndex == -1) musicService.tracks.size else insertBeforeIndex
+                index
             )
+            callback.resolve(index)
         } catch (exception: Exception) {
             rejectWithException(callback, exception)
         }
@@ -301,7 +303,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         if (inputIndexes != null) {
             val size = musicService.tracks.size
             var indexes: ArrayList<Int> = ArrayList();
-            for (inputIndex in indexes) {
+            for (inputIndex in inputIndexes) {
                 val index = if (inputIndex is Int) inputIndex else inputIndex.toString().toInt()
                 if (index < 0 || index >= size) {
                     callback.reject(
