@@ -20,6 +20,24 @@ Removes one or more tracks from the queue. If the current track is removed, the 
 |--------|-------------------|-------------|
 | tracks | `Track \| Track[]` | The [Track](../objects/track.md) objects that will be removed |
 
+## `setQueue(tracks)`
+
+Clears the current queue and adds the supplied tracks to the now empty queue.
+
+**Returns:** `Promise<void>`
+
+| Param  | Type              | Description |
+|--------|-------------------|-------------|
+| tracks | `Track[]` | An array of [Track](../objects/track.md) to replace the current queue with. |
+
+## `load(track)`
+
+Replaces the current track with the supplied track or creates a track when the queue is empty.
+
+| Param  | Type              | Description |
+|--------|-------------------|-------------|
+| track | `Track`            | The [Track](../objects/track.md) object that will be loaded |
+
 ## `skip(index, initialPosition)`
 Skips to a track in the queue.
 
@@ -48,6 +66,15 @@ Skips to the previous track in the queue.
 | ------ | -------- | --------------- |
 | initialPosition | `number` | **Optional.** Sets the initial playback for the track you're skipping to. |
 
+## `move(fromIndex, toIndex)`
+
+Moves a track from the specified index to another.
+
+| Param  | Type     | Description     |
+| ------ | -------- | --------------- |
+| fromIndex | `number` | The index of the track you'd like to move. |
+| toIndex   | `number` | The position you'd like to move the track to. |
+
 
 ## `reset()`
 Resets the player stopping the current track and clearing the queue.
@@ -61,10 +88,17 @@ Gets a track object from the queue.
 | -------- | ---------- | --------------- |
 | index    | `number`   | The track index |
 
-## `getCurrentTrack()`
-Gets the index of the current track, or null if no track loaded
+## `getActiveTrack()`
 
-**Returns:** `Promise<number | null>`
+Gets the active track object.
+
+**Returns:** `Promise<`[Track](../objects/track.md)` | undefined>`
+
+## `getActiveTrackIndex()`
+
+Gets the index of the current track, or `undefined` if no track loaded
+
+**Returns:** `Promise<number | undefined>`
 
 ## `getQueue()`
 Gets the whole queue
@@ -96,3 +130,14 @@ Sets the repeat mode.
 Gets the repeat mode.
 
 **Returns:** [Repeat Mode](../constants/repeat-mode.md)
+
+## ⚠️ `getCurrentTrack()`
+
+**⚠️ Deprecated:** To get the active track index use
+[`getActiveTrackIndex()`](#getactivetrackindex) instead or use
+[`getActiveTrack()`](#getactivetrack) to get the active track object.
+
+Gets the index of the current track, or null if no track loaded
+
+**Returns:** `Promise<number | null>`
+

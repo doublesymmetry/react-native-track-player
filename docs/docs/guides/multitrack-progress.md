@@ -104,8 +104,9 @@ export const PlaybackService = async function() {
 };
 ```
 
-:warning: make sure you've configured your `progressUpdateEventInterval`
+⚠️ make sure you've configured your `progressUpdateEventInterval`
 in the `TrackPlayer.updateOptions` call.
+
 
 #### 3. Reactively Update Progress
 

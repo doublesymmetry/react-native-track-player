@@ -19,14 +19,17 @@ Fired when the state of the player changes.
 | ----- | -------- | ------------- |
 | state | [State](./constants/state.md) | The new state |
 
-### `PlaybackTrackChanged`
-Fired when a track is changed.
+### `PlaybackActiveTrackChanged`
 
-| Param     | Type     | Description                            |
-| --------- | -------- | -------------------------------------- |
-| track     | `number` | The previous track index. Might be null   |
-| position  | `number` | The previous track position in seconds |
-| nextTrack | `number` | The next track index. Might be null       |
+The new event also includes the full track objects for the newly active and last tracks.
+
+| Param    | Type     | Description                               |
+| -------- | -------- | ----------------------------------------- |
+| lastIndex | `number`  \| `undefined` | The index of previously active track. |
+| lastTrack | `Track` \| `undefined` |   The previously active track or `undefined` when there wasn't a previously active track. |
+| lastPosition | `number` | The position of the previously active track in seconds.|
+| index | `number` \| `undefined` | The newly active track index or `undefined` if there is no longer an active track.|
+| track | `Track` \| `undefined` | The newly active track or `undefined` if there is no longer an active track.|
 
 ### `PlaybackQueueEnded`
 Fired when the queue reaches the end.
@@ -51,7 +54,7 @@ Fired when the current track receives metadata encoded in. (e.g. ID3 tags, Icy M
 
 ### `PlaybackProgressUpdated`
 
-:warning: Note: This event is only emitted if you specify a non-zero `progressUpdateEventInterval` value in your player options.
+⚠️ Note: This event is only emitted if you specify a non-zero `progressUpdateEventInterval` value in your player options.
 
 Fired at the `progressUpdateEventInterval` if the player is playing _and_ if a `progressUpdateEventInterval` has been specified.
 
@@ -69,7 +72,28 @@ Fired when an error occurs.
 | ------- | -------- | ----------------- |
 | code    | `string` | The error code    |
 | message | `string` | The error message |
----
+
+### `PlaybackPlayWhenReadyChanged`
+
+Fired when the `playWhenReady` property is changed.
+
+| Param         | Type     | Description                           |
+| ------------- | -------- | ------------------------------------- |
+| playWhenReady | `boolean` | The current value of `playWhenReady` |
+
+### ⚠️`PlaybackTrackChanged`
+
+**⚠️ Deprecated:** Please use `PlaybackActiveTrackChanged`.
+
+Fired when a track is changed.
+
+| Param     | Type     | Description                             |
+| --------- | -------- | --------------------------------------- |
+| track     | `number` | The previous track index. Might be null |
+| position  | `number` | The previous track position in seconds  |
+| nextTrack | `number` | The next track index. Might be null     |
+
+----
 
 ## Media Controls
 
