@@ -94,10 +94,9 @@ import { useProgressStateStore } from '../store';
 const setProgress = useProgressStateStore.getState().setProgress;
 
 export const PlaybackService = async function() {
-  TrackPlayer.addEventListener(Event.PlaybackProgressUpdated, async () => {
-    // get the position and currently playing track.
-    const position = TrackPlayer.getPosition();
-    const track = TrackPlayer.getCurrentTrack();
+  TrackPlayer.addEventListener(Event.PlaybackProgressUpdated, async ({ position, track }) => {
+    // get the track to fetch your unique ID property (if applicable)
+    const track = await TrackPlayer.getTrack(track);
     // write progress to the zustand store
     setProgress(track.id, position);
   });
