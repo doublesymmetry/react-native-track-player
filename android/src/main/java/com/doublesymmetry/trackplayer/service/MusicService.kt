@@ -483,9 +483,6 @@ class MusicService : HeadlessJsTaskService() {
                             @Suppress("DEPRECATION")
                             stopForeground(true)
                         }
-
-                        stopSelf()
-                        exitProcess(0)
                     }
                 }
             }
@@ -598,8 +595,18 @@ class MusicService : HeadlessJsTaskService() {
         when (appKilledPlaybackBehavior) {
             AppKilledPlaybackBehavior.PAUSE_PLAYBACK -> player.pause()
             AppKilledPlaybackBehavior.STOP_PLAYBACK_AND_REMOVE_NOTIFICATION -> {
-                player.stop()
                 player.clear()
+                player.stop()
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    stopForeground(STOP_FOREGROUND_REMOVE)
+                } else {
+                    @Suppress("DEPRECATION")
+                    stopForeground(true)
+                }
+
+                stopSelf()
+                exitProcess(0)
             }
             else -> {}
         }
