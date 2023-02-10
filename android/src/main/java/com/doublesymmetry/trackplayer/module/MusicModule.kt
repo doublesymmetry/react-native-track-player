@@ -12,6 +12,7 @@ import com.doublesymmetry.trackplayer.model.State
 import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
 import com.doublesymmetry.trackplayer.service.MusicService
+import com.doublesymmetry.trackplayer.service.MusicService.PlayerOption
 import com.doublesymmetry.trackplayer.utils.BundleUtils
 import com.doublesymmetry.trackplayer.utils.RejectionException
 import com.facebook.react.bridge.*
@@ -175,16 +176,16 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         // Validate buffer keys.
         val bundledData = Arguments.toBundle(data)
         val minBuffer =
-            bundledData?.getDouble(MusicService.MIN_BUFFER_KEY)?.toMilliseconds()?.toInt()
+            bundledData?.getDouble(PlayerOption.MIN_BUFFER.key)?.toMilliseconds()?.toInt()
                 ?: DEFAULT_MIN_BUFFER_MS
         val maxBuffer =
-            bundledData?.getDouble(MusicService.MAX_BUFFER_KEY)?.toMilliseconds()?.toInt()
+            bundledData?.getDouble(PlayerOption.MAX_BUFFER.key)?.toMilliseconds()?.toInt()
                 ?: DEFAULT_MAX_BUFFER_MS
         val playBuffer =
-            bundledData?.getDouble(MusicService.PLAY_BUFFER_KEY)?.toMilliseconds()?.toInt()
+            bundledData?.getDouble(PlayerOption.PLAY_BUFFER.key)?.toMilliseconds()?.toInt()
                 ?: DEFAULT_BUFFER_FOR_PLAYBACK_MS
         val backBuffer =
-            bundledData?.getDouble(MusicService.BACK_BUFFER_KEY)?.toMilliseconds()?.toInt()
+            bundledData?.getDouble(PlayerOption.BACK_BUFFER.key)?.toMilliseconds()?.toInt()
                 ?: DEFAULT_BACK_BUFFER_DURATION_MS
 
         if (playBuffer < 0) {
@@ -603,16 +604,18 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     @ReactMethod
     fun getProgress(callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
-        var bundle = Bundle()
-        bundle.putDouble("duration", musicService.getDurationInSeconds());
-        bundle.putDouble("position", musicService.getPositionInSeconds());
-        bundle.putDouble("buffered", musicService.getBufferedPositionInSeconds());
+
+        var bundle = Bundle().apply {
+            putDouble("duration", musicService.getDurationInSeconds());
+            putDouble("position", musicService.getPositionInSeconds());
+            putDouble("buffered", musicService.getBufferedPositionInSeconds());
+        }
         callback.resolve(Arguments.fromBundle(bundle))
     }
 
     @ReactMethod
     fun getPlaybackState(callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
-        callback.resolve(Arguments.fromBundle(musicService.getPlayerStateBundle(musicService.state)))
+        callback.resolve(Arguments.fromBundle(musicService.getPlaybackStateBundle(musicService.state)))
     }
 }
