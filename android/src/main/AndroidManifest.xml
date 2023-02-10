@@ -8,19 +8,11 @@
     <application>
 
         <!-- The main service, handles playback, playlists and media buttons -->
-        <service android:name="com.doublesymmetry.trackplayer.service.MusicService" android:enabled="true" android:exported="false">
+        <service android:name="com.doublesymmetry.trackplayer.service.MusicService" android:enabled="true" android:exported="true" android:foregroundServiceType="mediaPlayback">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </service>
-
-        <!-- A receiver that will receive media buttons. Required on pre-lollipop devices -->
-        <receiver android:name="androidx.media.session.MediaButtonReceiver" android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-            </intent-filter>
-        </receiver>
-
     </application>
 
 </manifest>
