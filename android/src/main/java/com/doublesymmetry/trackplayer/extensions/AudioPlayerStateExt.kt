@@ -11,7 +11,7 @@ val AudioPlayerState.asLibState: State
             AudioPlayerState.BUFFERING -> State.Buffering
             AudioPlayerState.PAUSED -> State.Paused
             AudioPlayerState.PLAYING -> State.Playing
-            AudioPlayerState.IDLE -> State.Idle
+            AudioPlayerState.IDLE -> State.None
             AudioPlayerState.ENDED -> State.Ended
             AudioPlayerState.ERROR -> State.Error
             AudioPlayerState.STOPPED -> State.Stopped
