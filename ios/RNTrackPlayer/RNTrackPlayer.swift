@@ -703,8 +703,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     @objc(getPlaybackState:rejecter:)
     public func getPlaybackState(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
-
-        resolve(getPlaybackStateBodyKeyValues())
+        resolve(getPlaybackStateBodyKeyValues(state: player.playerState))
     }
 
     @objc(updateMetadataForTrack:metadata:resolver:rejecter:)
@@ -768,9 +767,9 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         }
     }
 
-    private func getPlaybackStateBodyKeyValues() -> Dictionary<String, Any> {
-        var body: Dictionary<String, Any> = ["state": State.fromPlayerState(state: player.playerState).rawValue]
-        if (player.playerState == AudioPlayerState.failed) {
+    private func getPlaybackStateBodyKeyValues(state: AudioPlayerState) -> Dictionary<String, Any> {
+        var body: Dictionary<String, Any> = ["state": State.fromPlayerState(state: state).rawValue]
+        if (state == AudioPlayerState.failed) {
             body["error"] = getPlaybackStateErrorKeyValues()
         }
         return body
@@ -779,7 +778,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     // MARK: - QueuedAudioPlayer Event Handlers
 
     func handleAudioPlayerStateChange(state: AVPlayerWrapperState) {
-        emit(event: EventType.PlaybackState, body: getPlaybackStateBodyKeyValues())
+        emit(event: EventType.PlaybackState, body: getPlaybackStateBodyKeyValues(state: state))
     }
 
     func handleAudioPlayerMetadataReceived(metadata: [AVTimedMetadataGroup]) {
