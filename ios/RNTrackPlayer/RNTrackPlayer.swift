@@ -526,6 +526,19 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         resolve(NSNull())
     }
 
+    @objc(setPlayWhenReady:resolver:rejecter:)
+    public func setPlayWhenReady(playWhenReady: Bool, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        if (rejectWhenNotInitialized(reject: reject)) { return }
+        player.playWhenReady = playWhenReady
+        resolve(NSNull())
+    }
+
+    @objc(getPlayWhenReady:rejecter:)
+    public func getPlayWhenReady(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        if (rejectWhenNotInitialized(reject: reject)) { return }
+        resolve(player.playWhenReady)
+    }
+
     @objc(stop:rejecter:)
     public func stop(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
