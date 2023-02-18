@@ -11,24 +11,28 @@ import type { PlaybackState } from '../interfaces';
  * returned state property will be `undefined`.
  * */
 export const usePlaybackState = (): PlaybackState | { state: undefined } => {
-  const [state, setState] = useState<PlaybackState | { state: undefined }>({
+  const [playbackState, setPlaybackState] = useState<
+    PlaybackState | { state: undefined }
+  >({
     state: undefined,
   });
   useEffect(() => {
     let mounted = true;
 
     getPlaybackState()
-      .then((initialState) => {
+      .then((fetchedState) => {
         if (!mounted) return;
         // Only set the state if it wasn't already set by the Event.PlaybackState listener below:
-        setState((state) => state ?? initialState);
+        setPlaybackState((currentState) =>
+          currentState.state ? currentState : fetchedState
+        );
       })
       .catch(() => {
         /** getState only throw while you haven't yet setup, ignore failure. */
       });
 
     const sub = addEventListener(Event.PlaybackState, (state) => {
-      setState(state);
+      setPlaybackState(state);
     });
 
     return () => {
@@ -37,5 +41,5 @@ export const usePlaybackState = (): PlaybackState | { state: undefined } => {
     };
   }, []);
 
-  return state;
+  return playbackState;
 };
