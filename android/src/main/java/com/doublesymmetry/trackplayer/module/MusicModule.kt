@@ -139,7 +139,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         constants["CAPABILITY_JUMP_BACKWARD"] = Capability.JUMP_BACKWARD.ordinal
 
         // States
-        constants["STATE_NONE"] = State.Idle.state
+        constants["STATE_NONE"] = State.None.state
         constants["STATE_READY"] = State.Ready.state
         constants["STATE_PLAYING"] = State.Playing.state
         constants["STATE_PAUSED"] = State.Paused.state
