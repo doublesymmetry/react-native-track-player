@@ -446,7 +446,7 @@ export async function getCurrentTrack(): Promise<number | null> {
 
 /**
  * Gets the duration of the current track in seconds.
- * @deprecated Use `TrackPlayer.getProgress().then((progress) => progress.buffered)` instead.
+ * @deprecated Use `TrackPlayer.getProgress().then((progress) => progress.duration)` instead.
  */
 export async function getDuration(): Promise<number> {
   return TrackPlayer.getDuration();
