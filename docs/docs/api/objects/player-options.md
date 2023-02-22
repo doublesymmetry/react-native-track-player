@@ -4,11 +4,11 @@ All parameters are optional. You also only need to specify the ones you want to 
 
 | Param | Type | Description | Android | iOS |
 |-------|------|-------------|---------|-----|
-| `minBuffer` | `number` | Minimum time in seconds that needs to be buffered. | ✅ | ✅ |
-| `maxBuffer` | `number` | Maximum time in seconds that needs to be buffered. | ✅ | ✅ |
-| `backBuffer` | `number` | Time in seconds that should be kept in the buffer behind the current playhead time. | ✅ | ✅ |
-| `playBuffer` | `number` | Minimum time in seconds that needs to be buffered to start playing. | ✅ | ✅ |
-| `maxCacheSize` | `number` | Maximum cache size in kilobytes. | ✅ | ✅ |
+| `minBuffer` | `number` | Minimum duration of media that the player will attempt to buffer in seconds. | ✅ | ✅ |
+| `maxBuffer` | `number` | Maximum duration of media that the player will attempt to buffer in seconds. | ✅ | ❌ |
+| `backBuffer` | `number` | Duration in seconds that should be kept in the buffer behind the current playhead time. | ✅ | ❌ |
+| `playBuffer` | `number` | Duration of media in seconds that must be buffered for playback to start or resume following a user action such as a seek. | ✅ | ❌ |
+| `maxCacheSize` | `number` | Maximum cache size in kilobytes. | ✅ | ❌ |
 | `iosCategory` | [`IOSCategory`](../constants/ios-category.md) | An [`IOSCategory`](../constants/ios-category.md). Sets on `play()`. | ❌ | ✅  |
 | `iosCategoryMode` | [`IOSCategoryMode`](../constants/ios-category-mode.md) | The audio session mode, together with the audio session category, indicates to the system how you intend to use audio in your app. You can use a mode to configure the audio system for specific use cases such as video recording, voice or video chat, or audio analysis. Sets on `play()`. | ❌ | ✅  |
 | `iosCategoryOptions` | [`IOSCategoryOptions[]`](../constants/ios-category-options.md) | An array of [`IOSCategoryOptions`](../constants/ios-category-options.md). Sets on `play()`. | ❌ | ✅  |
