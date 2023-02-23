@@ -2,7 +2,7 @@ import type {
   AndroidAudioContentType,
   IOSCategory,
   IOSCategoryMode,
-  IOSCategoryOptions
+  IOSCategoryOptions,
 } from '../constants';
 
 export interface PlayerOptions {
