@@ -8,8 +8,9 @@ import { useTrackPlayerEvents } from './useTrackPlayerEvents';
 /**
  * Poll for track progress for the given interval (in miliseconds)
  * @param updateInterval - ms interval
+ * @param useSetInterval - use setInterval instead of setTimeout
  */
-export function useProgress(updateInterval = 1000) {
+export function useProgress(updateInterval = 1000, useSetInterval = false) {
   const INITIAL = {
     position: 0,
     duration: 0,
@@ -41,6 +42,15 @@ export function useProgress(updateInterval = 1000) {
       }
     };
 
+    if (useSetInterval) {
+      const pollInterval = setInterval(update, updateInterval);
+
+      return () => {
+        mounted = false;
+        clearInterval(pollInterval);
+      };
+    }
+
     const poll = async () => {
       await update();
       if (!mounted) return;
@@ -54,7 +64,7 @@ export function useProgress(updateInterval = 1000) {
     return () => {
       mounted = false;
     };
-  }, [updateInterval]);
+  }, [updateInterval, useSetInterval]);
 
   return state;
 }
