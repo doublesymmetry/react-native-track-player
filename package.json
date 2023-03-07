@@ -1,5 +1,5 @@
 {
-  "name": "react-native-track-player",
+  "name": "@5stones/react-native-track-player",
   "version": "4.0.0-rc03",
   "description": "A fully fledged audio module created for music apps",
   "main": "lib/src/index.js",
