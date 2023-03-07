@@ -1,3 +1,7 @@
+# [4.0.0-web.8](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-web.7...v4.0.0-web.8) (2023-03-07)
+
+
+
 # [4.0.0-web.7](https://github.com/doublesymmetry/react-native-track-player/compare/v3.1.0...v4.0.0-web.7) (2023-03-07)
 
 
