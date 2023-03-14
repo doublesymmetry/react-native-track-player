@@ -1,3 +1,19 @@
+# [4.0.0-rc01](https://github.com/doublesymmetry/react-native-track-player/compare/v3.2.0...v4.0.0-rc01) (2023-03-14)
+
+
+### Bug Fixes
+
+* **android:** add deep link back ([#1872](https://github.com/doublesymmetry/react-native-track-player/issues/1872)) ([9c227fa](https://github.com/doublesymmetry/react-native-track-player/commit/9c227fa7e0748d3d43dba435ee284e01e18de9bc))
+* **android:** fix handling of seek capability ([#1938](https://github.com/doublesymmetry/react-native-track-player/issues/1938)) ([166aa0d](https://github.com/doublesymmetry/react-native-track-player/commit/166aa0d2d4ee7d213d4a41e496592f20e4bbbede))
+* **android:** resolve problem with StopPlaybackAndRemoveNotification not working on subsequent exists ([#1762](https://github.com/doublesymmetry/react-native-track-player/issues/1762)) ([e742959](https://github.com/doublesymmetry/react-native-track-player/commit/e742959cc1d697d69daeade39830155bce2ccde7))
+* **android:** use “none” instead of “idle” for none state ([#1924](https://github.com/doublesymmetry/react-native-track-player/issues/1924)) ([e125045](https://github.com/doublesymmetry/react-native-track-player/commit/e125045106ad3db125a09dc60dab2acc3334f01c))
+* clears queue on iOS when you call reset() ([#1900](https://github.com/doublesymmetry/react-native-track-player/issues/1900)) ([e3c670a](https://github.com/doublesymmetry/react-native-track-player/commit/e3c670a822488565b923300be76e70a8c492fec4))
+* **hooks:** updates setting initial playback state in usePlaybackState hook ([417f3c4](https://github.com/doublesymmetry/react-native-track-player/commit/417f3c4cdf26c2db8551eeae6f84eed69f532e77)), closes [#1931](https://github.com/doublesymmetry/react-native-track-player/issues/1931)
+* **ios:** emit state passed to handleAudioPlayerStateChange ([#1928](https://github.com/doublesymmetry/react-native-track-player/issues/1928)) ([a65fdcd](https://github.com/doublesymmetry/react-native-track-player/commit/a65fdcd5f913e20ffcdf45bb1d814d51ffe255ae))
+* **ios:** prevents overwriting of forward/backward secs ([#1855](https://github.com/doublesymmetry/react-native-track-player/issues/1855)) ([fb594c7](https://github.com/doublesymmetry/react-native-track-player/commit/fb594c77b2f80ecf90995893c0158cc8cd11baa0)), closes [#1853](https://github.com/doublesymmetry/react-native-track-player/issues/1853)
+
+
+
 # [3.2.0](https://github.com/doublesymmetry/react-native-track-player/compare/v3.1.0...v3.2.0) (2022-09-23)
 
 
