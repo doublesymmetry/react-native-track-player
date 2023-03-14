@@ -101,10 +101,10 @@ class MusicService : HeadlessJsTaskService() {
 
         val cacheConfig = CacheConfig(playerOptions?.getDouble(MAX_CACHE_SIZE_KEY)?.toLong())
         val playerConfig = PlayerConfig(
-            true,
-            true,
-            playerOptions?.getBoolean(AUTO_HANDLE_INTERRUPTIONS) ?: false,
-            when(playerOptions?.getString(ANDROID_AUDIO_CONTENT_TYPE)) {
+            interceptPlayerActionsTriggeredExternally = true,
+            handleAudioBecomingNoisy = true,
+            handleAudioFocus = playerOptions?.getBoolean(AUTO_HANDLE_INTERRUPTIONS) ?: false,
+            audioContentType = when(playerOptions?.getString(ANDROID_AUDIO_CONTENT_TYPE)) {
                 "music" -> AudioContentType.MUSIC
                 "speech" -> AudioContentType.SPEECH
                 "sonification" -> AudioContentType.SONIFICATION
@@ -146,36 +146,37 @@ class MusicService : HeadlessJsTaskService() {
 
         if (notificationCapabilities.isEmpty()) notificationCapabilities = capabilities
 
-        val buttonsList = mutableListOf<NotificationButton>()
-
-        notificationCapabilities.forEach {
+        val buttonsList = notificationCapabilities.mapNotNull {
             when (it) {
                 Capability.PLAY, Capability.PAUSE -> {
                     val playIcon = BundleUtils.getIconOrNull(this, options, "playIcon")
                     val pauseIcon = BundleUtils.getIconOrNull(this, options, "pauseIcon")
-                    buttonsList.add(PLAY_PAUSE(playIcon = playIcon, pauseIcon = pauseIcon))
+                    PLAY_PAUSE(playIcon = playIcon, pauseIcon = pauseIcon)
                 }
                 Capability.STOP -> {
                     val stopIcon = BundleUtils.getIconOrNull(this, options, "stopIcon")
-                    buttonsList.add(STOP(icon = stopIcon))
+                    STOP(icon = stopIcon)
                 }
                 Capability.SKIP_TO_NEXT -> {
                     val nextIcon = BundleUtils.getIconOrNull(this, options, "nextIcon")
-                    buttonsList.add(NEXT(icon = nextIcon, isCompact = isCompact(it)))
+                    NEXT(icon = nextIcon, isCompact = isCompact(it))
                 }
                 Capability.SKIP_TO_PREVIOUS -> {
                     val previousIcon = BundleUtils.getIconOrNull(this, options, "previousIcon")
-                    buttonsList.add(PREVIOUS(icon = previousIcon, isCompact = isCompact(it)))
+                    PREVIOUS(icon = previousIcon, isCompact = isCompact(it))
                 }
                 Capability.JUMP_FORWARD -> {
                     val forwardIcon = BundleUtils.getIcon(this, options, "forwardIcon", R.drawable.forward)
-                    buttonsList.add(FORWARD(icon = forwardIcon, isCompact = isCompact(it)))
+                    FORWARD(icon = forwardIcon, isCompact = isCompact(it))
                 }
                 Capability.JUMP_BACKWARD -> {
                     val backwardIcon = BundleUtils.getIcon(this, options, "rewindIcon", R.drawable.rewind)
-                    buttonsList.add(BACKWARD(icon = backwardIcon, isCompact = isCompact(it)))
+                    BACKWARD(icon = backwardIcon, isCompact = isCompact(it))
                 }
-                else -> return@forEach
+                Capability.SEEK_TO -> {
+                    SEEK_TO
+                }
+                else -> { null }
             }
         }
 
