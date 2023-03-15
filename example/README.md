@@ -128,26 +128,11 @@ dependencies {
 
 **NOTE:** there are small differences in the package naming.
 
-#### 4. Add `mavenLocal()` to `example/android/build.gradle`:
 
-```groovy
-// example/android/build.gradle
-
-...
-
-allprojects {
-    repositories {
-        mavenLocal()
-        maven {
-...
-```
-
-
-#### 5. Install the new version of RNTP in the example app and build android:
+#### 4. Install the new version of RNTP in the example app and build android:
 
 ```sh
 cd ./example
-yarn add file:..
 yarn android
 ```
 
