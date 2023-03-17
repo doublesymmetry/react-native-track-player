@@ -1,4 +1,6 @@
 export * from './AndroidOptions';
+export * from './EqualizerSettings';
+export * from './events';
 export * from './FeedbackOptions';
 export * from './MetadataOptions';
 export * from './NowPlayingMetadata';
@@ -10,4 +12,3 @@ export * from './ServiceHandler';
 export * from './Track';
 export * from './TrackMetadataBase';
 export * from './UpdateOptions';
-export * from './events';

@@ -45,6 +45,7 @@ class MusicEvents(private val reactContext: ReactContext) : BroadcastReceiver() 
         const val PLAYBACK_METADATA = "playback-metadata-received"
         const val PLAYBACK_PROGRESS_UPDATED = "playback-progress-updated"
         const val PLAYBACK_ERROR = "playback-error"
+        const val EQUALIZER_CHANGED = "equalizer-changed"
 
         const val EVENT_INTENT = "com.doublesymmetry.trackplayer.event"
     }

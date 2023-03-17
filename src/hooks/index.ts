@@ -1,5 +1,6 @@
 export * from './useActiveTrack';
-export * from './usePlayWhenReady';
+export * from './useEqualizer';
 export * from './usePlaybackState';
+export * from './usePlayWhenReady';
 export * from './useProgress';
 export * from './useTrackPlayerEvents';

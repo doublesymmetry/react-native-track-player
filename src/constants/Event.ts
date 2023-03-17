@@ -1,4 +1,6 @@
 export enum Event {
+  /** Fired when the equalizer settings have changed. */
+  EqualizerChanged = 'equalizer-changed',
   /** Fired when the state of the player changes. */
   PlaybackState = 'playback-state',
   /** Fired when a playback error occurs. */

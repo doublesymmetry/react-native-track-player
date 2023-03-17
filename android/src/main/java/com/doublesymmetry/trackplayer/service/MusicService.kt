@@ -2,7 +2,6 @@ package com.doublesymmetry.trackplayer.service
 
 import android.app.PendingIntent
 import android.content.Intent
-import android.content.ServiceConnection
 import android.net.Uri
 import android.os.Binder
 import android.os.Build
@@ -335,6 +334,58 @@ class MusicService : HeadlessJsTaskService() {
     @MainThread
     fun retry() {
         player.prepare()
+    }
+
+    private fun emitEqualizerChangedEvent() {
+        emit(MusicEvents.EQUALIZER_CHANGED, getEqualizerSettings())
+    }
+
+    @MainThread
+    fun getEqualizerSettings(): Bundle {
+        return Bundle().apply{
+            this.putIntArray(
+                "bandLevels",
+                player.equalizer.properties.bandLevels.map { it.toInt() }.toIntArray()
+            )
+            this.putInt("bandCount", player.equalizer.numberOfBands.toInt())
+            this.putStringArray("presets", player.getEqualizerPresets())
+            val bandCount = player.equalizer.numberOfBands.toInt()
+            var centerBandFrequencies = Array(bandCount) {0}
+            for (i in 0 until bandCount) {
+                centerBandFrequencies[i] = player.equalizer.getCenterFreq(i.toShort())
+            }
+            this.putIntArray("centerBandFrequencies", centerBandFrequencies.toIntArray())
+            this.putInt("lowerBandLevelLimit", player.equalizer.bandLevelRange[0].toInt())
+            this.putInt("upperBandLevelLimit", player.equalizer.bandLevelRange[1].toInt())
+            if (player.equalizer.properties.curPreset >= 0) {
+                this.putString(
+                    "activePreset",
+                    player.equalizer.getPresetName(player.equalizer.properties.curPreset)
+                )
+            }
+            this.putBoolean("enabled", player.equalizer.enabled)
+        }
+    }
+
+    @MainThread
+    fun setEqualizerEnabled(enabled: Boolean) {
+        if (player.setEqualizerEnabled(enabled)) {
+            emitEqualizerChangedEvent()
+        }
+    }
+
+    @MainThread
+    fun setEqualizerPreset(name: String) {
+        if (player.setEqualizerPreset(name)) {
+            emitEqualizerChangedEvent()
+        }
+    }
+
+    @MainThread
+    fun setEqualizerLevels(levels: ShortArray) {
+        if (player.setEqualizerLevels(levels)) {
+            emitEqualizerChangedEvent()
+        }
     }
 
     @MainThread

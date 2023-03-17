@@ -615,4 +615,35 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         if (verifyServiceBoundOrReject(callback)) return@launch
         callback.resolve(Arguments.fromBundle(musicService.getPlayerStateBundle(musicService.state)))
     }
+
+    @ReactMethod
+    fun getEqualizerSettings(callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        callback.resolve(Arguments.fromBundle(musicService.getEqualizerSettings()))
+    }
+
+    @ReactMethod
+    fun setEqualizerEnabled(enabled: Boolean, callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        musicService.setEqualizerEnabled(enabled)
+        callback.resolve(null)
+    }
+
+    @ReactMethod
+    fun setEqualizerPreset(preset: String, callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        musicService.setEqualizerPreset(preset)
+        callback.resolve(null)
+    }
+
+    @ReactMethod
+    fun setEqualizerLevels(data: ReadableArray, callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        val levels = ShortArray(data.size())
+        for (i in 0 until data.size()) {
+            levels[i] = data.getInt(i).toShort()
+        }
+        musicService.setEqualizerLevels(levels)
+        callback.resolve(null)
+    }
 }

@@ -3,13 +3,14 @@ import {
   DeviceEventEmitter,
   NativeEventEmitter,
   NativeModules,
-  Platform,
+  Platform
 } from 'react-native';
 // @ts-expect-error because resolveAssetSource is untyped
 import { default as resolveAssetSource } from 'react-native/Libraries/Image/resolveAssetSource';
 
 import { Event, RepeatMode, State } from './constants';
 import type {
+  EqualizerSettings,
   EventPayloadByEvent,
   NowPlayingMetadata,
   PlaybackState,
@@ -18,7 +19,7 @@ import type {
   ServiceHandler,
   Track,
   TrackMetadataBase,
-  UpdateOptions,
+  UpdateOptions
 } from './interfaces';
 
 const { TrackPlayerModule: TrackPlayer } = NativeModules;
@@ -508,4 +509,20 @@ export async function getRepeatMode(): Promise<RepeatMode> {
  */
 export async function retry() {
   return TrackPlayer.retry();
+}
+
+export async function getEqualizerSettings(): Promise<EqualizerSettings> {
+  return TrackPlayer.getEqualizerSettings();
+}
+
+export async function setEqualizerEnabled(enabled: boolean): Promise<void> {
+  return TrackPlayer.setEqualizerEnabled(enabled);
+}
+
+export async function setEqualizerPreset(preset: string): Promise<void> {
+  return TrackPlayer.setEqualizerPreset(preset);
+}
+
+export async function setEqualizerLevels(levels: number[]): Promise<void> {
+  return TrackPlayer.setEqualizerLevels(levels);
 }
