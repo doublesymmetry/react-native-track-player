@@ -34,6 +34,12 @@ function resolveImportedPath(path?: number | string) {
   return resolveAssetSource(path) || path;
 }
 
+const POLL_SLEEP_MILLIS = 50;
+const MAX_POLL_ATTEMPTS = 60; // Give up after 3 secs you're still not done
+async function pollSleep() {
+  return new Promise((resolve) => setTimeout(resolve, POLL_SLEEP_MILLIS));
+}
+
 // MARK: - General API
 
 /**
@@ -121,7 +127,51 @@ export async function add(
     tracks[i].artwork = resolveImportedPath(tracks[i].artwork);
   }
 
-  return TrackPlayer.add(tracks, insertBeforeIndex);
+  // If you're inserting beyond the first element, you definitely won't hit
+  // timing issues outlined in #1117.
+  if (insertBeforeIndex > 0) {
+    return TrackPlayer.add(tracks, insertBeforeIndex);
+  }
+
+  // #1117: Now we need to figure out whether you might be replacing an existing
+  // first track -- because if you are, we need to poll/block until we're
+  // sure that the native AVPlayer tied with SwiftAudioEx's AVPlayerWrapper
+  // actually has the new track loaded before we return. Otherwise, future
+  // calls to things like getDuration() will return the old track's
+  // duration.
+  const queue = await TrackPlayer.getQueue();
+
+  // This is another case where you're safe to return immediately: there's
+  // already a top track and you're asking to insert behind it.
+  if (queue.length > 0 && insertBeforeIndex === -1) {
+    return TrackPlayer.add(tracks, insertBeforeIndex);
+  }
+
+  // Now we're in a case where there's either no top track, or there is one
+  // but you've asked to replace it. In both of those cases, we must poll
+  // until we're sure your track has been inserted through to AVPlayer. It
+  // turns out that duration is one of the facets that, when asked for,
+  // reflects what AVPlayer's current track says it is. So we use it as
+  // a proxy for figuring out whether your track is loaded. This of course
+  // won't work when the track you're adding coincidentally has the same
+  // duration as the current top track, but it's the best we currently know
+  // how to do.
+  const curTopTrackDuration = await TrackPlayer.getDuration();
+  const newTopTrackDuration = tracks[0].duration;
+  const index = TrackPlayer.add(tracks, insertBeforeIndex);
+  let attempts = 0;
+
+  if (curTopTrackDuration !== newTopTrackDuration) {
+    while (
+      attempts < MAX_POLL_ATTEMPTS &&
+      (await TrackPlayer.getDuration()) === curTopTrackDuration
+    ) {
+      attempts++;
+      await pollSleep();
+    }
+  }
+
+  return index;
 }
 
 /**
@@ -286,7 +336,19 @@ export function updateNowPlayingMetadata(
  * Resets the player stopping the current track and clearing the queue.
  */
 export async function reset(): Promise<void> {
-  return TrackPlayer.reset();
+  const duration = await TrackPlayer.getDuration();
+
+  await TrackPlayer.reset();
+  if (duration > 0) {
+    let attempts = 0;
+    while (
+      attempts < MAX_POLL_ATTEMPTS &&
+      (await TrackPlayer.getDuration()) > 0
+    ) {
+      attempts++;
+      await pollSleep();
+    }
+  }
 }
 
 /**
