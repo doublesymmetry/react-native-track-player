@@ -1,5 +1,8 @@
-# [4.0.0-rc01](https://github.com/doublesymmetry/react-native-track-player/compare/v3.2.0...v4.0.0-rc01) (2023-03-14)
+# [4.0.0-rc02](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc01...v4.0.0-rc02) (2023-03-19)
 
+### Bug Fixes
+
+* **android:** fix removeUpcomingItems from removing the currently playing item, [KotlinAudio PR 67](https://github.com/doublesymmetry/KotlinAudio/pull/67), closes ([#1953](https://github.com/doublesymmetry/react-native-track-player/issues/1953))
 
 ### Bug Fixes
 
