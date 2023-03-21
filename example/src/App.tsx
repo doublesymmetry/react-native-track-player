@@ -39,13 +39,13 @@ const App: React.FC = () => {
     }
 
     // This event will be fired when the app is already open and the notification is clicked
-    Linking.addEventListener('url', deepLinkHandler);
+    const subscription = Linking.addEventListener('url', deepLinkHandler);
 
     // When you launch the closed app from the notification or any other link
     Linking.getInitialURL().then((url) => console.log('getInitialURL', url));
 
     return () => {
-      Linking.removeEventListener('url', deepLinkHandler);
+      subscription.remove();
     };
   }, []);
 
