@@ -55,4 +55,16 @@ export async function PlaybackService() {
   TrackPlayer.addEventListener(Event.PlaybackState, (event) => {
     console.log('Event.PlaybackState', event);
   });
+
+  TrackPlayer.addEventListener(
+    Event.PlaybackMetadataReceived,
+    async ({ title, artist }) => {
+      const activeTrack = await TrackPlayer.getActiveTrack();
+      TrackPlayer.updateNowPlayingMetadata({
+        artist: [title, artist].filter(Boolean).join(' - '),
+        title: activeTrack?.title,
+        artwork: activeTrack?.artwork,
+      });
+    }
+  );
 }
