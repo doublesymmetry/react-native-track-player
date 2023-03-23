@@ -1,8 +1,9 @@
 package com.doublesymmetry.trackplayer.service
 
-import android.app.PendingIntent
+import android.annotation.TargetApi
+import android.app.*
+import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
 import android.net.Uri
 import android.os.Binder
 import android.os.Build
@@ -10,6 +11,10 @@ import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.RatingCompat
 import androidx.annotation.MainThread
+import androidx.annotation.NonNull
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationCompat.PRIORITY_LOW
+import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.models.NotificationButton.*
@@ -23,6 +28,7 @@ import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.model.TrackAudioItem
 import com.doublesymmetry.trackplayer.module.MusicEvents
 import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
+import com.doublesymmetry.trackplayer.utils.AppForegroundTracker
 import com.doublesymmetry.trackplayer.utils.BundleUtils
 import com.doublesymmetry.trackplayer.utils.BundleUtils.setRating
 import com.facebook.react.HeadlessJsTaskService
@@ -87,11 +93,45 @@ class MusicService : HeadlessJsTaskService() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startTask(getTaskConfig(intent))
+
+        // Fix crash "Context.startForegroundService() did not then call Service.startForeground()
+        // within 5s" by creating an empty notification and stopping it right after.
+        try {
+            // Sets the service to foreground with an empty notification
+            val notificationManager = this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            var name = ""
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                name = "temporary_channel"
+                notificationManager.createNotificationChannel(
+                    NotificationChannel(name, name, NotificationManager.IMPORTANCE_LOW)
+                )
+            }
+
+            val notification = NotificationCompat.Builder(this, name)
+                .setPriority(PRIORITY_LOW)
+                .setCategory(Notification.CATEGORY_SERVICE)
+                .build()
+            startForeground(MUSIC_NOTIFICATION_ID, notification)
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        } catch (e: Exception) {
+            e.printStackTrace();
+        }
         return START_STICKY
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        ProcessLifecycleOwner.get().lifecycle.addObserver(AppForegroundTracker)
     }
 
     @MainThread
     fun setupPlayer(playerOptions: Bundle?) {
+        if (this::player.isInitialized) {
+            print("Player was initialized. Prevent re-initializing again")
+            return
+        }
+
         val bufferConfig = BufferConfig(
             playerOptions?.getDouble(MIN_BUFFER_KEY)?.toMilliseconds()?.toInt(),
             playerOptions?.getDouble(MAX_BUFFER_KEY)?.toMilliseconds()?.toInt(),
@@ -475,13 +515,12 @@ class MusicService : HeadlessJsTaskService() {
             event.notificationStateChange.collect {
                 when (it) {
                     is NotificationState.POSTED -> {
-                        startForeground(it.notificationId, it.notification)
+                        if (AppForegroundTracker.foregrounded && it.notificationId == MUSIC_NOTIFICATION_ID) {
+                            startForeground(it.notificationId, it.notification)
+                        }
                     }
                     is NotificationState.CANCELLED -> {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            stopForeground(STOP_FOREGROUND_REMOVE)
-                        } else {
-                            @Suppress("DEPRECATION")
+                        if (AppForegroundTracker.foregrounded && it.notificationId == MUSIC_NOTIFICATION_ID) {
                             stopForeground(true)
                         }
                     }
@@ -634,6 +673,7 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     companion object {
+        const val MUSIC_NOTIFICATION_ID = 1
         const val STATE_KEY = "state"
         const val ERROR_KEY  = "error"
         const val EVENT_KEY = "event"

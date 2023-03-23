@@ -1,6 +1,7 @@
 package com.doublesymmetry.trackplayer.module
 
 import android.content.*
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.RatingCompat
@@ -12,6 +13,7 @@ import com.doublesymmetry.trackplayer.model.State
 import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
 import com.doublesymmetry.trackplayer.service.MusicService
+import com.doublesymmetry.trackplayer.utils.AppForegroundTracker
 import com.doublesymmetry.trackplayer.utils.BundleUtils
 import com.doublesymmetry.trackplayer.utils.RejectionException
 import com.facebook.react.bridge.*
@@ -228,7 +230,19 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         manager.registerReceiver(eventHandler!!, IntentFilter(EVENT_INTENT))
 
         Intent(context, MusicService::class.java).also { intent ->
-            context.startService(intent)
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    if (AppForegroundTracker.foregrounded) {
+                        // prevent crash Fatal Exception: android.app.RemoteServiceException$ForegroundServiceDidNotStartInTimeException
+                        context.startForegroundService(intent)
+                    }
+                } else {
+                    context.startService(intent)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace();
+            }
+
             context.bindService(intent, this, Context.BIND_AUTO_CREATE)
         }
     }
