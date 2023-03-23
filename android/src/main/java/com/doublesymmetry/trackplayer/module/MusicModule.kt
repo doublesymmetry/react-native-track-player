@@ -174,6 +174,15 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
             return
         }
 
+        // prevent crash Fatal Exception: android.app.RemoteServiceException$ForegroundServiceDidNotStartInTimeException
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && AppForegroundTracker.backgrounded) {
+            promise.reject(
+                "player_setup_failed",
+                "The player could not be setup because the app was in the background"
+            )
+            return
+        }
+
         // Validate buffer keys.
         val bundledData = Arguments.toBundle(data)
         val minBuffer =
@@ -232,10 +241,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         Intent(context, MusicService::class.java).also { intent ->
             try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    if (AppForegroundTracker.foregrounded) {
-                        // prevent crash Fatal Exception: android.app.RemoteServiceException$ForegroundServiceDidNotStartInTimeException
-                        context.startForegroundService(intent)
-                    }
+                    context.startForegroundService(intent)
                 } else {
                     context.startService(intent)
                 }

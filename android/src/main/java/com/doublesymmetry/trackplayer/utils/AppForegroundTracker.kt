@@ -10,6 +10,9 @@ object AppForegroundTracker : LifecycleObserver {
     val foregrounded: Boolean
         get() = counter > 0
 
+    val backgrounded: Boolean
+        get() = counter <= 0
+
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onStart() {
         counter++
