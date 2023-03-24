@@ -120,44 +120,43 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
     /* ****************************** API ****************************** */
     override fun getConstants(): Map<String, Any> {
-        val constants: MutableMap<String, Any> = HashMap()
+        return HashMap<String, Any>().apply {
+            // Capabilities
+            this["CAPABILITY_PLAY"] = Capability.PLAY.ordinal
+            this["CAPABILITY_PLAY_FROM_ID"] = Capability.PLAY_FROM_ID.ordinal
+            this["CAPABILITY_PLAY_FROM_SEARCH"] = Capability.PLAY_FROM_SEARCH.ordinal
+            this["CAPABILITY_PAUSE"] = Capability.PAUSE.ordinal
+            this["CAPABILITY_STOP"] = Capability.STOP.ordinal
+            this["CAPABILITY_SEEK_TO"] = Capability.SEEK_TO.ordinal
+            this["CAPABILITY_SKIP"] = OnErrorAction.SKIP.ordinal
+            this["CAPABILITY_SKIP_TO_NEXT"] = Capability.SKIP_TO_NEXT.ordinal
+            this["CAPABILITY_SKIP_TO_PREVIOUS"] = Capability.SKIP_TO_PREVIOUS.ordinal
+            this["CAPABILITY_SET_RATING"] = Capability.SET_RATING.ordinal
+            this["CAPABILITY_JUMP_FORWARD"] = Capability.JUMP_FORWARD.ordinal
+            this["CAPABILITY_JUMP_BACKWARD"] = Capability.JUMP_BACKWARD.ordinal
 
-        // Capabilities
-        constants["CAPABILITY_PLAY"] = Capability.PLAY.ordinal
-        constants["CAPABILITY_PLAY_FROM_ID"] = Capability.PLAY_FROM_ID.ordinal
-        constants["CAPABILITY_PLAY_FROM_SEARCH"] = Capability.PLAY_FROM_SEARCH.ordinal
-        constants["CAPABILITY_PAUSE"] = Capability.PAUSE.ordinal
-        constants["CAPABILITY_STOP"] = Capability.STOP.ordinal
-        constants["CAPABILITY_SEEK_TO"] = Capability.SEEK_TO.ordinal
-        constants["CAPABILITY_SKIP"] = OnErrorAction.SKIP.ordinal
-        constants["CAPABILITY_SKIP_TO_NEXT"] = Capability.SKIP_TO_NEXT.ordinal
-        constants["CAPABILITY_SKIP_TO_PREVIOUS"] = Capability.SKIP_TO_PREVIOUS.ordinal
-        constants["CAPABILITY_SET_RATING"] = Capability.SET_RATING.ordinal
-        constants["CAPABILITY_JUMP_FORWARD"] = Capability.JUMP_FORWARD.ordinal
-        constants["CAPABILITY_JUMP_BACKWARD"] = Capability.JUMP_BACKWARD.ordinal
+            // States
+            this["STATE_NONE"] = State.None.state
+            this["STATE_READY"] = State.Ready.state
+            this["STATE_PLAYING"] = State.Playing.state
+            this["STATE_PAUSED"] = State.Paused.state
+            this["STATE_STOPPED"] = State.Stopped.state
+            this["STATE_BUFFERING"] = State.Buffering.state
+            this["STATE_LOADING"] = State.Loading.state
 
-        // States
-        constants["STATE_NONE"] = State.None.state
-        constants["STATE_READY"] = State.Ready.state
-        constants["STATE_PLAYING"] = State.Playing.state
-        constants["STATE_PAUSED"] = State.Paused.state
-        constants["STATE_STOPPED"] = State.Stopped.state
-        constants["STATE_BUFFERING"] = State.Buffering.state
-        constants["STATE_LOADING"] = State.Loading.state
+            // Rating Types
+            this["RATING_HEART"] = RatingCompat.RATING_HEART
+            this["RATING_THUMBS_UP_DOWN"] = RatingCompat.RATING_THUMB_UP_DOWN
+            this["RATING_3_STARS"] = RatingCompat.RATING_3_STARS
+            this["RATING_4_STARS"] = RatingCompat.RATING_4_STARS
+            this["RATING_5_STARS"] = RatingCompat.RATING_5_STARS
+            this["RATING_PERCENTAGE"] = RatingCompat.RATING_PERCENTAGE
 
-        // Rating Types
-        constants["RATING_HEART"] = RatingCompat.RATING_HEART
-        constants["RATING_THUMBS_UP_DOWN"] = RatingCompat.RATING_THUMB_UP_DOWN
-        constants["RATING_3_STARS"] = RatingCompat.RATING_3_STARS
-        constants["RATING_4_STARS"] = RatingCompat.RATING_4_STARS
-        constants["RATING_5_STARS"] = RatingCompat.RATING_5_STARS
-        constants["RATING_PERCENTAGE"] = RatingCompat.RATING_PERCENTAGE
-
-        // Repeat Modes
-        constants["REPEAT_OFF"] = Player.REPEAT_MODE_OFF
-        constants["REPEAT_TRACK"] = Player.REPEAT_MODE_ONE
-        constants["REPEAT_QUEUE"] = Player.REPEAT_MODE_ALL
-        return constants
+            // Repeat Modes
+            this["REPEAT_OFF"] = Player.REPEAT_MODE_OFF
+            this["REPEAT_TRACK"] = Player.REPEAT_MODE_ONE
+            this["REPEAT_QUEUE"] = Player.REPEAT_MODE_ALL
+        }
     }
 
     @ReactMethod
