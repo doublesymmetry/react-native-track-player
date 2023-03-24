@@ -93,30 +93,6 @@ class MusicService : HeadlessJsTaskService() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startTask(getTaskConfig(intent))
-
-        // Fix crash "Context.startForegroundService() did not then call Service.startForeground()
-        // within 5s" by creating an empty notification and stopping it right after.
-        try {
-            // Sets the service to foreground with an empty notification
-            val notificationManager = this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            var name = ""
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                name = "temporary_channel"
-                notificationManager.createNotificationChannel(
-                    NotificationChannel(name, name, NotificationManager.IMPORTANCE_LOW)
-                )
-            }
-
-            val notification = NotificationCompat.Builder(this, name)
-                .setPriority(PRIORITY_LOW)
-                .setCategory(Notification.CATEGORY_SERVICE)
-                .build()
-            startForeground(MUSIC_NOTIFICATION_ID, notification)
-            @Suppress("DEPRECATION")
-            stopForeground(true)
-        } catch (e: Exception) {
-            e.printStackTrace();
-        }
         return START_STICKY
     }
 
