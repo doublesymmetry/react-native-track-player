@@ -31,7 +31,6 @@ import javax.annotation.Nonnull
  */
 class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext),
     ServiceConnection {
-    private var eventHandler: MusicEvents? = null
     private var playerOptions: Bundle? = null
     private var isServiceBound = false
     private var playerSetUpPromise: Promise? = null
@@ -234,9 +233,10 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         playerOptions = bundledData
 
 
-        val manager = LocalBroadcastManager.getInstance(context)
-        eventHandler = MusicEvents(context)
-        manager.registerReceiver(eventHandler!!, IntentFilter(EVENT_INTENT))
+        LocalBroadcastManager.getInstance(context).registerReceiver(
+            MusicEvents(context),
+            IntentFilter(EVENT_INTENT)
+        )
 
         Intent(context, MusicService::class.java).also { intent ->
             try {
