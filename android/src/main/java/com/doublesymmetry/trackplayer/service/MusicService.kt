@@ -96,11 +96,6 @@ class MusicService : HeadlessJsTaskService() {
         return START_STICKY
     }
 
-    override fun onCreate() {
-        super.onCreate()
-        ProcessLifecycleOwner.get().lifecycle.addObserver(AppForegroundTracker)
-    }
-
     @MainThread
     fun setupPlayer(playerOptions: Bundle?) {
         if (this::player.isInitialized) {

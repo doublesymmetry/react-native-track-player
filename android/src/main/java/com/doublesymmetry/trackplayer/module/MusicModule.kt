@@ -46,6 +46,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
     override fun initialize() {
         Timber.plant(Timber.DebugTree())
+        AppForegroundTracker.start()
     }
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
@@ -176,10 +177,9 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
         // prevent crash Fatal Exception: android.app.RemoteServiceException$ForegroundServiceDidNotStartInTimeException
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && AppForegroundTracker.backgrounded) {
-            promise.reject(
-                "player_setup_failed",
-                "The player could not be setup because the app was in the background"
-            )
+            AppForegroundTracker.onResume {
+                setupPlayer(data, promise)
+            }
             return
         }
 
