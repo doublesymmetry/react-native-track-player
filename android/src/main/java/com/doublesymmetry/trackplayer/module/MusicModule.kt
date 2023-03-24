@@ -102,24 +102,20 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     private fun readableArrayToTrackList(data: ReadableArray?): MutableList<Track> {
-        val tracks: MutableList<Track> = mutableListOf()
         val bundleList = Arguments.toList(data)
-
         if (bundleList !is ArrayList) {
             throw RejectionException("invalid_parameter", "Was not given an array of tracks")
         }
-
-        bundleList.forEach {
+        return bundleList.map {
             if (it is Bundle) {
-                tracks.add(bundleToTrack(it))
+                bundleToTrack(it)
             } else {
                 throw RejectionException(
                     "invalid_track_object",
                     "Track was not a dictionary type"
                 )
             }
-        }
-        return tracks
+        }.toMutableList()
     }
 
     /* ****************************** API ****************************** */
