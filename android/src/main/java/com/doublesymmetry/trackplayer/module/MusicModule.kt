@@ -235,16 +235,11 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         )
 
         Intent(context, MusicService::class.java).also { intent ->
-            try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    context.startForegroundService(intent)
-                } else {
-                    context.startService(intent)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(intent)
+            } else {
+                context.startService(intent)
             }
-
             context.bindService(intent, this, Context.BIND_AUTO_CREATE)
         }
     }
