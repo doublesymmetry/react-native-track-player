@@ -486,12 +486,13 @@ class MusicService : HeadlessJsTaskService() {
             event.notificationStateChange.collect {
                 when (it) {
                     is NotificationState.POSTED -> {
-                        if (AppForegroundTracker.foregrounded && it.notificationId == MUSIC_NOTIFICATION_ID) {
-                            startForeground(it.notificationId, it.notification)
-                        }
+                        startForeground(it.notificationId, it.notification)
                     }
                     is NotificationState.CANCELLED -> {
-                        if (AppForegroundTracker.foregrounded && it.notificationId == MUSIC_NOTIFICATION_ID) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            stopForeground(STOP_FOREGROUND_REMOVE)
+                        } else {
+                            @Suppress("DEPRECATION")
                             stopForeground(true)
                         }
                     }
@@ -644,7 +645,6 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     companion object {
-        const val MUSIC_NOTIFICATION_ID = 1
         const val STATE_KEY = "state"
         const val ERROR_KEY  = "error"
         const val EVENT_KEY = "event"
