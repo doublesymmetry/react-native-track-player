@@ -171,9 +171,10 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
         // prevent crash Fatal Exception: android.app.RemoteServiceException$ForegroundServiceDidNotStartInTimeException
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && AppForegroundTracker.backgrounded) {
-            AppForegroundTracker.onResume {
-                setupPlayer(data, promise)
-            }
+            promise.reject(
+                "android_cannot_setup_player_in_background",
+                "On Android the app must be in the foreground when setting up the player."
+            )
             return
         }
 

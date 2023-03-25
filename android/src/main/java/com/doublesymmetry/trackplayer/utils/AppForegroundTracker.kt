@@ -1,21 +1,18 @@
 package com.doublesymmetry.trackplayer.utils
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.facebook.react.bridge.UiThreadUtil
-import java.util.concurrent.ConcurrentLinkedQueue
 
 object AppForegroundTracker {
-    private var counter = 0
-    private val foregroundCallbacks = ConcurrentLinkedQueue<() -> Unit>()
+    private var activityCount = 0
 
     val foregrounded: Boolean
-        get() = counter > 0
+        get() = activityCount > 0
 
     val backgrounded: Boolean
-        get() = counter <= 0
+        get() = activityCount <= 0
 
     fun start() {
         UiThreadUtil.runOnUiThread {
@@ -23,28 +20,16 @@ object AppForegroundTracker {
         }
     }
 
-    fun onResume(block: () -> Unit) {
-        foregroundCallbacks.add(block)
-    }
+    object Observer : DefaultLifecycleObserver {
 
-    object Observer : LifecycleObserver {
-        @OnLifecycleEvent(Lifecycle.Event.ON_START)
-        fun onStart() {
-            counter++
-            println("Lifecycle.Event.ON_START --> counter: " + counter)
+        override fun onResume(owner: LifecycleOwner) {
+            super.onResume(owner)
+            activityCount++
         }
 
-        @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-        fun onStop() {
-            counter--
-            println("Lifecycle.Event.ON_STOP --> counter: " + counter)
-        }
-
-        @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-        fun onResume() {
-            while (!foregroundCallbacks.isEmpty()) {
-                foregroundCallbacks.poll()?.invoke()
-            }
+        override fun onPause(owner: LifecycleOwner) {
+            super.onPause(owner)
+            activityCount--
         }
     }
 }
