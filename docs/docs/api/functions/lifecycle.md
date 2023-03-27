@@ -10,6 +10,8 @@ You should always call this function (even without any options set) before using
 
 If the player is already initialized, the promise will resolve instantly.
 
+Note that on Android this method must only be called while the app is in the foreground, otherwise it will throw an error with code `'android_cannot_setup_player_in_background'`. In this case you can wait for the app to be in the foreground and try again.
+
 **Returns:** `Promise`
 
 | Param                | Type     | Description   | Default   | Android | iOS | Windows |
