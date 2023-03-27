@@ -1,3 +1,21 @@
+# [4.0.0-rc02](https://github.com/doublesymmetry/react-native-track-player/compare/v3.2.0...v4.0.0-rc02) (2023-03-27)
+
+
+### Bug Fixes
+
+* **android:** Fix ANR crashes ([#1974](https://github.com/doublesymmetry/react-native-track-player/issues/1974)) ([b70fbd7](https://github.com/doublesymmetry/react-native-track-player/commit/b70fbd7663921855f799a60083ca4522e913e6f8)
+* **android:** Fix removeUpcomingItems ([#67](https://github.com/doublesymmetry/KotlinAudior/issues/67))
+* **android:** Notification fixes
+
+* **ios:** Fix removing items from queue other than the current track ([#41](https://github.com/doublesymmetry/SwiftAudioEx/issues/41))
+* **ios:** Fix player state not becoming paused after loading ([#46](https://github.com/doublesymmetry/SwiftAudioEx/issues/46))
+* **ios:** Fix current item not being updated when removing items from queue ([#45](https://github.com/doublesymmetry/SwiftAudioEx/issues/45))
+* **ios:** Avoid calling onSkippedToSameCurrentItem when track before is removed ([#45](https://github.com/doublesymmetry/SwiftAudioEx/issues/45))
+
+
+
+
+
 # [4.0.0-rc01](https://github.com/doublesymmetry/react-native-track-player/compare/v3.2.0...v4.0.0-rc01) (2023-03-14)
 
 
