@@ -1,4 +1,4 @@
-# [4.0.0-rc02](https://github.com/doublesymmetry/react-native-track-player/compare/v3.2.0...v4.0.0-rc02) (2023-03-27)
+# [4.0.0-rc02](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc01...v4.0.0-rc02) (2023-03-27)
 
 
 ### Bug Fixes
