@@ -1,8 +1,8 @@
 package com.doublesymmetry.trackplayer.service
 
-import android.app.PendingIntent
+import android.app.*
+import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
 import android.net.Uri
 import android.os.Binder
 import android.os.Build
@@ -10,11 +10,13 @@ import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.RatingCompat
 import androidx.annotation.MainThread
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationCompat.PRIORITY_LOW
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.models.NotificationButton.*
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
-import com.doublesymmetry.trackplayer.R
+import com.doublesymmetry.trackplayer.R as TrackPlayerR
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toMilliseconds
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toSeconds
 import com.doublesymmetry.trackplayer.extensions.asLibState
@@ -87,11 +89,41 @@ class MusicService : HeadlessJsTaskService() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startTask(getTaskConfig(intent))
+        startAndStopEmptyNotificationToAvoidANR()
         return START_STICKY
+    }
+
+    /**
+     * Workaround for the "Context.startForegroundService() did not then call Service.startForeground()"
+     * within 5s" ANR and crash by creating an empty notification and stopping it right after. For more
+     * information see https://github.com/doublesymmetry/react-native-track-player/issues/1666
+     */
+    private fun startAndStopEmptyNotificationToAvoidANR() {
+        val notificationManager = this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        var name = ""
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            name = "temporary_channel"
+            notificationManager.createNotificationChannel(
+                NotificationChannel(name, name, NotificationManager.IMPORTANCE_LOW)
+            )
+        }
+
+        val notification = NotificationCompat.Builder(this, name)
+            .setPriority(PRIORITY_LOW)
+            .setCategory(Notification.CATEGORY_SERVICE)
+            .build()
+        startForeground(EMPTY_NOTIFICATION_ID, notification)
+        @Suppress("DEPRECATION")
+        stopForeground(true)
     }
 
     @MainThread
     fun setupPlayer(playerOptions: Bundle?) {
+        if (this::player.isInitialized) {
+            print("Player was initialized. Prevent re-initializing again")
+            return
+        }
+
         val bufferConfig = BufferConfig(
             playerOptions?.getDouble(MIN_BUFFER_KEY)?.toMilliseconds()?.toInt(),
             playerOptions?.getDouble(MAX_BUFFER_KEY)?.toMilliseconds()?.toInt(),
@@ -166,11 +198,11 @@ class MusicService : HeadlessJsTaskService() {
                     PREVIOUS(icon = previousIcon, isCompact = isCompact(it))
                 }
                 Capability.JUMP_FORWARD -> {
-                    val forwardIcon = BundleUtils.getIcon(this, options, "forwardIcon", R.drawable.forward)
+                    val forwardIcon = BundleUtils.getIcon(this, options, "forwardIcon", TrackPlayerR.drawable.forward)
                     FORWARD(icon = forwardIcon, isCompact = isCompact(it))
                 }
                 Capability.JUMP_BACKWARD -> {
-                    val backwardIcon = BundleUtils.getIcon(this, options, "rewindIcon", R.drawable.rewind)
+                    val backwardIcon = BundleUtils.getIcon(this, options, "rewindIcon", TrackPlayerR.drawable.rewind)
                     BACKWARD(icon = backwardIcon, isCompact = isCompact(it))
                 }
                 Capability.SEEK_TO -> {
@@ -634,6 +666,7 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     companion object {
+        const val EMPTY_NOTIFICATION_ID = 1
         const val STATE_KEY = "state"
         const val ERROR_KEY  = "error"
         const val EVENT_KEY = "event"

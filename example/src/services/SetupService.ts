@@ -4,41 +4,48 @@ import TrackPlayer, {
   RepeatMode,
 } from 'react-native-track-player';
 
-export const SetupService = async (): Promise<boolean> => {
-  let isSetup = false;
-  try {
-    // this method will only reject if player has not been setup yet
-    await TrackPlayer.getActiveTrackIndex();
-    isSetup = true;
-  } catch {
-    await TrackPlayer.setupPlayer({
-      autoHandleInterruptions: true,
-    });
-    await TrackPlayer.updateOptions({
-      android: {
-        appKilledPlaybackBehavior:
-          AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
-      },
-      // This flag is now deprecated. Please use the above to define playback mode.
-      // stoppingAppPausesPlayback: true,
-      capabilities: [
-        Capability.Play,
-        Capability.Pause,
-        Capability.SkipToNext,
-        Capability.SkipToPrevious,
-        Capability.SeekTo,
-      ],
-      compactCapabilities: [
-        Capability.Play,
-        Capability.Pause,
-        Capability.SkipToNext,
-      ],
-      progressUpdateEventInterval: 2,
-    });
-    await TrackPlayer.setRepeatMode(RepeatMode.Queue);
-    isSetup = true;
-  } finally {
-    // eslint-disable-next-line no-unsafe-finally
-    return isSetup;
+const setupPlayer = async (
+  options: Parameters<typeof TrackPlayer.setupPlayer>[0]
+) => {
+  const setup = async () => {
+    try {
+      await TrackPlayer.setupPlayer(options);
+    } catch (error) {
+      return (error as Error & { code?: string }).code;
+    }
+  };
+  while ((await setup()) === 'android_cannot_setup_player_in_background') {
+    // A timeout will mostly only execute when the app is in the foreground,
+    // and even if we were in the background still, it will reject the promise
+    // and we'll try again:
+    await new Promise<void>((resolve) => setTimeout(resolve, 1));
   }
+};
+
+export const SetupService = async () => {
+  await setupPlayer({
+    autoHandleInterruptions: true,
+  });
+  await TrackPlayer.updateOptions({
+    android: {
+      appKilledPlaybackBehavior:
+        AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
+    },
+    // This flag is now deprecated. Please use the above to define playback mode.
+    // stoppingAppPausesPlayback: true,
+    capabilities: [
+      Capability.Play,
+      Capability.Pause,
+      Capability.SkipToNext,
+      Capability.SkipToPrevious,
+      Capability.SeekTo,
+    ],
+    compactCapabilities: [
+      Capability.Play,
+      Capability.Pause,
+      Capability.SkipToNext,
+    ],
+    progressUpdateEventInterval: 2,
+  });
+  await TrackPlayer.setRepeatMode(RepeatMode.Queue);
 };

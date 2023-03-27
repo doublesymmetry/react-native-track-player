@@ -14,24 +14,7 @@ import { QueueInitialTracksService, SetupService } from './services';
 
 const App: React.FC = () => {
   const track = useActiveTrack();
-  const [isPlayerReady, setIsPlayerReady] = useState<boolean>(false);
-
-  useEffect(() => {
-    let unmounted = false;
-    (async () => {
-      const isSetup = await SetupService();
-      if (unmounted) return;
-      setIsPlayerReady(isSetup);
-      const queue = await TrackPlayer.getQueue();
-      if (unmounted) return;
-      if (isSetup && queue.length <= 0) {
-        await QueueInitialTracksService();
-      }
-    })();
-    return () => {
-      unmounted = true;
-    };
-  }, []);
+  const isPlayerReady = useSetupPlayer();
 
   useEffect(() => {
     function deepLinkHandler(data: { url: string }) {
@@ -100,5 +83,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
 });
+
+function useSetupPlayer() {
+  const [playerReady, setPlayerReady] = useState<boolean>(false);
+
+  useEffect(() => {
+    let unmounted = false;
+    (async () => {
+      await SetupService();
+      if (unmounted) return;
+      setPlayerReady(true);
+      const queue = await TrackPlayer.getQueue();
+      if (unmounted) return;
+      if (queue.length <= 0) {
+        await QueueInitialTracksService();
+      }
+    })();
+    return () => {
+      unmounted = true;
+    };
+  }, []);
+  return playerReady;
+}
 
 export default App;
