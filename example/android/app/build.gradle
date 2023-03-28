@@ -148,14 +148,14 @@ android {
 }
 
 dependencies {
-    implementation 'com.android.support:appcompat-v7:25.0.0'
-    implementation 'com.android.support:support-annotations:25.0.0'
-    implementation 'com.android.support:design:25.0.0'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:support-annotations:28.0.0'
+    implementation 'com.android.support:design:28.0.0'
 
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
 
@@ -171,6 +171,15 @@ dependencies {
     }
 
     implementation project(':reactnativetrackplayer')
+
+    constraints {
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
+            because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
+        }
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0") {
+            because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
+        }
+    }
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
