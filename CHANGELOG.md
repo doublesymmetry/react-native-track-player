@@ -1,3 +1,7 @@
+# [4.0.0-rc03](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc02...v4.0.0-rc03) (2023-03-28)
+
+* **android:** Fixes compilation issue due to uses of Lifecycle (updates kotlin gradle plugin)
+
 # [4.0.0-rc02](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc01...v4.0.0-rc02) (2023-03-27)
 
 
