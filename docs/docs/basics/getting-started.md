@@ -19,6 +19,8 @@ TrackPlayer.registerPlaybackService(() => require('./service'));
 
 ```
 
+Then create the file `service.js`
+
 ```ts
 // service.js
 module.exports = async function() {
@@ -31,7 +33,14 @@ Then, you need to set up the player. This usually takes less than a second:
 ```ts
 import TrackPlayer from 'react-native-track-player';
 
-await TrackPlayer.setupPlayer()
+async function setupPlayer() {
+  await TrackPlayer.setupPlayer();
+  // The player is ready to be used
+}
+
+function App(): JSX.Element {
+  await setupPlayer();
+}
 // The player is ready to be used
 ```
 
