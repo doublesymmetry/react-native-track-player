@@ -7,8 +7,16 @@ sidebar_position: 2
 ## Starting off
 First, you need to register a [playback service](./playback-service.md) right after registering the main component of your app (typically in your `index.js` file at the root of your project):
 ```ts
-// AppRegistry.registerComponent(...);
+import {AppRegistry} from 'react-native';
+import TrackPlayer from 'react-native-track-player';
+
+import App from './App';
+import {PlaybackService} from './src/services';
+import {name as appName} from './app.json';
+
+AppRegistry.registerComponent(appName, () => App);
 TrackPlayer.registerPlaybackService(() => require('./service'));
+
 ```
 
 ```ts
