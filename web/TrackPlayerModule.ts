@@ -3,6 +3,7 @@ import { DeviceEventEmitter } from 'react-native';
 import { Event, PlaybackState, State } from '../src';
 import type { Track, UpdateOptions } from '../src';
 import { PlaylistPlayer, RepeatMode } from './TrackPlayer';
+import { SetupNotCalledError } from './TrackPlayer/SetupNotCalledError';
 
 export class TrackPlayerModule extends PlaylistPlayer {
   protected emitter = DeviceEventEmitter;
@@ -61,9 +62,6 @@ export class TrackPlayerModule extends PlaylistPlayer {
     this.emitter.emit(Event.PlaybackState, newState);
   }
 
-  // TODO: this probably does nothing
-  public setupPlayer(options: any) {}
-
   public async updateOptions(options: UpdateOptions) {
     // clear and reset interval
     this.clearUpdateEventInterval();
@@ -91,7 +89,7 @@ export class TrackPlayerModule extends PlaylistPlayer {
   }
 
   protected async onTrackEnded() {
-    const position = this.element.currentTime;
+    const position = this.element!.currentTime;
     await super.onTrackEnded();
 
     this.emitter.emit(Event.PlaybackTrackChanged, {
@@ -105,7 +103,7 @@ export class TrackPlayerModule extends PlaylistPlayer {
     await super.onPlaylistEnded();
     this.emitter.emit(Event.PlaybackQueueEnded, {
       track: this.currentIndex,
-      position: this.element.currentTime,
+      position: this.element!.currentTime,
     });
   }
 
@@ -132,6 +130,7 @@ export class TrackPlayerModule extends PlaylistPlayer {
   }
 
   public async load(track: Track) {
+    if (!this.element) throw new SetupNotCalledError();
     const lastTrack = this.current;
     const lastPosition = this.element.currentTime;
     await super.load(track);
@@ -154,6 +153,8 @@ export class TrackPlayerModule extends PlaylistPlayer {
   }
 
   public getActiveTrackIndex(): number | undefined {
+    // per the existing spec, this should throw if setup hasn't been called
+    if (!this.element || !this.player) throw new SetupNotCalledError();
     return this.currentIndex;
   }
 
