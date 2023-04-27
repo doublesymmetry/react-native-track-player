@@ -1,3 +1,18 @@
+# [4.0.0-web.9](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc03...v4.0.0-web.9) (2023-04-27)
+
+
+### Bug Fixes
+
+* **example:** update tsconfig extension path ([8f096c8](https://github.com/doublesymmetry/react-native-track-player/commit/8f096c8222af0569c4ce55d74c266648bc23a770))
+
+
+### Features
+
+* **web:** add a web implementation ([4295134](https://github.com/doublesymmetry/react-native-track-player/commit/4295134df7a46c2a4d23130eadc186c5ab5f7e45))
+* **web:** prevent exceptions during SSR due to inability to import shaka player ([5f5ea22](https://github.com/doublesymmetry/react-native-track-player/commit/5f5ea22d656c40eae2e764e8b70641c6721dbbee))
+
+
+
 # [4.0.0-rc03](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc02...v4.0.0-rc03) (2023-03-28)
 
 * **android:** Fixes compilation issue due to uses of Lifecycle (updates kotlin gradle plugin)
