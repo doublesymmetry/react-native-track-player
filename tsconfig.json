@@ -11,6 +11,7 @@
     "outDir": "./lib",
     "strict": true,
     "target": "esnext",
+    "module": "esnext",
     "skipLibCheck": true
   },
   "include": ["src"],
