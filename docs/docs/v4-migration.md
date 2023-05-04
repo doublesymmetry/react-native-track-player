@@ -44,7 +44,7 @@ instead of `null`
 1. `getBufferedPosition()` -  Please use the `buffered` property returned by [`getProgress()`](./api/functions/player.md#getprogress).
 1. `Event.PlaybackTrackChanged` - Please use [`Event.PlaybackActiveTrackChanged`](./api/events.md#playbackactivetrackchanged).
 
-### Typescript Deep Imports
+### Typescript Imports
 
 1. If you were using deep imports from RNTP, the `src` has been completely
 reorganized, and so you may need to adjust your imports accordingly. If you've
