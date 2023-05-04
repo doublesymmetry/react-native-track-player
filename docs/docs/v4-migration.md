@@ -45,9 +45,10 @@ instead of `null`
 1. `getCurrentTrack()` - Please use [`getActiveTrackIndex()`](./api/functions/queue.md#getactivetrackindex).
 1. `Event.PlaybackTrackChanged` - Please use [`Event.PlaybackActiveTrackChanged`](./api/events.md#playbackactivetrackchanged).
 
-### Typescript Deep Imports
+### Typescript Imports
 
-If you were using deep imports from RNTP, the `src` has been completely
+1. If you were using deep imports from RNTP, the `src` has been completely
 reorganized, and so you may need to adjust your imports accordingly. If you've
 been importing everything directly (ex. `import ... from 'react-native-track-player';`)
 then you don't need to do anything.
+1. The `PlaybackStateEvent` interface has been renamed to `PlaybackState`
