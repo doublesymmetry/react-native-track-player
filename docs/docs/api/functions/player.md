@@ -6,7 +6,7 @@ Accepts a [`PlayerOptions`](../objects/metadata-options.md) object.
 
 ## `updateOptions(options)`
 
-Accepts a [`MetadataOptions`](../objects/metadata-options.md) object. Updates
+Accepts a [`UpdateOptions`](../objects/update-options.md) object. Updates
 the configuration for the components.
 
 
