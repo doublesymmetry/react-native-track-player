@@ -356,7 +356,7 @@ class MusicService : HeadlessJsTaskService() {
 
     @MainThread
     fun seekTo(seconds: Float) {
-        player.seek((seconds.toLong()), TimeUnit.SECONDS)
+        player.seek((seconds * 1000).toLong(), TimeUnit.MILLISECONDS)
     }
 
     @MainThread
