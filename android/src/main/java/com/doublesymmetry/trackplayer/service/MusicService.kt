@@ -36,6 +36,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
+import timber.log.Timber
 
 @MainThread
 class MusicService : HeadlessJsTaskService() {
@@ -156,6 +157,7 @@ class MusicService : HeadlessJsTaskService() {
         player = QueuedAudioPlayer(this@MusicService, playerConfig, bufferConfig, cacheConfig)
         player.automaticallyUpdateNotificationMetadata = automaticallyUpdateNotificationMetadata
         observeEvents()
+        setupForegrounding()
     }
 
     @MainThread
@@ -472,6 +474,93 @@ class MusicService : HeadlessJsTaskService() {
         emit(MusicEvents.PLAYBACK_QUEUE_ENDED, bundle)
     }
 
+    @Suppress("DEPRECATION")
+    fun isForegroundService(): Boolean {
+        val manager = baseContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        for (service in manager.getRunningServices(Int.MAX_VALUE)) {
+            if (MusicService::class.java.name == service.service.className) {
+                return service.foreground
+            }
+        }
+        Timber.e("isForegroundService found no matching service")
+        return false
+    }
+
+    @MainThread
+    private fun setupForegrounding() {
+        // Implementation based on https://github.com/Automattic/pocket-casts-android/blob/ee8da0c095560ef64a82d3a31464491b8d713104/modules/services/repositories/src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/PlaybackService.kt#L218
+        var notificationId: Int? = null
+        var notification: Notification? = null
+        var transientLoss = false
+        scope.launch {
+            event.onAudioFocusChanged.collect {
+                transientLoss = !it.isFocusLostPermanently && it.isPaused
+            }
+        }
+        scope.launch {
+            event.notificationStateChange.collect {
+                when (it) {
+                    is NotificationState.POSTED -> {
+                        notificationId = it.notificationId;
+                        notification = it.notification;
+                    }
+                    else -> {}
+                }
+            }
+        }
+        scope.launch {
+            event.stateChange.collect {
+                val isForegroundService = isForegroundService()
+                if (isForegroundService && (it == AudioPlayerState.PLAYING || it == AudioPlayerState.BUFFERING)) {
+                    return@collect
+                }
+                when (it) {
+                    AudioPlayerState.LOADING, AudioPlayerState.PLAYING -> {
+                        if (notification == null) {
+                            Timber.e("can't startForeground as the notification is null");
+                            return@collect
+                        }
+                        try {
+                            if (AppForegroundTracker.foregrounded) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                    startForeground(
+                                        notificationId!!,
+                                        notification!!,
+                                        ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+                                    )
+                                } else {
+                                    startForeground(notificationId!!, notification)
+                                }
+                            }
+                        } catch (e: Exception) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                                e is ForegroundServiceStartNotAllowedException
+                            ) {
+                                Timber.e(
+                                    "ForegroundServiceStartNotAllowedException: startForeground(it.notificationId, it.notification) called from background...",
+                                    e
+                                )
+                                emit(MusicEvents.FOREGROUND_SERVICE_START_NOT_ALLOWED);
+                            }
+                        }
+                    }
+                    AudioPlayerState.IDLE, AudioPlayerState.STOPPED, AudioPlayerState.ERROR -> {
+                        if (transientLoss) {
+                            return@collect
+                        }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            stopForeground(STOP_FOREGROUND_REMOVE)
+                        } else {
+                            @Suppress("DEPRECATION")
+                            stopForeground(true)
+                        }
+                    }
+                    else -> {}
+                }
+            }
+        }
+    }
+
     @MainThread
     private fun observeEvents() {
         scope.launch {
@@ -504,38 +593,6 @@ class MusicService : HeadlessJsTaskService() {
                     putBoolean(IS_FOCUS_LOSS_PERMANENT_KEY, it.isFocusLostPermanently)
                     putBoolean(IS_PAUSED_KEY, it.isPaused)
                     emit(MusicEvents.BUTTON_DUCK, this)
-                }
-            }
-        }
-
-        scope.launch {
-            event.notificationStateChange.collect {
-                when (it) {
-                    is NotificationState.POSTED -> {
-                        try {
-                            if (AppForegroundTracker.foregrounded) {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                    startForeground(it.notificationId, it.notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
-                                } else {
-                                    startForeground(it.notificationId, it.notification)
-                                }    
-                            }
-                        } catch (e: Exception) {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-                                e is ForegroundServiceStartNotAllowedException
-                            ) {
-                                // Potentially log - ForegroundServiceStartNotAllowedException: startForeground(it.notificationId, it.notification) called from background...
-                            }
-                        }
-                    }
-                    is NotificationState.CANCELLED -> {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            stopForeground(STOP_FOREGROUND_REMOVE)
-                        } else {
-                            @Suppress("DEPRECATION")
-                            stopForeground(true)
-                        }
-                    }
                 }
             }
         }
