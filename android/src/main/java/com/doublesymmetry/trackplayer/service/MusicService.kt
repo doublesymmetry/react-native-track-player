@@ -3,6 +3,7 @@ package com.doublesymmetry.trackplayer.service
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.net.Uri
 import android.os.Binder
 import android.os.Build
@@ -25,6 +26,7 @@ import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.model.TrackAudioItem
 import com.doublesymmetry.trackplayer.module.MusicEvents
 import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
+import com.doublesymmetry.trackplayer.utils.AppForegroundTracker
 import com.doublesymmetry.trackplayer.utils.BundleUtils
 import com.doublesymmetry.trackplayer.utils.BundleUtils.setRating
 import com.facebook.react.HeadlessJsTaskService
@@ -108,10 +110,13 @@ class MusicService : HeadlessJsTaskService() {
             )
         }
 
-        val notification = NotificationCompat.Builder(this, name)
+        val notificationBuilder = NotificationCompat.Builder(this, name)
             .setPriority(PRIORITY_LOW)
             .setCategory(Notification.CATEGORY_SERVICE)
-            .build()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+           notificationBuilder.setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
+        }
+        val notification = notificationBuilder.build()
         startForeground(EMPTY_NOTIFICATION_ID, notification)
         @Suppress("DEPRECATION")
         stopForeground(true)
@@ -507,7 +512,21 @@ class MusicService : HeadlessJsTaskService() {
             event.notificationStateChange.collect {
                 when (it) {
                     is NotificationState.POSTED -> {
-                        startForeground(it.notificationId, it.notification)
+                        try {
+                            if (AppForegroundTracker.foregrounded) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                    startForeground(it.notificationId, it.notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+                                } else {
+                                    startForeground(it.notificationId, it.notification)
+                                }    
+                            }
+                        } catch (e: Exception) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                                e is ForegroundServiceStartNotAllowedException
+                            ) {
+                                // Potentially log - ForegroundServiceStartNotAllowedException: startForeground(it.notificationId, it.notification) called from background...
+                            }
+                        }
                     }
                     is NotificationState.CANCELLED -> {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
