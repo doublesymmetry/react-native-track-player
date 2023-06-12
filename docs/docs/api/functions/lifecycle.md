@@ -6,9 +6,7 @@ Initializes the player with the specified options. These options do not apply to
 
 These options are different than the ones set using `updateOptions()`. Options other than those listed below will not be applied.
 
-You should always call this function (even without any options set) before using the player to make sure everything is initialized.
-
-If the player is already initialized, the promise will resolve instantly.
+You should always call this function (even without any options set) before using the player to make sure everything is initialized. Do not call this more than once in the lifetime of your app.
 
 Note that on Android this method must only be called while the app is in the foreground, otherwise it will throw an error with code `'android_cannot_setup_player_in_background'`. In this case you can wait for the app to be in the foreground and try again.
 
