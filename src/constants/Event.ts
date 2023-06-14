@@ -1,5 +1,5 @@
 export enum Event {
-  ForegroundServiceStartNotAllowed = 'android-foreground-service-start-not-allowed',
+  PlayerError = 'player-error',
 
   /** Fired when the state of the player changes. */
   PlaybackState = 'playback-state',

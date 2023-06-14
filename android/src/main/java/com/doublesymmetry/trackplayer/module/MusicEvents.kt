@@ -47,7 +47,7 @@ class MusicEvents(private val reactContext: ReactContext) : BroadcastReceiver() 
         const val PLAYBACK_ERROR = "playback-error"
 
         // Other
-        const val FOREGROUND_SERVICE_START_NOT_ALLOWED = "android-foreground-service-start-not-allowed"
+        const val PLAYER_ERROR = "player-error"
 
         const val EVENT_INTENT = "com.doublesymmetry.trackplayer.event"
     }

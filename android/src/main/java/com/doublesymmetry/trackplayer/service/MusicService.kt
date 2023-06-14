@@ -532,15 +532,18 @@ class MusicService : HeadlessJsTaskService() {
                                     startForeground(notificationId!!, notification)
                                 }
                             }
-                        } catch (e: Exception) {
+                        } catch (error: Exception) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-                                e is ForegroundServiceStartNotAllowedException
+                                error is ForegroundServiceStartNotAllowedException
                             ) {
                                 Timber.e(
-                                    "ForegroundServiceStartNotAllowedException: startForeground(it.notificationId, it.notification) called from background...",
-                                    e
+                                    "ForegroundServiceStartNotAllowedException: App tried to start a foreground Service when it was not allowed to do so.",
+                                    error
                                 )
-                                emit(MusicEvents.FOREGROUND_SERVICE_START_NOT_ALLOWED);
+                                emit(MusicEvents.PLAYER_ERROR, Bundle().apply {
+                                    putString("message", error.message)
+                                    putString("code", "android-foreground-service-start-not-allowed")
+                                });
                             }
                         }
                     }
