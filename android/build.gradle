@@ -14,7 +14,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 def getExtOrIntegerDefault(name) {
-    return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties['RNTP_' + name]).toInteger()
+    return rootProject.ext.has(name) ? rootProject.ext.get(name) : 111
 }
 
 android {
@@ -60,5 +60,6 @@ dependencies {
     implementation "androidx.core:core-ktx:1.9.0"
     implementation "androidx.localbroadcastmanager:localbroadcastmanager:1.1.0"
     implementation "androidx.lifecycle:lifecycle-process:2.6.1"
+    implementation 'androidx.media:media:1.6.0'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3"
 }
