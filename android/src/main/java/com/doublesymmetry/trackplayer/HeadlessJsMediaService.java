@@ -8,7 +8,6 @@
  package com.doublesymmetry.trackplayer;
 
  import android.annotation.SuppressLint;
- import android.app.Service;
  import android.content.BroadcastReceiver;
  import android.content.Context;
  import android.content.Intent;
@@ -22,6 +21,10 @@
  import com.facebook.react.jstasks.HeadlessJsTaskConfig;
  import com.facebook.react.jstasks.HeadlessJsTaskContext;
  import com.facebook.react.jstasks.HeadlessJsTaskEventListener;
+ import com.facebook.react.ReactInstanceManager;
+ import com.facebook.react.ReactInstanceEventListener;
+ import com.facebook.react.ReactNativeHost;
+ import com.facebook.react.ReactApplication;
  import java.util.Set;
  import java.util.concurrent.CopyOnWriteArraySet;
  
@@ -74,7 +77,7 @@
            Assertions.assertNotNull((PowerManager) context.getSystemService(POWER_SERVICE));
        sWakeLock =
            powerManager.newWakeLock(
-               PowerManager.PARTIAL_WAKE_LOCK, HeadlessJsTaskService.class.getCanonicalName());
+               PowerManager.PARTIAL_WAKE_LOCK, HeadlessJsMediaService.class.getCanonicalName());
        sWakeLock.setReferenceCounted(false);
        sWakeLock.acquire();
      }

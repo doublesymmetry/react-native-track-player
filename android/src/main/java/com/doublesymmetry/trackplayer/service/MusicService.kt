@@ -12,7 +12,8 @@ import android.support.v4.media.RatingCompat
 import androidx.annotation.MainThread
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_LOW
-import androidx.media.MediaBrowserServiceCompat.BrowserRoot
+import androidx.media.MediaBrowserServiceCompat
+import android.support.v4.media.MediaBrowserCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.models.NotificationButton.*
@@ -49,6 +50,39 @@ class MusicService : HeadlessJsMediaService() {
     @Deprecated("This will be removed soon")
     var stoppingAppPausesPlayback = true
         private set
+
+    override fun onGetRoot(
+            clientPackageName: String,
+            clientUid: Int,
+            rootHints: Bundle?
+    ): MediaBrowserServiceCompat.BrowserRoot {
+        return MediaBrowserServiceCompat.BrowserRoot("/", null)
+    }
+
+    override fun onLoadChildren(
+            parentMediaId: String,
+            result: MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>>
+    ) {
+        //  Browsing not allowed
+        if ("MY_EMPTY_MEDIA_ROOT_ID" == parentMediaId) {
+            result.sendResult(null)
+            return
+        }
+
+        // Assume for example that the music catalog is already loaded/cached.
+
+        val mediaItems = emptyList<MediaBrowserCompat.MediaItem>()
+
+        // Check if this is the root menu:
+        if ("MY_MEDIA_ROOT_ID" == parentMediaId) {
+            // Build the MediaItem objects for the top level,
+            // and put them in the mediaItems list...
+        } else {
+            // Examine the passed parentMediaId to see which submenu we're at,
+            // and put the children of that menu in the mediaItems list...
+        }
+        result.sendResult(mediaItems)
+    }
 
     enum class AppKilledPlaybackBehavior(val string: String) {
         CONTINUE_PLAYBACK("continue-playback"), PAUSE_PLAYBACK("pause-playback"), STOP_PLAYBACK_AND_REMOVE_NOTIFICATION("stop-playback-and-remove-notification")
