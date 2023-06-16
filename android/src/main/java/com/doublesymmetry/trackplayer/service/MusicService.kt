@@ -491,16 +491,48 @@ class MusicService : HeadlessJsTaskService() {
         // Implementation based on https://github.com/Automattic/pocket-casts-android/blob/ee8da0c095560ef64a82d3a31464491b8d713104/modules/services/repositories/src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/PlaybackService.kt#L218
         var notificationId: Int? = null
         var notification: Notification? = null
-        var transientLoss = false
-        scope.launch {
-            event.onAudioFocusChanged.collect {
-                transientLoss = !it.isFocusLostPermanently && it.isPaused
+
+        fun startForegroundIfNecessary() {
+            if (isForegroundService()) {
+                Timber.d("skipping foregrounding as the service is already foregrounded")
+                return
+            }
+            if (notification == null) {
+                Timber.d("can't startForeground as the notification is null")
+                return
+            }
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    startForeground(
+                        notificationId!!,
+                        notification!!,
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+                    )
+                } else {
+                    startForeground(notificationId!!, notification)
+                }
+                Timber.d("notification has been foregrounded")
+            } catch (error: Exception) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                    error is ForegroundServiceStartNotAllowedException
+                ) {
+                    Timber.e(
+                        "ForegroundServiceStartNotAllowedException: App tried to start a foreground Service when it was not allowed to do so.",
+                        error
+                    )
+                    emit(MusicEvents.PLAYER_ERROR, Bundle().apply {
+                        putString("message", error.message)
+                        putString("code", "android-foreground-service-start-not-allowed")
+                    });
+                }
             }
         }
+
         scope.launch {
             event.notificationStateChange.collect {
                 when (it) {
                     is NotificationState.POSTED -> {
+                        Timber.d("notification posted with id=%s, ongoing=%s", it.notificationId, it.ongoing)
                         notificationId = it.notificationId;
                         notification = it.notification;
                     }
@@ -510,53 +542,20 @@ class MusicService : HeadlessJsTaskService() {
         }
         scope.launch {
             event.stateChange.collect {
-                val isForegroundService = isForegroundService()
-                if (isForegroundService && (it == AudioPlayerState.PLAYING || it == AudioPlayerState.BUFFERING)) {
-                    return@collect
-                }
                 when (it) {
-                    AudioPlayerState.LOADING, AudioPlayerState.PLAYING -> {
-                        if (notification == null) {
-                            Timber.e("can't startForeground as the notification is null");
-                            return@collect
-                        }
-                        try {
-                            if (AppForegroundTracker.foregrounded) {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                    startForeground(
-                                        notificationId!!,
-                                        notification!!,
-                                        ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
-                                    )
-                                } else {
-                                    startForeground(notificationId!!, notification)
-                                }
-                            }
-                        } catch (error: Exception) {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-                                error is ForegroundServiceStartNotAllowedException
-                            ) {
-                                Timber.e(
-                                    "ForegroundServiceStartNotAllowedException: App tried to start a foreground Service when it was not allowed to do so.",
-                                    error
-                                )
-                                emit(MusicEvents.PLAYER_ERROR, Bundle().apply {
-                                    putString("message", error.message)
-                                    putString("code", "android-foreground-service-start-not-allowed")
-                                });
-                            }
-                        }
+                    AudioPlayerState.BUFFERING,
+                    AudioPlayerState.PLAYING -> {
+                        startForegroundIfNecessary()
                     }
-                    AudioPlayerState.IDLE, AudioPlayerState.STOPPED, AudioPlayerState.ERROR -> {
-                        if (transientLoss) {
-                            return@collect
-                        }
+                    AudioPlayerState.IDLE,
+                    AudioPlayerState.STOPPED -> {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             stopForeground(STOP_FOREGROUND_REMOVE)
                         } else {
                             @Suppress("DEPRECATION")
                             stopForeground(true)
                         }
+                        Timber.d("stopped foregrounding")
                     }
                     else -> {}
                 }
