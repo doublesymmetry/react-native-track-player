@@ -85,7 +85,7 @@
  
    @Override
    public @Nullable IBinder onBind(Intent intent) {
-     return null;
+    return super.onBind(intent);
    }
  
    /**

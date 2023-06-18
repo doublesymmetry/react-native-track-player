@@ -185,6 +185,7 @@ class MusicService : HeadlessJsMediaService() {
 
         player = QueuedAudioPlayer(this@MusicService, playerConfig, bufferConfig, cacheConfig)
         player.automaticallyUpdateNotificationMetadata = automaticallyUpdateNotificationMetadata
+        sessionToken = player.getMediaSessionToken()
         observeEvents()
     }
 
@@ -650,7 +651,8 @@ class MusicService : HeadlessJsMediaService() {
     }
 
     @MainThread
-    override fun onBind(intent: Intent?): IBinder {
+    override fun onBind(intent: Intent?): IBinder? {
+        return super.onBind(intent)
         return binder
     }
 
