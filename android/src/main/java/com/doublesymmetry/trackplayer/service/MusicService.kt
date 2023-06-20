@@ -652,8 +652,13 @@ class MusicService : HeadlessJsMediaService() {
 
     @MainThread
     override fun onBind(intent: Intent?): IBinder? {
-        return super.onBind(intent)
-        return binder
+        // return super.onBind(intent)
+        val intentAction = intent?.action
+        return if (intentAction != null) {
+            super.onBind(intent)
+        } else {
+            binder
+        }
     }
 
     @MainThread
