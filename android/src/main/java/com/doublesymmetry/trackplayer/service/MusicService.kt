@@ -548,14 +548,15 @@ class MusicService : HeadlessJsTaskService() {
                         startForegroundIfNecessary()
                     }
                     AudioPlayerState.IDLE,
-                    AudioPlayerState.STOPPED -> {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            stopForeground(STOP_FOREGROUND_REMOVE)
-                        } else {
+                    AudioPlayerState.STOPPED,
+                    AudioPlayerState.ERROR,
+                    AudioPlayerState.PAUSED -> {
+                        val removeNotification = it != AudioPlayerState.PAUSED && it != AudioPlayerState.ERROR
+                        if (removeNotification || isForegroundService()) {
                             @Suppress("DEPRECATION")
-                            stopForeground(true)
+                            stopForeground(removeNotification)
+                            Timber.d("stopped foregrounding")
                         }
-                        Timber.d("stopped foregrounding")
                     }
                     else -> {}
                 }
