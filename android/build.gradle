@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.2.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10"
     }
 }
 
@@ -49,7 +49,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.doublesymmetry:kotlinaudio:v2.0.0-rc3'
+    implementation 'com.github.doublesymmetry:kotlinaudio:v2.0.0-rc7'
     // used when building against local maven
 //    implementation "com.github.doublesymmetry:kotlin-audio:1.2.2"
 
@@ -59,5 +59,6 @@ dependencies {
     // Make sure we're using androidx
     implementation "androidx.core:core-ktx:1.9.0"
     implementation "androidx.localbroadcastmanager:localbroadcastmanager:1.1.0"
+    implementation "androidx.lifecycle:lifecycle-process:2.6.1"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3"
 }

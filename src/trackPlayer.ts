@@ -39,6 +39,11 @@ function resolveImportedPath(path?: number | string) {
 /**
  * Initializes the player with the specified options.
  *
+ * Note that on Android this method must only be called while the app is in the
+ * foreground, otherwise it will throw an error with code
+ * `'android_cannot_setup_player_in_background'`. In this case you can wait for
+ * the app to be in the foreground and try again.
+ *
  * @param options The options to initialize the player with.
  * @see https://react-native-track-player.js.org/docs/api/functions/lifecycle
  */
