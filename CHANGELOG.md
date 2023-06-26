@@ -1,3 +1,9 @@
+# [4.0.0-rc04](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc02...v4.0.0-rc03) (2023-03-28)
+
+* **ios:** Fix crash on getting current item
+* **android:** Improve preciseness of seeking
+* **android:** Improve handling of service foregrounding
+
 # [4.0.0-rc03](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc02...v4.0.0-rc03) (2023-03-28)
 
 * **android:** Fixes compilation issue due to uses of Lifecycle (updates kotlin gradle plugin)
