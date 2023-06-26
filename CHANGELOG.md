@@ -1,4 +1,4 @@
-# [4.0.0-rc05](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc04...v4.0.0-rc05) (2023-03-28)
+# [4.0.0-rc05](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc04...v4.0.0-rc05) (2023-06-26)
 
 * **ios:** Fix crash on getting current item
 * **android:** Improve preciseness of seeking
