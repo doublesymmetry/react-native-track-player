@@ -6,8 +6,10 @@ import { usePlaybackState } from './usePlaybackState';
 /**
  * Tells whether the TrackPlayer is in a mode that most people would describe
  * as "playing." Great for UI to decide whether to show a Play or Pause button.
- * @returns playing - whether UI should likely show as Playing
- * @returns bufferingDuringPlay - whether UI should show as Buffering
+ * @returns playing - whether UI should likely show as Playing, or undefined
+ *   if this isn't yet known.
+ * @returns bufferingDuringPlay - whether UI should show as Buffering, or
+ *   undefined if this isn't yet known.
  */
 export function useIsPlaying() {
   const state = usePlaybackState().state;
@@ -26,8 +28,8 @@ function determineIsPlaying(playWhenReady?: boolean, state?: State) {
   const isEnded = state === State.Ended;
 
   return {
-    playing: !!playWhenReady && !(isErrored || isEnded),
-    bufferingDuringPlay: !!playWhenReady && isLoading,
+    playing: playWhenReady && !(isErrored || isEnded),
+    bufferingDuringPlay: playWhenReady && isLoading,
   };
 }
 
@@ -38,6 +40,9 @@ function determineIsPlaying(playWhenReady?: boolean, state?: State) {
  *
  * It also exists whenever you need to know the play state outside of a React
  * component, since hooks only work in components.
+ *
+ * @returns playing - whether the player is attempting to play, or undefined
+ *   if this isn't yet known.
  */
 export async function isPlaying() {
   const [playbackState, playWhenReady] = await Promise.all([
