@@ -21,4 +21,4 @@ To determine how to render a Play button in its three states correctly, do the f
 To help with this logic, the API has two utilities:
 
 1. The `useIsPlaying()` hook. This returns `{playing: boolean | undefined, bufferingDuringPlay: boolean | undefined}`, which you can consult to render your play button correctly. You should render a spinner if `bufferingDuringPlay === true`; otherwise render according to `playing`. Values are `undefined` if the player isn't yet in a state where they can be determined.
-2. The `async isPlaying()` function, which returns whether the TrackPlayer is (attempting to) play at any point. Note that you can't easily just instead call `getPlaybackState()` to determine the same answer, unless you've accounted for the issues mentioned above.
+2. The `async isPlaying()` function, which returns the same result as `useIsPlaying()`, but can be used outside of React components (i.e. without hooks). Note that you can't easily just instead call `getPlaybackState()` to determine the same answer, unless you've accounted for the issues mentioned above.

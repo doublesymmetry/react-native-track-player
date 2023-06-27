@@ -19,8 +19,8 @@ export function useIsPlaying() {
 }
 
 function determineIsPlaying(playWhenReady?: boolean, state?: State) {
-  if (!state) {
-    return { playing: false, bufferingDuringPlay: false };
+  if (playWhenReady === undefined || state === undefined) {
+    return { playing: undefined, bufferingDuringPlay: undefined };
   }
 
   const isLoading = state === State.Loading || state === State.Buffering;
@@ -41,15 +41,15 @@ function determineIsPlaying(playWhenReady?: boolean, state?: State) {
  * It also exists whenever you need to know the play state outside of a React
  * component, since hooks only work in components.
  *
- * @returns playing - whether the player is attempting to play, or undefined
+ * @returns playing - whether UI should likely show as Playing, or undefined
  *   if this isn't yet known.
+ * @returns bufferingDuringPlay - whether UI should show as Buffering, or
+ *   undefined if this isn't yet known.
  */
 export async function isPlaying() {
   const [playbackState, playWhenReady] = await Promise.all([
     TrackPlayer.getPlaybackState(),
     TrackPlayer.getPlayWhenReady(),
   ]);
-  const { playing } = determineIsPlaying(playWhenReady, playbackState.state);
-
-  return playing;
+  return determineIsPlaying(playWhenReady, playbackState.state);
 }
