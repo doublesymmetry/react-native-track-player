@@ -491,6 +491,7 @@ class MusicService : HeadlessJsTaskService() {
         // Implementation based on https://github.com/Automattic/pocket-casts-android/blob/ee8da0c095560ef64a82d3a31464491b8d713104/modules/services/repositories/src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/PlaybackService.kt#L218
         var notificationId: Int? = null
         var notification: Notification? = null
+        var playerState: AudioPlayerState? = null
 
         fun startForegroundIfNecessary() {
             if (isForegroundService()) {
@@ -535,6 +536,28 @@ class MusicService : HeadlessJsTaskService() {
                         Timber.d("notification posted with id=%s, ongoing=%s", it.notificationId, it.ongoing)
                         notificationId = it.notificationId;
                         notification = it.notification;
+                        if (it.ongoing) {
+                            if (player.playWhenReady) {
+                                startForegroundIfNecessary()
+                            }
+                        } else {
+                            when (playerState) {
+                                AudioPlayerState.IDLE,
+                                AudioPlayerState.ENDED,
+                                AudioPlayerState.STOPPED,
+                                AudioPlayerState.ERROR,
+                                AudioPlayerState.PAUSED -> {
+                                    val removeNotification = playerState == AudioPlayerState.IDLE
+                                        || playerState == AudioPlayerState.STOPPED
+                                    if (removeNotification || isForegroundService()) {
+                                        @Suppress("DEPRECATION")
+                                        stopForeground(removeNotification)
+                                        Timber.d("stopped foregrounding")
+                                    }
+                                }
+                                else -> {}
+                            }
+                        }
                     }
                     else -> {}
                 }
@@ -542,23 +565,17 @@ class MusicService : HeadlessJsTaskService() {
         }
         scope.launch {
             event.stateChange.collect {
-                when (it) {
-                    AudioPlayerState.BUFFERING,
-                    AudioPlayerState.PLAYING -> {
-                        startForegroundIfNecessary()
-                    }
-                    AudioPlayerState.IDLE,
-                    AudioPlayerState.STOPPED,
-                    AudioPlayerState.ERROR,
-                    AudioPlayerState.PAUSED -> {
-                        val removeNotification = it != AudioPlayerState.PAUSED && it != AudioPlayerState.ERROR
-                        if (removeNotification || isForegroundService()) {
-                            @Suppress("DEPRECATION")
-                            stopForeground(removeNotification)
-                            Timber.d("stopped foregrounding")
-                        }
-                    }
-                    else -> {}
+                Timber.d("player state changed to %s", it)
+                // Skip states that don't affect foregrounding
+                if (
+                    it != AudioPlayerState.LOADING &&
+                    it != AudioPlayerState.READY &&
+                    it != AudioPlayerState.BUFFERING &&
+                    // Skip iniital idle state, since we are only interested when
+                    // state becomes idle after not being idle
+                    !(playerState == null && it == AudioPlayerState.IDLE)
+                ) {
+                    playerState = it
                 }
             }
         }
