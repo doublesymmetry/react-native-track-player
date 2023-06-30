@@ -493,7 +493,8 @@ class MusicService : HeadlessJsTaskService() {
         // Implementation based on https://github.com/Automattic/pocket-casts-android/blob/ee8da0c095560ef64a82d3a31464491b8d713104/modules/services/repositories/src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/PlaybackService.kt#L218
         var notificationId: Int? = null
         var notification: Notification? = null
-        var playerState: AudioPlayerState? = null
+        var stopForegroundWhenNotOngoing = false
+        var removeNotificationWhenNotOngoing = false
 
         fun startForegroundIfNecessary() {
             if (isForegroundService()) {
@@ -532,6 +533,35 @@ class MusicService : HeadlessJsTaskService() {
         }
 
         scope.launch {
+            val BACKGROUNDABLE_STATES = listOf(
+                AudioPlayerState.IDLE,
+                AudioPlayerState.ENDED,
+                AudioPlayerState.STOPPED,
+                AudioPlayerState.ERROR,
+                AudioPlayerState.PAUSED
+            )
+            val REMOVABLE_STATES = listOf(
+                AudioPlayerState.IDLE,
+                AudioPlayerState.STOPPED,
+                AudioPlayerState.ERROR
+            )
+            val LOADING_STATES = listOf(
+                AudioPlayerState.LOADING,
+                AudioPlayerState.READY,
+                AudioPlayerState.BUFFERING
+            )
+            var stateCount = 0
+            event.stateChange.collect {
+                stateCount++
+                if (it in LOADING_STATES) return@collect;
+                // Skip initial idle state, since we are only interested when
+                // state becomes idle after not being idle
+                stopForegroundWhenNotOngoing = stateCount > 1 && it in BACKGROUNDABLE_STATES
+                removeNotificationWhenNotOngoing = stopForegroundWhenNotOngoing && it in REMOVABLE_STATES
+            }
+        }
+
+        scope.launch {
             event.notificationStateChange.collect {
                 when (it) {
                     is NotificationState.POSTED -> {
@@ -542,42 +572,15 @@ class MusicService : HeadlessJsTaskService() {
                             if (player.playWhenReady) {
                                 startForegroundIfNecessary()
                             }
-                        } else {
-                            when (playerState) {
-                                AudioPlayerState.IDLE,
-                                AudioPlayerState.ENDED,
-                                AudioPlayerState.STOPPED,
-                                AudioPlayerState.ERROR,
-                                AudioPlayerState.PAUSED -> {
-                                    val removeNotification = playerState == AudioPlayerState.IDLE
-                                        || playerState == AudioPlayerState.STOPPED
-                                    if (removeNotification || isForegroundService()) {
-                                        @Suppress("DEPRECATION")
-                                        stopForeground(removeNotification)
-                                        Timber.d("stopped foregrounding")
-                                    }
-                                }
-                                else -> {}
+                        } else if (stopForegroundWhenNotOngoing) {
+                            if (removeNotificationWhenNotOngoing || isForegroundService()) {
+                                @Suppress("DEPRECATION")
+                                stopForeground(removeNotificationWhenNotOngoing)
+                                Timber.d("stopped foregrounding%s", if (removeNotificationWhenNotOngoing) " and removed notification" else "")
                             }
                         }
                     }
                     else -> {}
-                }
-            }
-        }
-        scope.launch {
-            event.stateChange.collect {
-                Timber.d("player state changed to %s", it)
-                // Skip states that don't affect foregrounding
-                if (
-                    it != AudioPlayerState.LOADING &&
-                    it != AudioPlayerState.READY &&
-                    it != AudioPlayerState.BUFFERING &&
-                    // Skip iniital idle state, since we are only interested when
-                    // state becomes idle after not being idle
-                    !(playerState == null && it == AudioPlayerState.IDLE)
-                ) {
-                    playerState = it
                 }
             }
         }
