@@ -32,6 +32,7 @@ import com.doublesymmetry.trackplayer.utils.BundleUtils.setRating
 import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
+import com.google.android.exoplayer2.ui.R as ExoPlayerR
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
 import java.util.concurrent.TimeUnit
@@ -114,6 +115,7 @@ class MusicService : HeadlessJsTaskService() {
         val notificationBuilder = NotificationCompat.Builder(this, name)
             .setPriority(PRIORITY_LOW)
             .setCategory(Notification.CATEGORY_SERVICE)
+            .setSmallIcon(ExoPlayerR.drawable.exo_notification_small_icon)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
            notificationBuilder.setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
         }
@@ -491,6 +493,8 @@ class MusicService : HeadlessJsTaskService() {
         // Implementation based on https://github.com/Automattic/pocket-casts-android/blob/ee8da0c095560ef64a82d3a31464491b8d713104/modules/services/repositories/src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/PlaybackService.kt#L218
         var notificationId: Int? = null
         var notification: Notification? = null
+        var stopForegroundWhenNotOngoing = false
+        var removeNotificationWhenNotOngoing = false
 
         fun startForegroundIfNecessary() {
             if (isForegroundService()) {
@@ -529,33 +533,51 @@ class MusicService : HeadlessJsTaskService() {
         }
 
         scope.launch {
+            val BACKGROUNDABLE_STATES = listOf(
+                AudioPlayerState.IDLE,
+                AudioPlayerState.ENDED,
+                AudioPlayerState.STOPPED,
+                AudioPlayerState.ERROR,
+                AudioPlayerState.PAUSED
+            )
+            val REMOVABLE_STATES = listOf(
+                AudioPlayerState.IDLE,
+                AudioPlayerState.STOPPED,
+                AudioPlayerState.ERROR
+            )
+            val LOADING_STATES = listOf(
+                AudioPlayerState.LOADING,
+                AudioPlayerState.READY,
+                AudioPlayerState.BUFFERING
+            )
+            var stateCount = 0
+            event.stateChange.collect {
+                stateCount++
+                if (it in LOADING_STATES) return@collect;
+                // Skip initial idle state, since we are only interested when
+                // state becomes idle after not being idle
+                stopForegroundWhenNotOngoing = stateCount > 1 && it in BACKGROUNDABLE_STATES
+                removeNotificationWhenNotOngoing = stopForegroundWhenNotOngoing && it in REMOVABLE_STATES
+            }
+        }
+
+        scope.launch {
             event.notificationStateChange.collect {
                 when (it) {
                     is NotificationState.POSTED -> {
                         Timber.d("notification posted with id=%s, ongoing=%s", it.notificationId, it.ongoing)
                         notificationId = it.notificationId;
                         notification = it.notification;
-                    }
-                    else -> {}
-                }
-            }
-        }
-        scope.launch {
-            event.stateChange.collect {
-                when (it) {
-                    AudioPlayerState.BUFFERING,
-                    AudioPlayerState.PLAYING -> {
-                        startForegroundIfNecessary()
-                    }
-                    AudioPlayerState.IDLE,
-                    AudioPlayerState.STOPPED,
-                    AudioPlayerState.ERROR,
-                    AudioPlayerState.PAUSED -> {
-                        val removeNotification = it != AudioPlayerState.PAUSED && it != AudioPlayerState.ERROR
-                        if (removeNotification || isForegroundService()) {
-                            @Suppress("DEPRECATION")
-                            stopForeground(removeNotification)
-                            Timber.d("stopped foregrounding")
+                        if (it.ongoing) {
+                            if (player.playWhenReady) {
+                                startForegroundIfNecessary()
+                            }
+                        } else if (stopForegroundWhenNotOngoing) {
+                            if (removeNotificationWhenNotOngoing || isForegroundService()) {
+                                @Suppress("DEPRECATION")
+                                stopForeground(removeNotificationWhenNotOngoing)
+                                Timber.d("stopped foregrounding%s", if (removeNotificationWhenNotOngoing) " and removed notification" else "")
+                            }
                         }
                     }
                     else -> {}
