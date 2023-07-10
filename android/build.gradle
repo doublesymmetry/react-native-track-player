@@ -49,11 +49,7 @@ repositories {
 }
 
 dependencies {
-<<<<<<< HEAD
     implementation 'com.github.lovegaoshi:KotlinAudio:v2.0.0-aa9'
-=======
-    implementation 'com.github.doublesymmetry:kotlinaudio:v2.0.0-rc7'
->>>>>>> af9003b72394ebac2608965b8467623291d96b3d
     // used when building against local maven
 //    implementation "com.github.doublesymmetry:kotlin-audio:1.2.2"
 
