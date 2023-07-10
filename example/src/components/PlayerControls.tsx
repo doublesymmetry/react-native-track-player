@@ -15,7 +15,7 @@ export const PlayerControls: React.FC = () => {
     <View style={styles.container}>
       <View style={styles.row}>
         <Button title="Prev" onPress={performSkipToPrevious} type="secondary" />
-        <PlayPauseButton state={playback.state} />
+        <PlayPauseButton />
         <Button title="Next" onPress={performSkipToNext} type="secondary" />
       </View>
       <PlaybackError
