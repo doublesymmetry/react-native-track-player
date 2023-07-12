@@ -10,6 +10,8 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.RatingCompat
+import android.support.v4.media.MediaBrowserCompat.MediaItem
+import android.support.v4.media.MediaDescriptionCompat
 import androidx.annotation.MainThread
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_LOW
@@ -76,8 +78,9 @@ class MusicService : HeadlessJsMediaService() {
 
         // Assume for example that the music catalog is already loaded/cached.
 
-        val mediaItems = emptyList<MediaBrowserCompat.MediaItem>()
-
+        val mediaItems = listOf<MediaItem>(MediaItem(
+            MediaDescriptionCompat.Builder().setMediaId("myMediaId").setTitle("MyMedia").setSubtitle("MyMediaSubTitle").build(), MediaItem.FLAG_PLAYABLE
+        ))
         // Check if this is the root menu:
         if ("MY_MEDIA_ROOT_ID" == parentMediaId) {
             // Build the MediaItem objects for the top level,
@@ -193,11 +196,19 @@ class MusicService : HeadlessJsMediaService() {
         val automaticallyUpdateNotificationMetadata = playerOptions?.getBoolean(AUTO_UPDATE_METADATA, true) ?: true
         val mediaSessionCallback = object: AAMediaSessionCallBack {
             override fun handlePlayFromMediaId(mediaId: String?, extras: Bundle?) {
-                Timber.tag("GVATest").d("playing from mediaID: %s", mediaId)
+                Timber.tag("GVA-RNTP").d("RNTP received req to play from mediaID: %s", mediaId)
+                val emitBundle = extras ?: Bundle()
+                emit(MusicEvents.BUTTON_PLAY_FROM_ID, emitBundle.apply {
+                    putString("id", mediaId)
+                })
             }
 
             override fun handlePlayFromSearch(query: String?, extras: Bundle?) {
-                Timber.tag("GVATest").d("playing from query: %s", query)
+                Timber.tag("GVA-RNTP").d("RNTP received req to play from query: %s", query)
+                val emitBundle = extras ?: Bundle()
+                emit(MusicEvents.BUTTON_PLAY_FROM_ID, emitBundle.apply {
+                    putString("query", query)
+                })
             }
         }
         player = QueuedAudioPlayer(this@MusicService, playerConfig, bufferConfig, cacheConfig, mediaSessionCallback)

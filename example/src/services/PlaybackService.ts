@@ -40,6 +40,14 @@ export async function PlaybackService() {
     console.log('Event.RemoteDuck', event);
   });
 
+  TrackPlayer.addEventListener(Event.RemotePlayId, (event) => {
+    console.log('Event.RemotePlayId', event);
+  });
+
+  TrackPlayer.addEventListener(Event.RemotePlaySearch, (event) => {
+    console.log('Event.RemotePlaySearch', event);
+  });
+
   TrackPlayer.addEventListener(Event.PlaybackQueueEnded, (event) => {
     console.log('Event.PlaybackQueueEnded', event);
   });
