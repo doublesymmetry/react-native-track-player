@@ -19,6 +19,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.models.NotificationButton.*
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
+import com.doublesymmetry.kotlinaudio.players.AAMediaSessionCallBack
 import com.doublesymmetry.trackplayer.HeadlessJsMediaService
 import com.doublesymmetry.trackplayer.R as TrackPlayerR
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toMilliseconds
@@ -190,8 +191,16 @@ class MusicService : HeadlessJsMediaService() {
         )
 
         val automaticallyUpdateNotificationMetadata = playerOptions?.getBoolean(AUTO_UPDATE_METADATA, true) ?: true
+        val mediaSessionCallback = object: AAMediaSessionCallBack {
+            override fun handlePlayFromMediaId(mediaId: String?, extras: Bundle?) {
+                Timber.tag("GVATest").d("playing from mediaID: %s", mediaId)
+            }
 
-        player = QueuedAudioPlayer(this@MusicService, playerConfig, bufferConfig, cacheConfig)
+            override fun handlePlayFromSearch(query: String?, extras: Bundle?) {
+                Timber.tag("GVATest").d("playing from query: %s", query)
+            }
+        }
+        player = QueuedAudioPlayer(this@MusicService, playerConfig, bufferConfig, cacheConfig, mediaSessionCallback)
         player.automaticallyUpdateNotificationMetadata = automaticallyUpdateNotificationMetadata
         sessionToken = player.getMediaSessionToken()
         observeEvents()
