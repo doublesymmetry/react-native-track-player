@@ -30,7 +30,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         EventEmitter.shared.register(eventEmitter: self)
         audioSessionController.delegate = self
         player.playWhenReady = false;
-        player.event.playbackEnd.addListener(self, handleAudioPlayerPlaybackEnded)
         player.event.receiveMetadata.addListener(self, handleAudioPlayerMetadataReceived)
         player.event.stateChange.addListener(self, handleAudioPlayerStateChange)
         player.event.fail.addListener(self, handleAudioPlayerFailed)
@@ -792,6 +791,12 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     func handleAudioPlayerStateChange(state: AVPlayerWrapperState) {
         emit(event: EventType.PlaybackState, body: getPlaybackStateBodyKeyValues(state: state))
+        if (state == .ended) {
+            emit(event: EventType.PlaybackQueueEnded, body: [
+                "track": player.currentIndex,
+                "position": player.currentTime,
+            ] as [String : Any])
+        }
     }
 
     func handleAudioPlayerMetadataReceived(metadata: [AVTimedMetadataGroup]) {
@@ -866,17 +871,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     func handleAudioPlayerFailed(error: Error?) {
         emit(event: EventType.PlaybackError, body: ["error": error?.localizedDescription])
-    }
-
-    func handleAudioPlayerPlaybackEnded(reason: PlaybackEndedReason) {
-        // fire an event for the queue ending
-        let queueEndReached = player.nextItems.count == 0 && reason == PlaybackEndedReason.playedUntilEnd
-        if queueEndReached && player.repeatMode != .queue {
-            emit(event: EventType.PlaybackQueueEnded, body: [
-                "track": player.currentIndex,
-                "position": player.currentTime,
-            ])
-        }
     }
 
     func handleAudioPlayerCurrentItemChange(
