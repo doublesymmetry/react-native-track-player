@@ -50,6 +50,7 @@ class MusicService : HeadlessJsMediaService() {
     private val binder = MusicBinder()
     private val scope = MainScope()
     private var progressUpdateJob: Job? = null
+    public var mediaSessionChildren: Map<String, Any> = HashMap()
 
     /**
      * Use [appKilledPlaybackBehavior] instead.

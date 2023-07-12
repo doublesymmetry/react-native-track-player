@@ -5,6 +5,8 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.RatingCompat
+import android.support.v4.media.MediaBrowserCompat.MediaItem
+import android.support.v4.media.MediaDescriptionCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.Capability
 import com.doublesymmetry.kotlinaudio.models.RepeatMode
@@ -88,6 +90,46 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
     private fun bundleToTrack(bundle: Bundle): Track {
         return Track(context, bundle, musicService.ratingType)
+    }
+
+    private fun bundleToMediaItem(bundle: Bundle): MediaItem {
+
+        val mediaId = bundle["mediaId"].toString()
+        val title = bundle["title"].toString()
+        val subtitle = bundle["subtitle"].toString()
+        val mediaUri = BundleUtils.getUri(context, bundle, "mediaUri")
+        val iconUri = BundleUtils.getUri(context, bundle, "iconUri")
+        val playableFlag = MediaItem.FLAG_PLAYABLE
+        if (BundleUtils.getInt(bundle, "playable", 0) != 0) {
+            playableFlag = MediaItem.FLAG_BROWSABLE
+        }
+
+        return MediaItem(
+            MediaDescriptionCompat.Builder()
+                .setMediaId(mediaId)
+                .setTitle(title)
+                .setSubtitle(subtitle)
+                .setIconUri(iconUri)
+                .setMediaUri(mediaUri)
+                .build(), playableFlag
+        )
+    }
+
+    private fun readableArrayToMediaItems(data: ReadableArray): MutableList<MediaItem> {
+        val bundleList = Arguments.toList(data)
+        if (bundleList !is ArrayList) {
+            throw RejectionException("invalid_parameter", "Was not given an array of tracks")
+        }
+        return bundleList.map {
+            if (it is Bundle) {
+                bundleToMediaItem(it)
+            } else {
+                throw RejectionException(
+                    "invalid_track_object",
+                    "Track was not a dictionary type"
+                )
+            }
+        }.toMutableList()
     }
 
     private fun rejectWithException(callback: Promise, exception: Exception) {
@@ -626,4 +668,12 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         if (verifyServiceBoundOrReject(callback)) return@launch
         callback.resolve(Arguments.fromBundle(musicService.getPlayerStateBundle(musicService.state)))
     }
+
+    @ReactMethod
+    fun loadMediaItems(mediaItems: ReadableMap, callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        musicService.mediaSessionChildren = mediaItems.toHashMap().mapValues { readableArrayToMediaItems(it.value as ReadableArray) }
+        callback.resolve(null)
+    }
+
 }
