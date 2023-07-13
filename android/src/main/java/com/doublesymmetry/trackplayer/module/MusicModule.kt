@@ -99,7 +99,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         val subtitle = bundle["subtitle"].toString()
         val mediaUri = BundleUtils.getUri(context, bundle, "mediaUri")
         val iconUri = BundleUtils.getUri(context, bundle, "iconUri")
-        val playableFlag = MediaItem.FLAG_PLAYABLE
+        var playableFlag = MediaItem.FLAG_PLAYABLE
         if (BundleUtils.getInt(bundle, "playable", 0) != 0) {
             playableFlag = MediaItem.FLAG_BROWSABLE
         }
