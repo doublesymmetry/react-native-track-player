@@ -91,6 +91,16 @@ function useSetupPlayer() {
     let unmounted = false;
     (async () => {
       await SetupService();
+      TrackPlayer.setBrowseTree({
+        "/": [
+          {
+            mediaId: "some id",
+            title: "some ttile",
+            subtitle: "some subtitle",
+            playable: "0"
+          }
+        ],
+      })
       if (unmounted) return;
       setPlayerReady(true);
       const queue = await TrackPlayer.getQueue();

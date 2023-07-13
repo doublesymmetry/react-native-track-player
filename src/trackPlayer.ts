@@ -514,3 +514,11 @@ export async function getRepeatMode(): Promise<RepeatMode> {
 export async function retry() {
   return TrackPlayer.retry();
 }
+
+/**
+ * Gets the playback state of the player.
+ *
+ */
+export async function setBrowseTree(browseTree: any): Promise<null> {
+  return TrackPlayer.loadMediaItems(browseTree);
+}

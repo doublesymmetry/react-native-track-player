@@ -50,7 +50,7 @@ class MusicService : HeadlessJsMediaService() {
     private val binder = MusicBinder()
     private val scope = MainScope()
     private var progressUpdateJob: Job? = null
-    public var mediaSessionChildren: Map<String, Any> = HashMap()
+    public var mediaTree: Map<String, Any> = HashMap()
 
     /**
      * Use [appKilledPlaybackBehavior] instead.
@@ -79,9 +79,20 @@ class MusicService : HeadlessJsMediaService() {
 
         // Assume for example that the music catalog is already loaded/cached.
 
-        val mediaItems = listOf<MediaItem>(MediaItem(
-            MediaDescriptionCompat.Builder().setMediaId("myMediaId").setTitle("MyMedia").setSubtitle("MyMediaSubTitle").build(), MediaItem.FLAG_PLAYABLE
-        ))
+        val mediaItems = listOf<MediaItem>(
+            MediaItem(
+                MediaDescriptionCompat.Builder().setMediaId("myMediaId1").setTitle("MyMedia1").setSubtitle("MyMediaSubTitle1").build(), MediaItem.FLAG_BROWSABLE
+            ),
+            MediaItem(
+                MediaDescriptionCompat.Builder().setMediaId("myMediaId2").setTitle("MyMedia2").setSubtitle("MyMediaSubTitle2").build(), MediaItem.FLAG_BROWSABLE
+            ),
+            MediaItem(
+                MediaDescriptionCompat.Builder().setMediaId("myMediaId3").setTitle("MyMedia3").setSubtitle("MyMediaSubTitle3").build(), MediaItem.FLAG_BROWSABLE
+            ),
+            MediaItem(
+                MediaDescriptionCompat.Builder().setMediaId("myMediaId4").setTitle("MyMedia4").setSubtitle("MyMediaSubTitle4").build(), MediaItem.FLAG_BROWSABLE
+            ),
+        )
         // Check if this is the root menu:
         if ("MY_MEDIA_ROOT_ID" == parentMediaId) {
             // Build the MediaItem objects for the top level,
