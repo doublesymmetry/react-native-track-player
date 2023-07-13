@@ -90,8 +90,8 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             "REPEAT_OFF": RepeatMode.off.rawValue,
             "REPEAT_TRACK": RepeatMode.track.rawValue,
             "REPEAT_QUEUE": RepeatMode.queue.rawValue,
-            "MEDIA_PLAYABLE": 0,
-            "MEDIA_BROWSABLE": 0,
+            "MEDIA_PLAYABLE": "0",
+            "MEDIA_BROWSABLE": "1",
         ]
     }
 
