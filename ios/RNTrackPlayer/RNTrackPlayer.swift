@@ -90,8 +90,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             "REPEAT_OFF": RepeatMode.off.rawValue,
             "REPEAT_TRACK": RepeatMode.track.rawValue,
             "REPEAT_QUEUE": RepeatMode.queue.rawValue,
-            "MEDIA_PLAYABLE": "0",
-            "MEDIA_BROWSABLE": "1",
         ]
     }
 
@@ -753,8 +751,8 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         resolve(NSNull())
     }
     
-    @objc(loadMediaItems:resolver:rejecter:)
-    public func loadMediaItems(mediaItems: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+    @objc(loadBrowseTree:resolver:rejecter:)
+    public func loadBrowseTree(mediaItems: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
         resolve(NSNull())
     }

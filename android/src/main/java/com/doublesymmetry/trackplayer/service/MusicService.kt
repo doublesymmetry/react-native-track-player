@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.RatingCompat
 import android.support.v4.media.MediaBrowserCompat.MediaItem
-import android.support.v4.media.MediaDescriptionCompat
 import androidx.annotation.MainThread
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_LOW
@@ -50,7 +49,7 @@ class MusicService : HeadlessJsMediaService() {
     private val binder = MusicBinder()
     private val scope = MainScope()
     private var progressUpdateJob: Job? = null
-    public var mediaTree: Map<String, Any> = HashMap()
+    public var mediaTree: Map<String, List<MediaItem>> = HashMap()
 
     /**
      * Use [appKilledPlaybackBehavior] instead.
@@ -64,6 +63,7 @@ class MusicService : HeadlessJsMediaService() {
             clientUid: Int,
             rootHints: Bundle?
     ): MediaBrowserServiceCompat.BrowserRoot {
+        // TODO: verify clientPackageName here.
         return MediaBrowserServiceCompat.BrowserRoot("/", null)
     }
 
@@ -71,37 +71,7 @@ class MusicService : HeadlessJsMediaService() {
             parentMediaId: String,
             result: MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>>
     ) {
-        //  Browsing not allowed
-        if ("MY_EMPTY_MEDIA_ROOT_ID" == parentMediaId) {
-            result.sendResult(null)
-            return
-        }
-
-        // Assume for example that the music catalog is already loaded/cached.
-
-        val mediaItems = listOf<MediaItem>(
-            MediaItem(
-                MediaDescriptionCompat.Builder().setMediaId("myMediaId1").setTitle("MyMedia1").setSubtitle("MyMediaSubTitle1").build(), MediaItem.FLAG_BROWSABLE
-            ),
-            MediaItem(
-                MediaDescriptionCompat.Builder().setMediaId("myMediaId2").setTitle("MyMedia2").setSubtitle("MyMediaSubTitle2").build(), MediaItem.FLAG_BROWSABLE
-            ),
-            MediaItem(
-                MediaDescriptionCompat.Builder().setMediaId("myMediaId3").setTitle("MyMedia3").setSubtitle("MyMediaSubTitle3").build(), MediaItem.FLAG_BROWSABLE
-            ),
-            MediaItem(
-                MediaDescriptionCompat.Builder().setMediaId("myMediaId4").setTitle("MyMedia4").setSubtitle("MyMediaSubTitle4").build(), MediaItem.FLAG_BROWSABLE
-            ),
-        )
-        // Check if this is the root menu:
-        if ("MY_MEDIA_ROOT_ID" == parentMediaId) {
-            // Build the MediaItem objects for the top level,
-            // and put them in the mediaItems list...
-        } else {
-            // Examine the passed parentMediaId to see which submenu we're at,
-            // and put the children of that menu in the mediaItems list...
-        }
-        result.sendResult(mediaItems)
+        result.sendResult(mediaTree[parentMediaId])
     }
 
     enum class AppKilledPlaybackBehavior(val string: String) {
@@ -218,7 +188,7 @@ class MusicService : HeadlessJsMediaService() {
             override fun handlePlayFromSearch(query: String?, extras: Bundle?) {
                 Timber.tag("GVA-RNTP").d("RNTP received req to play from query: %s", query)
                 val emitBundle = extras ?: Bundle()
-                emit(MusicEvents.BUTTON_PLAY_FROM_ID, emitBundle.apply {
+                emit(MusicEvents.BUTTON_PLAY_FROM_SEARCH, emitBundle.apply {
                     putString("query", query)
                 })
             }

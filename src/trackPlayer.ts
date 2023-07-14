@@ -19,6 +19,7 @@ import type {
   Track,
   TrackMetadataBase,
   UpdateOptions,
+  MediaItem,
 } from './interfaces';
 
 const { TrackPlayerModule: TrackPlayer } = NativeModules;
@@ -516,9 +517,16 @@ export async function retry() {
 }
 
 /**
- * Gets the playback state of the player.
+ * Sets the content hierarchy of Android Auto (Android only). The hierarchy structure is a dict with
+ * the mediaId as keys, and a list of MediaItem as values. To use, you must at least specify the root directory, where
+ * the key is "/". If the root directory contains BROWSABLE MediaItems, they will be shown as tabs. Do note Google requires
+ * AA to have a max of 4 tabs. You may then set the mediaId keys of the browsable MediaItems to be a list of other MediaItems.
  *
+ * @param browseTree the content hierarchy dict.
+ * @returns a serialized copy of the browseTree set by native. For debug purposes.
  */
-export async function setBrowseTree(browseTree: any): Promise<null> {
-  return TrackPlayer.loadMediaItems(browseTree);
+export async function setBrowseTree(browseTree: {
+  [key: string]: MediaItem[];
+}): Promise<string> {
+  return TrackPlayer.loadBrowseTree(browseTree);
 }

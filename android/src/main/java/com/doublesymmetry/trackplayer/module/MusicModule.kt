@@ -656,10 +656,10 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     @ReactMethod
-    fun loadMediaItems(mediaItems: ReadableMap, callback: Promise) = scope.launch {
+    fun loadBrowseTree(mediaItems: ReadableMap, callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
         musicService.mediaTree = mediaItems.toHashMap().mapValues { readableArrayToMediaItems(it.value as ArrayList<HashMap<String, String>>) }
-        callback.resolve(null)
+        callback.resolve(musicService.mediaTree.toString())
     }
 
 }
