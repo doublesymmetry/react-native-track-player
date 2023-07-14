@@ -751,6 +751,12 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         resolve(NSNull())
     }
     
+    @objc(loadBrowseTree:resolver:rejecter:)
+    public func loadBrowseTree(mediaItems: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        if (rejectWhenNotInitialized(reject: reject)) { return }
+        resolve(NSNull())
+    }
+
     private func getPlaybackStateErrorKeyValues() -> Dictionary<String, Any> {
         switch player.playbackError {
             case .failedToLoadKeyValue: return [

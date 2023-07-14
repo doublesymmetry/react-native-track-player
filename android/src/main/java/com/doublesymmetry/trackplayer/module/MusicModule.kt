@@ -4,7 +4,10 @@ import android.content.*
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.net.Uri
 import android.support.v4.media.RatingCompat
+import android.support.v4.media.MediaBrowserCompat.MediaItem
+import android.support.v4.media.MediaDescriptionCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.Capability
 import com.doublesymmetry.kotlinaudio.models.RepeatMode
@@ -88,6 +91,31 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
     private fun bundleToTrack(bundle: Bundle): Track {
         return Track(context, bundle, musicService.ratingType)
+    }
+
+    private fun hashmapToMediaItem(hashmap: HashMap<String, String>): MediaItem {
+
+        val mediaId = hashmap["mediaId"]
+        val title = hashmap["title"]
+        val subtitle = hashmap["subtitle"]
+        val mediaUri = hashmap["mediaUri"]
+        val iconUri = hashmap["iconUri"]
+        val playableFlag = if (hashmap["playable"]?.toInt() == 1 ) MediaItem.FLAG_BROWSABLE else MediaItem.FLAG_PLAYABLE
+        return MediaItem(
+            MediaDescriptionCompat.Builder()
+                .setMediaId(mediaId)
+                .setTitle(title)
+                .setSubtitle(subtitle)
+                .setIconUri(if (iconUri != null ) Uri.parse(iconUri) else null)
+                .setMediaUri(if (mediaUri != null ) Uri.parse(mediaUri) else null)
+                .build(), playableFlag
+        )
+    }
+
+    private fun readableArrayToMediaItems(data: ArrayList<HashMap<String, String>>): MutableList<MediaItem> {
+        return data.map {
+            hashmapToMediaItem(it)
+        }.toMutableList()
     }
 
     private fun rejectWithException(callback: Promise, exception: Exception) {
@@ -626,4 +654,12 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         if (verifyServiceBoundOrReject(callback)) return@launch
         callback.resolve(Arguments.fromBundle(musicService.getPlayerStateBundle(musicService.state)))
     }
+
+    @ReactMethod
+    fun loadBrowseTree(mediaItems: ReadableMap, callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        musicService.mediaTree = mediaItems.toHashMap().mapValues { readableArrayToMediaItems(it.value as ArrayList<HashMap<String, String>>) }
+        callback.resolve(musicService.mediaTree.toString())
+    }
+
 }

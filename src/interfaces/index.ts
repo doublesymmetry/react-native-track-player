@@ -11,3 +11,4 @@ export * from './Track';
 export * from './TrackMetadataBase';
 export * from './UpdateOptions';
 export * from './events';
+export * from './MediaItem';

@@ -11,6 +11,7 @@ import TrackPlayer, { useActiveTrack } from 'react-native-track-player';
 
 import { Button, PlayerControls, Progress, TrackInfo } from './components';
 import { QueueInitialTracksService, SetupService } from './services';
+import DemoAndroidAutoHierarchy from './services/AndroidAutoHierarchy';
 
 const App: React.FC = () => {
   const track = useActiveTrack();
@@ -91,6 +92,7 @@ function useSetupPlayer() {
     let unmounted = false;
     (async () => {
       await SetupService();
+      TrackPlayer.setBrowseTree(DemoAndroidAutoHierarchy).then(console.log);
       if (unmounted) return;
       setPlayerReady(true);
       const queue = await TrackPlayer.getQueue();

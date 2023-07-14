@@ -1,4 +1,6 @@
 export enum Event {
+  PlayerError = 'player-error',
+
   /** Fired when the state of the player changes. */
   PlaybackState = 'playback-state',
   /** Fired when a playback error occurs. */
