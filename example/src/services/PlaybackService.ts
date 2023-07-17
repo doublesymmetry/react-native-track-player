@@ -58,6 +58,11 @@ export async function PlaybackService() {
     }
   });
 
+  TrackPlayer.addEventListener(Event.RemoteSkip, (event) => {
+    console.log('Event.RemoteSkip', event);
+    TrackPlayer.skip(event.index).then(() => TrackPlayer.play());
+  });
+
   TrackPlayer.addEventListener(Event.PlaybackQueueEnded, (event) => {
     console.log('Event.PlaybackQueueEnded', event);
   });
