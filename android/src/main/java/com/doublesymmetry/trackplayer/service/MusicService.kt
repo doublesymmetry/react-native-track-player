@@ -192,6 +192,14 @@ class MusicService : HeadlessJsMediaService() {
                     putString("query", query)
                 })
             }
+
+            override fun handleSkipToQueueItem(id: Long) {
+                Timber.tag("GVA-RNTP").d("RNTP received req to play from queue index: %d", id)
+                val emitBundle = Bundle()
+                emit(MusicEvents.BUTTON_SKIP, emitBundle.apply {
+                    putInt("index", id.toInt())
+                })
+            }
         }
         player = QueuedAudioPlayer(this@MusicService, playerConfig, bufferConfig, cacheConfig, mediaSessionCallback)
         player.automaticallyUpdateNotificationMetadata = automaticallyUpdateNotificationMetadata
