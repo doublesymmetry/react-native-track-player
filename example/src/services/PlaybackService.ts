@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import TrackPlayer, { Event } from 'react-native-track-player';
 
 export async function PlaybackService() {
@@ -40,28 +41,30 @@ export async function PlaybackService() {
     console.log('Event.RemoteDuck', event);
   });
 
-  TrackPlayer.addEventListener(Event.RemotePlayId, async (event) => {
-    console.log('Event.RemotePlayId', event);
-    // For demonstration purposes, the mediaId of playable mediaItems in the content hierarchy
-    // is set to its index, and thus we are able to use TrackPlayer.skip. It's recommended
-    // users build their own playback methods and mediaIds to handle playback.
-    TrackPlayer.skip(Number(event.id)).then(() => TrackPlayer.play());
-  });
-
-  TrackPlayer.addEventListener(Event.RemotePlaySearch, (event) => {
-    console.log('Event.RemotePlaySearch', event);
-    // For demonstration purposes, code below searches if queue contains "soul"; then
-    // TrackPlayer plays the 2nd song (Soul Searching) in the queue. users must build their own search-playback
-    // methods to handle this event.
-    if (event.query.toLowerCase().includes('soul')) {
-      TrackPlayer.skip(1).then(() => TrackPlayer.play());
-    }
-  });
-
-  TrackPlayer.addEventListener(Event.RemoteSkip, (event) => {
-    console.log('Event.RemoteSkip', event);
-    TrackPlayer.skip(event.index).then(() => TrackPlayer.play());
-  });
+  if (Platform.OS === 'android') {
+    TrackPlayer.addEventListener(Event.RemotePlayId, async (event) => {
+      console.log('Event.RemotePlayId', event);
+      // For demonstration purposes, the mediaId of playable mediaItems in the content hierarchy
+      // is set to its index, and thus we are able to use TrackPlayer.skip. It's recommended
+      // users build their own playback methods and mediaIds to handle playback.
+      TrackPlayer.skip(Number(event.id)).then(() => TrackPlayer.play());
+    });
+  
+    TrackPlayer.addEventListener(Event.RemotePlaySearch, (event) => {
+      console.log('Event.RemotePlaySearch', event);
+      // For demonstration purposes, code below searches if queue contains "soul"; then
+      // TrackPlayer plays the 2nd song (Soul Searching) in the queue. users must build their own search-playback
+      // methods to handle this event.
+      if (event.query.toLowerCase().includes('soul')) {
+        TrackPlayer.skip(1).then(() => TrackPlayer.play());
+      }
+    });
+  
+    TrackPlayer.addEventListener(Event.RemoteSkip, (event) => {
+      console.log('Event.RemoteSkip', event);
+      TrackPlayer.skip(event.index).then(() => TrackPlayer.play());
+    });    
+  }
 
   TrackPlayer.addEventListener(Event.PlaybackQueueEnded, (event) => {
     console.log('Event.PlaybackQueueEnded', event);
