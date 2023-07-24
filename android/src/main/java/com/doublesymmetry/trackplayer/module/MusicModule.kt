@@ -658,7 +658,12 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     @ReactMethod
     fun loadBrowseTree(mediaItems: ReadableMap, callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
-        musicService.mediaTree = mediaItems.toHashMap().mapValues { readableArrayToMediaItems(it.value as ArrayList<HashMap<String, String>>) }
+        val mediaItemsMap = mediaItems.toHashMap()
+        musicService.mediaTree = mediaItemsMap.mapValues { readableArrayToMediaItems(it.value as ArrayList<HashMap<String, String>>) }
+        Timber.d("refreshing browseTree")
+        mediaItemsMap.keys.forEach {
+            musicService.notifyChildrenChanged(it)
+        }
         callback.resolve(musicService.mediaTree.toString())
     }
 
