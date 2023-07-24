@@ -1,9 +1,9 @@
+import type { PitchAlgorithm, TrackType } from '../constants';
+import { ResourceObject } from './ResourceObject';
 import type { TrackMetadataBase } from './TrackMetadataBase';
-import type { ResourceObject } from './ResourceObject';
-import type { TrackType, PitchAlgorithm } from '../constants';
 
 export interface Track extends TrackMetadataBase {
-  url: string | ResourceObject;
+  url: string;
   type?: TrackType;
   /** The user agent HTTP header */
   userAgent?: string;
@@ -16,3 +16,8 @@ export interface Track extends TrackMetadataBase {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
+
+export type AddTrack = Track & {
+  url: string | ResourceObject;
+  artwork?: string | ResourceObject;
+};

@@ -7,7 +7,7 @@ export const TrackInfo: React.FC<{
 }> = ({ track }) => {
   return (
     <View style={styles.container}>
-      <Image style={styles.artwork} source={{ uri: `${track?.artwork}` }} />
+      <Image style={styles.artwork} source={{ uri: track?.artwork }} />
       <Text style={styles.titleText}>{track?.title}</Text>
       <Text style={styles.artistText}>{track?.artist}</Text>
     </View>
