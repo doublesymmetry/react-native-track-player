@@ -5,7 +5,7 @@ import { Event } from '../constants';
 import type { Progress } from '../interfaces';
 import { useTrackPlayerEvents } from './useTrackPlayerEvents';
 
-const INITIAL = {
+const INITIAL_STATE = {
   position: 0,
   duration: 0,
   buffered: 0,
@@ -16,10 +16,10 @@ const INITIAL = {
  * @param updateInterval - ms interval
  */
 export function useProgress(updateInterval = 1000) {
-  const [state, setState] = useState<Progress>(INITIAL);
+  const [state, setState] = useState<Progress>(INITIAL_STATE);
 
   useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], () => {
-    setState({...INITIAL});
+    setState(INITIAL_STATE);
   });
 
   useEffect(() => {
