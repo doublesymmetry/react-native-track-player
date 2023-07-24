@@ -11,6 +11,7 @@
     "android:install-release": "RD=android/app/build/outputs/bundle/release && (rm $RD/app.apks || true) && bundletool build-apks --bundle=$RD/app-release.aab --output=$RD/app.apks && (adb uninstall com.example || true) && bundletool install-apks --apks=$RD/app.apks",
     "android:logs": "android/scripts/logs",
     "ios": "react-native run-ios",
+    "ios:sim": "react-native run-ios --simulator=\"iPhone\"",
     "ios:ide": "open ios/*.xcworkspace/",
     "windows": "react-native run-windows",
     "start": "react-native start",
@@ -24,7 +25,7 @@
   "dependencies": {
     "@react-native-community/slider": "^4.4.2",
     "react": "18.2.0",
-    "react-native": "0.71.8",
+    "react-native": "0.71.12",
     "react-native-windows": "^0.65.0-0"
   },
   "devDependencies": {

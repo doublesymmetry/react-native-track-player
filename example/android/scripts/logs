@@ -7,6 +7,8 @@ function monitor_logs {
     adb logcat --pid="$1" &
     LOGCAT_PID=$!
 
+    trap 'echo "Received SIGINT, cleaning up..."; kill $LOGCAT_PID; exit 1' SIGINT
+
     while adb shell "pidof -s $PACKAGE_NAME >/dev/null"; do
         sleep 1
     done
