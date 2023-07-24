@@ -94,6 +94,10 @@ const config = {
             title: 'Community',
             items: [
               {
+                label: 'GitHub',
+                href: 'https://github.com/doublesymmetry/react-native-track-player',
+              },
+              {
                 label: 'Discord',
                 href: 'https://discordapp.com/invite/ya2XDCR',
               },
@@ -106,10 +110,6 @@ const config = {
           {
             title: 'More',
             items: [
-              {
-                label: 'GitHub',
-                href: 'https://github.com/doublesymmetry/react-native-track-player',
-              },
               {
                 label: 'Become A Sponsor',
                 href: 'https://github.com/sponsors/doublesymmetry',
@@ -125,7 +125,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Double Symmetry GmbH. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Double Symmetry GmbH. All Rights Reserved.`,
       },
       prism: {
         theme: lightCodeTheme,
