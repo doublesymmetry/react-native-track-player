@@ -1,3 +1,13 @@
+# [4.0.0-rc06](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc05...v4.0.0-rc06) (2023-07-25)
+
+* **ios:** Fix iOS not repeating track in RepeatMode.Track
+* **RN:** Improve types on asset types
+* **android:** Fix foreground issues and notification item
+* **ios** Fix race conditions in player property setting
+* **android:** Improve notification updates when spamming notification buttons
+* **android** Fix AudioPlayerState.IDLE when queue emptied
+* **android** Improve metadata handling
+
 # [4.0.0-rc05](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc04...v4.0.0-rc05) (2023-06-26)
 
 * **ios:** Fix crash on getting current item
