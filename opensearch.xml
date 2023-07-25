@@ -4,8 +4,8 @@
   <ShortName>React Native Track Player</ShortName>
   <Description>Search React Native Track Player</Description>
   <InputEncoding>UTF-8</InputEncoding>
-  <Image width="16" height="16" type="image/x-icon">https://react-native-track-player.js.org/img/logo.png</Image>
-  <Url type="text/html" method="get" template="https://react-native-track-player.js.org/search?q={searchTerms}"/>
-  <Url type="application/opensearchdescription+xml" rel="self" template="https://react-native-track-player.js.org/opensearch.xml" />
-  <moz:SearchForm>https://react-native-track-player.js.org/</moz:SearchForm>
+  <Image width="16" height="16" type="image/x-icon">https://rntp.dev/img/logo.png</Image>
+  <Url type="text/html" method="get" template="https://rntp.dev/search?q={searchTerms}"/>
+  <Url type="application/opensearchdescription+xml" rel="self" template="https://rntp.dev/opensearch.xml" />
+  <moz:SearchForm>https://rntp.dev/</moz:SearchForm>
 </OpenSearchDescription>
