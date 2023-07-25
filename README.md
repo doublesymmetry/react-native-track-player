@@ -1,4 +1,4 @@
-<img src="https://react-native-track-player.js.org/img/optimized-logo.svg" width="300" />
+<img src="https:/rntp.dev/img/optimized-logo.svg" width="300" />
 
 [![downloads](https://img.shields.io/npm/dw/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player)
 [![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player)
