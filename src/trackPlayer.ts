@@ -8,7 +8,12 @@ import {
 // @ts-expect-error because resolveAssetSource is untyped
 import { default as resolveAssetSource } from 'react-native/Libraries/Image/resolveAssetSource';
 
-import { Event, RepeatMode, State } from './constants';
+import {
+  Event,
+  RepeatMode,
+  State,
+  AndroidAudioContentStyle,
+} from './constants';
 import type {
   AddTrack,
   EventPayloadByEvent,
@@ -520,5 +525,21 @@ export async function retry() {
 export async function setBrowseTree(browseTree: {
   [key: string]: MediaItem[];
 }): Promise<string> {
-  return TrackPlayer.loadBrowseTree(browseTree);
+  if (Platform.OS !== 'android') return new Promise(() => '');
+  return TrackPlayer.setBrowseTree(browseTree);
+}
+
+/**
+ * Sets the content style of Android Auto (Android only).
+ * there are list style and grid style. see https://developer.android.com/training/cars/media#apply_content_style .
+ * the styles are applicable to browsable nodes and playable nodes. setting the args to true will yield the list style.
+ * false = the grid style.
+ */
+export function setBrowseTreeStyle(
+  browsableStyle: AndroidAudioContentStyle,
+  playableStyle: AndroidAudioContentStyle
+): null {
+  if (Platform.OS !== 'android') return null;
+  TrackPlayer.setBrowseTreeStyle(browsableStyle, playableStyle);
+  return null;
 }

@@ -9,6 +9,7 @@ import android.support.v4.media.RatingCompat
 import android.support.v4.media.MediaBrowserCompat.MediaItem
 import android.support.v4.media.MediaDescriptionCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.media.utils.MediaConstants
 import com.doublesymmetry.kotlinaudio.models.Capability
 import com.doublesymmetry.kotlinaudio.models.RepeatMode
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toMilliseconds
@@ -656,7 +657,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     @ReactMethod
-    fun loadBrowseTree(mediaItems: ReadableMap, callback: Promise) = scope.launch {
+    fun setBrowseTree(mediaItems: ReadableMap, callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
         val mediaItemsMap = mediaItems.toHashMap()
         musicService.mediaTree = mediaItemsMap.mapValues { readableArrayToMediaItems(it.value as ArrayList<HashMap<String, String>>) }
@@ -665,6 +666,25 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
             musicService.notifyChildrenChanged(it)
         }
         callback.resolve(musicService.mediaTree.toString())
+    }
+
+    @ReactMethod
+    // this method doesn't seem to affect style after onGetRoot is called, and won't change if notifyChildrenChanged is emitted.
+    fun setBrowseTreeStyle(browsableStyle: Int, playableStyle: Int, callback: Promise) = scope.launch {
+        fun getStyle(check: Int): Int {
+            return when (check) {
+                1 -> MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_GRID_ITEM
+                2 -> MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_CATEGORY_LIST_ITEM
+                3 -> MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_CATEGORY_GRID_ITEM
+                else -> MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM
+            }
+        }
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        musicService.mediaTreeStyle = listOf(
+            getStyle(browsableStyle),
+            getStyle(playableStyle)
+        )
+        callback.resolve(null)
     }
 
 }
