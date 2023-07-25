@@ -1,6 +1,6 @@
 {
   "name": "react-native-track-player",
-  "version": "4.0.0-rc05",
+  "version": "4.0.0-rc06",
   "description": "A fully fledged audio module created for music apps",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
