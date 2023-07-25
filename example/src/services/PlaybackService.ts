@@ -1,5 +1,6 @@
 import { Platform } from 'react-native';
 import TrackPlayer, { Event } from 'react-native-track-player';
+import { Platform } from 'react-native';
 
 export async function PlaybackService() {
   TrackPlayer.addEventListener(Event.RemotePause, () => {
@@ -49,7 +50,7 @@ export async function PlaybackService() {
       // users build their own playback methods and mediaIds to handle playback.
       TrackPlayer.skip(Number(event.id)).then(() => TrackPlayer.play());
     });
-  
+
     TrackPlayer.addEventListener(Event.RemotePlaySearch, (event) => {
       console.log('Event.RemotePlaySearch', event);
       // For demonstration purposes, code below searches if queue contains "soul"; then
@@ -59,11 +60,13 @@ export async function PlaybackService() {
         TrackPlayer.skip(1).then(() => TrackPlayer.play());
       }
     });
-  
+
     TrackPlayer.addEventListener(Event.RemoteSkip, (event) => {
+      // As far as I can tell, Event.RemoteSkip is an android only event that handles the "queue" button (top right)
+      // clicks in android auto. it simply emits an index in the current queue to be played.
       console.log('Event.RemoteSkip', event);
       TrackPlayer.skip(event.index).then(() => TrackPlayer.play());
-    });    
+    });
   }
 
   TrackPlayer.addEventListener(Event.PlaybackQueueEnded, (event) => {

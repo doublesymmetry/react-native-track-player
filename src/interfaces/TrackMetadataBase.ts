@@ -1,4 +1,3 @@
-import type { ResourceObject } from './ResourceObject';
 import type { RatingType } from '../constants';
 
 export interface TrackMetadataBase {
@@ -11,7 +10,7 @@ export interface TrackMetadataBase {
   /** The track duration in seconds */
   duration?: number;
   /** The track artwork */
-  artwork?: string | ResourceObject;
+  artwork?: string;
   /** track description */
   description?: string;
   /** The track genre */

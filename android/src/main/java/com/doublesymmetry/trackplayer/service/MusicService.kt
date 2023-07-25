@@ -14,8 +14,7 @@ import android.support.v4.media.MediaBrowserCompat.MediaItem
 import androidx.annotation.MainThread
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_LOW
-import androidx.media.MediaBrowserServiceCompat
-import android.support.v4.media.MediaBrowserCompat
+import androidx.media.utils.MediaConstants
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.models.NotificationButton.*
@@ -49,7 +48,10 @@ class MusicService : HeadlessJsMediaService() {
     private val binder = MusicBinder()
     private val scope = MainScope()
     private var progressUpdateJob: Job? = null
-    public var mediaTree: Map<String, List<MediaItem>> = HashMap()
+    var mediaTree: Map<String, List<MediaItem>> = HashMap()
+    var mediaTreeStyle: List<Int> = listOf(
+        MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM,
+        MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM)
 
     /**
      * Use [appKilledPlaybackBehavior] instead.
@@ -62,14 +64,23 @@ class MusicService : HeadlessJsMediaService() {
             clientPackageName: String,
             clientUid: Int,
             rootHints: Bundle?
-    ): MediaBrowserServiceCompat.BrowserRoot {
+    ): BrowserRoot {
         // TODO: verify clientPackageName here.
-        return MediaBrowserServiceCompat.BrowserRoot("/", null)
+        val extras = Bundle()
+        extras.putInt(
+            MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE,
+            mediaTreeStyle[0]
+        )
+        extras.putInt(
+            MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_PLAYABLE,
+            mediaTreeStyle[1]
+        )
+        return BrowserRoot("/", extras)
     }
 
     override fun onLoadChildren(
             parentMediaId: String,
-            result: MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>>
+            result: Result<List<MediaItem>>
     ) {
         result.sendResult(mediaTree[parentMediaId])
     }

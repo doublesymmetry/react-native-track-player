@@ -6,8 +6,12 @@ import {
   StatusBar,
   StyleSheet,
   View,
+  Platform,
 } from 'react-native';
-import TrackPlayer, { useActiveTrack } from 'react-native-track-player';
+import TrackPlayer, {
+  useActiveTrack,
+  AndroidAudioContentStyle,
+} from 'react-native-track-player';
 
 import { Button, PlayerControls, Progress, TrackInfo } from './components';
 import { QueueInitialTracksService, SetupService } from './services';
@@ -92,7 +96,11 @@ function useSetupPlayer() {
     let unmounted = false;
     (async () => {
       await SetupService();
-      TrackPlayer.setBrowseTree(DemoAndroidAutoHierarchy).then(console.log);
+      TrackPlayer.setBrowseTree(DemoAndroidAutoHierarchy);
+      TrackPlayer.setBrowseTreeStyle(
+        AndroidAudioContentStyle.CategoryList,
+        AndroidAudioContentStyle.Grid
+      );
       if (unmounted) return;
       setPlayerReady(true);
       const queue = await TrackPlayer.getQueue();
