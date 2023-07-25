@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import TrackPlayer, { Event } from 'react-native-track-player';
 import { Platform } from 'react-native';
 
