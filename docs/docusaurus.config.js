@@ -8,7 +8,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
   title: 'React Native Track Player',
   tagline: 'A fully fledged audio module created for music apps',
-  url: 'https://react-native-track-player.js.org',
+  url: 'https://rntp.dev',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',

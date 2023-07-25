@@ -9,14 +9,14 @@
 
 A fully-fledged audio module created for music apps. Provides audio playback, external media controls, background mode and more!
 
-- [Documentation](https://react-native-track-player.js.org)
-  * [Installation](https://react-native-track-player.js.org/docs/basics/installation/)
-  * [Getting Started](https://react-native-track-player.js.org/docs/basics/getting-started/)
-  * [API Docs](https://react-native-track-player.js.org/docs/api/events)
-  * [Platform Support](https://react-native-track-player.js.org/docs/basics/platform-support)
-  * [Background Mode](https://react-native-track-player.js.org/docs/basics/background-mode)
-  * [Build Preferences](https://react-native-track-player.js.org/docs/basics/build-preferences)
-  * [v2 Migration Guide](https://react-native-track-player.js.org/docs/v2-migration)
+- [Documentation](https://rntp.dev)
+  * [Installation](https://rntp.dev/docs/basics/installation/)
+  * [Getting Started](https://rntp.dev/docs/basics/getting-started/)
+  * [API Docs](https://rntp.dev/docs/api/events)
+  * [Platform Support](https://rntp.dev/docs/basics/platform-support)
+  * [Background Mode](https://rntp.dev/docs/basics/background-mode)
+  * [Build Preferences](https://rntp.dev/docs/basics/build-preferences)
+  * [v2 Migration Guide](https://rntp.dev/docs/v2-migration)
 - [Sponsors](#sponsors)
 - [Features](#features)
 - [Why another music module?](#why-another-music-module)
@@ -28,13 +28,13 @@ A fully-fledged audio module created for music apps. Provides audio playback, ex
 
 Not sure where to start?
 
-1. Try [Getting Started](https://react-native-track-player.js.org/docs/basics/getting-started).
-2. Peruse the [API Docs](https://react-native-track-player.js.org/docs/api/events).
+1. Try [Getting Started](https://rntp.dev/docs/basics/getting-started).
+2. Peruse the [API Docs](https://rntp.dev/docs/api/events).
 3. Run the [Example Project](/example).
 
 ## Sponsors
 
-react-native-track-player is made possible by the generosity of the sponsors below, and many other [individual backers](https://react-native-track-player.js.org/docs/sponsors#backers). Sponsoring directly impacts the longevity of this project.
+react-native-track-player is made possible by the generosity of the sponsors below, and many other [individual backers](https://rntp.dev/docs/sponsors#backers). Sponsoring directly impacts the longevity of this project.
 
 Businesses: support continued development and maintenance via sponsoring contracts:
   E-mail: oss @ doublesymmetry dot com
@@ -143,7 +143,7 @@ All audio modules (like `react-native-sound`) don't play in a separated service 
 
 ## Example Setup
 
-First please take a look at the [Getting Started](https://react-native-track-player.js.org/docs/basics/getting-started/) guide, but a basic example of how to play a track:
+First please take a look at the [Getting Started](https://rntp.dev/docs/basics/getting-started/) guide, but a basic example of how to play a track:
 
 ```javascript
 import TrackPlayer from 'react-native-track-player';

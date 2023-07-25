@@ -55,8 +55,8 @@ source files, modify them, or add breakpoints. See the screenshots below for
 specifically how to navigate to react-native-track-player and SwiftAudioEx
 dependencies (see screenshots below).
 
-![Xcode RNTP](https://react-native-track-player.js.org/img/debugging/debug-ios-rntp.png)
-![Xcode SwiftAudioEx](https://react-native-track-player.js.org/img/debugging/debug-ios-swift-audio-ex.png)
+![Xcode RNTP](https://rntp.dev/img/debugging/debug-ios-rntp.png)
+![Xcode SwiftAudioEx](https://rntp.dev/img/debugging/debug-ios-swift-audio-ex.png)
 
 ## Android Native
 

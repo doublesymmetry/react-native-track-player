@@ -1,11 +1,11 @@
 export interface Progress {
   /**
    * The playback position of the current track in seconds.
-   * See https://react-native-track-player.js.org/docs/api/functions/player#getposition
+   * See https://rntp.dev/docs/api/functions/player#getposition
    **/
   position: number;
   /** The duration of the current track in seconds.
-   * See https://react-native-track-player.js.org/docs/api/functions/player#getduration
+   * See https://rntp.dev/docs/api/functions/player#getduration
    **/
   duration: number;
   /**
