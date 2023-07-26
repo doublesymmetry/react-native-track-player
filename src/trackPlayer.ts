@@ -1,14 +1,8 @@
-import {
-  AppRegistry,
-  DeviceEventEmitter,
-  NativeEventEmitter,
-  NativeModules,
-  Platform,
-} from 'react-native';
+import {AppRegistry, DeviceEventEmitter, NativeEventEmitter, NativeModules, Platform,} from 'react-native';
 // @ts-expect-error because resolveAssetSource is untyped
-import { default as resolveAssetSource } from 'react-native/Libraries/Image/resolveAssetSource';
+import {default as resolveAssetSource} from 'react-native/Libraries/Image/resolveAssetSource';
 
-import { Event, RepeatMode, State } from './constants';
+import {Event, RepeatMode, State} from './constants';
 import type {
   AddTrack,
   EventPayloadByEvent,
@@ -214,31 +208,37 @@ export async function skipToPrevious(initialPosition = -1): Promise<void> {
 // MARK: - Control Center / Notifications API
 
 /**
+ * Stores the last options used to update the player.
+ */
+let lastOptions: UpdateOptions = {};
+
+/**
  * Updates the configuration for the components.
  *
  * @param options The options to update.
  * @see https://rntp.dev/docs/api/functions/player#updateoptionsoptions
  */
-export async function updateOptions({
-  alwaysPauseOnInterruption,
-  ...options
-}: UpdateOptions = {}): Promise<void> {
+export async function updateOptions(options: UpdateOptions = {}): Promise<void> {
+  // Let's store the last options, so that when we receive a subset of options,
+  // we can merge them with the last ones.
+  lastOptions = {...lastOptions, ...options};
+
   return TrackPlayer.updateOptions({
     android: {
       // Handle deprecated alwaysPauseOnInterruption option:
       alwaysPauseOnInterruption:
-        options.android?.alwaysPauseOnInterruption ?? alwaysPauseOnInterruption,
-      ...options.android,
+        lastOptions.android?.alwaysPauseOnInterruption ?? lastOptions.alwaysPauseOnInterruption,
+      ...lastOptions.android,
     },
-    icon: resolveImportedAsset(options.icon),
-    playIcon: resolveImportedAsset(options.playIcon),
-    pauseIcon: resolveImportedAsset(options.pauseIcon),
-    stopIcon: resolveImportedAsset(options.stopIcon),
-    previousIcon: resolveImportedAsset(options.previousIcon),
-    nextIcon: resolveImportedAsset(options.nextIcon),
-    rewindIcon: resolveImportedAsset(options.rewindIcon),
-    forwardIcon: resolveImportedAsset(options.forwardIcon),
-    ...options,
+    icon: resolveImportedAsset(lastOptions.icon),
+    playIcon: resolveImportedAsset(lastOptions.playIcon),
+    pauseIcon: resolveImportedAsset(lastOptions.pauseIcon),
+    stopIcon: resolveImportedAsset(lastOptions.stopIcon),
+    previousIcon: resolveImportedAsset(lastOptions.previousIcon),
+    nextIcon: resolveImportedAsset(lastOptions.nextIcon),
+    rewindIcon: resolveImportedAsset(lastOptions.rewindIcon),
+    forwardIcon: resolveImportedAsset(lastOptions.forwardIcon),
+    ...lastOptions,
   });
 }
 

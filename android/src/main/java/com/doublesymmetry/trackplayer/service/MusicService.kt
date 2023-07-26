@@ -169,7 +169,7 @@ class MusicService : HeadlessJsTaskService() {
 
         appKilledPlaybackBehavior = AppKilledPlaybackBehavior::string.find(androidOptions?.getString(APP_KILLED_PLAYBACK_BEHAVIOR_KEY)) ?: AppKilledPlaybackBehavior.CONTINUE_PLAYBACK
 
-        //TODO: This handles a deprecated flag. Should be removed soon.
+        // TODO: This handles a deprecated flag. Should be removed soon.
         options.getBoolean(STOPPING_APP_PAUSES_PLAYBACK_KEY).let {
             stoppingAppPausesPlayback = options.getBoolean(STOPPING_APP_PAUSES_PLAYBACK_KEY)
             if (stoppingAppPausesPlayback) {
