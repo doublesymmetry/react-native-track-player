@@ -223,21 +223,33 @@ export async function updateOptions(options: UpdateOptions = {}): Promise<void> 
   // we can merge them with the last ones.
   lastOptions = {...lastOptions, ...options};
 
+  const resolvedCapabilities = lastOptions.capabilities?.map((capability) => {
+    // Check for capabilities with a notification icon and resolve the local assets if necessary.
+    if ("notificationOptions" in capability && capability.notificationOptions?.icon) {
+      return {
+        ...capability,
+        notificationOptions: {
+          ...capability.notificationOptions,
+          icon: resolveImportedAsset(capability.notificationOptions.icon),
+        },
+      };
+    }
+
+    return capability;
+  });
+
   return TrackPlayer.updateOptions({
     android: {
       // Handle deprecated alwaysPauseOnInterruption option:
-      alwaysPauseOnInterruption:
-        lastOptions.android?.alwaysPauseOnInterruption ?? lastOptions.alwaysPauseOnInterruption,
+      alwaysPauseOnInterruption: lastOptions.android?.alwaysPauseOnInterruption ?? lastOptions.alwaysPauseOnInterruption,
+      // Handle resolving icon assets for the notification
+      notificationConfig: {
+        smallIcon: lastOptions.android?.notificationConfig?.smallIcon ? resolveImportedAsset(lastOptions.android.notificationConfig.smallIcon) : undefined,
+        ...lastOptions.android?.notificationConfig,
+      },
       ...lastOptions.android,
     },
-    icon: resolveImportedAsset(lastOptions.icon),
-    playIcon: resolveImportedAsset(lastOptions.playIcon),
-    pauseIcon: resolveImportedAsset(lastOptions.pauseIcon),
-    stopIcon: resolveImportedAsset(lastOptions.stopIcon),
-    previousIcon: resolveImportedAsset(lastOptions.previousIcon),
-    nextIcon: resolveImportedAsset(lastOptions.nextIcon),
-    rewindIcon: resolveImportedAsset(lastOptions.rewindIcon),
-    forwardIcon: resolveImportedAsset(lastOptions.forwardIcon),
+    capabilities: resolvedCapabilities,
     ...lastOptions,
   });
 }

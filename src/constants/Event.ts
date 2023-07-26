@@ -8,14 +8,14 @@ export enum Event {
   /** Fired after playback has paused due to the queue having reached the end. */
   PlaybackQueueEnded = 'playback-queue-ended',
   /**
-   * Fired when another track has become active or when there no longer is an
+   * Fired when another track has become active or when there's no longer is an
    * active track.
    *
    * @deprecated use `playback-active-track-changed` instead.
    **/
   PlaybackTrackChanged = 'playback-track-changed',
   /**
-   * Fired when another track has become active or when there no longer is an
+   * Fired when another track has become active or when there's no longer is an
    * active track.
    **/
   PlaybackActiveTrackChanged = 'playback-active-track-changed',

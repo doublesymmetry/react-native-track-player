@@ -1,4 +1,5 @@
 import type { AppKilledPlaybackBehavior } from '../constants';
+import {ResourceObject} from "./ResourceObject";
 
 export interface AndroidOptions {
   /**
@@ -7,5 +8,15 @@ export interface AndroidOptions {
    * ignored.**
    */
   appKilledPlaybackBehavior?: AppKilledPlaybackBehavior;
+
+  /** Whether the remote-duck event will be triggered on every interruption. */
   alwaysPauseOnInterruption?: boolean;
+
+  /** Configuration settings for the notification. */
+  notificationConfig?: {
+    /** The small icon to use in the notification. */
+    smallIcon?: ResourceObject;
+    /** The color to use for the accent in the notification. */
+    accentColor?: string;
+  }
 }
