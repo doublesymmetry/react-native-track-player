@@ -20,8 +20,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     private let audioSessionController = AudioSessionController.shared
     private var shouldEmitProgressEvent: Bool = false
     private var shouldResumePlaybackAfterInterruptionEnds: Bool = false
-    private var forwardJumpInterval: NSNumber? = nil;
-    private var backwardJumpInterval: NSNumber? = nil;
 
     // MARK: - Lifecycle Methods
 
@@ -305,26 +303,8 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     @objc(updateOptions:resolver:rejecter:)
     public func update(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
-
-        var capabilitiesStr = options["capabilities"] as? [String] ?? []
-        if (capabilitiesStr.contains("play") && capabilitiesStr.contains("pause")) {
-            capabilitiesStr.append("togglePlayPause");
-        }
-
-        forwardJumpInterval = options["forwardJumpInterval"] as? NSNumber ?? forwardJumpInterval
-        backwardJumpInterval = options["backwardJumpInterval"] as? NSNumber ?? backwardJumpInterval
-
-        player.remoteCommands = capabilitiesStr
-            .compactMap { Capability(rawValue: $0) }
-            .map { capability in
-                capability.mapToPlayerCommand(
-                    forwardJumpInterval: forwardJumpInterval,
-                    backwardJumpInterval: backwardJumpInterval,
-                    likeOptions: options["likeOptions"] as? [String: Any],
-                    dislikeOptions: options["dislikeOptions"] as? [String: Any],
-                    bookmarkOptions: options["bookmarkOptions"] as? [String: Any]
-                )
-            }
+        
+        player.remoteCommands = Capability.fromDictionaryArray(dicts: options["capabilities"] as! [[String : Any]])
 
         configureProgressUpdateEvent(
             interval: ((options["progressUpdateEventInterval"] as? NSNumber) ?? 0).doubleValue

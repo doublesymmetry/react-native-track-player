@@ -68,7 +68,7 @@ export namespace Capability {
   /**
    * Generates a capability that allows the user to play media.
    * @param showInNotification Whether this capability should be shown in the notification.
-   * @param notificationOptions The notification options for this capability. If undefined, this capability will not be used in the notification.
+   * @param notificationOptions The notification options for this capability.
    */
   export function Play(
     showInNotification = true,

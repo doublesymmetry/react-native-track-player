@@ -10,44 +10,51 @@ import Foundation
 import SwiftAudioEx
 
 enum Capability: String {
-    case play, pause, togglePlayPause, stop, next, previous, jumpForward, jumpBackward, seek, like, dislike, bookmark
-
-    func mapToPlayerCommand(forwardJumpInterval: NSNumber?,
-                            backwardJumpInterval: NSNumber?,
-                            likeOptions: [String: Any]?,
-                            dislikeOptions: [String: Any]?,
-                            bookmarkOptions: [String: Any]?) -> RemoteCommand {
-        switch self {
-        case .stop:
-            return .stop
-        case .play:
-            return .play
-        case .pause:
-            return .pause
-        case .togglePlayPause:
-            return .togglePlayPause
-        case .next:
-            return .next
-        case .previous:
-            return .previous
-        case .seek:
-            return .changePlaybackPosition
-        case .jumpForward:
-            return .skipForward(preferredIntervals: [(forwardJumpInterval ?? backwardJumpInterval) ?? 15])
-        case .jumpBackward:
-            return .skipBackward(preferredIntervals: [(backwardJumpInterval ?? forwardJumpInterval) ?? 15])
-        case .like:
-            return .like(isActive: likeOptions?["isActive"] as? Bool ?? false,
-                         localizedTitle: likeOptions?["title"] as? String ?? "Like",
-                         localizedShortTitle: likeOptions?["title"] as? String ?? "Like")
-        case .dislike:
-            return .dislike(isActive: dislikeOptions?["isActive"] as? Bool ?? false,
-                            localizedTitle: dislikeOptions?["title"] as? String ?? "Dislike",
-                            localizedShortTitle: dislikeOptions?["title"] as? String ?? "Dislike")
-        case .bookmark:
-            return .bookmark(isActive: bookmarkOptions?["isActive"] as? Bool ?? false,
-                             localizedTitle: bookmarkOptions?["title"] as? String ?? "Bookmark",
-                             localizedShortTitle: bookmarkOptions?["title"] as? String ?? "Bookmark")
+    case play, pause, stop, next, previous, jumpForward, jumpBackward, seek, like, dislike, bookmark
+    
+    static func fromDictionaryArray(dicts: [[String: Any]]) -> [RemoteCommand] {
+        var ret: [RemoteCommand] = []
+        
+        let hasBothPlayAndPause = dicts.filter({
+            $0["constant"] as? String == "play" || $0["constant"] as? String == "pause"
+        }).count == 2
+        
+        if hasBothPlayAndPause {
+            ret.append(.togglePlayPause)
         }
+        
+        for dict in dicts {
+            let cap = Capability(rawValue: dict["constant"] as! String)
+            switch cap {
+            case .play: ret.append(.play)
+            case .pause: ret.append(.pause)
+            case .stop: ret.append(.stop)
+            case .seek: ret.append(.changePlaybackPosition)
+            case .next: ret.append(.next)
+            case .previous: ret.append(.previous)
+            case .jumpForward:
+                let forwardJumpInterval = dict["jumpInterval"] as? NSNumber ?? 15
+                ret.append(.skipForward(preferredIntervals: [forwardJumpInterval]))
+            case .jumpBackward:
+                let backwardJumpInterval = dict["jumpInterval"] as? NSNumber ?? 15
+                ret.append(.skipBackward(preferredIntervals: [backwardJumpInterval]))
+            case .like:
+                let isActive = dict["isActive"] as? Bool ?? false
+                let title = dict["title"] as? String ?? "Like"
+                ret.append(.like(isActive: isActive, localizedTitle: title, localizedShortTitle: title))
+            case .dislike:
+                let isActive = dict["isActive"] as? Bool ?? false
+                let title = dict["title"] as? String ?? "Like"
+                ret.append(.dislike(isActive: isActive, localizedTitle: title, localizedShortTitle: title))
+            case .bookmark:
+                let isActive = dict["isActive"] as? Bool ?? false
+                let title = dict["title"] as? String ?? "Like"
+                ret.append(.bookmark(isActive: isActive, localizedTitle: title, localizedShortTitle: title))
+            case .none:
+                break
+            }
+        }
+        
+        return ret
     }
 }
