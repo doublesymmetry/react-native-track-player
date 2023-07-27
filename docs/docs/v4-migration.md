@@ -4,6 +4,34 @@ sidebar_position: 8
 
 # Migrating from v3.2 to v4
 
+### `Capabilities` have been updated to include inline data about its configuration
+Before capabilities were split into a combination of `capabilities`, `notificationCapabilities` and `compactCapabilities`. These controlled different aspects of an audio player's configuration and were not clear nor consistent. Furthermore icons for notification actions were separately set by individual properties (i.e. `playIcon`, `pauseIcon`, etc). Now all of this information is contained in the `Capabilities` object.
+
+For more information on Capabilities see the [documentation](./api/objects/capabilities.md).
+
+```diff
+await TrackPlayer.updateOptions({
++      capabilities: [
++        Capability.Play(),
++        Capability.Pause(),
++        Capability.SkipToNext(),
++        Capability.SkipToPrevious(true, { compact: false, icon: require('./previous.png') }),
++        Capability.SeekTo,
++      ],
+-      capabilities: [
+-        Capability.Play,
+-        Capability.Pause,
+-        Capability.SkipToNext,
+-        Capability.SkipToPrevious,
+-        Capability.SeekTo,
+-      ],
+-      compactCapabilities: [
+-        Capability.Play,
+-        Capability.Pause,
+-        Capability.SkipToNext,
+-      ],
+-      previousIcon: require('./previous.png'),
+```
 
 ### `alwaysPauseOnInterruption` has been moved to [`AndroidOptions`](./api/objects/android-options.md)
 
@@ -13,6 +41,21 @@ await TrackPlayer.updateOptions({
 +        alwaysPauseOnInterruption: true,
 +      },
 -      alwaysPauseOnInterruption: true,
+}
+```
+
+### `icon` and `color` have been moved to [`NotificationOptions`](./api/objects/notification-options.md) under [`AndroidOptions`](./api/objects/android-options.md)
+
+```diff
+await TrackPlayer.updateOptions({
++      android: {
++        notificationOptions: {
++          color: '#ff0000',
++          icon: require('./icon.png'),
++        },
++      },
+-      color: '#ff0000',
+-      icon: require('./icon.png'),
 }
 ```
 
