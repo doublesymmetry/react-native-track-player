@@ -1,6 +1,6 @@
 import { NativeModules } from 'react-native';
-import {RatingType} from "./RatingType";
-import {ResourceObject} from "../interfaces";
+import { RatingType } from './RatingType';
+import { ResourceObject } from '../interfaces';
 const { TrackPlayerModule: TrackPlayer } = NativeModules;
 
 enum CapabilityConstant {
@@ -23,17 +23,24 @@ enum CapabilityConstant {
   // TODO: Android can support set repeat mode, shuffle mode, and playback speed.
 }
 
-/** The options for a notification capability. */
-export interface NotificationCapabilityOptions {
+/** The options for an icon notification capability. */
+interface NotificationIconCapabilityOptions {
   /** A custom icon to use in the notification. */
-  icon?: ResourceObject,
+  icon?: ResourceObject;
+}
+
+/** The options for a notification capability. */
+interface NotificationCapabilityOptions
+  extends NotificationIconCapabilityOptions {
   /** Wether this capability should be enabled in the compact notification. */
   compact: boolean;
 }
 
-export interface NotificationCapability {
+interface NotificationCapability {
   showInNotification: boolean;
-  notificationOptions?: NotificationCapabilityOptions;
+  notificationOptions?:
+    | NotificationCapabilityOptions
+    | NotificationIconCapabilityOptions;
   constant: CapabilityConstant;
 }
 
@@ -61,7 +68,12 @@ interface IOSRatingCapability {
 }
 
 /** A type collection of the available capabilities. */
-export type CapabilityImpl = NotificationCapability | JumpDirectionallyCapability | SimpleCapability | AndroidRatingCapability | IOSRatingCapability;
+export type CapabilityImpl =
+  | NotificationCapability
+  | JumpDirectionallyCapability
+  | SimpleCapability
+  | AndroidRatingCapability
+  | IOSRatingCapability;
 
 // MARK: - Capability Builders
 
@@ -74,7 +86,7 @@ export namespace Capability {
    */
   export function Play(
     showInNotification = true,
-    notificationOptions?: NotificationCapabilityOptions,
+    notificationOptions: NotificationCapabilityOptions = { compact: true }
   ): CapabilityImpl {
     return {
       showInNotification,
@@ -90,7 +102,7 @@ export namespace Capability {
    */
   export const PlayFromId: CapabilityImpl = {
     constant: CapabilityConstant.PlayFromId,
-  }
+  };
 
   /**
    * ANDROID ONLY.
@@ -99,7 +111,7 @@ export namespace Capability {
    */
   export const PlayFromSearch: CapabilityImpl = {
     constant: CapabilityConstant.PlayFromSearch,
-  }
+  };
 
   /**
    * Generates a capability that allows the user to pause media.
@@ -109,7 +121,7 @@ export namespace Capability {
    */
   export function Pause(
     showInNotification = true,
-    notificationOptions?: NotificationCapabilityOptions,
+    notificationOptions: NotificationCapabilityOptions = { compact: true }
   ): CapabilityImpl {
     return {
       showInNotification,
@@ -126,7 +138,7 @@ export namespace Capability {
    */
   export function Stop(
     showInNotification = true,
-    notificationOptions?: NotificationCapabilityOptions,
+    notificationOptions?: NotificationIconCapabilityOptions
   ): CapabilityImpl {
     return {
       showInNotification,
@@ -136,21 +148,11 @@ export namespace Capability {
   }
 
   /**
-   * Generates a capability that allows the user to seek to a given position.
-   * By default, this is enabled in the notification and in the compact notification.
-   * @param showInNotification Whether this capability should be shown in the notification.
-   * @param notificationOptions The notification options for this capability.
+   * A capability that allows the user to seek to a given position.
    */
-  export function SeekTo(
-    showInNotification = true,
-    notificationOptions?: NotificationCapabilityOptions,
-  ): CapabilityImpl {
-    return {
-      showInNotification,
-      notificationOptions,
-      constant: CapabilityConstant.SeekTo,
-    };
-  }
+  export const SeekTo: CapabilityImpl = {
+    constant: CapabilityConstant.SeekTo,
+  };
 
   /**
    * ANDROID ONLY.
@@ -159,7 +161,7 @@ export namespace Capability {
    */
   export const Skip: CapabilityImpl = {
     constant: CapabilityConstant.SkipToNext,
-  }
+  };
 
   /**
    * Generates a capability that allows the user to skip to the next song.
@@ -169,7 +171,7 @@ export namespace Capability {
    */
   export function SkipToNext(
     showInNotification = true,
-    notificationOptions?: NotificationCapabilityOptions,
+    notificationOptions: NotificationCapabilityOptions = { compact: true }
   ): CapabilityImpl {
     return {
       showInNotification,
@@ -186,7 +188,7 @@ export namespace Capability {
    */
   export function SkipToPrevious(
     showInNotification = true,
-    notificationOptions?: NotificationCapabilityOptions,
+    notificationOptions: NotificationCapabilityOptions = { compact: true }
   ): CapabilityImpl {
     return {
       showInNotification,
@@ -203,8 +205,8 @@ export namespace Capability {
    */
   export function JumpForward(
     showInNotification = true,
-    notificationOptions?: NotificationCapabilityOptions,
-    jumpInterval = 15,
+    notificationOptions: NotificationCapabilityOptions = { compact: true },
+    jumpInterval = 15
   ): CapabilityImpl {
     return {
       showInNotification,
@@ -222,8 +224,8 @@ export namespace Capability {
    */
   export function JumpBackward(
     showInNotification = true,
-    notificationOptions?: NotificationCapabilityOptions,
-    jumpInterval = 15,
+    notificationOptions: NotificationCapabilityOptions = { compact: true },
+    jumpInterval = 15
   ): CapabilityImpl {
     return {
       showInNotification,

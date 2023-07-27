@@ -1,8 +1,14 @@
-import {AppRegistry, DeviceEventEmitter, NativeEventEmitter, NativeModules, Platform,} from 'react-native';
+import {
+  AppRegistry,
+  DeviceEventEmitter,
+  NativeEventEmitter,
+  NativeModules,
+  Platform,
+} from 'react-native';
 // @ts-expect-error because resolveAssetSource is untyped
-import {default as resolveAssetSource} from 'react-native/Libraries/Image/resolveAssetSource';
+import { default as resolveAssetSource } from 'react-native/Libraries/Image/resolveAssetSource';
 
-import {Event, RepeatMode, State} from './constants';
+import { Event, RepeatMode, State } from './constants';
 import type {
   AddTrack,
   EventPayloadByEvent,
@@ -218,14 +224,19 @@ let lastOptions: UpdateOptions = {};
  * @param options The options to update.
  * @see https://rntp.dev/docs/api/functions/player#updateoptionsoptions
  */
-export async function updateOptions(options: UpdateOptions = {}): Promise<void> {
+export async function updateOptions(
+  options: UpdateOptions = {}
+): Promise<void> {
   // Let's store the last options, so that when we receive a subset of options,
   // we can merge them with the last ones.
-  lastOptions = {...lastOptions, ...options};
+  lastOptions = { ...lastOptions, ...options };
 
   const resolvedCapabilities = lastOptions.capabilities?.map((capability) => {
     // Check for capabilities with a notification icon and resolve the local assets if necessary.
-    if ("notificationOptions" in capability && capability.notificationOptions?.icon) {
+    if (
+      'notificationOptions' in capability &&
+      capability.notificationOptions?.icon
+    ) {
       return {
         ...capability,
         notificationOptions: {
@@ -241,11 +252,17 @@ export async function updateOptions(options: UpdateOptions = {}): Promise<void> 
   return TrackPlayer.updateOptions({
     android: {
       // Handle deprecated alwaysPauseOnInterruption option:
-      alwaysPauseOnInterruption: lastOptions.android?.alwaysPauseOnInterruption ?? lastOptions.alwaysPauseOnInterruption,
+      alwaysPauseOnInterruption:
+        lastOptions.android?.alwaysPauseOnInterruption ??
+        lastOptions.alwaysPauseOnInterruption,
       // Handle resolving icon assets for the notification
-      notificationConfig: {
-        smallIcon: lastOptions.android?.notificationConfig?.smallIcon ? resolveImportedAsset(lastOptions.android.notificationConfig.smallIcon) : undefined,
-        ...lastOptions.android?.notificationConfig,
+      notificationOptions: {
+        smallIcon: lastOptions.android?.notificationOptions?.smallIcon
+          ? resolveImportedAsset(
+              lastOptions.android.notificationOptions.smallIcon
+            )
+          : undefined,
+        ...lastOptions.android?.notificationOptions,
       },
       ...lastOptions.android,
     },

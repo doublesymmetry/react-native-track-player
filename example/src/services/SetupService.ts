@@ -34,11 +34,11 @@ export const SetupService = async () => {
     // This flag is now deprecated. Please use the above to define playback mode.
     // stoppingAppPausesPlayback: true,
     capabilities: [
-        Capability.Play(true, { compact: true }),
-        Capability.Pause(true, { compact: true }),
-        Capability.SkipToNext(true, { compact: true }),
-        Capability.SkipToPrevious(),
-        Capability.SeekTo(),
+        Capability.Play(),
+        Capability.Pause(),
+        Capability.SkipToNext(),
+        Capability.SkipToPrevious(true, { compact: false }),
+        Capability.SeekTo,
     ],
     progressUpdateEventInterval: 2,
   });

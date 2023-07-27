@@ -78,7 +78,7 @@ export interface PlayerOptions {
    * With `autoHandleInterruptions: true` and
    * `androidAudioContentType: AndroidAudioContentType.Speech`, the audio will be
    * paused during short interruptions, such as when a message arrives.
-   * Otherwise the playback volume is reduced while the notification is playing.
+   * Otherwise, the playback volume is reduced while the notification is playing.
    *
    * @default AndroidAudioContentType.Music
    */

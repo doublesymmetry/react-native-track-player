@@ -1,5 +1,5 @@
 import type { AppKilledPlaybackBehavior } from '../constants';
-import {ResourceObject} from "./ResourceObject";
+import { ResourceObject } from './ResourceObject';
 
 export interface AndroidOptions {
   /**
@@ -13,10 +13,10 @@ export interface AndroidOptions {
   alwaysPauseOnInterruption?: boolean;
 
   /** Configuration settings for the notification. */
-  notificationConfig?: {
+  notificationOptions?: {
     /** The small icon to use in the notification. */
     smallIcon?: ResourceObject;
     /** The color to use for the accent in the notification. */
     accentColor?: string;
-  }
+  };
 }
