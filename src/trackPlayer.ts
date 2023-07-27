@@ -91,7 +91,7 @@ export function isServiceRunning(): Promise<boolean> {
  *
  * @param tracks The tracks to add to the queue.
  * @param insertBeforeIndex (Optional) The index to insert the tracks before.
- * By default the tracks will be added to the end of the queue.
+ * By default, the tracks will be added to the end of the queue.
  */
 export async function add(
   tracks: AddTrack[],

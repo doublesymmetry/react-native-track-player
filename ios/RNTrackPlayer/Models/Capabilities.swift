@@ -11,11 +11,15 @@ import SwiftAudioEx
 
 enum Capability: String {
     case play, pause, stop, next, previous, jumpForward, jumpBackward, seek, like, dislike, bookmark
-    
-    static func fromDictionaryArray(dicts: [[String: Any]]) -> [RemoteCommand] {
+}
+
+extension RemoteCommand {
+    static func fromRNArray(data: [[String: Any]]) -> [RemoteCommand] {
         var ret: [RemoteCommand] = []
         
-        let hasBothPlayAndPause = dicts.filter({
+        // iOS has a special remote command for handling play/pause.
+        // We enable that only if both are present in the capabilities.
+        let hasBothPlayAndPause = data.filter({
             $0["constant"] as? String == "play" || $0["constant"] as? String == "pause"
         }).count == 2
         
@@ -23,7 +27,8 @@ enum Capability: String {
             ret.append(.togglePlayPause)
         }
         
-        for dict in dicts {
+        // Map RN's data into remote actions we can pass on to SwiftAudioEx's player.
+        for dict in data {
             let cap = Capability(rawValue: dict["constant"] as! String)
             switch cap {
             case .play: ret.append(.play)

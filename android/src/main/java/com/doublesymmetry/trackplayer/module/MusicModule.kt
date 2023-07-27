@@ -9,6 +9,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.Capability
 import com.doublesymmetry.kotlinaudio.models.RepeatMode
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toMilliseconds
+import com.doublesymmetry.trackplayer.model.RNTPCapability
 import com.doublesymmetry.trackplayer.model.State
 import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
@@ -122,18 +123,18 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     override fun getConstants(): Map<String, Any> {
         return HashMap<String, Any>().apply {
             // Capabilities
-            this["CAPABILITY_PLAY"] = Capability.PLAY.ordinal
-            this["CAPABILITY_PLAY_FROM_ID"] = Capability.PLAY_FROM_ID.ordinal
-            this["CAPABILITY_PLAY_FROM_SEARCH"] = Capability.PLAY_FROM_SEARCH.ordinal
-            this["CAPABILITY_PAUSE"] = Capability.PAUSE.ordinal
-            this["CAPABILITY_STOP"] = Capability.STOP.ordinal
-            this["CAPABILITY_SEEK_TO"] = Capability.SEEK_TO.ordinal
+            this["CAPABILITY_PLAY"] = RNTPCapability.PLAY.ordinal
+            this["CAPABILITY_PLAY_FROM_ID"] = RNTPCapability.PLAY_FROM_ID.ordinal
+            this["CAPABILITY_PLAY_FROM_SEARCH"] = RNTPCapability.PLAY_FROM_SEARCH.ordinal
+            this["CAPABILITY_PAUSE"] = RNTPCapability.PAUSE.ordinal
+            this["CAPABILITY_STOP"] = RNTPCapability.STOP.ordinal
+            this["CAPABILITY_SEEK_TO"] = RNTPCapability.SEEK_TO.ordinal
             this["CAPABILITY_SKIP"] = OnErrorAction.SKIP.ordinal
-            this["CAPABILITY_SKIP_TO_NEXT"] = Capability.SKIP_TO_NEXT.ordinal
-            this["CAPABILITY_SKIP_TO_PREVIOUS"] = Capability.SKIP_TO_PREVIOUS.ordinal
-            this["CAPABILITY_SET_RATING"] = Capability.SET_RATING.ordinal
-            this["CAPABILITY_JUMP_FORWARD"] = Capability.JUMP_FORWARD.ordinal
-            this["CAPABILITY_JUMP_BACKWARD"] = Capability.JUMP_BACKWARD.ordinal
+            this["CAPABILITY_SKIP_TO_NEXT"] = RNTPCapability.SKIP_TO_NEXT.ordinal
+            this["CAPABILITY_SKIP_TO_PREVIOUS"] = RNTPCapability.SKIP_TO_PREVIOUS.ordinal
+            this["CAPABILITY_SET_RATING"] = RNTPCapability.SET_RATING.ordinal
+            this["CAPABILITY_JUMP_FORWARD"] = RNTPCapability.JUMP_FORWARD.ordinal
+            this["CAPABILITY_JUMP_BACKWARD"] = RNTPCapability.JUMP_BACKWARD.ordinal
 
             // States
             this["STATE_NONE"] = State.None.state

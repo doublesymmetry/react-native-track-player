@@ -304,7 +304,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     public func update(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
         
-        player.remoteCommands = Capability.fromDictionaryArray(dicts: options["capabilities"] as! [[String : Any]])
+        player.remoteCommands = RemoteCommand.fromRNArray(data: options["capabilities"] as! [[String : Any]])
 
         configureProgressUpdateEvent(
             interval: ((options["progressUpdateEventInterval"] as? NSNumber) ?? 0).doubleValue

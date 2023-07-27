@@ -19,6 +19,8 @@ enum CapabilityConstant {
   Like = TrackPlayer.CAPABILITY_LIKE,
   Dislike = TrackPlayer.CAPABILITY_DISLIKE,
   Bookmark = TrackPlayer.CAPABILITY_BOOKMARK,
+
+  // TODO: Android can support set repeat mode, shuffle mode, and playback speed.
 }
 
 /** The options for a notification capability. */

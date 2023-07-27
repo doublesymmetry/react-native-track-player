@@ -15,18 +15,16 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_LOW
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.*
-import com.doublesymmetry.kotlinaudio.models.NotificationButton.*
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
-import com.doublesymmetry.trackplayer.R as TrackPlayerR
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toMilliseconds
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toSeconds
 import com.doublesymmetry.trackplayer.extensions.asLibState
 import com.doublesymmetry.trackplayer.extensions.find
+import com.doublesymmetry.trackplayer.model.RNTPCapability
 import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.model.TrackAudioItem
 import com.doublesymmetry.trackplayer.module.MusicEvents
 import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
-import com.doublesymmetry.trackplayer.utils.AppForegroundTracker
 import com.doublesymmetry.trackplayer.utils.BundleUtils
 import com.doublesymmetry.trackplayer.utils.BundleUtils.setRating
 import com.facebook.react.HeadlessJsTaskService
@@ -86,10 +84,8 @@ class MusicService : HeadlessJsTaskService() {
             player.playWhenReady = value
         }
 
-    private var latestOptions: Bundle? = null
-    private var capabilities: List<Capability> = emptyList()
-    private var notificationCapabilities: List<Capability> = emptyList()
-    private var compactCapabilities: List<Capability> = emptyList()
+    private var jumpForwardInterval: Int = 15
+    private var jumpBackwardInterval: Int = 15
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startTask(getTaskConfig(intent))
@@ -117,7 +113,7 @@ class MusicService : HeadlessJsTaskService() {
             .setCategory(Notification.CATEGORY_SERVICE)
             .setSmallIcon(ExoPlayerR.drawable.exo_notification_small_icon)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-           notificationBuilder.setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
+            notificationBuilder.foregroundServiceBehavior = NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
         }
         val notification = notificationBuilder.build()
         startForeground(EMPTY_NOTIFICATION_ID, notification)
@@ -164,7 +160,6 @@ class MusicService : HeadlessJsTaskService() {
 
     @MainThread
     fun updateOptions(options: Bundle) {
-        latestOptions = options
         val androidOptions = options.getBundle(ANDROID_OPTIONS_KEY)
 
         appKilledPlaybackBehavior = AppKilledPlaybackBehavior::string.find(androidOptions?.getString(APP_KILLED_PLAYBACK_BEHAVIOR_KEY)) ?: AppKilledPlaybackBehavior.CONTINUE_PLAYBACK
@@ -177,49 +172,100 @@ class MusicService : HeadlessJsTaskService() {
             }
         }
 
-        ratingType = BundleUtils.getInt(options, "ratingType", RatingCompat.RATING_NONE)
-
         player.playerOptions.alwaysPauseOnInterruption = androidOptions?.getBoolean(PAUSE_ON_INTERRUPTION_KEY) ?: false
 
-        capabilities = options.getIntegerArrayList("capabilities")?.map { Capability.values()[it] } ?: emptyList()
-        notificationCapabilities = options.getIntegerArrayList("notificationCapabilities")?.map { Capability.values()[it] } ?: emptyList()
-        compactCapabilities = options.getIntegerArrayList("compactCapabilities")?.map { Capability.values()[it] } ?: emptyList()
+        // Prepare capabilities
+        val capabilities: MutableList<Capability> = mutableListOf()
+        val rawCapabilities = options.getParcelableArrayList<Bundle>("capabilities") ?: emptyList()
 
-        if (notificationCapabilities.isEmpty()) notificationCapabilities = capabilities
-
-        val buttonsList = notificationCapabilities.mapNotNull {
-            when (it) {
-                Capability.PLAY, Capability.PAUSE -> {
-                    val playIcon = BundleUtils.getIconOrNull(this, options, "playIcon")
-                    val pauseIcon = BundleUtils.getIconOrNull(this, options, "pauseIcon")
-                    PLAY_PAUSE(playIcon = playIcon, pauseIcon = pauseIcon)
+        rawCapabilities.forEach {
+            val constant = it.getDouble(CAPABILITY_CONSTANT_KEY).toInt()
+            when (RNTPCapability.values()[constant]) {
+                RNTPCapability.PLAY, RNTPCapability.PAUSE -> capabilities.add(
+                    Capability.PLAY_PAUSE(
+                        showInNotification = it.getBoolean(SHOW_IN_NOTIFICATION_KEY, true),
+                        notificationConfig = it.getBundle(NOTIFICATION_OPTIONS_KEY)?.let { notificationConfig ->
+                            NofiticationPlayPauseActionConfig(
+                                isCompact = notificationConfig.getBoolean(NOTIFICATION_COMPACT_KEY, false),
+                                playIcon = BundleUtils.getIconOrNull(this, notificationConfig, NOTIFICATION_ICON_KEY),
+                            )
+                        },
+                    )
+                )
+                RNTPCapability.PLAY_FROM_ID -> capabilities.add(Capability.PLAY_FROM_ID)
+                RNTPCapability.PLAY_FROM_SEARCH -> capabilities.add(Capability.PLAY_FROM_SEARCH)
+                RNTPCapability.STOP -> capabilities.add(Capability.STOP(
+                    showInNotification = it.getBoolean(SHOW_IN_NOTIFICATION_KEY, true),
+                    notificationConfig = it.getBundle(NOTIFICATION_OPTIONS_KEY)?.let { notificationConfig ->
+                        NofiticationIconActionConfig(
+                            icon = BundleUtils.getIconOrNull(this, notificationConfig, NOTIFICATION_ICON_KEY),
+                        )
+                    },
+                ))
+                RNTPCapability.SEEK_TO -> capabilities.add(Capability.SEEK_TO)
+                RNTPCapability.SKIP -> capabilities.add(Capability.SKIP)
+                RNTPCapability.SKIP_TO_NEXT -> capabilities.add(Capability.NEXT(
+                    showInNotification = it.getBoolean(SHOW_IN_NOTIFICATION_KEY, true),
+                    notificationConfig = it.getBundle(NOTIFICATION_OPTIONS_KEY)?.let { notificationConfig ->
+                        NofiticationActionConfig(
+                            icon = BundleUtils.getIconOrNull(this, notificationConfig, NOTIFICATION_ICON_KEY),
+                            isCompact = notificationConfig.getBoolean(NOTIFICATION_COMPACT_KEY, false),
+                        )
+                    },
+                ))
+                RNTPCapability.SKIP_TO_PREVIOUS -> capabilities.add(Capability.PREVIOUS(
+                    showInNotification = it.getBoolean(SHOW_IN_NOTIFICATION_KEY, true),
+                    notificationConfig = it.getBundle(NOTIFICATION_OPTIONS_KEY)?.let { notificationConfig ->
+                        NofiticationActionConfig(
+                            icon = BundleUtils.getIconOrNull(this, notificationConfig, NOTIFICATION_ICON_KEY),
+                            isCompact = notificationConfig.getBoolean(NOTIFICATION_COMPACT_KEY, false),
+                        )
+                    },
+                ))
+                RNTPCapability.JUMP_FORWARD -> {
+                    jumpForwardInterval = it.getInt(JUMP_INTERVAL_KEY, 15)
+                    capabilities.add(Capability.FORWARD(
+                        showInNotification = it.getBoolean(SHOW_IN_NOTIFICATION_KEY, true),
+                        notificationConfig = it.getBundle(NOTIFICATION_OPTIONS_KEY)?.let { notificationConfig ->
+                            NofiticationActionConfig(
+                                icon = BundleUtils.getIconOrNull(this, notificationConfig, NOTIFICATION_ICON_KEY),
+                                isCompact = notificationConfig.getBoolean(NOTIFICATION_COMPACT_KEY, false),
+                            )
+                        },
+                    ))
                 }
-                Capability.STOP -> {
-                    val stopIcon = BundleUtils.getIconOrNull(this, options, "stopIcon")
-                    STOP(icon = stopIcon)
+                RNTPCapability.JUMP_BACKWARD -> {
+                    jumpBackwardInterval = it.getInt(JUMP_INTERVAL_KEY, 15)
+                    capabilities.add(Capability.BACKWARD(
+                        showInNotification = it.getBoolean(SHOW_IN_NOTIFICATION_KEY, true),
+                        notificationConfig = it.getBundle(NOTIFICATION_OPTIONS_KEY)?.let { notificationConfig ->
+                            NofiticationActionConfig(
+                                icon = BundleUtils.getIconOrNull(this, notificationConfig, NOTIFICATION_ICON_KEY),
+                                isCompact = notificationConfig.getBoolean(NOTIFICATION_COMPACT_KEY, false),
+                            )
+                        },
+                    ))
                 }
-                Capability.SKIP_TO_NEXT -> {
-                    val nextIcon = BundleUtils.getIconOrNull(this, options, "nextIcon")
-                    NEXT(icon = nextIcon, isCompact = isCompact(it))
+                RNTPCapability.SET_RATING -> {
+                    ratingType = it.getInt(RATING_TYPE_KEY, RatingCompat.RATING_NONE)
                 }
-                Capability.SKIP_TO_PREVIOUS -> {
-                    val previousIcon = BundleUtils.getIconOrNull(this, options, "previousIcon")
-                    PREVIOUS(icon = previousIcon, isCompact = isCompact(it))
-                }
-                Capability.JUMP_FORWARD -> {
-                    val forwardIcon = BundleUtils.getIcon(this, options, "forwardIcon", TrackPlayerR.drawable.forward)
-                    FORWARD(icon = forwardIcon, isCompact = isCompact(it))
-                }
-                Capability.JUMP_BACKWARD -> {
-                    val backwardIcon = BundleUtils.getIcon(this, options, "rewindIcon", TrackPlayerR.drawable.rewind)
-                    BACKWARD(icon = backwardIcon, isCompact = isCompact(it))
-                }
-                Capability.SEEK_TO -> {
-                    SEEK_TO
-                }
-                else -> { null }
+                else -> {}
             }
         }
+
+        // Check if a pause was present in rawCapabilities so we can extract an icon for it.
+        // We then update the icon for the PLAY_PAUSE capability.
+        val pauseCapability = rawCapabilities.find { RNTPCapability.values()[it.getInt(CAPABILITY_CONSTANT_KEY)] == RNTPCapability.PAUSE }
+        if (pauseCapability != null) {
+            capabilities.find { it is Capability.PLAY_PAUSE }?.let {
+                val notificationConfig = pauseCapability.getBundle(NOTIFICATION_OPTIONS_KEY)
+                if (notificationConfig != null) {
+                    (it as Capability.PLAY_PAUSE).notificationConfig?.pauseIcon =
+                        BundleUtils.getIconOrNull(this, notificationConfig, NOTIFICATION_ICON_KEY)
+                }
+            }
+        }
+
 
         val openAppIntent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -231,9 +277,10 @@ class MusicService : HeadlessJsTaskService() {
         val accentColor = BundleUtils.getIntOrNull(options, "color")
         val smallIcon = BundleUtils.getIconOrNull(this, options, "icon")
         val pendingIntent = PendingIntent.getActivity(this, 0, openAppIntent, getPendingIntentFlags())
-        val notificationConfig = NotificationConfig(buttonsList, accentColor, smallIcon, pendingIntent)
+        val notificationConfig = NotificationConfig(accentColor, smallIcon, pendingIntent)
+        val capabilitiesConfig = CapabilitiesConfig(capabilities, notificationConfig)
 
-        player.notificationManager.createNotification(notificationConfig)
+        player.notificationManager.createNotification(capabilitiesConfig)
 
         // setup progress update events if configured
         progressUpdateJob?.cancel()
@@ -275,10 +322,6 @@ class MusicService : HeadlessJsTaskService() {
         } else {
             PendingIntent.FLAG_CANCEL_CURRENT
         }
-    }
-
-    private fun isCompact(capability: Capability): Boolean {
-        return compactCapabilities.contains(capability)
     }
 
     @MainThread
@@ -444,7 +487,7 @@ class MusicService : HeadlessJsTaskService() {
         previousIndex: Int?,
         oldPosition: Double
     ) {
-        var a = Bundle()
+        val a = Bundle()
         a.putDouble(POSITION_KEY, oldPosition)
         if (index != null) {
             a.putInt(NEXT_TRACK_KEY, index)
@@ -456,9 +499,9 @@ class MusicService : HeadlessJsTaskService() {
 
         emit(MusicEvents.PLAYBACK_TRACK_CHANGED, a)
 
-        var b = Bundle()
+        val b = Bundle()
         b.putDouble("lastPosition", oldPosition)
-        if (tracks.size > 0) {
+        if (tracks.isNotEmpty()) {
             b.putInt("index", player.currentIndex)
             b.putBundle("track", tracks[player.currentIndex].originalItem)
             if (previousIndex != null) {
@@ -601,7 +644,7 @@ class MusicService : HeadlessJsTaskService() {
 
         scope.launch {
             event.audioItemTransition.collect {
-                if (!(it is AudioItemTransitionReason.REPEAT)) {
+                if (it !is AudioItemTransitionReason.REPEAT) {
                     emitPlaybackTrackChangedEvents(
                         player.currentIndex,
                         player.previousIndex,
@@ -643,15 +686,13 @@ class MusicService : HeadlessJsTaskService() {
                     MediaSessionCallback.STOP -> emit(MusicEvents.BUTTON_STOP)
                     MediaSessionCallback.FORWARD -> {
                         Bundle().apply {
-                            val interval = latestOptions?.getDouble(FORWARD_JUMP_INTERVAL_KEY, DEFAULT_JUMP_INTERVAL) ?: DEFAULT_JUMP_INTERVAL
-                            putInt("interval", interval.toInt())
+                            putInt("interval", jumpForwardInterval)
                             emit(MusicEvents.BUTTON_JUMP_FORWARD, this)
                         }
                     }
                     MediaSessionCallback.REWIND -> {
                         Bundle().apply {
-                            val interval = latestOptions?.getDouble(BACKWARD_JUMP_INTERVAL_KEY, DEFAULT_JUMP_INTERVAL) ?: DEFAULT_JUMP_INTERVAL
-                            putInt("interval", interval.toInt())
+                            putInt("interval", jumpBackwardInterval)
                             emit(MusicEvents.BUTTON_JUMP_BACKWARD, this)
                         }
                     }
@@ -691,13 +732,12 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     private fun getPlaybackErrorBundle(): Bundle {
-        var bundle = Bundle()
-        var error = playbackError
-        if (error?.message != null) {
-            bundle.putString("message", error.message)
+        val bundle = Bundle()
+        if (playbackError?.message != null) {
+            bundle.putString("message", playbackError!!.message)
         }
-        if (error?.code != null) {
-            bundle.putString("code", "android-" + error.code)
+        if (playbackError?.code != null) {
+            bundle.putString("code", "android-" + playbackError!!.code)
         }
         return bundle
     }
@@ -784,8 +824,13 @@ class MusicService : HeadlessJsTaskService() {
         const val PLAY_BUFFER_KEY = "playBuffer"
         const val BACK_BUFFER_KEY = "backBuffer"
 
-        const val FORWARD_JUMP_INTERVAL_KEY = "forwardJumpInterval"
-        const val BACKWARD_JUMP_INTERVAL_KEY = "backwardJumpInterval"
+        const val RATING_TYPE_KEY = "ratingType"
+        const val CAPABILITY_CONSTANT_KEY = "constant"
+        const val SHOW_IN_NOTIFICATION_KEY = "showInNotification"
+        const val NOTIFICATION_OPTIONS_KEY = "notificationOptions"
+        const val NOTIFICATION_COMPACT_KEY = "compact"
+        const val NOTIFICATION_ICON_KEY = "icon"
+        const val JUMP_INTERVAL_KEY = "jumpInterval"
         const val PROGRESS_UPDATE_EVENT_INTERVAL_KEY = "progressUpdateEventInterval"
 
         const val MAX_CACHE_SIZE_KEY = "maxCacheSize"
