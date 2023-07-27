@@ -6,7 +6,7 @@ sidebar_position: 2
 
 All Capability types are made available through the named export `Capability`. Some exposed capabilities are constants and some are builder functions which allow further configuration.
 
-**Important:** Some of these builder functions expose a `showInNotification` and `notificationOptions` parameter. These are only really useful for Android as the system differentiates between capabilities in the media session, enabled commands that could be triggered externally (i.e over headset or auto), from what you display in the notification as buttons. However, for the sake of a more uniform API, iOS will also take into account the `showInNofication` property. If that is false, iOS will not enable that remote feature nor show it in the command center.   
+**Important:** Some of these builder functions expose a `showInNotification` and `notificationOptions` parameter. These are only really used for Android as the system differentiates between capabilities in the media session, enabled commands that could be triggered externally (i.e over headset or auto), from what you display in the notification as buttons. On iOS there's only one system for actions users can take which allows for both external actions and in the now playing section in the command center. As such, on iOS if the capability is present, it will be enabled.   
 
 
 
