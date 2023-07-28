@@ -1,6 +1,7 @@
 package com.doublesymmetry.trackplayer.service
 
 import android.app.*
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
@@ -53,6 +54,12 @@ class MusicService : HeadlessJsMediaService() {
         MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM,
         MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM)
 
+    @ExperimentalCoroutinesApi
+    override fun onCreate() {
+        Timber.tag("GVA-RNTP").d("RNTP musicservice created.")
+        super.onCreate()
+    }
+
     /**
      * Use [appKilledPlaybackBehavior] instead.
      */
@@ -82,6 +89,7 @@ class MusicService : HeadlessJsMediaService() {
             parentMediaId: String,
             result: Result<List<MediaItem>>
     ) {
+        Timber.tag("GVA-RNTP").d("RNTP received loadChildren req: %s", parentMediaId)
         result.sendResult(mediaTree[parentMediaId])
     }
 
