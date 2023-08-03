@@ -19,9 +19,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   artwork: {
-    width: 240,
-    height: 240,
-    marginTop: 30,
+    width: '60%',
+    aspectRatio: 1,
+    marginTop: '2%',
     backgroundColor: 'grey',
   },
   titleText: {

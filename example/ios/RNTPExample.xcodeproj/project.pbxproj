@@ -11,13 +11,10 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		409E343DC7C5A2542B16EA98 /* libPods-example-exampleTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 75D2E29B0CDAF52B1E5FA483 /* libPods-example-exampleTests.a */; };
+		596CC24480E3273655EB9E9C /* libPods-RNTPExample-RNTPExampleTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6897C97D635799B5A8BF4795 /* libPods-RNTPExample-RNTPExampleTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		9B2931352A7C0E75002559D3 /* FontAwesome6_Solid.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9B2931322A7C0E75002559D3 /* FontAwesome6_Solid.ttf */; };
-		9B2931362A7C0E75002559D3 /* FontAwesome6_Brands.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9B2931332A7C0E75002559D3 /* FontAwesome6_Brands.ttf */; };
-		9B2931372A7C0E75002559D3 /* FontAwesome6_Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9B2931342A7C0E75002559D3 /* FontAwesome6_Regular.ttf */; };
 		9B521D0C26610C0700EF0C3A /* dummy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B521D0B26610C0700EF0C3A /* dummy.swift */; };
-		D4E419C990E32CBB3C7E1FD0 /* libPods-example.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 886110B3DD0A55153E82F632 /* libPods-example.a */; };
+		CF5A403ECECA3DF13D467EBF /* libPods-RNTPExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 363BF2EE64BF1B31B5EEDCEB /* libPods-RNTPExample.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,18 +38,19 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = example/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = example/main.m; sourceTree = "<group>"; };
 		2C2F9802D9A70707E1CB329F /* Pods-example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-example.release.xcconfig"; path = "Target Support Files/Pods-example/Pods-example.release.xcconfig"; sourceTree = "<group>"; };
-		75D2E29B0CDAF52B1E5FA483 /* libPods-example-exampleTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-example-exampleTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3177A29F4D5715D6334B4C0C /* Pods-RNTPExample-RNTPExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RNTPExample-RNTPExampleTests.release.xcconfig"; path = "Target Support Files/Pods-RNTPExample-RNTPExampleTests/Pods-RNTPExample-RNTPExampleTests.release.xcconfig"; sourceTree = "<group>"; };
+		363BF2EE64BF1B31B5EEDCEB /* libPods-RNTPExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RNTPExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3A8332538960A17E033ED4B0 /* Pods-RNTPExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RNTPExample.release.xcconfig"; path = "Target Support Files/Pods-RNTPExample/Pods-RNTPExample.release.xcconfig"; sourceTree = "<group>"; };
+		49EE854CD6C2B27125E1A3E9 /* Pods-RNTPExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RNTPExample.debug.xcconfig"; path = "Target Support Files/Pods-RNTPExample/Pods-RNTPExample.debug.xcconfig"; sourceTree = "<group>"; };
+		6897C97D635799B5A8BF4795 /* libPods-RNTPExample-RNTPExampleTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RNTPExample-RNTPExampleTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = example/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		886110B3DD0A55153E82F632 /* libPods-example.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-example.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		9B2931322A7C0E75002559D3 /* FontAwesome6_Solid.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome6_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome6_Solid.ttf"; sourceTree = "<group>"; };
-		9B2931332A7C0E75002559D3 /* FontAwesome6_Brands.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome6_Brands.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome6_Brands.ttf"; sourceTree = "<group>"; };
-		9B2931342A7C0E75002559D3 /* FontAwesome6_Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome6_Regular.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome6_Regular.ttf"; sourceTree = "<group>"; };
 		9B521D0626604D3800EF0C3A /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		9B521D0A26610C0600EF0C3A /* example-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "example-Bridging-Header.h"; sourceTree = "<group>"; };
 		9B521D0B26610C0700EF0C3A /* dummy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dummy.swift; sourceTree = "<group>"; };
 		C6A6377EE893F59DCD177B16 /* Pods-example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-example.debug.xcconfig"; path = "Target Support Files/Pods-example/Pods-example.debug.xcconfig"; sourceTree = "<group>"; };
 		DDFCE76F143B5D90F2157D05 /* Pods-example-exampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-example-exampleTests.release.xcconfig"; path = "Target Support Files/Pods-example-exampleTests/Pods-example-exampleTests.release.xcconfig"; sourceTree = "<group>"; };
 		E050A9D69F20B323551604B0 /* Pods-example-exampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-example-exampleTests.debug.xcconfig"; path = "Target Support Files/Pods-example-exampleTests/Pods-example-exampleTests.debug.xcconfig"; sourceTree = "<group>"; };
+		E387560E60A1AB33369A54DD /* Pods-RNTPExample-RNTPExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RNTPExample-RNTPExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-RNTPExample-RNTPExampleTests/Pods-RNTPExample-RNTPExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -61,7 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				409E343DC7C5A2542B16EA98 /* libPods-example-exampleTests.a in Frameworks */,
+				596CC24480E3273655EB9E9C /* libPods-RNTPExample-RNTPExampleTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -69,7 +67,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D4E419C990E32CBB3C7E1FD0 /* libPods-example.a in Frameworks */,
+				CF5A403ECECA3DF13D467EBF /* libPods-RNTPExample.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,7 +94,6 @@
 		13B07FAE1A68108700A75B9A /* example */ = {
 			isa = PBXGroup;
 			children = (
-				9B2931312A7C0E54002559D3 /* fonts */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -114,8 +111,8 @@
 			children = (
 				9B521D0626604D3800EF0C3A /* AVFoundation.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				886110B3DD0A55153E82F632 /* libPods-example.a */,
-				75D2E29B0CDAF52B1E5FA483 /* libPods-example-exampleTests.a */,
+				363BF2EE64BF1B31B5EEDCEB /* libPods-RNTPExample.a */,
+				6897C97D635799B5A8BF4795 /* libPods-RNTPExample-RNTPExampleTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -127,6 +124,10 @@
 				2C2F9802D9A70707E1CB329F /* Pods-example.release.xcconfig */,
 				E050A9D69F20B323551604B0 /* Pods-example-exampleTests.debug.xcconfig */,
 				DDFCE76F143B5D90F2157D05 /* Pods-example-exampleTests.release.xcconfig */,
+				49EE854CD6C2B27125E1A3E9 /* Pods-RNTPExample.debug.xcconfig */,
+				3A8332538960A17E033ED4B0 /* Pods-RNTPExample.release.xcconfig */,
+				E387560E60A1AB33369A54DD /* Pods-RNTPExample-RNTPExampleTests.debug.xcconfig */,
+				3177A29F4D5715D6334B4C0C /* Pods-RNTPExample-RNTPExampleTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -160,16 +161,6 @@
 				00E356EE1AD99517003FC87E /* RNTPExampleTests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		9B2931312A7C0E54002559D3 /* fonts */ = {
-			isa = PBXGroup;
-			children = (
-				9B2931332A7C0E75002559D3 /* FontAwesome6_Brands.ttf */,
-				9B2931342A7C0E75002559D3 /* FontAwesome6_Regular.ttf */,
-				9B2931322A7C0E75002559D3 /* FontAwesome6_Solid.ttf */,
-			);
-			name = fonts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -267,9 +258,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
-				9B2931372A7C0E75002559D3 /* FontAwesome6_Regular.ttf in Resources */,
-				9B2931352A7C0E75002559D3 /* FontAwesome6_Solid.ttf in Resources */,
-				9B2931362A7C0E75002559D3 /* FontAwesome6_Brands.ttf in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -308,7 +296,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-example-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-RNTPExample-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -321,15 +309,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-example/Pods-example-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-RNTPExample/Pods-RNTPExample-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-example/Pods-example-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-RNTPExample/Pods-RNTPExample-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-example/Pods-example-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RNTPExample/Pods-RNTPExample-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		4D1A105E8DA4143AA121A89C /* [CP] Embed Pods Frameworks */ = {
@@ -338,15 +326,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-example/Pods-example-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-RNTPExample/Pods-RNTPExample-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-example/Pods-example-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-RNTPExample/Pods-RNTPExample-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-example/Pods-example-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RNTPExample/Pods-RNTPExample-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		514ACECEF4829034DF0719ED /* [CP] Check Pods Manifest.lock */ = {
@@ -364,7 +352,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-example-exampleTests-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-RNTPExample-RNTPExampleTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -377,15 +365,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-example-exampleTests/Pods-example-exampleTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-RNTPExample-RNTPExampleTests/Pods-RNTPExample-RNTPExampleTests-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-example-exampleTests/Pods-example-exampleTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-RNTPExample-RNTPExampleTests/Pods-RNTPExample-RNTPExampleTests-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-example-exampleTests/Pods-example-exampleTests-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RNTPExample-RNTPExampleTests/Pods-RNTPExample-RNTPExampleTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		9C366928E3B19FD38DADEE35 /* [CP] Embed Pods Frameworks */ = {
@@ -394,15 +382,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-example-exampleTests/Pods-example-exampleTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-RNTPExample-RNTPExampleTests/Pods-RNTPExample-RNTPExampleTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-example-exampleTests/Pods-example-exampleTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-RNTPExample-RNTPExampleTests/Pods-RNTPExample-RNTPExampleTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-example-exampleTests/Pods-example-exampleTests-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RNTPExample-RNTPExampleTests/Pods-RNTPExample-RNTPExampleTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -458,7 +446,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E050A9D69F20B323551604B0 /* Pods-example-exampleTests.debug.xcconfig */;
+			baseConfigurationReference = E387560E60A1AB33369A54DD /* Pods-RNTPExample-RNTPExampleTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -487,7 +475,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DDFCE76F143B5D90F2157D05 /* Pods-example-exampleTests.release.xcconfig */;
+			baseConfigurationReference = 3177A29F4D5715D6334B4C0C /* Pods-RNTPExample-RNTPExampleTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -513,7 +501,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C6A6377EE893F59DCD177B16 /* Pods-example.debug.xcconfig */;
+			baseConfigurationReference = 49EE854CD6C2B27125E1A3E9 /* Pods-RNTPExample.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -543,7 +531,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2C2F9802D9A70707E1CB329F /* Pods-example.release.xcconfig */;
+			baseConfigurationReference = 3A8332538960A17E033ED4B0 /* Pods-RNTPExample.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;

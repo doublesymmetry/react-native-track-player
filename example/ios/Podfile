@@ -22,7 +22,7 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
-target 'example' do
+target 'RNTPExample' do
   config = use_native_modules!
 
   # Flags change depending on the env values.
@@ -45,7 +45,7 @@ target 'example' do
   )
   pod 'react-native-track-player', :path => '../..'
 
-  target 'exampleTests' do
+  target 'RNTPExampleTests' do
     inherit! :complete
     # Pods for testing
   end

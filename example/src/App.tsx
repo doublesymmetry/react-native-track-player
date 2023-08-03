@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   Linking,
@@ -9,14 +9,26 @@ import {
 } from 'react-native';
 import TrackPlayer, { useActiveTrack } from 'react-native-track-player';
 
-import { Button, PlayerControls, Progress, TrackInfo } from './components';
+import {Button, OptionSheet, PlayerControls, Progress, Spacer, TrackInfo} from './components';
 import { QueueInitialTracksService, SetupService } from './services';
+import {GestureHandlerRootView} from "react-native-gesture-handler";
+import BottomSheet from "@gorhom/bottom-sheet";
+import {SponsorCard} from "./components/SponsorCard";
 
-const Spacer: React.FC = () => <View style={{ height: 20 }} />;
+export default function App() {
+  return <GestureHandlerRootView style={{ flex: 1 }}><Inner /></GestureHandlerRootView>;
+}
 
-const App: React.FC = () => {
+const Inner: React.FC = () => {
   const track = useActiveTrack();
   const isPlayerReady = useSetupPlayer();
+
+  // bottom sheet
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const bottomSheetSnapPoints = useMemo(() => ['20%'], []);
+  const handleOptionsPress = useCallback(() => {
+    bottomSheetRef.current?.snapToIndex(0);
+  }, [bottomSheetRef]);
 
   useEffect(() => {
     function deepLinkHandler(data: { url: string }) {
@@ -49,7 +61,7 @@ const App: React.FC = () => {
         <View style={styles.topBarContainer}>
           <Button
             title="Options"
-            onPress={() => console.log('TODO: implement options')}
+            onPress={handleOptionsPress}
             type="primary"
           />
         </View>
@@ -57,7 +69,19 @@ const App: React.FC = () => {
         <Progress live={track?.isLiveStream} />
         <Spacer />
         <PlayerControls />
+        <Spacer mode={'expand'} />
+        <SponsorCard />
       </View>
+      <BottomSheet
+        index={-1}
+        ref={bottomSheetRef}
+        enablePanDownToClose={true}
+        snapPoints={bottomSheetSnapPoints}
+        handleIndicatorStyle={styles.sheetHandle}
+        backgroundStyle={styles.sheetBackgroundContainer}
+      >
+        <OptionSheet />
+      </BottomSheet>
     </SafeAreaView>
   );
 };
@@ -70,7 +94,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   contentContainer: {
-    flex: 3,
+    flex: 1,
     alignItems: 'center',
   },
   topBarContainer: {
@@ -78,6 +102,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
   },
+  sheetBackgroundContainer: {
+    backgroundColor: '#181818',
+  },
+  sheetHandle: {
+    backgroundColor: 'white',
+  }
 });
 
 function useSetupPlayer() {
@@ -101,5 +131,3 @@ function useSetupPlayer() {
   }, []);
   return playerReady;
 }
-
-export default App;

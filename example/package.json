@@ -23,9 +23,13 @@
     "ci:format": "prettier --check src"
   },
   "dependencies": {
+    "@gorhom/bottom-sheet": "^4",
     "@react-native-community/slider": "^4.4.2",
+    "@react-native-segmented-control/segmented-control": "^2.4.2",
     "react": "18.2.0",
     "react-native": "0.71.12",
+    "react-native-gesture-handler": "^2.12.1",
+    "react-native-reanimated": "^3.4.1",
     "react-native-vector-icons": "^10.0.0",
     "react-native-windows": "^0.65.0-0"
   },

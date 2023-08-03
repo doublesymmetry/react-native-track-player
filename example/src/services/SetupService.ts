@@ -4,6 +4,8 @@ import TrackPlayer, {
   RepeatMode,
 } from 'react-native-track-player';
 
+export const DefaultRepeatMode = RepeatMode.Queue;
+
 const setupPlayer = async (
   options: Parameters<typeof TrackPlayer.setupPlayer>[0]
 ) => {
@@ -47,5 +49,5 @@ export const SetupService = async () => {
     ],
     progressUpdateEventInterval: 2,
   });
-  await TrackPlayer.setRepeatMode(RepeatMode.Queue);
+  await TrackPlayer.setRepeatMode(DefaultRepeatMode);
 };
