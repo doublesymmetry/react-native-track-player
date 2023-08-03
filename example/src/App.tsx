@@ -12,6 +12,8 @@ import TrackPlayer, { useActiveTrack } from 'react-native-track-player';
 import { Button, PlayerControls, Progress, TrackInfo } from './components';
 import { QueueInitialTracksService, SetupService } from './services';
 
+const Spacer: React.FC = () => <View style={{ height: 20 }} />;
+
 const App: React.FC = () => {
   const track = useActiveTrack();
   const isPlayerReady = useSetupPlayer();
@@ -46,15 +48,14 @@ const App: React.FC = () => {
       <View style={styles.contentContainer}>
         <View style={styles.topBarContainer}>
           <Button
-            title="Queue"
-            onPress={() => console.log('TODO: implement queue interface')}
+            title="Options"
+            onPress={() => console.log('TODO: implement options')}
             type="primary"
           />
         </View>
         <TrackInfo track={track} />
         <Progress live={track?.isLiveStream} />
-      </View>
-      <View style={styles.actionRowContainer}>
+        <Spacer />
         <PlayerControls />
       </View>
     </SafeAreaView>
@@ -75,12 +76,7 @@ const styles = StyleSheet.create({
   topBarContainer: {
     width: '100%',
     flexDirection: 'row',
-    paddingHorizontal: 20,
     justifyContent: 'flex-end',
-  },
-  actionRowContainer: {
-    flex: 1,
-    flexDirection: 'row',
   },
 });
 

@@ -26,6 +26,7 @@
     "@react-native-community/slider": "^4.4.2",
     "react": "18.2.0",
     "react-native": "0.71.12",
+    "react-native-vector-icons": "^10.0.0",
     "react-native-windows": "^0.65.0-0"
   },
   "devDependencies": {

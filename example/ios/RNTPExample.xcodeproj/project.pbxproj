@@ -13,6 +13,9 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		409E343DC7C5A2542B16EA98 /* libPods-example-exampleTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 75D2E29B0CDAF52B1E5FA483 /* libPods-example-exampleTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		9B2931352A7C0E75002559D3 /* FontAwesome6_Solid.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9B2931322A7C0E75002559D3 /* FontAwesome6_Solid.ttf */; };
+		9B2931362A7C0E75002559D3 /* FontAwesome6_Brands.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9B2931332A7C0E75002559D3 /* FontAwesome6_Brands.ttf */; };
+		9B2931372A7C0E75002559D3 /* FontAwesome6_Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9B2931342A7C0E75002559D3 /* FontAwesome6_Regular.ttf */; };
 		9B521D0C26610C0700EF0C3A /* dummy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B521D0B26610C0700EF0C3A /* dummy.swift */; };
 		D4E419C990E32CBB3C7E1FD0 /* libPods-example.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 886110B3DD0A55153E82F632 /* libPods-example.a */; };
 /* End PBXBuildFile section */
@@ -41,6 +44,9 @@
 		75D2E29B0CDAF52B1E5FA483 /* libPods-example-exampleTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-example-exampleTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = example/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		886110B3DD0A55153E82F632 /* libPods-example.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-example.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B2931322A7C0E75002559D3 /* FontAwesome6_Solid.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome6_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome6_Solid.ttf"; sourceTree = "<group>"; };
+		9B2931332A7C0E75002559D3 /* FontAwesome6_Brands.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome6_Brands.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome6_Brands.ttf"; sourceTree = "<group>"; };
+		9B2931342A7C0E75002559D3 /* FontAwesome6_Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome6_Regular.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome6_Regular.ttf"; sourceTree = "<group>"; };
 		9B521D0626604D3800EF0C3A /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		9B521D0A26610C0600EF0C3A /* example-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "example-Bridging-Header.h"; sourceTree = "<group>"; };
 		9B521D0B26610C0700EF0C3A /* dummy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dummy.swift; sourceTree = "<group>"; };
@@ -90,6 +96,7 @@
 		13B07FAE1A68108700A75B9A /* example */ = {
 			isa = PBXGroup;
 			children = (
+				9B2931312A7C0E54002559D3 /* fonts */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -153,6 +160,16 @@
 				00E356EE1AD99517003FC87E /* RNTPExampleTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		9B2931312A7C0E54002559D3 /* fonts */ = {
+			isa = PBXGroup;
+			children = (
+				9B2931332A7C0E75002559D3 /* FontAwesome6_Brands.ttf */,
+				9B2931342A7C0E75002559D3 /* FontAwesome6_Regular.ttf */,
+				9B2931322A7C0E75002559D3 /* FontAwesome6_Solid.ttf */,
+			);
+			name = fonts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -250,6 +267,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
+				9B2931372A7C0E75002559D3 /* FontAwesome6_Regular.ttf in Resources */,
+				9B2931352A7C0E75002559D3 /* FontAwesome6_Solid.ttf in Resources */,
+				9B2931362A7C0E75002559D3 /* FontAwesome6_Brands.ttf in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
