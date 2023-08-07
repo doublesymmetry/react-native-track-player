@@ -99,10 +99,7 @@
     "rimraf": "^2.6.2",
     "typescript": "^4.8.2"
   },
-  "funding": {
-    "type": "github",
-    "url": "https://github.com/sponsors/doublesymmetry"
-  },
+  "funding": "https://github.com/doublesymmetry/react-native-track-player?sponsor=1",
   "config": {
     "commitizen": {
       "path": "cz-conventional-changelog"
