@@ -1,5 +1,5 @@
 declare module 'react-native-vector-icons/FontAwesome6' {
-import { Component } from 'react';
+  import { Component } from 'react';
   import { StyleProp, TextStyle } from 'react-native';
 
   export interface IconProps {
