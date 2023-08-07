@@ -1,18 +1,20 @@
-import React from "react";
-import {StyleSheet, Text, View} from "react-native";
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
 export const SponsorCard: React.FC = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>RNTP Pro</Text>
       <Text style={styles.body}>
-        If your project or business has found value in using RNTP, please consider sponsoring it.
-        Sponsors will receive additional benefits and help us continue the ongoing development and maintenance of this project under the Apache-2.0 license.
+        If your project or business has found value in using RNTP, please
+        consider sponsoring it. Sponsors will receive additional benefits and
+        help us continue the ongoing development and maintenance of this project
+        under the Apache-2.0 license.
       </Text>
       <Text style={styles.link}>github.com/sponsors/doublesymmetry</Text>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -38,5 +40,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '400',
     color: '#FFD479',
-  }
+  },
 });

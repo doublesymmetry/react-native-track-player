@@ -5,7 +5,8 @@ import TrackPlayer, {
 } from 'react-native-track-player';
 
 export const DefaultRepeatMode = RepeatMode.Queue;
-export const DefaultAudioServiceBehaviour = AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification;
+export const DefaultAudioServiceBehaviour =
+  AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification;
 
 const setupPlayer = async (
   options: Parameters<typeof TrackPlayer.setupPlayer>[0]

@@ -1,8 +1,8 @@
 import Slider from '@react-native-community/slider';
 import React from 'react';
-import {Dimensions, StyleSheet, Text, View} from 'react-native';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import TrackPlayer, { useProgress } from 'react-native-track-player';
-import {Spacer} from "./Spacer";
+import { Spacer } from './Spacer';
 
 export const Progress: React.FC<{ live?: boolean }> = ({ live }) => {
   const { position, duration } = useProgress();
@@ -12,12 +12,12 @@ export const Progress: React.FC<{ live?: boolean }> = ({ live }) => {
 
   return (
     <View style={styles.container}>
-      { live ? (
+      {live ? (
         <Text style={styles.liveText}>Live Stream</Text>
       ) : (
         <>
           <Slider
-            style={{...styles.slider, width: progressBarWidth}}
+            style={{ ...styles.slider, width: progressBarWidth }}
             value={position}
             minimumValue={0}
             maximumValue={duration}

@@ -1,5 +1,5 @@
-import React from "react";
-import { View } from "react-native";
+import React from 'react';
+import { View } from 'react-native';
 
 const DEFAULT_SPACE = 20;
 
@@ -11,7 +11,10 @@ const SPACER_STYLES = {
   expand: () => ({ flex: 1 }),
 };
 
-export const Spacer: React.FC<{ mode?: SpacerMode, size?: number }> = ({ mode = 'vertical', size = DEFAULT_SPACE }) => {
+export const Spacer: React.FC<{ mode?: SpacerMode; size?: number }> = ({
+  mode = 'vertical',
+  size = DEFAULT_SPACE,
+}) => {
   const style = SPACER_STYLES[mode](size);
   return <View style={style} />;
 };

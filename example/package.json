@@ -17,6 +17,7 @@
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint src",
+    "format": "prettier --write src",
     "fresh": "rm -rf node_modules ; cd .. && yarn build ; cd example && yarn install",
     "types": "tsc --noEmit true",
     "ci:lint": "eslint src --max-warnings=0",

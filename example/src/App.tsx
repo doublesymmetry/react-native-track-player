@@ -1,4 +1,10 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   ActivityIndicator,
   Linking,
@@ -9,14 +15,25 @@ import {
 } from 'react-native';
 import TrackPlayer, { useActiveTrack } from 'react-native-track-player';
 
-import {Button, OptionSheet, PlayerControls, Progress, Spacer, TrackInfo} from './components';
+import {
+  Button,
+  OptionSheet,
+  PlayerControls,
+  Progress,
+  Spacer,
+  TrackInfo,
+} from './components';
 import { QueueInitialTracksService, SetupService } from './services';
-import {GestureHandlerRootView} from "react-native-gesture-handler";
-import BottomSheet from "@gorhom/bottom-sheet";
-import {SponsorCard} from "./components/SponsorCard";
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import BottomSheet from '@gorhom/bottom-sheet';
+import { SponsorCard } from './components/SponsorCard';
 
 export default function App() {
-  return <GestureHandlerRootView style={{ flex: 1 }}><Inner /></GestureHandlerRootView>;
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Inner />
+    </GestureHandlerRootView>
+  );
 }
 
 const Inner: React.FC = () => {
@@ -59,11 +76,7 @@ const Inner: React.FC = () => {
       <StatusBar barStyle={'light-content'} />
       <View style={styles.contentContainer}>
         <View style={styles.topBarContainer}>
-          <Button
-            title="Options"
-            onPress={handleOptionsPress}
-            type="primary"
-          />
+          <Button title="Options" onPress={handleOptionsPress} type="primary" />
         </View>
         <TrackInfo track={track} />
         <Progress live={track?.isLiveStream} />
@@ -107,7 +120,7 @@ const styles = StyleSheet.create({
   },
   sheetHandle: {
     backgroundColor: 'white',
-  }
+  },
 });
 
 function useSetupPlayer() {
