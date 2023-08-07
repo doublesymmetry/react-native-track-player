@@ -7599,6 +7599,10 @@ react-native-reanimated@^3.4.1:
     convert-source-map "^2.0.0"
     invariant "^2.2.4"
 
+"react-native-track-player@link:..":
+  version "0.0.0"
+  uid ""
+
 react-native-vector-icons@^10.0.0:
   version "10.0.0"
   resolved "https://registry.yarnpkg.com/react-native-vector-icons/-/react-native-vector-icons-10.0.0.tgz#0f031f7717f76f0a397f725de9b5a47ec87862e9"

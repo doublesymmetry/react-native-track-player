@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "postinstall": "rm -rf node_modules/react-native-track-player/{example,node_modules}",
     "android": "react-native run-android",
     "android:ide": "open -a /Applications/Android\\ Studio.app ./android",
     "android:uninstall": "adb uninstall com.example",
@@ -18,7 +17,6 @@
     "test": "jest",
     "lint": "eslint src",
     "format": "prettier --write src",
-    "fresh": "rm -rf node_modules ; cd .. && yarn build ; cd example && yarn install",
     "types": "tsc --noEmit true",
     "ci:lint": "eslint src --max-warnings=0",
     "ci:format": "prettier --check src"
@@ -31,6 +29,7 @@
     "react-native": "0.71.12",
     "react-native-gesture-handler": "^2.12.1",
     "react-native-reanimated": "^3.4.1",
+    "react-native-track-player": "link:../",
     "react-native-vector-icons": "^10.0.0",
     "react-native-windows": "^0.65.0-0"
   },

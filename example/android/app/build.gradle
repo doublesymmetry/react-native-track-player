@@ -169,8 +169,6 @@ dependencies {
     } else {
         implementation jscFlavor
     }
-
-    implementation project(':reactnativetrackplayer')
 }
 
 project.ext.vectoricons = [
