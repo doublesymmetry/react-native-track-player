@@ -32,92 +32,11 @@ Not sure where to start?
 2. Peruse the [API Docs](https://rntp.dev/docs/api/events).
 3. Run the [Example Project](/example).
 
-## Sponsors
+## Commerical Usage
 
-react-native-track-player is made possible by the generosity of the sponsors below, and many other [individual backers](https://rntp.dev/docs/sponsors#backers). Sponsoring directly impacts the longevity of this project.
+**Are you using RNTP for a personal project?** Great! Sponsor us if you're able but otherwise you can support us by reporting any bugs you find, sending us screenshots of your projects and starring us on Github 🌟
 
-Businesses: support continued development and maintenance via sponsoring contracts:
-  E-mail: oss @ doublesymmetry dot com
-
-#### 🥇 Gold sponsors (\$2000+ total contributions)
-
-<table>
-  <tr>
-    <td align="center">
-      <a href="http://radio.garden/">
-        <img src="https://avatars.githubusercontent.com/u/271885?v=4" align="center" width="100" title="Radio Garden" alt="Radio Garden">
-        <br /><sub><b>Radio Garden</b></sub>
-      </a>
-    </td>
-  </tr>
-</table>
-
-#### 🗝 Silver Sponsor (\$500+ per month)
-
-[Become the first silver sponsor!](https://github.com/sponsors/DoubleSymmetry)
-
-#### 🔑 Bronze Sponsor (\$200+ per month)
-
-<table>
-  <tr>
-    <td align="center">
-      <a href="http://www.voxist.com/">
-        <img src="https://avatars.githubusercontent.com/u/18028734?s=200&v=4" align="center" width="75" title="Voxist" alt="Voxist">
-        <br /><sub><b>Voxist</b></sub>
-      </a>
-    </td>
-  </tr>
-</table>
-
-
-#### 🥉 Bronze sponsors (\$100+ per month)
-
-<table>
-  <tr>
-    <td align="center">
-      <a href="https://app.momento.fm/">
-        <img src="https://avatars.githubusercontent.com/u/98929576?s=200&v=4" align="center" width="50" title="Voxist" alt="Voxist">
-        <br /><sub><b>Momento</b></sub>
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://stand.fm/">
-        <img src="https://drive.google.com/uc?id=1PwVUjqiqIQqw18sL_0n9Cx0VQ5zisoUW" align="center" height="50" title="stand.fm" alt="stand.fm">
-        <br /><sub><b>stand.fm</b></sub>
-      </a>
-    </td>
-  </tr>
-</table>
-
-#### ✨ Contributing sponsors (\$25+ per month)
-
-<table>
-  <tr>
-    <td align="center">
-      <img src="https://avatars.githubusercontent.com/u/102089139?s=30&v=4" align="center" width="30" title="Through the Word" alt="Through the Word">
-    </td>
-    <td align="center">
-      <img src="https://avatars.githubusercontent.com/u/11860029?s=30&v=4" align="center" width="30" title="Podverse" alt="Podverse">
-    </td>
-    <td align="center">
-      <img src="https://avatars.githubusercontent.com/u/2523678?s=30&v=4" align="center" width="30" title="Elliot Dickison" alt="Elliot Dickison">
-    </td>
-    <td align="center">
-      <img src="https://avatars.githubusercontent.com/u/1085976?s=30&v=4" align="center" width="30" title="Brad Flood" alt="Brad Flood">
-    </td>
-    <td align="center">
-      <img src="https://avatars.githubusercontent.com/u/271885?s=30&v=4" align="center" width="30" title="puckey" alt="puckey">
-    </td>
-   <td align="center">
-      <img src="https://avatars.githubusercontent.com/u/77853659?s=30&v=4" align="center" width="30" title="Studio 206" alt="Studio 206">
-    </td>
-   <td align="center">
-      <img src="https://avatars.githubusercontent.com/u/42785824?s=30&v=4" align="center" width="30" title="MonokaiJs" alt="MonokaiJs">
-    </td>
-  </tr>
-</table>
-
----
+**Are you using RNTP at your organisation and/or making money from it?** Awesome! We rely on your support to keep RNTP developed and maintained under the Apache-2.0 license. You can do that through [Github Sponsors](https://github.com/sponsors/doublesymmetry).
 
 ## Features
 
@@ -172,8 +91,15 @@ start();
 <table>
   <tr>
     <td align="center"><a href="https://github.com/dcvz"><img src="https://avatars.githubusercontent.com/u/2475932?v=4" width="100px;" alt=""/><br /><sub><b>David Chavez</b></sub></a><br /></td>
-    <td align="center"><a href="https://github.com/mpivchev"><img src="https://avatars.githubusercontent.com/u/6960329?v=4" width="100px;" alt=""/><br /><sub><b>Milen Pivchev</b></sub></a><br /></td>
+  </tr>
+</table>
+
+## External Core Contributors ✨
+
+<table>
+  <tr>
     <td align="center"><a href="https://github.com/jspizziri"><img src="https://avatars.githubusercontent.com/u/1452066?v=4" width="100px;" alt=""/><br /><sub><b>Jacob Spizziri</b></sub></a><br /></td>
+    <td align="center"><a href="https://github.com/puckey"><img src="https://avatars.githubusercontent.com/u/271885?v=4" width="100px;" alt=""/><br /><sub><b>Jonathan Puckey</b></sub></a><br /></td>
   </tr>
 </table>
 
@@ -260,16 +186,16 @@ yarn version --major // 2.0.0
 This command will:
 
 1. Generate/update the Changelog
-1. Bump the package version
-1. Tag & pushing the commit
-1. Build & publish the package
+2. Bump the package version 
+3. Tag & pushing the commit 
+4. Build & publish the package
 
 
 ## Community
 
 You can find us as part of the [React Native Track Player](https://discordapp.com/invite/ya2XDCR):
 
-- `# introductions` - Come greet the newest members of this group!
-- `# support` - Ask members of the community to trouble shoot issues with your app and make recommendations.
-- `# app-anouncements` - Tell the community about the app you made with this project!
-- `# releases` - Stay updated about the latest releases and dev efforts on the project.
+- `#introduce-yourself` - Come greet the newest members of this group!
+- `#troubleshooting-forum` - Ask members of the community to trouble shoot issues with your app and make recommendations.
+- `#show-and-tell` - Tell the community about the app you made with this project!
+- `#news-and-releases` - Stay updated about the latest releases and dev efforts on the project.

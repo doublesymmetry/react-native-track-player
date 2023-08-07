@@ -1,4 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   ActivityIndicator,
   Linking,
@@ -9,12 +15,37 @@ import {
 } from 'react-native';
 import TrackPlayer, { useActiveTrack } from 'react-native-track-player';
 
-import { Button, PlayerControls, Progress, TrackInfo } from './components';
+import {
+  Button,
+  OptionSheet,
+  PlayerControls,
+  Progress,
+  Spacer,
+  TrackInfo,
+} from './components';
 import { QueueInitialTracksService, SetupService } from './services';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import BottomSheet from '@gorhom/bottom-sheet';
+import { SponsorCard } from './components/SponsorCard';
 
-const App: React.FC = () => {
+export default function App() {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Inner />
+    </GestureHandlerRootView>
+  );
+}
+
+const Inner: React.FC = () => {
   const track = useActiveTrack();
   const isPlayerReady = useSetupPlayer();
+
+  // bottom sheet
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const bottomSheetSnapPoints = useMemo(() => ['40%'], []);
+  const handleOptionsPress = useCallback(() => {
+    bottomSheetRef.current?.snapToIndex(0);
+  }, [bottomSheetRef]);
 
   useEffect(() => {
     function deepLinkHandler(data: { url: string }) {
@@ -45,18 +76,25 @@ const App: React.FC = () => {
       <StatusBar barStyle={'light-content'} />
       <View style={styles.contentContainer}>
         <View style={styles.topBarContainer}>
-          <Button
-            title="Queue"
-            onPress={() => console.log('TODO: implement queue interface')}
-            type="primary"
-          />
+          <Button title="Options" onPress={handleOptionsPress} type="primary" />
         </View>
         <TrackInfo track={track} />
         <Progress live={track?.isLiveStream} />
-      </View>
-      <View style={styles.actionRowContainer}>
+        <Spacer />
         <PlayerControls />
+        <Spacer mode={'expand'} />
+        <SponsorCard />
       </View>
+      <BottomSheet
+        index={-1}
+        ref={bottomSheetRef}
+        enablePanDownToClose={true}
+        snapPoints={bottomSheetSnapPoints}
+        handleIndicatorStyle={styles.sheetHandle}
+        backgroundStyle={styles.sheetBackgroundContainer}
+      >
+        <OptionSheet />
+      </BottomSheet>
     </SafeAreaView>
   );
 };
@@ -69,18 +107,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   contentContainer: {
-    flex: 3,
+    flex: 1,
     alignItems: 'center',
   },
   topBarContainer: {
     width: '100%',
     flexDirection: 'row',
-    paddingHorizontal: 20,
     justifyContent: 'flex-end',
   },
-  actionRowContainer: {
-    flex: 1,
-    flexDirection: 'row',
+  sheetBackgroundContainer: {
+    backgroundColor: '#181818',
+  },
+  sheetHandle: {
+    backgroundColor: 'white',
   },
 });
 
@@ -105,5 +144,3 @@ function useSetupPlayer() {
   }, []);
   return playerReady;
 }
-
-export default App;
