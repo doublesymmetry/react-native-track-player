@@ -43,7 +43,6 @@ target 'RNTPExample' do
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
-  pod 'react-native-track-player', :path => '../..'
 
   target 'RNTPExampleTests' do
     inherit! :complete
