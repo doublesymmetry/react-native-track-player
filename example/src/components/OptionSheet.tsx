@@ -1,10 +1,11 @@
-import React, {useState} from "react";
-import {StyleSheet, Text, View} from "react-native";
+import React, {useEffect, useState} from "react";
+import {Platform, StyleSheet, Text, View} from "react-native";
 import {BottomSheetScrollView} from "@gorhom/bottom-sheet";
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
-import TrackPlayer, {RepeatMode} from "react-native-track-player";
-import {DefaultRepeatMode} from "../services";
+import TrackPlayer, {AppKilledPlaybackBehavior, Capability, RepeatMode} from "react-native-track-player";
+import {DefaultAudioServiceBehaviour, DefaultRepeatMode} from "../services";
 import {Spacer} from "./Spacer";
+import {updateOptions} from "../../../lib/trackPlayer";
 
 export const OptionStack: React.FC<{ children: React.ReactNode, vertical?: boolean }> = ({children, vertical}) => {
   const childrenArray = React.Children.toArray(children);
@@ -25,8 +26,11 @@ export const OptionSheet: React.FC = () => {
     repeatModeToIndex(DefaultRepeatMode)
   );
 
-  return (
+  const [selectedAudioServiceBehaviour, setSelectedAudioServiceBehaviour] = useState(
+    audioServiceBehaviourToIndex(DefaultAudioServiceBehaviour)
+  );
 
+  return (
     <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
       <OptionStack vertical={true}>
         <Text style={styles.optionRowLabel}>Repeat Mode</Text>
@@ -42,6 +46,45 @@ export const OptionSheet: React.FC = () => {
           }}
         />
       </OptionStack>
+      <Spacer />
+      {Platform.OS === 'android' && (
+        <OptionStack vertical={true}>
+          <Text style={styles.optionRowLabel}>Audio Service on App Kill</Text>
+          <Spacer />
+          <SegmentedControl
+            appearance={'dark'}
+            values={['Continue', 'Pause', 'Stop & Remove']}
+            selectedIndex={selectedAudioServiceBehaviour}
+            onChange={async (event) => {
+              setSelectedAudioServiceBehaviour(event.nativeEvent.selectedSegmentIndex);
+              const appKilledPlaybackBehavior = audioServiceBehaviourFromIndex(event.nativeEvent.selectedSegmentIndex);
+
+              // TODO: Copied from example/src/services/SetupService.tsx until updateOptions
+              // allows for partial updates (i.e. only android.appKilledPlaybackBehavior).
+              await TrackPlayer.updateOptions({
+                android: {
+                  appKilledPlaybackBehavior,
+                },
+                // This flag is now deprecated. Please use the above to define playback mode.
+                // stoppingAppPausesPlayback: true,
+                capabilities: [
+                  Capability.Play,
+                  Capability.Pause,
+                  Capability.SkipToNext,
+                  Capability.SkipToPrevious,
+                  Capability.SeekTo,
+                ],
+                compactCapabilities: [
+                  Capability.Play,
+                  Capability.Pause,
+                  Capability.SkipToNext,
+                ],
+                progressUpdateEventInterval: 2,
+              });
+            }}
+          />
+        </OptionStack>
+      )}
     </BottomSheetScrollView>
   );
 }
@@ -91,5 +134,23 @@ const repeatModeToIndex = (repeatMode: RepeatMode): number => {
       return 2;
     default:
       return 0;
+  }
+}
+
+const audioServiceBehaviourFromIndex = (index: number): AppKilledPlaybackBehavior => {
+  switch (index) {
+    case 0: return AppKilledPlaybackBehavior.ContinuePlayback;
+    case 1: return AppKilledPlaybackBehavior.PausePlayback;
+    case 2: return AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification;
+    default: return AppKilledPlaybackBehavior.ContinuePlayback;
+  }
+}
+
+const audioServiceBehaviourToIndex = (audioServiceBehaviour: AppKilledPlaybackBehavior): number => {
+  switch (audioServiceBehaviour) {
+    case AppKilledPlaybackBehavior.ContinuePlayback: return 0;
+    case AppKilledPlaybackBehavior.PausePlayback: return 1;
+    case AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification: return 2;
+    default: return 0;
   }
 }

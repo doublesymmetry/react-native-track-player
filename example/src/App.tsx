@@ -25,7 +25,7 @@ const Inner: React.FC = () => {
 
   // bottom sheet
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const bottomSheetSnapPoints = useMemo(() => ['20%'], []);
+  const bottomSheetSnapPoints = useMemo(() => ['40%'], []);
   const handleOptionsPress = useCallback(() => {
     bottomSheetRef.current?.snapToIndex(0);
   }, [bottomSheetRef]);
