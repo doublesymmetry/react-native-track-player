@@ -114,14 +114,6 @@ const config = {
                 label: 'Become A Sponsor',
                 href: 'https://github.com/sponsors/doublesymmetry',
               },
-              {
-                label: 'Our Sponsors ❤️',
-                href: '/docs/sponsors',
-              },
-              {
-                label: 'Core Team ✨',
-                href: '/docs/core-team',
-              },
             ],
           },
         ],
