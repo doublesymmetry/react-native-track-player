@@ -104,5 +104,10 @@
     "commitizen": {
       "path": "cz-conventional-changelog"
     }
+  },
+  "tea": {
+    "dependencies": {
+      "classic.yarnpkg.com": "^1"
+    }
   }
 }

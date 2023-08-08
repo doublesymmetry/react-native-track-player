@@ -69,5 +69,10 @@
       "node"
     ]
   },
-  "isSwift": true
+  "isSwift": true,
+  "tea": {
+    "dependencies": {
+      "classic.yarnpkg.com": "^1"
+    }
+  }
 }
