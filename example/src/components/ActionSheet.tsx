@@ -1,9 +1,9 @@
-import React from "react";
-import {BottomSheetScrollView} from "@gorhom/bottom-sheet";
-import {StyleSheet} from "react-native";
-import {Spacer} from "./Spacer";
-import {Button} from "./Button";
-import TrackPlayer from "react-native-track-player";
+import React from 'react';
+import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { StyleSheet } from 'react-native';
+import { Spacer } from './Spacer';
+import { Button } from './Button';
+import TrackPlayer from 'react-native-track-player';
 
 const onUpdateMetadata = async () => {
   const currentTrackIndex = await TrackPlayer.getActiveTrackIndex();
@@ -14,18 +14,22 @@ const onUpdateMetadata = async () => {
       artwork: 'https://random.imagecdn.app/800/800',
     });
   }
-}
+};
 
 const onReset = async () => {
   await TrackPlayer.reset();
-}
+};
 
 export const ActionSheet: React.FC = () => {
   return (
     <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
       <Spacer />
-      <Button title={"Update Metadata Randomly"} onPress={onUpdateMetadata} type={'primary'} />
-      <Button title={"Reset"} onPress={onReset} type={'primary'} />
+      <Button
+        title={'Update Metadata Randomly'}
+        onPress={onUpdateMetadata}
+        type={'primary'}
+      />
+      <Button title={'Reset'} onPress={onReset} type={'primary'} />
     </BottomSheetScrollView>
   );
 };
