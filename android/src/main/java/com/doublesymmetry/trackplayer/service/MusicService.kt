@@ -430,11 +430,6 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     @MainThread
-    fun updateNotificationMetadata(title: String?, artist: String?, artwork: String?) {
-        player.notificationManager.notificationMetadata = NotificationMetadata(title, artist, artwork)
-    }
-
-    @MainThread
     fun clearNotificationMetadata() {
         player.notificationManager.hideNotification()
     }
@@ -601,7 +596,7 @@ class MusicService : HeadlessJsTaskService() {
 
         scope.launch {
             event.audioItemTransition.collect {
-                if (!(it is AudioItemTransitionReason.REPEAT)) {
+                if (it !is AudioItemTransitionReason.REPEAT) {
                     emitPlaybackTrackChangedEvents(
                         player.currentIndex,
                         player.previousIndex,
@@ -691,8 +686,8 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     private fun getPlaybackErrorBundle(): Bundle {
-        var bundle = Bundle()
-        var error = playbackError
+        val bundle = Bundle()
+        val error = playbackError
         if (error?.message != null) {
             bundle.putString("message", error.message)
         }

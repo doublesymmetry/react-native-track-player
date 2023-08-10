@@ -20,6 +20,7 @@ import com.facebook.react.bridge.*
 import com.google.android.exoplayer2.DefaultLoadControl.*
 import com.google.android.exoplayer2.Player
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
@@ -355,12 +356,10 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
             callback.reject("no_current_item", "There is no current item in the player")
 
         val context: ReactContext = context
-        val metadata = Arguments.toBundle(map)
-        musicService.updateNotificationMetadata(
-            metadata?.getString("title"),
-            metadata?.getString("artist"),
-            BundleUtils.getUri(context, metadata, "artwork")?.toString()
-        )
+        val index = musicService.getCurrentTrackIndex()
+        val track = musicService.tracks[index]
+        track.setMetadata(context, Arguments.toBundle(map), musicService.ratingType)
+        musicService.updateMetadataForTrack(index, track)
 
         callback.resolve(null)
     }
@@ -427,8 +426,10 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     fun reset(callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
 
-        musicService.clear()
         musicService.stop()
+        delay(300) // Allow playback to stop
+        musicService.clear()
+
         callback.resolve(null)
     }
 
