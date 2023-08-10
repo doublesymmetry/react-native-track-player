@@ -18,6 +18,7 @@ import TrackPlayer, { useActiveTrack } from 'react-native-track-player';
 import {
   Button,
   OptionSheet,
+  ActionSheet,
   PlayerControls,
   Progress,
   Spacer,
@@ -40,12 +41,19 @@ const Inner: React.FC = () => {
   const track = useActiveTrack();
   const isPlayerReady = useSetupPlayer();
 
-  // bottom sheet
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  const bottomSheetSnapPoints = useMemo(() => ['40%'], []);
+  // options bottom sheet
+  const optionsSheetRef = useRef<BottomSheet>(null);
+  const optionsSheetSnapPoints = useMemo(() => ['40%'], []);
   const handleOptionsPress = useCallback(() => {
-    bottomSheetRef.current?.snapToIndex(0);
-  }, [bottomSheetRef]);
+    optionsSheetRef.current?.snapToIndex(0);
+  }, [optionsSheetRef]);
+
+  // actions bottom sheet
+  const actionsSheetRef = useRef<BottomSheet>(null);
+  const actionsSheetSnapPoints = useMemo(() => ['40%'], []);
+  const handleActionsPress = useCallback(() => {
+    actionsSheetRef.current?.snapToIndex(0);
+  }, [actionsSheetRef]);
 
   useEffect(() => {
     function deepLinkHandler(data: { url: string }) {
@@ -77,6 +85,7 @@ const Inner: React.FC = () => {
       <View style={styles.contentContainer}>
         <View style={styles.topBarContainer}>
           <Button title="Options" onPress={handleOptionsPress} type="primary" />
+          <Button title="Actions" onPress={handleActionsPress} type="primary" />
         </View>
         <TrackInfo track={track} />
         <Progress live={track?.isLiveStream} />
@@ -87,13 +96,23 @@ const Inner: React.FC = () => {
       </View>
       <BottomSheet
         index={-1}
-        ref={bottomSheetRef}
+        ref={optionsSheetRef}
         enablePanDownToClose={true}
-        snapPoints={bottomSheetSnapPoints}
+        snapPoints={optionsSheetSnapPoints}
         handleIndicatorStyle={styles.sheetHandle}
         backgroundStyle={styles.sheetBackgroundContainer}
       >
         <OptionSheet />
+      </BottomSheet>
+      <BottomSheet
+        index={-1}
+        ref={actionsSheetRef}
+        enablePanDownToClose={true}
+        snapPoints={actionsSheetSnapPoints}
+        handleIndicatorStyle={styles.sheetHandle}
+        backgroundStyle={styles.sheetBackgroundContainer}
+      >
+        <ActionSheet />
       </BottomSheet>
     </SafeAreaView>
   );

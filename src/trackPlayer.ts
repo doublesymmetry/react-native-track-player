@@ -268,6 +268,10 @@ export function clearNowPlayingMetadata(): Promise<void> {
   return TrackPlayer.clearNowPlayingMetadata();
 }
 
+/**
+ * @deprecated Nominated for removal in the next major version.
+ * Use `updateMetadataForTrack` with the current index instead.
+ */
 export function updateNowPlayingMetadata(
   metadata: NowPlayingMetadata
 ): Promise<void> {
