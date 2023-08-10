@@ -1,3 +1,10 @@
+# [4.0.0-rc07](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc06...v4.0.0-rc07) (2023-08-11)
+
+* **ios:** Fix firing of `EventType.PlaybackQueueEnded` (fixes #2038)
+* **android:** Avoid emitting track changed when replaying the same track
+* **android:** Fixed a regression where `reset()` wasn't clearing notification properly
+* **android:** Resolved a where the update metadata method was not working
+
 # [4.0.0-rc06](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc05...v4.0.0-rc06) (2023-07-25)
 
 * **ios:** Fix iOS not repeating track in RepeatMode.Track
