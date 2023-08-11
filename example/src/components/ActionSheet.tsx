@@ -9,7 +9,7 @@ const onUpdateNotificationMetadata = async () => {
   const randomTitle = Math.random().toString(36).substring(7);
   await TrackPlayer.updateNowPlayingMetadata({
     title: `Random: ${randomTitle}`,
-    artwork: 'https://random.imagecdn.app/800/800',
+    artwork: `https://random.imagecdn.app/800/800?dummy=${Date.now()}`,
   });
 };
 
@@ -19,7 +19,7 @@ const onUpdateCurrentTrackMetadata = async () => {
     const randomTitle = Math.random().toString(36).substring(7);
     await TrackPlayer.updateMetadataForTrack(currentTrackIndex, {
       title: `Random: ${randomTitle}`,
-      artwork: 'https://random.imagecdn.app/800/800',
+      artwork: `https://random.imagecdn.app/800/800?dummy=${Date.now()}`,
     });
   }
 };
