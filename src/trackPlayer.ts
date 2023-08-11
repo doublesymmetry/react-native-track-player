@@ -269,8 +269,8 @@ export function clearNowPlayingMetadata(): Promise<void> {
 }
 
 /**
- * @deprecated Nominated for removal in the next major version.
- * Use `updateMetadataForTrack` with the current index instead.
+ * Updates the metadata content of the notification (Android) and the Now Playing Center (iOS)
+ * without affecting the data stored for the current track.
  */
 export function updateNowPlayingMetadata(
   metadata: NowPlayingMetadata

@@ -356,10 +356,10 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
             callback.reject("no_current_item", "There is no current item in the player")
 
         val context: ReactContext = context
-        val index = musicService.getCurrentTrackIndex()
-        val track = musicService.tracks[index]
-        track.setMetadata(context, Arguments.toBundle(map), musicService.ratingType)
-        musicService.updateMetadataForTrack(index, track)
+        Arguments.toBundle(map)?.let {
+            val track = bundleToTrack(it)
+            musicService.updateNowPlayingMetadata(track)
+        }
 
         callback.resolve(null)
     }
