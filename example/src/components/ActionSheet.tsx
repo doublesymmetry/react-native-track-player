@@ -38,9 +38,9 @@ export const ActionSheet: React.FC = () => {
         type={'primary'}
       />
       <Button
-          title={'Update Current Track Metadata Randomly'}
-          onPress={onUpdateCurrentTrackMetadata}
-          type={'primary'}
+        title={'Update Current Track Metadata Randomly'}
+        onPress={onUpdateCurrentTrackMetadata}
+        type={'primary'}
       />
       <Button title={'Reset'} onPress={onReset} type={'primary'} />
     </BottomSheetScrollView>
