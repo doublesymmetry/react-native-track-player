@@ -84,7 +84,7 @@ jobs:
       - name: Build App
         run: |-
           cd example/ios
-          xcodebuild build -workspace example.xcworkspace -scheme example -destination 'platform=iOS Simulator,name=iPhone 12 Pro'
+          xcodebuild build -workspace RNTPExample.xcworkspace -scheme RNTPExample -destination 'platform=iOS Simulator,name=iPhone 12 Pro'
   check-typescript:
     runs-on: ubuntu-latest
     steps:
