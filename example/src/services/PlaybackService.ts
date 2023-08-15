@@ -56,6 +56,10 @@ export async function PlaybackService() {
     console.log('Event.PlaybackState', event);
   });
 
+  TrackPlayer.addEventListener(Event.PlaybackMetadataReceived, (event) => {
+    console.log('Event.PlaybackMetadataReceived', event);
+  });
+
   TrackPlayer.addEventListener(
     Event.PlaybackMetadataReceived,
     async ({ title, artist }) => {
