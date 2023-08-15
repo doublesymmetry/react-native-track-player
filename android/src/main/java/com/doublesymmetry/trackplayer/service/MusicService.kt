@@ -430,6 +430,11 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     @MainThread
+    fun updateNowPlayingMetadata(track: Track) {
+        player.notificationManager.overrideMetadata(track.toAudioItem())
+    }
+
+    @MainThread
     fun clearNotificationMetadata() {
         player.notificationManager.hideNotification()
     }
@@ -439,7 +444,7 @@ class MusicService : HeadlessJsTaskService() {
         previousIndex: Int?,
         oldPosition: Double
     ) {
-        var a = Bundle()
+        val a = Bundle()
         a.putDouble(POSITION_KEY, oldPosition)
         if (index != null) {
             a.putInt(NEXT_TRACK_KEY, index)
@@ -451,7 +456,7 @@ class MusicService : HeadlessJsTaskService() {
 
         emit(MusicEvents.PLAYBACK_TRACK_CHANGED, a)
 
-        var b = Bundle()
+        val b = Bundle()
         b.putDouble("lastPosition", oldPosition)
         if (tracks.size > 0) {
             b.putInt("index", player.currentIndex)
