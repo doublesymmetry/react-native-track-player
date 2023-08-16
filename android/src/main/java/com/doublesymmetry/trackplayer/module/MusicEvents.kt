@@ -46,6 +46,11 @@ class MusicEvents(private val reactContext: ReactContext) : BroadcastReceiver() 
         const val PLAYBACK_PROGRESS_UPDATED = "playback-progress-updated"
         const val PLAYBACK_ERROR = "playback-error"
 
+        // Metadata Events
+        const val METADATA_CHAPTER_RECEIVED = "metadata-chapter-received"
+        const val METADATA_TIMED_RECEIVED = "metadata-timed-received"
+        const val METADATA_COMMON_RECEIVED = "metadata-common-received"
+
         // Other
         const val PLAYER_ERROR = "player-error"
 

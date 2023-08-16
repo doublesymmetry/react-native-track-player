@@ -13,7 +13,6 @@ import android.support.v4.media.RatingCompat
 import androidx.annotation.MainThread
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_LOW
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.models.NotificationButton.*
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
@@ -22,17 +21,17 @@ import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toMilliseco
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toSeconds
 import com.doublesymmetry.trackplayer.extensions.asLibState
 import com.doublesymmetry.trackplayer.extensions.find
+import com.doublesymmetry.trackplayer.model.MetadataAdapter
 import com.doublesymmetry.trackplayer.model.PlaybackMetadata
 import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.model.TrackAudioItem
 import com.doublesymmetry.trackplayer.module.MusicEvents
-import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
-import com.doublesymmetry.trackplayer.utils.AppForegroundTracker
 import com.doublesymmetry.trackplayer.utils.BundleUtils
 import com.doublesymmetry.trackplayer.utils.BundleUtils.setRating
 import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
+import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.google.android.exoplayer2.ui.R as ExoPlayerR
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
@@ -459,7 +458,7 @@ class MusicService : HeadlessJsTaskService() {
 
         val b = Bundle()
         b.putDouble("lastPosition", oldPosition)
-        if (tracks.size > 0) {
+        if (tracks.isNotEmpty()) {
             b.putInt("index", player.currentIndex)
             b.putBundle("track", tracks[player.currentIndex].originalItem)
             if (previousIndex != null) {
@@ -662,6 +661,9 @@ class MusicService : HeadlessJsTaskService() {
 
         scope.launch {
             event.onTimedMetadata.collect {
+                val data = MetadataAdapter.fromMetadata(it)
+                emitList(MusicEvents.METADATA_TIMED_RECEIVED, data)
+
                 // TODO: Handle the different types of metadata and publish to new events
                 val metadata = PlaybackMetadata.fromId3Metadata(it)
                     ?: PlaybackMetadata.fromIcy(it)
@@ -680,6 +682,13 @@ class MusicService : HeadlessJsTaskService() {
                         emit(MusicEvents.PLAYBACK_METADATA, this)
                     }
                 }
+            }
+        }
+
+        scope.launch {
+            event.onCommonMetadata.collect {
+                val data = MetadataAdapter.fromMediaMetadata(it)
+                emit(MusicEvents.METADATA_COMMON_RECEIVED, data)
             }
         }
 
@@ -712,11 +721,20 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     @MainThread
-    private fun emit(event: String?, data: Bundle? = null) {
-        val intent = Intent(EVENT_INTENT)
-        intent.putExtra(EVENT_KEY, event)
-        if (data != null) intent.putExtra(DATA_KEY, data)
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+    private fun emit(event: String, data: Bundle? = null) {
+        reactNativeHost.reactInstanceManager.currentReactContext
+            ?.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+            ?.emit(event, data?.let { Arguments.fromBundle(it) })
+    }
+
+    @MainThread
+    private fun emitList(event: String, data: List<Bundle> = emptyList()) {
+        val payload = Arguments.createArray()
+        data.forEach { payload.pushMap(Arguments.fromBundle(it)) }
+
+        reactNativeHost.reactInstanceManager.currentReactContext
+            ?.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+            ?.emit(event, payload)
     }
 
     override fun getTaskConfig(intent: Intent?): HeadlessJsTaskConfig {
