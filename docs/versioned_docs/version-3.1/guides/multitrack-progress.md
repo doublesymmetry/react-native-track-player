@@ -83,7 +83,7 @@ export const useTrackProgress = (id: string | number): number => {
 #### 2. Listen To Progress Updates
 
 Next we need to set up a listener for progress updates in our
-[playback service](../basics/playback-service.md) and update our zustonad store:
+[playback service](../basics/playback-service.md) and update our zustand store:
 
 ```ts
 // src/services/PlaybackService.ts

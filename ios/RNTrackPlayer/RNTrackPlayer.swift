@@ -30,7 +30,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         EventEmitter.shared.register(eventEmitter: self)
         audioSessionController.delegate = self
         player.playWhenReady = false;
-        player.event.receiveMetadata.addListener(self, handleAudioPlayerMetadataReceived)
+        player.event.receiveTimedMetadata.addListener(self, handleAudioPlayerTimedMetadataReceived)
         player.event.stateChange.addListener(self, handleAudioPlayerStateChange)
         player.event.fail.addListener(self, handleAudioPlayerFailed)
         player.event.currentItem.addListener(self, handleAudioPlayerCurrentItemChange)
@@ -799,7 +799,9 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         }
     }
 
-    func handleAudioPlayerMetadataReceived(metadata: [AVTimedMetadataGroup]) {
+    func handleAudioPlayerTimedMetadataReceived(metadata: [AVTimedMetadataGroup]) {
+        // TODO: Handle the different types of metadata and publish to new events
+        
         // SwiftAudioEx was updated to return the array of timed metadata
         // Until we have support for that in RNTP, we take the first item to keep existing behaviour.
         let metadata = metadata.first?.items ?? []

@@ -5,13 +5,21 @@ import { Spacer } from './Spacer';
 import { Button } from './Button';
 import TrackPlayer from 'react-native-track-player';
 
-const onUpdateMetadata = async () => {
+const onUpdateNotificationMetadata = async () => {
+  const randomTitle = Math.random().toString(36).substring(7);
+  await TrackPlayer.updateNowPlayingMetadata({
+    title: `Random: ${randomTitle}`,
+    artwork: `https://random.imagecdn.app/800/800?dummy=${Date.now()}`,
+  });
+};
+
+const onUpdateCurrentTrackMetadata = async () => {
   const currentTrackIndex = await TrackPlayer.getActiveTrackIndex();
   if (currentTrackIndex !== undefined) {
     const randomTitle = Math.random().toString(36).substring(7);
     await TrackPlayer.updateMetadataForTrack(currentTrackIndex, {
       title: `Random: ${randomTitle}`,
-      artwork: 'https://random.imagecdn.app/800/800',
+      artwork: `https://random.imagecdn.app/800/800?dummy=${Date.now()}`,
     });
   }
 };
@@ -25,8 +33,13 @@ export const ActionSheet: React.FC = () => {
     <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
       <Spacer />
       <Button
-        title={'Update Metadata Randomly'}
-        onPress={onUpdateMetadata}
+        title={'Update Notification Metadata Randomly'}
+        onPress={onUpdateNotificationMetadata}
+        type={'primary'}
+      />
+      <Button
+        title={'Update Current Track Metadata Randomly'}
+        onPress={onUpdateCurrentTrackMetadata}
         type={'primary'}
       />
       <Button title={'Reset'} onPress={onReset} type={'primary'} />

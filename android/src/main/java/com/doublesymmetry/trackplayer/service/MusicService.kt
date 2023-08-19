@@ -26,6 +26,7 @@ import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toMilliseco
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toSeconds
 import com.doublesymmetry.trackplayer.extensions.asLibState
 import com.doublesymmetry.trackplayer.extensions.find
+import com.doublesymmetry.trackplayer.model.PlaybackMetadata
 import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.model.TrackAudioItem
 import com.doublesymmetry.trackplayer.module.MusicEvents
@@ -494,6 +495,11 @@ class MusicService : HeadlessJsMediaService() {
     }
 
     @MainThread
+    fun updateNowPlayingMetadata(track: Track) {
+        player.notificationManager.overrideMetadata(track.toAudioItem())
+    }
+
+    @MainThread
     fun clearNotificationMetadata() {
         player.notificationManager.hideNotification()
     }
@@ -503,7 +509,7 @@ class MusicService : HeadlessJsMediaService() {
         previousIndex: Int?,
         oldPosition: Double
     ) {
-        var a = Bundle()
+        val a = Bundle()
         a.putDouble(POSITION_KEY, oldPosition)
         if (index != null) {
             a.putInt(NEXT_TRACK_KEY, index)
@@ -515,7 +521,7 @@ class MusicService : HeadlessJsMediaService() {
 
         emit(MusicEvents.PLAYBACK_TRACK_CHANGED, a)
 
-        var b = Bundle()
+        val b = Bundle()
         b.putDouble("lastPosition", oldPosition)
         if (tracks.size > 0) {
             b.putInt("index", player.currentIndex)
@@ -719,16 +725,24 @@ class MusicService : HeadlessJsMediaService() {
         }
 
         scope.launch {
-            event.onPlaybackMetadata.collect {
-                Bundle().apply {
-                    putString("source", it.source)
-                    putString("title", it.title)
-                    putString("url", it.url)
-                    putString("artist", it.artist)
-                    putString("album", it.album)
-                    putString("date", it.date)
-                    putString("genre", it.genre)
-                    emit(MusicEvents.PLAYBACK_METADATA, this)
+            event.onTimedMetadata.collect {
+                // TODO: Handle the different types of metadata and publish to new events
+                val metadata = PlaybackMetadata.fromId3Metadata(it)
+                    ?: PlaybackMetadata.fromIcy(it)
+                    ?: PlaybackMetadata.fromVorbisComment(it)
+                    ?: PlaybackMetadata.fromQuickTime(it)
+
+                if (metadata != null) {
+                    Bundle().apply {
+                        putString("source", metadata.source)
+                        putString("title", metadata.title)
+                        putString("url", metadata.url)
+                        putString("artist", metadata.artist)
+                        putString("album", metadata.album)
+                        putString("date", metadata.date)
+                        putString("genre", metadata.genre)
+                        emit(MusicEvents.PLAYBACK_METADATA, this)
+                    }
                 }
             }
         }
