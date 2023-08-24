@@ -1,6 +1,7 @@
 package com.doublesymmetry.trackplayer.module
 
 import android.content.*
+import android.media.MediaDescription
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
@@ -102,16 +103,23 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         val subtitle = hashmap["subtitle"]
         val mediaUri = hashmap["mediaUri"]
         val iconUri = hashmap["iconUri"]
-        val playableFlag = if (hashmap["playable"]?.toInt() == 1 ) MediaItem.FLAG_BROWSABLE else MediaItem.FLAG_PLAYABLE
-        return MediaItem(
-            MediaDescriptionCompat.Builder()
-                .setMediaId(mediaId)
-                .setTitle(title)
-                .setSubtitle(subtitle)
-                .setIconUri(if (iconUri != null ) Uri.parse(iconUri) else null)
-                .setMediaUri(if (mediaUri != null ) Uri.parse(mediaUri) else null)
-                .build(), playableFlag
-        )
+        val groupTitle = hashmap["groupTitle"]
+        val playableFlag = if (hashmap["playable"]?.toInt() == 1) MediaItem.FLAG_BROWSABLE else MediaItem.FLAG_PLAYABLE
+
+        val mediaDescriptionBuilder = MediaDescriptionCompat.Builder()
+        mediaDescriptionBuilder.setMediaId(mediaId)
+        mediaDescriptionBuilder.setTitle(title)
+        mediaDescriptionBuilder.setSubtitle(subtitle)
+        mediaDescriptionBuilder.setMediaUri(if (mediaUri != null) Uri.parse(mediaUri) else null)
+        mediaDescriptionBuilder.setIconUri(if (iconUri != null) Uri.parse(iconUri) else null)
+        if (groupTitle != null) {
+            val extras = Bundle()
+            extras.putString(
+                MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_GROUP_TITLE,
+                groupTitle)
+            mediaDescriptionBuilder.setExtras(extras)
+        }
+        return MediaItem(mediaDescriptionBuilder.build(), playableFlag)
     }
 
     private fun readableArrayToMediaItems(data: ArrayList<HashMap<String, String>>): MutableList<MediaItem> {
