@@ -10,4 +10,5 @@ export interface MediaItem {
   iconUri?: string | ResourceObject;
   /** playable has 2 states: 1 as browsable, or any other as playable.  */
   playable: MediaItemPlayable.MediaBrowsable | string;
+  groupTitle?: string;
 }

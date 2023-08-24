@@ -25,7 +25,7 @@ import type {
   Track,
   TrackMetadataBase,
   UpdateOptions,
-  MediaItem,
+  AndroidAutoBrowseTree,
 } from './interfaces';
 
 const { TrackPlayerModule: TrackPlayer } = NativeModules;
@@ -526,9 +526,9 @@ export async function retry() {
  * @param browseTree the content hierarchy dict.
  * @returns a serialized copy of the browseTree set by native. For debug purposes.
  */
-export async function setBrowseTree(browseTree: {
-  [key: string]: MediaItem[];
-}): Promise<string> {
+export async function setBrowseTree(
+  browseTree: AndroidAutoBrowseTree
+): Promise<string> {
   if (Platform.OS !== 'android') return new Promise(() => '');
   return TrackPlayer.setBrowseTree(browseTree);
 }
