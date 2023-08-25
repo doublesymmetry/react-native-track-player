@@ -224,6 +224,7 @@ export async function updateOptions({
   ...options
 }: UpdateOptions = {}): Promise<void> {
   return TrackPlayer.updateOptions({
+    ...options,
     android: {
       // Handle deprecated alwaysPauseOnInterruption option:
       alwaysPauseOnInterruption:
@@ -238,7 +239,6 @@ export async function updateOptions({
     nextIcon: resolveImportedAsset(options.nextIcon),
     rewindIcon: resolveImportedAsset(options.rewindIcon),
     forwardIcon: resolveImportedAsset(options.forwardIcon),
-    ...options,
   });
 }
 
