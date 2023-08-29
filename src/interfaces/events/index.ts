@@ -15,3 +15,4 @@ export * from './RemotePlaySearchEvent';
 export * from './RemoteSeekEvent';
 export * from './RemoteSetRatingEvent';
 export * from './RemoteSkipEvent';
+export * from './RemoteBrowseEvent';

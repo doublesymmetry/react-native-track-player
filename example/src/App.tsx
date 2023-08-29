@@ -12,11 +12,10 @@ import {
   StatusBar,
   StyleSheet,
   View,
-  Platform,
 } from 'react-native';
 import TrackPlayer, {
   useActiveTrack,
-  AndroidAudioContentStyle,
+  AndroidAutoContentStyle,
 } from 'react-native-track-player';
 
 import {
@@ -156,8 +155,8 @@ function useSetupPlayer() {
       await SetupService();
       TrackPlayer.setBrowseTree(DemoAndroidAutoHierarchy);
       TrackPlayer.setBrowseTreeStyle(
-        AndroidAudioContentStyle.CategoryList,
-        AndroidAudioContentStyle.Grid
+        AndroidAutoContentStyle.CategoryList,
+        AndroidAutoContentStyle.Grid
       );
       if (unmounted) return;
       setPlayerReady(true);
