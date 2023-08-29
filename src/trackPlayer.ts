@@ -8,12 +8,7 @@ import {
 // @ts-expect-error because resolveAssetSource is untyped
 import { default as resolveAssetSource } from 'react-native/Libraries/Image/resolveAssetSource';
 
-import {
-  Event,
-  RepeatMode,
-  State,
-  AndroidAudioContentStyle,
-} from './constants';
+import { Event, RepeatMode, State, AndroidAutoContentStyle } from './constants';
 import type {
   AddTrack,
   EventPayloadByEvent,
@@ -540,8 +535,8 @@ export async function setBrowseTree(
  * false = the grid style.
  */
 export function setBrowseTreeStyle(
-  browsableStyle: AndroidAudioContentStyle,
-  playableStyle: AndroidAudioContentStyle
+  browsableStyle: AndroidAutoContentStyle,
+  playableStyle: AndroidAutoContentStyle
 ): null {
   if (Platform.OS !== 'android') return null;
   TrackPlayer.setBrowseTreeStyle(browsableStyle, playableStyle);

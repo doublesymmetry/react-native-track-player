@@ -66,6 +66,12 @@ export async function PlaybackService() {
       console.log('Event.RemoteSkip', event);
       TrackPlayer.skip(event.index).then(() => TrackPlayer.play());
     });
+
+    TrackPlayer.addEventListener(Event.RemoteBrowse, (event) => {
+      // This event is emitted when onLoadChildren is called. the mediaId is returned to allow RNTP to handle any
+      // content updates.
+      console.log('Event.RemoteBrowse', event);
+    });
   }
 
   TrackPlayer.addEventListener(Event.PlaybackQueueEnded, (event) => {

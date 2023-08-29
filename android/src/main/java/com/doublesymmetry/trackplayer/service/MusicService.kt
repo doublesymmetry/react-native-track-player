@@ -90,6 +90,10 @@ class MusicService : HeadlessJsMediaService() {
             result: Result<List<MediaItem>>
     ) {
         Timber.tag("GVA-RNTP").d("RNTP received loadChildren req: %s", parentMediaId)
+
+        emit(MusicEvents.BUTTON_BROWSE, Bundle().apply {
+            putString("mediaId", parentMediaId)
+        });
         result.sendResult(mediaTree[parentMediaId])
     }
 
