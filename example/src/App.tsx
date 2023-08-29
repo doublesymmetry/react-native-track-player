@@ -12,7 +12,6 @@ import {
   StatusBar,
   StyleSheet,
   View,
-  Platform,
 } from 'react-native';
 import TrackPlayer, {
   useActiveTrack,
