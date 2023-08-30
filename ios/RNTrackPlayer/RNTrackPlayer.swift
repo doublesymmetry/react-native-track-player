@@ -301,7 +301,8 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, options: sessionCategoryOptions)
         }
         if (setActive) {
-            try? AVAudioSession.sharedInstance().setActive(true)
+            try? audioSessionController.deactivateSession()
+            try? audioSessionController.activateSession()
         }
     }
 
