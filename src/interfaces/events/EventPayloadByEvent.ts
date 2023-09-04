@@ -18,6 +18,7 @@ import type { RemoteSeekEvent } from './RemoteSeekEvent';
 import type { RemoteSetRatingEvent } from './RemoteSetRatingEvent';
 import type { RemoteSkipEvent } from './RemoteSkipEvent';
 import type { RemoteBrowseEvent } from './RemoteBrowseEvent';
+import type { RemoteCustomActionEvent } from './RemoteCustomActionEvent';
 
 export interface EventPayloadByEvent {
   [Event.PlayerError]: PlayerErrorEvent;
@@ -46,4 +47,5 @@ export interface EventPayloadByEvent {
   [Event.RemoteDislike]: never;
   [Event.RemoteBookmark]: never;
   [Event.RemoteBrowse]: RemoteBrowseEvent;
+  [Event.RemoteCustomAction]: RemoteCustomActionEvent;
 }

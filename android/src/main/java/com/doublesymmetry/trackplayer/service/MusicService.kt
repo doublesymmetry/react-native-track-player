@@ -223,6 +223,9 @@ class MusicService : HeadlessJsMediaService() {
                     putInt("index", id.toInt())
                 })
             }
+            override fun handleCustomActions(action: String?, extras: Bundle?) {
+                Timber.tag("GVA-RNTP").d("RNTP received req to play from queue index: %s", action)
+            }
         }
         player = QueuedAudioPlayer(this@MusicService, playerConfig, bufferConfig, cacheConfig, mediaSessionCallback)
         player.automaticallyUpdateNotificationMetadata = automaticallyUpdateNotificationMetadata
@@ -253,9 +256,10 @@ class MusicService : HeadlessJsMediaService() {
         capabilities = options.getIntegerArrayList("capabilities")?.map { Capability.values()[it] } ?: emptyList()
         notificationCapabilities = options.getIntegerArrayList("notificationCapabilities")?.map { Capability.values()[it] } ?: emptyList()
         compactCapabilities = options.getIntegerArrayList("compactCapabilities")?.map { Capability.values()[it] } ?: emptyList()
-
+        val customActions = options.getBundle(CUSTOM_ACTIONS_KEY)
+        val customActionsList = customActions?.getStringArrayList(CUSTOM_ACTIONS_LIST_KEY)
         if (notificationCapabilities.isEmpty()) notificationCapabilities = capabilities
-
+        Timber.tag("customactions debug").d(customActionsList.toString())
         val buttonsList = notificationCapabilities.mapNotNull {
             when (it) {
                 Capability.PLAY, Capability.PAUSE -> {
@@ -287,6 +291,12 @@ class MusicService : HeadlessJsMediaService() {
                     SEEK_TO
                 }
                 else -> { null }
+            }
+        }.toMutableList()
+        if (customActionsList != null) {
+            for (customAction in customActionsList ?: emptyList()) {
+                val customIcon = BundleUtils.getIcon(this, customActions, customAction, TrackPlayerR.drawable.exo_media_action_repeat_all)
+                buttonsList.add(CUSTOM_ACTION(icon=customIcon, customAction = customAction))
             }
         }
 
@@ -724,6 +734,13 @@ class MusicService : HeadlessJsMediaService() {
                             emit(MusicEvents.BUTTON_JUMP_BACKWARD, this)
                         }
                     }
+
+                    is MediaSessionCallback.CUSTOMACTION -> {
+                        Bundle().apply {
+                            putString("customAction", it.customAction)
+                            emit(MusicEvents.BUTTON_CUSTOM_ACTION, this)
+                        }
+                    }
                 }
             }
         }
@@ -874,6 +891,9 @@ class MusicService : HeadlessJsMediaService() {
         const val MAX_CACHE_SIZE_KEY = "maxCacheSize"
 
         const val ANDROID_OPTIONS_KEY = "android"
+
+        const val CUSTOM_ACTIONS_KEY = "customActions"
+        const val CUSTOM_ACTIONS_LIST_KEY = "customActionsList"
 
         const val STOPPING_APP_PAUSES_PLAYBACK_KEY = "stoppingAppPausesPlayback"
         const val APP_KILLED_PLAYBACK_BEHAVIOR_KEY = "appKilledPlaybackBehavior"

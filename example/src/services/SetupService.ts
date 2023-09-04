@@ -46,9 +46,22 @@ export const SetupService = async () => {
     compactCapabilities: [
       Capability.Play,
       Capability.Pause,
-      Capability.SkipToNext,
+      // Capability.SkipToNext,
     ],
+    notificationCapabilities: [Capability.Play, Capability.Pause],
     progressUpdateEventInterval: 2,
+    customActions: {
+      customActionsList: [
+        'customAction1',
+        'customAction2',
+        'customAction3',
+        'customAction4',
+      ],
+      customAction1: require('../assets/icons/heart.png'),
+      customAction2: require('../assets/icons/heart-outline.png'),
+      customAction3: require('../assets/icons/heart.png'),
+      customAction4: require('../assets/icons/heart-outline.png'),
+    },
   });
   await TrackPlayer.setRepeatMode(DefaultRepeatMode);
 };

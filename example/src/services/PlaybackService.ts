@@ -74,6 +74,10 @@ export async function PlaybackService() {
     });
   }
 
+  TrackPlayer.addEventListener(Event.RemoteCustomAction, (event) => {
+    console.log('Event.RemoteCustomAction', event);
+  });
+
   TrackPlayer.addEventListener(Event.PlaybackQueueEnded, (event) => {
     console.log('Event.PlaybackQueueEnded', event);
   });
