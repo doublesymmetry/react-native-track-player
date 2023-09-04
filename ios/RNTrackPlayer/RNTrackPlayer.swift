@@ -22,6 +22,10 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     private var shouldResumePlaybackAfterInterruptionEnds: Bool = false
     private var forwardJumpInterval: NSNumber? = nil;
     private var backwardJumpInterval: NSNumber? = nil;
+    private var sessionCategory: AVAudioSession.Category = .playback
+    private var sessionCategoryMode: AVAudioSession.Mode = .default
+    private var sessionCategoryPolicy: AVAudioSession.RouteSharingPolicy = .default
+    private var sessionCategoryOptions: AVAudioSession.CategoryOptions = []
 
     // MARK: - Lifecycle Methods
 
@@ -96,11 +100,11 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     override public func supportedEvents() -> [String] {
         return EventEmitter.shared.allEvents
     }
-    
+
     private func emit(event: EventType, body: Any? = nil) {
         EventEmitter.shared.emit(event: event, body: body)
     }
-    
+
     // MARK: - AudioSessionControllerDelegate
 
     public func handleInterruption(type: InterruptionType) {
@@ -164,11 +168,11 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         if let bufferDuration = config["minBuffer"] as? TimeInterval {
             player.bufferDuration = bufferDuration
         }
-        
+
         if let autoHandleInterruptions = config["autoHandleInterruptions"] as? Bool {
             self.shouldResumePlaybackAfterInterruptionEnds = autoHandleInterruptions
         }
-        
+
         // configure wether player waits to play (deprecated)
         if let waitForBuffer = config["waitForBuffer"] as? Bool {
             player.automaticallyWaitsToMinimizeStalling = waitForBuffer
@@ -178,11 +182,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         player.automaticallyUpdateNowPlayingInfo = config["autoUpdateMetadata"] as? Bool ?? true
 
         // configure audio session - category, options & mode
-        var sessionCategory: AVAudioSession.Category = .playback
-        var sessionCategoryMode: AVAudioSession.Mode = .default
-        var sessionCategoryPolicy: AVAudioSession.RouteSharingPolicy = .default
-        var sessionCategoryOptions: AVAudioSession.CategoryOptions = []
-
         if
             let sessionCategoryStr = config["iosCategory"] as? String,
             let mappedCategory = SessionCategory(rawValue: sessionCategoryStr) {
@@ -205,13 +204,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         let mappedCategoryOpts = sessionCategoryOptsStr?.compactMap { SessionCategoryOptions(rawValue: $0)?.mapConfigToAVAudioSessionCategoryOptions() } ?? []
         sessionCategoryOptions = AVAudioSession.CategoryOptions(mappedCategoryOpts)
 
-        if #available(iOS 13.0, *) {
-            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: sessionCategoryPolicy, options: sessionCategoryOptions)
-        } else if #available(iOS 11.0, *) {
-            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: sessionCategoryPolicy, options: sessionCategoryOptions)
-        } else {
-            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, options: sessionCategoryOptions)
-        }
+        configureAudioSession()
 
         // setup event listeners
         player.remoteCommandController.handleChangePlaybackPositionCommand = { [weak self] event in
@@ -273,7 +266,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
                 ? EventType.RemotePlay
                 : EventType.RemotePause
             )
-            
+
             return MPRemoteCommandHandlerStatus.success
         }
 
@@ -294,6 +287,20 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
         hasInitialized = true
         resolve(NSNull())
+    }
+
+
+    private func configureAudioSession(setActive: Bool = false) {
+        if #available(iOS 13.0, *) {
+            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: sessionCategoryPolicy, options: sessionCategoryOptions)
+        } else if #available(iOS 11.0, *) {
+            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: sessionCategoryPolicy, options: sessionCategoryOptions)
+        } else {
+            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, options: sessionCategoryOptions)
+        }
+        if (setActive) {
+            try? AVAudioSession.sharedInstance().setActive(true)
+        }
     }
 
     @objc(isServiceRunning:rejecter:)
@@ -512,7 +519,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     public func play(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
 
-        try? AVAudioSession.sharedInstance().setActive(true)
+        configureAudioSession(setActive: true)
         player.play()
         resolve(NSNull())
     }
@@ -528,6 +535,9 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     @objc(setPlayWhenReady:resolver:rejecter:)
     public func setPlayWhenReady(playWhenReady: Bool, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
+        if (playWhenReady) {
+            configureAudioSession(setActive: true)
+        }
         player.playWhenReady = playWhenReady
         resolve(NSNull())
     }
@@ -545,7 +555,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         player.stop()
         resolve(NSNull())
     }
-    
+
     @objc(seekTo:resolver:rejecter:)
     public func seekTo(time: Double, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
@@ -749,7 +759,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         Metadata.update(for: player, with: metadata)
         resolve(NSNull())
     }
-    
+
     private func getPlaybackStateErrorKeyValues() -> Dictionary<String, Any> {
         switch player.playbackError {
             case .failedToLoadKeyValue: return [
@@ -897,7 +907,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
                 UIApplication.shared.endReceivingRemoteControlEvents();
             }
         }
-        
+
         var a: Dictionary<String, Any> = ["lastPosition": lastPosition ?? 0]
         if let lastIndex = lastIndex {
             a["lastIndex"] = lastIndex
@@ -915,8 +925,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             a["track"] = track
         }
         emit(event: EventType.PlaybackActiveTrackChanged, body: a)
-        
-        
+
         // deprecated:
         var b: Dictionary<String, Any> = ["position": lastPosition ?? 0]
         if let lastIndex = lastIndex {
