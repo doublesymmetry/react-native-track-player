@@ -1,4 +1,4 @@
-# [4.0.0-rc07](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc07...v4.0.0-rc08) (2023-09-07)
+# [4.0.0-rc08](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc07...v4.0.0-rc08) (2023-09-07)
 
 * **RN:** Undeprecate updateNowPlayingMetadata
 * **android:** Restore notification image caching
