@@ -1,3 +1,12 @@
+# [4.0.0-rc08](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc07...v4.0.0-rc08) (2023-09-07)
+
+* **RN:** Undeprecate updateNowPlayingMetadata
+* **android:** Restore notification image caching
+* **RN:** Fix issue with updateOptions and local images
+* **ios:** Activate session on play to avoid issues with background audio
+* **ios:** Second fix for repeat mode
+* **ios:** Correctly update control center progress when pausing/playing
+
 # [4.0.0-rc07](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc06...v4.0.0-rc07) (2023-08-11)
 
 * **ios:** Fix firing of `EventType.PlaybackQueueEnded` (fixes #2038)
