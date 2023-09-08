@@ -4,6 +4,8 @@ import {
   NativeEventEmitter,
   NativeModules,
   Platform,
+  Animated,
+  OS
 } from 'react-native';
 // @ts-expect-error because resolveAssetSource is untyped
 import { default as resolveAssetSource } from 'react-native/Libraries/Image/resolveAssetSource';
@@ -28,6 +30,11 @@ const emitter =
     ? new NativeEventEmitter(TrackPlayer)
     : DeviceEventEmitter;
 
+
+const animatedVolume = new Animated.Value(1);
+
+animatedVolume.addListener((state: any) => TrackPlayer.setVolume(state.value));
+    
 // MARK: - Helpers
 
 function resolveImportedAssetOrPath(pathOrAsset: string | number | undefined) {
@@ -355,6 +362,44 @@ export async function seekBy(offset: number): Promise<void> {
 export async function setVolume(level: number): Promise<void> {
   return TrackPlayer.setVolume(level);
 }
+
+export const animatedVolumeChange = ({
+  val,
+  duration = 0,
+  init = -1,
+  callback = () => undefined,
+}: {
+  val: number;
+  duration?: number;
+  init?: number;
+  callback?: () => void;
+}) => {
+  /*
+  TODO: Animated.value change relies on React rendering so Android
+  headlessJS will not work with it. however does iOS and windows work in the background?
+  if not this code block is needed 
+  if (AppState.currentState !== 'active') {
+    // need to figure out a way to run Animated.timing in background. probably needs our own module
+    duration = 0;
+  }
+   */
+  val = Math.min(val, 1);
+  if (duration === 0) {
+    animatedVolume.setValue(val);
+    callback();
+    return;
+  }
+  if (init !== -1) {
+    animatedVolume.setValue(init);
+  }
+  animatedVolume.stopAnimation();
+  Animated.timing(animatedVolume, {
+    toValue: val,
+    useNativeDriver: true,
+    duration,
+  }).start(() => callback());
+};
+
 
 /**
  * Sets the playback rate.
