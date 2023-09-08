@@ -5,6 +5,8 @@ export enum Event {
   PlaybackState = 'playback-state',
   /** Fired when a playback error occurs. */
   PlaybackError = 'playback-error',
+  /** (Android Only) Fired when animated volume completed changing. */
+  PlaybackAnimatedVolumeChanged = 'playback-animated-volume-changed',
   /** Fired after playback has paused due to the queue having reached the end. */
   PlaybackQueueEnded = 'playback-queue-ended',
   /**
