@@ -31,7 +31,7 @@ const emitter =
 
 const animatedVolume = new Animated.Value(1);
 
-animatedVolume.addListener((state: any) => TrackPlayer.setVolume(state.value));
+animatedVolume.addListener((state) => TrackPlayer.setVolume(state.value));
 
 // MARK: - Helpers
 
