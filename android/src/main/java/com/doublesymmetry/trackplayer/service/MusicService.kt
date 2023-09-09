@@ -407,10 +407,15 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     @MainThread
-    fun setVolumeAnimated(value: Float, duration: Long = 500L, interval: Long = 20L, emitEventMsg: String = "") {
+    fun setAnimatedVolume(value: Float, duration: Long = 500L, interval: Long = 20L, emitEventMsg: String = ""): Deferred<Unit> {
         val eventMsgBundle = Bundle()
         eventMsgBundle.putString(DATA_KEY, emitEventMsg)
-        player.fadeVolume(value, duration, interval, { emit(MusicEvents.PLAYBACK_ANIMATED_VOLUME_CHANGED, eventMsgBundle) })
+        return player.fadeVolume(value, duration, interval) {
+            emit(
+                MusicEvents.PLAYBACK_ANIMATED_VOLUME_CHANGED,
+                eventMsgBundle
+            )
+        }
     }
 
     @MainThread

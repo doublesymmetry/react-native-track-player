@@ -5,9 +5,18 @@ import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 
 import { PlaybackError } from './PlaybackError';
 import { PlayPauseButton } from './PlayPauseButton';
+import { FadeEvent } from '../constant';
 
-const performSkipToNext = () => TrackPlayer.skipToNext();
-const performSkipToPrevious = () => TrackPlayer.skipToPrevious();
+const performSkipToNext = () =>
+  TrackPlayer.setAnimatedVolume({
+    volume: 0,
+    msg: FadeEvent.FadeNext,
+  });
+const performSkipToPrevious = () =>
+  TrackPlayer.setAnimatedVolume({
+    volume: 0,
+    msg: FadeEvent.FadePrevious,
+  });
 
 export const PlayerControls: React.FC = () => {
   const playback = usePlaybackState();

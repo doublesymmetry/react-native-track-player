@@ -629,8 +629,9 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     @ReactMethod
-    fun setAnimatedVolume(volume: Float = 1f, duration: Long = 0, interval: Long = 20, msg: String = "", callback: Promise) = scope.launch {
+    fun setAnimatedVolume(volume: Float = 1f, duration: Int = 0, interval: Int = 20, msg: String = "", callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
-        callback.resolve(MusicService.setAnimatedVolume(volume, duration, interval, msg))
+        musicService.setAnimatedVolume(volume, duration.toLong(), interval.toLong(), msg).await()
+        callback.resolve(null)
     }
 }

@@ -4,7 +4,7 @@ import {
   NativeEventEmitter,
   NativeModules,
   Platform,
-  Animated
+  Animated,
 } from 'react-native';
 // @ts-expect-error because resolveAssetSource is untyped
 import { default as resolveAssetSource } from 'react-native/Libraries/Image/resolveAssetSource';
@@ -29,11 +29,10 @@ const emitter =
     ? new NativeEventEmitter(TrackPlayer)
     : DeviceEventEmitter;
 
-
 const animatedVolume = new Animated.Value(1);
 
 animatedVolume.addListener((state: any) => TrackPlayer.setVolume(state.value));
-    
+
 // MARK: - Helpers
 
 function resolveImportedAssetOrPath(pathOrAsset: string | number | undefined) {
@@ -362,22 +361,38 @@ export async function setVolume(level: number): Promise<void> {
   return TrackPlayer.setVolume(level);
 }
 
-export const setAnimatedVolume = ({
+/**
+ * Sets the volume of the player with a simple linear scaling.
+ * In Android this is achieved via a native thread call.
+ * In other platforms this is achieved via RN's Animated.Value.
+ *
+ * @param volume The volume as a number between 0 and 1.
+ * @param duration The duration of the animation in milliseconds. defualt is 500 ms.
+ * @param init The initial value of the volume. This may be useful eg to be 0 for a fade in event.
+ * @param interval The interval of the animation in milliseconds. default is 20 ms.
+ * @param msg (Android) The message to be emitted after volume is fully changed, via Event.PlaybackAnimatedVolumeChanged.
+ * @param callback (other platforms) The callback to be called after volume is fully changed.
+ */
+export const setAnimatedVolume = async ({
   volume,
-  duration = 0,
+  duration = 500,
   init = -1,
+  interval = 20,
+  msg = '',
   callback = () => undefined,
 }: {
   volume: number;
   duration?: number;
   init?: number;
+  interval?: number;
+  msg?: string;
   callback?: () => void;
 }) => {
   if (init !== -1) {
     TrackPlayer.setVolume(init);
   }
   if (Platform.OS === 'android') {
-    TrackPlayer.setAnimatedVolume(volume, duration, init)
+    TrackPlayer.setAnimatedVolume(volume, duration, interval, msg);
   } else {
     /*
     TODO: Animated.value change relies on React rendering so Android
@@ -401,9 +416,7 @@ export const setAnimatedVolume = ({
       duration,
     }).start(() => callback());
   }
-
 };
-
 
 /**
  * Sets the playback rate.
