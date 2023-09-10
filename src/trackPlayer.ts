@@ -419,6 +419,115 @@ export const setAnimatedVolume = async ({
 };
 
 /**
+ * performs fading out to pause playback.
+ * @param duration duration of the fade progress in ms
+ * @param interval interval of the fade progress in ms
+ */
+export const fadeOutPause = async (duration = 500, interval = 20) => {
+  if (Platform.OS === 'android') {
+    TrackPlayer.fadeOutPause(duration, interval);
+  } else {
+    setAnimatedVolume({
+      duration,
+      interval,
+      volume: 0,
+      callback: () => pause(),
+    });
+  }
+};
+
+/**
+ * performs fading into playing the next track.
+ * @param duration duration of the fade progress in ms
+ * @param interval interval of the fade progress in ms
+ * @param toVolume volume to fade into
+ */
+export const fadeOutNext = async (
+  duration = 500,
+  interval = 20,
+  toVolume = 1
+) => {
+  if (Platform.OS === 'android') {
+    TrackPlayer.fadeOutNext(duration, interval, toVolume);
+  } else {
+    setAnimatedVolume({
+      duration,
+      interval,
+      volume: 0,
+      callback: () => {
+        skipToNext();
+        setAnimatedVolume({
+          duration,
+          interval,
+          volume: toVolume,
+        });
+      },
+    });
+  }
+};
+
+/**
+ * performs fading into playing the previous track.
+ * @param duration duration of the fade progress in ms
+ * @param interval interval of the fade progress in ms
+ * @param toVolume volume to fade into
+ */
+export const fadeOutPrevious = async (
+  duration = 500,
+  interval = 20,
+  toVolume = 1
+) => {
+  if (Platform.OS === 'android') {
+    TrackPlayer.fadeOutPrevious(duration, interval, toVolume);
+  } else {
+    setAnimatedVolume({
+      duration,
+      interval,
+      volume: 0,
+      callback: () => {
+        skipToPrevious();
+        setAnimatedVolume({
+          duration,
+          interval,
+          volume: toVolume,
+        });
+      },
+    });
+  }
+};
+
+/**
+ * performs fading into skipping to a track.
+ * @param index the index of the track to skip to
+ * @param duration duration of the fade progress in ms
+ * @param interval interval of the fade progress in ms
+ * @param toVolume volume to fade into
+ */
+export const fadeOutJump = async (
+  index: number,
+  duration = 500,
+  interval = 20,
+  toVolume = 1
+) => {
+  if (Platform.OS === 'android') {
+    TrackPlayer.fadeOutJump(index, duration, interval, toVolume);
+  } else {
+    setAnimatedVolume({
+      duration,
+      interval,
+      volume: 0,
+      callback: () => {
+        skip(index);
+        setAnimatedVolume({
+          duration,
+          interval,
+          volume: toVolume,
+        });
+      },
+    });
+  }
+};
+/**
  * Sets the playback rate.
  *
  * @param rate The playback rate to change to, where 0.5 would be half speed,

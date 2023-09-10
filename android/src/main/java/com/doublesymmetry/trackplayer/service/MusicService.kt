@@ -418,6 +418,32 @@ class MusicService : HeadlessJsTaskService() {
         }
     }
 
+    fun fadeOutPause (duration: Long = 500L, interval: Long = 20L) {
+        player.fadeVolume(0f, duration, interval) {
+            player.pause()
+        }
+    }
+
+    fun fadeOutNext (duration: Long = 500L, interval: Long = 20L, toVolume: Float = 1f) {
+        player.fadeVolume(0f, duration, interval) {
+            player.next()
+            player.fadeVolume(toVolume, duration, interval)
+        }
+    }
+
+    fun fadeOutPrevious (duration: Long = 500L, interval: Long = 20L, toVolume: Float = 1f) {
+        player.fadeVolume(0f, duration, interval) {
+            player.previous()
+            player.fadeVolume(toVolume, duration, interval)
+        }
+    }
+
+    fun fadeOutJump (index: Int, duration: Long = 500L, interval: Long = 20L, toVolume: Float = 1f) {
+        player.fadeVolume(0f, duration, interval) {
+            player.jumpToItem(index)
+            player.fadeVolume(toVolume, duration, interval)
+        }
+    }
     @MainThread
     fun getDurationInSeconds(): Double = player.duration.toSeconds()
 
