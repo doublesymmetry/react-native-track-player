@@ -7,16 +7,12 @@ import {
 } from 'react-native';
 import TrackPlayer, { useIsPlaying } from 'react-native-track-player';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
-import { FadeEvent } from '../constant';
 
 export const PlayPauseButton: React.FC = () => {
   const { playing, bufferingDuringPlay } = useIsPlaying();
 
-  const onFadeOutPause = async () => {
-    await TrackPlayer.setAnimatedVolume({
-      volume: 0,
-      msg: FadeEvent.FadePause,
-    });
+  const onFadeOutPause = () => {
+    TrackPlayer.fadeOutPause();
   };
 
   const onFadeInPlay = () => {
