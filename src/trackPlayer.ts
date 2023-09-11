@@ -9,7 +9,7 @@ import {
 // @ts-expect-error because resolveAssetSource is untyped
 import { default as resolveAssetSource } from 'react-native/Libraries/Image/resolveAssetSource';
 
-import { Event, RepeatMode, State, AndroidAutoContentStyle } from './constants';
+import { Event, RepeatMode, State } from './constants';
 import type {
   AddTrack,
   EventPayloadByEvent,
@@ -21,7 +21,6 @@ import type {
   Track,
   TrackMetadataBase,
   UpdateOptions,
-  AndroidAutoBrowseTree,
 } from './interfaces';
 
 const { TrackPlayerModule: TrackPlayer } = NativeModules;
@@ -681,35 +680,4 @@ export async function getRepeatMode(): Promise<RepeatMode> {
  */
 export async function retry() {
   return TrackPlayer.retry();
-}
-
-/**
- * Sets the content hierarchy of Android Auto (Android only). The hierarchy structure is a dict with
- * the mediaId as keys, and a list of MediaItem as values. To use, you must at least specify the root directory, where
- * the key is "/". If the root directory contains BROWSABLE MediaItems, they will be shown as tabs. Do note Google requires
- * AA to have a max of 4 tabs. You may then set the mediaId keys of the browsable MediaItems to be a list of other MediaItems.
- *
- * @param browseTree the content hierarchy dict.
- * @returns a serialized copy of the browseTree set by native. For debug purposes.
- */
-export async function setBrowseTree(
-  browseTree: AndroidAutoBrowseTree
-): Promise<string> {
-  if (Platform.OS !== 'android') return new Promise(() => '');
-  return TrackPlayer.setBrowseTree(browseTree);
-}
-
-/**
- * Sets the content style of Android Auto (Android only).
- * there are list style and grid style. see https://developer.android.com/training/cars/media#apply_content_style .
- * the styles are applicable to browsable nodes and playable nodes. setting the args to true will yield the list style.
- * false = the grid style.
- */
-export function setBrowseTreeStyle(
-  browsableStyle: AndroidAutoContentStyle,
-  playableStyle: AndroidAutoContentStyle
-): null {
-  if (Platform.OS !== 'android') return null;
-  TrackPlayer.setBrowseTreeStyle(browsableStyle, playableStyle);
-  return null;
 }

@@ -20,10 +20,6 @@ def getExtOrIntegerDefault(name) {
 android {
     compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
 
-    def agpVersion = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
-    if (agpVersion.tokenize('.')[0].toInteger() >= 7) {
-      namespace "com.doublesymmetry.trackplayer"
-    }
     defaultConfig {
         minSdkVersion getExtOrIntegerDefault('minSdkVersion') // RN's minimum version
         targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
@@ -53,7 +49,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.lovegaoshi:KotlinAudio:v2.0.0-aa21'
+    implementation 'com.github.lovegaoshi:KotlinAudio:v2.0.0-fade5'
     // used when building against local maven
 //    implementation "com.github.doublesymmetry:kotlin-audio:1.2.2"
 
@@ -65,5 +61,4 @@ dependencies {
     implementation "androidx.localbroadcastmanager:localbroadcastmanager:1.1.0"
     implementation "androidx.lifecycle:lifecycle-process:2.5.1"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3"
-    implementation 'androidx.media:media:1.6.0'
 }
