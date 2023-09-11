@@ -1,11 +1,16 @@
 package com.doublesymmetry.trackplayer.module
 
 import android.content.*
+import android.media.MediaDescription
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.net.Uri
 import android.support.v4.media.RatingCompat
+import android.support.v4.media.MediaBrowserCompat.MediaItem
+import android.support.v4.media.MediaDescriptionCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.media.utils.MediaConstants
 import com.doublesymmetry.kotlinaudio.models.Capability
 import com.doublesymmetry.kotlinaudio.models.RepeatMode
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toMilliseconds
@@ -89,6 +94,38 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
     private fun bundleToTrack(bundle: Bundle): Track {
         return Track(context, bundle, musicService.ratingType)
+    }
+
+    private fun hashmapToMediaItem(hashmap: HashMap<String, String>): MediaItem {
+
+        val mediaId = hashmap["mediaId"]
+        val title = hashmap["title"]
+        val subtitle = hashmap["subtitle"]
+        val mediaUri = hashmap["mediaUri"]
+        val iconUri = hashmap["iconUri"]
+        val groupTitle = hashmap["groupTitle"]
+        val playableFlag = if (hashmap["playable"]?.toInt() == 1) MediaItem.FLAG_BROWSABLE else MediaItem.FLAG_PLAYABLE
+
+        val mediaDescriptionBuilder = MediaDescriptionCompat.Builder()
+        mediaDescriptionBuilder.setMediaId(mediaId)
+        mediaDescriptionBuilder.setTitle(title)
+        mediaDescriptionBuilder.setSubtitle(subtitle)
+        mediaDescriptionBuilder.setMediaUri(if (mediaUri != null) Uri.parse(mediaUri) else null)
+        mediaDescriptionBuilder.setIconUri(if (iconUri != null) Uri.parse(iconUri) else null)
+        if (groupTitle != null) {
+            val extras = Bundle()
+            extras.putString(
+                MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_GROUP_TITLE,
+                groupTitle)
+            mediaDescriptionBuilder.setExtras(extras)
+        }
+        return MediaItem(mediaDescriptionBuilder.build(), playableFlag)
+    }
+
+    private fun readableArrayToMediaItems(data: ArrayList<HashMap<String, String>>): MutableList<MediaItem> {
+        return data.map {
+            hashmapToMediaItem(it)
+        }.toMutableList()
     }
 
     private fun rejectWithException(callback: Promise, exception: Exception) {
@@ -662,4 +699,35 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         musicService.fadeOutJump(index, duration.toLong(), interval.toLong(), toVolume)
         callback.resolve(null)
     }
+    
+    fun setBrowseTree(mediaItems: ReadableMap, callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        val mediaItemsMap = mediaItems.toHashMap()
+        musicService.mediaTree = mediaItemsMap.mapValues { readableArrayToMediaItems(it.value as ArrayList<HashMap<String, String>>) }
+        Timber.d("refreshing browseTree")
+        mediaItemsMap.keys.forEach {
+            musicService.notifyChildrenChanged(it)
+        }
+        callback.resolve(musicService.mediaTree.toString())
+    }
+
+    @ReactMethod
+    // this method doesn't seem to affect style after onGetRoot is called, and won't change if notifyChildrenChanged is emitted.
+    fun setBrowseTreeStyle(browsableStyle: Int, playableStyle: Int, callback: Promise) = scope.launch {
+        fun getStyle(check: Int): Int {
+            return when (check) {
+                1 -> MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_GRID_ITEM
+                2 -> MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_CATEGORY_LIST_ITEM
+                3 -> MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_CATEGORY_GRID_ITEM
+                else -> MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM
+            }
+        }
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        musicService.mediaTreeStyle = listOf(
+            getStyle(browsableStyle),
+            getStyle(playableStyle)
+        )
+        callback.resolve(null)
+    }
+
 }

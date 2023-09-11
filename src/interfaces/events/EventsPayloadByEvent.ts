@@ -68,4 +68,6 @@ export interface EventsPayloadByEvent {
   [Event.PlaybackAnimatedVolumeChanged]: PlaybackAnimatedVolumeChangedEvent & {
     type: Event.PlaybackAnimatedVolumeChanged;
   };
+  [Event.RemoteBrowse]: { type: Event.RemoteBrowse };
+  [Event.RemoteCustomAction]: { type: Event.RemoteCustomAction };
 }

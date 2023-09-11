@@ -1,6 +1,7 @@
 package com.doublesymmetry.trackplayer.service
 
 import android.app.*
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
@@ -10,13 +11,16 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.RatingCompat
+import android.support.v4.media.MediaBrowserCompat.MediaItem
 import androidx.annotation.MainThread
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_LOW
+import androidx.media.utils.MediaConstants
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.models.NotificationButton.*
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
+import com.doublesymmetry.trackplayer.HeadlessJsMediaService
 import com.doublesymmetry.trackplayer.R as TrackPlayerR
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toMilliseconds
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toSeconds
@@ -30,7 +34,6 @@ import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
 import com.doublesymmetry.trackplayer.utils.AppForegroundTracker
 import com.doublesymmetry.trackplayer.utils.BundleUtils
 import com.doublesymmetry.trackplayer.utils.BundleUtils.setRating
-import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
 import com.google.android.exoplayer2.ui.R as ExoPlayerR
@@ -41,11 +44,21 @@ import kotlin.system.exitProcess
 import timber.log.Timber
 
 @MainThread
-class MusicService : HeadlessJsTaskService() {
+class MusicService : HeadlessJsMediaService() {
     private lateinit var player: QueuedAudioPlayer
     private val binder = MusicBinder()
     private val scope = MainScope()
     private var progressUpdateJob: Job? = null
+    var mediaTree: Map<String, List<MediaItem>> = HashMap()
+    var mediaTreeStyle: List<Int> = listOf(
+        MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM,
+        MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM)
+
+    @ExperimentalCoroutinesApi
+    override fun onCreate() {
+        Timber.tag("GVA-RNTP").d("RNTP musicservice created.")
+        super.onCreate()
+    }
 
     /**
      * Use [appKilledPlaybackBehavior] instead.
@@ -53,6 +66,36 @@ class MusicService : HeadlessJsTaskService() {
     @Deprecated("This will be removed soon")
     var stoppingAppPausesPlayback = true
         private set
+
+    override fun onGetRoot(
+            clientPackageName: String,
+            clientUid: Int,
+            rootHints: Bundle?
+    ): BrowserRoot {
+        // TODO: verify clientPackageName here.
+        val extras = Bundle()
+        extras.putInt(
+            MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE,
+            mediaTreeStyle[0]
+        )
+        extras.putInt(
+            MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_PLAYABLE,
+            mediaTreeStyle[1]
+        )
+        return BrowserRoot("/", extras)
+    }
+
+    override fun onLoadChildren(
+            parentMediaId: String,
+            result: Result<List<MediaItem>>
+    ) {
+        Timber.tag("GVA-RNTP").d("RNTP received loadChildren req: %s", parentMediaId)
+
+        emit(MusicEvents.BUTTON_BROWSE, Bundle().apply {
+            putString("mediaId", parentMediaId)
+        });
+        result.sendResult(mediaTree[parentMediaId])
+    }
 
     enum class AppKilledPlaybackBehavior(val string: String) {
         CONTINUE_PLAYBACK("continue-playback"), PAUSE_PLAYBACK("pause-playback"), STOP_PLAYBACK_AND_REMOVE_NOTIFICATION("stop-playback-and-remove-notification")
@@ -156,9 +199,37 @@ class MusicService : HeadlessJsTaskService() {
         )
 
         val automaticallyUpdateNotificationMetadata = playerOptions?.getBoolean(AUTO_UPDATE_METADATA, true) ?: true
+        val mediaSessionCallback = object: AAMediaSessionCallBack {
+            override fun handlePlayFromMediaId(mediaId: String?, extras: Bundle?) {
+                Timber.tag("GVA-RNTP").d("RNTP received req to play from mediaID: %s", mediaId)
+                val emitBundle = extras ?: Bundle()
+                emit(MusicEvents.BUTTON_PLAY_FROM_ID, emitBundle.apply {
+                    putString("id", mediaId)
+                })
+            }
 
-        player = QueuedAudioPlayer(this@MusicService, playerConfig, bufferConfig, cacheConfig)
+            override fun handlePlayFromSearch(query: String?, extras: Bundle?) {
+                Timber.tag("GVA-RNTP").d("RNTP received req to play from query: %s", query)
+                val emitBundle = extras ?: Bundle()
+                emit(MusicEvents.BUTTON_PLAY_FROM_SEARCH, emitBundle.apply {
+                    putString("query", query)
+                })
+            }
+
+            override fun handleSkipToQueueItem(id: Long) {
+                Timber.tag("GVA-RNTP").d("RNTP received req to play from queue index: %d", id)
+                val emitBundle = Bundle()
+                emit(MusicEvents.BUTTON_SKIP, emitBundle.apply {
+                    putInt("index", id.toInt())
+                })
+            }
+            override fun handleCustomActions(action: String?, extras: Bundle?) {
+                Timber.tag("GVA-RNTP").d("RNTP received req to play from queue index: %s", action)
+            }
+        }
+        player = QueuedAudioPlayer(this@MusicService, playerConfig, bufferConfig, cacheConfig, mediaSessionCallback)
         player.automaticallyUpdateNotificationMetadata = automaticallyUpdateNotificationMetadata
+        sessionToken = player.getMediaSessionToken()
         observeEvents()
         setupForegrounding()
     }
@@ -185,9 +256,10 @@ class MusicService : HeadlessJsTaskService() {
         capabilities = options.getIntegerArrayList("capabilities")?.map { Capability.values()[it] } ?: emptyList()
         notificationCapabilities = options.getIntegerArrayList("notificationCapabilities")?.map { Capability.values()[it] } ?: emptyList()
         compactCapabilities = options.getIntegerArrayList("compactCapabilities")?.map { Capability.values()[it] } ?: emptyList()
-
+        val customActions = options.getBundle(CUSTOM_ACTIONS_KEY)
+        val customActionsList = customActions?.getStringArrayList(CUSTOM_ACTIONS_LIST_KEY)
         if (notificationCapabilities.isEmpty()) notificationCapabilities = capabilities
-
+        Timber.tag("customactions debug").d(customActionsList.toString())
         val buttonsList = notificationCapabilities.mapNotNull {
             when (it) {
                 Capability.PLAY, Capability.PAUSE -> {
@@ -219,6 +291,12 @@ class MusicService : HeadlessJsTaskService() {
                     SEEK_TO
                 }
                 else -> { null }
+            }
+        }.toMutableList()
+        if (customActionsList != null) {
+            for (customAction in customActionsList ?: emptyList()) {
+                val customIcon = BundleUtils.getIcon(this, customActions, customAction, TrackPlayerR.drawable.exo_media_action_repeat_all)
+                buttonsList.add(CUSTOM_ACTION(icon=customIcon, customAction = customAction))
             }
         }
 
@@ -694,6 +772,13 @@ class MusicService : HeadlessJsTaskService() {
                             emit(MusicEvents.BUTTON_JUMP_BACKWARD, this)
                         }
                     }
+
+                    is MediaSessionCallback.CUSTOMACTION -> {
+                        Bundle().apply {
+                            putString("customAction", it.customAction)
+                            emit(MusicEvents.BUTTON_CUSTOM_ACTION, this)
+                        }
+                    }
                 }
             }
         }
@@ -762,8 +847,14 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     @MainThread
-    override fun onBind(intent: Intent?): IBinder {
-        return binder
+    override fun onBind(intent: Intent?): IBinder? {
+        // return super.onBind(intent)
+        val intentAction = intent?.action
+        return if (intentAction != null) {
+            super.onBind(intent)
+        } else {
+            binder
+        }
     }
 
     @MainThread
@@ -838,6 +929,9 @@ class MusicService : HeadlessJsTaskService() {
         const val MAX_CACHE_SIZE_KEY = "maxCacheSize"
 
         const val ANDROID_OPTIONS_KEY = "android"
+
+        const val CUSTOM_ACTIONS_KEY = "customActions"
+        const val CUSTOM_ACTIONS_LIST_KEY = "customActionsList"
 
         const val STOPPING_APP_PAUSES_PLAYBACK_KEY = "stoppingAppPausesPlayback"
         const val APP_KILLED_PLAYBACK_BEHAVIOR_KEY = "appKilledPlaybackBehavior"
