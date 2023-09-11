@@ -386,7 +386,7 @@ export const setAnimatedVolume = async ({
   init?: number;
   interval?: number;
   msg?: string;
-  callback?: () => void;
+  callback?: () => void | Promise<void>;
 }) => {
   if (init !== -1) {
     TrackPlayer.setVolume(init);
@@ -454,8 +454,8 @@ export const fadeOutNext = async (
       duration,
       interval,
       volume: 0,
-      callback: () => {
-        skipToNext();
+      callback: async () => {
+        await skipToNext();
         setAnimatedVolume({
           duration,
           interval,
@@ -484,8 +484,8 @@ export const fadeOutPrevious = async (
       duration,
       interval,
       volume: 0,
-      callback: () => {
-        skipToPrevious();
+      callback: async () => {
+        await skipToPrevious();
         setAnimatedVolume({
           duration,
           interval,
@@ -516,8 +516,8 @@ export const fadeOutJump = async (
       duration,
       interval,
       volume: 0,
-      callback: () => {
-        skip(index);
+      callback: async () => {
+        await skip(index);
         setAnimatedVolume({
           duration,
           interval,

@@ -66,6 +66,6 @@ export interface EventsPayloadByEvent {
   [Event.RemoteDislike]: { type: Event.RemoteDislike };
   [Event.RemoteBookmark]: { type: Event.RemoteBookmark };
   [Event.PlaybackAnimatedVolumeChanged]: PlaybackAnimatedVolumeChangedEvent & {
-    type: Event.PlaybackAnimatedVolumeChanged
+    type: Event.PlaybackAnimatedVolumeChanged;
   };
 }
