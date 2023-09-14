@@ -26,9 +26,10 @@ function determineIsPlaying(playWhenReady?: boolean, state?: State) {
   const isLoading = state === State.Loading || state === State.Buffering;
   const isErrored = state === State.Error;
   const isEnded = state === State.Ended;
+  const isNone = state === State.None;
 
   return {
-    playing: playWhenReady && !(isErrored || isEnded),
+    playing: playWhenReady && !(isErrored || isEnded || isNone),
     bufferingDuringPlay: playWhenReady && isLoading,
   };
 }
