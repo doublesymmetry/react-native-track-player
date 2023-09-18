@@ -7,6 +7,32 @@ import TrackPlayer from 'react-native-track-player';
 import {PlaybackService} from './services';
 import 'mux.js';
 
+/******************************************
+ * BEGIN: react-native-vector-icons import
+ ******************************************/
+// Generate required css
+// @ts-expect-error: ts doesn't like this for some reason
+import iconFont from 'react-native-vector-icons/Fonts/FontAwesome6_Solid.ttf';
+const iconFontStyles = `@font-face {
+  src: url(${iconFont});
+  font-family: FontAwesome6_Solid;
+}`;
+
+// Create stylesheet
+const style: any = document.createElement('style');
+style.type = 'text/css';
+if (style.styleSheet) {
+  style.styleSheet.cssText = iconFontStyles;
+} else {
+  style.appendChild(document.createTextNode(iconFontStyles));
+}
+
+// Inject stylesheet
+document.head.appendChild(style);
+/******************************************
+ * END: react-native-vector-icons import
+ ******************************************/
+
 const appName = 'Your app name';
 
 AppRegistry.registerComponent(appName, () => App);
