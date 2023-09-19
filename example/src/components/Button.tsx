@@ -36,7 +36,7 @@ export const Button: React.FC<ButtonProps> = ({
 
 const styles = StyleSheet.create({
   primary: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: '#FFD479',
     padding: 20,

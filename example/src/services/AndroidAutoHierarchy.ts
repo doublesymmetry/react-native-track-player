@@ -1,4 +1,6 @@
-const DemoAndroidAutoHierarchy = {
+import { AndroidAutoBrowseTree } from 'react-native-track-player';
+
+const DemoAndroidAutoHierarchy: AndroidAutoBrowseTree = {
   '/': [
     {
       mediaId: 'tab1',
@@ -29,6 +31,7 @@ const DemoAndroidAutoHierarchy = {
         'https://react-native-track-player.js.org/example/Soul%20Searching.jpeg',
       mediaUri:
         'https://react-native-track-player.js.org/example/Soul%20Searching.mp3',
+      groupTitle: 'RNTP Demo Group',
     },
   ],
 };

@@ -64,4 +64,5 @@ export interface EventsPayloadByEvent {
   [Event.RemoteLike]: { type: Event.RemoteLike };
   [Event.RemoteDislike]: { type: Event.RemoteDislike };
   [Event.RemoteBookmark]: { type: Event.RemoteBookmark };
+  [Event.RemoteBrowse]: { type: Event.RemoteBrowse };
 }

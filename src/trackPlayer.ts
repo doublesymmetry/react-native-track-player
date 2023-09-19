@@ -8,12 +8,7 @@ import {
 // @ts-expect-error because resolveAssetSource is untyped
 import { default as resolveAssetSource } from 'react-native/Libraries/Image/resolveAssetSource';
 
-import {
-  Event,
-  RepeatMode,
-  State,
-  AndroidAudioContentStyle,
-} from './constants';
+import { Event, RepeatMode, State, AndroidAutoContentStyle } from './constants';
 import type {
   AddTrack,
   EventPayloadByEvent,
@@ -25,7 +20,7 @@ import type {
   Track,
   TrackMetadataBase,
   UpdateOptions,
-  MediaItem,
+  AndroidAutoBrowseTree,
 } from './interfaces';
 
 const { TrackPlayerModule: TrackPlayer } = NativeModules;
@@ -61,7 +56,7 @@ function resolveImportedAsset(id?: number) {
  * the app to be in the foreground and try again.
  *
  * @param options The options to initialize the player with.
- * @see https://react-native-track-player.js.org/docs/api/functions/lifecycle
+ * @see https://rntp.dev/docs/api/functions/lifecycle
  */
 export async function setupPlayer(options: PlayerOptions = {}): Promise<void> {
   return TrackPlayer.setupPlayer(options);
@@ -223,13 +218,14 @@ export async function skipToPrevious(initialPosition = -1): Promise<void> {
  * Updates the configuration for the components.
  *
  * @param options The options to update.
- * @see https://react-native-track-player.js.org/docs/api/functions/player#updateoptionsoptions
+ * @see https://rntp.dev/docs/api/functions/player#updateoptionsoptions
  */
 export async function updateOptions({
   alwaysPauseOnInterruption,
   ...options
 }: UpdateOptions = {}): Promise<void> {
   return TrackPlayer.updateOptions({
+    ...options,
     android: {
       // Handle deprecated alwaysPauseOnInterruption option:
       alwaysPauseOnInterruption:
@@ -244,7 +240,6 @@ export async function updateOptions({
     nextIcon: resolveImportedAsset(options.nextIcon),
     rewindIcon: resolveImportedAsset(options.rewindIcon),
     forwardIcon: resolveImportedAsset(options.forwardIcon),
-    ...options,
   });
 }
 
@@ -274,6 +269,10 @@ export function clearNowPlayingMetadata(): Promise<void> {
   return TrackPlayer.clearNowPlayingMetadata();
 }
 
+/**
+ * Updates the metadata content of the notification (Android) and the Now Playing Center (iOS)
+ * without affecting the data stored for the current track.
+ */
 export function updateNowPlayingMetadata(
   metadata: NowPlayingMetadata
 ): Promise<void> {
@@ -372,7 +371,7 @@ export async function setRate(rate: number): Promise<void> {
  * Sets the queue.
  *
  * @param tracks The tracks to set as the queue.
- * @see https://react-native-track-player.js.org/docs/api/constants/repeat-mode
+ * @see https://rntp.dev/docs/api/constants/repeat-mode
  */
 export async function setQueue(tracks: Track[]): Promise<void> {
   return TrackPlayer.setQueue(tracks);
@@ -382,7 +381,7 @@ export async function setQueue(tracks: Track[]): Promise<void> {
  * Sets the queue repeat mode.
  *
  * @param repeatMode The repeat mode to set.
- * @see https://react-native-track-player.js.org/docs/api/constants/repeat-mode
+ * @see https://rntp.dev/docs/api/constants/repeat-mode
  */
 export async function setRepeatMode(mode: RepeatMode): Promise<RepeatMode> {
   return TrackPlayer.setRepeatMode(mode);
@@ -491,7 +490,7 @@ export async function getState(): Promise<State> {
 /**
  * Gets the playback state of the player.
  *
- * @see https://react-native-track-player.js.org/docs/api/constants/state
+ * @see https://rntp.dev/docs/api/constants/state
  */
 export async function getPlaybackState(): Promise<PlaybackState> {
   return TrackPlayer.getPlaybackState();
@@ -500,7 +499,7 @@ export async function getPlaybackState(): Promise<PlaybackState> {
 /**
  * Gets the queue repeat mode.
  *
- * @see https://react-native-track-player.js.org/docs/api/constants/repeat-mode
+ * @see https://rntp.dev/docs/api/constants/repeat-mode
  */
 export async function getRepeatMode(): Promise<RepeatMode> {
   return TrackPlayer.getRepeatMode();
@@ -522,9 +521,9 @@ export async function retry() {
  * @param browseTree the content hierarchy dict.
  * @returns a serialized copy of the browseTree set by native. For debug purposes.
  */
-export async function setBrowseTree(browseTree: {
-  [key: string]: MediaItem[];
-}): Promise<string> {
+export async function setBrowseTree(
+  browseTree: AndroidAutoBrowseTree
+): Promise<string> {
   if (Platform.OS !== 'android') return new Promise(() => '');
   return TrackPlayer.setBrowseTree(browseTree);
 }
@@ -536,8 +535,8 @@ export async function setBrowseTree(browseTree: {
  * false = the grid style.
  */
 export function setBrowseTreeStyle(
-  browsableStyle: AndroidAudioContentStyle,
-  playableStyle: AndroidAudioContentStyle
+  browsableStyle: AndroidAutoContentStyle,
+  playableStyle: AndroidAutoContentStyle
 ): null {
   if (Platform.OS !== 'android') return null;
   TrackPlayer.setBrowseTreeStyle(browsableStyle, playableStyle);

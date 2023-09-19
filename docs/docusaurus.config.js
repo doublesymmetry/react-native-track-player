@@ -8,7 +8,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
   title: 'React Native Track Player',
   tagline: 'A fully fledged audio module created for music apps',
-  url: 'https://react-native-track-player.js.org',
+  url: 'https://rntp.dev',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -94,6 +94,10 @@ const config = {
             title: 'Community',
             items: [
               {
+                label: 'GitHub',
+                href: 'https://github.com/doublesymmetry/react-native-track-player',
+              },
+              {
                 label: 'Discord',
                 href: 'https://discordapp.com/invite/ya2XDCR',
               },
@@ -107,25 +111,13 @@ const config = {
             title: 'More',
             items: [
               {
-                label: 'GitHub',
-                href: 'https://github.com/doublesymmetry/react-native-track-player',
-              },
-              {
                 label: 'Become A Sponsor',
                 href: 'https://github.com/sponsors/doublesymmetry',
-              },
-              {
-                label: 'Our Sponsors ❤️',
-                href: '/docs/sponsors',
-              },
-              {
-                label: 'Core Team ✨',
-                href: '/docs/core-team',
               },
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Double Symmetry GmbH. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Double Symmetry GmbH. All Rights Reserved.`,
       },
       prism: {
         theme: lightCodeTheme,

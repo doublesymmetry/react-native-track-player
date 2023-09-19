@@ -11,8 +11,11 @@
  import android.content.BroadcastReceiver;
  import android.content.Context;
  import android.content.Intent;
+ import android.net.Uri;
  import android.os.IBinder;
  import android.os.PowerManager;
+ import android.util.Log;
+
  import androidx.annotation.Nullable;
  import androidx.media.MediaBrowserServiceCompat;
  import com.facebook.infer.annotation.Assertions;
@@ -45,7 +48,9 @@
  
    private final Set<Integer> mActiveTasks = new CopyOnWriteArraySet<>();
    private static @Nullable PowerManager.WakeLock sWakeLock;
- 
+
+
+
    @Override
    public int onStartCommand(Intent intent, int flags, int startId) {
      HeadlessJsTaskConfig taskConfig = getTaskConfig(intent);
@@ -87,8 +92,19 @@
    public @Nullable IBinder onBind(Intent intent) {
     return super.onBind(intent);
    }
- 
-   /**
+
+     @Override
+     public void onCreate() {
+        Intent openAppIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
+        openAppIntent.setData(Uri.parse("trackplayer://service-created"));
+        openAppIntent.setAction(Intent.ACTION_VIEW);
+        openAppIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(openAppIntent);
+        super.onCreate();
+
+     }
+
+     /**
     * Start a task. This method handles starting a new React instance if required.
     *
     * <p>Has to be called on the UI thread.

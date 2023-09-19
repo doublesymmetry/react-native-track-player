@@ -53,7 +53,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.lovegaoshi:KotlinAudio:v2.0.0-aa13'
+    implementation 'com.github.lovegaoshi:KotlinAudio:v2.0.0-aa19'
     // used when building against local maven
 //    implementation "com.github.doublesymmetry:kotlin-audio:1.2.2"
 
@@ -63,7 +63,7 @@ dependencies {
     // Make sure we're using androidx
     implementation "androidx.core:core-ktx:1.9.0"
     implementation "androidx.localbroadcastmanager:localbroadcastmanager:1.1.0"
-    implementation "androidx.lifecycle:lifecycle-process:2.6.1"
+    implementation "androidx.lifecycle:lifecycle-process:2.5.1"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3"
     implementation 'androidx.media:media:1.6.0'
 }

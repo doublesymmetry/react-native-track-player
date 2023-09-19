@@ -1,8 +1,8 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import TrackPlayer, { usePlaybackState } from 'react-native-track-player';
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 
-import { Button } from './Button';
 import { PlaybackError } from './PlaybackError';
 import { PlayPauseButton } from './PlayPauseButton';
 
@@ -14,9 +14,13 @@ export const PlayerControls: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.row}>
-        <Button title="Prev" onPress={performSkipToPrevious} type="secondary" />
+        <TouchableWithoutFeedback onPress={performSkipToPrevious}>
+          <FontAwesome6 name={'backward'} size={30} color={'white'} />
+        </TouchableWithoutFeedback>
         <PlayPauseButton />
-        <Button title="Next" onPress={performSkipToNext} type="secondary" />
+        <TouchableWithoutFeedback onPress={performSkipToNext}>
+          <FontAwesome6 name={'forward'} size={30} color={'white'} />
+        </TouchableWithoutFeedback>
       </View>
       <PlaybackError
         error={'error' in playback ? playback.error.message : undefined}
@@ -32,5 +36,6 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
+    alignItems: 'center',
   },
 });

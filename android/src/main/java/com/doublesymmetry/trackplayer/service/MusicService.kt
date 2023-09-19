@@ -1,6 +1,7 @@
 package com.doublesymmetry.trackplayer.service
 
 import android.app.*
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
@@ -19,13 +20,13 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.models.NotificationButton.*
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
-import com.doublesymmetry.kotlinaudio.players.AAMediaSessionCallBack
 import com.doublesymmetry.trackplayer.HeadlessJsMediaService
 import com.doublesymmetry.trackplayer.R as TrackPlayerR
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toMilliseconds
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toSeconds
 import com.doublesymmetry.trackplayer.extensions.asLibState
 import com.doublesymmetry.trackplayer.extensions.find
+import com.doublesymmetry.trackplayer.model.PlaybackMetadata
 import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.model.TrackAudioItem
 import com.doublesymmetry.trackplayer.module.MusicEvents
@@ -52,6 +53,12 @@ class MusicService : HeadlessJsMediaService() {
     var mediaTreeStyle: List<Int> = listOf(
         MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM,
         MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM)
+
+    @ExperimentalCoroutinesApi
+    override fun onCreate() {
+        Timber.tag("GVA-RNTP").d("RNTP musicservice created.")
+        super.onCreate()
+    }
 
     /**
      * Use [appKilledPlaybackBehavior] instead.
@@ -82,6 +89,11 @@ class MusicService : HeadlessJsMediaService() {
             parentMediaId: String,
             result: Result<List<MediaItem>>
     ) {
+        Timber.tag("GVA-RNTP").d("RNTP received loadChildren req: %s", parentMediaId)
+
+        emit(MusicEvents.BUTTON_BROWSE, Bundle().apply {
+            putString("mediaId", parentMediaId)
+        });
         result.sendResult(mediaTree[parentMediaId])
     }
 
@@ -487,8 +499,8 @@ class MusicService : HeadlessJsMediaService() {
     }
 
     @MainThread
-    fun updateNotificationMetadata(title: String?, artist: String?, artwork: String?) {
-        player.notificationManager.notificationMetadata = NotificationMetadata(title, artist, artwork)
+    fun updateNowPlayingMetadata(track: Track) {
+        player.notificationManager.overrideMetadata(track.toAudioItem())
     }
 
     @MainThread
@@ -501,7 +513,7 @@ class MusicService : HeadlessJsMediaService() {
         previousIndex: Int?,
         oldPosition: Double
     ) {
-        var a = Bundle()
+        val a = Bundle()
         a.putDouble(POSITION_KEY, oldPosition)
         if (index != null) {
             a.putInt(NEXT_TRACK_KEY, index)
@@ -513,7 +525,7 @@ class MusicService : HeadlessJsMediaService() {
 
         emit(MusicEvents.PLAYBACK_TRACK_CHANGED, a)
 
-        var b = Bundle()
+        val b = Bundle()
         b.putDouble("lastPosition", oldPosition)
         if (tracks.size > 0) {
             b.putInt("index", player.currentIndex)
@@ -658,14 +670,13 @@ class MusicService : HeadlessJsMediaService() {
 
         scope.launch {
             event.audioItemTransition.collect {
-                var lastIndex: Int? = null
-                if (it is AudioItemTransitionReason.REPEAT) {
-                    lastIndex = player.currentIndex
-                } else if (player.previousItem != null) {
-                    lastIndex = player.previousIndex
+                if (it !is AudioItemTransitionReason.REPEAT) {
+                    emitPlaybackTrackChangedEvents(
+                        player.currentIndex,
+                        player.previousIndex,
+                        (it?.oldPosition ?: 0).toSeconds()
+                    )
                 }
-                var lastPosition = (it?.oldPosition ?: 0).toSeconds();
-                emitPlaybackTrackChangedEvents(player.currentIndex, lastIndex, lastPosition)
             }
         }
 
@@ -718,16 +729,24 @@ class MusicService : HeadlessJsMediaService() {
         }
 
         scope.launch {
-            event.onPlaybackMetadata.collect {
-                Bundle().apply {
-                    putString("source", it.source)
-                    putString("title", it.title)
-                    putString("url", it.url)
-                    putString("artist", it.artist)
-                    putString("album", it.album)
-                    putString("date", it.date)
-                    putString("genre", it.genre)
-                    emit(MusicEvents.PLAYBACK_METADATA, this)
+            event.onTimedMetadata.collect {
+                // TODO: Handle the different types of metadata and publish to new events
+                val metadata = PlaybackMetadata.fromId3Metadata(it)
+                    ?: PlaybackMetadata.fromIcy(it)
+                    ?: PlaybackMetadata.fromVorbisComment(it)
+                    ?: PlaybackMetadata.fromQuickTime(it)
+
+                if (metadata != null) {
+                    Bundle().apply {
+                        putString("source", metadata.source)
+                        putString("title", metadata.title)
+                        putString("url", metadata.url)
+                        putString("artist", metadata.artist)
+                        putString("album", metadata.album)
+                        putString("date", metadata.date)
+                        putString("genre", metadata.genre)
+                        emit(MusicEvents.PLAYBACK_METADATA, this)
+                    }
                 }
             }
         }
@@ -749,8 +768,8 @@ class MusicService : HeadlessJsMediaService() {
     }
 
     private fun getPlaybackErrorBundle(): Bundle {
-        var bundle = Bundle()
-        var error = playbackError
+        val bundle = Bundle()
+        val error = playbackError
         if (error?.message != null) {
             bundle.putString("message", error.message)
         }

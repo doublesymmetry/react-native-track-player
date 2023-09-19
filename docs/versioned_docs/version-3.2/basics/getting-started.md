@@ -61,7 +61,7 @@ const track2 = {
 };
 
 const track3 = {
-    url: 'file:///storage/sdcard0/Downloads/artwork.png', // Load media from the file system
+    url: 'file:///storage/sdcard0/Downloads/iceage.mp3', // Load media from the file system
     title: 'Ice Age',
     artist: 'deadmau5',
      // Load artwork from the file system:
@@ -69,7 +69,7 @@ const track3 = {
     duration: 411
 };
 
-// You can then [add](https://react-native-track-player.js.org/docs/api/functions/queue#addtracks-insertbeforeindex) the items to the queue
+// You can then [add](https://rntp.dev/docs/api/functions/queue#addtracks-insertbeforeindex) the items to the queue
 await TrackPlayer.add([track1, track2, track3]);
 ```
 
