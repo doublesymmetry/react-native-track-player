@@ -21,6 +21,6 @@ export interface RawEntry {
   commonKey: string | undefined;
   keySpace: string | undefined;
   time: number | undefined;
-  value: any | null;
+  value: unknown | null;
   key: string;
 }
