@@ -45,7 +45,7 @@ export interface EventPayloadByEvent {
   [Event.RemoteLike]: never;
   [Event.RemoteDislike]: never;
   [Event.RemoteBookmark]: never;
-  [Event.MetatadataChapterReceived]: AudioCommonMetadataReceivedEvent[];
+  [Event.MetadataChapterReceived]: AudioCommonMetadataReceivedEvent[];
   [Event.MetadataTimedReceived]: AudioCommonMetadataReceivedEvent;
   [Event.MetadataCommonReceived]: AudioCommonMetadataReceivedEvent[];
 }

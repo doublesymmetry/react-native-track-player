@@ -1,5 +1,4 @@
 export * from './EventPayloadByEvent';
-export * from './EventsPayloadByEvent';
 export * from './PlaybackActiveTrackChangedEvent';
 export * from './PlaybackErrorEvent';
 export * from './PlaybackMetadataReceivedEvent';

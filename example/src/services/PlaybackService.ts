@@ -60,8 +60,8 @@ export async function PlaybackService() {
     console.log('[Deprecated] Event.PlaybackMetadataReceived', event);
   });
 
-  TrackPlayer.addEventListener(Event.MetatadataChapterReceived, (event) => {
-    console.log('Event.MetatadataChapterReceived', event);
+  TrackPlayer.addEventListener(Event.MetadataChapterReceived, (event) => {
+    console.log('Event.MetadataChapterReceived', event);
   });
 
   TrackPlayer.addEventListener(Event.MetadataTimedReceived, (event) => {
