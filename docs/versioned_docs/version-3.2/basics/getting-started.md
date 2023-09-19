@@ -61,7 +61,7 @@ const track2 = {
 };
 
 const track3 = {
-    url: 'file:///storage/sdcard0/Downloads/artwork.png', // Load media from the file system
+    url: 'file:///storage/sdcard0/Downloads/iceage.mp3', // Load media from the file system
     title: 'Ice Age',
     artist: 'deadmau5',
      // Load artwork from the file system:

@@ -40,5 +40,13 @@
     "artist": "New York, NY",
     "artwork": "https://rntp.dev/example/smooth-jazz-24-7.jpeg",
     "isLiveStream": true
+  },
+  {
+    "url": "https://traffic.libsyn.com/atpfm/atp545.mp3",
+    "title": "Chapters"
+  },
+  {
+    "url": "https://kut.streamguys1.com/kutx-app.aac?listenerId=123456784123",
+    "title": "KUTX"
   }
 ]

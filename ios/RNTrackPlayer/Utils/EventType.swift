@@ -1,6 +1,6 @@
 import Foundation
 
-enum EventType: String {
+enum EventType: String, CaseIterable {
     case RemoteDuck = "remote-duck"
     case RemoteSeek = "remote-seek"
     case RemoteNext = "remote-next"
@@ -23,4 +23,11 @@ enum EventType: String {
     case PlaybackPlayWhenReadyChanged = "playback-play-when-ready-changed"
     case SleepTimerChanged = "sleep-timer-changed"
     case SleepTimerComplete = "sleep-timer-complete"
+    case MetadataChapterReceived = "metadata-chapter-received"
+    case MetadataTimedReceived = "metadata-timed-received"
+    case MetadataCommonReceived = "metadata-common-received"
+    
+    static func allRawValues() -> [String] {
+        return allCases.map { $0.rawValue }
+    }
 }

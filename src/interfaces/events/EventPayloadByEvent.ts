@@ -4,6 +4,7 @@ import type { PlaybackState } from '../PlaybackState';
 import type { PlaybackActiveTrackChangedEvent } from './PlaybackActiveTrackChangedEvent';
 import type { PlaybackErrorEvent } from './PlaybackErrorEvent';
 import type { PlaybackMetadataReceivedEvent } from './PlaybackMetadataReceivedEvent';
+import type { AudioCommonMetadataReceivedEvent } from './AudioCommonMetadataReceivedEvent';
 import type { PlaybackPlayWhenReadyChangedEvent } from './PlaybackPlayWhenReadyChangedEvent';
 import type { PlaybackProgressUpdatedEvent } from './PlaybackProgressUpdatedEvent';
 import type { PlaybackQueueEndedEvent } from './PlaybackQueueEndedEvent';
@@ -46,4 +47,7 @@ export interface EventPayloadByEvent {
   [Event.RemoteDislike]: never;
   [Event.RemoteBookmark]: never;
   [Event.PlaybackAnimatedVolumeChanged]: PlaybackAnimatedVolumeChangedEvent;
+  [Event.MetadataChapterReceived]: AudioCommonMetadataReceivedEvent[];
+  [Event.MetadataTimedReceived]: AudioCommonMetadataReceivedEvent;
+  [Event.MetadataCommonReceived]: AudioCommonMetadataReceivedEvent[];
 }
