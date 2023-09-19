@@ -216,7 +216,7 @@ Fired when the current track receives metadata encoded in - dynamic metadata tie
 
 Received data will be [`AudioTimedMetadataReceivedEvent`](./api/objects/metadata.md).
 
-### `AudioChapterMetadataReceived`
+### `AudioChapterMetadataReceived` (iOS only)
 Fired when the current track receives metadata encoded in - chapter overview data. Usually received at start.
 
 Received data will be [`AudioChapterMetadataReceivedEvent`](./api/objects/metadata.md).
