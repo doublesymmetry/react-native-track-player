@@ -22,6 +22,7 @@ export enum Event {
   /**
    * Fired when the current track receives metadata encoded in. (e.g. ID3 tags,
    * Icy Metadata, Vorbis Comments or QuickTime metadata).
+   * @deprecated use `AudioChapterMetadataReceived, AudioTimedMetadataReceived, AudioCommonMetadataReceived` instead.
    **/
   PlaybackMetadataReceived = 'playback-metadata-received',
   /**
@@ -115,4 +116,19 @@ export enum Event {
    * See https://rntp.dev/docs/api/events#remoteskip
    **/
   RemoteSkip = 'remote-skip',
+  /**
+   * (iOS only) Fired when chapter metadata is received.
+   * See https://rntp.dev/docs/api/events#chaptermetadatareceived
+   **/
+  MetadataChapterReceived = 'metadata-chapter-received',
+  /**
+   * Fired when metadata is received at a specific time in the audio.
+   * See https://rntp.dev/docs/api/events#timedmetadatareceived
+   **/
+  MetadataTimedReceived = 'metadata-timed-received',
+  /**
+   * Fired when common (static) metadata is received.
+   * See https://rntp.dev/docs/api/events#commonmetadatareceived
+   **/
+  MetadataCommonReceived = 'metadata-common-received',
 }

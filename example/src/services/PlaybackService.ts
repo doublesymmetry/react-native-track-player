@@ -57,7 +57,19 @@ export async function PlaybackService() {
   });
 
   TrackPlayer.addEventListener(Event.PlaybackMetadataReceived, (event) => {
-    console.log('Event.PlaybackMetadataReceived', event);
+    console.log('[Deprecated] Event.PlaybackMetadataReceived', event);
+  });
+
+  TrackPlayer.addEventListener(Event.MetadataChapterReceived, (event) => {
+    console.log('Event.MetadataChapterReceived', event);
+  });
+
+  TrackPlayer.addEventListener(Event.MetadataTimedReceived, (event) => {
+    console.log('Event.MetadataTimedReceived', event);
+  });
+
+  TrackPlayer.addEventListener(Event.MetadataCommonReceived, (event) => {
+    console.log('Event.MetadataCommonReceived', event);
   });
 
   TrackPlayer.addEventListener(
