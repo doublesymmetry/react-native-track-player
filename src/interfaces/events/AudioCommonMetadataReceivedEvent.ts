@@ -16,7 +16,7 @@ export interface AudioCommonMetadataReceivedEvent {
   creationYear: string | undefined;
   raw: RawEntry[];
 }
-  
+
 export interface RawEntry {
   commonKey: string | undefined;
   keySpace: string | undefined;

@@ -14,7 +14,11 @@ type EventTypeFromArray<T extends Event[]> = T[number];
  */
 export const useTrackPlayerEvents = <
   T extends Event[],
-  H extends (data: EventPayloadByEvent[EventTypeFromArray<T>] & { type: EventTypeFromArray<T> } ) => void
+  H extends (
+    data: EventPayloadByEvent[EventTypeFromArray<T>] & {
+      type: EventTypeFromArray<T>;
+    }
+  ) => void
 >(
   events: T,
   handler: H

@@ -120,15 +120,15 @@ export enum Event {
    * (iOS only) Fired when chapter metadata is received.
    * See https://rntp.dev/docs/api/events#chaptermetadatareceived
    **/
-  MetadataChapterReceived = "metadata-chapter-received",
+  MetadataChapterReceived = 'metadata-chapter-received',
   /**
    * Fired when metadata is received at a specific time in the audio.
    * See https://rntp.dev/docs/api/events#timedmetadatareceived
    **/
-  MetadataTimedReceived = "metadata-timed-received",
+  MetadataTimedReceived = 'metadata-timed-received',
   /**
    * Fired when common (static) metadata is received.
    * See https://rntp.dev/docs/api/events#commonmetadatareceived
    **/
-  MetadataCommonReceived = "metadata-common-received",
+  MetadataCommonReceived = 'metadata-common-received',
 }
