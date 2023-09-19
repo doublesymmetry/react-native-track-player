@@ -34,7 +34,9 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         EventEmitter.shared.register(eventEmitter: self)
         audioSessionController.delegate = self
         player.playWhenReady = false;
+        player.event.receiveChapterMetadata.addListener(self, handleAudioPlayerChapterMetadataReceived)
         player.event.receiveTimedMetadata.addListener(self, handleAudioPlayerTimedMetadataReceived)
+        player.event.receiveCommonMetadata.addListener(self, handleAudioPlayerCommonMetadataReceived)
         player.event.stateChange.addListener(self, handleAudioPlayerStateChange)
         player.event.fail.addListener(self, handleAudioPlayerFailed)
         player.event.currentItem.addListener(self, handleAudioPlayerCurrentItemChange)
@@ -98,7 +100,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
     @objc(supportedEvents)
     override public func supportedEvents() -> [String] {
-        return EventEmitter.shared.allEvents
+        return EventType.allRawValues()
     }
 
     private func emit(event: EventType, body: Any? = nil) {
@@ -808,77 +810,26 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             ] as [String : Any])
         }
     }
+    
+    func handleAudioPlayerCommonMetadataReceived(metadata: [AVMetadataItem]) {
+        let commonMetadata = MetadataAdapter.convertToCommonMetadata(metadata: metadata, skipRaw: true)
+        emit(event: EventType.MetadataCommonReceived, body: commonMetadata)
+    }
+    
+    func handleAudioPlayerChapterMetadataReceived(metadata: [AVTimedMetadataGroup]) {
+        let metadataItems = MetadataAdapter.convertToGroupedMetadata(metadataGroups: metadata);
+        emit(event: EventType.MetadataChapterReceived, body: metadataItems)
+    }
 
     func handleAudioPlayerTimedMetadataReceived(metadata: [AVTimedMetadataGroup]) {
-        // TODO: Handle the different types of metadata and publish to new events
+        let metadataItems = MetadataAdapter.convertToGroupedMetadata(metadataGroups: metadata);
+        emit(event: EventType.MetadataTimedReceived, body: metadataItems)
         
         // SwiftAudioEx was updated to return the array of timed metadata
         // Until we have support for that in RNTP, we take the first item to keep existing behaviour.
         let metadata = metadata.first?.items ?? []
-
-        func getMetadataItem(forIdentifier: AVMetadataIdentifier) -> String {
-            return AVMetadataItem.metadataItems(from: metadata, filteredByIdentifier: forIdentifier).first?.stringValue ?? ""
-        }
-
-        var source: String {
-            switch metadata.first?.keySpace {
-            case AVMetadataKeySpace.id3:
-                return "id3"
-            case AVMetadataKeySpace.icy:
-                return "icy"
-            case AVMetadataKeySpace.quickTimeMetadata:
-                return "quicktime"
-            case AVMetadataKeySpace.common:
-                return "unknown"
-            default: return "unknown"
-            }
-        }
-
-        let album = getMetadataItem(forIdentifier: .commonIdentifierAlbumName)
-        var artist = getMetadataItem(forIdentifier: .commonIdentifierArtist)
-        var title = getMetadataItem(forIdentifier: .commonIdentifierTitle)
-        var date = getMetadataItem(forIdentifier: .commonIdentifierCreationDate)
-        var url = "";
-        var genre = "";
-        if (source == "icy") {
-            url = getMetadataItem(forIdentifier: .icyMetadataStreamURL)
-        } else if (source == "id3") {
-            if (date.isEmpty) {
-                date = getMetadataItem(forIdentifier: .id3MetadataDate)
-            }
-            genre = getMetadataItem(forIdentifier: .id3MetadataContentType)
-            url = getMetadataItem(forIdentifier: .id3MetadataOfficialAudioSourceWebpage)
-            if (url.isEmpty) {
-                url = getMetadataItem(forIdentifier: .id3MetadataOfficialAudioFileWebpage)
-            }
-            if (url.isEmpty) {
-                url = getMetadataItem(forIdentifier: .id3MetadataOfficialArtistWebpage)
-            }
-        } else if (source == "quicktime") {
-            genre = getMetadataItem(forIdentifier: .quickTimeMetadataGenre)
-        }
-
-        // Detect ICY metadata and split title into artist & title:
-        // - source should be either "unknown" (pre iOS 14) or "icy" (iOS 14 and above)
-        // - we have a title, but no artist
-        if ((source == "unknown" || source == "icy") && !title.isEmpty && artist.isEmpty) {
-            if let index = title.range(of: " - ")?.lowerBound {
-                artist = String(title.prefix(upTo: index));
-                title = String(title.suffix(from: title.index(index, offsetBy: 3)));
-            }
-        }
-        var data : [String : String?] = [
-            "title": title.isEmpty ? nil : title,
-            "url": url.isEmpty ? nil : url,
-            "artist": artist.isEmpty ? nil : artist,
-            "album": album.isEmpty ? nil : album,
-            "date": date.isEmpty ? nil : date,
-            "genre": genre.isEmpty ? nil : genre
-        ]
-        if (data.values.contains { $0 != nil }) {
-            data["source"] = source
-            emit(event: EventType.PlaybackMetadataReceived, body: data)
-        }
+        let metadataItem = MetadataAdapter.legacyConversion(metadata: metadata)
+        emit(event: EventType.PlaybackMetadataReceived, body: metadataItem)
     }
 
     func handleAudioPlayerFailed(error: Error?) {

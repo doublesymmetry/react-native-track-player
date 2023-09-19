@@ -40,6 +40,9 @@ Fired when the queue reaches the end.
 | position | `number` | The previous track position in seconds    |
 
 ### `PlaybackMetadataReceived`
+
+**⚠️ Deprecated:** Please use `AudioChapterMetadataReceived`, `AudioTimedMetadataReceived`, `AudioCommonMetadataReceived`.
+
 Fired when the current track receives metadata encoded in. (e.g. ID3 tags, Icy Metadata, Vorbis Comments or QuickTime metadata).
 
 | Param    | Type     | Description                                         |
@@ -199,3 +202,21 @@ event in the following situations:
 | --------- | --------- | -------------------------------------------- |
 | paused    | `boolean` | On Android when `true` the player should pause playback, when `false` the player may resume playback. On iOS when `true` the playback was paused and when `false` the player may resume playback. |
 | permanent | `boolean` | Whether the interruption is permanent. On Android the player should stop playback.  |
+
+
+## Metadata
+
+### `AudioCommonMetadataReceived`
+Fired when the current track receives metadata encoded in - static metadata not tied to a time. Usually received at start.
+
+Received data will be [`AudioCommonMetadataReceivedEvent`](./api/objects/metadata.md) - `raw` will always be `undefined`.
+
+### `AudioTimedMetadataReceived`
+Fired when the current track receives metadata encoded in - dynamic metadata tied to a time. Events may be emitted over time.
+
+Received data will be [`AudioTimedMetadataReceivedEvent`](./api/objects/metadata.md).
+
+### `AudioChapterMetadataReceived` (iOS only)
+Fired when the current track receives metadata encoded in - chapter overview data. Usually received at start.
+
+Received data will be [`AudioChapterMetadataReceivedEvent`](./api/objects/metadata.md).
