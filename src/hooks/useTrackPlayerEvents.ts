@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 
 import { addEventListener } from '../trackPlayer';
 import { Event } from '../constants';
-import type { EventPayloadByEvent } from '../interfaces';
+import type { EventPayloadByEventWithType } from '../interfaces';
 
 /**
  * Attaches a handler to the given TrackPlayer events and performs cleanup on unmount
@@ -11,7 +11,7 @@ import type { EventPayloadByEvent } from '../interfaces';
  */
 export const useTrackPlayerEvents = <
   T extends Event[],
-  H extends (data: EventPayloadByEvent[T[number]]) => void
+  H extends (data: EventPayloadByEventWithType[T[number]]) => void
 >(
   events: T,
   handler: H
@@ -39,7 +39,7 @@ export const useTrackPlayerEvents = <
     const subs = events.map((type) =>
       addEventListener(type, (payload) => {
         // @ts-expect-error - we know the type is correct
-        savedHandler.current(payload);
+        savedHandler.current({ ...payload, type });
       })
     );
 

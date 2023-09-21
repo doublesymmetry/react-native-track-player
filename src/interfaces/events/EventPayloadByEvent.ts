@@ -19,59 +19,41 @@ import type { RemoteSeekEvent } from './RemoteSeekEvent';
 import type { RemoteSetRatingEvent } from './RemoteSetRatingEvent';
 import type { RemoteSkipEvent } from './RemoteSkipEvent';
 
-export interface EventPayloadByEvent {
-  [Event.PlayerError]: PlayerErrorEvent & { type: Event.PlayerError };
-  [Event.PlaybackState]: PlaybackState & { type: Event.PlaybackState };
-  [Event.PlaybackError]: PlaybackErrorEvent & { type: Event.PlaybackError };
-  [Event.PlaybackQueueEnded]: PlaybackQueueEndedEvent & {
-    type: Event.PlaybackQueueEnded;
-  };
-  [Event.PlaybackTrackChanged]: PlaybackTrackChangedEvent & {
-    type: Event.PlaybackTrackChanged;
-  };
-  [Event.PlaybackActiveTrackChanged]: PlaybackActiveTrackChangedEvent & {
-    type: Event.PlaybackActiveTrackChanged;
-  };
-  [Event.PlaybackMetadataReceived]: PlaybackMetadataReceivedEvent & {
-    type: Event.PlaybackMetadataReceived;
-  };
-  [Event.PlaybackPlayWhenReadyChanged]: PlaybackPlayWhenReadyChangedEvent & {
-    type: Event.PlaybackPlayWhenReadyChanged;
-  };
-  [Event.PlaybackProgressUpdated]: PlaybackProgressUpdatedEvent & {
-    type: Event.PlaybackProgressUpdated;
-  };
-  [Event.RemotePlay]: { type: Event.RemotePlay };
-  [Event.RemotePlayId]: RemotePlayIdEvent & { type: Event.RemotePlayId };
-  [Event.RemotePlaySearch]: RemotePlaySearchEvent & {
-    type: Event.RemotePlaySearch;
-  };
-  [Event.RemotePause]: { type: Event.RemotePause };
-  [Event.RemoteStop]: { type: Event.RemoteStop };
-  [Event.RemoteSkip]: RemoteSkipEvent & { type: Event.RemoteSkip };
-  [Event.RemoteNext]: { type: Event.RemoteNext };
-  [Event.RemotePrevious]: { type: Event.RemotePrevious };
-  [Event.RemoteJumpForward]: RemoteJumpForwardEvent & {
-    type: Event.RemoteJumpForward;
-  };
-  [Event.RemoteJumpBackward]: RemoteJumpBackwardEvent & {
-    type: Event.RemoteJumpBackward;
-  };
-  [Event.RemoteSeek]: RemoteSeekEvent & { type: Event.RemoteSeek };
-  [Event.RemoteSetRating]: RemoteSetRatingEvent & {
-    type: Event.RemoteSetRating;
-  };
-  [Event.RemoteDuck]: RemoteDuckEvent & { type: Event.RemoteDuck };
-  [Event.RemoteLike]: { type: Event.RemoteLike };
-  [Event.RemoteDislike]: { type: Event.RemoteDislike };
-  [Event.RemoteBookmark]: { type: Event.RemoteBookmark };
-  [Event.MetadataChapterReceived]: AudioCommonMetadataReceivedEvent[] & {
-    type: Event.MetadataChapterReceived;
-  };
-  [Event.MetadataTimedReceived]: AudioCommonMetadataReceivedEvent & {
-    type: Event.MetadataTimedReceived;
-  };
-  [Event.MetadataCommonReceived]: AudioCommonMetadataReceivedEvent[] & {
-    type: Event.MetadataCommonReceived;
-  };
-}
+export type EventPayloadByEvent = {
+  [Event.PlayerError]: PlayerErrorEvent;
+  [Event.PlaybackState]: PlaybackState;
+  [Event.PlaybackError]: PlaybackErrorEvent;
+  [Event.PlaybackQueueEnded]: PlaybackQueueEndedEvent;
+  [Event.PlaybackTrackChanged]: PlaybackTrackChangedEvent;
+  [Event.PlaybackActiveTrackChanged]: PlaybackActiveTrackChangedEvent;
+  [Event.PlaybackMetadataReceived]: PlaybackMetadataReceivedEvent;
+  [Event.PlaybackPlayWhenReadyChanged]: PlaybackPlayWhenReadyChangedEvent;
+  [Event.PlaybackProgressUpdated]: PlaybackProgressUpdatedEvent;
+  [Event.RemotePlay]: never;
+  [Event.RemotePlayId]: RemotePlayIdEvent;
+  [Event.RemotePlaySearch]: RemotePlaySearchEvent;
+  [Event.RemotePause]: never;
+  [Event.RemoteStop]: never;
+  [Event.RemoteSkip]: RemoteSkipEvent;
+  [Event.RemoteNext]: never;
+  [Event.RemotePrevious]: never;
+  [Event.RemoteJumpForward]: RemoteJumpForwardEvent;
+  [Event.RemoteJumpBackward]: RemoteJumpBackwardEvent;
+  [Event.RemoteSeek]: RemoteSeekEvent;
+  [Event.RemoteSetRating]: RemoteSetRatingEvent;
+  [Event.RemoteDuck]: RemoteDuckEvent;
+  [Event.RemoteLike]: never;
+  [Event.RemoteDislike]: never;
+  [Event.RemoteBookmark]: never;
+  [Event.MetadataChapterReceived]: AudioCommonMetadataReceivedEvent[];
+  [Event.MetadataTimedReceived]: AudioCommonMetadataReceivedEvent;
+  [Event.MetadataCommonReceived]: AudioCommonMetadataReceivedEvent[];
+};
+
+type Simplify<T> = { [KeyType in keyof T]: T[KeyType] } & {};
+
+export type EventPayloadByEventWithType = {
+  [K in keyof EventPayloadByEvent]: EventPayloadByEvent[K] extends never
+    ? { type: K }
+    : Simplify<EventPayloadByEvent[K] & { type: K }>;
+};
