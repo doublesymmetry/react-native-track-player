@@ -113,14 +113,12 @@ class Track: AudioItem, TimePitching, AssetOptionsProviding {
                 return .varispeed
             case PitchAlgorithm.music.rawValue:
                 return .spectral
-            case PitchAlgorithm.voice.rawValue:
+            default: // voice
                 return .timeDomain
-            default:
-                return .lowQualityZeroLatency
             }
         }
 
-        return .lowQualityZeroLatency
+        return .timeDomain
     }
 
     // MARK: - Authorizing Protocol
