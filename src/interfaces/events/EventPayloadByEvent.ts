@@ -50,6 +50,7 @@ export type EventPayloadByEvent = {
   [Event.MetadataCommonReceived]: AudioCommonMetadataReceivedEvent[];
 };
 
+// eslint-disable-next-line
 type Simplify<T> = { [KeyType in keyof T]: T[KeyType] } & {};
 
 export type EventPayloadByEventWithType = {
