@@ -19,7 +19,7 @@ import type { RemoteSeekEvent } from './RemoteSeekEvent';
 import type { RemoteSetRatingEvent } from './RemoteSetRatingEvent';
 import type { RemoteSkipEvent } from './RemoteSkipEvent';
 
-export interface EventPayloadByEvent {
+export type EventPayloadByEvent = {
   [Event.PlayerError]: PlayerErrorEvent;
   [Event.PlaybackState]: PlaybackState;
   [Event.PlaybackError]: PlaybackErrorEvent;
@@ -48,4 +48,13 @@ export interface EventPayloadByEvent {
   [Event.MetadataChapterReceived]: AudioCommonMetadataReceivedEvent[];
   [Event.MetadataTimedReceived]: AudioCommonMetadataReceivedEvent;
   [Event.MetadataCommonReceived]: AudioCommonMetadataReceivedEvent[];
-}
+};
+
+// eslint-disable-next-line
+type Simplify<T> = { [KeyType in keyof T]: T[KeyType] } & {};
+
+export type EventPayloadByEventWithType = {
+  [K in keyof EventPayloadByEvent]: EventPayloadByEvent[K] extends never
+    ? { type: K }
+    : Simplify<EventPayloadByEvent[K] & { type: K }>;
+};
