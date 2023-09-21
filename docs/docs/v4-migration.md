@@ -57,6 +57,9 @@ instead of `null`
 
 1. `clearMetadata()` - Instead use [`reset()`](./api/functions/player.md#reset) - which stops playback, clears the queue and clears the notification.
 
+### General Changes
+1. on iOS pitch algorithm defaults to `timeDomain` instead of `lowQualityZeroLatency`. It has been deprecated by Apple and has a few bugs on iOS 17.
+
 ### Typescript Imports
 
 1. If you were using deep imports from RNTP, the `src` has been completely
