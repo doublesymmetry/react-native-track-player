@@ -4,9 +4,6 @@ import { addEventListener } from '../trackPlayer';
 import { Event } from '../constants';
 import type { EventPayloadByEvent } from '../interfaces';
 
-// Helper that gets the type of the event payload for a given event type
-type EventTypeFromArray<T extends Event[]> = T[number];
-
 /**
  * Attaches a handler to the given TrackPlayer events and performs cleanup on unmount
  * @param events - TrackPlayer events to subscribe to
@@ -14,11 +11,7 @@ type EventTypeFromArray<T extends Event[]> = T[number];
  */
 export const useTrackPlayerEvents = <
   T extends Event[],
-  H extends (
-    data: EventPayloadByEvent[EventTypeFromArray<T>] & {
-      type: EventTypeFromArray<T>;
-    }
-  ) => void
+  H extends (data: EventPayloadByEvent[T[number]]) => void
 >(
   events: T,
   handler: H
@@ -46,7 +39,7 @@ export const useTrackPlayerEvents = <
     const subs = events.map((type) =>
       addEventListener(type, (payload) => {
         // @ts-expect-error - we know the type is correct
-        savedHandler.current({ ...payload, type });
+        savedHandler.current(payload);
       })
     );
 
