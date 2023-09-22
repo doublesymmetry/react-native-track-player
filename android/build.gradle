@@ -49,7 +49,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.doublesymmetry:kotlinaudio:v2.0.0-rc14'
+    implementation 'com.github.doublesymmetry:kotlinaudio:v2.0.0-rc15'
     // used when building against local maven
 //    implementation "com.github.doublesymmetry:kotlin-audio:1.2.2"
 
