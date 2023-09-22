@@ -1,3 +1,12 @@
+# [4.0.0-rc09](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc08...v4.0.0-rc09) (2023-09-22)
+
+* **RN:** useIsPlaying hook now takes into account `none` state
+* **ios:** Fixes issue where rate was being reset to 1 on play
+* **ios:** Deactivates session before activating on play to avoid issues when losing focus in some scenarios
+* **RN:** Deprecated `Event.PlaybackMetadataReceived` and introduces three new events: [`Event.AudioChapterMetadataReceived`, `Event.AudioTimedMetadataReceived`, `Event.AudioCommonMetadataReceived`]
+* **ios:** Change default pitch algorithm to `timeDomain` instead of `lowQualityZeroLatency`
+* **android:** Fixes progress in notification for HLS audio
+
 # [4.0.0-rc08](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc07...v4.0.0-rc08) (2023-09-07)
 
 * **RN:** Undeprecate updateNowPlayingMetadata
