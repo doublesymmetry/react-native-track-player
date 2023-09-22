@@ -63,9 +63,9 @@ Fired at the `progressUpdateEventInterval` if the player is playing _and_ if a `
 
 | Param       | Type     | Description       |
 | ----------- | -------- | ----------------- |
-| position    | `number` | See [`getPosition`](./functions/player.md#getposition)                 |
-| duration    | `number` | See [`getDuration`](./functions/player.md#getduration)                 |
-| buffer      | `number` | See [`getBufferedPosition`](./functions/player.md#getbufferedpostion)  |
+| position    | `number` | See [`getProgress`](./functions/player.md#getProgress)                 |
+| duration    | `number` | See [`getProgress`](./functions/player.md#getProgress)                 |
+| buffered      | `number` | See [`getProgress`](./functions/player.md#getProgress)  |
 | track       | `number` | The current index in the queue of the track.                           |
 
 ### `PlaybackError`
