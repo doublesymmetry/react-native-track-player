@@ -30,6 +30,11 @@ return `{ state: undefined}` initially before it has finished retrieving the
 current state. Before it was incorrectly returning
 [`State.None`](./api/constants/state.md) which means no track is loaded.
 
+### `remove()` supports removing current track
+You can now remove the current track with `remove()`. This was not allowed before.
+1. If the current track is removed, the next track will activated.
+2. If the current track was the last track in the queue, the first track will be activated.
+
 ### `getTrack` return type
 
 [`getTrack()`](./api/functions/queue.md#gettrack) now returns  `undefined`
