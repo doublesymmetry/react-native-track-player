@@ -103,6 +103,9 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         val mediaUri = hashmap["mediaUri"]
         val iconUri = hashmap["iconUri"]
         val groupTitle = hashmap["groupTitle"]
+        val contentStyle = hashmap["contentStyle"]
+        val childrenPlayableContentStyle = hashmap["childrenPlayableContentStyle"]
+        val childrenBrowsableContentStyle = hashmap["childrenBrowsableContentStyle"]
         val playableFlag = if (hashmap["playable"]?.toInt() == 1) MediaItem.FLAG_BROWSABLE else MediaItem.FLAG_PLAYABLE
 
         val mediaDescriptionBuilder = MediaDescriptionCompat.Builder()
@@ -111,8 +114,35 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         mediaDescriptionBuilder.setSubtitle(subtitle)
         mediaDescriptionBuilder.setMediaUri(if (mediaUri != null) Uri.parse(mediaUri) else null)
         mediaDescriptionBuilder.setIconUri(if (iconUri != null) Uri.parse(iconUri) else null)
-        if (groupTitle != null) {
+        if (groupTitle != null
+                || contentStyle != null
+                || childrenPlayableContentStyle != null
+                || childrenBrowsableContentStyle != null) {
             val extras = Bundle()
+            if (groupTitle != null) {
+                extras.putString(
+                        MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_GROUP_TITLE,
+                        groupTitle
+                )
+            }
+            if (contentStyle != null) {
+                extras.putInt(
+                        MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_SINGLE_ITEM,
+                        contentStyle.toInt()
+                )
+            }
+            if (childrenPlayableContentStyle != null) {
+                extras.putInt(
+                        MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_PLAYABLE,
+                        childrenPlayableContentStyle.toInt()
+                )
+            }
+            if (childrenBrowsableContentStyle != null) {
+                extras.putInt(
+                        MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE,
+                        childrenBrowsableContentStyle.toInt()
+                )
+            }
             extras.putString(
                 MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_GROUP_TITLE,
                 groupTitle)
