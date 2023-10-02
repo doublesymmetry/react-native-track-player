@@ -292,17 +292,18 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     }
 
 
-    private func configureAudioSession(setActive: Bool = false) {
-        if #available(iOS 13.0, *) {
-            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: sessionCategoryPolicy, options: sessionCategoryOptions)
-        } else if #available(iOS 11.0, *) {
-            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: sessionCategoryPolicy, options: sessionCategoryOptions)
+    private func configureAudioSession() {
+        if (player.currentItem != nil) {
+            if (player.playWhenReady) {
+                try? audioSessionController.activateSession()
+            }
+            if #available(iOS 11.0, *) {
+                try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: sessionCategoryPolicy, options: sessionCategoryOptions)
+            } else {
+                try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, options: sessionCategoryOptions)
+            }
         } else {
-            try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, options: sessionCategoryOptions)
-        }
-        if (setActive) {
             try? audioSessionController.deactivateSession()
-            try? audioSessionController.activateSession()
         }
     }
 
@@ -521,8 +522,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     @objc(play:rejecter:)
     public func play(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
-
-        configureAudioSession(setActive: true)
         player.play()
         resolve(NSNull())
     }
@@ -538,9 +537,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     @objc(setPlayWhenReady:resolver:rejecter:)
     public func setPlayWhenReady(playWhenReady: Bool, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
-        if (playWhenReady) {
-            configureAudioSession(setActive: true)
-        }
         player.playWhenReady = playWhenReady
         resolve(NSNull())
     }
@@ -860,6 +856,10 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
             }
         }
 
+        if ((item != nil && lastItem == nil) || item == nil) {
+            configureAudioSession();
+        }
+
         var a: Dictionary<String, Any> = ["lastPosition": lastPosition ?? 0]
         if let lastIndex = lastIndex {
             a["lastIndex"] = lastIndex
@@ -908,6 +908,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     }
 
     func handlePlayWhenReadyChange(playWhenReady: Bool) {
+        configureAudioSession();
         emit(
             event: EventType.PlaybackPlayWhenReadyChanged,
             body: [
