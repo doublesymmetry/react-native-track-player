@@ -114,40 +114,32 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         mediaDescriptionBuilder.setSubtitle(subtitle)
         mediaDescriptionBuilder.setMediaUri(if (mediaUri != null) Uri.parse(mediaUri) else null)
         mediaDescriptionBuilder.setIconUri(if (iconUri != null) Uri.parse(iconUri) else null)
-        if (groupTitle != null
-                || contentStyle != null
-                || childrenPlayableContentStyle != null
-                || childrenBrowsableContentStyle != null) {
-            val extras = Bundle()
-            if (groupTitle != null) {
-                extras.putString(
-                        MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_GROUP_TITLE,
-                        groupTitle
-                )
-            }
-            if (contentStyle != null) {
-                extras.putInt(
-                        MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_SINGLE_ITEM,
-                        contentStyle.toInt()
-                )
-            }
-            if (childrenPlayableContentStyle != null) {
-                extras.putInt(
-                        MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_PLAYABLE,
-                        childrenPlayableContentStyle.toInt()
-                )
-            }
-            if (childrenBrowsableContentStyle != null) {
-                extras.putInt(
-                        MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE,
-                        childrenBrowsableContentStyle.toInt()
-                )
-            }
+        val extras = Bundle()
+        if (groupTitle != null) {
             extras.putString(
-                MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_GROUP_TITLE,
-                groupTitle)
-            mediaDescriptionBuilder.setExtras(extras)
+                    MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_GROUP_TITLE,
+                    groupTitle
+            )
         }
+        if (contentStyle != null) {
+            extras.putInt(
+                    MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_SINGLE_ITEM,
+                    contentStyle.toInt()
+            )
+        }
+        if (childrenPlayableContentStyle != null) {
+            extras.putInt(
+                    MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_PLAYABLE,
+                    childrenPlayableContentStyle.toInt()
+            )
+        }
+        if (childrenBrowsableContentStyle != null) {
+            extras.putInt(
+                    MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE,
+                    childrenBrowsableContentStyle.toInt()
+            )
+        }
+        mediaDescriptionBuilder.setExtras(extras)
         return MediaItem(mediaDescriptionBuilder.build(), playableFlag)
     }
 
@@ -711,9 +703,9 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     fun setBrowseTreeStyle(browsableStyle: Int, playableStyle: Int, callback: Promise) = scope.launch {
         fun getStyle(check: Int): Int {
             return when (check) {
-                1 -> MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_GRID_ITEM
-                2 -> MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_CATEGORY_LIST_ITEM
-                3 -> MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_CATEGORY_GRID_ITEM
+                2 -> MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_GRID_ITEM
+                3 -> MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_CATEGORY_LIST_ITEM
+                4 -> MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_CATEGORY_GRID_ITEM
                 else -> MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM
             }
         }

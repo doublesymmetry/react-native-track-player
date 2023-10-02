@@ -1,4 +1,4 @@
-import { AndroidAutoBrowseTree } from 'react-native-track-player';
+import { AndroidAutoBrowseTree, AndroidAutoContentStyle } from 'react-native-track-player';
 
 const DemoAndroidAutoHierarchy: AndroidAutoBrowseTree = {
   '/': [
@@ -7,6 +7,7 @@ const DemoAndroidAutoHierarchy: AndroidAutoBrowseTree = {
       title: 'tab1',
       subtitle: 'tab subtitle',
       playable: '1',
+      childrenBrowsableContentStyle: AndroidAutoContentStyle.Grid
     },
     {
       mediaId: 'tab2',

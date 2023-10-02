@@ -3,8 +3,8 @@
  * https://developer.android.com/training/cars/media#apply_content_style
  */
 export enum AndroidAutoContentStyle {
-  List = 0,
-  Grid = 1,
-  CategoryList = 2,
-  CategoryGrid = 3,
+  List = 1,
+  Grid = 2,
+  CategoryList = 3,
+  CategoryGrid = 4,
 }
