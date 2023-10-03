@@ -46,8 +46,8 @@ export type EventPayloadByEvent = {
   [Event.RemoteDislike]: never;
   [Event.RemoteBookmark]: never;
   [Event.MetadataChapterReceived]: AudioCommonMetadataReceivedEvent[];
-  [Event.MetadataTimedReceived]: AudioCommonMetadataReceivedEvent;
-  [Event.MetadataCommonReceived]: AudioCommonMetadataReceivedEvent[];
+  [Event.MetadataTimedReceived]: AudioCommonMetadataReceivedEvent[];
+  [Event.MetadataCommonReceived]: AudioCommonMetadataReceivedEvent;
 };
 
 // eslint-disable-next-line
