@@ -56,6 +56,6 @@ type Simplify<T> = { [KeyType in keyof T]: T[KeyType] } & {};
 
 export type EventPayloadByEventWithType = {
   [K in keyof EventPayloadByEvent]: EventPayloadByEvent[K] extends never
-  ? { type: K }
-  : Simplify<EventPayloadByEvent[K] & { type: K }>;
+    ? { type: K }
+    : Simplify<EventPayloadByEvent[K] & { type: K }>;
 };
