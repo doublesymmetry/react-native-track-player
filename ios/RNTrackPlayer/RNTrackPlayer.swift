@@ -293,17 +293,22 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
 
     private func configureAudioSession() {
-        if (player.currentItem != nil) {
-            if (player.playWhenReady) {
-                try? audioSessionController.activateSession()
-            }
+
+        // deactivate the session when there is no current item to be played
+        if (player.currentItem == nil) {
+            try? audioSessionController.deactivateSession()
+            return
+        // activate the audio session when there is an item to be played
+        // and the player has been configured to start when it is ready loading:
+        }
+        
+        if (player.playWhenReady) {
+            try? audioSessionController.activateSession()
             if #available(iOS 11.0, *) {
                 try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: sessionCategoryPolicy, options: sessionCategoryOptions)
             } else {
                 try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, options: sessionCategoryOptions)
             }
-        } else {
-            try? audioSessionController.deactivateSession()
         }
     }
 
