@@ -594,7 +594,6 @@ class MusicService : HeadlessJsTaskService() {
 
                 if (it == AudioPlayerState.ENDED && player.nextItem == null) {
                     emitQueueEndedEvent()
-                    emitPlaybackTrackChangedEvents(null, player.currentIndex, player.position.toSeconds())
                 }
             }
         }
