@@ -1,3 +1,24 @@
+# [4.0.0-web.10](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc08...v4.0.0-web.10) (2023-10-12)
+
+
+### Bug Fixes
+
+* **android:** Allow updating duration in notification ([#2157](https://github.com/doublesymmetry/react-native-track-player/issues/2157)) ([e28536c](https://github.com/doublesymmetry/react-native-track-player/commit/e28536c4b3312d6ccb76c43cc7f7fdd86d1fac41))
+* **android:** Fix key in progress updated event ([#2135](https://github.com/doublesymmetry/react-native-track-player/issues/2135)) ([f7c6762](https://github.com/doublesymmetry/react-native-track-player/commit/f7c676218595de751134f34906dccb0ebdcc1bff))
+* **example:** update tsconfig extension path ([4e0e1f0](https://github.com/doublesymmetry/react-native-track-player/commit/4e0e1f01cad134e9a14e604e5d188cf072e2929b))
+* **rate:** Fix rate for iOS ([#2128](https://github.com/doublesymmetry/react-native-track-player/issues/2128)) ([1bf0db1](https://github.com/doublesymmetry/react-native-track-player/commit/1bf0db14f9320e6a9174e72d228881c678c42928))
+* **ts:** Fix type inference in useTrackPlayerEvents ([#2131](https://github.com/doublesymmetry/react-native-track-player/issues/2131)) ([fff7940](https://github.com/doublesymmetry/react-native-track-player/commit/fff7940d1bd08f5b62a26249a8d2e71ccf77d310))
+* **types:** MetadataTimedReceived payload type ([#2148](https://github.com/doublesymmetry/react-native-track-player/issues/2148)) ([2b53b88](https://github.com/doublesymmetry/react-native-track-player/commit/2b53b88d98d3e53e1b13e1eab3271b85dec7eff6))
+* useIsPlaying hook does not cover 'none' state ([#2125](https://github.com/doublesymmetry/react-native-track-player/issues/2125)) ([1a6bc5b](https://github.com/doublesymmetry/react-native-track-player/commit/1a6bc5b54503e57537f44fa5e5c025e177abb154))
+
+
+### Features
+
+* **web:** add a web implementation ([5268c2f](https://github.com/doublesymmetry/react-native-track-player/commit/5268c2fb85bbaa19c7b72854060b3f531f78023d))
+* **web:** prevent exceptions during SSR due to inability to import shaka player ([875613e](https://github.com/doublesymmetry/react-native-track-player/commit/875613ecde9314cb4cba4693992cd01a52b3aca6))
+
+
+
 # [4.0.0-rc09](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc08...v4.0.0-rc09) (2023-09-22)
 
 * **RN:** useIsPlaying hook now takes into account `none` state
