@@ -31,6 +31,7 @@ import com.doublesymmetry.trackplayer.model.PlaybackMetadata
 import com.doublesymmetry.trackplayer.model.Track
 import com.doublesymmetry.trackplayer.model.TrackAudioItem
 import com.doublesymmetry.trackplayer.module.MusicEvents
+import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.METADATA_PAYLOAD_KEY
 import com.doublesymmetry.trackplayer.utils.BundleUtils
 import com.doublesymmetry.trackplayer.utils.BundleUtils.setRating
 import com.facebook.react.bridge.Arguments
@@ -663,7 +664,6 @@ class MusicService : HeadlessJsMediaService() {
 
                 if (it == AudioPlayerState.ENDED && player.nextItem == null) {
                     emitQueueEndedEvent()
-                    emitPlaybackTrackChangedEvents(null, player.currentIndex, player.position.toSeconds())
                 }
             }
         }
@@ -731,7 +731,10 @@ class MusicService : HeadlessJsMediaService() {
         scope.launch {
             event.onTimedMetadata.collect {
                 val data = MetadataAdapter.fromMetadata(it)
-                emitList(MusicEvents.METADATA_TIMED_RECEIVED, data)
+                val bundle = Bundle().apply {
+                    putParcelableArrayList(METADATA_PAYLOAD_KEY, ArrayList(data))
+                }
+                emit(MusicEvents.METADATA_TIMED_RECEIVED, bundle)
 
                 // TODO: Handle the different types of metadata and publish to new events
                 val metadata = PlaybackMetadata.fromId3Metadata(it)
@@ -757,7 +760,10 @@ class MusicService : HeadlessJsMediaService() {
         scope.launch {
             event.onCommonMetadata.collect {
                 val data = MetadataAdapter.fromMediaMetadata(it)
-                emit(MusicEvents.METADATA_COMMON_RECEIVED, data)
+                val bundle = Bundle().apply {
+                    putBundle(METADATA_PAYLOAD_KEY, data)
+                }
+                emit(MusicEvents.METADATA_COMMON_RECEIVED, bundle)
             }
         }
 
@@ -877,7 +883,7 @@ class MusicService : HeadlessJsMediaService() {
         const val NEXT_TRACK_KEY = "nextTrack"
         const val POSITION_KEY = "position"
         const val DURATION_KEY = "duration"
-        const val BUFFERED_POSITION_KEY = "buffer"
+        const val BUFFERED_POSITION_KEY = "buffered"
 
         const val TASK_KEY = "TrackPlayer"
 

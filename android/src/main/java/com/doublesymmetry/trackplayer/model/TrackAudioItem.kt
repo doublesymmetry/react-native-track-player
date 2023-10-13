@@ -12,6 +12,6 @@ data class TrackAudioItem(
     override var title: String? = null,
     override var albumTitle: String? = null,
     override val artwork: String? = null,
-    override val duration: Long = -1,
+    override val duration: Long? = null,
     override val options: AudioItemOptions? = null
 ): AudioItem

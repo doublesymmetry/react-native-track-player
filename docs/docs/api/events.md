@@ -63,9 +63,9 @@ Fired at the `progressUpdateEventInterval` if the player is playing _and_ if a `
 
 | Param       | Type     | Description       |
 | ----------- | -------- | ----------------- |
-| position    | `number` | See [`getPosition`](./functions/player.md#getposition)                 |
-| duration    | `number` | See [`getDuration`](./functions/player.md#getduration)                 |
-| buffer      | `number` | See [`getBufferedPosition`](./functions/player.md#getbufferedpostion)  |
+| position    | `number` | See [`getProgress`](./functions/player.md#getProgress)                 |
+| duration    | `number` | See [`getProgress`](./functions/player.md#getProgress)                 |
+| buffered      | `number` | See [`getProgress`](./functions/player.md#getProgress)  |
 | track       | `number` | The current index in the queue of the track.                           |
 
 ### `PlaybackError`
@@ -209,14 +209,14 @@ event in the following situations:
 ### `AudioCommonMetadataReceived`
 Fired when the current track receives metadata encoded in - static metadata not tied to a time. Usually received at start.
 
-Received data will be [`AudioCommonMetadataReceivedEvent`](./api/objects/metadata.md) - `raw` will always be `undefined`.
+Received data will be [`AudioCommonMetadataReceivedEvent`](./api/objects/metadata.md).
 
 ### `AudioTimedMetadataReceived`
 Fired when the current track receives metadata encoded in - dynamic metadata tied to a time. Events may be emitted over time.
 
-Received data will be [`AudioTimedMetadataReceivedEvent`](./api/objects/metadata.md).
+Received data will be [`AudioMetadataReceivedEvent`](./api/objects/metadata.md).
 
 ### `AudioChapterMetadataReceived` (iOS only)
 Fired when the current track receives metadata encoded in - chapter overview data. Usually received at start.
 
-Received data will be [`AudioChapterMetadataReceivedEvent`](./api/objects/metadata.md).
+Received data will be [`AudioMetadataReceivedEvent`](./api/objects/metadata.md).

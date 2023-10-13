@@ -1,6 +1,22 @@
+# AudioMetadataReceivedEvent
+
+An object representing the timed or chapter metadata received for a track.
+
+| Param    | Type     | Description                                         |
+| -------- | -------- | --------------------------------------------------- |
+| metadata    | `AudioMetadata[]` | The metadata received                      |
+
 # AudioCommonMetadataReceivedEvent
 
-An object representing the metadata received for a track.
+An object representing the common metadata received for a track.
+
+| Param    | Type     | Description                                         |
+| -------- | -------- | --------------------------------------------------- |
+| metadata    | `AudioCommonMetadata` | The metadata received                      |
+
+# AudioCommonMetadata
+
+An object representing the common metadata received for a track.
 
 | Param    | Type     | Description                                         |
 | -------- | -------- | --------------------------------------------------- |
@@ -19,7 +35,14 @@ An object representing the metadata received for a track.
 | mediaType | `string` | The track media type. Might be undefined              |
 | creationDate | `string` | The track creation date. Might be undefined              |
 | creationYear | `string` | The track creation year. Might be undefined              |
-| raw | `RawEntry[]` | The raw metadata that was used to populate. May contain other non common keys. Might be undefined              |
+
+# AudioMetadata
+
+An extension of `AudioCommonMetadataReceivedEvent` that includes the raw metadata.
+
+| Param    | Type     | Description                                         |
+| -------- | -------- | --------------------------------------------------- |
+| raw | `RawEntry[]` | The raw metadata that was used to populate. May contain other non common keys. May be empty              |
 
 # RawEntry
 

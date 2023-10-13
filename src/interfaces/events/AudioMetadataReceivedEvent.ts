@@ -1,4 +1,12 @@
+export interface AudioMetadataReceivedEvent {
+  metadata: AudioMetadata[];
+}
+
 export interface AudioCommonMetadataReceivedEvent {
+  metadata: AudioCommonMetadata;
+}
+
+export interface AudioCommonMetadata {
   title: string | undefined;
   artist: string | undefined;
   albumTitle: string | undefined;
@@ -14,6 +22,9 @@ export interface AudioCommonMetadataReceivedEvent {
   mediaType: string | undefined;
   creationDate: string | undefined;
   creationYear: string | undefined;
+}
+
+export interface AudioMetadata extends AudioCommonMetadata {
   raw: RawEntry[];
 }
 

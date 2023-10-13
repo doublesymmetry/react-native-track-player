@@ -20,6 +20,7 @@ const onUpdateCurrentTrackMetadata = async () => {
     await TrackPlayer.updateMetadataForTrack(currentTrackIndex, {
       title: `Random: ${randomTitle}`,
       artwork: `https://random.imagecdn.app/800/800?dummy=${Date.now()}`,
+      duration: Math.floor(Math.random()),
     });
   }
 };
