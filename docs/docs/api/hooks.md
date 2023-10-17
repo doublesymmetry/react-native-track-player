@@ -75,8 +75,6 @@ const MyComponent = () => {
 ## `usePlaybackState`
 
 A hook which returns the up to date state of [`getPlaybackState()`](./functions/player.md#getplaybackstate).
-The hook will initially return `{ state: undefined }` while it is awaiting the
-initial state of the player.
 
 ```tsx
 import React, { useState } from 'react';
