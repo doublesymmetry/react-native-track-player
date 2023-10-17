@@ -114,4 +114,11 @@ object BundleUtils {
             value.toInt()
         } else null
     }
+
+    fun getDoubleOrNull(data: Bundle?, key: String?): Double? {
+        val value = data!![key]
+        return if (value is Number) {
+            value.toDouble()
+        } else null
+    }
 }
