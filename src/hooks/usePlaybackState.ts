@@ -8,7 +8,7 @@ class PlaybackStateSingleton {
   public state = State.None;
 
   constructor() {
-    addEventListener(Event.PlaybackState, e => {
+    addEventListener(Event.PlaybackState, (e) => {
       this.state = e.state;
     });
   }
@@ -24,7 +24,7 @@ export const usePlaybackState = (): PlaybackState => {
     state: PlaybackStateProvider.state,
   } as PlaybackState);
   useEffect(() => {
-    const sub = addEventListener(Event.PlaybackState, state => {
+    const sub = addEventListener(Event.PlaybackState, (state) => {
       setPlaybackState(state);
     });
 
