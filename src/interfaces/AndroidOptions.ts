@@ -8,7 +8,6 @@ export interface AndroidOptions {
    */
   appKilledPlaybackBehavior?: AppKilledPlaybackBehavior;
 
-
   /**
    * Whether the remote-duck event will be triggered on every interruption
    */
