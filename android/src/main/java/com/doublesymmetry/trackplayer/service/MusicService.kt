@@ -238,23 +238,23 @@ class MusicService : HeadlessJsTaskService() {
 
         // setup progress update events if configured
         progressUpdateJob?.cancel()
-        val updateInterval = BundleUtils.getIntOrNull(options, PROGRESS_UPDATE_EVENT_INTERVAL_KEY)
+        val updateInterval = BundleUtils.getDoubleOrNull(options, PROGRESS_UPDATE_EVENT_INTERVAL_KEY)
         if (updateInterval != null && updateInterval > 0) {
             progressUpdateJob = scope.launch {
-                progressUpdateEventFlow(updateInterval.toLong()).collect { emit(MusicEvents.PLAYBACK_PROGRESS_UPDATED, it) }
+                progressUpdateEventFlow(updateInterval).collect { emit(MusicEvents.PLAYBACK_PROGRESS_UPDATED, it) }
             }
         }
     }
 
     @MainThread
-    private fun progressUpdateEventFlow(interval: Long) = flow {
+    private fun progressUpdateEventFlow(interval: Double) = flow {
         while (true) {
             if (player.isPlaying) {
                 val bundle = progressUpdateEvent()
                 emit(bundle)
             }
 
-            delay(interval * 1000)
+            delay((interval * 1000).toLong())
         }
     }
 

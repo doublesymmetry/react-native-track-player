@@ -72,6 +72,10 @@ export async function PlaybackService() {
     console.log('Event.MetadataCommonReceived', event);
   });
 
+  TrackPlayer.addEventListener(Event.PlaybackProgressUpdated, (event) => {
+    console.log('Event.PlaybackProgressUpdated', event);
+  });
+
   TrackPlayer.addEventListener(
     Event.PlaybackMetadataReceived,
     async ({ title, artist }) => {
