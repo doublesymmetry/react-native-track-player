@@ -5,7 +5,7 @@
 * **ios:** Avoid prematurely activating audio session
 * **android:** Fix: don't emit both PlaybackTrackChanged when queue ends (parity with iOS)
 * **android:** Fix: allow progressUpdateEventInterval to be set to a decimal value (partial seconds)
-* **android:** Supportfor setting grace period before stopForeground (#2164)
+* **android:** Support for setting grace period before stopForeground (defaults to 5 seconds)
 * **ios:** Fix: updating rate will immediately reflect in control center
 * **android** Fix: issue where loading a new track after end required seek to start 
 * **ios:** Fix: crash adding output when load is called too fast
