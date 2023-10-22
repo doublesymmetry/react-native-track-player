@@ -1,0 +1,5 @@
+<resources>
+    <string name="temporary_channel_id">temporary_channel</string>
+    <string name="temporary_channel_name">temporary_channel</string>
+    <string name="playback_channel_name">Now Playing</string>
+</resources>
