@@ -1,3 +1,15 @@
+# [4.0.0](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc09...v4.0.0) (2023-10-20)
+
+* **RN:** New metadata events have a new `metadata` property that contains the metadata that was received
+* **android:** Fix: allow updating duration in notification metadata
+* **ios:** Avoid prematurely activating audio session
+* **android:** Fix: don't emit both PlaybackTrackChanged when queue ends (parity with iOS)
+* **android:** Fix: allow progressUpdateEventInterval to be set to a decimal value (partial seconds)
+* **android:** Support for setting grace period before stopForeground (defaults to 5 seconds)
+* **ios:** Fix: updating rate will immediately reflect in control center
+* **android** Fix: issue where loading a new track after end required seek to start 
+* **ios:** Fix: crash adding output when load is called too fast
+
 # [4.0.0-rc09](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc08...v4.0.0-rc09) (2023-09-22)
 
 * **RN:** useIsPlaying hook now takes into account `none` state
