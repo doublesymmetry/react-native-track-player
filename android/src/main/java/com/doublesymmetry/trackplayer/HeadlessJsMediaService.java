@@ -12,8 +12,10 @@
  import android.content.Context;
  import android.content.Intent;
  import android.net.Uri;
+ import android.os.Build;
  import android.os.IBinder;
  import android.os.PowerManager;
+ import android.provider.Settings;
  import android.util.Log;
 
  import androidx.annotation.Nullable;
@@ -30,8 +32,10 @@
  import com.facebook.react.ReactApplication;
  import java.util.Set;
  import java.util.concurrent.CopyOnWriteArraySet;
- 
- /**
+
+ import timber.log.Timber;
+
+/**
   * Base class for running JS without a UI. Generally, you only need to override {@link
   * #getTaskConfig}, which is called for every {@link #onStartCommand}. The result, if not {@code
   * null}, is used to run a JS task.
@@ -95,11 +99,17 @@
 
      @Override
      public void onCreate() {
-        Intent openAppIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
-        openAppIntent.setData(Uri.parse("trackplayer://service-created"));
-        openAppIntent.setAction(Intent.ACTION_VIEW);
-        openAppIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(openAppIntent);
+         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+             if (Settings.canDrawOverlays(this)) {
+                 Intent openAppIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
+                 openAppIntent.setData(Uri.parse("trackplayer://service-created"));
+                 openAppIntent.setAction(Intent.ACTION_VIEW);
+                 openAppIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                 startActivity(openAppIntent);
+             } else {
+                 Timber.tag("RNTP").d("to wake RN Activity, enable draw over apps permission.");
+             }
+         }
         super.onCreate();
 
      }
