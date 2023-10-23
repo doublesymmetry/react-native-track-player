@@ -11,12 +11,8 @@
  import android.content.BroadcastReceiver;
  import android.content.Context;
  import android.content.Intent;
- import android.net.Uri;
- import android.os.Build;
  import android.os.IBinder;
  import android.os.PowerManager;
- import android.provider.Settings;
- import android.util.Log;
 
  import androidx.annotation.Nullable;
  import androidx.media.MediaBrowserServiceCompat;
@@ -99,19 +95,7 @@
 
      @Override
      public void onCreate() {
-         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-             if (Settings.canDrawOverlays(this)) {
-                 Intent openAppIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
-                 openAppIntent.setData(Uri.parse("trackplayer://service-created"));
-                 openAppIntent.setAction(Intent.ACTION_VIEW);
-                 openAppIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                 startActivity(openAppIntent);
-             } else {
-                 Timber.tag("RNTP").d("to wake RN Activity, enable draw over apps permission.");
-             }
-         }
         super.onCreate();
-
      }
 
      /**

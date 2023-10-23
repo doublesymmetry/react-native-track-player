@@ -1,7 +1,6 @@
 package com.doublesymmetry.trackplayer.service
 
 import android.app.*
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
@@ -10,18 +9,18 @@ import android.os.Binder
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
-import android.support.v4.media.RatingCompat
+import android.provider.Settings
 import android.support.v4.media.MediaBrowserCompat.MediaItem
+import android.support.v4.media.RatingCompat
+import android.util.Log
 import androidx.annotation.MainThread
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_LOW
 import androidx.media.utils.MediaConstants
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.*
 import com.doublesymmetry.kotlinaudio.models.NotificationButton.*
 import com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer
 import com.doublesymmetry.trackplayer.HeadlessJsMediaService
-import com.doublesymmetry.trackplayer.R as TrackPlayerR
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toMilliseconds
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toSeconds
 import com.doublesymmetry.trackplayer.extensions.asLibState
@@ -37,12 +36,13 @@ import com.doublesymmetry.trackplayer.utils.BundleUtils.setRating
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
 import com.facebook.react.modules.core.DeviceEventManagerModule
-import com.google.android.exoplayer2.ui.R as ExoPlayerR
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
-import timber.log.Timber
+import com.doublesymmetry.trackplayer.R as TrackPlayerR
+import com.google.android.exoplayer2.ui.R as ExoPlayerR
 
 @MainThread
 class MusicService : HeadlessJsMediaService() {
@@ -74,6 +74,19 @@ class MusicService : HeadlessJsMediaService() {
             rootHints: Bundle?
     ): BrowserRoot {
         // TODO: verify clientPackageName here.
+        Log.d("RNTP-AA", clientPackageName + " attempted to get Browsable root.")
+        if (clientPackageName in arrayOf<String>(
+                "com.android.systemui",
+                "com.example.android.mediacontroller",
+                "com.google.android.projection.gearhead"
+        )) {
+            Log.d("RNTP-AA", clientPackageName + " is in the white list of waking activity.")
+            val activityIntent = packageManager.getLaunchIntentForPackage(packageName)
+            activityIntent!!.data = Uri.parse("trackplayer://service-bound")
+            activityIntent.action = Intent.ACTION_VIEW
+            activityIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(activityIntent)
+        }
         val extras = Bundle()
         extras.putInt(
             MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE,
@@ -833,7 +846,6 @@ class MusicService : HeadlessJsMediaService() {
 
     @MainThread
     override fun onBind(intent: Intent?): IBinder? {
-        // return super.onBind(intent)
         val intentAction = intent?.action
         return if (intentAction != null) {
             super.onBind(intent)
