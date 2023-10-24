@@ -1,5 +1,6 @@
 package com.doublesymmetry.trackplayer.service
 
+import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
 import android.content.Intent
@@ -68,6 +69,7 @@ class MusicService : HeadlessJsMediaService() {
     var stoppingAppPausesPlayback = true
         private set
 
+    @SuppressLint("VisibleForTests")
     override fun onGetRoot(
             clientPackageName: String,
             clientUid: Int,
@@ -80,12 +82,20 @@ class MusicService : HeadlessJsMediaService() {
                 "com.example.android.mediacontroller",
                 "com.google.android.projection.gearhead"
         )) {
-            Log.d("RNTP-AA", clientPackageName + " is in the white list of waking activity.")
-            val activityIntent = packageManager.getLaunchIntentForPackage(packageName)
-            activityIntent!!.data = Uri.parse("trackplayer://service-bound")
-            activityIntent.action = Intent.ACTION_VIEW
-            activityIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(activityIntent)
+            val reactActivity = reactNativeHost.reactInstanceManager.currentReactContext?.currentActivity
+            if (
+                // HACK: validate reactActivity is present; if not, send wake intent
+                (reactActivity == null || reactActivity.isDestroyed)
+                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && Settings.canDrawOverlays(this)
+                ) {
+                Log.d("RNTP-AA", clientPackageName + " is in the white list of waking activity.")
+                val activityIntent = packageManager.getLaunchIntentForPackage(packageName)
+                activityIntent!!.data = Uri.parse("trackplayer://service-bound")
+                activityIntent.action = Intent.ACTION_VIEW
+                activityIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(activityIntent)
+            }
         }
         val extras = Bundle()
         extras.putInt(
