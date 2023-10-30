@@ -16,7 +16,7 @@ import { Capability } from 'react-native-track-player';
 | `PlayFromId`     | Capability indicating the ability to play from a track id (Required for Android Auto) |
 | `PlayFromSearch` | Capability indicating the ability to play from a text/voice search (Required for Android Auto) |
 | `Pause`          | Capability indicating the ability to pause |
-| `Stop`           | Capability indicating the ability to stop |
+| `Stop`           | Capability indicating the ability to stop (on iOS available only for tracks where `.isLiveStream` is `true`) |
 | `SeekTo`         | Capability indicating the ability to seek to a position in the timeline |
 | `Skip`           | Capability indicating the ability to skip to any song in the queue |
 | `SkipToNext`     | Capability indicating the ability to skip to the next track |
