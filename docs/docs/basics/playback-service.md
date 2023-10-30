@@ -35,3 +35,24 @@ export const PlaybackService = async function() {
 
 };
 ```
+
+## Custom Media Controls Notification id & name
+
+react-native-track-player is using media controls.
+As a result, it creates a notification channel.
+ - More information read here: https://developer.android.com/media/implement/surfaces/mobile
+
+To customize it, put the example below inside your project folder.
+
+## Example
+```xml
+<!-- YOUR_PROJECT_DIR/android/app/src/main/res/values/strings.xml -->
+<resources>
+    <!-- rtnp channel id -->
+    <string name="rntp_temporary_channel_id">temporary_channel</string>
+    <!-- rtnp channel name -->
+    <string name="rntp_temporary_channel_name">temporary_channel</string>
+    <!-- playback_channel_name used by KotlinAudio in rntp -->
+    <string name="playback_channel_name">Music Player</string>
+</resources>
+```

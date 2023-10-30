@@ -106,15 +106,13 @@ class MusicService : HeadlessJsTaskService() {
      */
     private fun startAndStopEmptyNotificationToAvoidANR() {
         val notificationManager = this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        var name = ""
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            name = "temporary_channel"
             notificationManager.createNotificationChannel(
-                NotificationChannel(name, name, NotificationManager.IMPORTANCE_LOW)
+                NotificationChannel(getString(TrackPlayerR.string.rntp_temporary_channel_id), getString(TrackPlayerR.string.rntp_temporary_channel_name), NotificationManager.IMPORTANCE_LOW)
             )
         }
 
-        val notificationBuilder = NotificationCompat.Builder(this, name)
+        val notificationBuilder = NotificationCompat.Builder(this, getString(TrackPlayerR.string.rntp_temporary_channel_id))
             .setPriority(PRIORITY_LOW)
             .setCategory(Notification.CATEGORY_SERVICE)
             .setSmallIcon(ExoPlayerR.drawable.exo_notification_small_icon)
