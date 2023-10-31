@@ -1,0 +1,4 @@
+<resources>
+    <string name="rntp_temporary_channel_id">rntp_temporary_channel</string>
+    <string name="rntp_temporary_channel_name">temporary_channel</string>
+</resources>

@@ -1,3 +1,8 @@
+# [4.0.1](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0...v4.0.1) (2023-10-31)
+
+* **android:** Fix: notification dissapearing in background
+* **android:** Allow overriding notification channel name and description
+
 # [4.0.0](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc09...v4.0.0) (2023-10-20)
 
 * **RN:** New metadata events have a new `metadata` property that contains the metadata that was received
