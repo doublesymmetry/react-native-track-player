@@ -95,4 +95,30 @@ This allows the RN Activity to overlay on top of the lock screen and start itsel
 
 JumpForward and JumpBackward may not show on Android <13 devices. To resolve this, implement these buttons as CustomActions, just like how they are handled under Android >=13. You need to implement changes in KotlinAudio. Note this will introduce [duplicate custom actions buttons](https://github.com/doublesymmetry/react-native-track-player/issues/1970) so more patches are needed. See Podverse's KotlinAudio fork.
 
-If [Event.RemoteBrowse is not firing](https://github.com/lovegaoshi/react-native-track-player/issues/26), you may need to reinstall android auto.
+If [Event.RemoteBrowse is not firing for the first two tabs](https://github.com/lovegaoshi/react-native-track-player/issues/26), you may need to reinstall android auto.
+
+## App Showcase
+
+[APM](https://play.google.com/store/apps/details?id=com.noxplay.noxplayer) and [Podverse](https://play.google.com/store/apps/details?id=com.podverse use a customized fork and are both on the google play store in production with auto support.
+
+Getting pass Play Store's review process for an auto suppported app is tough. Here are a few issues we encountered:
+
+```
+Issue found: App doesn't perform as expected
+
+Your app does not perform all functions properly or as expected from a user perspective.
+
+For example, your app does not load media content in Android Auto.
+```
+
+This was due to APM never performed content updates via `TrackPlayer.setBrowseTree` (albeit initializes) thoughout the app's lifecycle. I think a human tester intervened and expected what my app does.
+
+https://github.com/lovegaoshi/azusa-player-mobile/pull/209
+
+```
+something about media not responsive to voice commands
+```
+
+This was due to Podverse did not handle voice commands. Although play store refused to approve repeatly after fix until an appeal was submitted, then it was approved.
+
+https://github.com/podverse/podverse-rn/pull/1969
