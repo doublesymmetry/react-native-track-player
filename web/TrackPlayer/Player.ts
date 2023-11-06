@@ -3,6 +3,7 @@ import type { Track, Progress, PlaybackState } from '../../src/interfaces';
 import { SetupNotCalledError } from './SetupNotCalledError';
 
 export class Player {
+  protected hasInitialized: boolean = false;
   protected element?: HTMLMediaElement;
   protected player?: shaka.Player;
   protected _current?: Track = undefined;
@@ -36,6 +37,10 @@ export class Player {
   async setupPlayer() {
     // shaka only runs in a browser
     if (typeof window === 'undefined') return;
+    if (this.hasInitialized === true) {
+      // TODO: double check the structure of this error message
+      throw { code: 'player_already_initialized', message: 'The player is not initialized. Call setupPlayer first.' };
+    }
 
     // @ts-ignore
     const shaka = await import('shaka-player/dist/shaka-player.ui');
@@ -78,6 +83,7 @@ export class Player {
     // Attach player to the window to make it easy to access in the JS console.
     // @ts-ignore
     window.rntp = this.player;
+    this.hasInitialized = true;
   }
 
   /**
