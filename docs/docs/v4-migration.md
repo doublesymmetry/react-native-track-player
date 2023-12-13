@@ -30,6 +30,12 @@ await TrackPlayer.updateOptions({
 
 - On iOS, the pitch algorithm now defaults to `timeDomain` instead of `lowQualityZeroLatency`. The latter has been deprecated by Apple and has known issues on iOS 17.
 
+### Swift Compatibility
+
+In order to support iOS 12 (12.4 still officially supported by react-native), make SwiftUI optional.
+
+In XCode add "-weak_framework" and "SwiftUI" to the "Other Linker Flags" build settings.
+
 ### Hook Behavior Updates
 
 The [`usePlaybackState()`](./api/hooks.md##useplaybackstate) hook now initially returns `{ state: undefined }` before it has finished retrieving the current state. It previously returned [`State.None`](./api/constants/state.md), indicating no track loaded.
