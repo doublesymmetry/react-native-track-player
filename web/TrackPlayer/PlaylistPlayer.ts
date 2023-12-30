@@ -59,7 +59,7 @@ export class PlaylistPlayer extends Player {
     await this.load(track);
 
     if (initialPosition) {
-      await this.seekTo(initialPosition);
+      this.seekTo(initialPosition);
     }
 
     if (this.playWhenReady) {
@@ -87,10 +87,9 @@ export class PlaylistPlayer extends Player {
     }
 
     this.currentIndex = index;
-    await this.add([track]);
 
     if (initialPosition) {
-      await this.seekTo(initialPosition);
+      this.seekTo(initialPosition);
     }
   }
 
