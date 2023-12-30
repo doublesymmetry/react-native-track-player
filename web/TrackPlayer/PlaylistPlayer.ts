@@ -37,6 +37,7 @@ export class PlaylistPlayer extends Player {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   protected onPlaylistEnded() {}
 
   protected get currentIndex() {
@@ -197,8 +198,11 @@ export class PlaylistPlayer extends Player {
   }
 
   // TODO
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   public updateMetadataForTrack(index: number, metadata: Partial<Track>) {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   public clearNowPlayingMetadata() {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   public updateNowPlayingMetadata(metadata: Partial<Track>) {}
 
 }
