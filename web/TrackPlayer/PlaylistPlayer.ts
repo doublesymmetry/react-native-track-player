@@ -56,8 +56,10 @@ export class PlaylistPlayer extends Player {
       throw new Error('playlist_exhausted');
     }
 
-    this.currentIndex = index;
-    await this.load(track);
+    if (this.currentIndex !== index) {
+      this.currentIndex = index;
+      await this.load(track);
+    }
 
     if (initialPosition) {
       this.seekTo(initialPosition);
@@ -87,11 +89,7 @@ export class PlaylistPlayer extends Player {
       throw new Error('index out of bounds');
     }
 
-    this.currentIndex = index;
-
-    if (initialPosition) {
-      this.seekTo(initialPosition);
-    }
+    await this.goToIndex(index, initialPosition);
   }
 
   public async skipToNext(initialPosition?: number) {
