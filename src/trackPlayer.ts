@@ -367,7 +367,7 @@ export async function setVolume(level: number): Promise<void> {
  * In other platforms this is achieved via RN's Animated.Value.
  *
  * @param volume The volume as a number between 0 and 1.
- * @param duration The duration of the animation in milliseconds. defualt is 500 ms.
+ * @param duration The duration of the animation in milliseconds. defualt is 0 ms, which just functions as TP.setVolume.
  * @param init The initial value of the volume. This may be useful eg to be 0 for a fade in event.
  * @param interval The interval of the animation in milliseconds. default is 20 ms.
  * @param msg (Android) The message to be emitted after volume is fully changed, via Event.PlaybackAnimatedVolumeChanged.
@@ -375,7 +375,7 @@ export async function setVolume(level: number): Promise<void> {
  */
 export const setAnimatedVolume = async ({
   volume,
-  duration = 500,
+  duration = 0,
   init = -1,
   interval = 20,
   msg = '',
@@ -388,6 +388,9 @@ export const setAnimatedVolume = async ({
   msg?: string;
   callback?: () => void | Promise<void>;
 }) => {
+  if (duration === 0) {
+    return TrackPlayer.setVolume(volume);
+  }
   if (init !== -1) {
     TrackPlayer.setVolume(init);
   }
