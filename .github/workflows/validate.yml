@@ -46,12 +46,10 @@ jobs:
       - name: Checkout Repo
         if: ${{ needs.check-changes.outputs.should-check-types }}
         uses: actions/checkout@v4
-      - name: Setup Node
-        if: ${{ needs.check-changes.outputs.should-check-types }}
-        uses: actions/setup-node@v3
+      - name: Setup Environment
+        uses: pkgxdev/setup@v1
         with:
-          node-version: 16
-          cache: 'yarn'
+          +: classic.yarnpkg.com
       - name: Install Dependencies
         if: ${{ needs.check-changes.outputs.should-check-types }}
         run: |-
@@ -130,12 +128,10 @@ jobs:
       - name: Checkout Repo
         if: ${{ needs.check-changes.outputs.should-build-android }}
         uses: actions/checkout@v4
-      - name: Setup Node
-        if: ${{ needs.check-changes.outputs.should-build-android }}
-        uses: actions/setup-node@v3
+      - name: Setup Environment
+        uses: pkgxdev/setup@v1
         with:
-          node-version: 16
-          cache: 'yarn'
+          +: classic.yarnpkg.com
       - name: Install Library Dependencies
         if: ${{ needs.check-changes.outputs.should-build-android }}
         run: yarn install --frozen-lockfile
