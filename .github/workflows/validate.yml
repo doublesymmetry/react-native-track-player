@@ -17,7 +17,7 @@ jobs:
       should-build-android: ${{ steps.filter.outputs.android || steps.filter.outputs.workflow || steps.filter.outputs.js }}
       should-check-types: ${{ steps.filter.outputs.js || steps.filter.outputs.workflow }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
         id: filter
         with:
@@ -45,7 +45,7 @@ jobs:
     steps:
       - name: Checkout Repo
         if: ${{ needs.check-changes.outputs.should-check-types }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Node
         if: ${{ needs.check-changes.outputs.should-check-types }}
         uses: actions/setup-node@v3
@@ -80,7 +80,7 @@ jobs:
     steps:
       - name: Checkout Repo
         if: ${{ needs.check-changes.outputs.should-build-ios }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Environment
         uses: pkgxdev/setup@v1
         with:
@@ -129,7 +129,7 @@ jobs:
     steps:
       - name: Checkout Repo
         if: ${{ needs.check-changes.outputs.should-build-android }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Node
         if: ${{ needs.check-changes.outputs.should-build-android }}
         uses: actions/setup-node@v3
@@ -175,7 +175,7 @@ jobs:
     steps:
       - name: Checkout Repo
         if: ${{ needs.check-changes.outputs.should-build-docs }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Environment
         uses: pkgxdev/setup@v1
         with:
