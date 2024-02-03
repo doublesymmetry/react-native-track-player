@@ -47,7 +47,7 @@ jobs:
         if: ${{ needs.check-changes.outputs.should-check-types }}
         uses: actions/checkout@v4
       - name: Setup Environment
-        uses: pkgxdev/setup@v1
+        uses: pkgxdev/setup@v2
         with:
           +: classic.yarnpkg.com
       - name: Install Dependencies
@@ -80,7 +80,7 @@ jobs:
         if: ${{ needs.check-changes.outputs.should-build-ios }}
         uses: actions/checkout@v4
       - name: Setup Environment
-        uses: pkgxdev/setup@v1
+        uses: pkgxdev/setup@v2
         with:
           +: ruby-lang.org@3.1.0
             classic.yarnpkg.com
@@ -129,7 +129,7 @@ jobs:
         if: ${{ needs.check-changes.outputs.should-build-android }}
         uses: actions/checkout@v4
       - name: Setup Environment
-        uses: pkgxdev/setup@v1
+        uses: pkgxdev/setup@v2
         with:
           +: classic.yarnpkg.com
       - name: Install Library Dependencies
@@ -173,7 +173,7 @@ jobs:
         if: ${{ needs.check-changes.outputs.should-build-docs }}
         uses: actions/checkout@v4
       - name: Setup Environment
-        uses: pkgxdev/setup@v1
+        uses: pkgxdev/setup@v2
         with:
           +: classic.yarnpkg.com
       - name: Install Dependencies
