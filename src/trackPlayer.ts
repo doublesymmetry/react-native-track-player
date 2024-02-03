@@ -389,7 +389,8 @@ export const setAnimatedVolume = async ({
   callback?: () => void | Promise<void>;
 }) => {
   if (duration === 0) {
-    return TrackPlayer.setVolume(volume);
+    TrackPlayer.setVolume(volume);
+    return callback();
   }
   if (init !== -1) {
     TrackPlayer.setVolume(init);
