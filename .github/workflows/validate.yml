@@ -15,7 +15,7 @@ jobs:
       should-build-docs: ${{ steps.filter.outputs.docs || steps.filter.outputs.workflow }}
       should-build-ios: ${{ steps.filter.outputs.ios || steps.filter.outputs.workflow || steps.filter.outputs.js }}
       should-build-android: ${{ steps.filter.outputs.android || steps.filter.outputs.workflow || steps.filter.outputs.js }}
-      should-check-types: ${{ steps.filter.outputs.types || steps.filter.outputs.workflow }}
+      should-check-types: ${{ steps.filter.outputs.js || steps.filter.outputs.workflow }}
     steps:
       - uses: actions/checkout@v2
       - uses: dorny/paths-filter@v2
@@ -31,9 +31,6 @@ jobs:
               - 'example/src/**'
               - 'example/**.json'
               - 'example/**.js'
-            types:
-              - 'src/**'
-              - 'example/src/**'
             ios:
               - 'ios/**'
               - 'example/ios/**'
