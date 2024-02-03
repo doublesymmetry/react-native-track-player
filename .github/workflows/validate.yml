@@ -12,43 +12,36 @@ jobs:
   check-changes:
     runs-on: ubuntu-latest
     outputs:
-      should-build-docs: ${{ steps.filter.outputs.docs }}
-      should-build-ios: ${{ steps.filter.outputs.ios }}
-      should-build-android: ${{ steps.filter.outputs.android }}
-      should-check-types: ${{ steps.filter.outputs.types }}
+      should-build-docs: ${{ steps.filter.outputs.docs || steps.filter.outputs.workflow }}
+      should-build-ios: ${{ steps.filter.outputs.ios || steps.filter.outputs.workflow || steps.filter.outputs.js }}
+      should-build-android: ${{ steps.filter.outputs.android || steps.filter.outputs.workflow || steps.filter.outputs.js }}
+      should-check-types: ${{ steps.filter.outputs.types || steps.filter.outputs.workflow }}
     steps:
       - uses: actions/checkout@v2
       - uses: dorny/paths-filter@v2
         id: filter
         with:
           filters: |
-            ios:
-              - 'ios/**'
+            workflow:
+              - '.github/workflows/validate.yml'
+            js:
               - 'src/**'
               - '**.json'
               - '**.js'
-              - 'example/ios/**'
               - 'example/src/**'
               - 'example/**.json'
               - 'example/**.js'
-              - '.github/workflows/validate.yml'
-            docs:
-              - 'docs/**'
-              - '.github/workflows/validate.yml'
-            android:
-              - 'android/**'
-              - 'src/**'
-              - '**.json'
-              - '**.js'
-              - 'example/android/**'
-              - 'example/src/**'
-              - 'example/**.json'
-              - 'example/**.js'
-              - '.github/workflows/validate.yml'
             types:
               - 'src/**'
               - 'example/src/**'
-              - '.github/workflows/validate.yml'
+            ios:
+              - 'ios/**'
+              - 'example/ios/**'
+            android:
+              - 'android/**'
+              - 'example/android/**'
+            docs:
+              - 'docs/**'
   check-typescript:
     runs-on: ubuntu-latest
     needs: check-changes
