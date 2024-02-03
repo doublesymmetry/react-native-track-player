@@ -105,7 +105,7 @@ jobs:
           pkgx +ruby-lang.org@3.1.0 bundle install
       - name: Cache Cocoapods Dependencies
         if: ${{ needs.check-changes.outputs.should-build-ios }}
-        uses: buildjet/cache@v3
+        uses: buildjet/cache@v4
         with:
           path: example/ios/Pods
           key: ${{ runner.os }}-pods-${{ hashFiles('example/ios/Podfile.lock') }}
