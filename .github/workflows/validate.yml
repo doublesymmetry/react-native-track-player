@@ -145,13 +145,13 @@ jobs:
           yarn install
       - name: Cache Gradle Wrapper
         if: ${{ needs.check-changes.outputs.should-build-android }}
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('example/android/gradle/wrapper/gradle-wrapper.properties') }}
       - name: Cache Gradle Dependencies
         if: ${{ needs.check-changes.outputs.should-build-android }}
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-caches-${{ hashFiles('example/android/gradle/wrapper/gradle-wrapper.properties') }}
