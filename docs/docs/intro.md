@@ -6,8 +6,6 @@ sidebar_position: 1
 
 A fully fledged audio module created for music apps. Provides audio playback, external media controls, background mode and more!
 
-This is a test to see if CI skips the jobs as this is just a docs update.
-
 ## Features
 
 * **Lightweight** - Optimized to use the least amount of resources according to your needs
