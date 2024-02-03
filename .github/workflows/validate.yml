@@ -29,6 +29,8 @@ jobs:
               - '**.js'
               - 'example/ios/**'
               - 'example/src/**'
+              - 'example/**.json'
+              - 'example/**.js'
               - '.github/workflows/validate.yml'
             docs:
               - 'docs/**'
