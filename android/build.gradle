@@ -22,9 +22,6 @@ android {
     namespace 'com.doublesymmetry.trackplayer'
 
     def agpVersion = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
-    if (agpVersion.tokenize('.')[0].toInteger() >= 7) {
-      namespace "com.doublesymmetry.trackplayer"
-    }
     defaultConfig {
         minSdkVersion getExtOrIntegerDefault('minSdkVersion') // RN's minimum version
         targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
