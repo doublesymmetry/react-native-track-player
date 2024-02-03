@@ -17,8 +17,8 @@ jobs:
       should-build-android: ${{ steps.filter.outputs.android || steps.filter.outputs.workflow || steps.filter.outputs.js }}
       should-check-types: ${{ steps.filter.outputs.js || steps.filter.outputs.workflow }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: dorny/paths-filter@v2
+      - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v3
         id: filter
         with:
           filters: |
