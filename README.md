@@ -1,4 +1,4 @@
-<img src="https://rntp.dev/img/optimized-logo.svg" />
+<img src="https:/rntp.dev/img/optimized-logo.svg" width="300" />
 
 [![downloads](https://img.shields.io/npm/dw/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player)
 [![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player)
@@ -202,8 +202,8 @@ yarn version --major // 2.0.0
 This command will:
 
 1. Generate/update the Changelog
-2. Bump the package version 
-3. Tag & pushing the commit 
+2. Bump the package version
+3. Tag & pushing the commit
 4. Build & publish the package
 
 
