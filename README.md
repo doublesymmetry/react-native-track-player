@@ -19,7 +19,7 @@ A fully-fledged audio module created for music apps. Provides audio playback, ex
 
 <br style="display: none;"/>
 
-*Our CI is superpowered by fast Apple Silicon macOS GitHub Action Runners provided by [Blaze](https://runblaze.dev). Consider using them for your own project! Subscriptions directly support the maintenance of this library.*
+*Our CI is supercharged by fast Apple Silicon macOS GitHub Action Runners provided by [Blaze](https://runblaze.dev). Subscribing supports the maintenance of this library—consider it for your projects!*
 
 </div>
 
