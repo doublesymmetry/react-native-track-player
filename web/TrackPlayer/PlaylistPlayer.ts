@@ -2,6 +2,7 @@ import { Player } from './Player';
 
 import type { Track } from '../../src/interfaces';
 import {RepeatMode} from './RepeatMode';
+import { State } from '../../src';
 
 export class PlaylistPlayer extends Player {
   // TODO: use immer to make the `playlist` immutable
@@ -10,8 +11,15 @@ export class PlaylistPlayer extends Player {
   protected _currentIndex?: number;
   protected repeatMode: RepeatMode = RepeatMode.Off;
 
+  protected async onStateUpdate(state: Exclude<State, State.Error>) {
+    super.onStateUpdate(state);
+
+    if (state === State.Ended) {
+      await this.onTrackEnded();
+    }
+  }
+
   protected async onTrackEnded() {
-    await super.onTrackEnded();
     switch (this.repeatMode) {
       case RepeatMode.Track:
         if (this.currentIndex !== undefined) {

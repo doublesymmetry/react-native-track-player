@@ -70,14 +70,14 @@ export class Player {
       // Extract the shaka.util.Error object from the event.
       this.onError(error.detail);
     });
-    this.element.addEventListener('ended', () => this.onTrackEnded());
-    this.element.addEventListener('playing', () => this.onTrackPlaying());
-    this.element.addEventListener('pause', () => this.onTrackPaused());
-    this.player!.addEventListener('loading', () => this.onTrackLoading());
-    this.player!.addEventListener('loaded', () => this.onTrackLoaded());
+    this.element.addEventListener('ended', this.onStateUpdate.bind(this, State.Ended));
+    this.element.addEventListener('playing', this.onStateUpdate.bind(this, State.Playing));
+    this.element.addEventListener('pause', this.onStateUpdate.bind(this, State.Paused));
+    this.player!.addEventListener('loading', this.onStateUpdate.bind(this, State.Loading));
+    this.player!.addEventListener('loaded', this.onStateUpdate.bind(this, State.Ready));
     this.player!.addEventListener('buffering', ({ buffering }: any) => {
       if (buffering === true) {
-        this.onTrackBuffering();
+        this.onStateUpdate(State.Buffering);
       }
     });
 
@@ -90,24 +90,10 @@ export class Player {
   /**
    * event handlers
    */
-  protected async onTrackPlaying() {
-    this.state = { state: State.Playing };
-  }
-  protected async onTrackPaused() {
-    this.state = { state: State.Paused };
-  }
-  protected async onTrackLoading() {
-    this.state = { state: State.Loading };
-  }
-  protected async onTrackLoaded() {
-    this.state = { state: State.Ready };
-  }
-  protected async onTrackBuffering() {
-    this.state = { state: State.Buffering };
-  }
-  protected async onTrackEnded() {
-    this.state = { state: State.Ended };
-  }
+  protected onStateUpdate(state: Exclude<State, State.Error>) {
+    this.state = { state };
+ }
+
   protected onError(error: any) {
     // unload the current track to allow for clean playback on other
     this.player?.unload();
