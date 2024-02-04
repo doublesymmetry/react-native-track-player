@@ -1,4 +1,4 @@
-<img src="https:/rntp.dev/img/optimized-logo.svg" width="300" />
+<img src="https://rntp.dev/img/optimized-logo.svg" />
 
 [![downloads](https://img.shields.io/npm/dw/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player)
 [![npm](https://img.shields.io/npm/v/react-native-track-player.svg)](https://www.npmjs.com/package/react-native-track-player)
@@ -8,6 +8,22 @@
 ----
 
 A fully-fledged audio module created for music apps. Provides audio playback, external media controls, background mode and more!
+
+<div align="left" valign="middle">
+<a href="https://runblaze.dev">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://www.runblaze.dev/logo_dark.png">
+   <img align="right" src="https://www.runblaze.dev/logo_light.png" height="102px"/>
+ </picture>
+</a>
+
+<br style="display: none;"/>
+
+*Our CI is superpowered by fast Apple Silicon macOS GitHub Action Runners provided by [Blaze](https://runblaze.dev). Consider using them for your own project! Subscriptions directly support the maintenance of this library.*
+
+</div>
+
+## Overview
 
 - [Documentation](https://rntp.dev)
   * [Installation](https://rntp.dev/docs/basics/installation/)
