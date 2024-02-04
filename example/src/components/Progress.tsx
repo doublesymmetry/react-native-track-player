@@ -12,7 +12,7 @@ export const Progress: React.FC<{ live?: boolean }> = ({ live }) => {
 
   return (
     <View style={styles.container}>
-      {live ? (
+      {live || duration === Infinity ? (
         <Text style={styles.liveText}>Live Stream</Text>
       ) : (
         <View>

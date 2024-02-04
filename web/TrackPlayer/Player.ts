@@ -62,7 +62,8 @@ export class Player {
     // build dom element and attach shaka-player
     this.element = document.createElement('audio');
     this.element.setAttribute('id', 'react-native-track-player');
-    this.player = new shaka.Player(this.element);
+    this.player = new shaka.Player();
+    this.player?.attach(this.element);
 
     // Listen for relevant events events.
     this.player!.addEventListener('error', (error: any) => {
@@ -108,10 +109,12 @@ export class Player {
     this.state = { state: State.Ended };
   }
   protected onError(error: any) {
+    // unload the current track to allow for clean playback on other
+    this.player?.unload();
     this.state = {
       state: State.Error,
       error: {
-        code: error.code,
+        code: error.code.toString(),
         message: error.message,
       },
     };
@@ -143,7 +146,11 @@ export class Player {
   public play() {
     if (!this.element) throw new SetupNotCalledError();
     this.playWhenReady = true;
-    return this.element.play();
+    return this.element.play()
+      .catch(err => {
+        console.error(err);
+      })
+    ;
   }
 
   public pause() {

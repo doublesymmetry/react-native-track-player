@@ -63,9 +63,13 @@ export class TrackPlayerModule extends PlaylistPlayer {
   }
 
   public async updateOptions(options: UpdateOptions) {
+    this.setupProgressUpdates(options.progressUpdateEventInterval);
+  }
+
+  protected setupProgressUpdates(interval?: number) {
     // clear and reset interval
     this.clearUpdateEventInterval();
-    if (options.progressUpdateEventInterval) {
+    if (interval) {
       this.clearUpdateEventInterval()
       this.progressUpdateEventInterval = setInterval(
         async () => {
@@ -77,7 +81,7 @@ export class TrackPlayerModule extends PlaylistPlayer {
             });
           }
         },
-        options.progressUpdateEventInterval * 1000,
+        interval * 1000,
       )
     }
   }
