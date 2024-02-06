@@ -164,4 +164,7 @@ RCT_EXTERN_METHOD(sleepWhenActiveTrackReachesEnd:(RCTPromiseResolveBlock)resolve
 RCT_EXTERN_METHOD(clearSleepTimer:(RCTPromiseResolveBlock)resolve
               rejecter:(RCTPromiseRejectBlock)reject);
 
+RCT_EXTERN_METHOD(getNowPlayingMetadata:(RCTPromiseResolveBlock)resolve
+              rejecter:(RCTPromiseRejectBlock)reject);
+
 @end

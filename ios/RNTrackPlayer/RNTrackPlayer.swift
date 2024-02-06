@@ -26,6 +26,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     private var sessionCategoryMode: AVAudioSession.Mode = .default
     private var sessionCategoryPolicy: AVAudioSession.RouteSharingPolicy = .default
     private var sessionCategoryOptions: AVAudioSession.CategoryOptions = []
+    private var nowPlayingMetadata: [String: Any] = [:]
 
     // MARK: - Lifecycle Methods
 
@@ -695,6 +696,13 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         }
     }
 
+    @objc(getNowPlayingMetadata:rejecter:)
+    public func getNowPlayingMetadata(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        if (rejectWhenNotInitialized(reject: reject)) { return }
+
+        resolve(nowPlayingMetadata)
+    }
+
     @objc(getDuration:rejecter:)
     public func getDuration(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
@@ -754,6 +762,11 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
         player.nowPlayingInfoController.clear()
         resolve(NSNull())
+
+        nowPlayingMetadata = [:]
+        emit(event: EventType.NowPlayingMetadataChanged, body: [
+                "metadata": [:],
+            ] as [String : Any])
     }
 
     @objc(updateNowPlayingMetadata:resolver:rejecter:)
@@ -761,6 +774,11 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         if (rejectWhenNotInitialized(reject: reject)) { return }
 
         Metadata.update(for: player, with: metadata)
+        nowPlayingMetadata = metadata
+        emit(event: EventType.NowPlayingMetadataChanged, body: [
+                "metadata": metadata,
+            ] as [String : Any])
+
         resolve(NSNull())
     }
 
