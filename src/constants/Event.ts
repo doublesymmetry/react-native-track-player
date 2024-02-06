@@ -131,4 +131,8 @@ export enum Event {
    * See https://rntp.dev/docs/api/events#commonmetadatareceived
    **/
   MetadataCommonReceived = 'metadata-common-received',
+  /**
+   * Fired when metadata of active track has changed.
+   **/
+  NowPlayingMetadataChanged = 'now-playing-metadata-changed',
 }

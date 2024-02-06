@@ -19,6 +19,7 @@ import type { RemotePlaySearchEvent } from './RemotePlaySearchEvent';
 import type { RemoteSeekEvent } from './RemoteSeekEvent';
 import type { RemoteSetRatingEvent } from './RemoteSetRatingEvent';
 import type { RemoteSkipEvent } from './RemoteSkipEvent';
+import type { NowPlayingMetadataChangedEvent } from './NowPlayingMetadataChangedEvent';
 
 export type EventPayloadByEvent = {
   [Event.PlayerError]: PlayerErrorEvent;
@@ -49,6 +50,7 @@ export type EventPayloadByEvent = {
   [Event.MetadataChapterReceived]: AudioMetadataReceivedEvent;
   [Event.MetadataTimedReceived]: AudioMetadataReceivedEvent;
   [Event.MetadataCommonReceived]: AudioCommonMetadataReceivedEvent;
+  [Event.NowPlayingMetadataChanged]: NowPlayingMetadataChangedEvent;
 };
 
 // eslint-disable-next-line
