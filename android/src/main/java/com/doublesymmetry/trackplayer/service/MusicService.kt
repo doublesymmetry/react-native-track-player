@@ -430,6 +430,15 @@ class MusicService : HeadlessJsTaskService() {
     @MainThread
     fun updateMetadataForTrack(index: Int, track: Track) {
         player.replaceItem(index, track.toAudioItem())
+
+        if (player.currentIndex == index) {
+          nowPlayingMetadata = track.originalItem
+
+          val eventPayload = Bundle()
+          eventPayload.putBundle("metadata", nowPlayingMetadata!!.clone() as Bundle)
+
+          emit(MusicEvents.NOW_PLAYING_METADATA_CHANGED, eventPayload);
+        }
     }
 
     @MainThread

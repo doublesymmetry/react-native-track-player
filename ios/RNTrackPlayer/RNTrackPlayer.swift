@@ -751,6 +751,10 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
         if (player.currentIndex == index) {
             Metadata.update(for: player, with: metadata)
+            nowPlayingMetadata = metadata
+            emit(event: EventType.NowPlayingMetadataChanged, body: [
+                    "metadata": metadata,
+                ] as [String : Any])
         }
 
         resolve(NSNull())
