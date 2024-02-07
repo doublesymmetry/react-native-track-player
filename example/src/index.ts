@@ -33,7 +33,7 @@ document.head.appendChild(style);
  * END: react-native-vector-icons import
  ******************************************/
 
-const appName = 'Your app name';
+const appName = 'RNTP Example';
 
 AppRegistry.registerComponent(appName, () => App);
 AppRegistry.runApplication(appName, {
