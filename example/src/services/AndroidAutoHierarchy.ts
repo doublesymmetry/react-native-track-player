@@ -31,11 +31,20 @@ const DemoAndroidAutoHierarchy: AndroidAutoBrowseTree = {
       title: 'Soul Searching (Demo)',
       subtitle: 'David Chavez',
       playable: '0',
-      iconUri:
-        'https://react-native-track-player.js.org/example/Soul%20Searching.jpeg',
-      mediaUri:
-        'https://react-native-track-player.js.org/example/Soul%20Searching.mp3',
+      iconUri: 'https://rntp.dev/example/Soul%20Searching.jpeg',
+      mediaUri: 'https://rntp.dev/example/Soul%20Searching.mp3',
       groupTitle: 'RNTP Demo Group',
+      playbackProgress: '0',
+    },
+    {
+      mediaId: '2',
+      title: 'Lullaby (Demo)',
+      subtitle: 'David Chavez',
+      playable: '0',
+      iconUri: 'https://rntp.dev/example/Lullaby%20(Demo).jpeg',
+      mediaUri: 'https://rntp.dev/example/Lullaby%20(Demo).mp3',
+      groupTitle: 'RNTP Demo Group',
+      playbackProgress: '0',
     },
   ],
 };

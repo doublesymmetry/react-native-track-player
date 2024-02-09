@@ -76,7 +76,7 @@ class MusicService : HeadlessJsMediaService() {
             rootHints: Bundle?
     ): BrowserRoot {
         // TODO: verify clientPackageName here.
-        Log.d("RNTP-AA", clientPackageName + " attempted to get Browsable root.")
+        Timber.tag("RNTP-AA").d(clientPackageName + " attempted to get Browsable root.")
         if (clientPackageName in arrayOf<String>(
                 "com.android.systemui",
                 "com.example.android.mediacontroller",
