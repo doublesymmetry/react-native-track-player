@@ -102,10 +102,6 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         val subtitle = hashmap["subtitle"]
         val mediaUri = hashmap["mediaUri"]
         val iconUri = hashmap["iconUri"]
-        val groupTitle = hashmap["groupTitle"]
-        val contentStyle = hashmap["contentStyle"]
-        val childrenPlayableContentStyle = hashmap["childrenPlayableContentStyle"]
-        val childrenBrowsableContentStyle = hashmap["childrenBrowsableContentStyle"]
         val playableFlag = if (hashmap["playable"]?.toInt() == 1) MediaItem.FLAG_BROWSABLE else MediaItem.FLAG_PLAYABLE
 
         val mediaDescriptionBuilder = MediaDescriptionCompat.Builder()
@@ -115,30 +111,42 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         mediaDescriptionBuilder.setMediaUri(if (mediaUri != null) Uri.parse(mediaUri) else null)
         mediaDescriptionBuilder.setIconUri(if (iconUri != null) Uri.parse(iconUri) else null)
         val extras = Bundle()
-        if (groupTitle != null) {
+        hashmap["groupTitle"]?.let {
             extras.putString(
-                    MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_GROUP_TITLE,
-                    groupTitle
-            )
+                MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_GROUP_TITLE, it)
         }
-        if (contentStyle != null) {
+        hashmap["contentStyle"]?.toInt()?.let {
             extras.putInt(
-                    MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_SINGLE_ITEM,
-                    contentStyle.toInt()
-            )
+                MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_SINGLE_ITEM, it)
         }
-        if (childrenPlayableContentStyle != null) {
+        hashmap["childrenPlayableContentStyle"]?.toInt()?.let {
             extras.putInt(
-                    MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_PLAYABLE,
-                    childrenPlayableContentStyle.toInt()
-            )
+                MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_PLAYABLE, it)
         }
-        if (childrenBrowsableContentStyle != null) {
+        hashmap["childrenBrowsableContentStyle"]?.toInt()?.let {
             extras.putInt(
-                    MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE,
-                    childrenBrowsableContentStyle.toInt()
-            )
+                MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE, it)
         }
+
+        // playbackProgress should contain a string representation of a number between 0 and 1 if present
+        hashmap["playbackProgress"]?.toDouble()?.let {
+            if (it > 0.98) {
+                extras.putInt(
+                    MediaConstants.DESCRIPTION_EXTRAS_KEY_COMPLETION_STATUS,
+                    MediaConstants.DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_FULLY_PLAYED)
+            } else if (it == 0.0) {
+                extras.putInt(
+                    MediaConstants.DESCRIPTION_EXTRAS_KEY_COMPLETION_STATUS,
+                    MediaConstants.DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_NOT_PLAYED)
+            } else {
+                extras.putInt(
+                    MediaConstants.DESCRIPTION_EXTRAS_KEY_COMPLETION_STATUS,
+                    MediaConstants.DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_PARTIALLY_PLAYED)
+                extras.putDouble(
+                    MediaConstants.DESCRIPTION_EXTRAS_KEY_COMPLETION_PERCENTAGE, it)
+            }
+        }
+
         mediaDescriptionBuilder.setExtras(extras)
         return MediaItem(mediaDescriptionBuilder.build(), playableFlag)
     }

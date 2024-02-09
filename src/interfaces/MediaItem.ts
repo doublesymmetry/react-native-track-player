@@ -14,4 +14,6 @@ export interface MediaItem {
   contentStyle?: string;
   childrenPlayableContentStyle?: string;
   childrenBrowsableContentStyle?: string;
+  /** playbackProgress should contain a string representation of a number between 0 and 1 if present */
+  playbackProgress?: string;
 }
