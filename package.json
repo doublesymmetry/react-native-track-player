@@ -30,7 +30,9 @@
     "src",
     "lib/**/*",
     "ios/**/*",
-    "android/**/*",
+    "android/src/**/*",
+    "android/build.gradle",
+    "android/proguard-rules.txt",
     "*.podspec"
   ],
   "contributors": [
