@@ -140,7 +140,7 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     private func rejectWhenNotInitialized(reject: RCTPromiseRejectBlock) -> Bool {
         let rejected = !hasInitialized;
         if (rejected) {
-            reject("player_already_initialized", "The player is not initialized. Call setupPlayer first.", nil)
+            reject("player_not_initialized", "The player is not initialized. Call setupPlayer first.", nil)
         }
         return rejected;
     }
