@@ -9,6 +9,22 @@
 
 A fully-fledged audio module created for music apps. Provides audio playback, external media controls, background mode and more!
 
+<div align="left" valign="middle">
+<a href="https://runblaze.dev">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://www.runblaze.dev/logo_dark.png">
+   <img align="right" src="https://www.runblaze.dev/logo_light.png" height="102px"/>
+ </picture>
+</a>
+
+<br style="display: none;"/>
+
+_[Blaze](https://runblaze.dev) sponsors RNTP by providing super fast Apple Silicon based macOS Github Action Runners. Use the discount code `RNTP50` at checkout to get 50% off your first year._
+
+</div>
+
+## Overview
+
 - [Documentation](https://rntp.dev)
   * [Installation](https://rntp.dev/docs/basics/installation/)
   * [Getting Started](https://rntp.dev/docs/basics/getting-started/)
@@ -186,8 +202,8 @@ yarn version --major // 2.0.0
 This command will:
 
 1. Generate/update the Changelog
-2. Bump the package version 
-3. Tag & pushing the commit 
+2. Bump the package version
+3. Tag & pushing the commit
 4. Build & publish the package
 
 
