@@ -2,13 +2,11 @@ import {
   AppRegistry,
   DeviceEventEmitter,
   NativeEventEmitter,
-  NativeModules,
   Platform,
 } from 'react-native';
-// @ts-expect-error because resolveAssetSource is untyped
-import { default as resolveAssetSource } from 'react-native/Libraries/Image/resolveAssetSource';
 
 import { Event, RepeatMode, State, AndroidAutoContentStyle } from './constants';
+import TrackPlayer from './TrackPlayerModule';
 import type {
   AddTrack,
   EventPayloadByEvent,
@@ -22,8 +20,8 @@ import type {
   UpdateOptions,
   AndroidAutoBrowseTree,
 } from './interfaces';
+import resolveAssetSource from './resolveAssetSource';
 
-const { TrackPlayerModule: TrackPlayer } = NativeModules;
 const emitter =
   Platform.OS !== 'android'
     ? new NativeEventEmitter(TrackPlayer)
@@ -69,6 +67,8 @@ export function registerPlaybackService(factory: () => ServiceHandler) {
   if (Platform.OS === 'android') {
     // Registers the headless task
     AppRegistry.registerHeadlessTask('TrackPlayer', factory);
+  } else if (Platform.OS === 'web') {
+    factory()();
   } else {
     // Initializes and runs the service in the next tick
     setImmediate(factory());

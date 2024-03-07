@@ -2,8 +2,8 @@
   "name": "react-native-track-player",
   "version": "4.0.1",
   "description": "A fully fledged audio module created for music apps",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "lib/src/index.js",
+  "types": "lib/src/index.d.ts",
   "react-native": "src/index",
   "source": "src/index",
   "scripts": {
@@ -30,7 +30,10 @@
     "src",
     "lib/**/*",
     "ios/**/*",
-    "android/**/*",
+    "android/src/**/*",
+    "android/build.gradle",
+    "android/proguard-rules.txt",
+    "web/**/*",
     "*.podspec"
   ],
   "contributors": [
@@ -75,10 +78,14 @@
   "peerDependencies": {
     "react": ">=16.8.6",
     "react-native": ">=0.60.0-rc.2",
-    "react-native-windows": ">=0.63.0"
+    "react-native-windows": ">=0.63.0",
+    "shaka-player": "^4.7.9"
   },
   "peerDependenciesMeta": {
     "react-native-windows": {
+      "optional": true
+    },
+    "shaka-player": {
       "optional": true
     }
   },
@@ -97,6 +104,7 @@
     "react-native": "0.68.5",
     "react-native-windows": "^0.65.0-0",
     "rimraf": "^2.6.2",
+    "shaka-player": "^4.7.9",
     "typescript": "^4.8.2"
   },
   "funding": "https://github.com/doublesymmetry/react-native-track-player?sponsor=1",
