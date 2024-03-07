@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, ScrollView } from 'react-native';
+import { ScrollView } from 'react-native';
 import { Spacer } from './Spacer';
 import { Button } from './Button';
 import TrackPlayer from 'react-native-track-player';
@@ -46,16 +46,3 @@ export const ActionSheet: React.FC = () => {
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  contentContainer: {
-    flex: 1,
-    marginTop: '4%',
-    marginHorizontal: 16,
-  },
-  optionRowLabel: {
-    color: 'white',
-    fontSize: 20,
-    fontWeight: '600',
-  },
-});
