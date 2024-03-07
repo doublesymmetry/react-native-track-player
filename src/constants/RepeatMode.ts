@@ -1,5 +1,4 @@
-import { NativeModules } from 'react-native';
-const { TrackPlayerModule: TrackPlayer } = NativeModules;
+import TrackPlayer from '../TrackPlayerModule';
 
 export enum RepeatMode {
   /** Playback stops when the last track in the queue has finished playing. */

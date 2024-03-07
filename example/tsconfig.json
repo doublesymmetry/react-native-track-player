@@ -1,5 +1,5 @@
 {
-  "extends": "@tsconfig/react-native/tsconfig.json",
+  "extends": "./node_modules/@tsconfig/react-native/tsconfig.json",
   "compilerOptions": {
     "paths": {
       "react-native-track-player": [
@@ -13,8 +13,9 @@
     "isolatedModules": true,
     "resolveJsonModule": true,
     "jsx": "react-native",
-    "lib": ["es2017"],
+    "lib": ["es2017", "DOM", "DOM.Iterable"],
     "moduleResolution": "node",
+    "baseUrl": ".",
     "outDir": "./lib",
     "strict": true,
     "target": "esnext",
