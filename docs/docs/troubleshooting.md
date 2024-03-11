@@ -41,3 +41,18 @@ You can also use [jetifier](https://github.com/mikehardy/jetifier#usage-for-sour
 ## Android: Cleartext HTTP traffic not permitted
 
 Since API 28, Android disables traffic without TLS. To fix the issue you have to use `https` or [enable clear text traffic](https://stackoverflow.com/a/50834600).
+
+## Web: Issues with HLS Streams
+
+If your HLS content uses MPEG2-TS, you may need to enable transmuxing. The
+only browsers capable of playing TS natively are Edge and Chromecast. You will
+get a `CONTENT_UNSUPPORTED_BY_BROWSER` error on other browsers due to their lack
+of TS support.
+
+You can enable transmuxing by including [mux.js](https://www.npmjs.com/package/mux.js)
+v5.6.3+ in your application. Once installed mux.js will be auto-detected and
+will be used use to transmux TS content into MP4 on-the-fly, so that the content
+can be played by the browser.
+
+NOTE: there are some limitations to `mux.js` so not all possible content codec's
+are supported.

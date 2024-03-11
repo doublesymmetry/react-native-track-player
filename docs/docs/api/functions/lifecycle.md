@@ -12,7 +12,7 @@ Note that on Android this method must only be called while the app is in the for
 
 **Returns:** `Promise`
 
-| Param                | Type     | Description   | Default   | Android | iOS | Windows |
+| Param                | Type     | Description   | Default   | Android | iOS | Web |
 | -------------------- | -------- | ------------- | --------- | :-----: | :-: | :-----: |
 | options              | `PlayerOptions` | The options   |
 | options.minBuffer    | `number` | Minimum time in seconds that needs to be buffered | 15 (android), automatic (ios) | ✅ | ✅ | ❌ |

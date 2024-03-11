@@ -57,13 +57,3 @@ As of iOS Simulator version 11, Apple has removed support for Control Center and
 Now Playing Info from the simulator. You will not be able to test lock screen
 controls on recent versions of iOS Simulator. You can either test on real
 devices, or download older versions of the iOS Simulator.
-
-## Windows
-To allow background audio playback on Windows, you need to add the background
-capability in the app manifest, as [documented by Microsoft](https://docs.microsoft.com/windows/uwp/audio-video-camera/background-audio#background-media-playback-manifest-capability)
-
-```xml
-<Capabilities>
-    <uap3:Capability Name="backgroundMediaPlayback"/>
-</Capabilities>
-```
