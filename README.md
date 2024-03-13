@@ -9,6 +9,22 @@
 
 A fully-fledged audio module created for music apps. Provides audio playback, external media controls, background mode and more!
 
+<div align="left" valign="middle">
+<a href="https://runblaze.dev">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://www.runblaze.dev/logo_dark.png">
+   <img align="right" src="https://www.runblaze.dev/logo_light.png" height="102px"/>
+ </picture>
+</a>
+
+<br style="display: none;"/>
+
+_[Blaze](https://runblaze.dev) sponsors RNTP by providing super fast Apple Silicon based macOS Github Action Runners. Use the discount code `RNTP50` at checkout to get 50% off your first year._
+
+</div>
+
+## Overview
+
 - [Documentation](https://rntp.dev)
   * [Installation](https://rntp.dev/docs/basics/installation/)
   * [Getting Started](https://rntp.dev/docs/basics/getting-started/)
@@ -186,8 +202,8 @@ yarn version --major // 2.0.0
 This command will:
 
 1. Generate/update the Changelog
-2. Bump the package version 
-3. Tag & pushing the commit 
+2. Bump the package version
+3. Tag & pushing the commit
 4. Build & publish the package
 
 
@@ -199,3 +215,31 @@ You can find us as part of the [React Native Track Player](https://discordapp.co
 - `#troubleshooting-forum` - Ask members of the community to trouble shoot issues with your app and make recommendations.
 - `#show-and-tell` - Tell the community about the app you made with this project!
 - `#news-and-releases` - Stay updated about the latest releases and dev efforts on the project.
+
+## Web
+
+RNTP is available on web. The web implementation leverages [shaka-player](https://github.com/shaka-project/shaka-player)
+which is an optional peer dependency of the RNTP. If you want to deploy the web
+platform you'll need to install `shaka-player` directly in your project:
+
+```sh
+yarn add shaka-player
+```
+
+### Web FAQ
+
+See [`shaka-player`'s FAQ](https://github.com/shaka-project/shaka-player/blob/7772099029acb47e6905a688f6cfc9c8738c6ff2/docs/tutorials/faq.md)
+
+### Web HLS
+
+Q: Why doesn't my HLS content work?
+
+A: If your HLS content uses MPEG2-TS, you may need to enable transmuxing. The
+only browsers capable of playing TS natively are Edge and Chromecast. You will
+get a CONTENT_UNSUPPORTED_BY_BROWSER error on other browsers due to their lack
+of TS support.
+
+You can enable transmuxing by including [mux.js](https://www.npmjs.com/package/mux.js)
+v5.6.3+ in your application. If Shaka Player detects that mux.js has been
+loaded, we will use it to transmux TS content into MP4 on-the-fly, so that the
+content can be played by the browser.

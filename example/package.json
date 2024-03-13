@@ -12,6 +12,8 @@
     "ios": "react-native run-ios",
     "ios:sim": "react-native run-ios --simulator=\"iPhone\"",
     "ios:ide": "open ios/*.xcworkspace/",
+    "web:start": "craco start",
+    "web:build": "craco build",
     "windows": "react-native run-windows",
     "start": "react-native start",
     "test": "jest",
@@ -25,23 +27,33 @@
     "@gorhom/bottom-sheet": "^4",
     "@react-native-community/slider": "^4.4.2",
     "@react-native-segmented-control/segmented-control": "^2.4.2",
+    "mux.js": "^7.0.0",
     "react": "18.2.0",
+    "react-dom": "^18.0.2",
     "react-native": "0.71.12",
-    "react-native-gesture-handler": "^2.12.1",
-    "react-native-reanimated": "^3.4.1",
+    "react-native-gesture-handler": "2.12.1",
+    "react-native-reanimated": "3.3.0",
     "react-native-track-player": "link:../",
     "react-native-vector-icons": "^10.0.0",
-    "react-native-windows": "^0.65.0-0"
+    "react-native-web": "^0.18.10",
+    "react-native-windows": "0.71.12",
+    "react-scripts": "5.0.1",
+    "shaka-player": "^4.7.9"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
     "@babel/preset-env": "^7.20.0",
     "@babel/runtime": "^7.20.0",
+    "@craco/craco": "^7.0.0",
+    "@dealmore/craco-plugin-babel-include": "^1.0.0",
     "@react-native-community/eslint-config": "^3.2.0",
     "@tsconfig/react-native": "^2.0.2",
     "@types/jest": "^29.2.1",
     "@types/react": "^18.0.24",
+    "@types/react-dom": "^18.2.0",
     "@types/react-native": "^0.64.5",
+    "@types/react-native-vector-icons": "^6.4.14",
     "@types/react-test-renderer": "^18.0.0",
     "@typescript-eslint/eslint-plugin": "^5.36.0",
     "@typescript-eslint/parser": "^5.36.0",
@@ -53,6 +65,7 @@
     "jest": "^29.2.1",
     "metro-react-native-babel-preset": "0.73.9",
     "prettier": "^2.4.1",
+    "react-app-alias-ex": "^2.1.0",
     "react-native-clean-project": "^4.0.1",
     "react-test-renderer": "18.2.0",
     "rimraf": "^3.0.2",
@@ -74,5 +87,17 @@
     "dependencies": {
       "classic.yarnpkg.com": "^1"
     }
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
