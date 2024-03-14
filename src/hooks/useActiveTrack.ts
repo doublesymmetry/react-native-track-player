@@ -29,7 +29,7 @@ export const useActiveTrack = (): Track | undefined => {
     [Event.PlaybackActiveTrackChanged],
     async ({ track }) => {
       setTrack(track ?? undefined);
-    }
+    },
   );
 
   return track;
