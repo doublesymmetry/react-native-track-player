@@ -44,7 +44,7 @@ released you can install the `nightly` version which is an automatic release of
 
 ## iOS Setup
 
-iOS requires a few extra steps that are _not_ required for Android/Windows.
+iOS requires a few extra steps that are _not_ required for Android/Web.
 
 ### Enable Swift Modules
 
@@ -59,6 +59,41 @@ You'll need to run a `pod install` in order to install the native iOS dependenci
 ```sh
 cd ios && pod install
 ```
+
+## Web Setup
+
+RNTP is available on web. The web implementation leverages [shaka-player](https://github.com/shaka-project/shaka-player)
+which is an optional peer dependency of the RNTP. If you want to deploy the web
+platform you'll need to install `shaka-player` directly in your project:
+
+<Tabs groupId="pkg">
+  <TabItem value="npm" label="NPM" default>
+
+    npm install --save shaka-player
+
+  </TabItem>
+  <TabItem value="yarn" label="Yarn">
+
+    yarn add shaka-player
+
+  </TabItem>
+</Tabs>
+
+You may need to [enable transmuxing support](../troubleshooting.md#web-issues-with-hls-streams)
+if you're using HLS streams with MPEG2-TS content.
+
+<Tabs groupId="pkg">
+  <TabItem value="npm" label="NPM" default>
+
+    npm install --save mux.js
+
+  </TabItem>
+  <TabItem value="yarn" label="Yarn">
+
+    yarn add mux.js
+
+  </TabItem>
+</Tabs>
 
 ## Expo
 
