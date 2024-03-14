@@ -6,11 +6,11 @@ sidebar_position: 5
 
 ## Audio Sources
 
-| Feature | Android | iOS | Windows |
+| Feature | Android | iOS | Web |
 | ------- | :-----: | :-: | :-----: |
 | App bundle¹ | ✅ | ✅ | ✅ |
 | Network | ✅ | ✅ | ✅ |
-| File System² | ✅ | ✅ | ✅ |
+| File System² | ✅ | ✅ | ❌ |
 
 ¹: Use `require` or `import`
 
@@ -18,7 +18,7 @@ sidebar_position: 5
 
 ## Stream Types
 
-| Feature | Android | iOS | Windows |
+| Feature | Android | iOS | Web |
 | ------- | :-----: | :-: | :-----: |
 | Regular Streams | ✅ | ✅ | ✅ |
 | DASH | ✅ | ❌ | ✅ |
@@ -27,7 +27,7 @@ sidebar_position: 5
 
 ## Casting
 
-| Feature | Android | iOS | Windows |
+| Feature | Android | iOS | Web |
 | ------- | :-----: | :-: | :-----: |
 | Google Cast¹ | ✅ | ❌ | ❌ |
 | Miracast/DLNA | ❌ | ❌ | ❌ |
@@ -37,17 +37,17 @@ sidebar_position: 5
 
 ## Miscellaneous
 
-| Feature | Android | iOS | Windows |
+| Feature | Android | iOS | Web |
 | ------- | :-----: | :-: | :-----: |
-| Media Controls | ✅ | ✅ | ✅ |
+| Media Controls | ✅ | ✅ | ❌ |
 | Caching | ✅ | ❌ | ❌ |
-| Background Mode¹ | ✅ | ✅ | ✅ |
+| Background Mode¹ | ✅ | ✅ | ❌ |
 
 ¹: Read more in [Background Mode](./background-mode.md)
 
 ## Functions
 
-| Function | Android | iOS | Windows |
+| Function | Android | iOS | Web |
 | ------- | :-----: | :-: | :-----: |
 | `setupPlayer` | ✅ | ✅ | ✅ |
 | `updateOptions` | ✅ | ✅ | ✅ |
@@ -77,20 +77,20 @@ sidebar_position: 5
 
 ## Events
 
-| Event | Android | iOS | Windows |
+| Event | Android | iOS | Web |
 | ------- | :-----: | :-: | :-----: |
-| `remote-play` | ✅ | ✅ | ✅ |
+| `remote-play` | ✅ | ✅ | ❌ |
 | `remote-play-id` | ✅ | ❌ | ❌ |
 | `remote-play-search` | ✅ | ❌ | ❌ |
-| `remote-pause` | ✅ | ✅ | ✅ |
-| `remote-stop` | ✅ | ✅ | ✅ |
+| `remote-pause` | ✅ | ✅ | ❌ |
+| `remote-stop` | ✅ | ✅ | ❌ |
 | `remote-skip` | ✅ | ❌ | ❌ |
-| `remote-next` | ✅ | ✅ | ✅ |
-| `remote-previous` | ✅ | ✅ | ✅ |
-| `remote-seek` | ✅ | ✅ | ✅ |
+| `remote-next` | ✅ | ✅ | ❌ |
+| `remote-previous` | ✅ | ✅ | ❌ |
+| `remote-seek` | ✅ | ✅ | ❌ |
 | `remote-set-rating` | ✅ | ❌ | ❌ |
-| `remote-jump-forward` | ✅ | ✅ | ✅ |
-| `remote-jump-backward` | ✅ | ✅ | ✅ |
+| `remote-jump-forward` | ✅ | ✅ | ❌ |
+| `remote-jump-backward` | ✅ | ✅ | ❌ |
 | `remote-duck` | ✅ | ✅ | ❌ |
 | `playback-state` | ✅ | ✅ | ✅ |
 | `playback-track-changed` | ✅ | ✅ | ✅ |

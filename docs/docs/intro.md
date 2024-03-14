@@ -10,7 +10,7 @@ A fully fledged audio module created for music apps. Provides audio playback, ex
 
 * **Lightweight** - Optimized to use the least amount of resources according to your needs
 * **Feels native** - As everything is built together, it follows the same design principles as real music apps do
-* **Multi-platform** - Supports Android, iOS and Windows
+* **Multi-platform** - Supports Android, iOS and Web
 * **Media Controls support** - Provides events for controlling the app from a bluetooth device, the lockscreen, a notification, a smartwatch or even a car
 * **Local or network, files or streams** - It doesn't matter where the media belongs, we've got you covered
 * **Adaptive bitrate streaming support** - Support for DASH, HLS or SmoothStreaming

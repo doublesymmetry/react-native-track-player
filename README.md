@@ -58,7 +58,7 @@ Not sure where to start?
 
 * **Lightweight** - Optimized to use the least amount of resources according to your needs
 * **Feels native** - As everything is built together, it follows the same design principles as real music apps do
-* **Multi-platform** - Supports Android, iOS and Windows
+* **Multi-platform** - Supports Android, iOS and Web
 * **Media Controls support** - Provides events for controlling the app from a Bluetooth device, the lock screen, a notification, a smartwatch or even a car
 * **Local or network, files or streams** - It doesn't matter where the media belongs, we've got you covered
 * **Adaptive bitrate streaming support** - Support for DASH, HLS or SmoothStreaming
@@ -215,31 +215,3 @@ You can find us as part of the [React Native Track Player](https://discordapp.co
 - `#troubleshooting-forum` - Ask members of the community to trouble shoot issues with your app and make recommendations.
 - `#show-and-tell` - Tell the community about the app you made with this project!
 - `#news-and-releases` - Stay updated about the latest releases and dev efforts on the project.
-
-## Web
-
-RNTP is available on web. The web implementation leverages [shaka-player](https://github.com/shaka-project/shaka-player)
-which is an optional peer dependency of the RNTP. If you want to deploy the web
-platform you'll need to install `shaka-player` directly in your project:
-
-```sh
-yarn add shaka-player
-```
-
-### Web FAQ
-
-See [`shaka-player`'s FAQ](https://github.com/shaka-project/shaka-player/blob/7772099029acb47e6905a688f6cfc9c8738c6ff2/docs/tutorials/faq.md)
-
-### Web HLS
-
-Q: Why doesn't my HLS content work?
-
-A: If your HLS content uses MPEG2-TS, you may need to enable transmuxing. The
-only browsers capable of playing TS natively are Edge and Chromecast. You will
-get a CONTENT_UNSUPPORTED_BY_BROWSER error on other browsers due to their lack
-of TS support.
-
-You can enable transmuxing by including [mux.js](https://www.npmjs.com/package/mux.js)
-v5.6.3+ in your application. If Shaka Player detects that mux.js has been
-loaded, we will use it to transmux TS content into MP4 on-the-fly, so that the
-content can be played by the browser.
