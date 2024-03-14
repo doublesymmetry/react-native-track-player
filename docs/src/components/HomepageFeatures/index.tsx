@@ -34,7 +34,7 @@ const FeatureList: FeatureItem[] = [
     Svg: require('@site/static/img/undraw_devices.svg').default,
     description: (
       <>
-        Supports Android, iOS and Windows.
+        Supports Android, iOS and Web.
       </>
     ),
   },

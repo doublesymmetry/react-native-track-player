@@ -9,6 +9,22 @@
 
 A fully-fledged audio module created for music apps. Provides audio playback, external media controls, background mode and more!
 
+<div align="left" valign="middle">
+<a href="https://runblaze.dev">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://www.runblaze.dev/logo_dark.png">
+   <img align="right" src="https://www.runblaze.dev/logo_light.png" height="102px"/>
+ </picture>
+</a>
+
+<br style="display: none;"/>
+
+_[Blaze](https://runblaze.dev) sponsors RNTP by providing super fast Apple Silicon based macOS Github Action Runners. Use the discount code `RNTP50` at checkout to get 50% off your first year._
+
+</div>
+
+## Overview
+
 - [Documentation](https://rntp.dev)
   * [Installation](https://rntp.dev/docs/basics/installation/)
   * [Getting Started](https://rntp.dev/docs/basics/getting-started/)
@@ -42,7 +58,7 @@ Not sure where to start?
 
 * **Lightweight** - Optimized to use the least amount of resources according to your needs
 * **Feels native** - As everything is built together, it follows the same design principles as real music apps do
-* **Multi-platform** - Supports Android, iOS and Windows
+* **Multi-platform** - Supports Android, iOS and Web
 * **Media Controls support** - Provides events for controlling the app from a Bluetooth device, the lock screen, a notification, a smartwatch or even a car
 * **Local or network, files or streams** - It doesn't matter where the media belongs, we've got you covered
 * **Adaptive bitrate streaming support** - Support for DASH, HLS or SmoothStreaming
@@ -52,7 +68,7 @@ Not sure where to start?
 * **Supports React Hooks 🎣** - Includes React Hooks for common use-cases so you don't have to write them
 
 ## Why another music module?
-After trying to team up modules like `react-native-sound`, `react-native-music-controls` and `react-native-google-cast`, I've noticed, that their structure and the way should be tied together can cause a lot of problems (mainly on Android). Those can heavily affect the app stability and user experience.
+After trying to team up modules like `react-native-sound`, `react-native-music-controls` and `react-native-google-cast`, I've noticed that their structure and the way they should be tied together can cause a lot of problems (mainly on Android). Those can heavily affect the app stability and user experience.
 
 All audio modules (like `react-native-sound`) don't play in a separated service on Android, which should **only** be used for simple audio tracks in the foreground (such as sound effects, voice messages, etc.)
 
@@ -186,8 +202,8 @@ yarn version --major // 2.0.0
 This command will:
 
 1. Generate/update the Changelog
-2. Bump the package version 
-3. Tag & pushing the commit 
+2. Bump the package version
+3. Tag & pushing the commit
 4. Build & publish the package
 
 

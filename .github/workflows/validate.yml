@@ -1,0 +1,186 @@
+name: validate
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      should-build-docs: ${{ steps.filter.outputs.docs || steps.filter.outputs.workflow }}
+      should-build-ios: ${{ steps.filter.outputs.ios || steps.filter.outputs.workflow || steps.filter.outputs.js }}
+      should-build-android: ${{ steps.filter.outputs.android || steps.filter.outputs.workflow || steps.filter.outputs.js }}
+      should-check-types: ${{ steps.filter.outputs.js || steps.filter.outputs.workflow }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            workflow:
+              - '.github/workflows/validate.yml'
+            js:
+              - 'src/**'
+              - '**.json'
+              - '**.js'
+              - 'example/src/**'
+              - 'example/**.json'
+              - 'example/**.js'
+            ios:
+              - 'ios/**'
+              - 'example/ios/**'
+            android:
+              - 'android/**'
+              - 'example/android/**'
+            docs:
+              - 'docs/**'
+  check-typescript:
+    runs-on: ubuntu-latest
+    needs: check-changes
+    steps:
+      - name: Checkout Repo
+        if: ${{ needs.check-changes.outputs.should-check-types }}
+        uses: actions/checkout@v4
+      - name: Setup Environment
+        uses: pkgxdev/setup@v2
+        with:
+          +: classic.yarnpkg.com
+      - name: Install Dependencies
+        if: ${{ needs.check-changes.outputs.should-check-types }}
+        run: |-
+          yarn install --frozen-lockfile
+      - name: Install Example Dependencies
+        if: ${{ needs.check-changes.outputs.should-check-types }}
+        run: |-
+          cd example
+          yarn install --frozen-lockfile
+      - name: Check Lint, Format & Types
+        if: ${{ needs.check-changes.outputs.should-check-types }}
+        run: |
+          yarn run ci:lint
+          yarn run ci:format
+          yarn run types
+      - name: Example - Check Lint, Format & Types
+        if: ${{ needs.check-changes.outputs.should-check-types }}
+        run: |
+          cd example
+          yarn run ci:lint
+          yarn run ci:format
+          yarn run types
+  build-ios:
+    runs-on: blaze/macos-14
+    needs: check-changes
+    steps:
+      - name: Checkout Repo
+        if: ${{ needs.check-changes.outputs.should-build-ios }}
+        uses: actions/checkout@v4
+      - name: Setup Environment
+        uses: pkgxdev/setup@v2
+        with:
+          +: ruby-lang.org@3.1.0
+            classic.yarnpkg.com
+            tuist.io/xcbeautify
+      - name: Install Library Dependencies
+        if: ${{ needs.check-changes.outputs.should-build-ios }}
+        run: yarn install --frozen-lockfile
+      - name: Build Library
+        if: ${{ needs.check-changes.outputs.should-build-ios }}
+        run: yarn build
+      - name: Install Example Dependencies
+        if: ${{ needs.check-changes.outputs.should-build-ios }}
+        run: |-
+          cd example
+          yarn install --frozen-lockfile
+      - name: Bundle Install
+        if: ${{ needs.check-changes.outputs.should-build-ios }}
+        run: |-
+          cd example/ios
+          pkgx +ruby-lang.org@3.1.0 gem install bundler
+          pkgx +ruby-lang.org@3.1.0 bundle config set --local path 'vendor/bundle'
+          pkgx +ruby-lang.org@3.1.0 bundle install
+      - name: Cache Cocoapods Dependencies
+        if: ${{ needs.check-changes.outputs.should-build-ios }}
+        uses: buildjet/cache@v4
+        with:
+          path: example/ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('example/ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+      - name: Install Cococapods
+        if: ${{ needs.check-changes.outputs.should-build-ios }}
+        run: |-
+          cd example/ios
+          pkgx +ruby-lang.org@3.1.0 bundle exec pod install
+      - name: Build App
+        if: ${{ needs.check-changes.outputs.should-build-ios }}
+        run: |-
+          cd example/ios
+          set -o pipefail && xcodebuild build -workspace RNTPExample.xcworkspace -scheme RNTPExample -destination 'platform=iOS Simulator,name=iPhone 15 Pro' | xcbeautify --renderer github-actions
+  build-android:
+    runs-on: ubuntu-latest
+    needs: check-changes
+    steps:
+      - name: Checkout Repo
+        if: ${{ needs.check-changes.outputs.should-build-android }}
+        uses: actions/checkout@v4
+      - name: Setup Environment
+        uses: pkgxdev/setup@v2
+        with:
+          +: classic.yarnpkg.com
+      - name: Install Library Dependencies
+        if: ${{ needs.check-changes.outputs.should-build-android }}
+        run: yarn install --frozen-lockfile
+      - name: Build Library
+        if: ${{ needs.check-changes.outputs.should-build-android }}
+        run: yarn build
+      - name: Install Mobile Dependencies
+        if: ${{ needs.check-changes.outputs.should-build-android }}
+        run: |-
+          cd example
+          yarn install
+      - name: Cache Gradle Wrapper
+        if: ${{ needs.check-changes.outputs.should-build-android }}
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('example/android/gradle/wrapper/gradle-wrapper.properties') }}
+      - name: Cache Gradle Dependencies
+        if: ${{ needs.check-changes.outputs.should-build-android }}
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-caches-${{ hashFiles('example/android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-caches-
+      - name: Build App
+        if: ${{ needs.check-changes.outputs.should-build-android }}
+        run: |-
+          cd example/android
+          ./gradlew assembleDebug --no-daemon
+  build-docs:
+    runs-on: ubuntu-latest
+    needs: check-changes
+    defaults:
+      run:
+        working-directory: docs
+    steps:
+      - name: Checkout Repo
+        if: ${{ needs.check-changes.outputs.should-build-docs }}
+        uses: actions/checkout@v4
+      - name: Setup Environment
+        uses: pkgxdev/setup@v2
+        with:
+          +: classic.yarnpkg.com
+      - name: Install Dependencies
+        if: ${{ needs.check-changes.outputs.should-build-docs }}
+        run: |-
+          yarn install --frozen-lockfile
+      - name: Build Docs
+        if: ${{ needs.check-changes.outputs.should-build-docs }}
+        run: |-
+          yarn build

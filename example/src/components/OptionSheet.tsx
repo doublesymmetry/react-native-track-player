@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
-import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { Platform, StyleSheet, ScrollView, Text, View } from 'react-native';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
 import TrackPlayer, {
   AppKilledPlaybackBehavior,
@@ -34,7 +33,7 @@ export const OptionSheet: React.FC = () => {
     useState(audioServiceBehaviourToIndex(DefaultAudioServiceBehaviour));
 
   return (
-    <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
+    <ScrollView>
       <OptionStack vertical={true}>
         <Text style={styles.optionRowLabel}>Repeat Mode</Text>
         <Spacer />
@@ -94,7 +93,7 @@ export const OptionSheet: React.FC = () => {
           />
         </OptionStack>
       )}
-    </BottomSheetScrollView>
+    </ScrollView>
   );
 };
 
