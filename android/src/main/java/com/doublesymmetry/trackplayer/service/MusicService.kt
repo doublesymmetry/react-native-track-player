@@ -46,6 +46,7 @@ class MusicService : HeadlessJsTaskService() {
     private val binder = MusicBinder()
     private val scope = MainScope()
     private var progressUpdateJob: Job? = null
+    private var nowPlayingMetadata: Bundle? = Bundle()
 
     /**
      * Use [appKilledPlaybackBehavior] instead.
@@ -429,11 +430,32 @@ class MusicService : HeadlessJsTaskService() {
     @MainThread
     fun updateMetadataForTrack(index: Int, track: Track) {
         player.replaceItem(index, track.toAudioItem())
+
+        if (player.currentIndex == index) {
+          nowPlayingMetadata = track.originalItem
+
+          val eventPayload = Bundle()
+          eventPayload.putBundle("metadata", nowPlayingMetadata!!.clone() as Bundle)
+
+          emit(MusicEvents.NOW_PLAYING_METADATA_CHANGED, eventPayload);
+        }
     }
 
     @MainThread
     fun updateNowPlayingMetadata(track: Track) {
         player.notificationManager.overrideMetadata(track.toAudioItem())
+
+        nowPlayingMetadata = track.originalItem
+
+        val eventPayload = Bundle()
+        eventPayload.putBundle("metadata", nowPlayingMetadata!!.clone() as Bundle)
+
+        emit(MusicEvents.NOW_PLAYING_METADATA_CHANGED, eventPayload);
+    }
+
+    @MainThread
+    fun getNowPlayingMetadata(): Bundle {
+        return nowPlayingMetadata ?: Bundle()
     }
 
     @MainThread
