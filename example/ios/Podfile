@@ -44,6 +44,8 @@ target 'RNTPExample' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  pod 'SwiftAudioEx', :path => "#{config[:reactNativePath]}/../react-native-track-player/Libraries/SwiftAudioEx"
+
   target 'RNTPExampleTests' do
     inherit! :complete
     # Pods for testing
@@ -59,4 +61,3 @@ target 'RNTPExample' do
     __apply_Xcode_12_5_M1_post_install_workaround(installer)
   end
 end
-
