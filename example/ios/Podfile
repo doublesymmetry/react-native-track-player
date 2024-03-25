@@ -1,5 +1,6 @@
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+require_relative '../node_modules/react-native-track-player/scripts/rntp_pods'
 
 # use cocoapods CDN per https://blog.cocoapods.org/CocoaPods-1.7.2/
 source 'https://cdn.cocoapods.org/'
@@ -44,7 +45,7 @@ target 'RNTPExample' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  pod 'SwiftAudioEx', :path => "#{config[:reactNativePath]}/../react-native-track-player/Libraries/SwiftAudioEx"
+  use_rntp_local_audio!
 
   target 'RNTPExampleTests' do
     inherit! :complete
