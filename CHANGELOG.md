@@ -1,3 +1,7 @@
+# [4.1.1](https://github.com/doublesymmetry/react-native-track-player/compare/v4.1.0...v4.1.1) (2024-03-26)
+
+- **RN:** Fixes an issue when using local assets in release builds
+
 # [4.1.0](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.1...v4.1.0) (2024-03-25)
 
 - **web:** First beta version of RNTP for web
