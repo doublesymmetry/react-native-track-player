@@ -1,7 +1,7 @@
 import type { AndroidOptions } from './AndroidOptions';
 import type { FeedbackOptions } from './FeedbackOptions';
 import type { ResourceObject } from './ResourceObject';
-import type { RatingType, Capability } from '../constants';
+import type { RatingType, Capability, IOSCategory, IOSCategoryMode, IOSCategoryOptions } from '../constants';
 
 export interface UpdateOptions {
   android?: AndroidOptions;
@@ -46,4 +46,22 @@ export interface UpdateOptions {
   rewindIcon?: ResourceObject;
   forwardIcon?: ResourceObject;
   color?: number;
+
+  /**
+   * [AVAudioSession.Category](https://developer.apple.com/documentation/avfoundation/avaudiosession/1616615-category)
+   */
+  iosCategory?: IOSCategory;
+  /**
+   * (iOS only) The audio session mode, together with the audio session category,
+   * indicates to the system how you intend to use audio in your app. You can use
+   * a mode to configure the audio system for specific use cases such as video
+   * recording, voice or video chat, or audio analysis.
+   *
+   * See https://developer.apple.com/documentation/avfoundation/avaudiosession/1616508-mode
+   */
+  iosCategoryMode?: IOSCategoryMode;
+  /**
+   * [AVAudioSession.CategoryOptions](https://developer.apple.com/documentation/avfoundation/avaudiosession/1616503-categoryoptions) for iOS.
+   */
+  iosCategoryOptions?: IOSCategoryOptions[];
 }

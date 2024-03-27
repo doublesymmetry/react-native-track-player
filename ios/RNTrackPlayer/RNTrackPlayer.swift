@@ -183,29 +183,13 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         // configure wether control center metdata should auto update
         player.automaticallyUpdateNowPlayingInfo = config["autoUpdateMetadata"] as? Bool ?? true
 
-        // configure audio session - category, options & mode
-        if
-            let sessionCategoryStr = config["iosCategory"] as? String,
-            let mappedCategory = SessionCategory(rawValue: sessionCategoryStr) {
-            sessionCategory = mappedCategory.mapConfigToAVAudioSessionCategory()
-        }
-
-        if
-            let sessionCategoryModeStr = config["iosCategoryMode"] as? String,
-            let mappedCategoryMode = SessionCategoryMode(rawValue: sessionCategoryModeStr) {
-            sessionCategoryMode = mappedCategoryMode.mapConfigToAVAudioSessionCategoryMode()
-        }
-
         if
             let sessionCategoryPolicyStr = config["iosCategoryPolicy"] as? String,
             let mappedCategoryPolicy = SessionCategoryPolicy(rawValue: sessionCategoryPolicyStr) {
             sessionCategoryPolicy = mappedCategoryPolicy.mapConfigToAVAudioSessionCategoryPolicy()
         }
-
-        let sessionCategoryOptsStr = config["iosCategoryOptions"] as? [String]
-        let mappedCategoryOpts = sessionCategoryOptsStr?.compactMap { SessionCategoryOptions(rawValue: $0)?.mapConfigToAVAudioSessionCategoryOptions() } ?? []
-        sessionCategoryOptions = AVAudioSession.CategoryOptions(mappedCategoryOpts)
-
+        
+        setCategoryFrom(config: config)
         configureAudioSession()
 
         // setup event listeners
@@ -290,6 +274,25 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         hasInitialized = true
         resolve(NSNull())
     }
+    
+    private func setCategoryFrom(config: [String: Any]) {
+        // configure audio session - category, options & mode
+        if
+            let sessionCategoryStr = config["iosCategory"] as? String,
+            let mappedCategory = SessionCategory(rawValue: sessionCategoryStr) {
+            sessionCategory = mappedCategory.mapConfigToAVAudioSessionCategory()
+        }
+
+        if
+            let sessionCategoryModeStr = config["iosCategoryMode"] as? String,
+            let mappedCategoryMode = SessionCategoryMode(rawValue: sessionCategoryModeStr) {
+            sessionCategoryMode = mappedCategoryMode.mapConfigToAVAudioSessionCategoryMode()
+        }
+
+        let sessionCategoryOptsStr = config["iosCategoryOptions"] as? [String]
+        let mappedCategoryOpts = sessionCategoryOptsStr?.compactMap { SessionCategoryOptions(rawValue: $0)?.mapConfigToAVAudioSessionCategoryOptions() } ?? []
+        sessionCategoryOptions = AVAudioSession.CategoryOptions(mappedCategoryOpts)
+    }
 
 
     private func configureAudioSession() {
@@ -329,6 +332,9 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
 
         forwardJumpInterval = options["forwardJumpInterval"] as? NSNumber ?? forwardJumpInterval
         backwardJumpInterval = options["backwardJumpInterval"] as? NSNumber ?? backwardJumpInterval
+        
+        setCategoryFrom(config: options)
+        configureAudioSession()
 
         player.remoteCommands = capabilitiesStr
             .compactMap { Capability(rawValue: $0) }
