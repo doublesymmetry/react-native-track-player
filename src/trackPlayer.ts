@@ -34,7 +34,7 @@ function resolveImportedAssetOrPath(pathOrAsset: string | number | undefined) {
     ? undefined
     : typeof pathOrAsset === 'string'
     ? pathOrAsset
-    : resolveImportedAsset(pathOrAsset)?.uri;
+    : resolveImportedAsset(pathOrAsset);
 }
 
 function resolveImportedAsset(id?: number) {

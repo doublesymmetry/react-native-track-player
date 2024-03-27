@@ -25,9 +25,13 @@ jobs:
             workflow:
               - '.github/workflows/validate.yml'
             js:
+              - '.node-version'
+              - '.eslintrc.js'
+              - '.prettierrc.js'
+              - 'package.json'
+              - 'tsconfig.json'
+              - 'yarn.lock'
               - 'src/**'
-              - '**.json'
-              - '**.js'
               - 'example/src/**'
               - 'example/**.json'
               - 'example/**.js'
