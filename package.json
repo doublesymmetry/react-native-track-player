@@ -30,6 +30,7 @@
     "src",
     "lib/**/*",
     "ios/**/*",
+    "Libraries/**",
     "android/src/**/*",
     "android/build.gradle",
     "android/proguard-rules.txt",
