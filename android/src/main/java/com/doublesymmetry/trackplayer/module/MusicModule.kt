@@ -626,4 +626,39 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         if (verifyServiceBoundOrReject(callback)) return@launch
         callback.resolve(Arguments.fromBundle(musicService.getPlayerStateBundle(musicService.state)))
     }
+
+    @ReactMethod
+    fun setAnimatedVolume(volume: Float = 1f, duration: Int = 0, interval: Int = 20, msg: String = "", callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        musicService.setAnimatedVolume(volume, duration.toLong(), interval.toLong(), msg).await()
+        callback.resolve(null)
+    }
+
+    @ReactMethod
+    fun fadeOutPause(duration: Int = 0, interval: Int = 20, callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        musicService.fadeOutPause(duration.toLong(), interval.toLong())
+        callback.resolve(null)
+    }
+
+    @ReactMethod
+    fun fadeOutNext(duration: Int = 0, interval: Int = 20, toVolume: Float = 1f, callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        musicService.fadeOutNext(duration.toLong(), interval.toLong(), toVolume)
+        callback.resolve(null)
+    }
+
+    @ReactMethod
+    fun fadeOutPrevious(duration: Int = 0, interval: Int = 20, toVolume: Float = 1f, callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        musicService.fadeOutPrevious(duration.toLong(), interval.toLong(), toVolume)
+        callback.resolve(null)
+    }
+
+    @ReactMethod
+    fun fadeOutJump(index: Int, duration: Int = 0, interval: Int = 20, toVolume: Float = 1f, callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        musicService.fadeOutJump(index, duration.toLong(), interval.toLong(), toVolume)
+        callback.resolve(null)
+    }
 }

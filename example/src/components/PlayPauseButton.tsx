@@ -11,13 +11,24 @@ import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 export const PlayPauseButton: React.FC = () => {
   const { playing, bufferingDuringPlay } = useIsPlaying();
 
+  const onFadeOutPause = () => {
+    TrackPlayer.fadeOutPause();
+  };
+
+  const onFadeInPlay = () => {
+    TrackPlayer.play();
+    TrackPlayer.setAnimatedVolume({
+      volume: 1,
+    });
+  };
+
   return (
     <View style={styles.container}>
       {bufferingDuringPlay ? (
         <ActivityIndicator />
       ) : (
         <TouchableWithoutFeedback
-          onPress={playing ? TrackPlayer.pause : TrackPlayer.play}
+          onPress={playing ? onFadeOutPause : onFadeInPlay}
         >
           <FontAwesome6
             name={playing ? 'pause' : 'play'}

@@ -408,6 +408,44 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     @MainThread
+    fun setAnimatedVolume(value: Float, duration: Long = 500L, interval: Long = 20L, emitEventMsg: String = ""): Deferred<Unit> {
+        val eventMsgBundle = Bundle()
+        eventMsgBundle.putString(DATA_KEY, emitEventMsg)
+        return player.fadeVolume(value, duration, interval) {
+            emit(
+                MusicEvents.PLAYBACK_ANIMATED_VOLUME_CHANGED,
+                eventMsgBundle
+            )
+        }
+    }
+
+    fun fadeOutPause (duration: Long = 500L, interval: Long = 20L) {
+        player.fadeVolume(0f, duration, interval) {
+            player.pause()
+        }
+    }
+
+    fun fadeOutNext (duration: Long = 500L, interval: Long = 20L, toVolume: Float = 1f) {
+        player.fadeVolume(0f, duration, interval) {
+            player.next()
+            player.fadeVolume(toVolume, duration, interval)
+        }
+    }
+
+    fun fadeOutPrevious (duration: Long = 500L, interval: Long = 20L, toVolume: Float = 1f) {
+        player.fadeVolume(0f, duration, interval) {
+            player.previous()
+            player.fadeVolume(toVolume, duration, interval)
+        }
+    }
+
+    fun fadeOutJump (index: Int, duration: Long = 500L, interval: Long = 20L, toVolume: Float = 1f) {
+        player.fadeVolume(0f, duration, interval) {
+            player.jumpToItem(index)
+            player.fadeVolume(toVolume, duration, interval)
+        }
+    }
+    @MainThread
     fun getDurationInSeconds(): Double = player.duration.toSeconds()
 
     @MainThread
