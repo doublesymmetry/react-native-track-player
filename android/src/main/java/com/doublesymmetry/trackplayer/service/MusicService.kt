@@ -163,7 +163,7 @@ class MusicService : HeadlessJsTaskService() {
             interceptPlayerActionsTriggeredExternally = true,
             handleAudioBecomingNoisy = true,
             handleAudioFocus = playerOptions?.getBoolean(AUTO_HANDLE_INTERRUPTIONS) ?: false,
-            audioUsageType = getAudioUsageFromString(playerOptions?.getString("androidAudioUsageType")),
+            audioUsageType = getAudioUsageFromString(playerOptions?.getString(ANDROID_AUDIO_USAGE_TYPE)),
             audioContentType = getContentTypeFromString(playerOptions?.getString(ANDROID_AUDIO_CONTENT_TYPE))
         )
 
@@ -194,7 +194,7 @@ class MusicService : HeadlessJsTaskService() {
 
         player.setAudioAttributes(AudioAttributeConfig(
             handleAudioFocus = options.getBoolean(AUTO_HANDLE_INTERRUPTIONS),
-            audioUsageType = getAudioUsageFromString(options.getString("androidAudioUsageType")),
+            audioUsageType = getAudioUsageFromString(options.getString(ANDROID_AUDIO_USAGE_TYPE)),
             audioContentType = getContentTypeFromString(options?.getString(ANDROID_AUDIO_CONTENT_TYPE))
         ))
 
@@ -864,6 +864,7 @@ class MusicService : HeadlessJsTaskService() {
         const val AUTO_UPDATE_METADATA = "autoUpdateMetadata"
         const val AUTO_HANDLE_INTERRUPTIONS = "autoHandleInterruptions"
         const val ANDROID_AUDIO_CONTENT_TYPE = "androidAudioContentType"
+        const val ANDROID_AUDIO_USAGE_TYPE = "androidAudioUsageType"
         const val IS_FOCUS_LOSS_PERMANENT_KEY = "permanent"
         const val IS_PAUSED_KEY = "paused"
 
