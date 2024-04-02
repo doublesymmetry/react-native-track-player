@@ -28,5 +28,7 @@ All parameters are optional. You also only need to specify the ones you want to 
 | `iosCategory` | [`IOSCategory`](../constants/ios-category.md) | An [`IOSCategory`](../constants/ios-category.md). | ❌ | ✅ | ❌ |
 | `iosCategoryMode` | [`IOSCategoryMode`](../constants/ios-category-mode.md) | The audio session mode, together with the audio session category, indicates to the system how you intend to use audio in your app. You can use a mode to configure the audio system for specific use cases such as video recording, voice or video chat, or audio analysis. | ❌ | ✅ | ❌ |
 | `iosCategoryOptions` | [`IOSCategoryOptions[]`](../constants/ios-category-options.md) | An array of [`IOSCategoryOptions`](../constants/ios-category-options.md). | ❌ | ✅  | ❌ |
+| `androidAudioUsageType` | `boolean` | (Android only) Specifies why the source is playing and controls routing, focus, and volume decisions. With `androidAudioUsageType` set to VoiceCommunication the audio will come from the earpiece speaker | ✅ | ❌ |
+| `androidAudioContentType` | `boolean` | The audio content type indicates to the android system how you intend to use audio in your app. With `autoHandleInterruptions: true` and `androidAudioContentType: AndroidAudioContentType.Speech`, the audio will be paused during short interruptions, such as when a message arrives. Otherwise the playback volume is reduced while the notification is playing. Defaults to `AndroidAudioContentType.Music` | ✅ | ❌ |
 
 *¹ - The custom icons will only work in release builds*
