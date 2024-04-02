@@ -4,6 +4,7 @@ import type {
   IOSCategoryMode,
   IOSCategoryOptions,
 } from '../constants';
+import { AndroidAudioUsageType } from '../constants/AndroidAudioUsageType';
 
 export interface PlayerOptions {
   /**
@@ -71,6 +72,15 @@ export interface PlayerOptions {
    * Sets on `play()`.
    */
   iosCategoryOptions?: IOSCategoryOptions[];
+
+  /**
+   * (Android only) Specifies why the source is playing and controls routing, focus, and volume decisions.
+   * With `androidAudioUsageType` set to VoiceCommunication the audio will come from the earpiece speaker
+   *
+   * @default AndroidAudioUsageType.Media
+   */
+  androidAudioUsageType?: AndroidAudioUsageType;
+
   /**
    * (Android only) The audio content type indicates to the android system how
    * you intend to use audio in your app.

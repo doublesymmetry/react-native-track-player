@@ -125,6 +125,25 @@ class MusicService : HeadlessJsTaskService() {
         stopForeground(true)
     }
 
+    private fun getContentTypeFromString(contentTypeString: String?): AudioContentType {
+        return when(contentTypeString) {
+            "music" -> AudioContentType.MUSIC
+            "speech" -> AudioContentType.SPEECH
+            "sonification" -> AudioContentType.SONIFICATION
+            "movie" -> AudioContentType.MOVIE
+            "unknown" -> AudioContentType.UNKNOWN
+            else -> AudioContentType.MUSIC
+        }
+    }
+
+    private fun getAudioUsageFromString(contentTypeString: String?): AudioUsageType {
+        return when(contentTypeString) {
+            "music" -> AudioUsageType.MEDIA
+            "voice_communication" -> AudioUsageType.VOICE_COMMUNICATION
+            else -> AudioUsageType.MEDIA
+        }
+    }
+
     @MainThread
     fun setupPlayer(playerOptions: Bundle?) {
         if (this::player.isInitialized) {
@@ -144,14 +163,8 @@ class MusicService : HeadlessJsTaskService() {
             interceptPlayerActionsTriggeredExternally = true,
             handleAudioBecomingNoisy = true,
             handleAudioFocus = playerOptions?.getBoolean(AUTO_HANDLE_INTERRUPTIONS) ?: false,
-            audioContentType = when(playerOptions?.getString(ANDROID_AUDIO_CONTENT_TYPE)) {
-                "music" -> AudioContentType.MUSIC
-                "speech" -> AudioContentType.SPEECH
-                "sonification" -> AudioContentType.SONIFICATION
-                "movie" -> AudioContentType.MOVIE
-                "unknown" -> AudioContentType.UNKNOWN
-                else -> AudioContentType.MUSIC
-            }
+            audioUsageType = getAudioUsageFromString(playerOptions?.getString("androidAudioUsageType")),
+            audioContentType = getContentTypeFromString(playerOptions?.getString(ANDROID_AUDIO_CONTENT_TYPE))
         )
 
         val automaticallyUpdateNotificationMetadata = playerOptions?.getBoolean(AUTO_UPDATE_METADATA, true) ?: true
@@ -178,6 +191,12 @@ class MusicService : HeadlessJsTaskService() {
                 appKilledPlaybackBehavior = AppKilledPlaybackBehavior.PAUSE_PLAYBACK
             }
         }
+
+        player.setAudioAttributes(AudioAttributeConfig(
+            handleAudioFocus = options.getBoolean(AUTO_HANDLE_INTERRUPTIONS),
+            audioUsageType = getAudioUsageFromString(options.getString("androidAudioUsageType")),
+            audioContentType = getContentTypeFromString(options?.getString(ANDROID_AUDIO_CONTENT_TYPE))
+        ))
 
         ratingType = BundleUtils.getInt(options, "ratingType", RatingCompat.RATING_NONE)
 
