@@ -120,9 +120,16 @@ class MusicService : HeadlessJsTaskService() {
             notificationBuilder.foregroundServiceBehavior = NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
         }
         val notification = notificationBuilder.build()
-        startForeground(EMPTY_NOTIFICATION_ID, notification)
-        @Suppress("DEPRECATION")
-        stopForeground(true)
+        try {
+            startForeground(EMPTY_NOTIFICATION_ID, notification)
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        } catch (error: Exception) {
+            Timber.e(
+                "ForegroundServiceStartNotAllowedException: App tried to start a foreground Service when it was not allowed to do so.",
+                error
+            )
+        }
     }
 
     @MainThread
