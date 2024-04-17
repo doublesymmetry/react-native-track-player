@@ -11,14 +11,14 @@ added track index. If no tracks were added it returns `void`.
 | tracks         | `Track \| Track[]` | The [Track](../objects/track.md) objects that will be added |
 | insertBeforeIndex | `number` | The index of the track that will be located immediately after the inserted tracks. Set it to `null` to add it at the end of the queue |
 
-## `remove(tracks)`
-Removes one or more tracks from the queue. If the current track is removed, the next track will activated. If the current track was the last track in the queue, the first track will be activated.
+## `remove(indexes)`
+Removes one or more tracks from the queue by indexes. If the current track is removed, the next track will activated. If the current track was the last track in the queue, the first track will be activated.
 
 **Returns:** `Promise<void>`
 
 | Param  | Type              | Description |
 |--------|-------------------|-------------|
-| tracks | `Track \| Track[]` | The [Track](../objects/track.md) objects that will be removed |
+| indexes | `number \| number[]` | The index or indices of tracks in the queue that will be removed |
 
 ## `setQueue(tracks)`
 
