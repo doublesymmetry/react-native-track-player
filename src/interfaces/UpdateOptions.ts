@@ -1,7 +1,14 @@
 import type { AndroidOptions } from './AndroidOptions';
 import type { FeedbackOptions } from './FeedbackOptions';
 import type { ResourceObject } from './ResourceObject';
-import type { RatingType, Capability, IOSCategory, IOSCategoryMode, IOSCategoryOptions, AndroidAudioContentType } from '../constants';
+import type {
+  RatingType,
+  Capability,
+  IOSCategory,
+  IOSCategoryMode,
+  IOSCategoryOptions,
+  AndroidAudioContentType,
+} from '../constants';
 import { AndroidAudioUsageType } from '../constants/AndroidAudioUsageType';
 
 export interface UpdateOptions {
@@ -67,11 +74,11 @@ export interface UpdateOptions {
   iosCategoryOptions?: IOSCategoryOptions[];
 
   /**
-    * (Android only) Specifies why the source is playing and controls routing, focus, and volume decisions.
-    * With `androidAudioUsageType` set to VoiceCommunication the audio will come from the earpiece speaker
-    *
-    * @default AndroidAudioUsageType.Media
-    */
+   * (Android only) Specifies why the source is playing and controls routing, focus, and volume decisions.
+   * With `androidAudioUsageType` set to VoiceCommunication the audio will come from the earpiece speaker
+   *
+   * @default AndroidAudioUsageType.Media
+   */
   androidAudioUsageType?: AndroidAudioUsageType;
 
   /**
