@@ -1,4 +1,5 @@
 export * from './AndroidAudioContentType';
+export * from './AndroidAudioUsageType';
 export * from './AppKilledPlaybackBehavior';
 export * from './Capability';
 export * from './Event';

@@ -8,8 +8,8 @@ import type {
   IOSCategoryMode,
   IOSCategoryOptions,
   AndroidAudioContentType,
+  AndroidAudioUsageType,
 } from '../constants';
-import { AndroidAudioUsageType } from '../constants/AndroidAudioUsageType';
 
 export interface UpdateOptions {
   android?: AndroidOptions;

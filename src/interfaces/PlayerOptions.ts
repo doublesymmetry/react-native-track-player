@@ -1,10 +1,10 @@
 import type {
   AndroidAudioContentType,
+  AndroidAudioUsageType,
   IOSCategory,
   IOSCategoryMode,
   IOSCategoryOptions,
 } from '../constants';
-import { AndroidAudioUsageType } from '../constants/AndroidAudioUsageType';
 
 export interface PlayerOptions {
   /**
