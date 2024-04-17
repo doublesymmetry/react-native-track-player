@@ -1,6 +1,8 @@
 import { State } from '../../src/constants/State';
 import type { Track, Progress, PlaybackState } from '../../src/interfaces';
 import { SetupNotCalledError } from './SetupNotCalledError';
+// @ts-ignore
+import shaka from 'shaka-player/dist/shaka-player.ui';
 
 export class Player {
   protected hasInitialized: boolean = false;
@@ -41,9 +43,6 @@ export class Player {
       // TODO: double check the structure of this error message
       throw { code: 'player_already_initialized', message: 'The player is not initialized. Call setupPlayer first.' };
     }
-
-    // @ts-ignore
-    const shaka = await import('shaka-player/dist/shaka-player.ui');
     // Install built-in polyfills to patch browser incompatibilities.
     shaka.polyfill.installAll();
     // Check to see if the browser supports the basic APIs Shaka needs.
