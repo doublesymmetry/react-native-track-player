@@ -14,6 +14,6 @@
     "module": "esnext",
     "skipLibCheck": true
   },
-  "include": ["src"],
+  "include": ["src", "web"],
   "exclude": ["node_modules", "**/__tests__/*"]
 }

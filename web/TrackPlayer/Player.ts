@@ -1,7 +1,6 @@
 import { State } from '../../src/constants/State';
 import type { Track, Progress, PlaybackState } from '../../src/interfaces';
 import { SetupNotCalledError } from './SetupNotCalledError';
-// @ts-ignore
 import shaka from 'shaka-player/dist/shaka-player.ui';
 
 export class Player {
