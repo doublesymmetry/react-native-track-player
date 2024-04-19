@@ -29,6 +29,8 @@ export class PlaylistPlayer extends Player {
       case RepeatMode.Playlist:
         if (this.currentIndex === this.playlist.length - 1) {
           await this.goToIndex(0);
+        } else {
+          await this.skipToNext();
         }
         break;
       default:
@@ -38,7 +40,6 @@ export class PlaylistPlayer extends Player {
           if ((err as Error).message !== 'playlist_exhausted') {
             throw err;
           }
-
           this.onPlaylistEnded();
         }
         break;
@@ -79,7 +80,7 @@ export class PlaylistPlayer extends Player {
   }
 
   public async add(tracks: Track[], insertBeforeIndex?: number) {
-    if (insertBeforeIndex) {
+    if (insertBeforeIndex !== -1 && insertBeforeIndex !== undefined) {
       this.playlist.splice(insertBeforeIndex, 0, ...tracks);
     } else {
       this.playlist.push(...tracks);
