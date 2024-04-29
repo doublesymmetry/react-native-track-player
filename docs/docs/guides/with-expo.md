@@ -65,6 +65,6 @@ Then add this configuration in `app.json`:
 Here is the configuration required for audio playback in background:
 
 - [iOS: Enable audio playback in background via your app.json](https://docs.expo.dev/versions/latest/sdk/audio/#playing-or-recording-audio-in-background)
-- [Android: Stop playback when the app is closed](./background-mode.md/#android)
+- [Android: Stop playback when the app is closed](../basic/background-mode.md/#android)
 
 
