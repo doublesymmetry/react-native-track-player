@@ -35,7 +35,7 @@ export function useProgress(updateInterval = 1000) {
           duration === state.duration &&
           buffered === state.buffered
             ? state
-            : { position, duration, buffered },
+            : { position, duration, buffered }
         );
       } catch {
         // these method only throw while you haven't yet setup, ignore failure.

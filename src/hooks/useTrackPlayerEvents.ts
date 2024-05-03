@@ -11,10 +11,10 @@ import type { EventPayloadByEventWithType } from '../interfaces';
  */
 export const useTrackPlayerEvents = <
   T extends Event[],
-  H extends (data: EventPayloadByEventWithType[T[number]]) => void,
+  H extends (data: EventPayloadByEventWithType[T[number]]) => void
 >(
   events: T,
-  handler: H,
+  handler: H
 ) => {
   const savedHandler = useRef(handler);
   savedHandler.current = handler;
@@ -24,14 +24,14 @@ export const useTrackPlayerEvents = <
     if (__DEV__) {
       const allowedTypes = Object.values(Event);
       const invalidTypes = events.filter(
-        (type) => !allowedTypes.includes(type),
+        (type) => !allowedTypes.includes(type)
       );
       if (invalidTypes.length) {
         console.warn(
           'One or more of the events provided to useTrackPlayerEvents is ' +
             `not a valid TrackPlayer event: ${invalidTypes.join("', '")}. ` +
             'A list of available events can be found at ' +
-            'https://rntp.dev/docs/api/events',
+            'https://rntp.dev/docs/api/events'
         );
       }
     }
@@ -40,7 +40,7 @@ export const useTrackPlayerEvents = <
       addEventListener(type, (payload) => {
         // @ts-expect-error - we know the type is correct
         savedHandler.current({ ...payload, type });
-      }),
+      })
     );
 
     return () => subs.forEach((sub) => sub.remove());

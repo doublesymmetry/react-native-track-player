@@ -24,7 +24,7 @@ export const usePlaybackState = (): PlaybackState | { state: undefined } => {
         if (!mounted) return;
         // Only set the state if it wasn't already set by the Event.PlaybackState listener below:
         setPlaybackState((currentState) =>
-          currentState.state ? currentState : fetchedState,
+          currentState.state ? currentState : fetchedState
         );
       })
       .catch(() => {

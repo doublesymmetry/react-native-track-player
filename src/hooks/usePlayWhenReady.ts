@@ -5,7 +5,7 @@ import { Event } from '../constants';
 
 export const usePlayWhenReady = () => {
   const [playWhenReady, setPlayWhenReady] = useState<boolean | undefined>(
-    undefined,
+    undefined
   );
   useEffect(() => {
     let mounted = true;
@@ -24,7 +24,7 @@ export const usePlayWhenReady = () => {
       Event.PlaybackPlayWhenReadyChanged,
       (event) => {
         setPlayWhenReady(event.playWhenReady);
-      },
+      }
     );
 
     return () => {
