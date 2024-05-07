@@ -1,5 +1,5 @@
 ---
-sidebar_position: 98
+sidebar_position: 97
 ---
 
 # Android Auto Support
@@ -99,7 +99,7 @@ If [Event.RemoteBrowse is not firing for the first two tabs](https://github.com/
 
 ## App Showcase
 
-[APM](https://play.google.com/store/apps/details?id=com.noxplay.noxplayer) and [Podverse](https://play.google.com/store/apps/details?id=com.podverse use a customized fork and are both on the google play store in production with auto support.
+[APM](https://play.google.com/store/apps/details?id=com.noxplay.noxplayer) and [Podverse](https://play.google.com/store/apps/details?id=com.podverse) use a customized fork and are both on the google play store in production with auto support.
 
 Getting pass Play Store's review process for an auto suppported app is tough. Here are a few issues we encountered:
 
@@ -122,3 +122,9 @@ something about media not responsive to voice commands
 This was due to Podverse did not handle voice commands. Although play store refused to approve repeatly after fix until an appeal was submitted, then it was approved.
 
 https://github.com/podverse/podverse-rn/pull/1969
+
+```
+your app does not respond after issuing a voice command.
+```
+
+This is a recent rejection I experienced since this year and it could be JS bugs I accidentally introduced or now a native handler to MEDIA_PLAY_FROM_SEARCH is expected; but for the PR that fixed this as a reference, see https://github.com/lovegaoshi/azusa-player-mobile/pull/407
