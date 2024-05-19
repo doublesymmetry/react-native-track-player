@@ -24,7 +24,7 @@ inside of your App UI tree (anything called as a result of
 `AppRegistry.registerComponent(appName, () => App);` in your `index.js` file)
 **WILL NOT EXECUTE**.
 
-In a nutshell, if you do this, you're progress **will not** update when the user
+In a nutshell, if you do this, your progress **will not** update when the user
 is playing back in Remote contexts and therefore your app will seem buggy.
 
 ## Recommended Approach
