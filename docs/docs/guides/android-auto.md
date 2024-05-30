@@ -8,9 +8,9 @@ Make sure to read through [Google's guidelines](https://developer.android.com/tr
 
 See the example app and [Podverse's PR](https://github.com/podverse/podverse-rn/pull/1928) as examples adding Android Auto support to an existing RNTP app.
 
-## Using RN < 0.71?
+## RN Version Compatibility
 
-You may need to manually edit HeadlessJsMediaService.java to make it compatible with your current RN version. See [Podverse's RNTP fork](https://github.com/lovegaoshi/react-native-track-player/tree/dev-podverse-aa) that uses RN 0.66.
+HeadlessJsTaskService.java does change across RN versions, for example from RN 0.71. RNTP's HeadlessJsTaskService will use whatever compatible with the most recent RN version. You may need to manually edit HeadlessJsMediaService.java to make it compatible with your current RN version. See [Podverse's RNTP fork](https://github.com/lovegaoshi/react-native-track-player/tree/dev-podverse-aa) that uses RN 0.66.
 
 ## Necessary Declarations
 
@@ -90,6 +90,16 @@ This allows the RN Activity to overlay on top of the lock screen and start itsel
       setTurnScreenOn(false);
     }
 ```
+
+## Album Art
+
+I originally enabled album art via https://github.com/lovegaoshi/KotlinAudio/commit/7a3d90b5b7b548e45b8b54ffcf62eac5c795bc14 but [google's guidelines](https://developer.android.com/training/cars/media/#display-artwork) seem to contradict with that. nevertheless however RNTP is currently set up (for ex https://github.com/lovegaoshi/react-native-track-player/blob/6f634594f24aa1974b2c8cdc6848b8b349cccdf0/android/src/main/java/com/doublesymmetry/kotlinaudio/notification/NotificationManager.kt#L389) for remote urls it works great, but for local uris (file:///) and embedded covers within local media files it wont work.
+
+for local uris while I do not have a use and no rigorous tests yet, I believe converting the file:/// uri to a content:// one, as specified in the google guidelines, would work. u can see how i did this via a fileProvider: https://github.com/lovegaoshi/azusa-player-mobile/pull/449
+
+for embedded covers this has to be first resolved and written to a file, then load the content:// uri as in the google guidelines. I tried with both ffmpeg and MediaMetadataRetriever, opted for the latter in the end for simplicity. commit is here: https://github.com/lovegaoshi/react-native-track-player/commit/6f634594f24aa1974b2c8cdc6848b8b349cccdf0
+
+the specific implementation I have does have a drawback taht the local file is written in the /Pictures folder. you might be able to write to cache using File() then convert to content:// with a fileProvider, but I chose the simplicity of MediaStore and can deal with this drawback.
 
 ## Known Issues
 
