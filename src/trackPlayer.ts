@@ -373,7 +373,16 @@ export async function setRate(rate: number): Promise<void> {
  * @see https://rntp.dev/docs/api/constants/repeat-mode
  */
 export async function setQueue(tracks: Track[]): Promise<void> {
-  return TrackPlayer.setQueue(tracks);
+  const resolvedTracks = (Array.isArray(tracks) ? tracks : [tracks]).map(
+    (track) => ({
+      ...track,
+      url: resolveImportedAssetOrPath(track.url),
+      artwork: resolveImportedAssetOrPath(track.artwork),
+    })
+  );
+  return resolvedTracks.length < 1
+    ? undefined
+    : TrackPlayer.setQueue(resolvedTracks);
 }
 
 /**
