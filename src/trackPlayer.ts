@@ -370,7 +370,7 @@ export async function setRate(rate: number): Promise<void> {
  * Sets the queue.
  *
  * @param tracks The tracks to set as the queue.
- * @see https://rntp.dev/docs/api/constants/repeat-mode
+ * @see https://rntp.dev/docs/api/objects/track
  */
 export async function setQueue(tracks: Track[]): Promise<void> {
   return TrackPlayer.setQueue(tracks);
