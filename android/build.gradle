@@ -50,9 +50,11 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.doublesymmetry:kotlinaudio:v2.1.0'
-    // used when building against local maven
-//    implementation "com.github.doublesymmetry:kotlin-audio:2.1.0"
+    implementation 'io.coil-kt:coil:2.2.0'
+    implementation 'androidx.media:media:1.6.0'
+    api 'com.google.android.exoplayer:exoplayer:2.19.0'
+    api 'com.google.android.exoplayer:extension-mediasession:2.19.0'
+    api 'com.jakewharton.timber:timber:5.0.1'
 
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"
