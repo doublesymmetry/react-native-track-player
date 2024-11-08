@@ -134,8 +134,14 @@ class MusicService : HeadlessJsMediaService() {
     val tracks: List<Track>
         get() = player.items.map { (it as TrackAudioItem).track }
 
-    val currentTrack
-        get() = (player.currentItem as TrackAudioItem).track
+    val currentTrack: Track
+        get() {
+            return try {
+                (player.currentItem as TrackAudioItem).track
+            } catch (e: Exception) {
+                Track(this, Bundle(), 0)
+            }
+        }
 
     val state
         get() = player.playerState
