@@ -10,13 +10,6 @@ export enum Event {
   /**
    * Fired when another track has become active or when there no longer is an
    * active track.
-   *
-   * @deprecated use `playback-active-track-changed` instead.
-   **/
-  PlaybackTrackChanged = 'playback-track-changed',
-  /**
-   * Fired when another track has become active or when there no longer is an
-   * active track.
    **/
   PlaybackActiveTrackChanged = 'playback-active-track-changed',
   /**

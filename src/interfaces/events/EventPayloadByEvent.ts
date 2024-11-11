@@ -9,7 +9,6 @@ import type { AudioCommonMetadataReceivedEvent } from './AudioMetadataReceivedEv
 import type { PlaybackPlayWhenReadyChangedEvent } from './PlaybackPlayWhenReadyChangedEvent';
 import type { PlaybackProgressUpdatedEvent } from './PlaybackProgressUpdatedEvent';
 import type { PlaybackQueueEndedEvent } from './PlaybackQueueEndedEvent';
-import type { PlaybackTrackChangedEvent } from './PlaybackTrackChangedEvent';
 import { PlayerErrorEvent } from './PlayerErrorEvent';
 import type { RemoteDuckEvent } from './RemoteDuckEvent';
 import type { RemoteJumpBackwardEvent } from './RemoteJumpBackwardEvent';
@@ -25,7 +24,6 @@ export type EventPayloadByEvent = {
   [Event.PlaybackState]: PlaybackState;
   [Event.PlaybackError]: PlaybackErrorEvent;
   [Event.PlaybackQueueEnded]: PlaybackQueueEndedEvent;
-  [Event.PlaybackTrackChanged]: PlaybackTrackChangedEvent;
   [Event.PlaybackActiveTrackChanged]: PlaybackActiveTrackChangedEvent;
   [Event.PlaybackMetadataReceived]: PlaybackMetadataReceivedEvent;
   [Event.PlaybackPlayWhenReadyChanged]: PlaybackPlayWhenReadyChangedEvent;

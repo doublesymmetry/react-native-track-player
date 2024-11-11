@@ -73,8 +73,6 @@ export const OptionSheet: React.FC = () => {
                 android: {
                   appKilledPlaybackBehavior,
                 },
-                // This flag is now deprecated. Please use the above to define playback mode.
-                // stoppingAppPausesPlayback: true,
                 capabilities: [
                   Capability.Play,
                   Capability.Pause,

@@ -83,13 +83,6 @@ export function addEventListener<T extends Event>(
   return emitter.addListener(event, listener);
 }
 
-/**
- * @deprecated This method should not be used, most methods reject when service is not bound.
- */
-export function isServiceRunning(): Promise<boolean> {
-  return TrackPlayer.isServiceRunning();
-}
-
 // MARK: - Queue API
 
 /**
@@ -219,16 +212,10 @@ export async function skipToPrevious(initialPosition = -1): Promise<void> {
  * @param options The options to update.
  * @see https://rntp.dev/docs/api/functions/player#updateoptionsoptions
  */
-export async function updateOptions({
-  alwaysPauseOnInterruption,
-  ...options
-}: UpdateOptions = {}): Promise<void> {
+export async function updateOptions(options: UpdateOptions = {}): Promise<void> {
   return TrackPlayer.updateOptions({
     ...options,
     android: {
-      // Handle deprecated alwaysPauseOnInterruption option:
-      alwaysPauseOnInterruption:
-        options.android?.alwaysPauseOnInterruption ?? alwaysPauseOnInterruption,
       ...options.android,
     },
     icon: resolveImportedAsset(options.icon),
@@ -437,53 +424,12 @@ export async function getActiveTrack(): Promise<Track | undefined> {
 }
 
 /**
- * Gets the index of the current track or null if there is no current track.
- *
- * @deprecated use `TrackPlayer.getActiveTrackIndex()` instead.
- */
-export async function getCurrentTrack(): Promise<number | null> {
-  return TrackPlayer.getActiveTrackIndex();
-}
-
-/**
- * Gets the duration of the current track in seconds.
- * @deprecated Use `TrackPlayer.getProgress().then((progress) => progress.duration)` instead.
- */
-export async function getDuration(): Promise<number> {
-  return TrackPlayer.getDuration();
-}
-
-/**
- * Gets the buffered position of the current track in seconds.
- *
- * @deprecated Use `TrackPlayer.getProgress().then((progress) => progress.buffered)` instead.
- */
-export async function getBufferedPosition(): Promise<number> {
-  return TrackPlayer.getBufferedPosition();
-}
-
-/**
- * Gets the playback position of the current track in seconds.
- * @deprecated Use `TrackPlayer.getProgress().then((progress) => progress.position)` instead.
- */
-export async function getPosition(): Promise<number> {
-  return TrackPlayer.getPosition();
-}
-
-/**
  * Gets information on the progress of the currently active track, including its
  * current playback position in seconds, buffered position in seconds and
  * duration in seconds.
  */
 export async function getProgress(): Promise<Progress> {
   return TrackPlayer.getProgress();
-}
-
-/**
- * @deprecated use (await getPlaybackState()).state instead.
- */
-export async function getState(): Promise<State> {
-  return (await TrackPlayer.getPlaybackState()).state;
 }
 
 /**
