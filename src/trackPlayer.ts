@@ -2,13 +2,13 @@ import {
   AppRegistry,
   DeviceEventEmitter,
   NativeEventEmitter,
-  Platform,
+  Platform
 } from 'react-native';
 
-import TrackPlayer from './TrackPlayerModule';
-import { Event, RepeatMode, State } from './constants';
+import { AndroidAutoContentStyle, Event, RepeatMode } from './constants';
 import type {
   AddTrack,
+  AndroidAutoBrowseTree,
   EventPayloadByEvent,
   NowPlayingMetadata,
   PlaybackState,
@@ -20,11 +20,13 @@ import type {
   UpdateOptions,
 } from './interfaces';
 import resolveAssetSource from './resolveAssetSource';
+import TrackPlayer from './TrackPlayerModule';
 
-const emitter =
-  Platform.OS !== 'android'
-    ? new NativeEventEmitter(TrackPlayer)
-    : DeviceEventEmitter;
+const isAndroid = Platform.OS === 'android';
+
+const emitter = !isAndroid
+  ? new NativeEventEmitter(TrackPlayer)
+  : DeviceEventEmitter;
 
 // MARK: - Helpers
 
@@ -47,23 +49,20 @@ function resolveImportedAsset(id?: number) {
 /**
  * Initializes the player with the specified options.
  *
- * Note that on Android this method must only be called while the app is in the
- * foreground, otherwise it will throw an error with code
- * `'android_cannot_setup_player_in_background'`. In this case you can wait for
- * the app to be in the foreground and try again.
- *
  * @param options The options to initialize the player with.
  * @see https://rntp.dev/docs/api/functions/lifecycle
  */
-export async function setupPlayer(options: PlayerOptions = {}): Promise<void> {
-  return TrackPlayer.setupPlayer(options);
+export async function setupPlayer(
+  options: PlayerOptions = {}
+): Promise<void> {
+  return TrackPlayer.setupPlayer(options)
 }
 
 /**
  * Register the playback service. The service will run as long as the player runs.
  */
 export function registerPlaybackService(factory: () => ServiceHandler) {
-  if (Platform.OS === 'android') {
+  if (isAndroid) {
     // Registers the headless task
     AppRegistry.registerHeadlessTask('TrackPlayer', factory);
   } else if (Platform.OS === 'web') {
@@ -455,4 +454,63 @@ export async function getRepeatMode(): Promise<RepeatMode> {
  */
 export async function retry() {
   return TrackPlayer.retry();
+}
+
+/**
+ * Sets the content hierarchy of Android Auto (Android only). The hierarchy structure is a dict with
+ * the mediaId as keys, and a list of MediaItem as values. To use, you must at least specify the root directory, where
+ * the key is "/". If the root directory contains BROWSABLE MediaItems, they will be shown as tabs. Do note Google requires
+ * AA to have a max of 4 tabs. You may then set the mediaId keys of the browsable MediaItems to be a list of other MediaItems.
+ *
+ * @param browseTree the content hierarchy dict.
+ * @returns a serialized copy of the browseTree set by native. For debug purposes.
+ */
+export async function setBrowseTree(
+  browseTree: AndroidAutoBrowseTree
+): Promise<string> {
+  if (!isAndroid) return new Promise(() => '');
+  return TrackPlayer.setBrowseTree(browseTree);
+}
+
+/**
+ * this method enables android auto playback progress tracking; see
+ * https://developer.android.com/training/cars/media#browse-progress-bar
+ * android only.
+ * @param mediaID the mediaID.
+ * @returns
+ */
+export async function setPlaybackState(mediaID: string): Promise<void> {
+  if (!isAndroid) return;
+  TrackPlayer.setPlaybackState(mediaID);
+}
+
+/**
+ * Sets the content style of Android Auto (Android only).
+ * there are list style and grid style. see https://developer.android.com/training/cars/media#apply_content_style .
+ * the styles are applicable to browsable nodes and playable nodes. setting the args to true will yield the list style.
+ * false = the grid style.
+ */
+export function setBrowseTreeStyle(
+  browsableStyle: AndroidAutoContentStyle,
+  playableStyle: AndroidAutoContentStyle
+): null {
+  if (!isAndroid) return null;
+  TrackPlayer.setBrowseTreeStyle(browsableStyle, playableStyle);
+  return null;
+}
+
+/**
+ * acquires the wake lock of MusicService (android only.)
+ */
+export async function acquireWakeLock() {
+  if (!isAndroid) return;
+  TrackPlayer.acquireWakeLock();
+}
+
+/**
+ * acquires the wake lock of MusicService (android only.)
+ */
+export async function abandonWakeLock() {
+  if (!isAndroid) return;
+  TrackPlayer.abandonWakeLock();
 }

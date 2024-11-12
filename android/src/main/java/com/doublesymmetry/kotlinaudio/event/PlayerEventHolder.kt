@@ -1,13 +1,13 @@
 package com.doublesymmetry.kotlinaudio.event
 
+import androidx.annotation.OptIn
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.Metadata
+import androidx.media3.common.util.UnstableApi
 import com.doublesymmetry.kotlinaudio.models.*
-import com.google.android.exoplayer2.MediaMetadata
-import com.google.android.exoplayer2.metadata.Metadata
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class PlayerEventHolder {
@@ -103,6 +103,7 @@ class PlayerEventHolder {
         }
     }
 
+    @OptIn(UnstableApi::class)
     internal fun updateOnTimedMetadata(metadata: Metadata) {
         coroutineScope.launch {
             _onTimedMetadata.emit(metadata)
