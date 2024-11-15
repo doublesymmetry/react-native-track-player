@@ -20,7 +20,6 @@ export interface UpdateOptions {
 
   // android
   notificationCapabilities?: Capability[];
-  compactCapabilities?: Capability[];
 
   icon?: ResourceObject;
   playIcon?: ResourceObject;

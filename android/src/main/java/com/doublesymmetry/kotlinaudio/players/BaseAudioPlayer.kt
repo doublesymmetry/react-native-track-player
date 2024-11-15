@@ -43,7 +43,7 @@ abstract class BaseAudioPlayer internal constructor(
     private var currentExoPlayer = true
 
     var exoPlayer: ExoPlayer
-    var player: ForwardingPlayer
+    var forwardingPlayer: ForwardingPlayer
     private var playerListener = PlayerListener()
     private val scope = MainScope()
     private var cache: SimpleCache? = null
@@ -172,8 +172,8 @@ abstract class BaseAudioPlayer internal constructor(
         mPlayer.setAudioAttributes(audioAttributes, options.handleAudioFocus)
 
         exoPlayer = mPlayer
-        player = InnerForwardingPlayer(exoPlayer)
-        player.addListener(playerListener)
+        forwardingPlayer = ForwardingPlayer(exoPlayer)
+        forwardingPlayer.addListener(playerListener)
     }
 
     /**
@@ -431,35 +431,6 @@ abstract class BaseAudioPlayer internal constructor(
             playerEventHolder.updatePlaybackError(_playbackError)
             playbackError = _playbackError
             playerState = AudioPlayerState.ERROR
-        }
-    }
-
-
-    @UnstableApi
-    private open inner class InnerForwardingPlayer
-        (val mPlayer: ExoPlayer): ForwardingPlayer(mPlayer) {
-//        override fun setMediaItems(mediaItems: MutableList<MediaItem>, resetPosition: Boolean) {
-//            mPlayer.setMediaItems(mediaItems, resetPosition)
-//        }
-        override fun isCommandAvailable(command: Int): Boolean {
-            if (options.alwaysShowNext) {
-                return when (command) {
-                    COMMAND_SEEK_TO_NEXT_MEDIA_ITEM -> true
-                    COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM -> true
-                    else -> super.isCommandAvailable(command)
-                }
-            }
-            return super.isCommandAvailable(command)
-        }
-
-        override fun getAvailableCommands(): Player.Commands {
-            if (options.alwaysShowNext) {
-                return super.getAvailableCommands().buildUpon()
-                    .add(COMMAND_SEEK_TO_NEXT_MEDIA_ITEM)
-                    .add(COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM)
-                    .build()
-            }
-            return super.getAvailableCommands()
         }
     }
 
