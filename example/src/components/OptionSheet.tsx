@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Platform, StyleSheet, ScrollView, Text, View } from 'react-native';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
+import React, { useState } from 'react';
+import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import TrackPlayer, {
   AppKilledPlaybackBehavior,
   Capability,
@@ -79,11 +79,6 @@ export const OptionSheet: React.FC = () => {
                   Capability.SkipToNext,
                   Capability.SkipToPrevious,
                   Capability.SeekTo,
-                ],
-                compactCapabilities: [
-                  Capability.Play,
-                  Capability.Pause,
-                  Capability.SkipToNext,
                 ],
                 progressUpdateEventInterval: 2,
               });

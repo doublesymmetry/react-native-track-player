@@ -29,7 +29,7 @@
     "@react-native-segmented-control/segmented-control": "^2.4.2",
     "mux.js": "^7.0.0",
     "react": "18.3.1",
-    "react-native": "0.76.1",
+    "react-native": "patch:react-native@npm%3A0.76.1#~/.yarn/patches/react-native-npm-0.76.1-c738a2fa39.patch",
     "react-native-gesture-handler": "2.20.2",
     "react-native-reanimated": "3.16.1",
     "react-native-track-player": "link:../",
