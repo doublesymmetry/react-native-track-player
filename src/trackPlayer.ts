@@ -519,7 +519,7 @@ export async function abandonWakeLock() {
  * get onStartCommandIntent is null or not (Android only.). this is used to identify
  * if musicservice is restarted or not.
  */
-export async function validateOnStartCommandIntent() {
+export async function validateOnStartCommandIntent(): Promise<boolean> {
   if (!isAndroid) return true;
   return TrackPlayer.validateOnStartCommandIntent();
 }
