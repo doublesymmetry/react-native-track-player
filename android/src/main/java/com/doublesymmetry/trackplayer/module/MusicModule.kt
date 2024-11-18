@@ -646,7 +646,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         if (verifyServiceBoundOrReject(callback)) return@launchInScope
         val mediaItemsMap = mediaItems.toHashMap()
         musicService.mediaTree = mediaItemsMap.mapValues { readableArrayToMediaItems(it.value as ArrayList<HashMap<String, String>>) }
-        Timber.tag("APM").d("refreshing browseTree")
+        Timber.tag("RNTP").d("refreshing browseTree")
         musicService.notifyChildrenChanged()
         callback.resolve(musicService.mediaTree.toString())
     }

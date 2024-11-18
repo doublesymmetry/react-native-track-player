@@ -98,7 +98,7 @@ class MusicService : HeadlessJsMediaService() {
     @ExperimentalCoroutinesApi
     override fun onCreate() {
         Timber.plant(Timber.DebugTree())
-        Timber.tag("APM").d("RNTP musicservice created.")
+        Timber.tag("RNTP").d("RNTP musicservice created.")
         fakePlayer = ExoPlayer.Builder(this).build()
         val openAppIntent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -157,7 +157,7 @@ class MusicService : HeadlessJsMediaService() {
     private var commandStarted = false
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Timber.tag("APM").d("onStartCommand: ${intent?.action}, ${intent?.`package`}")
+        Timber.tag("RNTP").d("onStartCommand: ${intent?.action}, ${intent?.`package`}")
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             // HACK: this is not supposed to be here. I definitely screwed up. but Why?
             onMediaKeyEvent(intent)
@@ -176,7 +176,7 @@ class MusicService : HeadlessJsMediaService() {
             print("Player was initialized. Prevent re-initializing again")
             return
         }
-        Timber.tag("APM").d("RNTP musicservice set up")
+        Timber.tag("RNTP").d("RNTP musicservice set up")
         val mPlayerOptions = PlayerOptions(
             cacheSize = playerOptions?.getDouble(MAX_CACHE_SIZE_KEY)?.toLong() ?: 0,
             audioContentType = when (playerOptions?.getString(ANDROID_AUDIO_CONTENT_TYPE)) {
@@ -715,7 +715,7 @@ class MusicService : HeadlessJsMediaService() {
     @MainThread
     override fun onBind(intent: Intent?): IBinder? {
         val intentAction = intent?.action
-        Timber.tag("APM").d("onbind: $intentAction")
+        Timber.tag("RNTP").d("onbind: $intentAction")
         return if (intentAction != null) {
             super.onBind(intent)
         } else {
@@ -724,7 +724,7 @@ class MusicService : HeadlessJsMediaService() {
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
-        Timber.tag("APM").d("unbind: ${intent?.action}")
+        Timber.tag("RNTP").d("unbind: ${intent?.action}")
         return super.onUnbind(intent)
     }
 
@@ -747,7 +747,7 @@ class MusicService : HeadlessJsMediaService() {
         when (appKilledPlaybackBehavior) {
             AppKilledPlaybackBehavior.PAUSE_PLAYBACK -> player.pause()
             AppKilledPlaybackBehavior.STOP_PLAYBACK_AND_REMOVE_NOTIFICATION -> {
-                Timber.tag("APM").d("onTaskRemoved: Killing service")
+                Timber.tag("RNTP").d("onTaskRemoved: Killing service")
                 mediaSession.release()
                 player.clear()
                 player.stop()
@@ -801,7 +801,7 @@ class MusicService : HeadlessJsMediaService() {
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession {
-        Timber.tag("APM").d("onGetSession: ${controllerInfo.packageName}")
+        Timber.tag("RNTP").d("onGetSession: ${controllerInfo.packageName}")
         return mediaSession
     }
 
@@ -821,7 +821,7 @@ class MusicService : HeadlessJsMediaService() {
 
     @MainThread
     override fun onDestroy() {
-        Timber.tag("APM").d("RNTP service is destroyed.")
+        Timber.tag("RNTP").d("RNTP service is destroyed.")
         if (::player.isInitialized) {
             mediaSession.release()
             player.destroy()
@@ -916,7 +916,7 @@ class MusicService : HeadlessJsMediaService() {
             session: MediaSession,
             controller: MediaSession.ControllerInfo
         ): MediaSession.ConnectionResult {
-            Timber.tag("APM").d("connection via: ${controller.packageName}")
+            Timber.tag("RNTP").d("connection via: ${controller.packageName}")
             val isMediaNotificationController = session.isMediaNotificationController(controller)
             val isAutomotiveController = session.isAutomotiveController(controller)
             val isAutoCompanionController = session.isAutoCompanionController(controller)
@@ -988,7 +988,7 @@ class MusicService : HeadlessJsMediaService() {
                 putInt("android.media.browse.CONTENT_STYLE_PLAYABLE_HINT", mediaTreeStyle[1])
             }
             val libraryParams = LibraryParams.Builder().setExtras(rootExtras).build()
-            Timber.tag("APM").d("acquiring root: ${browser.packageName}")
+            Timber.tag("RNTP").d("acquiring root: ${browser.packageName}")
             // https://github.com/androidx/media/issues/1731#issuecomment-2411109462
             val mRootItem = when (browser.packageName) {
                 "com.google.android.googlequicksearchbox" -> {
@@ -1022,7 +1022,7 @@ class MusicService : HeadlessJsMediaService() {
             browser: MediaSession.ControllerInfo,
             mediaId: String
         ): ListenableFuture<LibraryResult<MediaItem>> {
-            Timber.tag("APM").d("acquiring item: ${browser.packageName}, $mediaId")
+            Timber.tag("RNTP").d("acquiring item: ${browser.packageName}, $mediaId")
             // emit(MusicEvents.BUTTON_PLAY_FROM_ID, Bundle().apply { putString("id", mediaId) })
             return Futures.immediateFuture(LibraryResult.ofItem(rootItem, null))
         }
@@ -1033,7 +1033,7 @@ class MusicService : HeadlessJsMediaService() {
             query: String,
             params: LibraryParams?
         ): ListenableFuture<LibraryResult<Void>> {
-            Timber.tag("APM").d("searching: ${browser.packageName}, $query")
+            Timber.tag("RNTP").d("searching: ${browser.packageName}, $query")
             return super.onSearch(session, browser, query, params)
         }
 
@@ -1042,7 +1042,7 @@ class MusicService : HeadlessJsMediaService() {
             controller: MediaSession.ControllerInfo,
             mediaItems: MutableList<MediaItem>
         ): ListenableFuture<MutableList<MediaItem>> {
-            Timber.tag("APM")
+            Timber.tag("RNTP")
                 .d("addMediaItem: ${controller.packageName}, ${mediaItems[0].mediaId}, ${mediaItems.size}")
             return super.onAddMediaItems(mediaSession, controller, mediaItems)
         }
@@ -1054,7 +1054,7 @@ class MusicService : HeadlessJsMediaService() {
             startIndex: Int,
             startPositionMs: Long
         ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
-            Timber.tag("APM")
+            Timber.tag("RNTP")
                 .d("setMediaItem: ${controller.packageName}, ${mediaItems[0].toBundle()}")
             if (mediaItems[0].requestMetadata.searchQuery == null) {
                 emit(MusicEvents.BUTTON_PLAY_FROM_ID, Bundle().apply {
@@ -1094,7 +1094,7 @@ class MusicService : HeadlessJsMediaService() {
             pageSize: Int,
             params: LibraryParams?
         ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-            Timber.tag("APM").d("searching2: ${browser.packageName}, $query")
+            Timber.tag("RNTP").d("searching2: ${browser.packageName}, $query")
             return super.onGetSearchResult(session, browser, query, page, pageSize, params)
         }
 
