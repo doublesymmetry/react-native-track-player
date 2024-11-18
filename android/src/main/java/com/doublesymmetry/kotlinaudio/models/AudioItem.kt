@@ -78,7 +78,7 @@ enum class MediaType(val value: String) {
 
 fun audioItem2MediaItem(audioItem: AudioItem, context: Context? = null): MediaItem {
     return MediaItem.Builder()
-        .setMediaId(audioItem.mediaId ?: UUID.randomUUID().toString())
+        .setMediaId(audioItem.mediaId ?: audioItem.audioUrl)
         .setUri(audioItem.audioUrl)
         .setMediaMetadata(
             MediaMetadata.Builder()
