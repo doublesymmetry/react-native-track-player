@@ -203,7 +203,7 @@ class MusicService : HeadlessJsMediaService() {
         )
         player = QueuedAudioPlayer(this@MusicService, mPlayerOptions)
         fakePlayer.release()
-        mediaSession.player = player.forwardingPlayer
+        mediaSession.player = player.exoPlayer
         observeEvents()
     }
 
@@ -966,10 +966,10 @@ class MusicService : HeadlessJsMediaService() {
             args: Bundle
         ): ListenableFuture<SessionResult> {
             when (sessionCommand.customAction) {
-                CustomCommandButton.JUMP_BACKWARD.customAction -> { player.forwardingPlayer.seekBack() }
-                CustomCommandButton.JUMP_FORWARD.customAction -> { player.forwardingPlayer.seekForward() }
-                CustomCommandButton.NEXT.customAction -> { player.forwardingPlayer.seekToNext() }
-                CustomCommandButton.PREVIOUS.customAction -> { player.forwardingPlayer.seekToPrevious() }
+                CustomCommandButton.JUMP_BACKWARD.customAction -> { player.exoPlayer.seekBack() }
+                CustomCommandButton.JUMP_FORWARD.customAction -> { player.exoPlayer.seekForward() }
+                CustomCommandButton.NEXT.customAction -> { player.exoPlayer.seekToNext() }
+                CustomCommandButton.PREVIOUS.customAction -> { player.exoPlayer.seekToPrevious() }
             }
             emit(
                 MusicEvents.BUTTON_CUSTOM_ACTION,

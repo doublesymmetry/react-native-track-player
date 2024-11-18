@@ -43,7 +43,6 @@ abstract class BaseAudioPlayer internal constructor(
     private var currentExoPlayer = true
 
     var exoPlayer: ExoPlayer
-    var forwardingPlayer: ForwardingPlayer
     private var playerListener = PlayerListener()
     private val scope = MainScope()
     private var cache: SimpleCache? = null
@@ -172,8 +171,7 @@ abstract class BaseAudioPlayer internal constructor(
         mPlayer.setAudioAttributes(audioAttributes, options.handleAudioFocus)
 
         exoPlayer = mPlayer
-        forwardingPlayer = ForwardingPlayer(exoPlayer)
-        forwardingPlayer.addListener(playerListener)
+        exoPlayer.addListener(playerListener)
     }
 
     /**

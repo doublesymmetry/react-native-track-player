@@ -29,7 +29,7 @@ class MusicService : MediaLibraryService() {
         player = QueuedAudioPlayer(this, PlayerOptions(nativeExample = true))
         val customCommandButtons =
             CustomCommandButton.entries.map { command -> command.commandButton }
-        mediaLibrarySession = MediaLibrarySession.Builder(this, player.forwardingPlayer, object : MediaLibrarySession.Callback {
+        mediaLibrarySession = MediaLibrarySession.Builder(this, player.exoPlayer, object : MediaLibrarySession.Callback {
             override fun onConnect(
                 session: MediaSession,
                 controller: MediaSession.ControllerInfo
