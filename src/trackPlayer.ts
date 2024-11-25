@@ -312,7 +312,7 @@ export async function stop(): Promise<void> {
 }
 
 /**
- * Sets wether the player will play automatically when it is ready to do so.
+ * Sets whether the player will play automatically when it is ready to do so.
  * This is the equivalent of calling `TrackPlayer.play()` when `playWhenReady = true`
  * or `TrackPlayer.pause()` when `playWhenReady = false`.
  */
@@ -323,7 +323,7 @@ export async function setPlayWhenReady(
 }
 
 /**
- * Gets wether the player will play automatically when it is ready to do so.
+ * Gets whether the player will play automatically when it is ready to do so.
  */
 export async function getPlayWhenReady(): Promise<boolean> {
   return TrackPlayer.getPlayWhenReady();
