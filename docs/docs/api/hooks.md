@@ -85,7 +85,7 @@ import { usePlaybackState, State } from 'react-native-track-player';
 
 const MyComponent = () => {
   const playerState = usePlaybackState();
-  const isPlaying = playerState === State.Playing;
+  const isPlaying = playerState.state === State.Playing;
 
   return (
     <View>
