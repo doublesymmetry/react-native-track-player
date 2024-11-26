@@ -39,7 +39,7 @@ export class Player {
     if (typeof window === 'undefined') return;
     if (this.hasInitialized === true) {
       // TODO: double check the structure of this error message
-      throw { code: 'player_already_initialized', message: 'The player is not initialized. Call setupPlayer first.' };
+      throw { code: 'player_already_initialized', message: 'The player has already been initialized via setupPlayer.' };
     }
 
     // @ts-ignore
