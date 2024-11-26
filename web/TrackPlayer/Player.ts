@@ -43,7 +43,7 @@ export class Player {
     }
 
     // @ts-ignore
-    const shaka = await import('shaka-player/dist/shaka-player.ui');
+    const shaka = (await import('shaka-player/dist/shaka-player.ui')).default;
     // Install built-in polyfills to patch browser incompatibilities.
     shaka.polyfill.installAll();
     // Check to see if the browser supports the basic APIs Shaka needs.
