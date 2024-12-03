@@ -239,9 +239,9 @@ class QueuedAudioPlayer(
      * Replaces item at index in queue.
      */
     fun replaceItem(index: Int, item: AudioItem) {
-        val mediaSource = parseAudioItem(item)
-        queue[index] = mediaSource
-        exoPlayer.replaceMediaItem(index, mediaSource)
+        val mediaItem = parseAudioItem(item)
+        queue[index] = mediaItem
+        exoPlayer.replaceMediaItem(index, mediaItem)
     }
 
     /**
