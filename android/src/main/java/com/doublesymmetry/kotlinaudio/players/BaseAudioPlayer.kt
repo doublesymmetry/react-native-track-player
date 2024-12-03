@@ -3,8 +3,13 @@
 import android.content.Context
 import android.media.AudioManager
 import androidx.annotation.CallSuper
+import androidx.core.content.ContextCompat
+import androidx.media.AudioAttributesCompat
+import androidx.media.AudioFocusRequestCompat
+import androidx.media.AudioManagerCompat
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
+import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Metadata
@@ -21,6 +26,7 @@ import com.doublesymmetry.kotlinaudio.models.AudioItem
 import com.doublesymmetry.kotlinaudio.models.audioItem2MediaItem
 import com.doublesymmetry.kotlinaudio.models.AudioItemTransitionReason
 import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
+import com.doublesymmetry.kotlinaudio.models.MediaSessionCallback
 import com.doublesymmetry.kotlinaudio.models.asAudioItem
 import com.doublesymmetry.kotlinaudio.models.PlayWhenReadyChangeData
 import com.doublesymmetry.kotlinaudio.models.PlaybackError
@@ -28,10 +34,10 @@ import com.doublesymmetry.kotlinaudio.models.PlayerOptions
 import com.doublesymmetry.kotlinaudio.models.PositionChangedReason
 import com.doublesymmetry.kotlinaudio.models.setWakeMode
 import com.doublesymmetry.kotlinaudio.players.components.Cache
-import com.doublesymmetry.kotlinaudio.players.components.FocusManager
 import com.doublesymmetry.kotlinaudio.players.components.MediaFactory
 import com.doublesymmetry.kotlinaudio.players.components.setupBuffer
 import kotlinx.coroutines.MainScope
+import timber.log.Timber
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -40,19 +46,19 @@ abstract class BaseAudioPlayer internal constructor(
     val options: PlayerOptions = PlayerOptions()
 ) {
 
-    private var currentExoPlayer = true
-
-    var exoPlayer: ExoPlayer
-    private var playerListener = PlayerListener()
+    val exoPlayer: ExoPlayer
+    private val forwardingPlayer: InnerForwardingPlayer
+    private var playerListener = InnerPlayerListener()
     private val scope = MainScope()
     private var cache: SimpleCache? = null
     val playerEventHolder = PlayerEventHolder()
-    private val focusListener = InnerFocusListener()
-    private val focusManager = FocusManager(context, listener=focusListener, options=options)
+
+    private var wasDucking = false
+    private val focusManager: FocusManager = FocusManager()
 
     var alwaysPauseOnInterruption: Boolean
-        get() = focusManager.alwaysPauseOnInterruption
-        set(v) { focusManager.alwaysPauseOnInterruption = v }
+        get() = options.alwaysPauseOnInterruption
+        set(v) { options.alwaysPauseOnInterruption = v }
 
     open val currentItem: AudioItem?
         get() = asAudioItem(exoPlayer.currentMediaItem)
@@ -124,7 +130,6 @@ abstract class BaseAudioPlayer internal constructor(
     val isPlaying
         get() = exoPlayer.isPlaying
 
-    private var wasDucking = false
 
     fun setAudioOffload(offload: Boolean = true) {
         val audioOffloadPreferences =
@@ -151,7 +156,7 @@ abstract class BaseAudioPlayer internal constructor(
 
         val renderer = DefaultRenderersFactory(context)
         renderer.setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER)
-        val mPlayer = ExoPlayer
+        exoPlayer = ExoPlayer
             .Builder(context)
             .setRenderersFactory(renderer)
             .setHandleAudioBecomingNoisy(options.handleAudioBecomingNoisy)
@@ -168,10 +173,9 @@ abstract class BaseAudioPlayer internal constructor(
             .setUsage(C.USAGE_MEDIA)
             .setContentType(options.audioContentType)
             .build()
-        mPlayer.setAudioAttributes(audioAttributes, options.handleAudioFocus)
-
-        exoPlayer = mPlayer
-        exoPlayer.addListener(playerListener)
+        exoPlayer.setAudioAttributes(audioAttributes, options.handleAudioFocus)
+        forwardingPlayer = InnerForwardingPlayer(exoPlayer)
+        forwardingPlayer.addListener(playerListener)
     }
 
     /**
@@ -255,7 +259,7 @@ abstract class BaseAudioPlayer internal constructor(
     open fun destroy() {
         focusManager.abandonAudioFocusIfHeld()
         stop()
-        exoPlayer.removeListener(playerListener)
+        forwardingPlayer.removeListener(playerListener)
         exoPlayer.release()
         cache?.release()
         cache = null
@@ -272,7 +276,7 @@ abstract class BaseAudioPlayer internal constructor(
     }
 
     @UnstableApi
-    inner class PlayerListener : Listener {
+    inner class InnerPlayerListener : Listener {
 
         /**
          * Called when there is metadata associated with the current playback time.
@@ -432,9 +436,155 @@ abstract class BaseAudioPlayer internal constructor(
         }
     }
 
-    private inner class InnerFocusListener: AudioManager.OnAudioFocusChangeListener {
-        override fun onAudioFocusChange(focusChange: Int) {
-            // TODO: complete focusManager logic here
+    @UnstableApi
+    private inner class InnerForwardingPlayer(player: ExoPlayer): ForwardingPlayer(player) {
+        override fun setMediaItems(mediaItems: MutableList<MediaItem>, resetPosition: Boolean) {
+            // override setMediaItem handling to RNTP
+            return
+        }
+
+        override fun addMediaItems(mediaItems: MutableList<MediaItem>) {
+            // override setMediaItem handling to RNTP
+            return
+        }
+
+        override fun addMediaItems(index: Int, mediaItems: MutableList<MediaItem>) {
+            // override setMediaItem handling to RNTP
+            return
+        }
+
+        override fun setMediaItems(
+            mediaItems: MutableList<MediaItem>,
+            startIndex: Int,
+            startPositionMs: Long
+        ) {
+            // override setMediaItem handling to RNTP
+            return
+        }
+
+        override fun setMediaItems(mediaItems: MutableList<MediaItem>) {
+            // override setMediaItem handling to RNTP
+            return
+        }
+
+        override fun play() {
+            playerEventHolder.updateOnPlayerActionTriggeredExternally(MediaSessionCallback.PLAY)
+        }
+
+        override fun pause() {
+            playerEventHolder.updateOnPlayerActionTriggeredExternally(MediaSessionCallback.PAUSE)
+        }
+
+        override fun seekToNext() {
+            playerEventHolder.updateOnPlayerActionTriggeredExternally(MediaSessionCallback.NEXT)
+        }
+
+        override fun seekToNextMediaItem() {
+            playerEventHolder.updateOnPlayerActionTriggeredExternally(MediaSessionCallback.NEXT)
+        }
+
+        override fun seekToPrevious() {
+            playerEventHolder.updateOnPlayerActionTriggeredExternally(MediaSessionCallback.PREVIOUS)
+        }
+
+        override fun seekToPreviousMediaItem() {
+            playerEventHolder.updateOnPlayerActionTriggeredExternally(MediaSessionCallback.PREVIOUS)
+        }
+
+        override fun seekForward() {
+            playerEventHolder.updateOnPlayerActionTriggeredExternally(MediaSessionCallback.FORWARD)
+        }
+
+        override fun seekBack() {
+            playerEventHolder.updateOnPlayerActionTriggeredExternally(MediaSessionCallback.REWIND)
+        }
+
+        override fun stop() {
+            playerEventHolder.updateOnPlayerActionTriggeredExternally(MediaSessionCallback.STOP)
+        }
+
+        override fun seekTo(mediaItemIndex: Int, positionMs: Long) {
+            playerEventHolder.updateOnPlayerActionTriggeredExternally(
+                MediaSessionCallback.SEEK(
+                    positionMs
+                )
+            )
+        }
+
+        override fun seekTo(positionMs: Long) {
+            playerEventHolder.updateOnPlayerActionTriggeredExternally(
+                MediaSessionCallback.SEEK(
+                    positionMs
+                )
+            )
+        }
+    }
+
+    inner class FocusManager() {
+        private var hasAudioFocus = false
+        private var focus: AudioFocusRequestCompat? = null
+
+        fun requestAudioFocus() {
+            if (hasAudioFocus) return
+
+            val manager = ContextCompat.getSystemService(context, AudioManager::class.java)
+
+            focus = AudioFocusRequestCompat.Builder(AudioManagerCompat.AUDIOFOCUS_GAIN)
+                .setOnAudioFocusChangeListener(
+                    { focusChange ->
+                        Timber.d("Audio focus changed")
+                        val isPermanent = focusChange == AudioManager.AUDIOFOCUS_LOSS
+                        val isPaused = when (focusChange) {
+                            AudioManager.AUDIOFOCUS_LOSS, AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> true
+                            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> options.alwaysPauseOnInterruption
+                            else -> false
+                        }
+                        if (!options.handleAudioFocus) {
+                            if (isPermanent) focusManager.abandonAudioFocusIfHeld()
+
+                            val isDucking = focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK
+                                    && !options.alwaysPauseOnInterruption
+                            if (isDucking) {
+                                volumeMultiplier = 0.5f
+                                wasDucking = true
+                            } else if (wasDucking) {
+                                volumeMultiplier = 1f
+                                wasDucking = false
+                            }
+                        }
+                        playerEventHolder.updateOnAudioFocusChanged(isPaused, isPermanent)
+                    }
+                )
+                .setAudioAttributes(
+                    AudioAttributesCompat.Builder()
+                        .setUsage(AudioAttributesCompat.USAGE_MEDIA)
+                        .setContentType(AudioAttributesCompat.CONTENT_TYPE_MUSIC)
+                        .build()
+                )
+                .setWillPauseWhenDucked(options.alwaysPauseOnInterruption)
+                .build()
+
+            val result: Int = if (manager != null && focus != null) {
+                AudioManagerCompat.requestAudioFocus(manager, focus!!)
+            } else {
+                AudioManager.AUDIOFOCUS_REQUEST_FAILED
+            }
+
+            hasAudioFocus = (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
+        }
+
+        fun abandonAudioFocusIfHeld() {
+            if (!hasAudioFocus) return
+
+            val manager = ContextCompat.getSystemService(context, AudioManager::class.java)
+
+            val result: Int = if (manager != null && focus != null) {
+                AudioManagerCompat.abandonAudioFocusRequest(manager, focus!!)
+            } else {
+                AudioManager.AUDIOFOCUS_REQUEST_FAILED
+            }
+
+            hasAudioFocus = (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
         }
     }
 }
