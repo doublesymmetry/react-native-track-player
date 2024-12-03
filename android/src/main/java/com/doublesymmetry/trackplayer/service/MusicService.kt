@@ -505,10 +505,6 @@ class MusicService : HeadlessJsMediaService() {
         updateMetadataForTrack(player.currentIndex, track)
     }
 
-    @MainThread
-    fun clearNotificationMetadata() {
-    }
-
     private fun emitPlaybackTrackChangedEvents(
         index: Int,
         previousIndex: Int?,

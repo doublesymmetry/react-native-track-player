@@ -378,17 +378,6 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     @ReactMethod
-    fun clearNowPlayingMetadata(callback: Promise) = launchInScope {
-        if (verifyServiceBoundOrReject(callback)) return@launchInScope
-
-        if (musicService.tracks.isEmpty())
-            callback.reject("no_current_item", "There is no current item in the player")
-
-        musicService.clearNotificationMetadata()
-        callback.resolve(null)
-    }
-
-    @ReactMethod
     fun removeUpcomingTracks(callback: Promise) = launchInScope {
         if (verifyServiceBoundOrReject(callback)) return@launchInScope
 

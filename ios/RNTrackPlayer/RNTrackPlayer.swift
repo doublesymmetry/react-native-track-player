@@ -722,14 +722,6 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
         resolve(NSNull())
     }
 
-    @objc(clearNowPlayingMetadata:rejecter:)
-    public func clearNowPlayingMetadata(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
-        if (rejectWhenNotInitialized(reject: reject)) { return }
-
-        player.nowPlayingInfoController.clear()
-        resolve(NSNull())
-    }
-
     @objc(updateNowPlayingMetadata:resolver:rejecter:)
     public func updateNowPlayingMetadata(metadata: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
