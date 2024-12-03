@@ -47,7 +47,7 @@ abstract class BaseAudioPlayer internal constructor(
 ) {
 
     val exoPlayer: ExoPlayer
-    private val forwardingPlayer: InnerForwardingPlayer
+    val forwardingPlayer: InnerForwardingPlayer
     private var playerListener = InnerPlayerListener()
     private val scope = MainScope()
     private var cache: SimpleCache? = null
@@ -437,7 +437,7 @@ abstract class BaseAudioPlayer internal constructor(
     }
 
     @UnstableApi
-    private inner class InnerForwardingPlayer(player: ExoPlayer): ForwardingPlayer(player) {
+    inner class InnerForwardingPlayer(player: ExoPlayer): ForwardingPlayer(player) {
         override fun setMediaItems(mediaItems: MutableList<MediaItem>, resetPosition: Boolean) {
             // override setMediaItem handling to RNTP
             return

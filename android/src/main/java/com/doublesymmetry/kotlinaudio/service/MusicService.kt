@@ -53,11 +53,13 @@ class MusicService : MediaLibraryService() {
                 customCommand: SessionCommand,
                 args: Bundle
             ): ListenableFuture<SessionResult> {
-                when (customCommand.customAction) {
-                    CustomCommandButton.JUMP_BACKWARD.customAction -> { session.player.seekBack() }
-                    CustomCommandButton.JUMP_FORWARD.customAction -> { session.player.seekForward() }
-                    CustomCommandButton.NEXT.customAction -> { session.player.seekToNext() }
-                    CustomCommandButton.PREVIOUS.customAction -> { session.player.seekToPrevious() }
+                player.forwardingPlayer.let {
+                    when (customCommand.customAction) {
+                        CustomCommandButton.JUMP_BACKWARD.customAction -> { it.seekBack() }
+                        CustomCommandButton.JUMP_FORWARD.customAction -> { it.seekForward() }
+                        CustomCommandButton.NEXT.customAction -> { it.seekToNext() }
+                        CustomCommandButton.PREVIOUS.customAction -> { it.seekToPrevious() }
+                    }
                 }
                 return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
             }
