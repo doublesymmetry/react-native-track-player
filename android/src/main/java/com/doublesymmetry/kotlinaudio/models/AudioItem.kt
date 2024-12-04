@@ -10,40 +10,56 @@ import com.doublesymmetry.kotlinaudio.utils.getEmbeddedBitmapArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-
-data class DefaultAudioItem(
-    override var audioUrl: String,
-
-    /**
-     * Set to [MediaType.DEFAULT] by default.
-     */
-    override val type: MediaType = MediaType.DEFAULT,
-
-    override var artist: String? = null,
-    override var title: String? = null,
-    override var albumTitle: String? = null,
-    override var artwork: String? = null,
-    override val duration: Long? = null,
-    override val options: AudioItemOptions? = null,
-    override val mediaId: String? = null,
-) : AudioItem
-
-class AudioItemHolder(
-    var audioItem: AudioItem
+open class AudioItem(
+    open var audioUrl: String,
+    open val type: MediaType = MediaType.DEFAULT,
+    open var artist: String? = null,
+    open var title: String? = null,
+    open var albumTitle: String? = null,
+    open val artwork: String? = null,
+    open val duration: Long? = null,
+    open val options: AudioItemOptions? = null,
+    open val mediaId: String? = null
 ) {
-    var artworkBitmap: Bitmap? = null
-}
+    fun asMediaItem(): MediaItem {
+        val artworkData = if (audioUrl.startsWith("file://")) {
+            getEmbeddedBitmapArray(audioUrl)
+        } else {
+            null
+        }
+        val extras = Bundle().apply {
+            options?.headers?.let {
+                putSerializable("headers", HashMap(it))
+            }
+            options?.userAgent?.let {
+                putString("user-agent", it)
+            }
+            options?.resourceId?.let {
+                putInt("resource-id", it)
+            }
+            putString("type", type.toString())
+            putString("uri", audioUrl)
+        }
+        val mediaMetadata = MediaMetadata.Builder()
+            .setTitle(title)
+            .setArtist(artist)
+            .setArtworkUri(Uri.parse(artwork))
+            .setArtworkData(artworkData, MediaMetadata.PICTURE_TYPE_MEDIA)
+            .setExtras(extras)
+            .build()
+        return MediaItem.Builder()
+            .setMediaId(mediaId ?: audioUrl)
+            .setUri(audioUrl)
+            .setMediaMetadata(mediaMetadata)
+            .setTag(this)
+            .build()
+    }
 
-interface AudioItem {
-    var audioUrl: String
-    val type: MediaType
-    var artist: String?
-    var title: String?
-    var albumTitle: String?
-    val artwork: String?
-    val duration: Long?
-    val options: AudioItemOptions?
-    val mediaId: String?
+    companion object {
+        fun fromMediaItem(item: MediaItem): AudioItem {
+            return item.localConfiguration!!.tag as AudioItem
+        }
+    }
 }
 
 data class AudioItemOptions(
@@ -72,46 +88,4 @@ enum class MediaType(val value: String) {
      * The SmoothStreaming media type for adaptive streams. Should be used with SmoothStreaming manifests.
      */
     SMOOTH_STREAMING("smoothstreaming");
-}
-
-
-
-suspend fun audioItem2MediaItem(audioItem: AudioItem, context: Context? = null): MediaItem {
-    val artworkData = if (audioItem.audioUrl.startsWith("file://")) {
-        withContext(Dispatchers.IO) {
-            getEmbeddedBitmapArray(audioItem.audioUrl)
-        }
-    } else {
-        null
-    }
-
-    return MediaItem.Builder()
-        .setMediaId(audioItem.mediaId ?: audioItem.audioUrl)
-        .setUri(audioItem.audioUrl)
-        .setMediaMetadata(
-            MediaMetadata.Builder()
-            .setTitle(audioItem.title)
-            .setArtist(audioItem.artist)
-            .setArtworkUri(Uri.parse(audioItem.artwork))
-            .setArtworkData(artworkData, MediaMetadata.PICTURE_TYPE_MEDIA)
-            .setExtras(Bundle().apply {
-                audioItem.options?.headers?.let {
-                    putSerializable("headers", HashMap(it))
-                }
-                audioItem.options?.userAgent?.let {
-                    putString("user-agent", it)
-                }
-                audioItem.options?.resourceId?.let {
-                    putInt("resource-id", it)
-                }
-                putString("type", audioItem.type.toString())
-                putString("uri", audioItem.audioUrl)
-            }).build()
-        )
-        .setTag(audioItem)
-        .build()
-}
-
-fun asAudioItem(item: MediaItem?): AudioItem? {
-    return item?.localConfiguration?.tag as AudioItem?
 }

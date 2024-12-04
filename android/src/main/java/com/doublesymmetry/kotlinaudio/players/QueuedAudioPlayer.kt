@@ -1,4 +1,4 @@
-@file: OptIn(UnstableApi::class) package com.doublesymmetry.kotlinaudio.players
+package com.doublesymmetry.kotlinaudio.players
 
 import android.content.Context
 import androidx.media3.common.C
@@ -17,10 +17,6 @@ class QueuedAudioPlayer(
 ) : AudioPlayer(context, options) {
 
     private val queue = LinkedList<MediaItem>()
-
-    private fun parseAudioItem(audioItem: AudioItem): MediaItem {
-        return audioItem2MediaItem(audioItem, if (parseEmbeddedArtwork) context else null)
-    }
 
     var repeatMode: RepeatMode
         get() {
@@ -48,7 +44,7 @@ class QueuedAudioPlayer(
         }
 
     override val currentItem: AudioItem?
-        get() = asAudioItem(queue.getOrNull(currentIndex))
+        get() = queue.getOrNull(currentIndex)?.let { AudioItem.fromMediaItem(it) }
 
     val nextIndex: Int?
         get() {
@@ -63,14 +59,14 @@ class QueuedAudioPlayer(
         }
 
     val items: List<AudioItem>
-        get() = queue.map { asAudioItem(it)!! }
+        get() = queue.map { AudioItem.fromMediaItem(it) }
 
     val previousItems: List<AudioItem>
         get() {
             return if (queue.isEmpty()) emptyList()
             else queue
                 .subList(0, exoPlayer.currentMediaItemIndex)
-                .map { asAudioItem(it)!! }
+                .map { AudioItem.fromMediaItem(it) }
         }
 
     val nextItems: List<AudioItem>
@@ -78,7 +74,7 @@ class QueuedAudioPlayer(
             return if (queue.isEmpty()) emptyList()
             else queue
                 .subList(exoPlayer.currentMediaItemIndex, queue.lastIndex)
-                .map { asAudioItem(it)!! }
+                .map { AudioItem.fromMediaItem(it) }
         }
 
     val nextItem: AudioItem?
@@ -96,7 +92,7 @@ class QueuedAudioPlayer(
         if (queue.isEmpty()) {
             add(item)
         } else {
-            exoPlayer.addMediaItem(currentIndex + 1, parseAudioItem(item))
+            exoPlayer.addMediaItem(currentIndex + 1, item.asMediaItem())
             exoPlayer.removeMediaItem(currentIndex)
             exoPlayer.seekTo(currentIndex, C.TIME_UNSET)
             exoPlayer.prepare()
@@ -117,7 +113,7 @@ class QueuedAudioPlayer(
      * @param item The [AudioItem] to add.
      */
     fun add(item: AudioItem) {
-        val mediaSource = parseAudioItem(item)
+        val mediaSource = item.asMediaItem()
         queue.add(mediaSource)
         exoPlayer.addMediaItem(mediaSource)
         exoPlayer.prepare()
@@ -138,9 +134,9 @@ class QueuedAudioPlayer(
      * @param items The [AudioItem]s to add.
      */
     fun add(items: List<AudioItem>) {
-        val mediaSources = items.map { parseAudioItem(it) }
-        queue.addAll(mediaSources)
-        exoPlayer.addMediaItems(mediaSources)
+        val mediaItems = items.map { it.asMediaItem() }
+        queue.addAll(mediaItems)
+        exoPlayer.addMediaItems(mediaItems)
         exoPlayer.prepare()
     }
 
@@ -151,9 +147,9 @@ class QueuedAudioPlayer(
      * @param atIndex  Index to insert items at, if no items loaded this will not automatically start playback.
      */
     fun add(items: List<AudioItem>, atIndex: Int) {
-        val mediaSources = items.map { parseAudioItem(it) }
-        queue.addAll(atIndex, mediaSources)
-        exoPlayer.addMediaItems(atIndex, mediaSources)
+        val mediaItems = items.map { (it).asMediaItem() }
+        queue.addAll(atIndex, mediaItems)
+        exoPlayer.addMediaItems(atIndex, mediaItems)
         exoPlayer.prepare()
     }
 
@@ -237,7 +233,7 @@ class QueuedAudioPlayer(
      * Replaces item at index in queue.
      */
     fun replaceItem(index: Int, item: AudioItem) {
-        val mediaItem = parseAudioItem(item)
+        val mediaItem = item.asMediaItem()
         queue[index] = mediaItem
         exoPlayer.replaceMediaItem(index, mediaItem)
     }

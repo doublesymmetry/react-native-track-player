@@ -1,4 +1,4 @@
-@file: OptIn(UnstableApi::class) package com.doublesymmetry.kotlinaudio.players
+package com.doublesymmetry.kotlinaudio.players
 
 import android.content.Context
 import android.media.AudioManager
@@ -24,11 +24,9 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.legacy.RatingCompat
 import com.doublesymmetry.kotlinaudio.event.PlayerEventHolder
 import com.doublesymmetry.kotlinaudio.models.AudioItem
-import com.doublesymmetry.kotlinaudio.models.audioItem2MediaItem
 import com.doublesymmetry.kotlinaudio.models.AudioItemTransitionReason
 import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
 import com.doublesymmetry.kotlinaudio.models.MediaSessionCallback
-import com.doublesymmetry.kotlinaudio.models.asAudioItem
 import com.doublesymmetry.kotlinaudio.models.PlayWhenReadyChangeData
 import com.doublesymmetry.kotlinaudio.models.PlaybackError
 import com.doublesymmetry.kotlinaudio.models.PlayerOptions
@@ -69,7 +67,7 @@ abstract class BaseAudioPlayer internal constructor(
         set(v) { options.alwaysPauseOnInterruption = v }
 
     open val currentItem: AudioItem?
-        get() = asAudioItem(exoPlayer.currentMediaItem)
+        get() = exoPlayer.currentMediaItem?.let { AudioItem.fromMediaItem(it) }
 
     var playbackError: PlaybackError? = null
     var playerState: AudioPlayerState = AudioPlayerState.IDLE
@@ -202,7 +200,7 @@ abstract class BaseAudioPlayer internal constructor(
      * @param item The [AudioItem] to replace the current one.
      */
     open fun load(item: AudioItem) {
-        exoPlayer.addMediaItem(audioItem2MediaItem(item))
+        exoPlayer.addMediaItem(item.asMediaItem())
         exoPlayer.prepare()
     }
 
