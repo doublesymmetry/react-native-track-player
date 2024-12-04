@@ -270,7 +270,6 @@ class MusicService : HeadlessJsMediaService() {
         if (notificationCapabilities.isEmpty()) notificationCapabilities = capabilities
 
         val customActions = options.getBundle(CUSTOM_ACTIONS_KEY)
-        val customActionsList = customActions?.getStringArrayList(CUSTOM_ACTIONS_LIST_KEY)
 
         val playerCommandsBuilder = Player.Commands.Builder().addAll(
             // HACK: without COMMAND_GET_CURRENT_MEDIA_ITEM, notification cannot be created
@@ -1141,7 +1140,6 @@ class MusicService : HeadlessJsMediaService() {
         const val ANDROID_OPTIONS_KEY = "android"
 
         const val CUSTOM_ACTIONS_KEY = "customActions"
-        const val CUSTOM_ACTIONS_LIST_KEY = "customActionsList"
 
         const val APP_KILLED_PLAYBACK_BEHAVIOR_KEY = "appKilledPlaybackBehavior"
         const val AUDIO_OFFLOAD_KEY = "audioOffload"

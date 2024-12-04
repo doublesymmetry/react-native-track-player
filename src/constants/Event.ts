@@ -123,11 +123,6 @@ export enum Event {
    * See https://rntp.dev/docs/api/events#remoteBrowse
    **/
   RemoteBrowse = 'remote-browse',
-  /**
-   * (Android only) Fired when a custom action button is pressed.
-   * See https://rntp.dev/docs/api/events#remoteCustomAction
-   **/
-  RemoteCustomAction = 'remote-custom-action',
   /** (iOS only) Fired when chapter metadata is received.
    * See https://rntp.dev/docs/api/events#chaptermetadatareceived
    **/
