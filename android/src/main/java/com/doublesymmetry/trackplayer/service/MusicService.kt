@@ -225,9 +225,6 @@ class MusicService : HeadlessJsMediaService() {
         latestOptions = options
         val androidOptions = options.getBundle(ANDROID_OPTIONS_KEY)
 
-        if (androidOptions?.containsKey(PARSE_EMBEDDED_ARTWORK) == true) {
-            player.parseEmbeddedArtwork = androidOptions.getBoolean(PARSE_EMBEDDED_ARTWORK)
-        }
         if (androidOptions?.containsKey(AUDIO_OFFLOAD_KEY) == true) {
             player.setAudioOffload(androidOptions.getBoolean(AUDIO_OFFLOAD_KEY))
         }
@@ -1157,7 +1154,6 @@ class MusicService : HeadlessJsMediaService() {
         const val IS_FOCUS_LOSS_PERMANENT_KEY = "permanent"
         const val IS_PAUSED_KEY = "paused"
 
-        const val PARSE_EMBEDDED_ARTWORK = "androidParseEmbeddedArtwork"
         const val HANDLE_NOISY = "androidHandleAudioBecomingNoisy"
         const val CROSSFADE = "crossfade"
         const val ALWAYS_SHOW_NEXT = "androidAlwaysShowNext"

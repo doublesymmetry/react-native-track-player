@@ -16,8 +16,6 @@ class QueuedAudioPlayer(
     options: PlayerOptions = PlayerOptions()
 ) : AudioPlayer(context, options) {
 
-    var parseEmbeddedArtwork: Boolean = false
-
     private val queue = LinkedList<MediaItem>()
 
     private fun parseAudioItem(audioItem: AudioItem): MediaItem {

@@ -7,8 +7,6 @@ import android.os.Bundle
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import com.doublesymmetry.kotlinaudio.utils.getEmbeddedBitmapArray
-import com.doublesymmetry.kotlinaudio.utils.saveMediaCoverToPng
-import java.util.UUID
 
 
 data class DefaultAudioItem(
@@ -84,18 +82,15 @@ fun audioItem2MediaItem(audioItem: AudioItem, context: Context? = null): MediaIt
             MediaMetadata.Builder()
             .setTitle(audioItem.title)
             .setArtist(audioItem.artist)
-            .setArtworkUri(Uri.parse(
-                if (context != null && audioItem.audioUrl.startsWith("file://")) {
-                    saveMediaCoverToPng(
-                        audioItem.audioUrl,
-                        context.contentResolver,
-                        audioItem.mediaId ?: audioItem.audioUrl
-                    )
-                        ?: audioItem.artwork
-                }
-                else audioItem.artwork))
-            .setArtworkData(if (audioItem.audioUrl.startsWith("file://")) getEmbeddedBitmapArray(
-                audioItem.audioUrl.substring(7)) else null, MediaMetadata.PICTURE_TYPE_MEDIA)
+            .setArtworkUri(Uri.parse(audioItem.artwork))
+            .setArtworkData(
+                if (audioItem.audioUrl.startsWith("file://")) {
+                    getEmbeddedBitmapArray(audioItem.audioUrl)
+                } else {
+                    null
+                },
+                MediaMetadata.PICTURE_TYPE_MEDIA
+            )
             .setExtras(Bundle().apply {
                 audioItem.options?.headers?.let {
                     putSerializable("headers", HashMap(it))
@@ -108,7 +103,8 @@ fun audioItem2MediaItem(audioItem: AudioItem, context: Context? = null): MediaIt
                 }
                 putString("type", audioItem.type.toString())
                 putString("uri", audioItem.audioUrl)
-            }).build())
+            }).build()
+        )
         .setTag(audioItem)
         .build()
 }
