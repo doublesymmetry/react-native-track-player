@@ -43,5 +43,7 @@ fun getEmbeddedBitmapArray(path: String?): ByteArray? {
         return mmr.embeddedPicture
     } catch (e: Exception) {
         return null
+    } finally {
+        mmr.release()
     }
 }

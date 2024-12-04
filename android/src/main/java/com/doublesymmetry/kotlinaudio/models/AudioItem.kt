@@ -7,6 +7,8 @@ import android.os.Bundle
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import com.doublesymmetry.kotlinaudio.utils.getEmbeddedBitmapArray
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 
 data class DefaultAudioItem(
@@ -74,7 +76,15 @@ enum class MediaType(val value: String) {
 
 
 
-fun audioItem2MediaItem(audioItem: AudioItem, context: Context? = null): MediaItem {
+suspend fun audioItem2MediaItem(audioItem: AudioItem, context: Context? = null): MediaItem {
+    val artworkData = if (audioItem.audioUrl.startsWith("file://")) {
+        withContext(Dispatchers.IO) {
+            getEmbeddedBitmapArray(audioItem.audioUrl)
+        }
+    } else {
+        null
+    }
+
     return MediaItem.Builder()
         .setMediaId(audioItem.mediaId ?: audioItem.audioUrl)
         .setUri(audioItem.audioUrl)
@@ -83,14 +93,7 @@ fun audioItem2MediaItem(audioItem: AudioItem, context: Context? = null): MediaIt
             .setTitle(audioItem.title)
             .setArtist(audioItem.artist)
             .setArtworkUri(Uri.parse(audioItem.artwork))
-            .setArtworkData(
-                if (audioItem.audioUrl.startsWith("file://")) {
-                    getEmbeddedBitmapArray(audioItem.audioUrl)
-                } else {
-                    null
-                },
-                MediaMetadata.PICTURE_TYPE_MEDIA
-            )
+            .setArtworkData(artworkData, MediaMetadata.PICTURE_TYPE_MEDIA)
             .setExtras(Bundle().apply {
                 audioItem.options?.headers?.let {
                     putSerializable("headers", HashMap(it))
