@@ -21,6 +21,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.session.legacy.RatingCompat
 import com.doublesymmetry.kotlinaudio.event.PlayerEventHolder
 import com.doublesymmetry.kotlinaudio.models.AudioItem
 import com.doublesymmetry.kotlinaudio.models.audioItem2MediaItem
@@ -130,6 +131,7 @@ abstract class BaseAudioPlayer internal constructor(
     val isPlaying
         get() = exoPlayer.isPlaying
 
+    var ratingType: Int = RatingCompat.RATING_NONE
 
     fun setAudioOffload(offload: Boolean = true) {
         val audioOffloadPreferences =

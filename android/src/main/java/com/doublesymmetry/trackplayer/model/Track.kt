@@ -22,13 +22,13 @@ class Track
     var type = MediaType.DEFAULT
     var contentType: String?
     var userAgent: String?
-    var originalItem: Bundle?
+    var originalItem: Bundle
     var headers: HashMap<String, String>? = null
     val queueId: Long
 
     override fun setMetadata(context: Context, bundle: Bundle?, ratingType: Int) {
         super.setMetadata(context, bundle, ratingType)
-        if (originalItem != null && originalItem != bundle) originalItem!!.putAll(bundle)
+        originalItem.putAll(bundle)
     }
 
     fun toAudioItem(): TrackAudioItem {
@@ -37,6 +37,7 @@ class Track
     }
 
     init {
+        originalItem = bundle
         resourceId = BundleUtils.getRawResourceId(context, bundle, "url")
         uri = if (resourceId == 0) {
             resourceId = null
@@ -65,6 +66,5 @@ class Track
         }
         setMetadata(context, bundle, ratingType)
         queueId = System.currentTimeMillis()
-        originalItem = bundle
     }
 }

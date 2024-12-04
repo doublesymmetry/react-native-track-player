@@ -92,7 +92,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     private fun bundleToTrack(bundle: Bundle): Track {
-        return Track(context, bundle, 0)
+        return Track(context, bundle, musicService.ratingType)
     }
 
     private fun hashmapToMediaItem(hashmap: HashMap<String, String>): MediaItem {
@@ -346,32 +346,32 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     }
 
     @ReactMethod
-    fun updateMetadataForTrack(index: Int, map: ReadableMap?, callback: Promise) =
-        launchInScope {
-            if (verifyServiceBoundOrReject(callback)) return@launchInScope
+    fun updateMetadataForTrack(index: Int, map: ReadableMap?, callback: Promise) = launchInScope {
+        if (verifyServiceBoundOrReject(callback)) return@launchInScope
 
-            if (index < 0 || index >= musicService.tracks.size) {
-                callback.reject("index_out_of_bounds", "The index is out of bounds")
-            } else {
-                val context: ReactContext = context
-                val track = musicService.tracks[index]
-                track.setMetadata(context, Arguments.toBundle(map), 0)
-                musicService.updateMetadataForTrack(index, track)
-
-                callback.resolve(null)
-            }
+        if (index < 0 || index >= musicService.tracks.size) {
+            callback.reject("index_out_of_bounds", "The index is out of bounds")
+            return@launchInScope
         }
+
+        Arguments.toBundle(map)?.let {
+            musicService.updateMetadataForTrack(index, it)
+        }
+
+        callback.resolve(null)
+    }
 
     @ReactMethod
     fun updateNowPlayingMetadata(map: ReadableMap?, callback: Promise) = launchInScope {
         if (verifyServiceBoundOrReject(callback)) return@launchInScope
 
-        if (musicService.tracks.isEmpty())
+        if (musicService.tracks.isEmpty()) {
             callback.reject("no_current_item", "There is no current item in the player")
+            return@launchInScope
+        }
 
         Arguments.toBundle(map)?.let {
-            val track = bundleToTrack(it)
-            musicService.updateNowPlayingMetadata(track)
+            musicService.updateNowPlayingMetadata(it)
         }
 
         callback.resolve(null)

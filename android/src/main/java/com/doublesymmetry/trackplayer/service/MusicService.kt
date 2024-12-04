@@ -143,6 +143,11 @@ class MusicService : HeadlessJsMediaService() {
     val state
         get() = player.playerState
 
+    var ratingType: Int
+        get() = player.ratingType
+        set(value) {
+            player.ratingType = value
+        }
 
     val playbackError
         get() = player.playbackError
@@ -492,24 +497,27 @@ class MusicService : HeadlessJsMediaService() {
     }
 
     @MainThread
-    fun updateMetadataForTrack(index: Int, track: Track) {
-        player.replaceItem(index, track.toAudioItem())
+    fun updateMetadataForTrack(index: Int, bundle: Bundle) {
+        tracks[index].let { currentTrack ->
+            currentTrack.setMetadata(reactContext, bundle, 0)
+
+            player.replaceItem(index, currentTrack.toAudioItem())
+        }
     }
 
     @MainThread
-    fun updateNowPlayingMetadata(track: Track) {
-        updateMetadataForTrack(player.currentIndex, track)
+    fun updateNowPlayingMetadata(bundle: Bundle) {
+        updateMetadataForTrack(player.currentIndex, bundle)
     }
 
     private fun emitPlaybackTrackChangedEvents(
-        index: Int,
         previousIndex: Int?,
         oldPosition: Double
     ) {
         val bundle = Bundle()
         bundle.putDouble("lastPosition", oldPosition)
         if (tracks.isNotEmpty()) {
-            bundle.putInt("index", index)
+            bundle.putInt("index", player.currentIndex)
             bundle.putBundle("track", tracks[player.currentIndex].originalItem)
             if (previousIndex != null) {
                 bundle.putInt("lastIndex", previousIndex)
@@ -554,7 +562,6 @@ class MusicService : HeadlessJsMediaService() {
             event.audioItemTransition.collect {
                 if (it !is AudioItemTransitionReason.REPEAT) {
                     emitPlaybackTrackChangedEvents(
-                        player.currentIndex,
                         player.previousIndex,
                         (it?.oldPosition ?: 0).toSeconds()
                     )
