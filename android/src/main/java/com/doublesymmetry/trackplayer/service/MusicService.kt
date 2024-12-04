@@ -539,18 +539,6 @@ class MusicService : HeadlessJsMediaService() {
         emit(MusicEvents.PLAYBACK_QUEUE_ENDED, bundle)
     }
 
-    @Suppress("DEPRECATION")
-    fun isForegroundService(): Boolean {
-        val manager = baseContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        for (service in manager.getRunningServices(Int.MAX_VALUE)) {
-            if (MusicService::class.java.name == service.service.className) {
-                return service.foreground
-            }
-        }
-        Timber.e("isForegroundService found no matching service")
-        return false
-    }
-
     @MainThread
     private fun observeEvents() {
         scope.launch {
