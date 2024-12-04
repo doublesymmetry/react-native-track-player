@@ -1,13 +1,9 @@
 package com.doublesymmetry.kotlinaudio.models
 
-import android.content.Context
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 open class AudioItem(
     open var audioUrl: String,
@@ -20,7 +16,7 @@ open class AudioItem(
     open val options: AudioItemOptions? = null,
     open val mediaId: String? = null
 ) {
-    fun asMediaItem(): MediaItem {
+    fun toMediaItem(): MediaItem {
         val extras = Bundle().apply {
             options?.headers?.let {
                 putSerializable("headers", HashMap(it))

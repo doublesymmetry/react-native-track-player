@@ -200,7 +200,7 @@ abstract class BaseAudioPlayer internal constructor(
      * @param item The [AudioItem] to replace the current one.
      */
     open fun load(item: AudioItem) {
-        exoPlayer.addMediaItem(item.asMediaItem())
+        exoPlayer.addMediaItem(item.toMediaItem())
         exoPlayer.prepare()
     }
 

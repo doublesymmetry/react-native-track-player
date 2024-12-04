@@ -5,7 +5,6 @@ import androidx.media3.common.C
 import androidx.media3.common.IllegalSeekPositionException
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
 import com.doublesymmetry.kotlinaudio.models.*
 import java.util.*
 import kotlin.math.max
@@ -92,7 +91,7 @@ class QueuedAudioPlayer(
         if (queue.isEmpty()) {
             add(item)
         } else {
-            exoPlayer.addMediaItem(currentIndex + 1, item.asMediaItem())
+            exoPlayer.addMediaItem(currentIndex + 1, item.toMediaItem())
             exoPlayer.removeMediaItem(currentIndex)
             exoPlayer.seekTo(currentIndex, C.TIME_UNSET)
             exoPlayer.prepare()
@@ -113,7 +112,7 @@ class QueuedAudioPlayer(
      * @param item The [AudioItem] to add.
      */
     fun add(item: AudioItem) {
-        val mediaSource = item.asMediaItem()
+        val mediaSource = item.toMediaItem()
         queue.add(mediaSource)
         exoPlayer.addMediaItem(mediaSource)
         exoPlayer.prepare()
@@ -134,7 +133,7 @@ class QueuedAudioPlayer(
      * @param items The [AudioItem]s to add.
      */
     fun add(items: List<AudioItem>) {
-        val mediaItems = items.map { it.asMediaItem() }
+        val mediaItems = items.map { it.toMediaItem() }
         queue.addAll(mediaItems)
         exoPlayer.addMediaItems(mediaItems)
         exoPlayer.prepare()
@@ -147,7 +146,7 @@ class QueuedAudioPlayer(
      * @param atIndex  Index to insert items at, if no items loaded this will not automatically start playback.
      */
     fun add(items: List<AudioItem>, atIndex: Int) {
-        val mediaItems = items.map { (it).asMediaItem() }
+        val mediaItems = items.map { (it).toMediaItem() }
         queue.addAll(atIndex, mediaItems)
         exoPlayer.addMediaItems(atIndex, mediaItems)
         exoPlayer.prepare()
@@ -233,7 +232,7 @@ class QueuedAudioPlayer(
      * Replaces item at index in queue.
      */
     fun replaceItem(index: Int, item: AudioItem) {
-        val mediaItem = item.asMediaItem()
+        val mediaItem = item.toMediaItem()
         queue[index] = mediaItem
         exoPlayer.replaceMediaItem(index, mediaItem)
     }

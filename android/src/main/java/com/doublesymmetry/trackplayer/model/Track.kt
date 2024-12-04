@@ -32,8 +32,18 @@ class Track
     }
 
     fun toAudioItem(): TrackAudioItem {
-        return TrackAudioItem(this, type, uri.toString(), artist, title, album, artwork.toString(), duration,
-                AudioItemOptions(headers, userAgent, resourceId), mediaId)
+        return TrackAudioItem(
+            track = this,
+            type = type,
+            audioUrl = uri.toString(),
+            artist = artist,
+            title = title,
+            albumTitle = album,
+            artwork = artwork.toString(),
+            duration = duration,
+            options = AudioItemOptions(headers, userAgent, resourceId),
+            mediaId = mediaId
+        )
     }
 
     init {
