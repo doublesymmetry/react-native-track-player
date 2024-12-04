@@ -188,9 +188,9 @@ class MusicService : HeadlessJsMediaService() {
             print("Player was initialized previously. Preventing reinitialization.")
             return
         }
-        val mPlayerOptions = PlayerOptions(
-            cacheSize = playerOptions?.getDouble(MAX_CACHE_SIZE_KEY)?.toLong() ?: 0,
         Timber.d("Setting up player")
+        val options = PlayerOptions(
+            alwaysShowNext = playerOptions?.getBoolean(ALWAYS_SHOW_NEXT, true) ?: true,
             audioContentType = when (playerOptions?.getString(ANDROID_AUDIO_CONTENT_TYPE)) {
                 "music" -> C.AUDIO_CONTENT_TYPE_MUSIC
                 "speech" -> C.AUDIO_CONTENT_TYPE_SPEECH
@@ -199,21 +199,20 @@ class MusicService : HeadlessJsMediaService() {
                 "unknown" -> C.AUDIO_CONTENT_TYPE_UNKNOWN
                 else -> C.AUDIO_CONTENT_TYPE_MUSIC
             },
-            wakeMode = playerOptions?.getInt(WAKE_MODE, 0) ?: 0,
-            handleAudioBecomingNoisy = playerOptions?.getBoolean(HANDLE_NOISY, true) ?: true,
-            alwaysShowNext = playerOptions?.getBoolean(ALWAYS_SHOW_NEXT, true) ?: true,
-            handleAudioFocus = playerOptions?.getBoolean(AUTO_HANDLE_INTERRUPTIONS) ?: true,
-
             bufferOptions = BufferOptions(
                 playerOptions?.getDouble(MIN_BUFFER_KEY)?.toMilliseconds()?.toInt(),
                 playerOptions?.getDouble(MAX_BUFFER_KEY)?.toMilliseconds()?.toInt(),
                 playerOptions?.getDouble(PLAY_BUFFER_KEY)?.toMilliseconds()?.toInt(),
                 playerOptions?.getDouble(BACK_BUFFER_KEY)?.toMilliseconds()?.toInt(),
             ),
-
-            skipSilence = playerOptions?.getBoolean(SKIP_SILENCE) ?: false
+            cacheSize = playerOptions?.getDouble(MAX_CACHE_SIZE_KEY)?.toLong() ?: 0,
+            handleAudioBecomingNoisy = playerOptions?.getBoolean(HANDLE_NOISY, true) ?: true,
+            handleAudioFocus = playerOptions?.getBoolean(AUTO_HANDLE_INTERRUPTIONS) ?: true,
+            interceptPlayerActionsTriggeredExternally = true,
+            skipSilence = playerOptions?.getBoolean(SKIP_SILENCE) ?: false,
+            wakeMode = playerOptions?.getInt(WAKE_MODE, 0) ?: 0
         )
-        player = QueuedAudioPlayer(this@MusicService, mPlayerOptions)
+        player = QueuedAudioPlayer(this@MusicService, options)
         fakePlayer.release()
         mediaSession.player = player.exoPlayer
         observeEvents()
