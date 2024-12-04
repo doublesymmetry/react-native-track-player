@@ -21,6 +21,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CacheBitmapLoader
 import androidx.media3.session.LibraryResult
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Rating
 import androidx.media3.common.util.BitmapLoader
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.CommandButton
@@ -1117,6 +1118,18 @@ class MusicService : HeadlessJsMediaService() {
                 putString("package", controller.packageName)
             })
             return super.onPlaybackResumption(mediaSession, controller)
+        }
+
+        override fun onSetRating(
+            session: MediaSession,
+            controller: MediaSession.ControllerInfo,
+            rating: Rating
+        ): ListenableFuture<SessionResult> {
+            Bundle().apply {
+                setRating(this, "rating", rating)
+                emit(MusicEvents.BUTTON_SET_RATING, this)
+            }
+            return super.onSetRating(session, controller, rating)
         }
     }
 
