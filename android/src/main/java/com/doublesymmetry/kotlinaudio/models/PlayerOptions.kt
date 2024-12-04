@@ -18,15 +18,14 @@ data class PlayerOptions(
     val parseEmbeddedArtwork: Boolean = false,
     val skipSilence: Boolean = false,
     val nativeExample: Boolean = false,
+    val interceptPlayerActionsTriggeredExternally: Boolean = false
 )
 
 data class BufferOptions (
-
     val minBuffer: Int?,
     val maxBuffer: Int?,
     val playBuffer: Int?,
     val backBuffer: Int?,
-
 )
 
 fun setWakeMode(type: Int = 0): Int {
