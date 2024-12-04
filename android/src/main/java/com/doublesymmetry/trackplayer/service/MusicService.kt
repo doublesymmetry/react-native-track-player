@@ -2,7 +2,6 @@ package com.doublesymmetry.trackplayer.service
 
 import android.annotation.SuppressLint
 import android.app.*
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -964,19 +963,18 @@ class MusicService : HeadlessJsMediaService() {
         override fun onCustomCommand(
             session: MediaSession,
             controller: MediaSession.ControllerInfo,
-            sessionCommand: SessionCommand,
+            command: SessionCommand,
             args: Bundle
         ): ListenableFuture<SessionResult> {
-            when (sessionCommand.customAction) {
-                CustomCommandButton.JUMP_BACKWARD.customAction -> { player.exoPlayer.seekBack() }
-                CustomCommandButton.JUMP_FORWARD.customAction -> { player.exoPlayer.seekForward() }
-                CustomCommandButton.NEXT.customAction -> { player.exoPlayer.seekToNext() }
-                CustomCommandButton.PREVIOUS.customAction -> { player.exoPlayer.seekToPrevious() }
+            player.forwardingPlayer.let {
+                when (command.customAction) {
+                    CustomCommandButton.JUMP_BACKWARD.customAction -> { it.seekBack() }
+                    CustomCommandButton.JUMP_FORWARD.customAction -> { it.seekForward() }
+                    CustomCommandButton.NEXT.customAction -> { it.seekToNext() }
+                    CustomCommandButton.PREVIOUS.customAction -> { it.seekToPrevious() }
+                }
             }
-            emit(
-                MusicEvents.BUTTON_CUSTOM_ACTION,
-                Bundle().apply { putString("customAction", sessionCommand.customAction) })
-            return super.onCustomCommand(session, controller, sessionCommand, args)
+            return super.onCustomCommand(session, controller, command, args)
         }
 
         override fun onGetLibraryRoot(

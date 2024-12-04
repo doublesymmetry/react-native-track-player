@@ -29,7 +29,7 @@ class MusicService : MediaLibraryService() {
         player = QueuedAudioPlayer(this, PlayerOptions(nativeExample = true))
         val customCommandButtons =
             CustomCommandButton.entries.map { command -> command.commandButton }
-        mediaLibrarySession = MediaLibrarySession.Builder(this, player.exoPlayer, object : MediaLibrarySession.Callback {
+        val callback = object : MediaLibrarySession.Callback {
             override fun onConnect(
                 session: MediaSession,
                 controller: MediaSession.ControllerInfo
@@ -53,17 +53,17 @@ class MusicService : MediaLibraryService() {
                 customCommand: SessionCommand,
                 args: Bundle
             ): ListenableFuture<SessionResult> {
-                player.forwardingPlayer.let {
-                    when (customCommand.customAction) {
-                        CustomCommandButton.JUMP_BACKWARD.customAction -> { it.seekBack() }
-                        CustomCommandButton.JUMP_FORWARD.customAction -> { it.seekForward() }
-                        CustomCommandButton.NEXT.customAction -> { it.seekToNext() }
-                        CustomCommandButton.PREVIOUS.customAction -> { it.seekToPrevious() }
-                    }
+                val player = player.player;
+                when (customCommand.customAction) {
+                    CustomCommandButton.JUMP_BACKWARD.customAction -> { player.seekBack() }
+                    CustomCommandButton.JUMP_FORWARD.customAction -> { player.seekForward() }
+                    CustomCommandButton.NEXT.customAction -> { player.seekToNext() }
+                    CustomCommandButton.PREVIOUS.customAction -> { player.seekToPrevious() }
                 }
                 return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
             }
-        })
+        }
+        mediaLibrarySession = MediaLibrarySession.Builder(this, player.exoPlayer, callback)
         .setCustomLayout(customCommandButtons)
             .build()
     }
