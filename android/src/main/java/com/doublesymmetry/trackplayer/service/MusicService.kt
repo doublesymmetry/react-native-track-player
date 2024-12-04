@@ -110,7 +110,9 @@ class MusicService : HeadlessJsMediaService() {
             data = Uri.parse("trackplayer://notification.click")
             action = Intent.ACTION_VIEW
         }
-        mediaSession = MediaLibrarySession.Builder(this, fakePlayer, APMMediaSessionCallback())
+        mediaSession = MediaLibrarySession.Builder(this, fakePlayer,
+            InnerMediaSessionCallback()
+        )
             .setBitmapLoader(CacheBitmapLoader(CoilBitmapLoader(this)))
             // https://github.com/androidx/media/issues/1218
             .setSessionActivity(
@@ -902,7 +904,7 @@ class MusicService : HeadlessJsMediaService() {
         val service = this@MusicService
     }
 
-    private inner class APMMediaSessionCallback : MediaLibrarySession.Callback {
+    private inner class InnerMediaSessionCallback : MediaLibrarySession.Callback {
         // HACK: I'm sure most of the callbacks were not implemented correctly.
         // ATM I only care that andorid auto still functions.
 
