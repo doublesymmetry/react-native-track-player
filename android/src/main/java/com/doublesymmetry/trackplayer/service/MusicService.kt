@@ -614,13 +614,6 @@ class MusicService : HeadlessJsMediaService() {
                             emit(MusicEvents.BUTTON_JUMP_BACKWARD, this)
                         }
                     }
-
-                    is MediaSessionCallback.CUSTOMACTION -> {
-//                        Bundle().apply {
-//                            putString("customAction", it.customAction)
-//                            emit(MusicEvents.BUTTON_CUSTOM_ACTION, this)
-//                        }
-                    }
                 }
             }
         }

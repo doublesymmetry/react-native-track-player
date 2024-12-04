@@ -13,5 +13,4 @@ sealed class MediaSessionCallback {
     object REWIND : MediaSessionCallback()
     object STOP : MediaSessionCallback()
     class SEEK(val positionMs: Long): MediaSessionCallback()
-    class CUSTOMACTION(val customAction: String): MediaSessionCallback()
 }
