@@ -18,7 +18,7 @@ object Cache {
 
         instance ?: synchronized(this) {
             instance ?: SimpleCache(
-                File(context.cacheDir, "APM"), LeastRecentlyUsedCacheEvictor(size), db)
+                File(context.cacheDir, "RNTP"), LeastRecentlyUsedCacheEvictor(size), db)
                 .also { instance = it }
         }
 
