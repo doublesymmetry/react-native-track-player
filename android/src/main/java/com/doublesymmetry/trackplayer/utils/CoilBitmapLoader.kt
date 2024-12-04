@@ -11,7 +11,6 @@ import androidx.media3.common.util.Util.isBitmapFactorySupportedMimeType
 import androidx.media3.common.util.UnstableApi
 import coil.ImageLoader
 import coil.request.ImageRequest
-import com.doublesymmetry.kotlinaudio.utils.getEmbeddedBitmap
 import com.google.common.util.concurrent.ListenableFuture
 import jp.wasabeef.transformers.coil.CropSquareTransformation
 import kotlinx.coroutines.MainScope
@@ -42,24 +41,15 @@ class CoilBitmapLoader @Inject constructor(
     }
 
     override fun loadBitmap(uri: Uri): ListenableFuture<Bitmap> = scope.future {
-        val bitmap: Bitmap?
-        val parsedUri = uri.toString()
-        if (parsedUri.startsWith("file://")) {
-            bitmap = getEmbeddedBitmap(parsedUri.substring(7))
-        } else {
-            var imgrequest = ImageRequest.Builder(context)
-                .data(uri)
-                .allowHardware(false)
-            // HACK: header implementation should be done via parsed data from uri
-
-            if (Build.MANUFACTURER == "samsung" || cropSquare) {
-                imgrequest = imgrequest.transformations(CropSquareTransformation())
-            }
-            val response = imageLoader.execute(imgrequest.build())
-            bitmap = (response.drawable as? BitmapDrawable)?.bitmap
-
+        var imageRequest = ImageRequest.Builder(context)
+            .data(uri)
+            .allowHardware(false)
+        // HACK: header implementation should be done via parsed data from uri
+        if (Build.MANUFACTURER == "samsung" || cropSquare) {
+            imageRequest = imageRequest.transformations(CropSquareTransformation())
         }
+        val response = imageLoader.execute(imageRequest.build())
+        val bitmap = (response.drawable as? BitmapDrawable)?.bitmap
         bitmap ?: throw IOException("Unable to load bitmap: $uri")
-
     }
 }

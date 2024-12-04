@@ -34,16 +34,3 @@ fun isUriLocalFile(uri: Uri?): Boolean {
             scheme == "res" ||
             host == null
 }
-
-fun getEmbeddedBitmapArray(path: String?): ByteArray? {
-    if (path == null) return null
-    val mmr = MediaMetadataRetriever()
-    try {
-        mmr.setDataSource(path)
-        return mmr.embeddedPicture
-    } catch (e: Exception) {
-        return null
-    } finally {
-        mmr.release()
-    }
-}

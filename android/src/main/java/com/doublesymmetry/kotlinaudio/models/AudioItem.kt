@@ -6,7 +6,6 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
-import com.doublesymmetry.kotlinaudio.utils.getEmbeddedBitmapArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -22,11 +21,6 @@ open class AudioItem(
     open val mediaId: String? = null
 ) {
     fun asMediaItem(): MediaItem {
-        val artworkData = if (audioUrl.startsWith("file://")) {
-            getEmbeddedBitmapArray(audioUrl)
-        } else {
-            null
-        }
         val extras = Bundle().apply {
             options?.headers?.let {
                 putSerializable("headers", HashMap(it))
@@ -44,7 +38,6 @@ open class AudioItem(
             .setTitle(title)
             .setArtist(artist)
             .setArtworkUri(Uri.parse(artwork))
-            .setArtworkData(artworkData, MediaMetadata.PICTURE_TYPE_MEDIA)
             .setExtras(extras)
             .build()
         return MediaItem.Builder()
