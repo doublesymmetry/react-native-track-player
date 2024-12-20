@@ -152,6 +152,11 @@ export class TrackPlayerModule extends PlaylistPlayer {
     return this.playlist;
   }
 
+  public async setQueue(queue: Track[]) {
+    await this.stop();
+    this.playlist = queue;
+  }
+
   public getActiveTrack(): Track | undefined {
     return this.current;
   }
