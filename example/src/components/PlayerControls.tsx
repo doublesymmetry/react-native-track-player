@@ -1,10 +1,10 @@
 import React from 'react';
-import { StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
-import TrackPlayer, { usePlaybackState } from 'react-native-track-player';
+import {StyleSheet, TouchableWithoutFeedback, View} from 'react-native';
+import TrackPlayer, {usePlaybackState} from 'react-native-track-player';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 
-import { PlaybackError } from './PlaybackError';
-import { PlayPauseButton } from './PlayPauseButton';
+import {PlaybackError} from './PlaybackError';
+import {PlayPauseButton} from './PlayPauseButton';
 
 const performSkipToNext = () => TrackPlayer.skipToNext();
 const performSkipToPrevious = () => TrackPlayer.skipToPrevious();

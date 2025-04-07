@@ -26,8 +26,7 @@ export const Button: React.FC<ButtonProps> = ({
         style={{
           ...styles[type],
           ...style,
-        }}
-      >
+        }}>
         {title}
       </Text>
     </TouchableWithoutFeedback>

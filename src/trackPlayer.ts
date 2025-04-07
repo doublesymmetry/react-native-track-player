@@ -2,7 +2,7 @@ import {
   AppRegistry,
   DeviceEventEmitter,
   NativeEventEmitter,
-  Platform
+  Platform,
 } from 'react-native';
 
 import { AndroidAutoContentStyle, Event, RepeatMode } from './constants';
@@ -52,10 +52,8 @@ function resolveImportedAsset(id?: number) {
  * @param options The options to initialize the player with.
  * @see https://rntp.dev/docs/api/functions/lifecycle
  */
-export async function setupPlayer(
-  options: PlayerOptions = {}
-): Promise<void> {
-  return TrackPlayer.setupPlayer(options)
+export async function setupPlayer(options: PlayerOptions = {}): Promise<void> {
+  return TrackPlayer.setupPlayer(options);
 }
 
 /**
@@ -211,7 +209,9 @@ export async function skipToPrevious(initialPosition = -1): Promise<void> {
  * @param options The options to update.
  * @see https://rntp.dev/docs/api/functions/player#updateoptionsoptions
  */
-export async function updateOptions(options: UpdateOptions = {}): Promise<void> {
+export async function updateOptions(
+  options: UpdateOptions = {}
+): Promise<void> {
   return TrackPlayer.updateOptions({
     ...options,
     android: {

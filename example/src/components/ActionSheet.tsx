@@ -1,7 +1,7 @@
 import React from 'react';
-import { ScrollView } from 'react-native';
-import { Spacer } from './Spacer';
-import { Button } from './Button';
+import {ScrollView} from 'react-native';
+import {Spacer} from './Spacer';
+import {Button} from './Button';
 import TrackPlayer from 'react-native-track-player';
 
 const onUpdateNotificationMetadata = async () => {

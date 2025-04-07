@@ -1,6 +1,9 @@
 import { Event } from '../../constants';
 import type { PlaybackState } from '../PlaybackState';
-import type { AudioCommonMetadataReceivedEvent, AudioMetadataReceivedEvent } from './AudioMetadataReceivedEvent';
+import type {
+  AudioCommonMetadataReceivedEvent,
+  AudioMetadataReceivedEvent,
+} from './AudioMetadataReceivedEvent';
 import type {
   AndroidControllerConnectedEvent,
   AndroidControllerDisconnectedEvent,

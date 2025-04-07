@@ -14,11 +14,12 @@
     "resolveJsonModule": true,
     "jsx": "react-native",
     "lib": ["es2017", "DOM", "DOM.Iterable"],
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "baseUrl": ".",
     "outDir": "./lib",
     "strict": true,
     "target": "esnext",
+    "module": "esnext",
     "skipLibCheck": true
   },
   "include": ["src"],

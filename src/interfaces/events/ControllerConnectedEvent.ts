@@ -1,4 +1,5 @@
-export interface AndroidControllerConnectedEvent extends AndroidControllerDisconnectedEvent {
+export interface AndroidControllerConnectedEvent
+  extends AndroidControllerDisconnectedEvent {
   isMediaNotificationController: boolean;
   isAutomotiveController: boolean;
   isAutoCompanionController: boolean;

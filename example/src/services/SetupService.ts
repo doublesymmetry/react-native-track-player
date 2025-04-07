@@ -1,7 +1,7 @@
 import TrackPlayer, {
   AppKilledPlaybackBehavior,
   Capability,
-  RepeatMode
+  RepeatMode,
 } from 'react-native-track-player';
 
 export const DefaultRepeatMode = RepeatMode.Queue;
@@ -9,7 +9,7 @@ export const DefaultAudioServiceBehaviour =
   AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification;
 
 const setupPlayer = async (
-  options: Parameters<typeof TrackPlayer.setupPlayer>[0]
+  options: Parameters<typeof TrackPlayer.setupPlayer>[0],
 ) => {
   await TrackPlayer.setupPlayer(options);
 };
@@ -37,7 +37,7 @@ export const SetupService = async () => {
         Capability.Pause,
         Capability.SeekTo,
         Capability.SkipToNext,
-        Capability.SkipToPrevious
+        Capability.SkipToPrevious,
       ],
       progressUpdateEventInterval: 2,
     });

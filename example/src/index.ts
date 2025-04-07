@@ -1,10 +1,10 @@
 /************************************************
  * NOTE: this is the entrypoint for web
  ************************************************/
-import { AppRegistry } from 'react-native';
+import {AppRegistry} from 'react-native';
 import App from './App';
 import TrackPlayer from 'react-native-track-player';
-import { PlaybackService } from './services';
+import {PlaybackService} from './services';
 import 'mux.js';
 
 /******************************************
@@ -22,7 +22,7 @@ const iconFontStyles = `@font-face {
 const style: HTMLStyleElement = document.createElement('style');
 style.type = 'text/css';
 if ('styleSheet' in style) {
-  type CSSTextStyleElement = { styleSheet: { cssText: string } };
+  type CSSTextStyleElement = {styleSheet: {cssText: string}};
   (style as unknown as CSSTextStyleElement).styleSheet.cssText = iconFontStyles;
 } else {
   style.appendChild(document.createTextNode(iconFontStyles));
