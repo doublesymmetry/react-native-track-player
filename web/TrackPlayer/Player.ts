@@ -147,6 +147,7 @@ export class Player {
 
   public setRate(rate: number) {
     if (!this.element) throw new SetupNotCalledError();
+    this.element.defaultPlaybackRate = rate;
     return this.element.playbackRate = rate;
   }
 
