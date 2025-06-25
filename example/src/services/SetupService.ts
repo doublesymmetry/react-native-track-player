@@ -9,7 +9,7 @@ export const DefaultAudioServiceBehaviour =
   AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification;
 
 const setupPlayer = async (
-  options: Parameters<typeof TrackPlayer.setupPlayer>[0],
+  options: Parameters<typeof TrackPlayer.setupPlayer>[0]
 ) => {
   await TrackPlayer.setupPlayer(options);
 };

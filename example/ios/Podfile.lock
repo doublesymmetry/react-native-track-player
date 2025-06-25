@@ -1383,7 +1383,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-track-player (0.1.0):
+  - react-native-track-player (4.1.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2164,7 +2164,7 @@ SPEC CHECKSUMS:
   React-microtasksnativemodule: ca2804a25fdcefffa0aa942aa23ab53b99614a34
   react-native-segmented-control: 44d14c6899ee12de3384517f4fa1cf4a66ae105c
   react-native-slider: 351d1186b07d686b93dad14ce2b474ca62dea0fc
-  react-native-track-player: 3f213cc34a88f6312d25e26afdee320b294f54fb
+  react-native-track-player: 0c0f810f2768ed0f5762f53725a3ff7332a1a864
   react-native-vector-icons-fontawesome6: 624a5578d701e52b18fb7f35b56556395a4249c0
   React-NativeModulesApple: 452b86b29fae99ed0a4015dca3ad9cd222f88abf
   React-oscompat: ef5df1c734f19b8003e149317d041b8ce1f7d29c

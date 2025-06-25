@@ -1,13 +1,13 @@
 import { DeviceEventEmitter } from 'react-native';
 
 import type { Track, UpdateOptions } from '../src';
-import { Event, PlaybackState, State } from '../src';
+import { Event, type PlaybackState, State } from '../src';
 import { PlaylistPlayer, RepeatMode } from './TrackPlayer';
 import { SetupNotCalledError } from './TrackPlayer/SetupNotCalledError';
 
 export class TrackPlayerModule extends PlaylistPlayer {
   protected emitter = DeviceEventEmitter;
-  protected progressUpdateEventInterval: any;
+  protected progressUpdateEventInterval: NodeJS.Timeout | undefined;
 
   // Capabilities
   public readonly CAPABILITY_PLAY = 'CAPABILITY_PLAY';
@@ -70,19 +70,16 @@ export class TrackPlayerModule extends PlaylistPlayer {
     // clear and reset interval
     this.clearUpdateEventInterval();
     if (interval) {
-      this.clearUpdateEventInterval()
-      this.progressUpdateEventInterval = setInterval(
-        async () => {
-          if (this.state.state === State.Playing) {
-            const progress = await this.getProgress()
-            this.emitter.emit(Event.PlaybackProgressUpdated, {
-              ...progress,
-              track: this.currentIndex,
-            });
-          }
-        },
-        interval * 1000,
-      )
+      this.clearUpdateEventInterval();
+      this.progressUpdateEventInterval = setInterval(async () => {
+        if (this.state.state === State.Playing) {
+          const progress = await this.getProgress();
+          this.emitter.emit(Event.PlaybackProgressUpdated, {
+            ...progress,
+            track: this.currentIndex,
+          });
+        }
+      }, interval * 1000);
     }
   }
 
@@ -109,7 +106,9 @@ export class TrackPlayerModule extends PlaylistPlayer {
     super.playWhenReady = pwr;
 
     if (didChange) {
-      this.emitter.emit(Event.PlaybackPlayWhenReadyChanged, { playWhenReady: this._playWhenReady });
+      this.emitter.emit(Event.PlaybackPlayWhenReadyChanged, {
+        playWhenReady: this._playWhenReady,
+      });
     }
   }
 

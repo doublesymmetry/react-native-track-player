@@ -2,7 +2,6 @@ export * from './ControllerConnectedEvent';
 export * from './EventPayloadByEvent';
 export * from './PlaybackActiveTrackChangedEvent';
 export * from './PlaybackErrorEvent';
-export * from './PlaybackMetadataReceivedEvent';
 export * from './PlaybackPlayWhenReadyChangedEvent';
 export * from './PlaybackProgressUpdatedEvent';
 export * from './PlaybackQueueEndedEvent';

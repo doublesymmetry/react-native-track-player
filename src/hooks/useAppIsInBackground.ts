@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AppState, AppStateStatus } from 'react-native';
+import { AppState, type AppStateStatus } from 'react-native';
 
 export function useAppIsInBackground() {
   const [state, setState] = useState<AppStateStatus>('active');
@@ -9,10 +9,10 @@ export function useAppIsInBackground() {
       setState(nextState);
     };
 
-    AppState.addEventListener('change', onStateChange);
+    const subscription = AppState.addEventListener('change', onStateChange);
 
     return () => {
-      AppState.removeEventListener('change', onStateChange);
+      subscription.remove();
     };
   }, []);
   return state === 'background';

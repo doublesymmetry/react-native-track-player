@@ -10,12 +10,11 @@ import type {
 } from './ControllerConnectedEvent';
 import type { PlaybackActiveTrackChangedEvent } from './PlaybackActiveTrackChangedEvent';
 import type { PlaybackErrorEvent } from './PlaybackErrorEvent';
-import type { PlaybackMetadataReceivedEvent } from './PlaybackMetadataReceivedEvent';
 import type { PlaybackPlayWhenReadyChangedEvent } from './PlaybackPlayWhenReadyChangedEvent';
 import type { PlaybackProgressUpdatedEvent } from './PlaybackProgressUpdatedEvent';
 import type { PlaybackQueueEndedEvent } from './PlaybackQueueEndedEvent';
 import type { PlaybackResumeEvent } from './PlaybackResumeEvent';
-import { PlayerErrorEvent } from './PlayerErrorEvent';
+import type { PlayerErrorEvent } from './PlayerErrorEvent';
 import type { RemoteDuckEvent } from './RemoteDuckEvent';
 import type { RemoteJumpBackwardEvent } from './RemoteJumpBackwardEvent';
 import type { RemoteJumpForwardEvent } from './RemoteJumpForwardEvent';
@@ -31,7 +30,6 @@ export type EventPayloadByEvent = {
   [Event.PlaybackError]: PlaybackErrorEvent;
   [Event.PlaybackQueueEnded]: PlaybackQueueEndedEvent;
   [Event.PlaybackActiveTrackChanged]: PlaybackActiveTrackChangedEvent;
-  [Event.PlaybackMetadataReceived]: PlaybackMetadataReceivedEvent;
   [Event.PlaybackPlayWhenReadyChanged]: PlaybackPlayWhenReadyChangedEvent;
   [Event.PlaybackProgressUpdated]: PlaybackProgressUpdatedEvent;
   [Event.RemotePlay]: never;
@@ -59,7 +57,6 @@ export type EventPayloadByEvent = {
   [Event.AndroidConnectorDisconnected]: AndroidControllerDisconnectedEvent;
 };
 
-// eslint-disable-next-line
 type Simplify<T> = { [KeyType in keyof T]: T[KeyType] } & {};
 
 export type EventPayloadByEventWithType = {

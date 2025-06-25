@@ -14,7 +14,7 @@ export const useActiveTrack = (): Track | undefined => {
     getActiveTrack()
       .then((initialTrack) => {
         if (unmounted) return;
-        setTrack((track) => track ?? initialTrack ?? undefined);
+        setTrack((currentTrack) => currentTrack ?? initialTrack ?? undefined);
       })
       .catch(() => {
         // throws when you haven't yet setup, which is fine because it also
@@ -27,8 +27,8 @@ export const useActiveTrack = (): Track | undefined => {
 
   useTrackPlayerEvents(
     [Event.PlaybackActiveTrackChanged],
-    async ({ track }) => {
-      setTrack(track ?? undefined);
+    async ({ track: newTrack }) => {
+      setTrack(newTrack ?? undefined);
     }
   );
 

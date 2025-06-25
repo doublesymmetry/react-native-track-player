@@ -33,7 +33,7 @@ import { SponsorCard } from './components/SponsorCard';
 
 export default function App() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={styles.gestureContainer}>
       <Inner />
     </GestureHandlerRootView>
   );
@@ -121,6 +121,7 @@ const Inner: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  gestureContainer: { flex: 1 },
   screenContainer: {
     flex: 1,
     backgroundColor: '#212121',

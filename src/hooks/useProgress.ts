@@ -30,11 +30,11 @@ export function useProgress(updateInterval = 1000) {
         const { position, duration, buffered } = await getProgress();
         if (!mounted) return;
 
-        setState((state) =>
-          position === state.position &&
-          duration === state.duration &&
-          buffered === state.buffered
-            ? state
+        setState((currentState) =>
+          position === currentState.position &&
+          duration === currentState.duration &&
+          buffered === currentState.buffered
+            ? currentState
             : { position, duration, buffered }
         );
       } catch {

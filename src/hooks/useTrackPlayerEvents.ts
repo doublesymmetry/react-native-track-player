@@ -11,7 +11,7 @@ import type { EventPayloadByEventWithType } from '../interfaces';
  */
 export const useTrackPlayerEvents = <
   T extends Event[],
-  H extends (data: EventPayloadByEventWithType[T[number]]) => void
+  H extends (data: EventPayloadByEventWithType[T[number]]) => void,
 >(
   events: T,
   handler: H

@@ -2,9 +2,9 @@ import React from 'react';
 import {
   StyleSheet,
   Text,
-  TextStyle,
+  type TextStyle,
   TouchableWithoutFeedback,
-  ViewStyle,
+  type ViewStyle,
 } from 'react-native';
 
 export interface ButtonProps {
@@ -26,7 +26,8 @@ export const Button: React.FC<ButtonProps> = ({
         style={{
           ...styles[type],
           ...style,
-        }}>
+        }}
+      >
         {title}
       </Text>
     </TouchableWithoutFeedback>

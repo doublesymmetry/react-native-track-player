@@ -7,7 +7,7 @@ import TrackPlayer, {
   RepeatMode,
 } from 'react-native-track-player';
 import { DefaultAudioServiceBehaviour, DefaultRepeatMode } from '../services';
-import { Spacer} from './Spacer';
+import { Spacer } from './Spacer';
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
 export const OptionStack: React.FC<{
@@ -27,7 +27,7 @@ export const OptionStack: React.FC<{
 
 export const OptionSheet: React.FC = () => {
   const [selectedRepeatMode, setSelectedRepeatMode] = useState(
-    repeatModeToIndex(DefaultRepeatMode),
+    repeatModeToIndex(DefaultRepeatMode)
   );
 
   const [selectedAudioServiceBehaviour, setSelectedAudioServiceBehaviour] =

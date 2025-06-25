@@ -53,8 +53,11 @@
     "example": "yarn workspace react-native-track-player-example",
     "test": "jest",
     "typecheck": "tsc",
-    "lint": "eslint \"**/*.{js,ts,tsx}\"",
+    "lint": "eslint src web --max-warnings=0",
+    "format": "prettier --check src web",
+    "format:fix": "prettier --write src web",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
+    "build": "yarn prepare",
     "prepare": "bob build",
     "release": "release-it --only-version"
   },
@@ -117,6 +120,7 @@
     "react-native": "0.79.2",
     "react-native-builder-bob": "^0.40.12",
     "release-it": "^17.10.0",
+    "shaka-player": "^4.15.4",
     "turbo": "^1.10.7",
     "typescript": "^5.8.3"
   },

@@ -1,11 +1,11 @@
 import Slider from '@react-native-community/slider';
 import React from 'react';
-import {Dimensions, StyleSheet, Text, View} from 'react-native';
-import TrackPlayer, {useProgress} from 'react-native-track-player';
-import {Spacer} from './Spacer';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import TrackPlayer, { useProgress } from 'react-native-track-player';
+import { Spacer } from './Spacer';
 
-export const Progress: React.FC<{live?: boolean}> = ({live}) => {
-  const {position, duration} = useProgress();
+export const Progress: React.FC<{ live?: boolean }> = ({ live }) => {
+  const { position, duration } = useProgress();
 
   // This is a workaround since the slider component only takes absolute widths
   const progressBarWidth = Dimensions.get('window').width * 0.92;
@@ -18,7 +18,7 @@ export const Progress: React.FC<{live?: boolean}> = ({live}) => {
         <View>
           <Slider
             tapToSeek
-            style={{...styles.slider, width: progressBarWidth}}
+            style={{ ...styles.slider, width: progressBarWidth }}
             value={position}
             minimumValue={0}
             maximumValue={duration}
