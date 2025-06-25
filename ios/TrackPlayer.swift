@@ -35,7 +35,6 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
         audioSessionController.delegate = self
         player.playWhenReady = false;
         player.event.receiveChapterMetadata.addListener(self, handleAudioPlayerChapterMetadataReceived)
-        player.event.receiveTimedMetadata.addListener(self, handleAudioPlayerTimedMetadataReceived)
         player.event.receiveCommonMetadata.addListener(self, handleAudioPlayerCommonMetadataReceived)
         player.event.stateChange.addListener(self, handleAudioPlayerStateChange)
         player.event.fail.addListener(self, handleAudioPlayerFailed)
@@ -732,17 +731,6 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
     func handleAudioPlayerChapterMetadataReceived(metadata: [AVTimedMetadataGroup]) {
         let metadataItems = MetadataAdapter.convertToGroupedMetadata(metadataGroups: metadata);
         emit(event: EventType.MetadataChapterReceived, body:  ["metadata": metadataItems])
-    }
-
-    func handleAudioPlayerTimedMetadataReceived(metadata: [AVTimedMetadataGroup]) {
-        let metadataItems = MetadataAdapter.convertToGroupedMetadata(metadataGroups: metadata);
-        emit(event: EventType.MetadataTimedReceived, body: ["metadata": metadataItems])
-
-        // SwiftAudioEx was updated to return the array of timed metadata
-        // Until we have support for that in RNTP, we take the first item to keep existing behaviour.
-        let metadata = metadata.first?.items ?? []
-        let metadataItem = MetadataAdapter.legacyConversion(metadata: metadata)
-        emit(event: EventType.PlaybackMetadataReceived, body: metadataItem)
     }
 
     func handleAudioPlayerFailed(error: Error?) {

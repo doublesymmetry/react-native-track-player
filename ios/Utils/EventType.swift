@@ -13,7 +13,6 @@ enum EventType: String, CaseIterable {
     case RemoteLike = "remote-like"
     case RemoteDislike = "remote-dislike"
     case RemoteBookmark = "remote-bookmark"
-    case PlaybackMetadataReceived = "playback-metadata-received"
     case PlaybackError = "playback-error"
     case PlaybackQueueEnded = "playback-queue-ended"
     case PlaybackActiveTrackChanged = "playback-active-track-changed"
