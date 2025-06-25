@@ -21,4 +21,3 @@ import { State } from 'react-native-track-player';
 | `Buffering`   | State indicating that the player is currently buffering (no matter whether playback is paused or not) |
 | `Loading`     | State indicating the initial loading phase of a track |
 | `Error`       | State indicating that the player experienced a playback error causing the audio to stop playing (or not start playing). When in `State.Error`, calling `play()` reloads the current track and seeks to its last known time. |
-| `Connecting`  | **⚠️ Deprecated**. Please use `State.Loading` instead. State indicating that the player is currently buffering (in "pause" state) |

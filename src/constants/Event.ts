@@ -13,12 +13,6 @@ export enum Event {
    **/
   PlaybackActiveTrackChanged = 'playback-active-track-changed',
   /**
-   * Fired when the current track receives metadata encoded in. (e.g. ID3 tags,
-   * Icy Metadata, Vorbis Comments or QuickTime metadata).
-   * @deprecated use `AudioChapterMetadataReceived, AudioTimedMetadataReceived, AudioCommonMetadataReceived` instead.
-   **/
-  PlaybackMetadataReceived = 'playback-metadata-received',
-  /**
    * Fired when playback play when ready has changed.
    **/
   PlaybackPlayWhenReadyChanged = 'playback-play-when-ready-changed',
@@ -118,11 +112,6 @@ export enum Event {
    * See https://rntp.dev/docs/api/events#remoteskip
    **/
   RemoteSkip = 'remote-skip',
-  /**
-   * (Android only) Fired when the user enters a browsable children in android auto.
-   * See https://rntp.dev/docs/api/events#remoteBrowse
-   **/
-  RemoteBrowse = 'remote-browse',
   /** (iOS only) Fired when chapter metadata is received.
    * See https://rntp.dev/docs/api/events#chaptermetadatareceived
    **/

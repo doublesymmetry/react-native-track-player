@@ -1,19 +1,16 @@
-import TrackPlayer from '../TrackPlayerModule';
+import { Constants } from '../NativeTrackPlayer';
 
 export enum Capability {
-  Play = TrackPlayer.CAPABILITY_PLAY,
-  PlayFromId = TrackPlayer.CAPABILITY_PLAY_FROM_ID,
-  PlayFromSearch = TrackPlayer.CAPABILITY_PLAY_FROM_SEARCH,
-  Pause = TrackPlayer.CAPABILITY_PAUSE,
-  Stop = TrackPlayer.CAPABILITY_STOP,
-  SeekTo = TrackPlayer.CAPABILITY_SEEK_TO,
-  Skip = TrackPlayer.CAPABILITY_SKIP,
-  SkipToNext = TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
-  SkipToPrevious = TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
-  JumpForward = TrackPlayer.CAPABILITY_JUMP_FORWARD,
-  JumpBackward = TrackPlayer.CAPABILITY_JUMP_BACKWARD,
-  SetRating = TrackPlayer.CAPABILITY_SET_RATING,
-  Like = TrackPlayer.CAPABILITY_LIKE,
-  Dislike = TrackPlayer.CAPABILITY_DISLIKE,
-  Bookmark = TrackPlayer.CAPABILITY_BOOKMARK,
+  Play = Constants?.CAPABILITY_PLAY ?? 1,
+  PlayFromId = Constants?.CAPABILITY_PLAY_FROM_ID ?? 2,
+  PlayFromSearch = Constants?.CAPABILITY_PLAY_FROM_SEARCH ?? 3,
+  Pause = Constants?.CAPABILITY_PAUSE ?? 4,
+  Stop = Constants?.CAPABILITY_STOP ?? 5,
+  SeekTo = Constants?.CAPABILITY_SEEK_TO ?? 6,
+  Skip = Constants?.CAPABILITY_SKIP ?? 7,
+  SkipToNext = Constants?.CAPABILITY_SKIP_TO_NEXT ?? 8,
+  SkipToPrevious = Constants?.CAPABILITY_SKIP_TO_PREVIOUS ?? 9,
+  JumpForward = Constants?.CAPABILITY_JUMP_FORWARD ?? 10,
+  JumpBackward = Constants?.CAPABILITY_JUMP_BACKWARD ?? 11,
+  SetRating = Constants?.CAPABILITY_SET_RATING ?? 12,
 }

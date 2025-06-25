@@ -1,10 +1,10 @@
 import React from 'react';
-import {StyleSheet, TouchableWithoutFeedback, View} from 'react-native';
-import TrackPlayer, {usePlaybackState} from 'react-native-track-player';
-import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import { StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import TrackPlayer, { usePlaybackState } from 'react-native-track-player';
+import Icon from '@react-native-vector-icons/fontawesome6';
 
-import {PlaybackError} from './PlaybackError';
-import {PlayPauseButton} from './PlayPauseButton';
+import { PlaybackError } from './PlaybackError';
+import { PlayPauseButton } from './PlayPauseButton';
 
 const performSkipToNext = () => TrackPlayer.skipToNext();
 const performSkipToPrevious = () => TrackPlayer.skipToPrevious();
@@ -15,11 +15,11 @@ export const PlayerControls: React.FC = () => {
     <View style={styles.container}>
       <View style={styles.row}>
         <TouchableWithoutFeedback onPress={performSkipToPrevious}>
-          <FontAwesome6 name={'backward'} size={30} color={'white'} />
+          <Icon name="backward" size={30} color="white" iconStyle="solid" />
         </TouchableWithoutFeedback>
         <PlayPauseButton />
         <TouchableWithoutFeedback onPress={performSkipToNext}>
-          <FontAwesome6 name={'forward'} size={30} color={'white'} />
+          <Icon name="forward" size={30} color="white" iconStyle="solid" />
         </TouchableWithoutFeedback>
       </View>
       <PlaybackError

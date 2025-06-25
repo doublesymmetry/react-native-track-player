@@ -5,11 +5,11 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import TrackPlayer, {useIsPlaying} from 'react-native-track-player';
-import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import TrackPlayer, { useIsPlaying } from 'react-native-track-player';
+import Icon from '@react-native-vector-icons/fontawesome6';
 
 export const PlayPauseButton: React.FC = () => {
-  const {playing, bufferingDuringPlay} = useIsPlaying();
+  const { playing, bufferingDuringPlay } = useIsPlaying();
 
   return (
     <View style={styles.container}>
@@ -17,11 +17,13 @@ export const PlayPauseButton: React.FC = () => {
         <ActivityIndicator />
       ) : (
         <TouchableWithoutFeedback
-          onPress={playing ? TrackPlayer.pause : TrackPlayer.play}>
-          <FontAwesome6
+          onPress={playing ? TrackPlayer.pause : TrackPlayer.play}
+        >
+          <Icon
             name={playing ? 'pause' : 'play'}
             size={48}
-            color={'white'}
+            color="white"
+            iconStyle="solid"
           />
         </TouchableWithoutFeedback>
       )}

@@ -1,4 +1,10 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   ActivityIndicator,
   Linking,
@@ -9,7 +15,9 @@ import {
   Platform,
   Dimensions,
 } from 'react-native';
-import TrackPlayer, {useActiveTrack} from 'react-native-track-player';
+import TrackPlayer, { useActiveTrack } from 'react-native-track-player';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import BottomSheet from '@gorhom/bottom-sheet';
 
 import {
   Button,
@@ -20,14 +28,12 @@ import {
   Spacer,
   TrackInfo,
 } from './components';
-import {QueueInitialTracksService, SetupService} from './services';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import BottomSheet from '@gorhom/bottom-sheet';
-import {SponsorCard} from './components/SponsorCard';
+import { QueueInitialTracksService, SetupService } from './services';
+import { SponsorCard } from './components/SponsorCard';
 
 export default function App() {
   return (
-    <GestureHandlerRootView style={{flex: 1}}>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <Inner />
     </GestureHandlerRootView>
   );
@@ -52,7 +58,7 @@ const Inner: React.FC = () => {
   }, [actionsSheetRef]);
 
   useEffect(() => {
-    function deepLinkHandler(data: {url: string}) {
+    function deepLinkHandler(data: { url: string }) {
       console.log('deepLinkHandler', data.url);
     }
 
@@ -60,7 +66,7 @@ const Inner: React.FC = () => {
     const subscription = Linking.addEventListener('url', deepLinkHandler);
 
     // When you launch the closed app from the notification or any other link
-    Linking.getInitialURL().then(url => console.log('getInitialURL', url));
+    Linking.getInitialURL().then((url) => console.log('getInitialURL', url));
 
     return () => {
       subscription.remove();
@@ -96,7 +102,8 @@ const Inner: React.FC = () => {
         enablePanDownToClose={true}
         snapPoints={optionsSheetSnapPoints}
         handleIndicatorStyle={styles.sheetHandle}
-        backgroundStyle={styles.sheetBackgroundContainer}>
+        backgroundStyle={styles.sheetBackgroundContainer}
+      >
         <OptionSheet />
       </BottomSheet>
       <BottomSheet
@@ -105,7 +112,8 @@ const Inner: React.FC = () => {
         enablePanDownToClose={true}
         snapPoints={actionsSheetSnapPoints}
         handleIndicatorStyle={styles.sheetHandle}
-        backgroundStyle={styles.sheetBackgroundContainer}>
+        backgroundStyle={styles.sheetBackgroundContainer}
+      >
         <ActionSheet />
       </BottomSheet>
     </SafeAreaView>

@@ -1,18 +1,19 @@
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
-import React, {useState} from 'react';
-import {Platform, ScrollView, StyleSheet, Text, View} from 'react-native';
+import React, { useState } from 'react';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import TrackPlayer, {
   AppKilledPlaybackBehavior,
   Capability,
   RepeatMode,
 } from 'react-native-track-player';
-import {DefaultAudioServiceBehaviour, DefaultRepeatMode} from '../services';
-import {Spacer} from './Spacer';
+import { DefaultAudioServiceBehaviour, DefaultRepeatMode } from '../services';
+import { Spacer} from './Spacer';
+import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
 export const OptionStack: React.FC<{
   children: React.ReactNode;
   vertical?: boolean;
-}> = ({children, vertical}) => {
+}> = ({ children, vertical }) => {
   const childrenArray = React.Children.toArray(children);
 
   return (
@@ -33,7 +34,7 @@ export const OptionSheet: React.FC = () => {
     useState(audioServiceBehaviourToIndex(DefaultAudioServiceBehaviour));
 
   return (
-    <ScrollView>
+    <BottomSheetScrollView>
       <OptionStack vertical={true}>
         <Text style={styles.optionRowLabel}>Repeat Mode</Text>
         <Spacer />
@@ -41,10 +42,10 @@ export const OptionSheet: React.FC = () => {
           appearance={'dark'}
           values={['Off', 'Track', 'Queue']}
           selectedIndex={selectedRepeatMode}
-          onChange={async event => {
+          onChange={async (event) => {
             setSelectedRepeatMode(event.nativeEvent.selectedSegmentIndex);
             const repeatMode = repeatModeFromIndex(
-              event.nativeEvent.selectedSegmentIndex,
+              event.nativeEvent.selectedSegmentIndex
             );
             await TrackPlayer.setRepeatMode(repeatMode);
           }}
@@ -59,12 +60,12 @@ export const OptionSheet: React.FC = () => {
             appearance={'dark'}
             values={['Continue', 'Pause', 'Stop & Remove']}
             selectedIndex={selectedAudioServiceBehaviour}
-            onChange={async event => {
+            onChange={async (event) => {
               setSelectedAudioServiceBehaviour(
-                event.nativeEvent.selectedSegmentIndex,
+                event.nativeEvent.selectedSegmentIndex
               );
               const appKilledPlaybackBehavior = audioServiceBehaviourFromIndex(
-                event.nativeEvent.selectedSegmentIndex,
+                event.nativeEvent.selectedSegmentIndex
               );
 
               // TODO: Copied from example/src/services/SetupService.tsx until updateOptions
@@ -86,7 +87,7 @@ export const OptionSheet: React.FC = () => {
           />
         </OptionStack>
       )}
-    </ScrollView>
+    </BottomSheetScrollView>
   );
 };
 
@@ -139,7 +140,7 @@ const repeatModeToIndex = (repeatMode: RepeatMode): number => {
 };
 
 const audioServiceBehaviourFromIndex = (
-  index: number,
+  index: number
 ): AppKilledPlaybackBehavior => {
   switch (index) {
     case 0:
@@ -154,7 +155,7 @@ const audioServiceBehaviourFromIndex = (
 };
 
 const audioServiceBehaviourToIndex = (
-  audioServiceBehaviour: AppKilledPlaybackBehavior,
+  audioServiceBehaviour: AppKilledPlaybackBehavior
 ): number => {
   switch (audioServiceBehaviour) {
     case AppKilledPlaybackBehavior.ContinuePlayback:

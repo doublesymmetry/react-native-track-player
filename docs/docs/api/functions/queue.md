@@ -130,14 +130,3 @@ Sets the repeat mode.
 Gets the repeat mode.
 
 **Returns:** [Repeat Mode](../constants/repeat-mode.md)
-
-## ⚠️ `getCurrentTrack()`
-
-**⚠️ Deprecated:** To get the active track index use
-[`getActiveTrackIndex()`](#getactivetrackindex) instead or use
-[`getActiveTrack()`](#getactivetrack) to get the active track object.
-
-Gets the index of the current track, or null if no track loaded
-
-**Returns:** `Promise<number | null>`
-

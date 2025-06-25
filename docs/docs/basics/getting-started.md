@@ -129,7 +129,7 @@ console.log(`First title: ${tracks[0].title}`);
 
 You can subscribe to [player events](../api/events.md#player), which describe the
 changing nature of the playback state. For example, subscribe to the
-`Event.PlaybackTrackChanged` event to be notified when the track has changed or
+`Event.PlaybackActiveTrackChanged` event to be notified when the track has changed or
 subscribe to the `Event.PlaybackState` event to be notified when the player
 buffers, plays, pauses and stops.
 

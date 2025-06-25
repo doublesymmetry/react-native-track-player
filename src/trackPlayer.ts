@@ -1,14 +1,8 @@
-import {
-  AppRegistry,
-  DeviceEventEmitter,
-  NativeEventEmitter,
-  Platform,
-} from 'react-native';
+import { AppRegistry, NativeEventEmitter, Platform } from 'react-native';
 
-import { AndroidAutoContentStyle, Event, RepeatMode } from './constants';
+import { Event, RepeatMode } from './constants';
 import type {
   AddTrack,
-  AndroidAutoBrowseTree,
   EventPayloadByEvent,
   NowPlayingMetadata,
   PlaybackState,
@@ -20,13 +14,10 @@ import type {
   UpdateOptions,
 } from './interfaces';
 import resolveAssetSource from './resolveAssetSource';
-import TrackPlayer from './TrackPlayerModule';
+import TrackPlayer from './NativeTrackPlayer';
 
 const isAndroid = Platform.OS === 'android';
-
-const emitter = !isAndroid
-  ? new NativeEventEmitter(TrackPlayer)
-  : DeviceEventEmitter;
+const emitter = new NativeEventEmitter(TrackPlayer);
 
 // MARK: - Helpers
 
@@ -34,13 +25,13 @@ function resolveImportedAssetOrPath(pathOrAsset: string | number | undefined) {
   return pathOrAsset === undefined
     ? undefined
     : typeof pathOrAsset === 'string'
-    ? pathOrAsset
-    : resolveImportedAsset(pathOrAsset);
+      ? pathOrAsset
+      : resolveImportedAsset(pathOrAsset);
 }
 
 function resolveImportedAsset(id?: number) {
   return id
-    ? (resolveAssetSource(id) as { uri: string } | null) ?? undefined
+    ? ((resolveAssetSource(id) as { uri: string } | null) ?? undefined)
     : undefined;
 }
 
@@ -388,14 +379,14 @@ export async function getRate(): Promise<number> {
  * index.
  */
 export async function getTrack(index: number): Promise<Track | undefined> {
-  return TrackPlayer.getTrack(index);
+  return TrackPlayer.getTrack(index) as unknown as Track;
 }
 
 /**
  * Gets the whole queue.
  */
 export async function getQueue(): Promise<Track[]> {
-  return TrackPlayer.getQueue();
+  return TrackPlayer.getQueue() as unknown as Track[];
 }
 
 /**
@@ -410,7 +401,7 @@ export async function getActiveTrackIndex(): Promise<number | undefined> {
  * Gets the active track or undefined if there is no current track.
  */
 export async function getActiveTrack(): Promise<Track | undefined> {
-  return (await TrackPlayer.getActiveTrack()) ?? undefined;
+  return ((await TrackPlayer.getActiveTrack()) as Track) ?? undefined;
 }
 
 /**
@@ -419,7 +410,7 @@ export async function getActiveTrack(): Promise<Track | undefined> {
  * duration in seconds.
  */
 export async function getProgress(): Promise<Progress> {
-  return TrackPlayer.getProgress();
+  return (await TrackPlayer.getProgress()) as Progress;
 }
 
 /**
@@ -428,7 +419,7 @@ export async function getProgress(): Promise<Progress> {
  * @see https://rntp.dev/docs/api/constants/state
  */
 export async function getPlaybackState(): Promise<PlaybackState> {
-  return TrackPlayer.getPlaybackState();
+  return (await TrackPlayer.getPlaybackState()) as PlaybackState;
 }
 
 /**
@@ -445,49 +436,6 @@ export async function getRepeatMode(): Promise<RepeatMode> {
  */
 export async function retry() {
   return TrackPlayer.retry();
-}
-
-/**
- * Sets the content hierarchy of Android Auto (Android only). The hierarchy structure is a dict with
- * the mediaId as keys, and a list of MediaItem as values. To use, you must at least specify the root directory, where
- * the key is "/". If the root directory contains BROWSABLE MediaItems, they will be shown as tabs. Do note Google requires
- * AA to have a max of 4 tabs. You may then set the mediaId keys of the browsable MediaItems to be a list of other MediaItems.
- *
- * @param browseTree the content hierarchy dict.
- * @returns a serialized copy of the browseTree set by native. For debug purposes.
- */
-export async function setBrowseTree(
-  browseTree: AndroidAutoBrowseTree
-): Promise<string> {
-  if (!isAndroid) return new Promise(() => '');
-  return TrackPlayer.setBrowseTree(browseTree);
-}
-
-/**
- * this method enables android auto playback progress tracking; see
- * https://developer.android.com/training/cars/media#browse-progress-bar
- * android only.
- * @param mediaID the mediaID.
- * @returns
- */
-export async function setPlaybackState(mediaID: string): Promise<void> {
-  if (!isAndroid) return;
-  TrackPlayer.setPlaybackState(mediaID);
-}
-
-/**
- * Sets the content style of Android Auto (Android only).
- * there are list style and grid style. see https://developer.android.com/training/cars/media#apply_content_style .
- * the styles are applicable to browsable nodes and playable nodes. setting the args to true will yield the list style.
- * false = the grid style.
- */
-export function setBrowseTreeStyle(
-  browsableStyle: AndroidAutoContentStyle,
-  playableStyle: AndroidAutoContentStyle
-): null {
-  if (!isAndroid) return null;
-  TrackPlayer.setBrowseTreeStyle(browsableStyle, playableStyle);
-  return null;
 }
 
 /**
