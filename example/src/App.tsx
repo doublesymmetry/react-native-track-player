@@ -8,7 +8,6 @@ import React, {
 import {
   ActivityIndicator,
   Linking,
-  SafeAreaView,
   StatusBar,
   StyleSheet,
   View,
@@ -17,6 +16,7 @@ import {
 } from 'react-native';
 import TrackPlayer, { useActiveTrack } from 'react-native-track-player';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import BottomSheet from '@gorhom/bottom-sheet';
 
 import {
@@ -33,9 +33,11 @@ import { SponsorCard } from './components/SponsorCard';
 
 export default function App() {
   return (
-    <GestureHandlerRootView style={styles.gestureContainer}>
-      <Inner />
-    </GestureHandlerRootView>
+    <SafeAreaProvider>
+      <GestureHandlerRootView style={styles.gestureContainer}>
+        <Inner />
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
   );
 }
 
