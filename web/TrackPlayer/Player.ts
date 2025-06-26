@@ -1,13 +1,13 @@
 import { State } from '../../src/constants/State';
-import type { Track, Progress, PlaybackState } from '../../src/interfaces';
+import type { PlaybackState, Progress, Track } from '../../src/interfaces';
 import { SetupNotCalledError } from './SetupNotCalledError';
 
 export class Player {
-  protected hasInitialized: boolean = false;
+  protected hasInitialized = false;
   protected element?: HTMLMediaElement;
   protected player?: shaka.Player;
   protected _current?: Track = undefined;
-  protected _playWhenReady: boolean = false;
+  protected _playWhenReady = false;
   protected _state: PlaybackState = { state: State.None };
 
   // current getter/setter
@@ -39,7 +39,10 @@ export class Player {
     if (typeof window === 'undefined') return;
     if (this.hasInitialized === true) {
       // TODO: double check the structure of this error message
-      throw { code: 'player_already_initialized', message: 'The player has already been initialized via setupPlayer.' };
+      throw {
+        code: 'player_already_initialized',
+        message: 'The player has already been initialized via setupPlayer.',
+      };
     }
 
     // @ts-ignore
@@ -66,15 +69,32 @@ export class Player {
     this.player?.attach(this.element);
 
     // Listen for relevant events events.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.player!.addEventListener('error', (error: any) => {
       // Extract the shaka.util.Error object from the event.
       this.onError(error.detail);
     });
-    this.element.addEventListener('ended', this.onStateUpdate.bind(this, State.Ended));
-    this.element.addEventListener('playing', this.onStateUpdate.bind(this, State.Playing));
-    this.element.addEventListener('pause', this.onStateUpdate.bind(this, State.Paused));
-    this.player!.addEventListener('loading', this.onStateUpdate.bind(this, State.Loading));
-    this.player!.addEventListener('loaded', this.onStateUpdate.bind(this, State.Ready));
+    this.element.addEventListener(
+      'ended',
+      this.onStateUpdate.bind(this, State.Ended)
+    );
+    this.element.addEventListener(
+      'playing',
+      this.onStateUpdate.bind(this, State.Playing)
+    );
+    this.element.addEventListener(
+      'pause',
+      this.onStateUpdate.bind(this, State.Paused)
+    );
+    this.player!.addEventListener(
+      'loading',
+      this.onStateUpdate.bind(this, State.Loading)
+    );
+    this.player!.addEventListener(
+      'loaded',
+      this.onStateUpdate.bind(this, State.Ready)
+    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.player!.addEventListener('buffering', ({ buffering }: any) => {
       if (buffering === true) {
         this.onStateUpdate(State.Buffering);
@@ -92,9 +112,9 @@ export class Player {
    */
   protected onStateUpdate(state: Exclude<State, State.Error>) {
     this.state = { state };
- }
+  }
 
-  protected onError(error: any) {
+  protected onError(error: { code: number; message: string }) {
     // unload the current track to allow for clean playback on other
     this.player?.unload();
     this.state = {
@@ -126,17 +146,14 @@ export class Player {
   public async stop() {
     if (!this.player) throw new SetupNotCalledError();
     this.current = undefined;
-    await this.player.unload()
+    await this.player.unload();
   }
 
   public play() {
     if (!this.element) throw new SetupNotCalledError();
     this.playWhenReady = true;
-    return this.element.play()
-      .catch(err => {
-        console.error(err);
-      })
-    ;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return this.element.play().catch((err: any) => console.error(err));
   }
 
   public pause() {
@@ -148,7 +165,7 @@ export class Player {
   public setRate(rate: number) {
     if (!this.element) throw new SetupNotCalledError();
     this.element.defaultPlaybackRate = rate;
-    return this.element.playbackRate = rate;
+    return (this.element.playbackRate = rate);
   }
 
   public getRate() {
@@ -176,27 +193,12 @@ export class Player {
     return this.element.volume;
   }
 
-  public getDuration() {
-    if (!this.element) throw new SetupNotCalledError();
-    return this.element.duration
-  }
-
-  public getPosition() {
-    if (!this.element) throw new SetupNotCalledError();
-    return this.element.currentTime
-  }
-
   public getProgress(): Progress {
     if (!this.element) throw new SetupNotCalledError();
     return {
       position: this.element.currentTime,
       duration: this.element.duration || 0,
       buffered: 0, // TODO: this.element.buffered.end,
-    }
-  }
-
-  public getBufferedPosition() {
-    if (!this.element) throw new SetupNotCalledError();
-    return this.element.buffered.end;
+    };
   }
 }

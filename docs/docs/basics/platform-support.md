@@ -61,12 +61,9 @@ sidebar_position: 5
 | `setRate` | ✅ | ✅ | ✅ |
 | `getRate` | ✅ | ✅ | ✅ |
 | `seekTo` | ✅ | ✅ | ✅ |
-| `getPosition` | ✅ | ✅ | ✅ |
-| `getBufferedPosition` | ✅ | ✅ | ✅ |
-| `getDuration` | ✅ | ✅ | ✅ |
-| `getState` | ✅ | ✅ | ✅ |
 | `getQueue` | ✅ | ✅ | ✅ |
-| `getCurrentTrack` | ✅ | ✅ | ✅ |
+| `getActiveTrackIndex` | ✅ | ✅ | ✅ |
+| `getActiveTrack` | ✅ | ✅ | ✅ |
 | `getTrack` | ✅ | ✅ | ✅ |
 | `add` | ✅ | ✅ | ✅ |
 | `remove` | ✅ | ✅ | ✅ |

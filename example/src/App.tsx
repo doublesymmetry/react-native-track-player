@@ -8,13 +8,16 @@ import React, {
 import {
   ActivityIndicator,
   Linking,
-  SafeAreaView,
   StatusBar,
   StyleSheet,
   View,
   Platform,
+  Dimensions,
 } from 'react-native';
 import TrackPlayer, { useActiveTrack } from 'react-native-track-player';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import BottomSheet from '@gorhom/bottom-sheet';
 
 import {
   Button,
@@ -26,15 +29,15 @@ import {
   TrackInfo,
 } from './components';
 import { QueueInitialTracksService, SetupService } from './services';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import BottomSheet from '@gorhom/bottom-sheet';
 import { SponsorCard } from './components/SponsorCard';
 
 export default function App() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <Inner />
-    </GestureHandlerRootView>
+    <SafeAreaProvider>
+      <GestureHandlerRootView style={styles.gestureContainer}>
+        <Inner />
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
   );
 }
 
@@ -120,12 +123,13 @@ const Inner: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  gestureContainer: { flex: 1 },
   screenContainer: {
     flex: 1,
     backgroundColor: '#212121',
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: Platform.OS === 'web' ? '100vh' : '100%',
+    minHeight: Platform.OS === 'web' ? Dimensions.get('window').height : '100%',
   },
   contentContainer: {
     flex: 1,

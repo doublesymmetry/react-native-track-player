@@ -10,3 +10,4 @@ export * from './RatingType';
 export * from './RepeatMode';
 export * from './State';
 export * from './TrackType';
+export * from './MediaItemPlayable';

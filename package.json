@@ -2,39 +2,36 @@
   "name": "react-native-track-player",
   "version": "4.1.1",
   "description": "A fully fledged audio module created for music apps",
-  "main": "lib/src/index.js",
-  "types": "lib/src/index.d.ts",
-  "react-native": "src/index",
-  "source": "src/index",
-  "scripts": {
-    "build": "rimraf lib && tsc",
-    "dev": "tsc --watch",
-    "lint": "eslint src",
-    "format": "prettier --write src",
-    "types": "tsc --noEmit true",
-    "prepare": "yarn build && husky install",
-    "example": "yarn --cwd example",
-    "pods": "cd example/ios && pod install",
-    "bootstrap": "yarn example && yarn && yarn pods",
-    "prepublishOnly": "yarn lint",
-    "preversion": "yarn lint",
-    "version": "yarn format && git add -A src && yarn changelog && git add CHANGELOG.md",
-    "postversion": "if [[ ${npm_package_version} != *'nightly'* ]]; then yarn publish:git && yarn publish:npm; fi",
-    "ci:lint": "eslint src --max-warnings=0",
-    "ci:format": "prettier --check src",
-    "changelog": "conventional-changelog -p angular -s -i CHANGELOG.md -r 1",
-    "publish:git": "git push && git push --tags",
-    "publish:npm": "yarn prepare && npm publish --access public"
+  "main": "./lib/module/index.js",
+  "types": "./lib/typescript/src/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.tsx",
+      "types": "./lib/typescript/src/index.d.ts",
+      "default": "./lib/module/index.js"
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "src",
-    "lib/**/*",
-    "ios/**/*",
-    "android/src/**/*",
-    "android/build.gradle",
-    "android/proguard-rules.txt",
+    "lib",
+    "android",
+    "ios",
+    "cpp",
     "web/**/*",
-    "*.podspec"
+    "*.podspec",
+    "react-native.config.js",
+    "!docs/**/*",
+    "!ios/build",
+    "!android/build",
+    "!android/gradle",
+    "!android/gradlew",
+    "!android/gradlew.bat",
+    "!android/local.properties",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__",
+    "!**/.*"
   ],
   "contributors": [
     {
@@ -52,6 +49,18 @@
       "email": "dustin@curiousmedia.com"
     }
   ],
+  "scripts": {
+    "example": "yarn workspace react-native-track-player-example",
+    "test": "jest",
+    "typecheck": "tsc",
+    "lint": "eslint src web --max-warnings=0",
+    "format": "prettier --check src web",
+    "format:fix": "prettier --write src web",
+    "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
+    "build": "yarn prepare",
+    "prepare": "bob build",
+    "release": "release-it --only-version"
+  },
   "keywords": [
     "react",
     "react-native",
@@ -75,47 +84,123 @@
   "bugs": {
     "url": "https://github.com/doublesymmetry/react-native-track-player/issues"
   },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
   "peerDependencies": {
-    "react": ">=16.8.6",
-    "react-native": ">=0.60.0-rc.2",
-    "react-native-windows": ">=0.63.0",
+    "react": "*",
+    "react-native": "*",
     "shaka-player": "^4.7.9"
   },
   "peerDependenciesMeta": {
-    "react-native-windows": {
-      "optional": true
-    },
     "shaka-player": {
       "optional": true
     }
   },
   "devDependencies": {
-    "@types/react": "^17.0.52",
-    "@types/react-native": "^0.68",
-    "@typescript-eslint/eslint-plugin": "^5.36.0",
-    "@typescript-eslint/parser": "^5.36.0",
-    "conventional-changelog-cli": "^2.2.2",
-    "cz-conventional-changelog": "3.3.0",
-    "eslint": "^8.23.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "husky": "^8.0.0",
-    "prettier": "^2.7.1",
-    "react": "17.0.2",
-    "react-native": "0.68.5",
-    "react-native-windows": "^0.65.0-0",
-    "rimraf": "^2.6.2",
-    "shaka-player": "^4.7.9",
-    "typescript": "^4.8.2"
+    "@commitlint/config-conventional": "^19.6.0",
+    "@eslint/compat": "^1.2.7",
+    "@eslint/eslintrc": "^3.3.0",
+    "@eslint/js": "^9.22.0",
+    "@evilmartians/lefthook": "^1.5.0",
+    "@react-native-community/cli": "15.0.0-alpha.2",
+    "@react-native/babel-preset": "0.79.2",
+    "@react-native/eslint-config": "^0.78.0",
+    "@release-it/conventional-changelog": "^9.0.2",
+    "@types/jest": "^29.5.5",
+    "@types/react": "^19.0.0",
+    "commitlint": "^19.6.1",
+    "del-cli": "^5.1.0",
+    "eslint": "^9.22.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "jest": "^29.7.0",
+    "prettier": "^3.0.3",
+    "react": "19.1.0",
+    "react-native": "0.80.0",
+    "react-native-builder-bob": "^0.40.12",
+    "release-it": "^17.10.0",
+    "shaka-player": "^4.15.4",
+    "turbo": "^1.10.7",
+    "typescript": "^5.8.3"
   },
   "funding": "https://github.com/doublesymmetry/react-native-track-player?sponsor=1",
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
+  "workspaces": [
+    "example"
+  ],
+  "packageManager": "yarn@3.6.1",
+  "jest": {
+    "preset": "react-native",
+    "modulePathIgnorePatterns": [
+      "<rootDir>/example/node_modules",
+      "<rootDir>/lib/"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "release-it": {
+    "git": {
+      "commitMessage": "chore: release ${version}",
+      "tagName": "v${version}"
+    },
+    "npm": {
+      "publish": true
+    },
+    "github": {
+      "release": true
+    },
+    "plugins": {
+      "@release-it/conventional-changelog": {
+        "preset": {
+          "name": "angular"
+        }
+      }
     }
   },
-  "tea": {
-    "dependencies": {
-      "classic.yarnpkg.com": "^1"
+  "prettier": {
+    "quoteProps": "consistent",
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5",
+    "useTabs": false
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      [
+        "module",
+        {
+          "esm": true
+        }
+      ],
+      [
+        "typescript",
+        {
+          "project": "tsconfig.build.json"
+        }
+      ]
+    ]
+  },
+  "codegenConfig": {
+    "name": "TrackPlayerSpec",
+    "type": "modules",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "com.doublesymmetry.trackplayer"
+    },
+    "ios": {
+      "modulesProvider": {
+        "NativeTrackPlayer": "TrackPlayer"
+      }
     }
+  },
+  "create-react-native-library": {
+    "languages": "kotlin-objc",
+    "type": "turbo-module",
+    "version": "0.51.0"
   }
 }

@@ -39,22 +39,6 @@ Fired when the queue reaches the end.
 | track    | `number` | The previous track index. Might be null      |
 | position | `number` | The previous track position in seconds    |
 
-### `PlaybackMetadataReceived`
-
-**⚠️ Deprecated:** Please use `AudioChapterMetadataReceived`, `AudioTimedMetadataReceived`, `AudioCommonMetadataReceived`.
-
-Fired when the current track receives metadata encoded in. (e.g. ID3 tags, Icy Metadata, Vorbis Comments or QuickTime metadata).
-
-| Param    | Type     | Description                                         |
-| -------- | -------- | --------------------------------------------------- |
-| source   | `string` | The metadata source (`id3`, `icy`, `icy-headers`, `vorbis-comment`, `quicktime`) |
-| title    | `string` | The track title. Might be null                      |
-| url      | `string` | The track url. Might be null                        |
-| artist   | `string` | The track artist. Might be null                     |
-| album    | `string` | The track album. Might be null                      |
-| date     | `string` | The track date. Might be null                       |
-| genre    | `string` | The track genre. Might be null                      |
-
 ### `PlaybackProgressUpdated`
 
 ⚠️ Note: This event is only emitted if you specify a non-zero `progressUpdateEventInterval` value in your player options.
@@ -83,18 +67,6 @@ Fired when the `playWhenReady` property is changed.
 | Param         | Type     | Description                           |
 | ------------- | -------- | ------------------------------------- |
 | playWhenReady | `boolean` | The current value of `playWhenReady` |
-
-### ⚠️`PlaybackTrackChanged`
-
-**⚠️ Deprecated:** Please use `PlaybackActiveTrackChanged`.
-
-Fired when a track is changed.
-
-| Param     | Type     | Description                             |
-| --------- | -------- | --------------------------------------- |
-| track     | `number` | The previous track index. Might be null |
-| position  | `number` | The previous track position in seconds  |
-| nextTrack | `number` | The next track index. Might be null     |
 
 ----
 

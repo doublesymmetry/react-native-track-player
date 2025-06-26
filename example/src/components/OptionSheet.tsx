@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Platform, StyleSheet, ScrollView, Text, View } from 'react-native';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
+import React, { useState } from 'react';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import TrackPlayer, {
   AppKilledPlaybackBehavior,
   Capability,
@@ -8,6 +8,7 @@ import TrackPlayer, {
 } from 'react-native-track-player';
 import { DefaultAudioServiceBehaviour, DefaultRepeatMode } from '../services';
 import { Spacer } from './Spacer';
+import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
 export const OptionStack: React.FC<{
   children: React.ReactNode;
@@ -33,7 +34,7 @@ export const OptionSheet: React.FC = () => {
     useState(audioServiceBehaviourToIndex(DefaultAudioServiceBehaviour));
 
   return (
-    <ScrollView>
+    <BottomSheetScrollView>
       <OptionStack vertical={true}>
         <Text style={styles.optionRowLabel}>Repeat Mode</Text>
         <Spacer />
@@ -73,8 +74,6 @@ export const OptionSheet: React.FC = () => {
                 android: {
                   appKilledPlaybackBehavior,
                 },
-                // This flag is now deprecated. Please use the above to define playback mode.
-                // stoppingAppPausesPlayback: true,
                 capabilities: [
                   Capability.Play,
                   Capability.Pause,
@@ -82,18 +81,13 @@ export const OptionSheet: React.FC = () => {
                   Capability.SkipToPrevious,
                   Capability.SeekTo,
                 ],
-                compactCapabilities: [
-                  Capability.Play,
-                  Capability.Pause,
-                  Capability.SkipToNext,
-                ],
                 progressUpdateEventInterval: 2,
               });
             }}
           />
         </OptionStack>
       )}
-    </ScrollView>
+    </BottomSheetScrollView>
   );
 };
 

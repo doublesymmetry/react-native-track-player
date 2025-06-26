@@ -1,5 +1,5 @@
 import type { PitchAlgorithm, TrackType } from '../constants';
-import { ResourceObject } from './ResourceObject';
+import type { ResourceObject } from './ResourceObject';
 import type { TrackMetadataBase } from './TrackMetadataBase';
 
 export interface Track extends TrackMetadataBase {
