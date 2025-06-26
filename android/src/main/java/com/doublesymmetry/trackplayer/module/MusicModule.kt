@@ -544,11 +544,13 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     fun getTrack(index: Int, callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
 
-        if (index >= 0 && index < musicService.tracks.size) {
-            callback.resolve(Arguments.fromBundle(musicService.tracks[index].originalItem))
-        } else {
+        if( index < 0 || index >= musicService.tracks.size) {
             callback.resolve(null)
+            return@launch
         }
+
+        val originalItem = musicService.tracks[index].originalItem
+        callback.resolve(if(originalItem == null) null else Arguments.fromBundle(originalItem))
     }
 
     @ReactMethod
@@ -582,12 +584,13 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     @ReactMethod
     fun getActiveTrack(callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
-        callback.resolve(
-            if (musicService.tracks.isEmpty()) null
-            else Arguments.fromBundle(
-                musicService.tracks[musicService.getCurrentTrackIndex()].originalItem
-            )
-        )
+        if(musicService.tracks.isEmpty()) {
+            callback.resolve(null)
+            return@launch
+        }
+
+        val activeTrack = musicService.tracks[musicService.getCurrentTrackIndex()].originalItem
+        callback.resolve(if(activeTrack == null) null else Arguments.fromBundle(activeTrack))
     }
 
     @ReactMethod
