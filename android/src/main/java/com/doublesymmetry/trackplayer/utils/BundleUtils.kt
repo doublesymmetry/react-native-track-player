@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.support.v4.media.RatingCompat
 import com.doublesymmetry.trackplayer.R
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper
-import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper.Companion.instance
 import androidx.media3.common.Rating
 import androidx.media3.common.HeartRating
 import androidx.media3.common.ThumbRating
@@ -87,7 +86,7 @@ object BundleUtils {
 
         val bundle = options.getBundle(propertyName) ?: return null
 
-        val helper = instance
+        val helper = ResourceDrawableIdHelper.getInstance()
         val icon = helper.getResourceDrawableId(context, bundle.getString("uri"))
         return if (icon == 0) null else icon
     }
