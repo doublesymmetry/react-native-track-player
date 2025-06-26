@@ -10600,6 +10600,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-safe-area-context@npm:^5.5.0":
+  version: 5.5.0
+  resolution: "react-native-safe-area-context@npm:5.5.0"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: e04fd9e9f52cbc73f495c4ef7ad527ec48398b17032cbbba412bd72d8b2c9a7b184b57e8e8a72edc3e6c41832442596dafbfee7d29ca9d1dd85081991dd834f5
+  languageName: node
+  linkType: hard
+
 "react-native-track-player-example@workspace:example":
   version: 0.0.0-use.local
   resolution: "react-native-track-player-example@workspace:example"
@@ -10625,6 +10635,7 @@ __metadata:
     react-native-gesture-handler: ^2.26.0
     react-native-monorepo-config: ^0.1.9
     react-native-reanimated: ^3.18.0
+    react-native-safe-area-context: ^5.5.0
   languageName: unknown
   linkType: soft
 
