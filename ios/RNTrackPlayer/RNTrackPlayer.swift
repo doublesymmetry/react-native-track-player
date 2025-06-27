@@ -26,6 +26,8 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     private var sessionCategoryMode: AVAudioSession.Mode = .default
     private var sessionCategoryPolicy: AVAudioSession.RouteSharingPolicy = .default
     private var sessionCategoryOptions: AVAudioSession.CategoryOptions = []
+    private var currentLoadWorkItem: DispatchWorkItem?
+    private var currentSetQueueWorkItem: DispatchWorkItem?
 
     // MARK: - Lifecycle Methods
 
@@ -392,18 +394,34 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     @objc(load:resolver:rejecter:)
     public func load(
         trackDict: [String: Any],
-        resolve: RCTPromiseResolveBlock,
-        reject: RCTPromiseRejectBlock
+        resolve: @escaping RCTPromiseResolveBlock,
+        reject: @escaping RCTPromiseRejectBlock
     ) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
-
+        currentLoadWorkItem?.cancel()
         guard let track = Track(dictionary: trackDict) else {
             reject("invalid_track_object", "Track is missing a required key", nil)
             return
         }
 
-        player.load(item: track)
-        resolve(player.currentIndex)
+
+        var workItem: DispatchWorkItem? = nil
+
+        workItem = DispatchWorkItem { [weak self] in
+            guard let self = self else { return }
+            player.load(item: track)
+
+            if workItem?.isCancelled == true {
+                print("Load operation was cancelled")
+                return
+            }
+
+            resolve(player.currentIndex)
+        }
+
+        currentLoadWorkItem = workItem
+
+        DispatchQueue.global(qos: .userInitiated).async(execute: workItem!)
     }
 
     @objc(remove:resolver:rejecter:)
@@ -651,23 +669,38 @@ public class RNTrackPlayer: RCTEventEmitter, AudioSessionControllerDelegate {
     @objc(setQueue:resolver:rejecter:)
     public func setQueue(
         trackDicts: [[String: Any]],
-        resolve: RCTPromiseResolveBlock,
-        reject: RCTPromiseRejectBlock
+        resolve: @escaping RCTPromiseResolveBlock,
+        reject: @escaping RCTPromiseRejectBlock
     ) {
+        print("Set queue")
         if (rejectWhenNotInitialized(reject: reject)) { return }
-
+        currentSetQueueWorkItem?.cancel()
+        var workItem: DispatchWorkItem? = nil
         var tracks = [Track]()
-        for trackDict in trackDicts {
-            guard let track = Track(dictionary: trackDict) else {
-                reject("invalid_track_object", "Track is missing a required key", nil)
+
+        workItem = DispatchWorkItem { [weak self] in
+            guard let self = self else { return }
+
+            for trackDict in trackDicts {
+                guard let track = Track(dictionary: trackDict) else {
+                    reject("invalid_track_object", "Track is missing a required key", nil)
+                    return
+                }
+
+                tracks.append(track)
+            }
+            if workItem?.isCancelled == true {
+                print("Set queue operation was cancelled")
                 return
             }
+            player.clear()
+            player.add(items: tracks)
 
-            tracks.append(track)
+            resolve(index)
         }
-        player.clear()
-        try? player.add(items: tracks)
-        resolve(index)
+        currentSetQueueWorkItem = workItem
+        DispatchQueue.global(qos: .userInitiated).async(execute: workItem!)
+
     }
 
     @objc(getActiveTrack:rejecter:)
