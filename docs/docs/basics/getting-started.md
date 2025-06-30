@@ -79,8 +79,8 @@ await TrackPlayer.add([track1, track2, track3]);
 
 import TrackPlayer, { State } from 'react-native-track-player';
 
-const state = await TrackPlayer.getState();
-if (state === State.Playing) {
+const playback = await TrackPlayer.getPlaybackState();
+if (playback.state === State.Playing) {
     console.log('The player is playing');
 };
 
