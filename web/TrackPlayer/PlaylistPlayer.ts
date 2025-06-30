@@ -1,8 +1,8 @@
 import { Player } from './Player';
 
-import type { Track } from '../../src/interfaces';
-import {RepeatMode} from './RepeatMode';
 import { State } from '../../src';
+import type { Track } from '../../src/interfaces';
+import { RepeatMode } from './RepeatMode';
 
 export class PlaylistPlayer extends Player {
   // TODO: use immer to make the `playlist` immutable
@@ -46,8 +46,9 @@ export class PlaylistPlayer extends Player {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  protected onPlaylistEnded() {}
+  protected onPlaylistEnded() {
+    console.warn('`onPlaylistEnded` is currently unimplemented');
+  }
 
   protected get currentIndex() {
     return this._currentIndex;
@@ -130,12 +131,12 @@ export class PlaylistPlayer extends Player {
 
   public async remove(indexes: number[]) {
     const idxMap = indexes.reduce<Record<number, boolean>>((acc, elem) => {
-      acc[elem] = true
+      acc[elem] = true;
       return acc;
     }, {});
     let isCurrentRemoved = false;
     this.playlist = this.playlist.filter((_track, idx) => {
-      const keep = !idxMap[idx]
+      const keep = !idxMap[idx];
 
       if (!keep && idx === this.currentIndex) {
         isCurrentRemoved = true;
@@ -185,12 +186,12 @@ export class PlaylistPlayer extends Player {
     }
 
     // calculate `currentIndex` after move
-    let shift: number | undefined = undefined;
+    let shift: number | undefined;
     if (this.currentIndex) {
       if (fromIndex < this.currentIndex && toIndex > this.currentIndex) {
         shift = -1;
       } else if (fromIndex > this.currentIndex && toIndex < this.currentIndex) {
-        shift = + 1;
+        shift = 1;
       }
     }
 
@@ -200,16 +201,16 @@ export class PlaylistPlayer extends Player {
     this.playlist.splice(toIndex, 0, fromItem);
 
     if (this.currentIndex && shift) {
-      this.currentIndex = this.currentIndex + shift
+      this.currentIndex = this.currentIndex + shift;
     }
   }
 
   // TODO
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  public updateMetadataForTrack(index: number, metadata: Partial<Track>) {}
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  public clearNowPlayingMetadata() {}
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  public updateNowPlayingMetadata(metadata: Partial<Track>) {}
+  public updateMetadataForTrack(_index: number, _metadata: Partial<Track>) {
+    console.warn('`updateMetadataForTrack` is currently unimplemented');
+  }
 
+  public updateNowPlayingMetadata(_metadata: Partial<Track>) {
+    console.warn('`updateNowPlayingMetadata` is currently unimplemented');
+  }
 }

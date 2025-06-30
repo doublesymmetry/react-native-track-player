@@ -2,9 +2,9 @@ import React from 'react';
 import {
   StyleSheet,
   Text,
-  TextStyle,
+  type TextStyle,
   TouchableWithoutFeedback,
-  ViewStyle,
+  type ViewStyle,
 } from 'react-native';
 
 export interface ButtonProps {

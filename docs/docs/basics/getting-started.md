@@ -79,8 +79,8 @@ await TrackPlayer.add([track1, track2, track3]);
 
 import TrackPlayer, { State } from 'react-native-track-player';
 
-const state = await TrackPlayer.getState();
-if (state === State.Playing) {
+const playback = await TrackPlayer.getPlaybackState();
+if (playback.state === State.Playing) {
     console.log('The player is playing');
 };
 
@@ -129,7 +129,7 @@ console.log(`First title: ${tracks[0].title}`);
 
 You can subscribe to [player events](../api/events.md#player), which describe the
 changing nature of the playback state. For example, subscribe to the
-`Event.PlaybackTrackChanged` event to be notified when the track has changed or
+`Event.PlaybackActiveTrackChanged` event to be notified when the track has changed or
 subscribe to the `Event.PlaybackState` event to be notified when the player
 buffers, plays, pauses and stops.
 

@@ -1,6 +1,7 @@
 export * from './AndroidOptions';
+export * from './events';
 export * from './FeedbackOptions';
-export * from './MetadataOptions';
+export * from './MediaItem';
 export * from './NowPlayingMetadata';
 export * from './PlaybackState';
 export * from './PlayerOptions';
@@ -10,4 +11,3 @@ export * from './ServiceHandler';
 export * from './Track';
 export * from './TrackMetadataBase';
 export * from './UpdateOptions';
-export * from './events';

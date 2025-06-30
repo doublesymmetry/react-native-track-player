@@ -6,7 +6,7 @@ export const TrackInfo: React.FC<{
   track?: Track;
 }> = ({ track }) => {
   // TODO: properly fix type
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+
   // @ts-ignore
   const imageUri = track?.artwork?.uri || track?.artwork;
 

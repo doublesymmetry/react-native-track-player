@@ -1,10 +1,10 @@
-import TrackPlayer from '../TrackPlayerModule';
+import { Constants } from '../NativeTrackPlayer';
 
 export enum RepeatMode {
   /** Playback stops when the last track in the queue has finished playing. */
-  Off = TrackPlayer.REPEAT_OFF,
+  Off = Constants?.REPEAT_OFF ?? 1,
   /** Repeats the current track infinitely during ongoing playback. */
-  Track = TrackPlayer.REPEAT_TRACK,
+  Track = Constants?.REPEAT_TRACK ?? 2,
   /** Repeats the entire queue infinitely. */
-  Queue = TrackPlayer.REPEAT_QUEUE,
+  Queue = Constants?.REPEAT_QUEUE ?? 3,
 }

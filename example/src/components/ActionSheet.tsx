@@ -1,8 +1,8 @@
 import React from 'react';
-import { ScrollView } from 'react-native';
 import { Spacer } from './Spacer';
 import { Button } from './Button';
 import TrackPlayer from 'react-native-track-player';
+import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
 const onUpdateNotificationMetadata = async () => {
   const randomTitle = Math.random().toString(36).substring(7);
@@ -30,7 +30,7 @@ const onReset = async () => {
 
 export const ActionSheet: React.FC = () => {
   return (
-    <ScrollView>
+    <BottomSheetScrollView>
       <Spacer />
       <Button
         title={'Update Notification Metadata Randomly'}
@@ -43,6 +43,6 @@ export const ActionSheet: React.FC = () => {
         type={'primary'}
       />
       <Button title={'Reset'} onPress={onReset} type={'primary'} />
-    </ScrollView>
+    </BottomSheetScrollView>
   );
 };
