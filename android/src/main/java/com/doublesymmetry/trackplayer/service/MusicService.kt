@@ -98,11 +98,19 @@ class MusicService : HeadlessJsMediaService() {
             }
         })
         fakePlayer = ExoPlayer.Builder(this).build()
+
+        val notificationClickBehavior = androidOptions?.getBundle(NOTIFICATION_CLICK_BEHAVIOR_KEY)
+        val enableUriData = notificationClickBehavior?.getBoolean(NOTIFICATION_CLICK_ENABLED_KEY, true) ?: true
+
         val openAppIntent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            // Add the Uri data so apps can identify that it was a notification click
-            data = Uri.parse("trackplayer://notification.click")
-            action = Intent.ACTION_VIEW
+            if (enableUriData) {
+                val customUri = notificationClickBehavior?.getString(NOTIFICATION_CLICK_CUSTOM_URI_KEY)
+                data = Uri.parse(customUri ?: "trackplayer://notification.click")
+
+                val customAction = notificationClickBehavior?.getString(NOTIFICATION_CLICK_CUSTOM_ACTION_KEY)
+                action = customAction ?: Intent.ACTION_VIEW
+            }
         }
         mediaSession = MediaLibrarySession.Builder(this, fakePlayer,
             InnerMediaSessionCallback()
@@ -1021,6 +1029,12 @@ class MusicService : HeadlessJsMediaService() {
         const val ANDROID_AUDIO_CONTENT_TYPE = "androidAudioContentType"
         const val IS_FOCUS_LOSS_PERMANENT_KEY = "permanent"
         const val IS_PAUSED_KEY = "paused"
+
+        // Notification click behavior keys
+        const val NOTIFICATION_CLICK_BEHAVIOR_KEY = "notificationClickBehavior"
+        const val NOTIFICATION_CLICK_ENABLED_KEY = "enabled"
+        const val NOTIFICATION_CLICK_CUSTOM_URI_KEY = "customUri"
+        const val NOTIFICATION_CLICK_CUSTOM_ACTION_KEY = "action"
 
         const val HANDLE_NOISY = "androidHandleAudioBecomingNoisy"
         const val ALWAYS_SHOW_NEXT = "androidAlwaysShowNext"
