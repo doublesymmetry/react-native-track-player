@@ -33,6 +33,17 @@ export const SetupService = async () => {
   await TrackPlayer.updateOptions({
     android: {
       appKilledPlaybackBehavior: DefaultAudioServiceBehaviour,
+      // Example: Configure notification click behavior
+      // You can disable URI data to launch app without notification click detection
+      // notificationClickBehavior: {
+      //   enabled: false
+      // },
+      // Or use custom URI and action
+      // notificationClickBehavior: {
+      //   enabled: true,
+      //   customUri: "example://notification.click",
+      //   action: "android.intent.action.VIEW"
+      // }
     },
     // This flag is now deprecated. Please use the above to define playback mode.
     // stoppingAppPausesPlayback: true,
