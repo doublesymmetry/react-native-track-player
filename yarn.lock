@@ -3400,6 +3400,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-community/slider@npm:4.5.6":
+  version: 4.5.6
+  resolution: "@react-native-community/slider@npm:4.5.6"
+  checksum: 8287f3f69b63e0b313639d7dc9a45718a85c4c4494f78485695d7e80bcf3fa9d3891d05a557affc66306df5f2a0a9853d319a35ffcc875ae71149a38a2258bb8
+  languageName: node
+  linkType: hard
+
 "@react-native-community/slider@npm:^4.5.7":
   version: 4.5.7
   resolution: "@react-native-community/slider@npm:4.5.7"
@@ -3407,7 +3414,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-segmented-control/segmented-control@npm:^2.5.7":
+"@react-native-segmented-control/segmented-control@npm:2.5.7, @react-native-segmented-control/segmented-control@npm:^2.5.7":
   version: 2.5.7
   resolution: "@react-native-segmented-control/segmented-control@npm:2.5.7"
   peerDependencies:
@@ -7721,6 +7728,9 @@ __metadata:
   dependencies:
     "@babel/core": ^7.25.2
     "@expo/vector-icons": ^14.1.0
+    "@gorhom/bottom-sheet": ^5.1.6
+    "@react-native-community/slider": 4.5.6
+    "@react-native-segmented-control/segmented-control": 2.5.7
     "@react-navigation/bottom-tabs": ^7.3.10
     "@react-navigation/elements": ^2.3.8
     "@react-navigation/native": ^7.1.6
