@@ -13,13 +13,17 @@ object Cache {
     @Volatile
     private var instance: SimpleCache? = null
 
-    fun initCache(context: Context, size: Long): SimpleCache {
+    fun initCache(context: Context, sizeKb: Long): SimpleCache {
         val db: DatabaseProvider = StandaloneDatabaseProvider(context)
 
         instance ?: synchronized(this) {
             instance ?: SimpleCache(
-                File(context.cacheDir, "RNTP"), LeastRecentlyUsedCacheEvictor(size), db)
-                .also { instance = it }
+                File(context.cacheDir, "RNTP"),
+                LeastRecentlyUsedCacheEvictor(
+                  sizeKb * 1000 // kb to bytes
+                ),
+                db
+            ).also { instance = it }
         }
 
         return instance!!

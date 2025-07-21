@@ -156,8 +156,8 @@ abstract class BaseAudioPlayer internal constructor(
     }
 
     init {
-        if (options.cacheSize > 0) {
-            cache = Cache.initCache(context, options.cacheSize)
+        if (options.cacheSizeKb > 0) {
+            cache = Cache.initCache(context, options.cacheSizeKb)
         }
         playerEventHolder.updateAudioPlayerState(AudioPlayerState.IDLE)
 

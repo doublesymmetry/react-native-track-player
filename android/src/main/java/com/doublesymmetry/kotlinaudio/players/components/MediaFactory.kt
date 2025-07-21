@@ -32,7 +32,7 @@ import com.doublesymmetry.kotlinaudio.utils.isUriLocalFile
 class MediaFactory (
     private val context: Context,
     private val cache: SimpleCache?
-) : MediaSource.Factory{
+) : MediaSource.Factory {
 
     private val mediaFactory = DefaultMediaSourceFactory(context)
 
@@ -118,14 +118,13 @@ class MediaFactory (
     }
 
     private fun enableCaching(factory: DataSource.Factory): DataSource.Factory {
-        return if (cache == null) {
-            factory
+        if (cache == null) {
+            return factory
         } else {
-            CacheDataSource.Factory().apply {
-                setCache(cache!!)
-                setUpstreamDataSourceFactory(factory)
-                setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
-            }
+            return CacheDataSource.Factory()
+                .setCache(cache)
+                .setUpstreamDataSourceFactory(factory)
+                .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
         }
     }
 }

@@ -6,7 +6,7 @@ import androidx.media3.common.C
 import androidx.media3.common.util.UnstableApi
 
 data class PlayerOptions(
-    val cacheSize: Long = 0,
+    val cacheSizeKb: Long = 0,
     val audioContentType: Int = C.AUDIO_CONTENT_TYPE_MUSIC,
     val wakeMode: Int = 0,
     val handleAudioBecomingNoisy: Boolean = true,
