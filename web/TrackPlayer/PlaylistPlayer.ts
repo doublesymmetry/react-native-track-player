@@ -1,6 +1,6 @@
 import { Player } from './Player';
 
-import { State } from '../../src';
+import { State } from '../../src/constants/State';
 import type { Track } from '../../src/interfaces';
 import { RepeatMode } from './RepeatMode';
 

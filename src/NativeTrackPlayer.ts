@@ -1,5 +1,4 @@
-import type { TurboModule } from 'react-native';
-import { TurboModuleRegistry } from 'react-native';
+import { type TurboModule, TurboModuleRegistry } from 'react-native';
 import { type UnsafeObject } from 'react-native/Libraries/Types/CodegenTypes';
 
 export interface Spec extends TurboModule {
@@ -55,6 +54,7 @@ export interface Spec extends TurboModule {
 
   // constants
   getConstants: () => {
+    // Capabilities
     CAPABILITY_PLAY: number;
     CAPABILITY_PLAY_FROM_ID: number;
     CAPABILITY_PLAY_FROM_SEARCH: number;
@@ -90,6 +90,7 @@ export interface Spec extends TurboModule {
     REPEAT_TRACK: number;
     REPEAT_QUEUE: number;
 
+    // Pitch Algorithms - iOS
     PITCH_ALGORITHM_LINEAR: number;
     PITCH_ALGORITHM_MUSIC: number;
     PITCH_ALGORITHM_VOICE: number;
