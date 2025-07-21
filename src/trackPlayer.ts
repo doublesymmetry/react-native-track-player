@@ -208,14 +208,6 @@ export async function updateOptions(
     android: {
       ...options.android,
     },
-    icon: resolveImportedAsset(options.icon),
-    playIcon: resolveImportedAsset(options.playIcon),
-    pauseIcon: resolveImportedAsset(options.pauseIcon),
-    stopIcon: resolveImportedAsset(options.stopIcon),
-    previousIcon: resolveImportedAsset(options.previousIcon),
-    nextIcon: resolveImportedAsset(options.nextIcon),
-    rewindIcon: resolveImportedAsset(options.rewindIcon),
-    forwardIcon: resolveImportedAsset(options.forwardIcon),
   });
 }
 

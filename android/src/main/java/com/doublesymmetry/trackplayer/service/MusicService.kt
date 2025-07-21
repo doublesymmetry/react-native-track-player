@@ -263,13 +263,9 @@ class MusicService : HeadlessJsMediaService() {
         val capabilities =
             options.getIntegerArrayList("capabilities")?.map { Capability.entries[it] }
                 ?: emptyList()
-        var notificationCapabilities = (
-                options.getIntegerArrayList("notificationCapabilities")
-                    ?: options.getIntegerArrayList("compactCapabilities"))
+        var notificationCapabilities = options.getIntegerArrayList("notificationCapabilities")
             ?.map { Capability.entries[it] } ?: emptyList()
         if (notificationCapabilities.isEmpty()) notificationCapabilities = capabilities
-
-        val customActions = options.getBundle(CUSTOM_ACTIONS_KEY)
 
         val playerCommandsBuilder = Player.Commands.Builder().addAll(
             // HACK: without COMMAND_GET_CURRENT_MEDIA_ITEM, notification cannot be created
