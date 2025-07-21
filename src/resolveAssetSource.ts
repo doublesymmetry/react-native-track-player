@@ -1,3 +1,3 @@
-// @ts-expect-error because resolveAssetSource is untyped
-import resolve from 'react-native/Libraries/Image/resolveAssetSource';
+import { Image } from 'react-native';
+const resolve = Image.resolveAssetSource;
 export default resolve;
