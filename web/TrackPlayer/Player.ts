@@ -1,5 +1,5 @@
 import { State } from '../../src/constants/State';
-import type { Track, Progress, PlaybackState } from '../../src/interfaces';
+import type { PlaybackState, Progress, Track } from '../../src/interfaces';
 import { SetupNotCalledError } from './SetupNotCalledError';
 
 export class Player {
@@ -92,7 +92,7 @@ export class Player {
    */
   protected onStateUpdate(state: Exclude<State, State.Error>) {
     this.state = { state };
- }
+  }
 
   protected onError(error: any) {
     // unload the current track to allow for clean playback on other
@@ -114,6 +114,7 @@ export class Player {
    */
   public async load(track: Track) {
     if (!this.player) throw new SetupNotCalledError();
+    this.addHeaders(track);
     await this.player.load(track.url as string);
     this.current = track;
   }
@@ -135,8 +136,7 @@ export class Player {
     return this.element.play()
       .catch(err => {
         console.error(err);
-      })
-    ;
+      });
   }
 
   public pause() {
@@ -198,5 +198,20 @@ export class Player {
   public getBufferedPosition() {
     if (!this.element) throw new SetupNotCalledError();
     return this.element.buffered.end;
+  }
+
+  private addHeaders(track: Track) {
+    const networkingEngine = this.player?.getNetworkingEngine();
+    networkingEngine?.clearAllRequestFilters();
+    if (track.headers) {
+      networkingEngine?.registerRequestFilter((type, request) => {
+        if (type === 0 || type === 1) {
+          request.headers = {
+            ...track.headers,
+            ...request.headers,
+          }
+        }
+      });
+    }
   }
 }
