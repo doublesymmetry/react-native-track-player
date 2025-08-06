@@ -216,7 +216,7 @@ class MusicService : HeadlessJsMediaService() {
         )
         player = QueuedAudioPlayer(this@MusicService, options)
         fakePlayer.release()
-        mediaSession.player = player.exoPlayer
+        mediaSession.player = player.forwardingPlayer
         observeEvents()
     }
 
