@@ -44,7 +44,6 @@ import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.METADATA_PAYL
 import com.doublesymmetry.trackplayer.utils.BundleUtils
 import com.doublesymmetry.trackplayer.utils.BundleUtils.setRating
 import com.doublesymmetry.trackplayer.utils.CoilBitmapLoader
-import com.doublesymmetry.trackplayer.utils.buildMediaItem
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
 import com.google.common.collect.ImmutableList
@@ -65,11 +64,6 @@ class MusicService : HeadlessJsMediaService() {
     private lateinit var fakePlayer: ExoPlayer
     private lateinit var mediaSession: MediaLibrarySession
     private var progressUpdateJob: Job? = null
-    var mediaTree: Map<String, List<MediaItem>> = HashMap()
-    var mediaTreeStyle: List<Int> = listOf(
-        MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM,
-        MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM
-    )
     private var sessionCommands: SessionCommands? = null
     private var playerCommands: Player.Commands? = null
     private var customLayout: List<CommandButton> = listOf()
@@ -791,15 +785,6 @@ class MusicService : HeadlessJsMediaService() {
         return mediaSession
     }
 
-    fun notifyChildrenChanged() {
-        mediaSession.connectedControllers.forEach { controller ->
-            mediaTree.forEach { it ->
-                mediaSession.notifyChildrenChanged(controller, it.key, it.value.size, null)
-            }
-
-        }
-    }
-
     @MainThread
     override fun onHeadlessJsTaskFinish(taskId: Int) {
         // This is empty so ReactNative doesn't kill this service
@@ -881,11 +866,6 @@ class MusicService : HeadlessJsMediaService() {
         // HACK: I'm sure most of the callbacks were not implemented correctly.
         // ATM I only care that andorid auto still functions.
 
-        private val rootItem =
-            buildMediaItem(title = "root", mediaId = AA_ROOT_KEY, isPlayable = false)
-        private val forYouItem =
-            buildMediaItem(title = "For You", mediaId = AA_FOR_YOU_KEY, isPlayable = false)
-
         override fun onDisconnected(
             session: MediaSession,
             controller: MediaSession.ControllerInfo
@@ -962,100 +942,6 @@ class MusicService : HeadlessJsMediaService() {
             return super.onCustomCommand(session, controller, command, args)
         }
 
-        override fun onGetLibraryRoot(
-            session: MediaLibrarySession,
-            browser: MediaSession.ControllerInfo,
-            params: LibraryParams?
-        ): ListenableFuture<LibraryResult<MediaItem>> {
-            Timber.d("${browser.packageName}")
-            val rootExtras = Bundle().apply {
-                putBoolean("android.media.browse.CONTENT_STYLE_SUPPORTED", true)
-                putInt("android.media.browse.CONTENT_STYLE_BROWSABLE_HINT", mediaTreeStyle[0])
-                putInt("android.media.browse.CONTENT_STYLE_PLAYABLE_HINT", mediaTreeStyle[1])
-            }
-            val libraryParams = LibraryParams.Builder().setExtras(rootExtras).build()
-            // https://github.com/androidx/media/issues/1731#issuecomment-2411109462
-            val mRootItem = when (browser.packageName) {
-                "com.google.android.googlequicksearchbox" -> {
-                    if (mediaTree[AA_FOR_YOU_KEY] == null) rootItem else forYouItem
-                }
-
-                else -> rootItem
-            }
-            return Futures.immediateFuture(LibraryResult.ofItem(mRootItem, libraryParams))
-        }
-
-        override fun onGetChildren(
-            session: MediaLibrarySession,
-            browser: MediaSession.ControllerInfo,
-            parentId: String,
-            page: Int,
-            pageSize: Int,
-            params: LibraryParams?
-        ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-            emit(MusicEvents.BUTTON_BROWSE, Bundle().apply { putString("mediaId", parentId) });
-            return Futures.immediateFuture(
-                LibraryResult.ofItemList(
-                    mediaTree[parentId] ?: listOf(),
-                    null
-                )
-            )
-        }
-
-        override fun onGetItem(
-            session: MediaLibrarySession,
-            browser: MediaSession.ControllerInfo,
-            mediaId: String
-        ): ListenableFuture<LibraryResult<MediaItem>> {
-            Timber.d("${browser.packageName}, mediaId = $mediaId")
-            // emit(MusicEvents.BUTTON_PLAY_FROM_ID, Bundle().apply { putString("id", mediaId) })
-            return Futures.immediateFuture(LibraryResult.ofItem(rootItem, null))
-        }
-
-        override fun onSearch(
-            session: MediaLibrarySession,
-            browser: MediaSession.ControllerInfo,
-            query: String,
-            params: LibraryParams?
-        ): ListenableFuture<LibraryResult<Void>> {
-            Timber.d("${browser.packageName}, query = $query")
-            return super.onSearch(session, browser, query, params)
-        }
-
-        override fun onAddMediaItems(
-            mediaSession: MediaSession,
-            controller: MediaSession.ControllerInfo,
-            mediaItems: MutableList<MediaItem>
-        ): ListenableFuture<MutableList<MediaItem>> {
-            Timber.d("${controller.packageName}, ${mediaItems[0].mediaId}, ${mediaItems.size}")
-            return super.onAddMediaItems(mediaSession, controller, mediaItems)
-        }
-
-        override fun onSetMediaItems(
-            mediaSession: MediaSession,
-            controller: MediaSession.ControllerInfo,
-            mediaItems: MutableList<MediaItem>,
-            startIndex: Int,
-            startPositionMs: Long
-        ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
-            Timber.d("${controller.packageName}, ${mediaItems[0].toBundle()}")
-            if (mediaItems[0].requestMetadata.searchQuery == null) {
-                emit(MusicEvents.BUTTON_PLAY_FROM_ID, Bundle().apply {
-                    putString("id", mediaItems[0].mediaId)
-                })
-            } else {
-                emit(MusicEvents.BUTTON_PLAY_FROM_SEARCH, Bundle().apply {
-                    putString("query", mediaItems[0].requestMetadata.searchQuery)
-                })
-            }
-            return super.onSetMediaItems(
-                mediaSession,
-                controller,
-                mediaItems,
-                startIndex,
-                startPositionMs
-            )
-        }
 
         override fun onMediaButtonEvent(
             session: MediaSession,
@@ -1067,18 +953,6 @@ class MusicService : HeadlessJsMediaService() {
                 controllerInfo,
                 intent
             )
-        }
-
-        override fun onGetSearchResult(
-            session: MediaLibrarySession,
-            browser: MediaSession.ControllerInfo,
-            query: String,
-            page: Int,
-            pageSize: Int,
-            params: LibraryParams?
-        ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-            Timber.d("${browser.packageName}, $query")
-            return super.onGetSearchResult(session, browser, query, page, pageSize, params)
         }
 
         override fun onPlaybackResumption(
@@ -1149,13 +1023,9 @@ class MusicService : HeadlessJsMediaService() {
         const val IS_PAUSED_KEY = "paused"
 
         const val HANDLE_NOISY = "androidHandleAudioBecomingNoisy"
-        const val CROSSFADE = "crossfade"
         const val ALWAYS_SHOW_NEXT = "androidAlwaysShowNext"
         const val SKIP_SILENCE = "androidSkipSilence"
         const val WAKE_MODE = "androidWakeMode"
-
-        const val AA_FOR_YOU_KEY = "for-you"
-        const val AA_ROOT_KEY = "/"
 
         const val DEFAULT_JUMP_INTERVAL = 15.0
         const val DEFAULT_STOP_FOREGROUND_GRACE_PERIOD = 5

@@ -24,7 +24,6 @@ import com.facebook.react.bridge.*
 import androidx.media3.common.Player
 import androidx.media3.session.MediaBrowser
 import androidx.media3.session.SessionToken
-import com.doublesymmetry.trackplayer.utils.buildMediaItem
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -112,64 +111,6 @@ class MusicModule(reactContext: ReactApplicationContext) : NativeTrackPlayerSpec
 
     private fun bundleToTrack(bundle: Bundle): Track {
         return Track(context, bundle, musicService.ratingType)
-    }
-
-    private fun hashmapToMediaItem(hashmap: HashMap<String, String>): MediaItem {
-        val mediaUri = hashmap["mediaUri"]
-        val iconUri = hashmap["iconUri"]
-
-        val extras = Bundle()
-        hashmap["groupTitle"]?.let {
-            extras.putString(
-                MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_GROUP_TITLE, it)
-        }
-        hashmap["contentStyle"]?.toInt()?.let {
-            extras.putInt(
-                MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_SINGLE_ITEM, it)
-        }
-        hashmap["childrenPlayableContentStyle"]?.toInt()?.let {
-            extras.putInt(
-                MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_PLAYABLE, it)
-        }
-        hashmap["childrenBrowsableContentStyle"]?.toInt()?.let {
-            extras.putInt(
-                MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE, it)
-        }
-
-        // playbackProgress should contain a string representation of a number between 0 and 1 if present
-        hashmap["playbackProgress"]?.toDouble()?.let {
-            if (it > 0.98) {
-                extras.putInt(
-                    MediaConstants.DESCRIPTION_EXTRAS_KEY_COMPLETION_STATUS,
-                    MediaConstants.DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_FULLY_PLAYED)
-            } else if (it == 0.0) {
-                extras.putInt(
-                    MediaConstants.DESCRIPTION_EXTRAS_KEY_COMPLETION_STATUS,
-                    MediaConstants.DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_NOT_PLAYED)
-            } else {
-                extras.putInt(
-                    MediaConstants.DESCRIPTION_EXTRAS_KEY_COMPLETION_STATUS,
-                    MediaConstants.DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_PARTIALLY_PLAYED)
-                extras.putDouble(
-                    MediaConstants.DESCRIPTION_EXTRAS_KEY_COMPLETION_PERCENTAGE, it)
-            }
-        }
-        return buildMediaItem(
-            isPlayable = hashmap["playable"]?.toInt() != 1,
-            title = hashmap["title"],
-            mediaId = hashmap["mediaId"] ?: "no-media-id",
-            imageUri = if (iconUri != null) Uri.parse(iconUri) else null,
-            artist = hashmap["subtitle"],
-            subtitle = hashmap["subtitle"],
-            sourceUri = if (mediaUri != null) Uri.parse(mediaUri) else null,
-            extras = extras
-        )
-    }
-
-    private fun readableArrayToMediaItems(data: ArrayList<HashMap<String, String>>): MutableList<MediaItem> {
-        return data.map {
-            hashmapToMediaItem(it)
-        }.toMutableList()
     }
 
     private fun rejectWithException(callback: Promise, exception: Exception) {
