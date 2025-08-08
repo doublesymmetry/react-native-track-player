@@ -101,6 +101,9 @@ In the case where `query` is empty, feel free to select any track to play.
 ### `RemotePause`
 Fired when the user presses the pause button. Only fired if the [`Capability.Pause`](./constants/capability.md) is allowed or if there's a change in outputs (e.g.: headphone disconnected).
 
+### `RemotePlayPause` (Android Only)
+Fired on android when Android emits the [`KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE`](https://developer.android.com/reference/android/view/KeyEvent#KEYCODE_MEDIA_PLAY_PAUSE).
+
 ### `RemoteStop`
 Fired when the user presses the stop button. Only fired if the [`Capability.Stop`](./constants/capability.md) is allowed.
 
