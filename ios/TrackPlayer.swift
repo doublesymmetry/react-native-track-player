@@ -35,6 +35,7 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
         audioSessionController.delegate = self
         player.playWhenReady = false;
         player.event.receiveChapterMetadata.addListener(self, handleAudioPlayerChapterMetadataReceived)
+        player.event.receiveTimedMetadata.addListener(self, handleAudioPlayerTimedMetadataReceived)
         player.event.receiveCommonMetadata.addListener(self, handleAudioPlayerCommonMetadataReceived)
         player.event.stateChange.addListener(self, handleAudioPlayerStateChange)
         player.event.fail.addListener(self, handleAudioPlayerFailed)
@@ -731,6 +732,11 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
     func handleAudioPlayerChapterMetadataReceived(metadata: [AVTimedMetadataGroup]) {
         let metadataItems = MetadataAdapter.convertToGroupedMetadata(metadataGroups: metadata);
         emit(event: EventType.MetadataChapterReceived, body:  ["metadata": metadataItems])
+    }
+
+    func handleAudioPlayerTimedMetadataReceived(metadata: [AVTimedMetadataGroup]) {
+        let metadataItems = MetadataAdapter.convertToGroupedMetadata(metadataGroups: metadata);
+        emit(event: EventType.MetadataTimedReceived, body: ["metadata": metadataItems])
     }
 
     func handleAudioPlayerFailed(error: Error?) {
