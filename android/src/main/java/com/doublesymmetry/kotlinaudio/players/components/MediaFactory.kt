@@ -34,6 +34,10 @@ class MediaFactory (
     private val cache: SimpleCache?
 ) : MediaSource.Factory {
 
+    companion object {
+        private const val DEFAULT_USER_AGENT = "react-native-track-player"
+    }
+
     private val mediaFactory = DefaultMediaSourceFactory(context)
 
     override fun setDrmSessionManagerProvider(drmSessionManagerProvider: DrmSessionManagerProvider): MediaSource.Factory {
@@ -50,7 +54,7 @@ class MediaFactory (
 
     override fun createMediaSource(mediaItem: MediaItem): MediaSource {
 
-        val userAgent = mediaItem.mediaMetadata.extras?.getString("user-agent")
+        val userAgent = mediaItem.mediaMetadata.extras?.getString("user-agent") ?: DEFAULT_USER_AGENT
         val headers = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             mediaItem.mediaMetadata.extras?.getSerializable("headers", HashMap::class.java)
         } else {
