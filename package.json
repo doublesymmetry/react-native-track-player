@@ -2,13 +2,13 @@
   "name": "react-native-track-player",
   "version": "4.1.1",
   "description": "A fully fledged audio module created for music apps",
-  "main": "./lib/module/index.js",
-  "types": "./lib/typescript/src/index.d.ts",
+  "main": "./src/index.tsx",
+  "types": "./src/index.tsx",
   "exports": {
     ".": {
       "source": "./src/index.tsx",
-      "types": "./lib/typescript/src/index.d.ts",
-      "default": "./lib/module/index.js"
+      "types": "./src/index.tsx",
+      "default": "./src/index.tsx"
     },
     "./package.json": "./package.json"
   },
