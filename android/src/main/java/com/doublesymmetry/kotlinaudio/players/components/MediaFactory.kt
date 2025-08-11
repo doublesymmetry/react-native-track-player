@@ -35,7 +35,7 @@ class MediaFactory (
 ) : MediaSource.Factory {
 
     companion object {
-        private const val DEFAULT_USER_AGENT = "react-native-track-player/5.0.0"
+        private const val DEFAULT_USER_AGENT = "react-native-track-player"
     }
 
     private val mediaFactory = DefaultMediaSourceFactory(context)
