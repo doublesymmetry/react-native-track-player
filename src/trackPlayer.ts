@@ -241,6 +241,15 @@ export function updateNowPlayingMetadata(
   });
 }
 
+/**
+ * Gets the metadata content of the notification (Android) and the Now Playing Center (iOS).
+ */
+export async function getNowPlayingMetadata(): Promise<
+  NowPlayingMetadata | undefined
+> {
+  return (await TrackPlayer.getNowPlayingMetadata()) ?? undefined;
+}
+
 // MARK: - Player API
 
 /**

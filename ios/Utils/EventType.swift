@@ -24,6 +24,7 @@ enum EventType: String, CaseIterable {
     case MetadataChapterReceived = "metadata-chapter-received"
     case MetadataTimedReceived = "metadata-timed-received"
     case MetadataCommonReceived = "metadata-common-received"
+    case NowPlayingMetadataChanged = "now-playing-metadata-changed"
 
     static func allRawValues() -> [String] {
         return allCases.map { $0.rawValue }

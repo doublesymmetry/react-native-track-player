@@ -8,6 +8,7 @@ import type {
   AndroidControllerConnectedEvent,
   AndroidControllerDisconnectedEvent,
 } from './ControllerConnectedEvent';
+import type { NowPlayingMetadataChangedEvent } from './NowPlayingMetadataChangedEvent';
 import type { PlaybackActiveTrackChangedEvent } from './PlaybackActiveTrackChangedEvent';
 import type { PlaybackErrorEvent } from './PlaybackErrorEvent';
 import type { PlaybackPlayWhenReadyChangedEvent } from './PlaybackPlayWhenReadyChangedEvent';
@@ -55,6 +56,7 @@ export type EventPayloadByEvent = {
   [Event.MetadataCommonReceived]: AudioCommonMetadataReceivedEvent;
   [Event.AndroidConnectorConnected]: AndroidControllerConnectedEvent;
   [Event.AndroidConnectorDisconnected]: AndroidControllerDisconnectedEvent;
+  [Event.NowPlayingMetadataChanged]: NowPlayingMetadataChangedEvent;
 };
 
 type Simplify<T> = { [KeyType in keyof T]: T[KeyType] } & {};

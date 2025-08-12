@@ -27,6 +27,7 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
     private var sessionCategoryMode: AVAudioSession.Mode = .default
     private var sessionCategoryPolicy: AVAudioSession.RouteSharingPolicy = .default
     private var sessionCategoryOptions: AVAudioSession.CategoryOptions = []
+    private var nowPlayingMetadata: [String: Any] = [:]
 
     // MARK: - Lifecycle Methods
 
@@ -662,6 +663,11 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
 
         if (player.currentIndex == trackIndex) {
             Metadata.update(for: player, with: metadata)
+
+            nowPlayingMetadata = metadata
+            emit(event: EventType.NowPlayingMetadataChanged, body: [
+              "metadata": metadata,
+            ] as [String : Any])
         }
 
         resolve(NSNull())
@@ -672,7 +678,20 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
         if (rejectWhenNotInitialized(reject: reject)) { return }
 
         Metadata.update(for: player, with: metadata)
+        
+        nowPlayingMetadata = metadata
+        emit(event: EventType.NowPlayingMetadataChanged, body: [
+          "metadata": metadata,
+        ] as [String : Any])
+
         resolve(NSNull())
+    }
+
+    @objc
+    public func getNowPlayingMetadata(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        if (rejectWhenNotInitialized(reject: reject)) { return }
+
+        resolve(nowPlayingMetadata)
     }
 
     private func getPlaybackStateErrorKeyValues() -> Dictionary<String, Any> {
@@ -727,6 +746,9 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
     func handleAudioPlayerCommonMetadataReceived(metadata: [AVMetadataItem]) {
         let commonMetadata = MetadataAdapter.convertToCommonMetadata(metadata: metadata, skipRaw: true)
         emit(event: EventType.MetadataCommonReceived, body: ["metadata": commonMetadata])
+
+        nowPlayingMetadata = commonMetadata
+        emit(event: EventType.NowPlayingMetadataChanged, body: ["metadata": commonMetadata])
     }
 
     func handleAudioPlayerChapterMetadataReceived(metadata: [AVTimedMetadataGroup]) {
