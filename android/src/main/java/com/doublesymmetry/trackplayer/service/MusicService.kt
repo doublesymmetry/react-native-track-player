@@ -68,6 +68,7 @@ class MusicService : HeadlessJsMediaService() {
     private var playerCommands: Player.Commands? = null
     private var customLayout: List<CommandButton> = listOf()
     private var lastWake: Long = 0
+    private var nowPlayingMetadata: Bundle? = Bundle()
     var onStartCommandIntentValid: Boolean = true
 
     fun acquireWakeLock() {
@@ -500,6 +501,11 @@ class MusicService : HeadlessJsMediaService() {
         updateMetadataForTrack(player.currentIndex, bundle)
     }
 
+    @MainThread
+    fun getNowPlayingMetadata(): Bundle? {
+        return nowPlayingMetadata
+    }
+
     private fun emitPlaybackTrackChangedEvents(
         previousIndex: Int?,
         oldPosition: Double
@@ -628,6 +634,11 @@ class MusicService : HeadlessJsMediaService() {
                         putString("date", metadata.date)
                         putString("genre", metadata.genre)
                         emit(MusicEvents.PLAYBACK_METADATA, this)
+
+                        nowPlayingMetadata = this
+                        val eventPayload = Bundle()
+                        eventPayload.putBundle("metadata", this!!.clone() as Bundle)
+                        emit(MusicEvents.NOW_PLAYING_METADATA_CHANGED, eventPayload)
                     }
                 }
             }
@@ -640,6 +651,12 @@ class MusicService : HeadlessJsMediaService() {
                     putBundle(METADATA_PAYLOAD_KEY, data)
                 }
                 emit(MusicEvents.METADATA_COMMON_RECEIVED, bundle)
+                
+                nowPlayingMetadata = data
+                val eventPayload = Bundle()
+                eventPayload.putBundle("metadata", data!!.clone() as Bundle)
+                emit(MusicEvents.NOW_PLAYING_METADATA_CHANGED, eventPayload)
+                emit(MusicEvents.NOW_PLAYING_METADATA_CHANGED, eventPayload)
             }
         }
 

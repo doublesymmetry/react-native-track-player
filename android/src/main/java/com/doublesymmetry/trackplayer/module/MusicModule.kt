@@ -338,6 +338,13 @@ class MusicModule(reactContext: ReactApplicationContext) : NativeTrackPlayerSpec
         callback.resolve(null)
     }
 
+    override fun getNowPlayingMetadata(callback: Promise) = launchInScope {
+        if (verifyServiceBoundOrReject(callback)) return@launchInScope
+
+        val metadata = musicService.getNowPlayingMetadata()
+        callback.resolve(metadata?.let { Arguments.fromBundle(it) })
+    }
+    
     override fun removeUpcomingTracks(callback: Promise) = launchInScope {
         if (verifyServiceBoundOrReject(callback)) return@launchInScope
 

@@ -76,4 +76,8 @@ export async function PlaybackService() {
   TrackPlayer.addEventListener(Event.MetadataCommonReceived, (event) => {
     console.log('Event.MetadataCommonReceived', event);
   });
+
+  TrackPlayer.addEventListener(Event.NowPlayingMetadataChanged, (event) => {
+    console.log('Event.NowPlayingMetadataChanged', event);
+  });
 }
