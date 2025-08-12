@@ -1,3 +1,23 @@
+## [4.1.2](https://github.com/doublesymmetry/react-native-track-player/compare/v4.1.1...v4.1.2) (2025-08-12)
+
+
+### Bug Fixes
+
+* **android:** correct onBind method signature in MusicService.kt ([#2451](https://github.com/doublesymmetry/react-native-track-player/issues/2451)) ([e8701be](https://github.com/doublesymmetry/react-native-track-player/commit/e8701be9f7876ae3c80d7cfdfca7e90c40d6c389))
+* **component:** fixed example slider to include tap events and error styling ([#2376](https://github.com/doublesymmetry/react-native-track-player/issues/2376)) ([a486121](https://github.com/doublesymmetry/react-native-track-player/commit/a486121912eda10981c0c80a307fa7fb40998d0c))
+* **docs:** typo ([#2322](https://github.com/doublesymmetry/react-native-track-player/issues/2322)) ([e049abb](https://github.com/doublesymmetry/react-native-track-player/commit/e049abbd935493bc40cd0a4d9edc25a804dd94ab))
+* **web:** Fix error message when calling setupPlayer twice ([#2364](https://github.com/doublesymmetry/react-native-track-player/issues/2364)) ([bc55ca1](https://github.com/doublesymmetry/react-native-track-player/commit/bc55ca13b9136225b148449fa60e341b0c090be8))
+* **web:** fix issues with certain bundlers only containing `default` … ([#2299](https://github.com/doublesymmetry/react-native-track-player/issues/2299)) ([a89d785](https://github.com/doublesymmetry/react-native-track-player/commit/a89d7856c25e2cf5a440e996dd4976292b67feda))
+* **web:** fix issues with repeat mode and track add logic ([#2291](https://github.com/doublesymmetry/react-native-track-player/issues/2291)) ([6c4a3bd](https://github.com/doublesymmetry/react-native-track-player/commit/6c4a3bd7d47c6ba8c85db4c1d031dc904bb0cd1a))
+* **web:** preserve playback rate across tracks ([#2475](https://github.com/doublesymmetry/react-native-track-player/issues/2475)) ([eb32a97](https://github.com/doublesymmetry/react-native-track-player/commit/eb32a9781f16ee4912b98f7317e3d9cd188a020a))
+
+
+### Features
+
+* **web:** add setQueue method ([#2394](https://github.com/doublesymmetry/react-native-track-player/issues/2394)) ([2765d09](https://github.com/doublesymmetry/react-native-track-player/commit/2765d09cb93541d89be94a4809320e4df33c0d47))
+
+
+
 # [4.1.1](https://github.com/doublesymmetry/react-native-track-player/compare/v4.1.0...v4.1.1) (2024-03-26)
 
 - **RN:** Fixes an issue when using local assets in release builds
