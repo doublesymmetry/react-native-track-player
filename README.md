@@ -184,19 +184,19 @@ All the documentation on how to work on the library and it's dependencies is
 
 ## Release
 
-The standard release command for this project is [`yarn version`](https://classic.yarnpkg.com/lang/en/docs/cli/version/).
+The standard release command for this project is [`yarn release`](https://github.com/release-it/release-it).
 
 ```
-yarn version [--major | --minor | --patch | --new-version <version>]
+yarn release [major | minor | patch | --increment=<version>]
 ```
 
 Ex.
 
 ```
-yarn version --new-version 1.2.17
-yarn version --patch // 1.2.17 -> 1.2.18
-yarn version --minor // 1.2.18 -> 1.3.0
-yarn version --major // 2.0.0
+yarn release --increment=1.2.17
+yarn release --patch // 1.2.17 -> 1.2.18
+yarn release --minor // 1.2.18 -> 1.3.0
+yarn release --major // 2.0.0
 ```
 
 This command will:

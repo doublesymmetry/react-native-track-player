@@ -106,7 +106,7 @@
     "@react-native-community/cli": "15.0.0-alpha.2",
     "@react-native/babel-preset": "0.79.2",
     "@react-native/eslint-config": "^0.78.0",
-    "@release-it/conventional-changelog": "^9.0.2",
+    "@release-it/conventional-changelog": "^10.0.1",
     "@types/jest": "^29.5.5",
     "@types/react": "^19.0.0",
     "commitlint": "^19.6.1",
@@ -143,20 +143,33 @@
   },
   "release-it": {
     "git": {
-      "commitMessage": "chore: release ${version}",
+      "commitMessage": "v${version}",
       "tagName": "v${version}"
     },
     "npm": {
       "publish": true
     },
     "github": {
-      "release": true
+      "release": false
     },
     "plugins": {
       "@release-it/conventional-changelog": {
         "preset": {
-          "name": "angular"
-        }
+          "name": "conventionalcommits",
+          "types": [
+            {
+              "type": "feat",
+              "section": "Features"
+            },
+            {
+              "type": "fix",
+              "section": "Bug Fixes"
+            },
+            {}
+          ]
+        },
+        "infile": "CHANGELOG.md",
+        "releaseCount": 0
       }
     }
   },
@@ -202,5 +215,8 @@
     "languages": "kotlin-objc",
     "type": "turbo-module",
     "version": "0.51.0"
+  },
+  "resolutions": {
+    "conventional-changelog-conventionalcommits": "8.0.0"
   }
 }
