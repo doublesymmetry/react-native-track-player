@@ -26,9 +26,23 @@ export const useActiveTrack = (): Track | undefined => {
   }, []);
 
   useTrackPlayerEvents(
-    [Event.PlaybackActiveTrackChanged],
-    async ({ track: newTrack }) => {
-      setTrack(newTrack ?? undefined);
+    [Event.PlaybackActiveTrackChanged, Event.MetadataCommonReceived],
+    async (event) => {
+      if (event.type === Event.PlaybackActiveTrackChanged) {
+        setTrack(event.track ?? undefined);
+      } else {
+        setTrack((prevTrack) => {
+          if (!prevTrack) {
+            return undefined;
+          }
+
+          return {
+            ...prevTrack,
+            ...event.metadata,
+            artwork: event.metadata?.artworkUri,
+          };
+        });
+      }
     }
   );
 
