@@ -486,18 +486,35 @@ class MusicService : HeadlessJsMediaService() {
         return bundle
     }
 
+    // Updates current track in player, as well as now playing notification.
     @MainThread
     fun updateMetadataForTrack(index: Int, bundle: Bundle) {
         tracks[index].let { currentTrack ->
             currentTrack.setMetadata(reactContext, bundle, 0)
 
             player.replaceItem(index, currentTrack.toAudioItem())
+
+            val eventBundle = Bundle().apply {
+                putInt("index", index)
+                putBundle("track", currentTrack.originalItem)
+            }
+            emit(MusicEvents.TRACK_METADATA_UPDATED, eventBundle)
         }
     }
 
+    // Updates only now playing notification, without affecting stored track in player.
     @MainThread
     fun updateNowPlayingMetadata(bundle: Bundle) {
-        updateMetadataForTrack(player.currentIndex, bundle)
+        val nowPlayingTrack = currentTrack ?: return
+
+        nowPlayingTrack?.setMetadata(reactContext, bundle, 0)
+        player.replaceItem(player.currentIndex, nowPlayingTrack.toAudioItem())
+
+        val eventBundle = Bundle().apply {
+            putInt("index", player.currentIndex)
+            putBundle("track", nowPlayingTrack.originalItem)
+        }
+        emit(MusicEvents.NOW_PLAYING_METADATA_UPDATED, eventBundle)
     }
 
     private fun emitPlaybackTrackChangedEvents(

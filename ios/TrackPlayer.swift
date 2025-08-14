@@ -652,10 +652,12 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
         resolve(getPlaybackStateBodyKeyValues(state: player.playerState))
     }
 
+    // Updates current track in player, as well as Now Playing information in the Now Playing Center.
     @objc
     public func updateMetadata(for trackIndex: Int, metadata: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
         if (rejectWhenTrackIndexOutOfBounds(index: trackIndex, reject: reject)) { return }
+
 
         let track : Track = player.items[trackIndex] as! Track;
         track.updateMetadata(dictionary: metadata)
@@ -664,14 +666,35 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
             Metadata.update(for: player, with: metadata)
         }
 
+        emit(event: EventType.TrackMetadataUpdated, body: [
+            "index": trackIndex,
+            "track": track.toObject()
+        ])
+
         resolve(NSNull())
     }
 
+    // Updates only Now Playing information in the Now Playing Center, without affecting stored track in player.
     @objc
     public func updateNowPlayingMetadata(metadata: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
+        if (rejectWhenTrackIndexOutOfBounds(index: player.currentIndex, reject: reject)) { return }
 
+        let currentTrack = player.items[player.currentIndex] as! Track
+        
+        // Create a temporary copy of the current track to get merged metadata
+        let tempTrack = Track(dictionary: currentTrack.toObject())
+        tempTrack?.updateMetadata(dictionary: metadata)
+        
         Metadata.update(for: player, with: metadata)
+
+        if let tempTrack = tempTrack {
+            emit(event: EventType.NowPlayingMetadataUpdated, body: [
+                "index": player.currentIndex,
+                "track": tempTrack.toObject()
+            ])
+        }
+
         resolve(NSNull())
     }
 
@@ -726,6 +749,7 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
 
     func handleAudioPlayerCommonMetadataReceived(metadata: [AVMetadataItem]) {
         let commonMetadata = MetadataAdapter.convertToCommonMetadata(metadata: metadata, skipRaw: true)
+        NSLog("commonMetadata: %@", metadata)
         emit(event: EventType.MetadataCommonReceived, body: ["metadata": commonMetadata])
     }
 
