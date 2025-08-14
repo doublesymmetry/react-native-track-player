@@ -203,3 +203,20 @@ Fired when a track's metadata has been updated using `updateMetadataForTrack`. C
 | ----- | ---- | ----------- |
 | index | `number` | The index of the track that was updated |
 | track | `Track` | The track object with updated metadata |
+
+### `TrackMetadataUpdated`
+Fired when a track's metadata has been updated using `updateMetadataForTrack`. Contains information about the track that was updated.
+
+| Param | Type | Description |
+| ----- | ---- | ----------- |
+| index | `number` | The index of the track that was updated |
+| track | `Track` | The track object with updated metadata |
+
+### `NowPlayingMetadataUpdated`
+
+Fired when a track's metadata has been updated using `updateNowPlayingMetadata`. Contains information about the track that was updated.
+
+| Param | Type     | Description                             |
+| ----- | -------- | --------------------------------------- |
+| index | `number` | The index of the track that was updated |
+| track | `Track`  | The track object with updated metadata  |
