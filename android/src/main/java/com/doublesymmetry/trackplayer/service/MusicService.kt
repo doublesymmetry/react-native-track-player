@@ -486,6 +486,7 @@ class MusicService : HeadlessJsMediaService() {
         return bundle
     }
 
+    // Updates current track in player, as well as Now Playing information in lock screen notification.
     @MainThread
     fun updateMetadataForTrack(index: Int, bundle: Bundle) {
         tracks[index].let { currentTrack ->
@@ -501,13 +502,19 @@ class MusicService : HeadlessJsMediaService() {
         }
     }
 
+    // Updates only Now Playing information in lock screen notification, without affecting stored track in player.
     @MainThread
     fun updateNowPlayingMetadata(bundle: Bundle) {
         val nowPlayingTrack = currentTrack ?: return
-      
+
         nowPlayingTrack?.setMetadata(reactContext, bundle, 0)
         player.replaceItem(player.currentIndex, nowPlayingTrack.toAudioItem())
 
+        val eventBundle = Bundle().apply {
+            putInt("index", player.currentIndex)
+            putBundle("track", nowPlayingTrack.originalItem)
+        }
+        emit(MusicEvents.NOW_PLAYING_METADATA_UPDATED, eventBundle)
     }
 
     private fun emitPlaybackTrackChangedEvents(
