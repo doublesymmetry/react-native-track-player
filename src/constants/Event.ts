@@ -127,8 +127,8 @@ export enum Event {
    **/
   MetadataCommonReceived = 'metadata-common-received',
   /**
-   * Fired when common (static) metadata is received.
-   * See https://rntp.dev/docs/api/events#commonmetadatareceived
+   * Fired after calling `TrackPlayer.updateMetadata`.
+   * See https://rntp.dev/docs/api/events#trackmetadataupdated
    **/
   TrackMetadataUpdated = 'track-metadata-updated',
   /**
