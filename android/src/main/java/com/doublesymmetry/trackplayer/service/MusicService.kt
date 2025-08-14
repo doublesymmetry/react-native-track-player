@@ -503,7 +503,11 @@ class MusicService : HeadlessJsMediaService() {
 
     @MainThread
     fun updateNowPlayingMetadata(bundle: Bundle) {
-        updateMetadataForTrack(player.currentIndex, bundle)
+        val nowPlayingTrack = currentTrack ?: return
+      
+        nowPlayingTrack?.setMetadata(reactContext, bundle, 0)
+        player.replaceItem(player.currentIndex, nowPlayingTrack.toAudioItem())
+
     }
 
     private fun emitPlaybackTrackChangedEvents(
