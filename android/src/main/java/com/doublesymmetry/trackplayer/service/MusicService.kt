@@ -492,6 +492,12 @@ class MusicService : HeadlessJsMediaService() {
             currentTrack.setMetadata(reactContext, bundle, 0)
 
             player.replaceItem(index, currentTrack.toAudioItem())
+
+            val eventBundle = Bundle().apply {
+                putInt("index", index)
+                putBundle("track", currentTrack.originalItem)
+            }
+            emit(MusicEvents.TRACK_METADATA_UPDATED, eventBundle)
         }
     }
 
