@@ -486,7 +486,7 @@ class MusicService : HeadlessJsMediaService() {
         return bundle
     }
 
-    // Updates current track in player, as well as Now Playing information in lock screen notification.
+    // Updates current track in player, as well as now playing notification.
     @MainThread
     fun updateMetadataForTrack(index: Int, bundle: Bundle) {
         tracks[index].let { currentTrack ->
@@ -502,7 +502,7 @@ class MusicService : HeadlessJsMediaService() {
         }
     }
 
-    // Updates only Now Playing information in lock screen notification, without affecting stored track in player.
+    // Updates only now playing notification, without affecting stored track in player.
     @MainThread
     fun updateNowPlayingMetadata(bundle: Bundle) {
         val nowPlayingTrack = currentTrack ?: return

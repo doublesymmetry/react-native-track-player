@@ -652,7 +652,7 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
         resolve(getPlaybackStateBodyKeyValues(state: player.playerState))
     }
 
-    // Updates current track in player, as well as Now Playing information in Notification Center.
+    // Updates current track in player, as well as Now Playing information in the Now Playing Center.
     @objc
     public func updateMetadata(for trackIndex: Int, metadata: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
@@ -674,7 +674,7 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
         resolve(NSNull())
     }
 
-    // Updates only Now Playing information in Notification Center, without affecting stored track in player.
+    // Updates only Now Playing information in the Now Playing Center, without affecting stored track in player.
     @objc
     public func updateNowPlayingMetadata(metadata: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }

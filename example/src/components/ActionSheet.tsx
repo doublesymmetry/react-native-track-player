@@ -23,8 +23,12 @@ const getRandomArtwork = () => {
   return ARTWORK_URLS[randomIndex];
 };
 
-// Merges current metadata with random title & artwork.
-// artist remains unchanged, because no artist value is provided.
+/**
+ * Merges current now playing metadata with random title & artwork.
+ * artist remains unchanged, because no artist value is provided.
+ * This function updates now playing metadata, without changing
+ * the underlying track object & its metadata.
+ */
 const onUpdateNotificationMetadata = async () => {
   const randomTitle = Math.random().toString(36).substring(7);
   await TrackPlayer.updateNowPlayingMetadata({
@@ -33,6 +37,12 @@ const onUpdateNotificationMetadata = async () => {
   });
 };
 
+/**
+ * Merges current metadata with random title, artwork and duration.
+ * artist remains unchanged, because no artist value is provided.
+ * This function updates the stored metadata for the current track, as
+ * well as now playing metadata.
+ */
 const onUpdateCurrentTrackMetadata = async () => {
   const currentTrackIndex = await TrackPlayer.getActiveTrackIndex();
   if (currentTrackIndex !== undefined) {
@@ -45,7 +55,11 @@ const onUpdateCurrentTrackMetadata = async () => {
   }
 };
 
-// Removes artwork and artist for the current track, by setting them to empty strings.
+/**
+ * Removes artwork and artist for the current track, by setting them to empty strings.
+ * This function updates the stored metadata for the current track, as
+ * well as now playing metadata.
+ */
 const onRemoveArtworkAndArtist = async () => {
   const currentTrackIndex = await TrackPlayer.getActiveTrackIndex();
   if (currentTrackIndex !== undefined) {
