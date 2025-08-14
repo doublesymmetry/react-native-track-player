@@ -677,7 +677,8 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
     public func updateNowPlayingMetadata(metadata: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
 
-        updateMetadata(for: player.currentIndex, metadata: metadata, resolve: resolve, reject: reject)
+        Metadata.update(for: player, with: metadata)
+        resolve(NSNull())
     }
 
     private func getPlaybackStateErrorKeyValues() -> Dictionary<String, Any> {
