@@ -132,6 +132,11 @@ export enum Event {
    **/
   TrackMetadataUpdated = 'track-metadata-updated',
   /**
+   * Fired after calling `TrackPlayer.updateNowPlayingMetadata`.
+   * See https://rntp.dev/docs/api/events#nowplayingmetadataupdated
+   **/
+  NowPlayingMetadataUpdated = 'now-playing-metadata-updated',
+  /**
    * Fired when an android connector connects to MusicService.
    * typical controllers are media notification and Android Auto.
    **/

@@ -80,4 +80,8 @@ export async function PlaybackService() {
   TrackPlayer.addEventListener(Event.TrackMetadataUpdated, (event) => {
     console.log('Event.TrackMetadataUpdated', event);
   });
+
+  TrackPlayer.addEventListener(Event.NowPlayingMetadataUpdated, (event) => {
+    console.log('Event.NowPlayingMetadataUpdated', event);
+  });
 }
