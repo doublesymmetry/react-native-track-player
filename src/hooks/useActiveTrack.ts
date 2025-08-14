@@ -26,22 +26,19 @@ export const useActiveTrack = (): Track | undefined => {
   }, []);
 
   useTrackPlayerEvents(
-    [Event.PlaybackActiveTrackChanged, Event.MetadataCommonReceived],
+    [Event.PlaybackActiveTrackChanged, Event.TrackMetadataUpdated],
     async (event) => {
       if (event.type === Event.PlaybackActiveTrackChanged) {
         setTrack(event.track ?? undefined);
-      } else {
-        setTrack((prevTrack) => {
-          if (!prevTrack) {
-            return undefined;
-          }
+        return;
+      }
 
-          return {
-            ...prevTrack,
-            ...event.metadata,
-            artwork: event.metadata?.artworkUri,
-          };
-        });
+      if (
+        event.type === Event.TrackMetadataUpdated &&
+        track?.url === event.track?.url
+      ) {
+        // Update the active track if the updated track is the current active one
+        setTrack(event.track);
       }
     }
   );

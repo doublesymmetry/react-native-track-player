@@ -664,6 +664,12 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
             Metadata.update(for: player, with: metadata)
         }
 
+        // Emit metadata updated event with the full track data
+        emit(event: EventType.TrackMetadataUpdated, body: [
+            "index": trackIndex,
+            "track": track.toObject()
+        ])
+
         resolve(NSNull())
     }
 
@@ -671,8 +677,7 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
     public func updateNowPlayingMetadata(metadata: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
 
-        Metadata.update(for: player, with: metadata)
-        resolve(NSNull())
+        updateMetadata(for: player.currentIndex, metadata: metadata, resolve: resolve, reject: reject)
     }
 
     private func getPlaybackStateErrorKeyValues() -> Dictionary<String, Any> {
@@ -726,6 +731,7 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
 
     func handleAudioPlayerCommonMetadataReceived(metadata: [AVMetadataItem]) {
         let commonMetadata = MetadataAdapter.convertToCommonMetadata(metadata: metadata, skipRaw: true)
+        NSLog("commonMetadata: %@", metadata)
         emit(event: EventType.MetadataCommonReceived, body: ["metadata": commonMetadata])
     }
 
