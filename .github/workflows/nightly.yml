@@ -14,16 +14,14 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
-          node-version: 16.x
+          node-version: 22.x
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Build Library
         run: yarn build
       - name: Extract Version
         run: echo "LIB_VERSION=$(cat package.json | jq -r .version)" >> $GITHUB_ENV
-      - name: Set Nightly Version
-        run: yarn version --no-git-tag-version --no-commit-hooks --new-version ${{ env.LIB_VERSION }}-nightly-${{ github.sha }}
-      - uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
-          tag: nightly
+      - name: Publish Nightly Version
+        run: yarn release-it --ci --no-increment --no-git --no-plugins --npm.tag "nightly" ${{ env.LIB_VERSION }}-nightly-${{ github.sha }}
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
