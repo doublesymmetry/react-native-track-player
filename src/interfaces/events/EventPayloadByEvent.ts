@@ -23,6 +23,8 @@ import type { RemotePlaySearchEvent } from './RemotePlaySearchEvent';
 import type { RemoteSeekEvent } from './RemoteSeekEvent';
 import type { RemoteSetRatingEvent } from './RemoteSetRatingEvent';
 import type { RemoteSkipEvent } from './RemoteSkipEvent';
+import type { TrackMetadataUpdatedEvent } from './TrackMetadataUpdatedEvent';
+import type { NowPlayingMetadataUpdatedEvent } from './NowPlayingMetadataUpdatedEvent';
 
 export type EventPayloadByEvent = {
   [Event.PlayerError]: PlayerErrorEvent;
@@ -55,6 +57,8 @@ export type EventPayloadByEvent = {
   [Event.MetadataCommonReceived]: AudioCommonMetadataReceivedEvent;
   [Event.AndroidConnectorConnected]: AndroidControllerConnectedEvent;
   [Event.AndroidConnectorDisconnected]: AndroidControllerDisconnectedEvent;
+  [Event.TrackMetadataUpdated]: TrackMetadataUpdatedEvent;
+  [Event.NowPlayingMetadataUpdated]: NowPlayingMetadataUpdatedEvent;
 };
 
 type Simplify<T> = { [KeyType in keyof T]: T[KeyType] } & {};

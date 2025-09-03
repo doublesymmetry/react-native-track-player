@@ -51,6 +51,8 @@ class MusicEvents(private val reactContext: ReactContext) : BroadcastReceiver() 
         const val METADATA_TIMED_RECEIVED = "metadata-timed-received"
         const val METADATA_COMMON_RECEIVED = "metadata-common-received"
         const val METADATA_PAYLOAD_KEY = "metadata"
+        const val TRACK_METADATA_UPDATED = "track-metadata-updated"
+        const val NOW_PLAYING_METADATA_UPDATED = "now-playing-metadata-updated"
 
         // Other
         const val PLAYER_ERROR = "player-error"

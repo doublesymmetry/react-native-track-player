@@ -26,9 +26,20 @@ export const useActiveTrack = (): Track | undefined => {
   }, []);
 
   useTrackPlayerEvents(
-    [Event.PlaybackActiveTrackChanged],
-    async ({ track: newTrack }) => {
-      setTrack(newTrack ?? undefined);
+    [Event.PlaybackActiveTrackChanged, Event.TrackMetadataUpdated],
+    async (event) => {
+      if (event.type === Event.PlaybackActiveTrackChanged) {
+        setTrack(event.track ?? undefined);
+        return;
+      }
+
+      if (
+        event.type === Event.TrackMetadataUpdated &&
+        track?.url === event.track?.url
+      ) {
+        // Update the active track if the updated track is the current active one
+        setTrack(event.track);
+      }
     }
   );
 

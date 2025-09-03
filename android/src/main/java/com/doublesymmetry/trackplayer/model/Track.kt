@@ -28,7 +28,24 @@ class Track
 
     override fun setMetadata(context: Context, bundle: Bundle?, ratingType: Int) {
         super.setMetadata(context, bundle, ratingType)
-        originalItem.putAll(bundle)
+        // Only update originalItem with fields that were actually provided
+        bundle?.keySet()?.forEach { key ->
+            originalItem.putAll(Bundle().apply {
+                putValue(key, bundle.get(key))
+            })
+        }
+    }
+
+    private fun Bundle.putValue(key: String, value: Any?) {
+        when (value) {
+            null -> remove(key)
+            is String -> putString(key, value)
+            is Int -> putInt(key, value)
+            is Double -> putDouble(key, value)
+            is Boolean -> putBoolean(key, value)
+            is Bundle -> putBundle(key, value)
+            // Add other types as needed
+        }
     }
 
     fun toAudioItem(): TrackAudioItem {
