@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: 22.x
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
       - name: Build Library
         run: yarn build
       - name: Extract Version
@@ -25,3 +25,4 @@ jobs:
         run: yarn release-it --ci --no-increment --no-git --no-plugins --npm.tag "nightly" ${{ env.LIB_VERSION }}-nightly-${{ github.sha }}
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
