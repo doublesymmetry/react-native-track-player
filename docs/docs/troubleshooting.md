@@ -7,7 +7,7 @@ sidebar_position: 10
 ## iOS: (Enable Swift) `library not found for -lswiftCoreAudio for architecture x86_64`
 Because the iOS module uses Swift, if the user is using a standard react-native application they'll need to add support for Swift in the project. This can easily be done by adding a swift file to the Xcode project -- could be called `dummy.swift` and saying yes when prompted if you'd like to generate a bridging header.
 
-![Importing Swift](https://i.imgur.com/CBqBcWs.png)
+![Importing Swift](../static/img/ios-swift-bridging-header.png)
 
 ## Android: `CIRCULAR REFERENCE:com.android.tools.r8.ApiLevelException: Default interface methods are only supported starting with Android N (--min-api 24)`
 Since version 1.0.0, we began using a few Java 8 features in the project to reduce the code size.

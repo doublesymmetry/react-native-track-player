@@ -46,11 +46,26 @@ custom initialization (e.g.: opening directly the player UI) by using the
 `trackplayer://notification.click` URI.
 
 ## iOS
-To allow background audio playback on iOS, you need to activate the 'Audio,
-Airplay and Picture in Picture' background mode in Xcode. Without activating it,
-the audio will only play when the app is in the foreground.
 
-![Xcode Background Capability](https://developer.apple.com/library/content/documentation/Audio/Conceptual/AudioSessionProgrammingGuide/Art/background_modes_2x.png)
+In order to continue playing audio in the background (e.g. via a lockscreen or
+when the app has been backgrounded), you'll need to enable the
+`Audio, AirPlay, and Picture in Picture` Capability in your project. Without
+activating it, the audio will only play when the app is in the foreground. This
+can be added via the "Capability" option on the "Signing & Capabilities" tab:
+
+1. Click on the "+ Capabilities" button.
+2. Search for and select "Background Modes".
+
+![Enable Background Modes](../../static/img/ios-background-mode-audio-1.png)
+
+Once selected, the Capability will be shown below the other enabled
+capabilities. If no option appears when searching, the capability may already
+be enabled.
+
+Now ensure that both the `Audio, AirPlay, and Picture in Picture` sub-modes are
+enabled:
+
+![Enable Background Audio](../../static/img/ios-background-mode-audio-2.png)
 
 ### iOS Simulator
 As of iOS Simulator version 11, Apple has removed support for Control Center and
