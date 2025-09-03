@@ -21,6 +21,10 @@ jobs:
         run: yarn build
       - name: Extract Version
         run: echo "LIB_VERSION=$(cat package.json | jq -r .version)" >> $GITHUB_ENV
+      - name: Initialise NPM config
+        run: npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Publish Nightly Version
         run: yarn release-it --ci --no-increment --no-git --no-plugins --npm.tag "nightly" ${{ env.LIB_VERSION }}-nightly-${{ github.sha }}
         env:
