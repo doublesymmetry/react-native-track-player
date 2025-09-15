@@ -166,10 +166,10 @@ class MusicService : HeadlessJsMediaService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         onStartCommandIntentValid = intent != null
         Timber.d("onStartCommand: ${intent?.action}, ${intent?.`package`}")
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+        // if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             // HACK: this is not supposed to be here. I definitely screwed up. but Why?
             onMediaKeyEvent(intent)
-        }
+        // }
         // HACK: Why is onPlay triggering onStartCommand??
         if (!commandStarted) {
             commandStarted = true
@@ -290,12 +290,33 @@ class MusicService : HeadlessJsMediaService() {
                     playerCommandsBuilder.add(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM)
                 }
 
+                Capability.SKIP_TO_NEXT -> {
+                    playerCommandsBuilder.add(Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM)
+                    playerCommandsBuilder.add(Player.COMMAND_SEEK_TO_NEXT)
+                }
+
+                Capability.SKIP_TO_PREVIOUS -> {
+                    playerCommandsBuilder.add(Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM)
+                    playerCommandsBuilder.add(Player.COMMAND_SEEK_TO_PREVIOUS)
+                }
+
+                Capability.JUMP_FORWARD -> {
+                    playerCommandsBuilder.add(Player.COMMAND_SEEK_FORWARD)
+                }
+
+                Capability.JUMP_BACKWARD -> {
+                    playerCommandsBuilder.add(Player.COMMAND_SEEK_BACK)
+                }
+
                 else -> {}
             }
         }
+
         customLayout = CustomCommandButton.entries
             .filter { notificationCapabilities.contains(it.capability) }
+            .filter { it != CustomCommandButton.NEXT && it != CustomCommandButton.PREVIOUS }
             .map { c -> c.commandButton }
+
         val sessionCommandsBuilder =
             MediaSession.ConnectionResult.DEFAULT_SESSION_AND_LIBRARY_COMMANDS.buildUpon()
         customLayout.forEach { v ->
@@ -935,8 +956,6 @@ class MusicService : HeadlessJsMediaService() {
                 when (command.customAction) {
                     CustomCommandButton.JUMP_BACKWARD.customAction -> { it.seekBack() }
                     CustomCommandButton.JUMP_FORWARD.customAction -> { it.seekForward() }
-                    CustomCommandButton.NEXT.customAction -> { it.seekToNext() }
-                    CustomCommandButton.PREVIOUS.customAction -> { it.seekToPrevious() }
                 }
             }
             return super.onCustomCommand(session, controller, command, args)

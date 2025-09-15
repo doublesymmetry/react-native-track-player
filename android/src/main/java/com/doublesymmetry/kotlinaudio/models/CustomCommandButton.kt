@@ -27,23 +27,5 @@ enum class CustomCommandButton(
             .setSessionCommand(SessionCommand("JUMP_FORWARD", Bundle()))
             .setIconResId(R.drawable.media3_icon_skip_forward)
             .build(),
-    ),
-    PREVIOUS(
-        customAction = "PREVIOUS",
-        capability = Capability.SKIP_TO_NEXT,
-        commandButton = CommandButton.Builder()
-            .setDisplayName("Previous")
-            .setSessionCommand(SessionCommand("PREVIOUS", Bundle()))
-            .setIconResId(R.drawable.media3_icon_previous)
-            .build(),
-    ),
-    NEXT(
-        customAction = "NEXT",
-        capability = Capability.SKIP_TO_PREVIOUS,
-        commandButton = CommandButton.Builder()
-            .setDisplayName("Next")
-            .setSessionCommand(SessionCommand("NEXT", Bundle()))
-            .setIconResId(R.drawable.media3_icon_next)
-            .build(),
     );
 }
