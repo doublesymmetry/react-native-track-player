@@ -1,3 +1,4 @@
+export * from './AudioMetadataReceivedEvent';
 export * from './ControllerConnectedEvent';
 export * from './EventPayloadByEvent';
 export * from './PlaybackActiveTrackChangedEvent';
