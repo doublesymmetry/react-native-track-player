@@ -314,7 +314,6 @@ class MusicService : HeadlessJsMediaService() {
 
         customLayout = CustomCommandButton.entries
             .filter { notificationCapabilities.contains(it.capability) }
-            .filter { it != CustomCommandButton.NEXT && it != CustomCommandButton.PREVIOUS }
             .map { c -> c.commandButton }
 
         val sessionCommandsBuilder =
