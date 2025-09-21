@@ -57,8 +57,6 @@ class MusicService : MediaLibraryService() {
                 when (customCommand.customAction) {
                     CustomCommandButton.JUMP_BACKWARD.customAction -> { player.seekBack() }
                     CustomCommandButton.JUMP_FORWARD.customAction -> { player.seekForward() }
-                    CustomCommandButton.NEXT.customAction -> { player.seekToNext() }
-                    CustomCommandButton.PREVIOUS.customAction -> { player.seekToPrevious() }
                 }
                 return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
             }
