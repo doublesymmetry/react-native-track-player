@@ -832,7 +832,9 @@ class MusicService : HeadlessJsMediaService() {
         if (keyEvent?.action == KeyEvent.ACTION_DOWN) {
             return when (keyEvent.keyCode) {
                 KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
-                    emit(MusicEvents.BUTTON_PLAY_PAUSE)
+                    // in oxygenOS, the play button in the expanded view always sends KEYCODE_MEDIA_PLAY_PAUSE 
+                    // instead of distinguishing between play and pause actions
+                    emit(if (!player.playWhenReady) MusicEvents.BUTTON_PLAY else MusicEvents.BUTTON_PLAY_PAUSE)
                     true
                 }
 
