@@ -22,7 +22,6 @@ import androidx.media3.exoplayer.smoothstreaming.DefaultSsChunkSource
 import androidx.media3.exoplayer.smoothstreaming.SsMediaSource
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
-import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
 import androidx.media3.extractor.DefaultExtractorsFactory
 import com.doublesymmetry.kotlinaudio.utils.isUriLocalFile
@@ -38,7 +37,10 @@ class MediaFactory (
         private const val DEFAULT_USER_AGENT = "react-native-track-player"
     }
 
-    private val mediaFactory = DefaultMediaSourceFactory(context)
+    private val mediaFactory = DefaultMediaSourceFactory(
+        context,
+        DefaultExtractorsFactory().setConstantBitrateSeekingEnabled(true)
+    )
 
     override fun setDrmSessionManagerProvider(drmSessionManagerProvider: DrmSessionManagerProvider): MediaSource.Factory {
         return mediaFactory.setDrmSessionManagerProvider(drmSessionManagerProvider)
@@ -110,17 +112,6 @@ class MediaFactory (
 
     private fun createSsSource(mediaItem: MediaItem, factory: DataSource.Factory?): MediaSource {
         return SsMediaSource.Factory(DefaultSsChunkSource.Factory(factory!!), factory)
-            .createMediaSource(mediaItem)
-    }
-
-    private fun createProgressiveSource(
-        mediaItem: MediaItem,
-        factory: DataSource.Factory
-    ): ProgressiveMediaSource {
-        return ProgressiveMediaSource.Factory(
-            factory, DefaultExtractorsFactory()
-                .setConstantBitrateSeekingEnabled(true)
-        )
             .createMediaSource(mediaItem)
     }
 
