@@ -91,8 +91,9 @@ class QueuedAudioPlayer(
         if (queue.isEmpty()) {
             add(item)
         } else {
-            exoPlayer.addMediaItem(currentIndex + 1, item.toMediaItem())
-            exoPlayer.removeMediaItem(currentIndex)
+            val mediaItem = item.toMediaItem()
+            queue[currentIndex] = mediaItem
+            exoPlayer.replaceMediaItem(currentIndex, mediaItem)
             exoPlayer.seekTo(currentIndex, C.TIME_UNSET)
             exoPlayer.prepare()
         }
