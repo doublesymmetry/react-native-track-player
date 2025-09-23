@@ -91,7 +91,10 @@ class MediaFactory (
             "dash" -> createDashSource(mediaItem, factory)
             "hls" -> createHlsSource(mediaItem, factory)
             "smoothstreaming" -> createSsSource(mediaItem, factory)
-            else -> createProgressiveSource(mediaItem, factory)
+            else -> {
+                mediaFactory.setDataSourceFactory(factory)
+                mediaFactory.createMediaSource(mediaItem)
+            }
         }
     }
 
