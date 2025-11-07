@@ -136,4 +136,6 @@ export enum Event {
    * typical controllers are media notification and Android Auto.
    **/
   AndroidConnectorDisconnected = 'android-controller-disconnected',
+
+  CustomSchemeRequestReceived = 'custom-scheme-request-received',
 }

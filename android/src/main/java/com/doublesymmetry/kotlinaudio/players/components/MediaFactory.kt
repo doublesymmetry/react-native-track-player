@@ -12,6 +12,7 @@ import androidx.media3.datasource.DataSpec
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.RawResourceDataSource
+import androidx.media3.datasource.ResolvingDataSource
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.dash.DashMediaSource
@@ -25,18 +26,26 @@ import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
 import androidx.media3.extractor.DefaultExtractorsFactory
+import com.doublesymmetry.kotlinaudio.event.PlayerEventHolder
 import com.doublesymmetry.kotlinaudio.utils.isUriLocalFile
+import com.doublesymmetry.kotlinaudio.models.CustomSchemeResponse
+import okio.IOException
+import java.util.UUID
 
 
 @OptIn(UnstableApi::class)
 class MediaFactory (
     private val context: Context,
-    private val cache: SimpleCache?
+    private val cache: SimpleCache?,
+    private val playerEventHolder: PlayerEventHolder,
+    private val customSchemeResponses: MutableList<CustomSchemeResponse>
 ) : MediaSource.Factory {
 
     companion object {
         private const val DEFAULT_USER_AGENT = "react-native-track-player"
     }
+
+    var customUrlPrefix: String? = null
 
     private val mediaFactory = DefaultMediaSourceFactory(context)
 
@@ -64,13 +73,14 @@ class MediaFactory (
         // HACK: why are these capitalized?
         val resourceType = mediaItem.mediaMetadata.extras?.getString("type")?.lowercase()
         val uri = Uri.parse(mediaItem.mediaMetadata.extras?.getString("uri")!!)
+        val customPrefix = customUrlPrefix
         val factory: DataSource.Factory = when {
             resourceId != 0 && resourceId != null -> {
                 val raw = RawResourceDataSource(context)
                 raw.open(DataSpec(uri))
                 DataSource.Factory { raw }
             }
-            isUriLocalFile(uri) -> {
+            ((customPrefix == null) || !uri.toString().startsWith(customPrefix)) && isUriLocalFile(uri) -> {
                 DefaultDataSource.Factory(context)
             }
             else -> {
@@ -83,7 +93,42 @@ class MediaFactory (
                     }
                 }
 
-                enableCaching(tempFactory)
+                val httpFactory = enableCaching(tempFactory)
+
+                // If the uri matches our current custom scheme prefix we'll use ResolvingDataSource so that we can override
+                // each new connection to the file. Otherwise we'll just use DefaultHttpDataSource directly.
+                val returnFactory = if ((customPrefix == null) || !uri.toString().startsWith(customPrefix)) httpFactory else {
+                    val resolver = ResolvingDataSource.Resolver { dataSpec ->
+                        val reqId = UUID.randomUUID().toString()
+                        // Emit event about the new request
+                        playerEventHolder.updateCustomSchemeRequest(reqId, dataSpec.uri.toString())
+
+                        var loopCount = 0
+                        var response: CustomSchemeResponse? = null
+
+                        // We'll time out and throw an exception after (waitMs * waitIterations) milliseconds.
+                        val waitMs: Long = 100
+                        val waitIterations = 600
+
+                        while(response == null && loopCount < waitIterations){
+                            Thread.sleep(waitMs)
+                            try {
+                                response = customSchemeResponses.first{ it.id == reqId }
+                                customSchemeResponses.remove(response)
+                            } catch (e: NoSuchElementException) {
+                                loopCount++
+                            }
+                        }
+                        if(response == null) throw IOException("Custom scheme request timed out while waiting for response")
+
+                        val headers = if (response.headerprops != null) response.headerprops!! else mapOf<String,String>()
+                        val url = if (response.newUri != null) response.newUri!! else dataSpec.uri.toString()
+                        dataSpec.withAdditionalHeaders((headers)).withUri(Uri.parse(url))
+                    }
+                    ResolvingDataSource.Factory(httpFactory, resolver)
+                }
+
+                returnFactory
             }
         }
 

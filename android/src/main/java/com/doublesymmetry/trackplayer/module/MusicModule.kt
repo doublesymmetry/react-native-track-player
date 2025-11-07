@@ -433,6 +433,20 @@ class MusicModule(reactContext: ReactApplicationContext) : NativeTrackPlayerSpec
         callback.resolve(null)
     }
 
+    override fun respondToCustomSchemeRequest(data: ReadableMap?, callback: Promise) = launchInScope {
+        if (verifyServiceBoundOrReject(callback)) return@launchInScope
+
+        val bundle = Arguments.toBundle(data)
+        val id = bundle?.getString("id")
+        if(id is String){
+            musicService.respondToCustomSchemeRequest(bundle)
+            callback.resolve(null)
+        } else {
+            callback.reject("missing_argument", "Id is required when responding to custom scheme requests")
+        }
+
+    }
+
     override fun setVolume(volume: Double, callback: Promise) = launchInScope {
         if (verifyServiceBoundOrReject(callback)) return@launchInScope
 

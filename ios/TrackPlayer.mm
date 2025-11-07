@@ -181,6 +181,10 @@ RCT_EXPORT_MODULE()
   [nativeTrackPlayer updateOptions:options resolver:resolve rejecter:reject];
 }
 
+- (void)respondToCustomSchemeRequest:(nonnull NSDictionary *)response resolve:(nonnull RCTPromiseResolveBlock)resolve reject:(nonnull RCTPromiseRejectBlock)reject {
+  [nativeTrackPlayer respondToCustomSchemeRequest:response resolver:resolve rejecter:reject];
+}
+
 // event listeners
 - (void)sendEvent:(NSString *)name body:(id)body {
   [super sendEventWithName:name body:body];

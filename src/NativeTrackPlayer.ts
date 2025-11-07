@@ -23,6 +23,7 @@ export interface Spec extends TurboModule {
   getProgress(): Promise<UnsafeObject>;
   getPlaybackState(): Promise<UnsafeObject>;
   retry(): Promise<void>;
+  respondToCustomSchemeRequest(options: UnsafeObject): Promise<void>;
 
   // playlist management
   add(

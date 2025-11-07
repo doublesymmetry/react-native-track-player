@@ -21,11 +21,13 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.ExoPlaybackException
 import androidx.media3.session.legacy.RatingCompat
 import com.doublesymmetry.kotlinaudio.event.PlayerEventHolder
 import com.doublesymmetry.kotlinaudio.models.AudioItem
 import com.doublesymmetry.kotlinaudio.models.AudioItemTransitionReason
 import com.doublesymmetry.kotlinaudio.models.AudioPlayerState
+import com.doublesymmetry.kotlinaudio.models.CustomSchemeResponse
 import com.doublesymmetry.kotlinaudio.models.MediaSessionCallback
 import com.doublesymmetry.kotlinaudio.models.PlayWhenReadyChangeData
 import com.doublesymmetry.kotlinaudio.models.PlaybackError
@@ -46,6 +48,7 @@ abstract class BaseAudioPlayer internal constructor(
 ) {
 
     val exoPlayer: ExoPlayer
+    val mediaFactory: MediaFactory
     val forwardingPlayer: InnerForwardingPlayer
     val player: Player
         get() {
@@ -68,6 +71,17 @@ abstract class BaseAudioPlayer internal constructor(
 
     open val currentItem: AudioItem?
         get() = exoPlayer.currentMediaItem?.let { AudioItem.fromMediaItem(it) }
+
+    internal val customSchemeResponses = mutableListOf<CustomSchemeResponse> ()
+
+    // If this is defined AND matches the beginning of an AudioItem's audioUrl, each new connection
+    // request from exoplayer will emit a CustomSchemeRequest event and then block the connection
+    // until respondToCustomSchemeRequest() has been called with a matching id (or we time out).
+    // This mechanism enables users to rewrite the url and provide headers on a per-connection
+    // basis, for instance for auth purposes.
+    var customUrlPrefix: String?
+        get() = mediaFactory.customUrlPrefix
+        set(v) { mediaFactory.customUrlPrefix = v }
 
     var playbackError: PlaybackError? = null
     var playerState: AudioPlayerState = AudioPlayerState.IDLE
@@ -163,11 +177,13 @@ abstract class BaseAudioPlayer internal constructor(
 
         val renderer = DefaultRenderersFactory(context)
         renderer.setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER)
+        mediaFactory = MediaFactory(context, cache, playerEventHolder, customSchemeResponses)
+
         exoPlayer = ExoPlayer
             .Builder(context)
             .setRenderersFactory(renderer)
             .setHandleAudioBecomingNoisy(options.handleAudioBecomingNoisy)
-            .setMediaSourceFactory(MediaFactory(context, cache))
+            .setMediaSourceFactory(mediaFactory)
             .setWakeMode(setWakeMode(options.wakeMode))
             .apply {
                 setLoadControl(setupBuffer(options.bufferOptions))
@@ -280,6 +296,10 @@ abstract class BaseAudioPlayer internal constructor(
     open fun seekBy(offset: Long, unit: TimeUnit) {
         val positionMs = exoPlayer.currentPosition + TimeUnit.MILLISECONDS.convert(offset, unit)
         exoPlayer.seekTo(positionMs)
+    }
+
+    fun respondToCustomSchemeRequest(id: String, newUri: String?, headerprops: MutableMap<String, String>?) {
+        customSchemeResponses.add(CustomSchemeResponse(id, newUri, headerprops))
     }
 
     @UnstableApi
@@ -430,12 +450,20 @@ abstract class BaseAudioPlayer internal constructor(
         }
 
         override fun onPlayerError(error: PlaybackException) {
+            val detailMessage: String? = if(error is ExoPlaybackException) {
+                when (error.type){
+                    ExoPlaybackException.TYPE_SOURCE -> error.sourceException.message
+                    ExoPlaybackException.TYPE_RENDERER -> error.rendererException.message
+                    ExoPlaybackException.TYPE_UNEXPECTED -> error.unexpectedException.message
+                    else -> null
+                }
+            } else { null }
             val _playbackError = PlaybackError(
                 error.errorCodeName
                     .replace("ERROR_CODE_", "")
                     .lowercase(Locale.getDefault())
                     .replace("_", "-"),
-                error.message
+                error.message + " - " + (detailMessage?:"")
             )
             playerEventHolder.updatePlaybackError(_playbackError)
             playbackError = _playbackError

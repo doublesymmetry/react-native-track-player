@@ -13,6 +13,9 @@ import kotlinx.coroutines.launch
 class PlayerEventHolder {
     private val coroutineScope = MainScope()
 
+    private var _customSchemeRequest = MutableSharedFlow<CustomSchemeRequest>(1)
+    var customSchemeRequest = _customSchemeRequest.asSharedFlow()
+
     private var _stateChange = MutableSharedFlow<AudioPlayerState>(1)
     var stateChange = _stateChange.asSharedFlow()
 
@@ -60,6 +63,12 @@ class PlayerEventHolder {
      * For this observable to send events, set [interceptPlayerActionsTriggeredExternally][com.doublesymmetry.kotlinaudio.models.PlayerConfig.interceptPlayerActionsTriggeredExternally] to true.
     */
     var onPlayerActionTriggeredExternally = _onPlayerActionTriggeredExternally.asSharedFlow()
+
+    internal fun updateCustomSchemeRequest(id: String, uri: String) {
+        coroutineScope.launch {
+            _customSchemeRequest.emit(CustomSchemeRequest(id, uri))
+        }
+    }
 
     internal fun updateAudioPlayerState(state: AudioPlayerState) {
         coroutineScope.launch {

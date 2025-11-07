@@ -454,3 +454,11 @@ export async function validateOnStartCommandIntent(): Promise<boolean> {
   if (!isAndroid) return true;
   return TrackPlayer.validateOnStartCommandIntent();
 }
+
+export async function respondToCustomSchemeRequest(response: {
+  id: string;
+  newUri?: string;
+  headerprops?: { [id: string]: string };
+}) {
+  return TrackPlayer.respondToCustomSchemeRequest(response);
+}

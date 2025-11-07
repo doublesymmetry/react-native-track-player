@@ -8,6 +8,7 @@ export interface UpdateOptions {
   forwardJumpInterval?: number;
   backwardJumpInterval?: number;
   progressUpdateEventInterval?: number; // in seconds
+  customUrlPrefix?: string;
 
   // ios
   likeOptions?: FeedbackOptions;

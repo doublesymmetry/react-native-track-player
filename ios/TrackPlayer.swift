@@ -42,6 +42,7 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
         player.event.currentItem.addListener(self, handleAudioPlayerCurrentItemChange)
         player.event.secondElapse.addListener(self, handleAudioPlayerSecondElapse)
         player.event.playWhenReadyChange.addListener(self, handlePlayWhenReadyChange)
+        player.event.customSchemeRequest.addListener(self, handleCustomSchemeRequest)
     }
 
     deinit {
@@ -286,6 +287,11 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
         configureProgressUpdateEvent(
             interval: ((options["progressUpdateEventInterval"] as? NSNumber) ?? 0).doubleValue
         )
+
+        if let customUrlPrefix = options["customUrlPrefix"] as? String {
+            // Explicitly setting an empty prefix string disables it
+            player.customUrlPrefix = customUrlPrefix.isEmpty ? nil : customUrlPrefix
+        }
 
         resolve(NSNull())
     }
@@ -697,6 +703,10 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
                 "message": "The track could not be played",
                 "code": "ios_track_unplayable"
             ]
+            case .customSchemeRequestFailed(let message) : return [
+                "message": message,
+                "code": "ios_custom_scheme_request_failed"
+            ]
             default: return [
                 "message": "A playback error occurred",
                 "code": "ios_playback_error"
@@ -740,7 +750,12 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
     }
 
     func handleAudioPlayerFailed(error: Error?) {
-        emit(event: EventType.PlaybackError, body: ["error": error?.localizedDescription])
+        // Remi/Fuse: Previously the error events only contained the generic localizedDescription
+        // (with the key "error") and not the "code" and "message" keys expected by the higher-level
+        // typescript code. This function has been patched to include those as well.
+        var errorBody = getPlaybackStateErrorKeyValues()
+        errorBody["error"] = error?.localizedDescription
+        emit(event: EventType.PlaybackError, body: errorBody)
     }
 
     func handleAudioPlayerCurrentItemChange(
@@ -816,6 +831,29 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
             ]
         )
     }
+
+    func handleCustomSchemeRequest(request: CustomSchemeRequest) {
+        emit(event: EventType.CustomSchemeRequestReceived, body: ["id": request.id, "uri": request.uri])
+    }
+
+
+    @objc(respondToCustomSchemeRequest:resolver:rejecter:)
+    public func respondToCustomSchemeRequest(response: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        if (rejectWhenNotInitialized(reject: reject)) { return }
+
+        let id = response["id"] as? String
+        if(id == nil){
+            reject("invalid_custom_scheme_response", "missing id",nil)
+        }
+
+        let headerprops = response["headerprops"] as? [String: String]
+        let newUri = response["newUri"] as? String
+
+        player.respondToCustomSchemeRequest(response: (id: id!, newUri: newUri, headerprops: headerprops))
+
+        resolve(NSNull())
+    }
+
 }
 
 

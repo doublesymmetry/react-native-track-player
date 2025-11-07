@@ -54,6 +54,7 @@ class MusicEvents(private val reactContext: ReactContext) : BroadcastReceiver() 
 
         // Other
         const val PLAYER_ERROR = "player-error"
+        const val CUSTOM_SCHEME_REQUEST_RECEVIED = "custom-scheme-request-received"
         const val CONNECTOR_CONNECTED = "android-controller-connected"
         const val CONNECTOR_DISCONNECTED = "android-controller-disconnected"
 

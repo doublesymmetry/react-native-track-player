@@ -64,6 +64,7 @@ class MusicService : HeadlessJsMediaService() {
     private lateinit var fakePlayer: ExoPlayer
     private lateinit var mediaSession: MediaLibrarySession
     private var progressUpdateJob: Job? = null
+    private var previousProgressBundle: Bundle? = null
     private var sessionCommands: SessionCommands? = null
     private var playerCommands: Player.Commands? = null
     private var customLayout: List<CommandButton> = listOf()
@@ -206,7 +207,10 @@ class MusicService : HeadlessJsMediaService() {
             handleAudioFocus = playerOptions?.getBoolean(AUTO_HANDLE_INTERRUPTIONS) ?: true,
             interceptPlayerActionsTriggeredExternally = true,
             skipSilence = playerOptions?.getBoolean(SKIP_SILENCE) ?: false,
-            wakeMode = playerOptions?.getInt(WAKE_MODE, 0) ?: 0
+            // Hardcode wake mode "Network", just like we did in the KotlinAudio dependency for RNTP 4.x
+            // TODO: Switch to doing this from the model code once the option is exposed all the way up to TypeScript.
+            wakeMode = 2
+            // wakeMode = playerOptions?.getInt(WAKE_MODE, 0) ?: 0
         )
         player = QueuedAudioPlayer(this@MusicService, options)
         fakePlayer.release()
@@ -239,6 +243,11 @@ class MusicService : HeadlessJsMediaService() {
         player.alwaysPauseOnInterruption =
             androidOptions?.getBoolean(PAUSE_ON_INTERRUPTION_KEY) ?: false
         player.shuffleMode = androidOptions?.getBoolean(SHUFFLE_KEY) ?: false
+
+        options.getString("customUrlPrefix")?.let {
+            // Explicitly setting an empty prefix string disables it
+            player.customUrlPrefix = if (it.isEmpty()) null else it
+        }
 
         // setup progress update events if configured
         progressUpdateJob?.cancel()
@@ -322,8 +331,17 @@ class MusicService : HeadlessJsMediaService() {
     @MainThread
     private fun progressUpdateEventFlow(interval: Double) = flow {
         while (true) {
-            if (player.isPlaying) {
-                val bundle = progressUpdateEvent()
+            val bundle = progressUpdateEvent()
+            val prevBundle = previousProgressBundle
+            // In some cases we want progress updates even when audio is not playing.
+            // Ref: https://gitlab.fusetools.com/suide/suide/-/issues/9201
+            val bundleHasChanged = (prevBundle !== null) && (
+                // We only care about position and duration.
+                !(prevBundle.get(POSITION_KEY)?.equals(bundle.get(POSITION_KEY)) ?: false ) ||
+                !(prevBundle.get(DURATION_KEY)?.equals(bundle.get(DURATION_KEY)) ?: false ))
+
+            previousProgressBundle = bundle
+            if (player.isPlaying || bundleHasChanged) {
                 emit(bundle)
             }
 
@@ -500,6 +518,24 @@ class MusicService : HeadlessJsMediaService() {
         updateMetadataForTrack(player.currentIndex, bundle)
     }
 
+    @MainThread
+    fun respondToCustomSchemeRequest(bundle: Bundle) {
+        val id = bundle.getString("id")
+        if(id == null) return
+        val newUri = bundle.getString("newUri")
+        val headers = bundle.getBundle("headerprops")
+        var headerprops: MutableMap<String, String>? = null
+
+        if(headers != null) {
+            headerprops = HashMap()
+            for (h in headers.keySet()) {
+                headerprops!![h] = headers.getString(h)!!
+            }
+        }
+
+        player.respondToCustomSchemeRequest(id, newUri, headerprops)
+    }
+
     private fun emitPlaybackTrackChangedEvents(
         previousIndex: Int?,
         oldPosition: Double
@@ -655,6 +691,17 @@ class MusicService : HeadlessJsMediaService() {
         scope.launch {
             event.playbackError.collect {
                 emit(MusicEvents.PLAYBACK_ERROR, getPlaybackErrorBundle())
+            }
+        }
+
+        scope.launch {
+            event.customSchemeRequest.collect {
+                val bundle = Bundle().apply {
+                        putString("id", it.id)
+                        putString("uri", it.uri)
+                    }
+
+                emit(MusicEvents.CUSTOM_SCHEME_REQUEST_RECEVIED, bundle)
             }
         }
     }
