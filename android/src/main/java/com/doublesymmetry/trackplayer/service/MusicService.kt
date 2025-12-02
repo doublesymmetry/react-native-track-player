@@ -97,6 +97,14 @@ class MusicService : HeadlessJsMediaService() {
                 return "RNTP-${element.className}:${element.methodName}"
             }
         })
+        
+        // Skip if mediaSession is already initialized to prevent duplicate session crash
+        if (this::mediaSession.isInitialized) {
+            Timber.d("MusicService onCreate called but mediaSession already initialized, skipping")
+            super.onCreate()
+            return
+        }
+        
         fakePlayer = ExoPlayer.Builder(this).build()
         val openAppIntent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -104,9 +112,15 @@ class MusicService : HeadlessJsMediaService() {
             data = Uri.parse("trackplayer://notification.click")
             action = Intent.ACTION_VIEW
         }
+        
+        // Generate unique session ID using timestamp to avoid conflicts
+        val sessionId = "TrackPlayer_${System.currentTimeMillis()}"
+        Timber.d("Creating MediaLibrarySession with ID: $sessionId")
+        
         mediaSession = MediaLibrarySession.Builder(this, fakePlayer,
             InnerMediaSessionCallback()
         )
+            .setId(sessionId)
             .setBitmapLoader(CacheBitmapLoader(CoilBitmapLoader(this)))
             // https://github.com/androidx/media/issues/1218
             .setSessionActivity(
