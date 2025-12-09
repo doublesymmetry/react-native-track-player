@@ -166,10 +166,16 @@ class MusicService : HeadlessJsMediaService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         onStartCommandIntentValid = intent != null
         Timber.d("onStartCommand: ${intent?.action}, ${intent?.`package`}")
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            // HACK: this is not supposed to be here. I definitely screwed up. but Why?
-            onMediaKeyEvent(intent)
+
+        val manufacturer = Build.MANUFACTURER
+        val brand = Build.BRAND
+        val isOnePlus = manufacturer.equals("OnePlus", ignoreCase = true) && brand.equals("OnePlus", ignoreCase = true);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || isOnePlus && Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+          // Hack - fixes onMediaKeyEvent on Android < 13 & OxygenOS 14
+          onMediaKeyEvent(intent)
         }
+
         // HACK: Why is onPlay triggering onStartCommand??
         if (!commandStarted) {
             commandStarted = true
