@@ -30,7 +30,7 @@ enum class CustomCommandButton(
     ),
     PREVIOUS(
         customAction = "PREVIOUS",
-        capability = Capability.SKIP_TO_NEXT,
+        capability = Capability.SKIP_TO_PREVIOUS,
         commandButton = CommandButton.Builder()
             .setDisplayName("Previous")
             .setSessionCommand(SessionCommand("PREVIOUS", Bundle()))
@@ -39,7 +39,7 @@ enum class CustomCommandButton(
     ),
     NEXT(
         customAction = "NEXT",
-        capability = Capability.SKIP_TO_PREVIOUS,
+        capability = Capability.SKIP_TO_NEXT,
         commandButton = CommandButton.Builder()
             .setDisplayName("Next")
             .setSessionCommand(SessionCommand("NEXT", Bundle()))

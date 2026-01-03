@@ -166,8 +166,38 @@ class MusicService : HeadlessJsMediaService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         onStartCommandIntentValid = intent != null
         Timber.d("onStartCommand: ${intent?.action}, ${intent?.`package`}")
+        
+        // Handle custom notification button clicks (NEXT, PREVIOUS, JUMP_FORWARD, JUMP_BACKWARD)
+        // from Media3's notification UI. This works on all Android versions.
+        if (intent?.action == ACTION_CUSTOM_NOTIFICATION_ACTION) {
+            val customAction = intent.getStringExtra(EXTRAS_KEY_CUSTOM_NOTIFICATION_ACTION)
+            
+            if (customAction != null && ::player.isInitialized) {
+                player.forwardingPlayer.let {
+                    when (customAction) {
+                        CustomCommandButton.JUMP_BACKWARD.customAction -> {
+                            it.seekBack()
+                        }
+                        CustomCommandButton.JUMP_FORWARD.customAction -> {
+                            it.seekForward()
+                        }
+                        CustomCommandButton.NEXT.customAction -> {
+                            it.seekToNext()
+                        }
+                        CustomCommandButton.PREVIOUS.customAction -> {
+                            it.seekToPrevious()
+                        }
+                        else -> {
+                            Timber.d("Unknown custom action: $customAction")
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Handle hardware media buttons (Bluetooth, car stereo, etc.) on Android < 13
+        // On Android 13+, these are handled via onMediaButtonEvent callback instead
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            // HACK: this is not supposed to be here. I definitely screwed up. but Why?
             onMediaKeyEvent(intent)
         }
         // HACK: Why is onPlay triggering onStartCommand??
@@ -812,7 +842,15 @@ class MusicService : HeadlessJsMediaService() {
         if (keyEvent?.action == KeyEvent.ACTION_DOWN) {
             return when (keyEvent.keyCode) {
                 KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
-                    emit(MusicEvents.BUTTON_PLAY_PAUSE)
+                    if (::player.isInitialized) {
+                        if (player.isPlaying) {
+                            emit(MusicEvents.BUTTON_PAUSE)
+                        } else {
+                            emit(MusicEvents.BUTTON_PLAY)
+                        }
+                    } else {
+                        emit(MusicEvents.BUTTON_PLAY_PAUSE)
+                    }
                     true
                 }
 
@@ -933,10 +971,19 @@ class MusicService : HeadlessJsMediaService() {
         ): ListenableFuture<SessionResult> {
             player.forwardingPlayer.let {
                 when (command.customAction) {
-                    CustomCommandButton.JUMP_BACKWARD.customAction -> { it.seekBack() }
-                    CustomCommandButton.JUMP_FORWARD.customAction -> { it.seekForward() }
-                    CustomCommandButton.NEXT.customAction -> { it.seekToNext() }
-                    CustomCommandButton.PREVIOUS.customAction -> { it.seekToPrevious() }
+                    CustomCommandButton.JUMP_BACKWARD.customAction -> { 
+                        it.seekBack() 
+                    }
+                    CustomCommandButton.JUMP_FORWARD.customAction -> { 
+                        it.seekForward() 
+                    }
+                    CustomCommandButton.NEXT.customAction -> { 
+                        it.seekToNext() 
+                    }
+                    CustomCommandButton.PREVIOUS.customAction -> { 
+                        it.seekToPrevious() 
+                    }
+                    else -> {}
                 }
             }
             return super.onCustomCommand(session, controller, command, args)
@@ -993,6 +1040,10 @@ class MusicService : HeadlessJsMediaService() {
         const val POSITION_KEY = "position"
         const val DURATION_KEY = "duration"
         const val BUFFERED_POSITION_KEY = "buffered"
+
+        // Media3 custom notification action constants
+        const val ACTION_CUSTOM_NOTIFICATION_ACTION = "androidx.media3.session.CUSTOM_NOTIFICATION_ACTION"
+        const val EXTRAS_KEY_CUSTOM_NOTIFICATION_ACTION = "androidx.media3.session.EXTRAS_KEY_CUSTOM_NOTIFICATION_ACTION"
 
         const val TASK_KEY = "TrackPlayer"
 
