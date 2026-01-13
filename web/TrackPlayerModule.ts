@@ -26,6 +26,7 @@ export class TrackPlayerModule extends PlaylistPlayer implements Spec {
       CAPABILITY_SKIP_TO_NEXT: 9,
       CAPABILITY_SKIP_TO_PREVIOUS: 10,
       CAPABILITY_STOP: 11,
+      CAPABILITY_REPEAT: 99,
 
       // Rating Types
       RATING_HEART: 0,

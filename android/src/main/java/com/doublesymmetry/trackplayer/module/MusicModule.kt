@@ -157,6 +157,7 @@ class MusicModule(reactContext: ReactApplicationContext) : NativeTrackPlayerSpec
             this["CAPABILITY_SET_RATING"] = Capability.SET_RATING.ordinal
             this["CAPABILITY_JUMP_FORWARD"] = Capability.JUMP_FORWARD.ordinal
             this["CAPABILITY_JUMP_BACKWARD"] = Capability.JUMP_BACKWARD.ordinal
+            this["CAPABILITY_REPEAT"] = 99
 
             // States
             this["STATE_NONE"] = State.None.state

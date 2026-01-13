@@ -97,6 +97,10 @@ export enum Event {
    * See https://rntp.dev/docs/api/events#remotebookmark-ios-only
    **/
   RemoteBookmark = 'remote-bookmark',
+  /** (Android only) Fired when the user presses the repeat button in the now
+   * playing center.
+   **/
+  RemoteRepeat = 'remote-repeat',
   /**
    * (Android only) Fired when the user selects a track from an external device.
    * See https://rntp.dev/docs/api/events#remoteplayid

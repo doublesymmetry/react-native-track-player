@@ -67,6 +67,7 @@ export interface Spec extends TurboModule {
     CAPABILITY_SET_RATING: number;
     CAPABILITY_JUMP_FORWARD: number;
     CAPABILITY_JUMP_BACKWARD: number;
+    CAPABILITY_REPEAT: number;
 
     // States
     STATE_NONE: string;
