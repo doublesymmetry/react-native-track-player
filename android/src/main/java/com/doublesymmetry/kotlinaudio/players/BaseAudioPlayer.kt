@@ -476,11 +476,22 @@ abstract class BaseAudioPlayer internal constructor(
 
         override fun play() {
             playerEventHolder.updateOnPlayerActionTriggeredExternally(MediaSessionCallback.PLAY)
+            super.play()
         }
 
         override fun pause() {
             playerEventHolder.updateOnPlayerActionTriggeredExternally(MediaSessionCallback.PAUSE)
+            super.pause()
         }
+
+        override fun setPlayWhenReady(playWhenReady: Boolean) {
+            if (playWhenReady) {
+                playerEventHolder.updateOnPlayerActionTriggeredExternally(MediaSessionCallback.PLAY)
+            } else {
+                playerEventHolder.updateOnPlayerActionTriggeredExternally(MediaSessionCallback.PAUSE)
+            }
+            super.setPlayWhenReady(playWhenReady)
+         }
 
         override fun seekToNext() {
             playerEventHolder.updateOnPlayerActionTriggeredExternally(MediaSessionCallback.NEXT)

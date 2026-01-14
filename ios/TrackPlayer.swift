@@ -445,13 +445,24 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
     ) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
 
+        let RESTART_THRESHOLD: Double = 3.0  // 3 seconds
+
         player.previous()
 
         // if an initialTime is passed the seek to it
-        if (initialTime >= 0) {
-            self.seekTo(time: initialTime, resolve: resolve, reject: reject)
+        if player.currentTime > RESTART_THRESHOLD {
+            // Position > 3 seconds: restart current track
+            self.seekTo(time: 0.0, resolve: resolve, reject: reject)
         } else {
-            resolve(NSNull())
+            // Position <= 3 seconds: skip to previous track
+            player.previous()
+
+            // if an initialTime is passed then seek to it
+            if (initialTime >= 0) {
+                self.seekTo(time: initialTime, resolve: resolve, reject: reject)
+            } else {
+                resolve(NSNull())
+            }
         }
     }
 

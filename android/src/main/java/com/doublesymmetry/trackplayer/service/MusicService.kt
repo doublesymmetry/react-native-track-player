@@ -166,9 +166,39 @@ class MusicService : HeadlessJsMediaService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         onStartCommandIntentValid = intent != null
         Timber.d("onStartCommand: ${intent?.action}, ${intent?.`package`}")
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            // HACK: this is not supposed to be here. I definitely screwed up. but Why?
-            onMediaKeyEvent(intent)
+        // Handle custom notification button clicks (NEXT, PREVIOUS, JUMP_FORWARD, JUMP_BACKWARD)
+        // from Media3's notification UI. This works on all Android versions.
+        if (intent?.action == ACTION_CUSTOM_NOTIFICATION_ACTION) {
+            val customAction = intent.getStringExtra(EXTRAS_KEY_CUSTOM_NOTIFICATION_ACTION)
+
+            if (customAction != null && ::player.isInitialized) {
+                when (customAction) {
+                    CustomCommandButton.JUMP_BACKWARD.customAction -> {
+                        player.forwardingPlayer.seekBack()
+                    }
+                    CustomCommandButton.JUMP_FORWARD.customAction -> {
+                        player.forwardingPlayer.seekForward()
+                    }
+                    CustomCommandButton.NEXT.customAction -> {
+                        skipToNext()
+                    }
+                    CustomCommandButton.PREVIOUS.customAction -> {
+                        skipToPrevious()
+                    }
+                    else -> {
+                        Timber.d("Unknown custom action: $customAction")
+                    }
+                }
+            }
+        }
+        
+        val manufacturer = Build.MANUFACTURER
+        val brand = Build.BRAND
+        val isOnePlus = manufacturer.equals("OnePlus", ignoreCase = true) && brand.equals("OnePlus", ignoreCase = true);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || isOnePlus && Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+          // Hack - fixes onMediaKeyEvent on Android < 13 & OxygenOS 14
+          onMediaKeyEvent(intent)
         }
         // HACK: Why is onPlay triggering onStartCommand??
         if (!commandStarted) {
@@ -422,7 +452,15 @@ class MusicService : HeadlessJsMediaService() {
 
     @MainThread
     fun skipToPrevious() {
-        player.previous()
+        val RESTART_THRESHOLD_MS = 3000L  // 3 seconds
+
+        if (player.position > RESTART_THRESHOLD_MS) {
+            // Position > 3 seconds: restart current track
+            seekTo(0f)
+        } else {
+            // Position <= 3 seconds: skip to previous track
+            player.previous()
+        }
     }
 
     @MainThread
@@ -812,41 +850,84 @@ class MusicService : HeadlessJsMediaService() {
         if (keyEvent?.action == KeyEvent.ACTION_DOWN) {
             return when (keyEvent.keyCode) {
                 KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
+                    if (::player.isInitialized) {
+                        if (player.isPlaying) {
+                            player.pause()
+                        } else {
+                            player.play()
+                        }
+                    }
                     emit(MusicEvents.BUTTON_PLAY_PAUSE)
                     true
                 }
 
                 KeyEvent.KEYCODE_MEDIA_STOP -> {
+                    if (::player.isInitialized) {
+                        player.stop()
+                    }
                     emit(MusicEvents.BUTTON_STOP)
                     true
                 }
 
                 KeyEvent.KEYCODE_MEDIA_PAUSE -> {
-                    emit(MusicEvents.BUTTON_PAUSE)
+                    if (::player.isInitialized) {
+                        if (player.isPlaying) {
+                            player.pause()
+                            emit(MusicEvents.BUTTON_PAUSE)
+                        } else {
+                            player.play()
+                            emit(MusicEvents.BUTTON_PLAY)
+                        }
+                    } else {
+                        emit(MusicEvents.BUTTON_PLAY_PAUSE)
+                    }
                     true
                 }
 
                 KeyEvent.KEYCODE_MEDIA_PLAY -> {
+                    if (::player.isInitialized) {
+                        player.play()
+                    }
                     emit(MusicEvents.BUTTON_PLAY)
                     true
                 }
 
                 KeyEvent.KEYCODE_MEDIA_NEXT -> {
+                    if (::player.isInitialized) {
+                        skipToNext()
+                    }
                     emit(MusicEvents.BUTTON_SKIP_NEXT)
                     true
                 }
 
                 KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
+                    if (::player.isInitialized) {
+                        skipToPrevious()
+                    }
                     emit(MusicEvents.BUTTON_SKIP_PREVIOUS)
                     true
                 }
 
                 KeyEvent.KEYCODE_MEDIA_FAST_FORWARD, KeyEvent.KEYCODE_MEDIA_SKIP_FORWARD, KeyEvent.KEYCODE_MEDIA_STEP_FORWARD -> {
+                    if (::player.isInitialized) {
+                        val interval = latestOptions?.getDouble(
+                            FORWARD_JUMP_INTERVAL_KEY,
+                            DEFAULT_JUMP_INTERVAL
+                        )?.toLong() ?: DEFAULT_JUMP_INTERVAL.toLong()
+                        seekBy(interval.toFloat())
+                    }
                     emit(MusicEvents.BUTTON_JUMP_FORWARD)
                     true
                 }
 
                 KeyEvent.KEYCODE_MEDIA_REWIND, KeyEvent.KEYCODE_MEDIA_SKIP_BACKWARD, KeyEvent.KEYCODE_MEDIA_STEP_BACKWARD -> {
+                    if (::player.isInitialized) {
+                        val interval = latestOptions?.getDouble(
+                            BACKWARD_JUMP_INTERVAL_KEY,
+                            DEFAULT_JUMP_INTERVAL
+                        )?.toLong() ?: DEFAULT_JUMP_INTERVAL.toLong()
+                        seekBy(-interval.toFloat())
+                    }
                     emit(MusicEvents.BUTTON_JUMP_BACKWARD)
                     true
                 }
@@ -931,13 +1012,20 @@ class MusicService : HeadlessJsMediaService() {
             command: SessionCommand,
             args: Bundle
         ): ListenableFuture<SessionResult> {
-            player.forwardingPlayer.let {
-                when (command.customAction) {
-                    CustomCommandButton.JUMP_BACKWARD.customAction -> { it.seekBack() }
-                    CustomCommandButton.JUMP_FORWARD.customAction -> { it.seekForward() }
-                    CustomCommandButton.NEXT.customAction -> { it.seekToNext() }
-                    CustomCommandButton.PREVIOUS.customAction -> { it.seekToPrevious() }
+            when (command.customAction) {
+                CustomCommandButton.JUMP_BACKWARD.customAction -> {
+                    player.forwardingPlayer.seekBack()
                 }
+                CustomCommandButton.JUMP_FORWARD.customAction -> {
+                    player.forwardingPlayer.seekForward()
+                }
+                CustomCommandButton.NEXT.customAction -> {
+                    skipToNext()
+                }
+                CustomCommandButton.PREVIOUS.customAction -> {
+                    skipToPrevious()
+                }
+                else -> {}
             }
             return super.onCustomCommand(session, controller, command, args)
         }
@@ -993,6 +1081,10 @@ class MusicService : HeadlessJsMediaService() {
         const val POSITION_KEY = "position"
         const val DURATION_KEY = "duration"
         const val BUFFERED_POSITION_KEY = "buffered"
+
+        // Media3 custom notification action constants
+        const val ACTION_CUSTOM_NOTIFICATION_ACTION = "androidx.media3.session.CUSTOM_NOTIFICATION_ACTION"
+        const val EXTRAS_KEY_CUSTOM_NOTIFICATION_ACTION = "androidx.media3.session.EXTRAS_KEY_CUSTOM_NOTIFICATION_ACTION"
 
         const val TASK_KEY = "TrackPlayer"
 
