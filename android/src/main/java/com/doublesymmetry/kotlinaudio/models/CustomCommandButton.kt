@@ -45,5 +45,14 @@ enum class CustomCommandButton(
             .setSessionCommand(SessionCommand("NEXT", Bundle()))
             .setIconResId(R.drawable.media3_icon_next)
             .build(),
+    ),
+    REPEAT(
+        customAction = "REPEAT",
+        capability = Capability.REPEAT,
+        commandButton = CommandButton.Builder()
+            .setDisplayName("Repeat")
+            .setSessionCommand(SessionCommand("REPEAT", Bundle()))
+            .setIconResId(androidx.media3.ui.R.drawable.exo_icon_repeat_off)
+            .build(),
     );
 }

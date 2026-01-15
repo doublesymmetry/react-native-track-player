@@ -272,7 +272,7 @@ class MusicService : HeadlessJsMediaService() {
             notificationCapabilities.addAll(capabilities)
         }
 
-        val hasRepeatCapability = rawNotificationCapabilities.contains(CAPABILITY_REPEAT)
+        val hasRepeatCapability = rawNotificationCapabilities.contains(Capability.REPEAT.ordinal)
 
         val playerCommandsBuilder = Player.Commands.Builder().addAll(
             // HACK: without COMMAND_GET_CURRENT_MEDIA_ITEM, notification cannot be created
@@ -321,7 +321,7 @@ class MusicService : HeadlessJsMediaService() {
             val repeatBtn = CommandButton.Builder()
                 .setDisplayName("Repeat")
                 .setIconResId(repeatIcon)
-                .setSessionCommand(SessionCommand(ACTION_REPEAT, Bundle.EMPTY))
+                .setSessionCommand(SessionCommand(CustomCommandButton.REPEAT.customAction, Bundle.EMPTY))
                 .build()
             (customLayout as MutableList).add(repeatBtn)
         }
@@ -967,7 +967,7 @@ class MusicService : HeadlessJsMediaService() {
                     CustomCommandButton.JUMP_FORWARD.customAction -> { it.seekForward() }
                     CustomCommandButton.NEXT.customAction -> { it.seekToNext() }
                     CustomCommandButton.PREVIOUS.customAction -> { it.seekToPrevious() }
-                    ACTION_REPEAT -> {
+                    CustomCommandButton.REPEAT.customAction -> {
                          emit(MusicEvents.BUTTON_REPEAT)
                     }
                 }
@@ -1063,7 +1063,6 @@ class MusicService : HeadlessJsMediaService() {
         const val DEFAULT_JUMP_INTERVAL = 15.0
         const val DEFAULT_STOP_FOREGROUND_GRACE_PERIOD = 5
         
-        const val CAPABILITY_REPEAT = 99
-        const val ACTION_REPEAT = "action_repeat"
+
     }
 }

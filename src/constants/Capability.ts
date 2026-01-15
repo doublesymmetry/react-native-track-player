@@ -13,5 +13,5 @@ export enum Capability {
   JumpForward = Constants?.CAPABILITY_JUMP_FORWARD ?? 10,
   JumpBackward = Constants?.CAPABILITY_JUMP_BACKWARD ?? 11,
   SetRating = Constants?.CAPABILITY_SET_RATING ?? 12,
-  Repeat = Constants?.CAPABILITY_REPEAT ?? 99,
+  Repeat = Constants?.CAPABILITY_REPEAT ?? 15,
 }

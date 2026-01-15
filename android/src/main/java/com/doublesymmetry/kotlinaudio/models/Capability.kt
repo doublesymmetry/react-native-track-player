@@ -15,5 +15,6 @@ enum class Capability {
     SET_RATING,
     LIKE,
     DISLIKE,
-    BOOKMARK
+    BOOKMARK,
+    REPEAT
 }
