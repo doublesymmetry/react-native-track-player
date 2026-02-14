@@ -46,6 +46,8 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
         player.event.newErrorLogEntry.addListener(self, handleNewErrorLogEntry)
         player.event.bufferEmpty.addListener(self, handleBufferEmpty)
         player.event.bufferFull.addListener(self, handleBufferFull)
+        player.event.seek.addListener(self, handleSeekCompleted)
+        player.event.playbackEnd.addListener(self, handlePlaybackEnd)
     }
 
     deinit {
@@ -744,7 +746,10 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
     }
 
     func handleAudioPlayerFailed(error: Error?) {
-        emit(event: EventType.PlaybackError, body: ["error": error?.localizedDescription])
+        emit(event: EventType.PlaybackError, body: [
+            "error": error?.localizedDescription as Any,
+            "position": player.currentTime,
+        ])
     }
 
     func handleAudioPlayerCurrentItemChange(
@@ -855,6 +860,27 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
             body: [
                 "isFull": isFull
             ]
+        )
+    }
+
+    func handleSeekCompleted(data: (seconds: Double, didFinish: Bool)) {
+        emit(
+            event: EventType.PlaybackSeekCompleted,
+            body: [
+                "position": data.seconds,
+                "didFinish": data.didFinish,
+            ] as [String : Any]
+        )
+    }
+
+    func handlePlaybackEnd(reason: PlaybackEndedReason) {
+        emit(
+            event: EventType.PlaybackEndedWithReason,
+            body: [
+                "reason": reason.rawValue,
+                "track": player.currentIndex,
+                "position": player.currentTime,
+            ] as [String : Any]
         )
     }
 }

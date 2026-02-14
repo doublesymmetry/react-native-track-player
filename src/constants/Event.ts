@@ -135,6 +135,17 @@ export enum Event {
    * Maps to AVPlayerItem.isPlaybackBufferFull KVO.
    **/
   PlaybackBufferFull = 'playback-buffer-full',
+  /**
+   * Fired when a seek operation completes.
+   * Includes the final position and whether the seek finished successfully.
+   **/
+  PlaybackSeekCompleted = 'playback-seek-completed',
+  /**
+   * Fired when playback ends for a specific reason.
+   * Reasons include: playedUntilEnd, playerStopped, skippedToNext,
+   * skippedToPrevious, jumpedToIndex, cleared, failed.
+   **/
+  PlaybackEndedWithReason = 'playback-ended-reason',
   /** (iOS only) Fired when chapter metadata is received.
    * See https://rntp.dev/docs/api/events#chaptermetadatareceived
    **/

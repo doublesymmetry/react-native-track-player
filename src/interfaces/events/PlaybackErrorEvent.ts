@@ -3,4 +3,6 @@ export interface PlaybackErrorEvent {
   code: string;
   /** The error message */
   message: string;
+  /** The playback position (in seconds) when the error occurred */
+  position?: number;
 }

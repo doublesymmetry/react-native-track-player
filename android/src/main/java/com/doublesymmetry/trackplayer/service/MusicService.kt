@@ -679,7 +679,43 @@ class MusicService : HeadlessJsMediaService() {
 
         scope.launch {
             event.playbackError.collect {
-                emit(MusicEvents.PLAYBACK_ERROR, getPlaybackErrorBundle())
+                val bundle = getPlaybackErrorBundle()
+                bundle.putDouble(POSITION_KEY, player.position.toSeconds())
+                emit(MusicEvents.PLAYBACK_ERROR, bundle)
+            }
+        }
+
+        scope.launch {
+            event.positionChanged.collect {
+                if (it != null) {
+                    when (it) {
+                        is PositionChangedReason.SEEK,
+                        is PositionChangedReason.SEEK_FAILED -> {
+                            Bundle().apply {
+                                putDouble("position", it.newPosition.toSeconds())
+                                putBoolean("didFinish", it is PositionChangedReason.SEEK)
+                                emit(MusicEvents.PLAYBACK_SEEK_COMPLETED, this)
+                            }
+                        }
+                        else -> {
+                            // Internal position discontinuity -- log for diagnostics
+                            Timber.d("Position changed: ${it::class.simpleName} from ${it.oldPosition} to ${it.newPosition}")
+                        }
+                    }
+                }
+            }
+        }
+
+        scope.launch {
+            event.playbackEnd.collect {
+                if (it != null) {
+                    Bundle().apply {
+                        putString("reason", it.name)
+                        putInt(TRACK_KEY, player.currentIndex)
+                        putDouble(POSITION_KEY, player.position.toSeconds())
+                        emit(MusicEvents.PLAYBACK_ENDED_REASON, this)
+                    }
+                }
             }
         }
     }

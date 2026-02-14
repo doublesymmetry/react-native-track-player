@@ -25,6 +25,8 @@ enum EventType: String, CaseIterable {
     case PlaybackErrorLog = "playback-error-log"
     case PlaybackBufferEmpty = "playback-buffer-empty"
     case PlaybackBufferFull = "playback-buffer-full"
+    case PlaybackSeekCompleted = "playback-seek-completed"
+    case PlaybackEndedWithReason = "playback-ended-reason"
     case MetadataChapterReceived = "metadata-chapter-received"
     case MetadataTimedReceived = "metadata-timed-received"
     case MetadataCommonReceived = "metadata-common-received"

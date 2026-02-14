@@ -49,6 +49,8 @@ class MusicEvents(private val reactContext: ReactContext) : BroadcastReceiver() 
         const val PLAYBACK_ERROR_LOG = "playback-error-log"
         const val PLAYBACK_BUFFER_EMPTY = "playback-buffer-empty"
         const val PLAYBACK_BUFFER_FULL = "playback-buffer-full"
+        const val PLAYBACK_SEEK_COMPLETED = "playback-seek-completed"
+        const val PLAYBACK_ENDED_REASON = "playback-ended-reason"
 
         // Metadata Events
         const val METADATA_CHAPTER_RECEIVED = "metadata-chapter-received"
