@@ -42,6 +42,10 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
         player.event.currentItem.addListener(self, handleAudioPlayerCurrentItemChange)
         player.event.secondElapse.addListener(self, handleAudioPlayerSecondElapse)
         player.event.playWhenReadyChange.addListener(self, handlePlayWhenReadyChange)
+        player.event.playbackStalled.addListener(self, handlePlaybackStalled)
+        player.event.newErrorLogEntry.addListener(self, handleNewErrorLogEntry)
+        player.event.bufferEmpty.addListener(self, handleBufferEmpty)
+        player.event.bufferFull.addListener(self, handleBufferFull)
     }
 
     deinit {
@@ -813,6 +817,43 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
             event: EventType.PlaybackPlayWhenReadyChanged,
             body: [
                 "playWhenReady": playWhenReady
+            ]
+        )
+    }
+
+    func handlePlaybackStalled(_: ()) {
+        emit(
+            event: EventType.PlaybackStalled,
+            body: [
+                "track": player.currentIndex,
+                "position": player.currentTime,
+            ] as [String : Any]
+        )
+    }
+
+    func handleNewErrorLogEntry(entries: [[String: Any]]) {
+        emit(
+            event: EventType.PlaybackErrorLog,
+            body: [
+                "entries": entries
+            ]
+        )
+    }
+
+    func handleBufferEmpty(isEmpty: Bool) {
+        emit(
+            event: EventType.PlaybackBufferEmpty,
+            body: [
+                "isEmpty": isEmpty
+            ]
+        )
+    }
+
+    func handleBufferFull(isFull: Bool) {
+        emit(
+            event: EventType.PlaybackBufferFull,
+            body: [
+                "isFull": isFull
             ]
         )
     }

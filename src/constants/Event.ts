@@ -112,6 +112,29 @@ export enum Event {
    * See https://rntp.dev/docs/api/events#remoteskip
    **/
   RemoteSkip = 'remote-skip',
+  /**
+   * Fired when playback has stalled due to insufficient buffered data.
+   * On iOS this maps to AVPlayerItemPlaybackStalled; on Android it
+   * fires when the player transitions from PLAYING to BUFFERING.
+   **/
+  PlaybackStalled = 'playback-stalled',
+  /**
+   * (iOS only) Fired when a new error log entry is added by AVPlayer.
+   * Contains transient streaming errors (e.g. segment download failures)
+   * that may not stop playback.
+   **/
+  PlaybackErrorLog = 'playback-error-log',
+  /**
+   * Fired when the playback buffer empty state changes.
+   * On iOS this maps to AVPlayerItem.isPlaybackBufferEmpty KVO;
+   * on Android it fires based on state transitions.
+   **/
+  PlaybackBufferEmpty = 'playback-buffer-empty',
+  /**
+   * (iOS only) Fired when the playback buffer full state changes.
+   * Maps to AVPlayerItem.isPlaybackBufferFull KVO.
+   **/
+  PlaybackBufferFull = 'playback-buffer-full',
   /** (iOS only) Fired when chapter metadata is received.
    * See https://rntp.dev/docs/api/events#chaptermetadatareceived
    **/

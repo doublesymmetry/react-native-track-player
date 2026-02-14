@@ -45,6 +45,10 @@ class MusicEvents(private val reactContext: ReactContext) : BroadcastReceiver() 
         const val PLAYBACK_PROGRESS_UPDATED = "playback-progress-updated"
         const val PLAYBACK_ERROR = "playback-error"
         const val PLAYBACK_RESUME = "android-playback-resume"
+        const val PLAYBACK_STALLED = "playback-stalled"
+        const val PLAYBACK_ERROR_LOG = "playback-error-log"
+        const val PLAYBACK_BUFFER_EMPTY = "playback-buffer-empty"
+        const val PLAYBACK_BUFFER_FULL = "playback-buffer-full"
 
         // Metadata Events
         const val METADATA_CHAPTER_RECEIVED = "metadata-chapter-received"

@@ -527,12 +527,37 @@ class MusicService : HeadlessJsMediaService() {
     @MainThread
     private fun observeEvents() {
         scope.launch {
+            var previousState: AudioPlayerState? = null
             event.stateChange.collect {
                 emit(MusicEvents.PLAYBACK_STATE, getPlayerStateBundle(it))
 
                 if (it == AudioPlayerState.ENDED && player.nextItem == null) {
                     emitQueueEndedEvent()
                 }
+
+                // Detect stall: transition from PLAYING to BUFFERING means the buffer ran dry
+                if (previousState == AudioPlayerState.PLAYING && it == AudioPlayerState.BUFFERING) {
+                    Bundle().apply {
+                        putInt(TRACK_KEY, player.currentIndex)
+                        putDouble(POSITION_KEY, player.position.toSeconds())
+                        emit(MusicEvents.PLAYBACK_STALLED, this)
+                    }
+                    Bundle().apply {
+                        putBoolean("isEmpty", true)
+                        emit(MusicEvents.PLAYBACK_BUFFER_EMPTY, this)
+                    }
+                }
+
+                // Detect buffer recovery: BUFFERING -> PLAYING/READY means buffer is no longer empty
+                if (previousState == AudioPlayerState.BUFFERING &&
+                    (it == AudioPlayerState.PLAYING || it == AudioPlayerState.READY)) {
+                    Bundle().apply {
+                        putBoolean("isEmpty", false)
+                        emit(MusicEvents.PLAYBACK_BUFFER_EMPTY, this)
+                    }
+                }
+
+                previousState = it
             }
         }
 
