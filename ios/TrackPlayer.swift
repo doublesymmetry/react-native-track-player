@@ -23,6 +23,7 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
     private var shouldResumePlaybackAfterInterruptionEnds: Bool = false
     private var forwardJumpInterval: NSNumber? = nil;
     private var backwardJumpInterval: NSNumber? = nil;
+    private var nextPreviousCommandTargets: [Any] = []
     private var sessionCategory: AVAudioSession.Category = .playback
     private var sessionCategoryMode: AVAudioSession.Mode = .default
     private var sessionCategoryPolicy: AVAudioSession.RouteSharingPolicy = .default
@@ -283,11 +284,56 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
                 )
             }
 
+        // Configure next/previous track commands to act as skip forward/backward.
+        // This enables AirPods double/triple-press to seek without affecting the
+        // lock screen UI (which continues to show skip-interval buttons).
+        configureNextPreviousAsSkip(
+            enabled: options["iosNextPreviousCommandsSkip"] as? Bool ?? false
+        )
+
         configureProgressUpdateEvent(
             interval: ((options["progressUpdateEventInterval"] as? NSNumber) ?? 0).doubleValue
         )
 
         resolve(NSNull())
+    }
+
+    /// Registers `nextTrackCommand` / `previousTrackCommand` on the shared
+    /// `MPRemoteCommandCenter` with handlers that seek by the configured jump
+    /// intervals. This enables AirPods double-press (skip forward) and
+    /// triple-press (skip backward) without adding `SkipToNext` /
+    /// `SkipToPrevious` to the capabilities array, so the lock screen / Control
+    /// Center continues to show skip-interval buttons instead of next/previous
+    /// track arrows.
+    private func configureNextPreviousAsSkip(enabled: Bool) {
+        let commandCenter = MPRemoteCommandCenter.shared()
+
+        // Always clean up previously registered targets first
+        for target in nextPreviousCommandTargets {
+            commandCenter.nextTrackCommand.removeTarget(target)
+            commandCenter.previousTrackCommand.removeTarget(target)
+        }
+        nextPreviousCommandTargets.removeAll()
+
+        guard enabled else { return }
+
+        commandCenter.nextTrackCommand.isEnabled = true
+        let nextTarget = commandCenter.nextTrackCommand.addTarget { [weak self] _ in
+            guard let self = self else { return .commandFailed }
+            let interval = self.forwardJumpInterval?.doubleValue ?? 30.0
+            self.player.seek(to: self.player.currentTime + interval)
+            return .success
+        }
+        nextPreviousCommandTargets.append(nextTarget)
+
+        commandCenter.previousTrackCommand.isEnabled = true
+        let prevTarget = commandCenter.previousTrackCommand.addTarget { [weak self] _ in
+            guard let self = self else { return .commandFailed }
+            let interval = self.backwardJumpInterval?.doubleValue ?? 15.0
+            self.player.seek(to: max(self.player.currentTime - interval, 0))
+            return .success
+        }
+        nextPreviousCommandTargets.append(prevTarget)
     }
 
     private func configureProgressUpdateEvent(interval: Double) {

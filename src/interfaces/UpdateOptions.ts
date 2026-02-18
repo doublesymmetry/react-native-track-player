@@ -14,6 +14,21 @@ export interface UpdateOptions {
   dislikeOptions?: FeedbackOptions;
   bookmarkOptions?: FeedbackOptions;
 
+  /**
+   * iOS only. When `true`, registers `nextTrackCommand` and
+   * `previousTrackCommand` on `MPRemoteCommandCenter` but routes them to skip
+   * forward / backward by the configured jump intervals instead of emitting
+   * `Event.RemoteNext` / `Event.RemotePrevious`.
+   *
+   * This enables AirPods double-press (skip forward) and triple-press (skip
+   * backward) without changing the lock screen / Control Center UI, which will
+   * continue to show the skip-interval buttons when `Capability.JumpForward`
+   * and `Capability.JumpBackward` are in the `capabilities` array.
+   *
+   * Default: `false`
+   */
+  iosNextPreviousCommandsSkip?: boolean;
+
   capabilities?: Capability[];
 
   // android
