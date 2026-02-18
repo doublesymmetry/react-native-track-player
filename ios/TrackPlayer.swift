@@ -244,12 +244,16 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
         // activate the audio session when there is an item to be played
         // and the player has been configured to start when it is ready loading:
         if (player.playWhenReady) {
-            try? audioSessionController.activateSession()
+            // Set the category BEFORE activating the session so that the session
+            // activates with .playback (required for lock screen controls).
+            // Previously, activateSession() was called first, which caused the
+            // session to activate with the default .soloAmbient category.
             if #available(iOS 11.0, *) {
                 try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, policy: sessionCategoryPolicy, options: sessionCategoryOptions)
             } else {
                 try? AVAudioSession.sharedInstance().setCategory(sessionCategory, mode: sessionCategoryMode, options: sessionCategoryOptions)
             }
+            try? audioSessionController.activateSession()
         }
     }
 
@@ -468,6 +472,22 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
     public func play(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
         player.play()
+
+        // Synchronously publish now playing info so it is available immediately
+        // when the lock screen renders. The NowPlayingInfoController in SwiftAudioEx
+        // publishes asynchronously via a concurrent dispatch queue, which can race
+        // against the lock screen appearing — the info is still nil when iOS queries it.
+        // This is observable when the user locks the screen immediately after pressing play.
+        if let item = player.currentItem {
+            var nowPlayingInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
+            nowPlayingInfo[MPMediaItemPropertyTitle] = item.getTitle()
+            nowPlayingInfo[MPMediaItemPropertyArtist] = item.getArtist()
+            nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = item.getAlbumTitle()
+            nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 1.0
+            nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = (item as? Track)?.duration
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+        }
+
         resolve(NSNull())
     }
 
