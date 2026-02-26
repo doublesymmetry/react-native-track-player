@@ -91,7 +91,13 @@ class QueuedAudioPlayer(
         if (queue.isEmpty()) {
             add(item)
         } else {
-            exoPlayer.addMediaItem(currentIndex + 1, item.toMediaItem())
+            val mediaItem = item.toMediaItem()
+            // Keep the Kotlin queue in sync with ExoPlayer's internal queue.
+            // Without this, queue[0] always returns the first-ever loaded station,
+            // causing updateMetadataForTrack to replace the current stream URL with
+            // the original station's URL every time metadata is refreshed.
+            queue[currentIndex] = mediaItem
+            exoPlayer.addMediaItem(currentIndex + 1, mediaItem)
             exoPlayer.removeMediaItem(currentIndex)
             exoPlayer.seekTo(currentIndex, C.TIME_UNSET)
             exoPlayer.prepare()
