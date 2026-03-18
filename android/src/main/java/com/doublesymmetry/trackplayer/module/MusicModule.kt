@@ -541,7 +541,7 @@ class MusicModule(reactContext: ReactApplicationContext) : NativeTrackPlayerSpec
 
     override fun getPlaybackState(callback: Promise) = launchInScope {
         if (verifyServiceBoundOrReject(callback)) return@launchInScope
-        callback.resolve(Arguments.fromBundle(musicService.getPlayerStateBundle(musicService.state)))
+        callback.resolve(Arguments.fromBundle(musicService.getPlayerStateBundle(musicService.state) ?: Bundle()))
     }
 
     override fun acquireWakeLock(callback: Promise) = launchInScope {
