@@ -674,16 +674,24 @@ class MusicService : HeadlessJsMediaService() {
     @SuppressLint("VisibleForTests")
     @MainThread
     fun emit(event: String, data: Bundle? = null) {
-        reactContext?.emitDeviceEvent(event, data?.let { Arguments.fromBundle(it) })
+        try {
+            reactContext?.emitDeviceEvent(event, data?.let { Arguments.fromBundle(it) })
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to emit event: $event")
+        }
     }
 
     @SuppressLint("VisibleForTests")
     @MainThread
     private fun emitList(event: String, data: List<Bundle> = emptyList()) {
-        val payload = Arguments.createArray()
-        data.forEach { payload.pushMap(Arguments.fromBundle(it)) }
+        try {
+            val payload = Arguments.createArray()
+            data.forEach { payload.pushMap(Arguments.fromBundle(it)) }
 
-        reactContext?.emitDeviceEvent(event, payload)
+            reactContext?.emitDeviceEvent(event, payload)
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to emitList event: $event")
+        }
     }
 
     override fun getTaskConfig(intent: Intent?): HeadlessJsTaskConfig {

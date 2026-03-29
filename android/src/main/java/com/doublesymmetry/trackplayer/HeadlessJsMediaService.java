@@ -183,7 +183,7 @@
     protected ReactContext getReactContext() {
         if (DefaultNewArchitectureEntryPoint.getBridgelessEnabled()) {
             ReactHost reactHost = getReactHost();
-            Assertions.assertNotNull(reactHost, "React host is null in newArchitecture");
+            if (reactHost == null) { return null; }
             return reactHost.getCurrentReactContext();
         }
 
@@ -197,6 +197,7 @@
 
         if (DefaultNewArchitectureEntryPoint.getBridgelessEnabled()) { // new arch
             final ReactHost reactHost = getReactHost();
+            if (reactHost == null) { return; }
             reactHost.addReactInstanceEventListener(
                     new ReactInstanceEventListener() {
                         @Override
