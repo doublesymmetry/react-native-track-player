@@ -161,7 +161,6 @@ class MusicService : HeadlessJsMediaService() {
         }
 
     private var latestOptions: Bundle? = null
-    private var commandStarted = false
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         onStartCommandIntentValid = intent != null
@@ -170,11 +169,9 @@ class MusicService : HeadlessJsMediaService() {
             // HACK: this is not supposed to be here. I definitely screwed up. but Why?
             onMediaKeyEvent(intent)
         }
-        // HACK: Why is onPlay triggering onStartCommand??
-        if (!commandStarted) {
-            commandStarted = true
-            super.onStartCommand(intent, flags, startId)
-        }
+      // always forward to super (unconditionally) so Media3 processes all intents
+      // including CUSTOM_NOTIFICATION_ACTION for next/previous/jump buttons.
+        super.onStartCommand(intent, flags, startId)
         return START_STICKY
     }
 
