@@ -796,6 +796,11 @@ class MusicService : HeadlessJsMediaService() {
             Timber.d("Releasing media session and destroying player")
             mediaSession.release()
             player.destroy()
+        } else {
+            // release fakePlayer and mediaSession even when player was not initialized
+            // to prevent resource leaks on service restart
+            fakePlayer.release()
+            mediaSession.release()
         }
 
         progressUpdateJob?.cancel()
