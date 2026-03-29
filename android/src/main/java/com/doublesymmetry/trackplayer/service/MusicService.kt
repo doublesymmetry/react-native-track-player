@@ -175,7 +175,11 @@ class MusicService : HeadlessJsMediaService() {
             commandStarted = true
             super.onStartCommand(intent, flags, startId)
         }
-        return START_STICKY
+        return if (appKilledPlaybackBehavior == AppKilledPlaybackBehavior.STOP_PLAYBACK_AND_REMOVE_NOTIFICATION) {
+            START_NOT_STICKY // use START_NOT_STICKY to prevent service restart after exitProcess(0)
+        } else {
+            START_STICKY // allow background playback to persist for CONTINUE_PLAYBACK and PAUSE_PLAYBACK
+        }
     }
 
     @MainThread
