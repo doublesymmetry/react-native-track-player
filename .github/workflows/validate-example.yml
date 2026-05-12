@@ -126,7 +126,7 @@ jobs:
         run: cd example/android && ./gradlew assembleDebug
 
   build-ios:
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -158,14 +158,18 @@ jobs:
         env:
           NO_FLIPPER: 1
 
+      - name: Select Xcode 26.4
+        run: sudo xcode-select -s /Applications/Xcode_26.4.1.app/Contents/Developer
+
       - name: Build example for iOS
         run: |
+          set -o pipefail
           cd example/ios
           xcodebuild \
             -workspace TrackPlayerExample.xcworkspace \
             -scheme TrackPlayerExample \
             -sdk iphonesimulator \
             -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -destination 'platform=iOS Simulator,name=iPhone 17' \
             build \
-            | tail -20
+            | tail -50
