@@ -2767,7 +2767,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNTPPlayer (5.0.0):
+  - RNTPPlayer (5.1.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -3263,7 +3263,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: 77eecab5fd636666ca73a55bb61e2f1a685b7e84
   RNReanimated: 361d5b8e20a77cd1f7907ad301f6d51ef79c1545
   RNScreens: 69f68c95d395bc4261d27c3aae7b4a458b947b7e
-  RNTPPlayer: 54fa174461e1e0cec32d9709151a30eacb94d0e6
+  RNTPPlayer: d3ff34fb6044dc39201b2ad4928fa22a9927fd7e
   RNVectorIcons: 6acc19c833be864e9c70894e101a587fe491150a
   RNWorklets: b94f5c1b61a985c309dcc0092aacf41515cc39d6
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748

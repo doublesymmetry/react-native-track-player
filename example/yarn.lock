@@ -1850,10 +1850,10 @@
   dependencies:
     nanoid "^3.1.23"
 
-"@rntp/player@^5.0.0":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@rntp/player/-/player-5.0.0.tgz#d27ead475a2f1244de53f421812b84903779a7f0"
-  integrity sha512-fBZ+J+GZx56npFQcuv4XW4fNs2GUYBGISZjlIXl6sPnYrlLfeYppd/RXHIJbri9/X6pVi2jR/0nvw7S8323NxQ==
+"@rntp/player@^5.3.0":
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/@rntp/player/-/player-5.3.0.tgz#2e2c0600aca95e9826cf01c4f60f897aaf9e74cb"
+  integrity sha512-zpzfCd405TcjQ3gWQqZhUHzuGh2LFbKORNICj/YDNNUa+Fl9s7pwEYg+KAZWfT/YnwQJv0LQsyzIx7ppTiAPRA==
 
 "@sideway/address@^4.1.5":
   version "4.1.5"

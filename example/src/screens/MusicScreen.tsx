@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -19,7 +19,8 @@ import TrackPlayer, {
 } from '@rntp/player';
 import { PlaybackState } from '@rntp/player';
 import { usePlaybackSourceStore } from '../stores/playbackSource';
-import { album } from '../data/music';
+import { buildAlbum } from '../data/music';
+import { useDownloadedTrackStore } from '../stores/downloadedTrack';
 import { formatDuration } from '../lib/formatTime';
 import { cn } from '../lib/cn';
 
@@ -45,6 +46,11 @@ export default function MusicScreen() {
   const playbackState = usePlaybackState();
 
   const setSource = usePlaybackSourceStore(s => s.setSource);
+  const downloadedFileUri = useDownloadedTrackStore(s => s.fileUri);
+  const album = useMemo(
+    () => buildAlbum(downloadedFileUri),
+    [downloadedFileUri],
+  );
 
   const playAlbum = useCallback(
     (startIndex = 0) => {
@@ -61,7 +67,7 @@ export default function MusicScreen() {
       TrackPlayer.setMediaItems(album.tracks, startIndex);
       TrackPlayer.play();
     },
-    [setSource],
+    [setSource, album.tracks],
   );
 
   const shuffleAlbum = useCallback(() => {
@@ -78,7 +84,7 @@ export default function MusicScreen() {
     TrackPlayer.setMediaItems(album.tracks);
     TrackPlayer.setShuffleEnabled(true);
     TrackPlayer.play();
-  }, [setSource]);
+  }, [setSource, album.tracks]);
 
   const contentContainerStyle = {
     paddingTop: insets.top + 16,

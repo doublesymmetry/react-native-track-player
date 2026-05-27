@@ -12,6 +12,10 @@
 		5C01D7F4F7110B6E5D3DA502 /* libPods-TrackPlayerExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5AA6040636196903910675F /* libPods-TrackPlayerExample.a */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		A1B2C3D400000001LOCALMP3 /* one_love_two_love.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000002LOCALMP3 /* one_love_two_love.mp3 */; };
+		A1B2C3D400000003HELPER01 /* LocalAssetHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000004HELPER01 /* LocalAssetHelper.swift */; };
+		A1B2C3D400000005HELPER02 /* LocalAssetHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000006HELPER02 /* LocalAssetHelper.mm */; };
+		A1B2C3D400000007SEAAWAIT /* the_sea_awaits.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000008SEAAWAIT /* the_sea_awaits.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +27,10 @@
 		2DD1E159FA463B0C528C8679 /* Pods-TrackPlayerExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TrackPlayerExample.release.xcconfig"; path = "Target Support Files/Pods-TrackPlayerExample/Pods-TrackPlayerExample.release.xcconfig"; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = TrackPlayerExample/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = TrackPlayerExample/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		A1B2C3D400000002LOCALMP3 /* one_love_two_love.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = one_love_two_love.mp3; path = TrackPlayerExample/one_love_two_love.mp3; sourceTree = "<group>"; };
+		A1B2C3D400000004HELPER01 /* LocalAssetHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LocalAssetHelper.swift; path = TrackPlayerExample/LocalAssetHelper.swift; sourceTree = "<group>"; };
+		A1B2C3D400000006HELPER02 /* LocalAssetHelper.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = LocalAssetHelper.mm; path = TrackPlayerExample/LocalAssetHelper.mm; sourceTree = "<group>"; };
+		A1B2C3D400000008SEAAWAIT /* the_sea_awaits.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = the_sea_awaits.mp3; path = TrackPlayerExample/the_sea_awaits.mp3; sourceTree = "<group>"; };
 		D5AA6040636196903910675F /* libPods-TrackPlayerExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-TrackPlayerExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -47,6 +55,10 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
+				A1B2C3D400000002LOCALMP3 /* one_love_two_love.mp3 */,
+				A1B2C3D400000004HELPER01 /* LocalAssetHelper.swift */,
+				A1B2C3D400000006HELPER02 /* LocalAssetHelper.mm */,
+				A1B2C3D400000008SEAAWAIT /* the_sea_awaits.mp3 */,
 			);
 			name = TrackPlayerExample;
 			sourceTree = "<group>";
@@ -161,6 +173,8 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				53A5A39B182EDDD94ED7523E /* PrivacyInfo.xcprivacy in Resources */,
+				A1B2C3D400000001LOCALMP3 /* one_love_two_love.mp3 in Resources */,
+				A1B2C3D400000007SEAAWAIT /* the_sea_awaits.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -247,6 +261,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				761780ED2CA45674006654EE /* AppDelegate.swift in Sources */,
+				A1B2C3D400000003HELPER01 /* LocalAssetHelper.swift in Sources */,
+				A1B2C3D400000005HELPER02 /* LocalAssetHelper.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

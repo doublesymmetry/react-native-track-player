@@ -1,9 +1,9 @@
+import type { BackgroundEvent } from '@rntp/player';
 import { useEventLogStore } from '../stores/eventLog';
 
-// On Android, HeadlessJS delivers { event: string, payload: Record<string, unknown> }
-export async function TaskService(data: {
-  event: string;
-  payload?: Record<string, unknown>;
-}) {
-  useEventLogStore.getState().addLog(data.event, data.payload);
+export async function TaskService(event: BackgroundEvent) {
+  const { type, ...payload } = event;
+  useEventLogStore
+    .getState()
+    .addLog(type, Object.keys(payload).length > 0 ? payload : undefined);
 }

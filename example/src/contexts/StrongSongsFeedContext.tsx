@@ -9,7 +9,8 @@ import {
 import TrackPlayer, { type BrowseItem } from '@rntp/player';
 import type { PodcastShowFromFeed } from '../data/strongSongsFeed';
 import { fetchStrongSongsFeed } from '../data/strongSongsFeed';
-import { album } from '../data/music';
+import { buildAlbum } from '../data/music';
+import { useDownloadedTrackStore } from '../stores/downloadedTrack';
 import { radioStations } from '../data/radio';
 
 export type StrongSongsFeedValue = {
@@ -29,6 +30,7 @@ export function StrongSongsFeedProvider({ children }: { children: ReactNode }) {
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
+    const album = buildAlbum(useDownloadedTrackStore.getState().fileUri);
     try {
       const data = await fetchStrongSongsFeed();
       setShow(data);
@@ -107,6 +109,11 @@ export function StrongSongsFeedProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     load();
   }, [load]);
+
+  const downloadedFileUri = useDownloadedTrackStore(s => s.fileUri);
+  useEffect(() => {
+    if (downloadedFileUri) load();
+  }, [downloadedFileUri, load]);
 
   const value: StrongSongsFeedValue = {
     show,

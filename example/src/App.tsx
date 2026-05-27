@@ -25,6 +25,9 @@ import TrackPlayer, {
   useActiveMediaItem,
 } from '@rntp/player';
 import { useEventLogStore } from './stores/eventLog';
+import { useDownloadedTrackStore } from './stores/downloadedTrack';
+import { ensureDownloadedTrack } from './lib/downloadedTracks';
+import { FILE_TRACK_RESOURCE_NAME, FILE_TRACK_RESOURCE_EXT } from './data/music';
 
 import MusicScreen from './screens/MusicScreen';
 import PodcastScreen from './screens/PodcastScreen';
@@ -132,8 +135,19 @@ function AppContent() {
     }
   }, []);
 
-  // On iOS, listen to all events in the foreground since there's no background
-  // service. On Android this is handled by the background event handler.
+  // Copy a native resource to Documents so the file:// demo track is available.
+  useEffect(() => {
+    if (!isReady) return;
+    let cancelled = false;
+    ensureDownloadedTrack(FILE_TRACK_RESOURCE_NAME, FILE_TRACK_RESOURCE_EXT).then(uri => {
+      if (!cancelled) useDownloadedTrackStore.getState().setFileUri(uri);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isReady]);
+
+  // iOS: all events here. Android: foreground here; background → TaskService (index.js).
   useEffect(() => {
     if (Platform.OS !== 'ios' || !isReady) return;
     const addLog = useEventLogStore.getState().addLog;
