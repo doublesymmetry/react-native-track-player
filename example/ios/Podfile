@@ -30,5 +30,32 @@ target 'TrackPlayerExample' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+
+    # Fix glog build failure under Swift/Clang module interop (react-native-video's
+    # NitroModules dependency + Xcode 16+): "import of module 'glog.glog.log_severity'
+    # appears within namespace 'google'".
+    #
+    # CocoaPods generates a glog modulemap with per-header submodules
+    # (`module * { export * }`), but glog/logging.h textually #includes
+    # log_severity.h and vlog_is_on.h *inside* `namespace google { ... }`. That's
+    # legal for textual includes, but NitroModules' public Swift modulemap pulls in
+    # React renderer headers -> react_native_assert.h -> <glog/logging.h>, forcing
+    # Swift's Clang importer to build glog as a real module. The namespaced include
+    # then becomes an illegal submodule import.
+    #
+    # Excluding log_severity.h / vlog_is_on.h from the glog module keeps every
+    # include of them textual (as they're designed to be used), while glog is still
+    # otherwise importable as a module (e.g. `#include <glog/logging.h>`).
+    glog_modulemap = File.join(installer.sandbox.root, 'Target Support Files', 'glog', 'glog.modulemap')
+    if File.exist?(glog_modulemap)
+      File.write(glog_modulemap, <<~MODULEMAP)
+        module glog {
+          umbrella header "glog-umbrella.h"
+          exclude header "glog/log_severity.h"
+          exclude header "glog/vlog_is_on.h"
+          export *
+        }
+      MODULEMAP
+    end
   end
 end

@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -23,6 +23,7 @@ import { buildAlbum } from '../data/music';
 import { useDownloadedTrackStore } from '../stores/downloadedTrack';
 import { formatDuration } from '../lib/formatTime';
 import { cn } from '../lib/cn';
+import TestVideo from '../components/TestVideo';
 
 const buttonIconColors = {
   light: {
@@ -52,6 +53,8 @@ export default function MusicScreen() {
     [downloadedFileUri],
   );
 
+  const [showVideo, setShowVideo] = useState(true);
+
   const playAlbum = useCallback(
     (startIndex = 0) => {
       TrackPlayer.setPlaybackSpeed(1);
@@ -59,10 +62,12 @@ export default function MusicScreen() {
       TrackPlayer.setCommands({
         capabilities: [
           PlayerCommand.PlayPause,
-          PlayerCommand.Next,
-          PlayerCommand.Previous,
+          PlayerCommand.SkipForward,
+          PlayerCommand.SkipBackward,
           PlayerCommand.Seek,
         ],
+        forwardInterval: 15,
+        backwardInterval: 15,
       });
       TrackPlayer.setMediaItems(album.tracks, startIndex);
       TrackPlayer.play();
@@ -208,6 +213,20 @@ export default function MusicScreen() {
           );
         })}
       </View>
+      {showVideo && (
+        <View className="items-center mt-4 gap-2">
+          <TestVideo />
+          <TouchableOpacity
+            className="px-4 py-2 rounded-full bg-secondary"
+            onPress={() => setShowVideo(false)}
+            activeOpacity={0.8}
+          >
+            <Text className="text-secondary-foreground font-bold text-sm">
+              Remove video
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </ScrollView>
   );
 }
