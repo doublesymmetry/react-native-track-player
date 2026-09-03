@@ -13,7 +13,7 @@
     "@react-navigation/bottom-tabs": "^6.6.1",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/native-stack": "^6.0.0",
-    "@rntp/player": "^5.3.0",
+    "@rntp/player": "^5.9.2",
     "clsx": "^2.1.1",
     "fast-xml-parser": "^4.3.2",
     "nativewind": "^4.2.2",
@@ -21,10 +21,12 @@
     "react-native": "0.83.9",
     "react-native-css-interop": "^0.2.2",
     "react-native-gesture-handler": "^2.17.1",
+    "react-native-nitro-modules": "^0.37.1",
     "react-native-reanimated": "^4.2.0",
     "react-native-safe-area-context": "^5.6.2",
     "react-native-screens": "^4.19.0",
     "react-native-vector-icons": "^10.2.0",
+    "react-native-video": "7.0.0-beta.11",
     "react-native-worklets": "^0.7.0",
     "tailwind-merge": "^3.5.0",
     "tailwindcss": "3",
@@ -52,5 +54,6 @@
   },
   "engines": {
     "node": ">=20"
-  }
+  },
+  "packageManager": "yarn@4.18.0"
 }
