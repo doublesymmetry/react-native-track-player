@@ -159,6 +159,13 @@ jobs:
       - name: Select Xcode 26.4
         run: sudo xcode-select -s /Applications/Xcode_26.4.1.app/Contents/Developer
 
+      - name: Pick an iPhone simulator
+        id: simulator
+        run: |
+          udid=$(xcrun simctl list devices available -j | jq -r '.devices | to_entries | map(select(.key | test("iOS"))) | sort_by(.key) | last | .value | map(select(.name | startswith("iPhone"))) | first | .udid')
+          echo "Using simulator $udid"
+          echo "udid=$udid" >> "$GITHUB_OUTPUT"
+
       - name: Build example for iOS
         run: |
           set -o pipefail
@@ -168,6 +175,6 @@ jobs:
             -scheme TrackPlayerExample \
             -sdk iphonesimulator \
             -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 17' \
+            -destination "id=${{ steps.simulator.outputs.udid }}" \
             build \
             | tail -50
