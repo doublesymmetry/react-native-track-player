@@ -2767,7 +2767,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNTPPlayer (5.1.3):
+  - RNTPPlayer (5.10.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3188,7 +3188,7 @@ SPEC CHECKSUMS:
   FBLazyVector: 3bcb3055086e5d90a12f0fe1668e79f6eceabc17
   fmt: 530618a01105dae0fa3a2f27c81ae11fa8f67eac
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
-  hermes-engine: 52b56f11c317366a3d602c876d3c4a9bbb8699fd
+  hermes-engine: d0a7e4a8916945df2e3f5c35959b89804f08a17c
   RCT-Folly: 121436bcc4611f6bde5c09bf35f0a7a82cef1969
   RCTDeprecation: c7d33f6bc08dbb8be7dfa70d219bfb034480a406
   RCTRequired: 42b13c9504609bae9a9f65673a6b4fcbd8d07bd1
@@ -3263,7 +3263,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: 77eecab5fd636666ca73a55bb61e2f1a685b7e84
   RNReanimated: 361d5b8e20a77cd1f7907ad301f6d51ef79c1545
   RNScreens: 69f68c95d395bc4261d27c3aae7b4a458b947b7e
-  RNTPPlayer: d3ff34fb6044dc39201b2ad4928fa22a9927fd7e
+  RNTPPlayer: b3cfde7a9b6e5ff33181eb37a839c44b96db68a4
   RNVectorIcons: 6acc19c833be864e9c70894e101a587fe491150a
   RNWorklets: b94f5c1b61a985c309dcc0092aacf41515cc39d6
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748

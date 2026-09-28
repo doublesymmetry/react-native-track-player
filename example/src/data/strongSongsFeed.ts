@@ -23,8 +23,10 @@ function attr(obj: unknown, key: string): string | undefined {
   return typeof v === 'string' ? v : undefined;
 }
 
-export async function fetchStrongSongsFeed(): Promise<PodcastShowFromFeed> {
-  const res = await fetch(STRONG_SONGS_RSS);
+export async function fetchStrongSongsFeed(
+  signal?: AbortSignal,
+): Promise<PodcastShowFromFeed> {
+  const res = await fetch(STRONG_SONGS_RSS, { signal });
   if (!res.ok) throw new Error(`Feed failed: ${res.status}`);
   const xml = await res.text();
 

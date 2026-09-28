@@ -123,7 +123,7 @@ jobs:
       - name: Build example for Android
         env:
           JAVA_OPTS: "-XX:MaxHeapSize=6g"
-        run: cd example/android && ./gradlew assembleDebug
+        run: cd example/android && ./gradlew :app:assembleDebug -PreactNativeArchitectures=x86_64
 
   build-ios:
     runs-on: macos-26
@@ -151,13 +151,20 @@ jobs:
           key: ${{ runner.os }}-cocoapods-${{ hashFiles('example/ios/Podfile', 'example/ios/Podfile.lock') }}
 
       - name: Install cocoapods
-        if: steps.cocoapods-cache.outputs.cache-hit != 'true'
+        # Always run: pod install also writes React Native codegen output, which the Pods cache does not hold.
         run: cd example/ios && pod install
         env:
           NO_FLIPPER: 1
 
       - name: Select Xcode 26.4
         run: sudo xcode-select -s /Applications/Xcode_26.4.1.app/Contents/Developer
+
+      - name: Pick an iPhone simulator
+        id: simulator
+        run: |
+          udid=$(xcrun simctl list devices available -j | jq -r '.devices | to_entries | map(select(.key | test("iOS"))) | sort_by(.key) | last | .value | map(select(.name | startswith("iPhone"))) | first | .udid')
+          echo "Using simulator $udid"
+          echo "udid=$udid" >> "$GITHUB_OUTPUT"
 
       - name: Build example for iOS
         run: |
@@ -168,6 +175,6 @@ jobs:
             -scheme TrackPlayerExample \
             -sdk iphonesimulator \
             -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 17' \
+            -destination "id=${{ steps.simulator.outputs.udid }}" \
             build \
             | tail -50

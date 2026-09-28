@@ -34,7 +34,7 @@ interface MiniPlayerProps {
 }
 
 export default function MiniPlayer({ onPress }: MiniPlayerProps) {
-  const colorScheme = useColorScheme() ?? 'light';
+  const colorScheme = useColorScheme() === 'dark' ? 'dark' : 'light';
   const colors = iconColors[colorScheme];
   const activeMediaItem = useActiveMediaItem();
   const isPlaying = useIsPlaying();

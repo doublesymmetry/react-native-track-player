@@ -26,8 +26,8 @@ Built on the New Architecture with synchronous native calls — background playb
 
 ## Requirements
 
-- React Native **0.74** or later
-- **New Architecture** enabled (Fabric + TurboModules)
+- React Native **0.76** or later
+- **New Architecture** enabled (Fabric + TurboModules), with **bridgeless enabled**
 
 ## Installation
 

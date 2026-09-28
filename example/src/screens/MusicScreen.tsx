@@ -39,7 +39,7 @@ const buttonIconColors = {
 
 export default function MusicScreen() {
   const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme() ?? 'light';
+  const colorScheme = useColorScheme() === 'dark' ? 'dark' : 'light';
   const colors = buttonIconColors[colorScheme];
   const activeMediaItem = useActiveMediaItem();
   const isPlaying = useIsPlaying();
@@ -59,6 +59,7 @@ export default function MusicScreen() {
       TrackPlayer.setCommands({
         capabilities: [
           PlayerCommand.PlayPause,
+          PlayerCommand.Stop,
           PlayerCommand.Next,
           PlayerCommand.Previous,
           PlayerCommand.Seek,

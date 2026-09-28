@@ -13,7 +13,7 @@
     "@react-navigation/bottom-tabs": "^6.6.1",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/native-stack": "^6.0.0",
-    "@rntp/player": "^5.3.0",
+    "@rntp/player": "^5.10.0",
     "clsx": "^2.1.1",
     "fast-xml-parser": "^4.3.2",
     "nativewind": "^4.2.2",

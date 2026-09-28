@@ -1,14 +1,12 @@
 import './global.css';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import {
-  ActivityIndicator,
   Platform,
   StatusBar,
   View,
   useColorScheme,
 } from 'react-native';
-import type { EmitterSubscription } from 'react-native';
 import type { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
@@ -19,12 +17,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import TrackPlayer, {
-  DEFAULT_CAST_RECEIVER_APP_ID,
-  Event,
-  useActiveMediaItem,
-} from '@rntp/player';
-import { useEventLogStore } from './stores/eventLog';
+import { useActiveMediaItem } from '@rntp/player';
 import { useDownloadedTrackStore } from './stores/downloadedTrack';
 import { ensureDownloadedTrack } from './lib/downloadedTracks';
 import { FILE_TRACK_RESOURCE_NAME, FILE_TRACK_RESOURCE_EXT } from './data/music';
@@ -104,40 +97,10 @@ export default function App() {
 
 function AppContent() {
   const scheme = useColorScheme();
-  const [isReady, setIsReady] = useState(false);
   useStrongSongsFeed(); // triggers browse tree setup
-
-  useEffect(() => {
-    try {
-      TrackPlayer.setupPlayer({
-        contentType: 'music',
-        handleAudioBecomingNoisy: true,
-        cache: {},
-        progressSync: {
-          intervalSeconds: 5,
-          http: {
-            url: 'http://localhost:3333/progress',
-          },
-        },
-        android: {
-          wakeMode: 'network',
-          skipSilenceEnabled: false,
-          cast: DEFAULT_CAST_RECEIVER_APP_ID,
-        },
-      });
-      setIsReady(true);
-    } catch (error) {
-      if ((error as Error).message?.includes('already set up')) {
-        setIsReady(true);
-      } else {
-        console.error('Failed to setup player:', error);
-      }
-    }
-  }, []);
 
   // Copy a native resource to Documents so the file:// demo track is available.
   useEffect(() => {
-    if (!isReady) return;
     let cancelled = false;
     ensureDownloadedTrack(FILE_TRACK_RESOURCE_NAME, FILE_TRACK_RESOURCE_EXT).then(uri => {
       if (!cancelled) useDownloadedTrackStore.getState().setFileUri(uri);
@@ -145,27 +108,7 @@ function AppContent() {
     return () => {
       cancelled = true;
     };
-  }, [isReady]);
-
-  // iOS: all events here. Android: foreground here; background → TaskService (index.js).
-  useEffect(() => {
-    if (Platform.OS !== 'ios' || !isReady) return;
-    const addLog = useEventLogStore.getState().addLog;
-    const subs: EmitterSubscription[] = Object.values(Event).map(event =>
-      TrackPlayer.addEventListener(event as any, (payload: any) => {
-        addLog(event, payload ?? {});
-      }),
-    );
-    return () => subs.forEach(s => s.remove());
-  }, [isReady]);
-
-  if (!isReady) {
-    return (
-      <View className="flex-1 items-center justify-center bg-background">
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
+  }, []);
 
   return (
     <GestureHandlerRootView className="flex-1">
