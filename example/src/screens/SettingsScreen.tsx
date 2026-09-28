@@ -57,7 +57,7 @@ function LogItem({ item, mutedColor }: { item: LogEntry; mutedColor: string }) {
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme() ?? 'light';
+  const colorScheme = useColorScheme() === 'dark' ? 'dark' : 'light';
   const colors = sectionLabelColors[colorScheme];
   const logs = useEventLogStore(s => s.logs);
   const clearLogs = useEventLogStore(s => s.clearLogs);

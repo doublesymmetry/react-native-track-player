@@ -21,6 +21,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     reactNativeDelegate = delegate
     reactNativeFactory = factory
 
+    // defaultConfiguration() is nil in Release builds, but this initializer's parameter is non-null.
+    factory.rootViewFactory.initializeReactHost(
+      launchOptions: launchOptions,
+      devMenuConfiguration: RCTDevMenuConfiguration.default() ?? RCTDevMenuConfiguration()
+    )
+
     return true
   }
 }

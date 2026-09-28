@@ -32,7 +32,7 @@ const iconColors = {
 
 export default function PodcastScreen() {
   const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme() ?? 'light';
+  const colorScheme = useColorScheme() === 'dark' ? 'dark' : 'light';
   const colors = iconColors[colorScheme];
   const activeMediaItem = useActiveMediaItem();
   const isPlaying = useIsPlaying();

@@ -123,7 +123,7 @@ jobs:
       - name: Build example for Android
         env:
           JAVA_OPTS: "-XX:MaxHeapSize=6g"
-        run: cd example/android && ./gradlew assembleDebug
+        run: cd example/android && ./gradlew :app:assembleDebug -PreactNativeArchitectures=x86_64
 
   build-ios:
     runs-on: macos-26
@@ -151,7 +151,7 @@ jobs:
           key: ${{ runner.os }}-cocoapods-${{ hashFiles('example/ios/Podfile', 'example/ios/Podfile.lock') }}
 
       - name: Install cocoapods
-        if: steps.cocoapods-cache.outputs.cache-hit != 'true'
+        # Always run: pod install also writes React Native codegen output, which the Pods cache does not hold.
         run: cd example/ios && pod install
         env:
           NO_FLIPPER: 1

@@ -48,7 +48,7 @@ const playIconStartMargin = { marginLeft: 3 };
 export default function PlayerScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const colorScheme = useColorScheme() ?? 'light';
+  const colorScheme = useColorScheme() === 'dark' ? 'dark' : 'light';
   const colors = iconColors[colorScheme];
   const activeMediaItem = useActiveMediaItem();
   const isPlaying = useIsPlaying();
@@ -314,7 +314,7 @@ export default function PlayerScreen({ navigation }: Props) {
             className="w-[52px] h-[52px] items-center justify-center"
             onPress={() => {
               if (isLive) {
-                TrackPlayer.seekBy(15);
+                TrackPlayer.seekToLiveEdge();
               } else {
                 TrackPlayer.skipToNext();
               }
