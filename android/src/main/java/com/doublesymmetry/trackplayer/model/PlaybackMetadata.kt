@@ -87,14 +87,14 @@ data class PlaybackMetadata(
                     is IcyInfo -> {
                         val artist: String?
                         val title: String?
-                        val index =
-                            if (entry.title == null) -1 else entry.title!!.indexOf(" - ")
+                        val normalizedTitle = entry.title?.normalizeLegacyIcyPunctuation()
+                        val index = normalizedTitle?.indexOf(" - ") ?: -1
                         if (index != -1) {
-                            artist = entry.title!!.substring(0, index)
-                            title = entry.title!!.substring(index + 3)
+                            artist = normalizedTitle!!.substring(0, index)
+                            title = normalizedTitle.substring(index + 3)
                         } else {
                             artist = null
-                            title = entry.title
+                            title = normalizedTitle
                         }
 
                         return PlaybackMetadata("icy", title = title, url = entry.url, artist = artist)
@@ -198,3 +198,40 @@ data class PlaybackMetadata(
         }
     }
 }
+
+/**
+ * ExoPlayer exposes non-UTF-8 ICY metadata as ISO-8859-1. Some streams use
+ * Windows-1252 punctuation in the C1 range, so map only its defined characters.
+ */
+internal fun String.normalizeLegacyIcyPunctuation(): String = map { character ->
+    when (character) {
+        '\u0080' -> '€'
+        '\u0082' -> '‚'
+        '\u0083' -> 'ƒ'
+        '\u0084' -> '„'
+        '\u0085' -> '…'
+        '\u0086' -> '†'
+        '\u0087' -> '‡'
+        '\u0088' -> 'ˆ'
+        '\u0089' -> '‰'
+        '\u008A' -> 'Š'
+        '\u008B' -> '‹'
+        '\u008C' -> 'Œ'
+        '\u008E' -> 'Ž'
+        '\u0091' -> '‘'
+        '\u0092' -> '’'
+        '\u0093' -> '“'
+        '\u0094' -> '”'
+        '\u0095' -> '•'
+        '\u0096' -> '–'
+        '\u0097' -> '—'
+        '\u0098' -> '˜'
+        '\u0099' -> '™'
+        '\u009A' -> 'š'
+        '\u009B' -> '›'
+        '\u009C' -> 'œ'
+        '\u009E' -> 'ž'
+        '\u009F' -> 'Ÿ'
+        else -> character
+    }
+}.joinToString("")
