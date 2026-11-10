@@ -5,13 +5,11 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.RatingCompat
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.doublesymmetry.kotlinaudio.models.Capability
 import com.doublesymmetry.kotlinaudio.models.RepeatMode
 import com.doublesymmetry.trackplayer.extensions.NumberExt.Companion.toMilliseconds
 import com.doublesymmetry.trackplayer.model.State
 import com.doublesymmetry.trackplayer.model.Track
-import com.doublesymmetry.trackplayer.module.MusicEvents.Companion.EVENT_INTENT
 import com.doublesymmetry.trackplayer.service.MusicService
 import com.doublesymmetry.trackplayer.utils.AppForegroundTracker
 import com.doublesymmetry.trackplayer.utils.RejectionException
@@ -33,6 +31,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     ServiceConnection {
     private var playerOptions: Bundle? = null
     private var isServiceBound = false
+    private var isServiceBindRequested = false
     private var playerSetUpPromise: Promise? = null
     private val scope = MainScope()
     private lateinit var musicService: MusicService
@@ -46,6 +45,15 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     override fun initialize() {
         Timber.plant(Timber.DebugTree())
         AppForegroundTracker.start()
+    }
+
+    override fun invalidate() {
+        // The connection is held by the process-wide LoadedApk, so without this it keeps the old React instance alive after a reload.
+        if (isServiceBindRequested) {
+            context.unbindService(this)
+            isServiceBindRequested = false
+        }
+        super.invalidate()
     }
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
@@ -228,12 +236,6 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         playerSetUpPromise = promise
         playerOptions = bundledData
 
-
-        LocalBroadcastManager.getInstance(context).registerReceiver(
-            MusicEvents(context),
-            IntentFilter(EVENT_INTENT)
-        )
-
         Intent(context, MusicService::class.java).also { intent ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(intent)
@@ -241,6 +243,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
                 context.startService(intent)
             }
             context.bindService(intent, this, Context.BIND_AUTO_CREATE)
+            isServiceBindRequested = true
         }
     }
 
